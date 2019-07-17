@@ -32,7 +32,25 @@
 namespace slib
 {
 
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicWeakRef<Application>, _g_app)
+	namespace priv
+	{
+		namespace app
+		{
+			
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicWeakRef<Application>, g_app)
+
+			typedef HashMap<String, String> EnvironmentList;
+			
+			SLIB_SAFE_STATIC_GETTER(EnvironmentList, getEnvironmentList, EnvironmentList::create())
+
+			SLIB_SAFE_STATIC_GETTER(String, getAppPath, System::getApplicationPath())
+		
+			SLIB_SAFE_STATIC_GETTER(String, getAppDir, System::getApplicationDirectory())
+
+		}
+	}
+
+	using namespace priv::app;
 
 	SLIB_DEFINE_OBJECT(Application, Object)
 
@@ -47,18 +65,18 @@ namespace slib
 
 	Ref<Application> Application::getApp()
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_app)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_app)) {
 			return sl_null;
 		}
-		return _g_app;
+		return g_app;
 	}
 
 	void Application::setApp(Application* app)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_app)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_app)) {
 			return;
 		}
-		_g_app = app;
+		g_app = app;
 	}
 
 	String Application::getExecutablePath()
@@ -186,24 +204,6 @@ namespace slib
 		m_flagCrashRecoverySupport = flagSupport;
 	}
 	
-	namespace priv
-	{
-		namespace app
-		{
-			
-			typedef HashMap<String, String> EnvironmentList;
-			
-			SLIB_SAFE_STATIC_GETTER(EnvironmentList, getEnvironmentList, EnvironmentList::create())
-
-			SLIB_SAFE_STATIC_GETTER(String, getAppPath, System::getApplicationPath())
-		
-			SLIB_SAFE_STATIC_GETTER(String, getAppDir, System::getApplicationDirectory())
-
-		}
-	}
-	
-	using namespace priv::app;
-
 	void Application::setEnvironmentPath(const String& key, const String& path)
 	{
 		EnvironmentList* envMap = getEnvironmentList();

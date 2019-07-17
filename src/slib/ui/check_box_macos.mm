@@ -61,24 +61,12 @@ namespace slib
 			[v setState: (flag ? NSOnState : NSOffState)];
 		}
 	}
-
-	namespace priv
-	{
-		namespace check_box
-		{
-			UISize measureNativeWidgetSize(CheckBox* view)
-			{
-				NSView* handle = UIPlatform::getViewHandle(view);
-				if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
-					NSButton* button = (NSButton*)handle;
-					NSSize size = button.fittingSize;
-					return UISize((sl_ui_len)(size.width), (sl_ui_len)(size.height));
-				}
-				return UISize::zero();
-			}
-		}
-	}
 	
+	sl_bool CheckBox::_measureSize_NW(UISize& _out)
+	{
+		return UIPlatform::measureNativeWidgetFittingSize(this, _out);
+	}
+
 }
 
 #endif

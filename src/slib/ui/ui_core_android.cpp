@@ -48,19 +48,19 @@ namespace slib
 			
 			Ref<UIApp> g_app;
 			
-			SLIB_JNI_BEGIN_CLASS(JAndroidPoint, "android/graphics/Point")
+			SLIB_JNI_BEGIN_CLASS(JPoint, "android/graphics/Point")
 				SLIB_JNI_INT_FIELD(x);
 				SLIB_JNI_INT_FIELD(y);
 			SLIB_JNI_END_CLASS
 
-			SLIB_JNI_BEGIN_CLASS(JAndroidRect, "android/graphics/Rect")
+			SLIB_JNI_BEGIN_CLASS(JRect, "android/graphics/Rect")
 				SLIB_JNI_INT_FIELD(left);
 				SLIB_JNI_INT_FIELD(top);
 				SLIB_JNI_INT_FIELD(right);
 				SLIB_JNI_INT_FIELD(bottom);
 			SLIB_JNI_END_CLASS
 
-			SLIB_JNI_BEGIN_CLASS(JAndroidUtil, "slib/platform/android/ui/Util")
+			SLIB_JNI_BEGIN_CLASS(JUtil, "slib/platform/android/ui/Util")
 				SLIB_JNI_STATIC_METHOD(getDefaultDisplay, "getDefaultDisplay", "(Landroid/app/Activity;)Landroid/view/Display;");
 				SLIB_JNI_STATIC_METHOD(getDisplaySize, "getDisplaySize", "(Landroid/view/Display;)Landroid/graphics/Point;");
 				SLIB_JNI_STATIC_METHOD(getScreenOrientation, "getScreenOrientation", "(Landroid/app/Activity;)I");
@@ -75,7 +75,7 @@ namespace slib
 			void DispatchCallback(JNIEnv* env, jobject _this);
 			void DispatchDelayedCallback(JNIEnv* env, jobject _this, jlong ptr);
 
-			SLIB_JNI_BEGIN_CLASS(JAndroidUiThread, "slib/platform/android/ui/UiThread")
+			SLIB_JNI_BEGIN_CLASS(JUiThread, "slib/platform/android/ui/UiThread")
 				SLIB_JNI_STATIC_METHOD(isUiThread, "isUiThread", "()Z");
 				SLIB_JNI_STATIC_METHOD(dispatch, "dispatch", "()V");
 				SLIB_JNI_STATIC_METHOD(dispatchDelayed, "dispatchDelayed", "(JI)V");
@@ -118,13 +118,13 @@ namespace slib
 			public:
 				static Ref<ScreenImpl> create(jobject display)
 				{
-					JniLocal<jobject> size = JAndroidUtil::getDisplaySize.callObject(sl_null, display);
+					JniLocal<jobject> size = JUtil::getDisplaySize.callObject(sl_null, display);
 					if (size.isNotNull()) {
 						Ref<ScreenImpl> ret = new ScreenImpl();
 						if (ret.isNotNull()) {
 							ret->m_display = display;
-							ret->m_width = JAndroidPoint::x.get(size);
-							ret->m_height = JAndroidPoint::y.get(size);
+							ret->m_width = JPoint::x.get(size);
+							ret->m_height = JPoint::y.get(size);
 							return ret;
 						}
 					}
@@ -257,7 +257,7 @@ namespace slib
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			return (ScreenOrientation)(JAndroidUtil::getScreenOrientation.callInt(sl_null, jactivity));
+			return (ScreenOrientation)(JUtil::getScreenOrientation.callInt(sl_null, jactivity));
 		}
 		return ScreenOrientation::Portrait;
 	}
@@ -268,9 +268,9 @@ namespace slib
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			if (orientations.isEmpty()) {
-				JAndroidUtil::setScreenOrientations.call(sl_null, jactivity, sl_true, sl_true, sl_true, sl_true);
+				JUtil::setScreenOrientations.call(sl_null, jactivity, sl_true, sl_true, sl_true, sl_true);
 			} else {
-				JAndroidUtil::setScreenOrientations.call(sl_null, jactivity,
+				JUtil::setScreenOrientations.call(sl_null, jactivity,
 					orientations.contains(ScreenOrientation::Portrait),
 					orientations.contains(ScreenOrientation::LandscapeRight),
 					orientations.contains(ScreenOrientation::PortraitUpsideDown),
@@ -282,14 +282,14 @@ namespace slib
 
 	sl_bool UI::isUiThread()
 	{
-		return JAndroidUiThread::isUiThread.callBoolean(sl_null) != 0;
+		return JUiThread::isUiThread.callBoolean(sl_null) != 0;
 	}
 
 	void UI::dispatchToUiThread(const Function<void()>& callback, sl_uint32 delayMillis)
 	{
 		if (delayMillis == 0) {
 			if (UIDispatcher::addCallback(callback)) {
-				JAndroidUiThread::dispatch.call(sl_null);
+				JUiThread::dispatch.call(sl_null);
 			}
 		} else {
 			if (delayMillis > 0x7fffffff) {
@@ -297,7 +297,7 @@ namespace slib
 			}
 			sl_reg ptr;
 			if (UIDispatcher::addDelayedCallback(callback, ptr)) {
-				JAndroidUiThread::dispatchDelayed.call(sl_null, (jlong)ptr, delayMillis);
+				JUiThread::dispatchDelayed.call(sl_null, (jlong)ptr, delayMillis);
 			}
 		}
 	}
@@ -306,7 +306,7 @@ namespace slib
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			JniLocal<jstring> jurl = Jni::getJniString(_url);
-			JAndroidUtil::openURL.call(sl_null, jactivity, jurl.get());
+			JUtil::openURL.call(sl_null, jactivity, jurl.get());
 		}
 	}
 	
@@ -319,13 +319,13 @@ namespace slib
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			JniLocal<jobject> jrect = JAndroidUtil::getSafeAreaInsets.callObject(sl_null, jactivity);
+			JniLocal<jobject> jrect = JUtil::getSafeAreaInsets.callObject(sl_null, jactivity);
 			if (jrect.isNotNull()) {
 				UIEdgeInsets ret;
-				ret.left = (sl_ui_len)(JAndroidRect::left.get(jrect));
-				ret.top = (sl_ui_len)(JAndroidRect::top.get(jrect));
-				ret.right = (sl_ui_len)(JAndroidRect::right.get(jrect));
-				ret.bottom = (sl_ui_len)(JAndroidRect::bottom.get(jrect));
+				ret.left = (sl_ui_len)(JRect::left.get(jrect));
+				ret.top = (sl_ui_len)(JRect::top.get(jrect));
+				ret.right = (sl_ui_len)(JRect::right.get(jrect));
+				ret.bottom = (sl_ui_len)(JRect::bottom.get(jrect));
 				return ret;
 			}
 		}
@@ -337,7 +337,7 @@ namespace slib
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			return JAndroidUtil::getStatusBarHeight.callInt(sl_null, jactivity);
+			return JUtil::getStatusBarHeight.callInt(sl_null, jactivity);
 		}
 		return 0;
 	}
@@ -346,7 +346,7 @@ namespace slib
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			JAndroidUtil::setStatusBarStyle.call(sl_null, jactivity, (int)style);
+			JUtil::setStatusBarStyle.call(sl_null, jactivity, (int)style);
 			UIResource::updateDefaultScreenSize();
 		}
 	}
@@ -355,18 +355,18 @@ namespace slib
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			JAndroidUtil::setBadgeNumber.call(sl_null, jactivity, number);
+			JUtil::setBadgeNumber.call(sl_null, jactivity, number);
 		}
 	}
 	
 	void UIPlatform::runLoop(sl_uint32 level)
 	{
-		JAndroidUiThread::runLoop.call(sl_null);
+		JUiThread::runLoop.call(sl_null);
 	}
 
 	void UIPlatform::quitLoop()
 	{
-		JAndroidUiThread::quitLoop.call(sl_null);
+		JUiThread::quitLoop.call(sl_null);
 	}
 
 	void UIPlatform::runApp()

@@ -124,35 +124,43 @@ namespace slib
 		
 	};
 
-	struct _priv_RenderProgramStateItem
+	namespace priv
 	{
-		const char* gl_name;
-		sl_int32 gl_location;
-		sl_uint32 type; // 1: Uniform, 2: Attribute
-		sl_uint32 attrType; // 0: Float, 1: Int8, 2: Uint8, 3: Int16, 4: Uint16
-		sl_uint32 attrOffset;
-		sl_uint32 attrCount;
-	};
+		namespace render_program
+		{
 
+			struct RenderProgramStateItem
+			{
+				const char* gl_name;
+				sl_int32 gl_location;
+				sl_uint32 type; // 1: Uniform, 2: Attribute
+				sl_uint32 attrType; // 0: Float, 1: Int8, 2: Uint8, 3: Int16, 4: Uint16
+				sl_uint32 attrOffset;
+				sl_uint32 attrCount;
+			};
+		
 #define PRIV_SLIB_RENDERPROGRAM_STATE_ITEM(NAME, GL_NAME, TYPE, ATTR_TYPE, ATTR_OFFSET, ATTR_COUNT) \
-	struct T_##NAME { \
-		const char* gl_name; \
-		sl_int32 gl_location; \
-		sl_int32 type; \
-		sl_uint32 attrType; \
-		sl_uint32 attrOffset; \
-		sl_uint32 attrCount; \
-		SLIB_INLINE T_##NAME() : gl_name(GL_NAME), gl_location(-1), type(TYPE), attrType(ATTR_TYPE), attrOffset(ATTR_OFFSET), attrCount(ATTR_COUNT) {} \
-	} NAME;
+			struct T_##NAME { \
+				const char* gl_name; \
+				sl_int32 gl_location; \
+				sl_int32 type; \
+				sl_uint32 attrType; \
+				sl_uint32 attrOffset; \
+				sl_uint32 attrCount; \
+				SLIB_INLINE T_##NAME() : gl_name(GL_NAME), gl_location(-1), type(TYPE), attrType(ATTR_TYPE), attrOffset(ATTR_OFFSET), attrCount(ATTR_COUNT) {} \
+			} NAME;
 
-	class _priv_RenderProgramStateTemplate : public RenderProgramState
-	{
-	public:
-		sl_int32 _indexFirstAttribute;
-		sl_int32 _indexLastAttribute;
-		sl_uint32 _sizeVertexData;
-		_priv_RenderProgramStateItem items[1];
-	};
+			class RenderProgramStateTemplate : public RenderProgramState
+			{
+			public:
+				sl_int32 _indexFirstAttribute;
+				sl_int32 _indexLastAttribute;
+				sl_uint32 _sizeVertexData;
+				RenderProgramStateItem items[1];
+			};
+
+		}
+	}
 
 #define SLIB_RENDER_PROGRAM_STATE_BEGIN(TYPE, VERTEX_TYPE) \
 	class SLIB_EXPORT TYPE : public slib::RenderProgramState \
@@ -247,19 +255,29 @@ namespace slib
 #define SLIB_RENDER_PROGRAM_STATE_ATTRIBUTE_UINT16(NAME, GL_NAME) \
 	PRIV_SLIB_RENDERPROGRAM_STATE_ITEM(GL_NAME, #GL_NAME, 2, 4, (sl_uint32)(sl_size)(&(((VertexType*)0)->MEMBER)), sizeof(((VertexType*)0)->MEMBER)/2)
 
-	class SLIB_EXPORT _priv_RenderProgramTemplate : public RenderProgram
-	{
-	public:
-		sl_bool onInit(RenderEngine* engine, RenderProgramState* state) override;
-		
-		sl_bool onPreRender(RenderEngine* engine, RenderProgramState* state) override;
-		
-		void onPostRender(RenderEngine* engine, RenderProgramState* state) override;
 
-	};
+	namespace priv
+	{
+		namespace render_program
+		{
+
+			class SLIB_EXPORT RenderProgramTemplate : public RenderProgram
+			{
+			public:
+				sl_bool onInit(RenderEngine* engine, RenderProgramState* state) override;
+				
+				sl_bool onPreRender(RenderEngine* engine, RenderProgramState* state) override;
+				
+				void onPostRender(RenderEngine* engine, RenderProgramState* state) override;
+
+			};
+
+		}
+	}
+
 
 	template <class StateType>
-	class SLIB_EXPORT RenderProgramT : public _priv_RenderProgramTemplate
+	class SLIB_EXPORT RenderProgramT : public priv::render_program::RenderProgramTemplate
 	{
 	public:
 		Ref<RenderProgramState> onCreate(RenderEngine* engine) override

@@ -392,17 +392,26 @@ namespace slib
 		drawPath(path, Ref<Pen>::null(), color);
 	}
 	
-	SLIB_ALIGN(8) const char _g_globalDefaultDrawParamBuf[sizeof(DrawParam)] = {0};
-	const DrawParam& _g_globalDefaultDrawParam = *((const DrawParam*)((void*)_g_globalDefaultDrawParamBuf));
+	namespace priv
+	{
+		namespace canvas
+		{
+
+			SLIB_ALIGN(8) const char g_defaultDrawParamBuf[sizeof(DrawParam)] = {0};
+			
+			const DrawParam& g_defaultDrawParam = *((const DrawParam*)((void*)g_defaultDrawParamBuf));
+
+		}
+	}
 
 	void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc)
 	{
-		draw(rectDst, src, rectSrc, _g_globalDefaultDrawParam);
+		draw(rectDst, src, rectSrc, priv::canvas::g_defaultDrawParam);
 	}
 	
 	void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& src)
 	{
-		draw(rectDst, src, _g_globalDefaultDrawParam);
+		draw(rectDst, src, priv::canvas::g_defaultDrawParam);
 	}
 
 	void Canvas::draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst, const Ref<Drawable>& src, sl_real xSrc, sl_real ySrc, sl_real widthSrc, sl_real heightSrc, const DrawParam& param)
@@ -412,7 +421,7 @@ namespace slib
 
 	void Canvas::draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst, const Ref<Drawable>& src, sl_real xSrc, sl_real ySrc, sl_real widthSrc, sl_real heightSrc)
 	{
-		draw(Rectangle(xDst, yDst, xDst + widthDst, yDst + heightDst), src, Rectangle(xSrc, ySrc, xSrc + widthSrc, ySrc + heightSrc), _g_globalDefaultDrawParam);
+		draw(Rectangle(xDst, yDst, xDst + widthDst, yDst + heightDst), src, Rectangle(xSrc, ySrc, xSrc + widthSrc, ySrc + heightSrc), priv::canvas::g_defaultDrawParam);
 	}
 
 	void Canvas::draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst, const Ref<Drawable>& src, const DrawParam& param)
@@ -422,17 +431,17 @@ namespace slib
 
 	void Canvas::draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst, const Ref<Drawable>& src)
 	{
-		draw(Rectangle(xDst, yDst, xDst + widthDst, yDst + heightDst), src, _g_globalDefaultDrawParam);
+		draw(Rectangle(xDst, yDst, xDst + widthDst, yDst + heightDst), src, priv::canvas::g_defaultDrawParam);
 	}
 
 	void Canvas::draw(sl_real xDst, sl_real yDst, const Ref<Drawable>& src)
 	{
-		draw(xDst, yDst, src, _g_globalDefaultDrawParam);
+		draw(xDst, yDst, src, priv::canvas::g_defaultDrawParam);
 	}
 
 	void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleMode scaleMode, Alignment alignment)
 	{
-		draw(rectDst, source, scaleMode, alignment, _g_globalDefaultDrawParam);
+		draw(rectDst, source, scaleMode, alignment, priv::canvas::g_defaultDrawParam);
 	}
 
 	void Canvas::_setAlpha(sl_real alpha)

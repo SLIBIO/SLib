@@ -34,36 +34,46 @@
 namespace slib
 {
 
-	class _priv_FreeTypeLibrary : public Referable
+	namespace priv
 	{
-	public:
-		FT_Library m_library;
-
-	public:
-		_priv_FreeTypeLibrary()
+		namespace freetype
 		{
-			FT_Error err = FT_Init_FreeType(&m_library);
-			if (err || !m_library) {
-				LogError("FreeType", "Failed to initialize FreeType");
-			}
-		}
 
-		~_priv_FreeTypeLibrary()
-		{
-			freeLibrary();
-		}
+			class Library : public Referable
+			{
+			public:
+				FT_Library m_library;
 
-	public:
-		void freeLibrary()
-		{
-			FT_Library library = m_library;
-			if (library) {
-				m_library = sl_null;
-				FT_Done_FreeType(library);
-			}
-		}
+			public:
+				Library()
+				{
+					FT_Error err = FT_Init_FreeType(&m_library);
+					if (err || !m_library) {
+						LogError("FreeType", "Failed to initialize FreeType");
+					}
+				}
 
-	};
+				~Library()
+				{
+					freeLibrary();
+				}
+
+			public:
+				void freeLibrary()
+				{
+					FT_Library library = m_library;
+					if (library) {
+						m_library = sl_null;
+						FT_Done_FreeType(library);
+					}
+				}
+
+			};
+
+		}
+	}
+
+	using namespace priv::freetype;
 
 
 	SLIB_DEFINE_OBJECT(FreeType, Object)
@@ -81,7 +91,7 @@ namespace slib
 	Ref<FreeType> FreeType::loadFromMemory(const Memory& mem, sl_uint32 index)
 	{
 		if (mem.isNotNull()) {
-			Ref<_priv_FreeTypeLibrary> libraryRef = new _priv_FreeTypeLibrary;
+			Ref<Library> libraryRef = new Library;
 			if (libraryRef.isNotNull()) {
 				FT_Library library = libraryRef->m_library;
 				if (library) {

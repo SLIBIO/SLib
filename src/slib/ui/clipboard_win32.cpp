@@ -30,86 +30,97 @@
 namespace slib
 {
 
-	LRESULT CALLBACK _priv_Win32_ClipboardOwnerWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
+	namespace priv
 	{
-		switch (message) {
-		case WM_RENDERFORMAT:
-		case WM_RENDERALLFORMATS:
-		case WM_DRAWCLIPBOARD:
-		case WM_DESTROY:
-		case WM_CHANGECBCHAIN:
-			return 0;
-		}
-		return DefWindowProc(hwnd, message, wparam, lparam);
-	}
-
-	class _priv_ClipboardManager
-	{
-	public:
-		HWND owner;
-
-	public:
-		_priv_ClipboardManager()
+		namespace clipboard
 		{
-			WNDCLASSEXW wc;
-			Base::zeroMemory(&wc, sizeof(wc));
-			wc.cbSize = sizeof(wc);
-			wc.lpszClassName = L"SLibClipboardOwner";
-			wc.lpfnWndProc = _priv_Win32_ClipboardOwnerWndProc;
-			wc.hInstance = GetModuleHandle(NULL);
-			RegisterClassEx(&wc);
-			owner = CreateWindowW(L"SLibClipboardOwner", L"", 0, 0, 0, 0, 0, HWND_MESSAGE, 0, 0, 0);
-		}
 
-		~_priv_ClipboardManager()
-		{
-			DestroyWindow(owner);
-			owner = NULL;
-		}
-
-	};
-	SLIB_SAFE_STATIC_GETTER(_priv_ClipboardManager, _priv_getClipboardManager)
-
-	class _priv_ClipboardScope
-	{
-	public:
-		BOOL bOpened;
-
-	public:
-		_priv_ClipboardScope()
-		{
-			bOpened = FALSE;
-			_priv_ClipboardManager* manager = _priv_getClipboardManager();
-			if (manager) {
-				if (manager->owner) {
-					bOpened = OpenClipboard(manager->owner);
+			LRESULT CALLBACK OwnerWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
+			{
+				switch (message) {
+				case WM_RENDERFORMAT:
+				case WM_RENDERALLFORMATS:
+				case WM_DRAWCLIPBOARD:
+				case WM_DESTROY:
+				case WM_CHANGECBCHAIN:
+					return 0;
 				}
+				return DefWindowProc(hwnd, message, wparam, lparam);
 			}
-		}
 
-		~_priv_ClipboardScope()
-		{
-			if (bOpened) {
-				_priv_ClipboardManager* manager = _priv_getClipboardManager();
-				if (manager) {
-					if (manager->owner) {
-						CloseClipboard();
+			class ClipboardManager
+			{
+			public:
+				HWND owner;
+
+			public:
+				ClipboardManager()
+				{
+					WNDCLASSEXW wc;
+					Base::zeroMemory(&wc, sizeof(wc));
+					wc.cbSize = sizeof(wc);
+					wc.lpszClassName = L"SLibClipboardOwner";
+					wc.lpfnWndProc = OwnerWndProc;
+					wc.hInstance = GetModuleHandle(NULL);
+					RegisterClassEx(&wc);
+					owner = CreateWindowW(L"SLibClipboardOwner", L"", 0, 0, 0, 0, 0, HWND_MESSAGE, 0, 0, 0);
+				}
+
+				~ClipboardManager()
+				{
+					DestroyWindow(owner);
+					owner = NULL;
+				}
+
+			};
+
+			SLIB_SAFE_STATIC_GETTER(ClipboardManager, GetClipboardManager)
+
+			class ClipboardScope
+			{
+			public:
+				BOOL bOpened;
+
+			public:
+				ClipboardScope()
+				{
+					bOpened = FALSE;
+					ClipboardManager* manager = GetClipboardManager();
+					if (manager) {
+						if (manager->owner) {
+							bOpened = OpenClipboard(manager->owner);
+						}
 					}
 				}
-			}
-		}
 
-	};
+				~ClipboardScope()
+				{
+					if (bOpened) {
+						ClipboardManager* manager = GetClipboardManager();
+						if (manager) {
+							if (manager->owner) {
+								CloseClipboard();
+							}
+						}
+					}
+				}
+
+			};
+
+		}
+	}
+
+	using namespace priv::clipboard;
 
 	sl_bool Clipboard::hasText()
 	{
-		_priv_ClipboardScope scope;
+		ClipboardScope scope;
 		return IsClipboardFormatAvailable(CF_UNICODETEXT) ? sl_true : sl_false;
 	}
 	
 	String Clipboard::getText()
 	{
-		_priv_ClipboardScope scope;
+		ClipboardScope scope;
 		HANDLE data = GetClipboardData(CF_UNICODETEXT);
 		if (data) {
 			void* src = GlobalLock(data);
@@ -124,7 +135,7 @@ namespace slib
 	
 	void Clipboard::setText(const String& _text)
 	{
-		_priv_ClipboardScope scope;
+		ClipboardScope scope;
 		EmptyClipboard();
 		String16 text = _text;
 		HGLOBAL handle = Windows::createGlobalData(text.getData(), (text.getLength() + 1) << 1);

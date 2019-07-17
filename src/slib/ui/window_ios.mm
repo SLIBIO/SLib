@@ -746,8 +746,44 @@ namespace slib
 		UIResource::updateDefaultScreenSize();
 	}
 	
+	
+	Ref<WindowInstance> UIPlatform::createWindowInstance(UIView* window)
+	{
+		Ref<WindowInstance> ret = UIPlatform::_getWindowInstance((__bridge void*)window);
+		if (ret.isNotNull()) {
+			return ret;
+		}
+		return iOS_WindowInstance::create(window);
+	}
+	
+	void UIPlatform::registerWindowInstance(UIView* window, WindowInstance* instance)
+	{
+		UIPlatform::_registerWindowInstance((__bridge void*)window, instance);
+	}
+	
+	Ref<WindowInstance> UIPlatform::getWindowInstance(UIView* window)
+	{
+		return UIPlatform::_getWindowInstance((__bridge void*)window);
+	}
+	
+	void UIPlatform::removeWindowInstance(UIView* window)
+	{
+		UIPlatform::_removeWindowInstance((__bridge void*)window);
+	}
+	
+	UIView* UIPlatform::getWindowHandle(WindowInstance* instance)
+	{
+		iOS_WindowInstance* window = (iOS_WindowInstance*)instance;
+		if (window) {
+			return window->m_window;
+		} else {
+			return nil;
+		}
+	}
+
 }
 
+using namespace slib;
 using namespace slib::priv::window;
 
 @implementation SLIBWindowRootViewController
@@ -756,8 +792,8 @@ using namespace slib::priv::window;
 {
 	self = [super init];
 	if (self != nil) {
-		self->m_sizeClient = slib::UISize::zero();
-		self->m_sizeClientResizedByKeyboard = slib::UISize::zero();
+		self->m_sizeClient = UISize::zero();
+		self->m_sizeClientResizedByKeyboard = UISize::zero();
 	}
 	return self;
 }
@@ -765,7 +801,7 @@ using namespace slib::priv::window;
 - (BOOL)prefersStatusBarHidden
 {
 	if (g_flagSetStatusBarStyle) {
-		if (g_currentStatusBarStyle == slib::StatusBarStyle::Hidden) {
+		if (g_currentStatusBarStyle == StatusBarStyle::Hidden) {
 			return YES;
 		}
 		return NO;
@@ -776,7 +812,7 @@ using namespace slib::priv::window;
 - (UIStatusBarStyle)preferredStatusBarStyle
 {
 	if (g_flagSetStatusBarStyle) {
-		if (g_currentStatusBarStyle == slib::StatusBarStyle::Light) {
+		if (g_currentStatusBarStyle == StatusBarStyle::Light) {
 			return UIStatusBarStyleLightContent;
 		}
 		return UIStatusBarStyleDefault;
@@ -801,13 +837,13 @@ using namespace slib::priv::window;
 	if (g_flagSetStatusBarStyle) {
 		[self setNeedsStatusBarAppearanceUpdate];
 	}
-	slib::Ref<slib::iOS_WindowInstance> window = m_window;
+	Ref<iOS_WindowInstance> window = m_window;
 	if (window.isNotNull()) {
 		UIView* handle = window->m_window;
 		if (handle != nil) {
-			CGFloat f = slib::UIPlatform::getGlobalScaleFactor();
+			CGFloat f = UIPlatform::getGlobalScaleFactor();
 			CGSize _size = handle.frame.size;
-			slib::UISize size;
+			UISize size;
 			size.x = (sl_ui_pos)(_size.width * f);
 			size.y = (sl_ui_pos)(_size.height * f);
 			self->m_sizeClient = size;
@@ -829,13 +865,13 @@ using namespace slib::priv::window;
 			r.size = size;
 			handle.frame = r;
 		}
-		CGFloat f = slib::UIPlatform::getGlobalScaleFactor();
-		slib::UISize sizeContent;
+		CGFloat f = UIPlatform::getGlobalScaleFactor();
+		UISize sizeContent;
 		sizeContent.x = (sl_ui_pos)(size.width * f);
 		sizeContent.y = (sl_ui_pos)(size.height * f);
 		self->m_sizeClient = sizeContent;
 		self->m_sizeClientResizedByKeyboard = sizeContent;
-		slib::Ref<slib::iOS_WindowInstance> window = self->m_window;
+		Ref<iOS_WindowInstance> window = self->m_window;
 		if (window.isNotNull()) {
 			window->onResize(sizeContent.x, sizeContent.y);
 		}
@@ -844,7 +880,7 @@ using namespace slib::priv::window;
 
 -(UIView*)findFirstResponderText
 {
-	UIView* view = slib::UIPlatform::findFirstResponder(self.view);
+	UIView* view = UIPlatform::findFirstResponder(self.view);
 	if (view != nil) {
 		if ([view isKindOfClass:[UITextField class]] || [view isKindOfClass:[UITextView class]]) {
 			return view;
@@ -883,26 +919,26 @@ using namespace slib::priv::window;
 		[self restoreKeyboardScrollView];
 	}
 	
-	slib::UIKeyboardAdjustMode adjustMode = slib::UI::getKeyboardAdjustMode();
-	slib::Ref<slib::iOS_WindowInstance> window = self->m_window;
+	UIKeyboardAdjustMode adjustMode = UI::getKeyboardAdjustMode();
+	Ref<iOS_WindowInstance> window = self->m_window;
 	if (window.isNotNull()) {
-		if (adjustMode == slib::UIKeyboardAdjustMode::Resize) {
+		if (adjustMode == UIKeyboardAdjustMode::Resize) {
 			NSDictionary* info = [aNotification userInfo];
-			sl_ui_len heightKeyboard = (sl_ui_len)([[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height * slib::UIPlatform::getGlobalScaleFactor());
-			slib::UISize size = self->m_sizeClient;
+			sl_ui_len heightKeyboard = (sl_ui_len)([[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height * UIPlatform::getGlobalScaleFactor());
+			UISize size = self->m_sizeClient;
 			size.y -= heightKeyboard;
 			self->m_sizeClientResizedByKeyboard = size;
 			window->onResize(size.x, size.y);
 		} else {
 			if (self->m_sizeClient.y != self->m_sizeClientResizedByKeyboard.y) {
-				slib::UISize size = self->m_sizeClient;
+				UISize size = self->m_sizeClient;
 				self->m_sizeClientResizedByKeyboard = size;
 				window->onResize(size.x, size.y);
 			}
 		}
 	}
 	
-	if (adjustMode == slib::UIKeyboardAdjustMode::Pan || scroll != nil) {
+	if (adjustMode == UIKeyboardAdjustMode::Pan || scroll != nil) {
 		NSDictionary* info = [aNotification userInfo];
 		CGSize kbSize = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size;
 		CGRect rcScreen = [[UIScreen mainScreen] bounds];
@@ -955,17 +991,17 @@ using namespace slib::priv::window;
 }
 
 -(void)keyboardWillHide {
-	if (!(slib::Math::isAlmostZero(self.view.transform.ty))) {
+	if (!(Math::isAlmostZero(self.view.transform.ty))) {
 		[UIView animateWithDuration:0.3 animations:^(void) {
 			self.view.transform = CGAffineTransformIdentity;
 		}];
 	}
 	[self restoreKeyboardScrollView];
 	
-	slib::Ref<slib::iOS_WindowInstance> window = self->m_window;
+	Ref<iOS_WindowInstance> window = self->m_window;
 	if (window.isNotNull()) {
 		if (self->m_sizeClient.y != self->m_sizeClientResizedByKeyboard.y) {
-			slib::UISize size = self->m_sizeClient;
+			UISize size = self->m_sizeClient;
 			self->m_sizeClientResizedByKeyboard = size;
 			window->onResize(size.x, size.y);
 		}
@@ -1003,48 +1039,9 @@ using namespace slib::priv::window;
 - (void)viewSafeAreaInsetsDidChange
 {
 	[super viewSafeAreaInsetsDidChange];
-	slib::UIResource::updateDefaultScreenSize();
+	UIResource::updateDefaultScreenSize();
 }
 
 @end
-
-
-namespace slib
-{
-	Ref<WindowInstance> UIPlatform::createWindowInstance(UIView* window)
-	{
-		Ref<WindowInstance> ret = UIPlatform::_getWindowInstance((__bridge void*)window);
-		if (ret.isNotNull()) {
-			return ret;
-		}
-		return iOS_WindowInstance::create(window);
-	}
-	
-	void UIPlatform::registerWindowInstance(UIView* window, WindowInstance* instance)
-	{
-		UIPlatform::_registerWindowInstance((__bridge void*)window, instance);
-	}
-	
-	Ref<WindowInstance> UIPlatform::getWindowInstance(UIView* window)
-	{
-		return UIPlatform::_getWindowInstance((__bridge void*)window);
-	}
-	
-	void UIPlatform::removeWindowInstance(UIView* window)
-	{
-		UIPlatform::_removeWindowInstance((__bridge void*)window);
-	}
-	
-	UIView* UIPlatform::getWindowHandle(WindowInstance* instance)
-	{
-		iOS_WindowInstance* window = (iOS_WindowInstance*)instance;
-		if (window) {
-			return window->m_window;
-		} else {
-			return nil;
-		}
-	}
-	
-}
 
 #endif

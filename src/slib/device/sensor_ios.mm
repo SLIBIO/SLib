@@ -37,15 +37,22 @@
 
 namespace slib
 {
-	class _priv_Sensor;
+	namespace priv
+	{
+		namespace sensor
+		{
+			class SensorImpl;
+		}
+	}
 }
 
-@interface _priv_Slib_iOS_Sensor : NSObject <CLLocationManagerDelegate>{
+@interface SLIBSensor : NSObject <CLLocationManagerDelegate>
+{
 	
 	@public NSOperationQueue* operationQueue;
 	@public CMMotionManager* m_motionManager;
 	@public CLLocationManager* m_locationManager;
-	@public slib::WeakRef<slib::_priv_Sensor> m_sensor;
+	@public slib::WeakRef<slib::priv::sensor::SensorImpl> m_sensor;
 	
 	@public sl_bool flagUseCompass;
 	@public sl_bool flagUseAccelerometor;
@@ -62,102 +69,112 @@ namespace slib
 namespace slib
 {
 
-	class _priv_Sensor_Shared
+	namespace priv
 	{
-	public:
-		CMMotionManager* defaultMotion;
-		
-	public:
-		_priv_Sensor_Shared()
+		namespace sensor
 		{
-			defaultMotion = [[CMMotionManager alloc] init];
-		}
-		
-	};
 
-	SLIB_SAFE_STATIC_GETTER(_priv_Sensor_Shared, _getSensor_Shared)
-
-	class _priv_Sensor : public Sensor
-	{
-	public:
-		_priv_Slib_iOS_Sensor* m_sensor;
-		
-	public:
-		_priv_Sensor()
-		{
-		}
-
-		~_priv_Sensor()
-		{
-			stop();
-		}
-
-	public:
-		static Ref<_priv_Sensor> create(const SensorParam& param)
-		{
-			_priv_Slib_iOS_Sensor* sensor = [[_priv_Slib_iOS_Sensor alloc] initWithParam:&param];
-			if(sensor != nil){
-				Ref<_priv_Sensor> ret = new _priv_Sensor;
-				if(ret.isNotNull()) {
-					ret->_init(param);
-					ret->m_sensor = sensor;
-					sensor->m_sensor = ret;
-					if(param.flagAutoStart) {
-						ret->start();
-					}
-					return ret;
+			class SharedContext
+			{
+			public:
+				CMMotionManager* defaultMotion;
+				
+			public:
+				SharedContext()
+				{
+					defaultMotion = [[CMMotionManager alloc] init];
 				}
-			}
-			return sl_null;
-		}
+				
+			};
 
-		sl_bool _start() override
-		{
-			if ([m_sensor start]) {
-				return sl_true;
-			}
-			return sl_false;
-		}
+			SLIB_SAFE_STATIC_GETTER(SharedContext, GetSharedContext)
 
-		void _stop() override
-		{
-			[m_sensor stop];
-		}
-		
-		void onChangeLocation(double latitude, double longitude, double altitude)
-		{
-			_onLocationChanged(GeoLocation(latitude, longitude, altitude));
-		}
+			class SensorImpl : public Sensor
+			{
+			public:
+				SLIBSensor* m_sensor;
+				
+			public:
+				SensorImpl()
+				{
+				}
 
-		void onChangeCompass(float declination)
-		{
-			_onCompassChanged(declination);
-		}
+				~SensorImpl()
+				{
+					stop();
+				}
 
-		void onChangeAccelerometer(float xAccel, float yAccel, float zAccel)
-		{
-			_onAccelerometerChanged(xAccel, yAccel, zAccel);
+			public:
+				static Ref<SensorImpl> create(const SensorParam& param)
+				{
+					SLIBSensor* sensor = [[SLIBSensor alloc] initWithParam:&param];
+					if(sensor != nil){
+						Ref<SensorImpl> ret = new SensorImpl;
+						if(ret.isNotNull()) {
+							ret->_init(param);
+							ret->m_sensor = sensor;
+							sensor->m_sensor = ret;
+							if(param.flagAutoStart) {
+								ret->start();
+							}
+							return ret;
+						}
+					}
+					return sl_null;
+				}
+
+				sl_bool _start() override
+				{
+					if ([m_sensor start]) {
+						return sl_true;
+					}
+					return sl_false;
+				}
+
+				void _stop() override
+				{
+					[m_sensor stop];
+				}
+				
+				void onChangeLocation(double latitude, double longitude, double altitude)
+				{
+					_onLocationChanged(GeoLocation(latitude, longitude, altitude));
+				}
+
+				void onChangeCompass(float declination)
+				{
+					_onCompassChanged(declination);
+				}
+
+				void onChangeAccelerometer(float xAccel, float yAccel, float zAccel)
+				{
+					_onAccelerometerChanged(xAccel, yAccel, zAccel);
+				}
+				
+				void setRunningLocation(sl_bool flag)
+				{
+					m_flagRunningLocation = flag;
+				}
+				
+				void setRunningCompass(sl_bool flag)
+				{
+					m_flagRunningCompass = flag;
+				}
+				
+				void setRunningAccelerometer(sl_bool flag)
+				{
+					m_flagRunningAccelerometer = flag;
+				}
+			};
+
 		}
-		
-		void setRunningLocation(sl_bool flag)
-		{
-			m_flagRunningLocation = flag;
-		}
-		
-		void setRunningCompass(sl_bool flag)
-		{
-			m_flagRunningCompass = flag;
-		}
-		
-		void setRunningAccelerometer(sl_bool flag)
-		{
-			m_flagRunningAccelerometer = flag;
-		}
-	};
+	}
+
+	using namespace priv::sensor;
 
 	Ref<Sensor> Sensor::create(const SensorParam& param)
 	{
-		return _priv_Sensor::create(param);
+		return SensorImpl::create(param);
 	}
 
 	sl_bool Sensor::isAvailableLocation()
@@ -167,7 +184,7 @@ namespace slib
 
 	sl_bool Sensor::isAvailableCompass()
 	{
-		_priv_Sensor_Shared* shared = _getSensor_Shared();
+		SharedContext* shared = GetSharedContext();
 		if (shared) {
 			if (shared->defaultMotion.magnetometerAvailable) {
 				return sl_true;
@@ -178,7 +195,7 @@ namespace slib
 
 	sl_bool Sensor::isAvailableAccelerometer()
 	{
-		_priv_Sensor_Shared* shared = _getSensor_Shared();
+		SharedContext* shared = GetSharedContext();
 		if (shared) {
 			if (shared->defaultMotion.accelerometerAvailable) {
 				return sl_true;
@@ -189,8 +206,12 @@ namespace slib
 
 }
 
-@implementation _priv_Slib_iOS_Sensor
--(id) initWithParam:(const slib::SensorParam *)param
+using namespace slib;
+using namespace slib::priv::sensor;
+
+@implementation SLIBSensor
+
+-(id) initWithParam:(const SensorParam *)param
 {
 	self = [super init];
 	if(self != nil){
@@ -205,7 +226,7 @@ namespace slib
 
 -(void) onChangeCompass: (CMMagnetometerData * _Nullable) magnetometerData error: (NSError * _Nullable) error
 {
-	slib::Ref<slib::_priv_Sensor> sensor(m_sensor);
+	Ref<SensorImpl> sensor(m_sensor);
 	if (sensor.isNotNull() && magnetometerData != nil) {
 		sensor->onChangeCompass(magnetometerData.magneticField.x);
 	}
@@ -213,7 +234,7 @@ namespace slib
 
 -(void) onChangeAccelerometer: (CMDeviceMotion * _Nullable) motion error: (NSError * _Nullable) error
 {
-	slib::Ref<slib::_priv_Sensor> sensor(m_sensor);
+	Ref<SensorImpl> sensor(m_sensor);
 	if (sensor.isNotNull() && motion != nil) {
 		sensor->onChangeAccelerometer((float)(motion.userAcceleration.x + motion.gravity.x) * G, (float)(motion.userAcceleration.y + motion.gravity.y) * G, (float)(motion.userAcceleration.z + motion.gravity.z) * G);
 	}
@@ -221,7 +242,7 @@ namespace slib
 
 -(sl_bool) start
 {
-	slib::Ref<slib::_priv_Sensor> sensor(m_sensor);
+	Ref<SensorImpl> sensor(m_sensor);
 	if (sensor.isNull()) {
 		return sl_false;
 	}
@@ -291,7 +312,7 @@ namespace slib
 
 -(void) stop
 {
-	slib::Ref<slib::_priv_Sensor> sensor(m_sensor);
+	Ref<SensorImpl> sensor(m_sensor);
 	if (sensor.isNull()) {
 		return;
 	}
@@ -318,7 +339,7 @@ namespace slib
 {
 	if (locations != nil) {
 		CLLocation* location = [locations lastObject];
-		slib::Ref<slib::_priv_Sensor> sensor(m_sensor);
+		Ref<SensorImpl> sensor(m_sensor);
 		if (sensor.isNotNull() && location != nil) {
 			sensor->onChangeLocation(location.coordinate.latitude, location.coordinate.longitude, location.altitude);
 		}

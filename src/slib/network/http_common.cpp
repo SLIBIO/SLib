@@ -31,6 +31,70 @@
 namespace slib
 {
 
+	namespace priv
+	{
+		namespace http
+		{
+
+			SLIB_STATIC_STRING(g_method_GET, "GET");
+			SLIB_STATIC_STRING(g_method_HEAD, "HEAD");
+			SLIB_STATIC_STRING(g_method_POST, "POST");
+			SLIB_STATIC_STRING(g_method_PUT, "PUT");
+			SLIB_STATIC_STRING(g_method_DELETE, "DELETE");
+			SLIB_STATIC_STRING(g_method_CONNECT, "CONNECT");
+			SLIB_STATIC_STRING(g_method_OPTIONS, "OPTIONS");
+			SLIB_STATIC_STRING(g_method_TRACE, "TRACE");
+			SLIB_STATIC_STRING(g_method_PATCH, "PATCH");
+
+			SLIB_STATIC_STRING(g_setCookie_expires, "Expires")
+			SLIB_STATIC_STRING(g_setCookie_max_age, "Max-Age")
+			SLIB_STATIC_STRING(g_setCookie_domain, "Domain")
+			SLIB_STATIC_STRING(g_setCookie_path, "Path")
+			SLIB_STATIC_STRING(g_setCookie_secure, "Secure")
+			SLIB_STATIC_STRING(g_setCookie_http_only, "HttpOnly")
+			SLIB_STATIC_STRING(g_setCookie_same_site, "SameSite")
+			
+			SLIB_STATIC_STRING(g_cacheControl_max_age, "max-age")
+			SLIB_STATIC_STRING(g_cacheControl_max_stale, "max-stale")
+			SLIB_STATIC_STRING(g_cacheControl_min_fresh, "min-fresh")
+			SLIB_STATIC_STRING(g_cacheControl_no_cache, "no-cache")
+			SLIB_STATIC_STRING(g_cacheControl_no_store, "no-store")
+			SLIB_STATIC_STRING(g_cacheControl_no_transform, "no-transform")
+			SLIB_STATIC_STRING(g_cacheControl_only_if_cached, "only-if-cached")
+			SLIB_STATIC_STRING(g_cacheControl_must_revalidate, "must-revalidate")
+			SLIB_STATIC_STRING(g_cacheControl_public, "public")
+			SLIB_STATIC_STRING(g_cacheControl_private, "private")
+			SLIB_STATIC_STRING(g_cacheControl_proxy_revalidate, "proxy-revalidate")
+			SLIB_STATIC_STRING(g_cacheControl_s_maxage, "s-maxage")
+			SLIB_STATIC_STRING(g_cacheControl_immutable, "immutable")
+			SLIB_STATIC_STRING(g_cacheControl_stale_while_revalidate, "stale-while-revalidate")
+			SLIB_STATIC_STRING(g_cacheControl_stale_if_error, "stale-if-error")
+
+			class HttpMethodMapping
+			{
+			public:
+				CHashMap<String, HttpMethod> maps;
+				
+			public:
+				HttpMethodMapping()
+				{
+					maps.put_NoLock(g_method_GET, HttpMethod::GET);
+					maps.put_NoLock(g_method_HEAD, HttpMethod::HEAD);
+					maps.put_NoLock(g_method_POST, HttpMethod::POST);
+					maps.put_NoLock(g_method_PUT, HttpMethod::PUT);
+					maps.put_NoLock(g_method_DELETE, HttpMethod::DELETE);
+					maps.put_NoLock(g_method_CONNECT, HttpMethod::CONNECT);
+					maps.put_NoLock(g_method_OPTIONS, HttpMethod::OPTIONS);
+					maps.put_NoLock(g_method_TRACE, HttpMethod::TRACE);
+					maps.put_NoLock(g_method_PATCH, HttpMethod::PATCH);
+				}
+			};
+
+		}
+	}
+
+	using namespace priv::http;
+
 #define HTTP_STATUS_CASE(name, text) \
 	case HttpStatus::name: SLIB_RETURN_STRING(text);
 
@@ -89,66 +153,36 @@ namespace slib
 		return sl_null;
 	}
 
-
-	SLIB_STATIC_STRING(_g_priv_http_method_GET, "GET");
-	SLIB_STATIC_STRING(_g_priv_http_method_HEAD, "HEAD");
-	SLIB_STATIC_STRING(_g_priv_http_method_POST, "POST");
-	SLIB_STATIC_STRING(_g_priv_http_method_PUT, "PUT");
-	SLIB_STATIC_STRING(_g_priv_http_method_DELETE, "DELETE");
-	SLIB_STATIC_STRING(_g_priv_http_method_CONNECT, "CONNECT");
-	SLIB_STATIC_STRING(_g_priv_http_method_OPTIONS, "OPTIONS");
-	SLIB_STATIC_STRING(_g_priv_http_method_TRACE, "TRACE");
-	SLIB_STATIC_STRING(_g_priv_http_method_PATCH, "PATCH");
-
 	String HttpMethods::toString(HttpMethod method)
 	{
 		switch (method) {
 			case HttpMethod::GET:
-				return _g_priv_http_method_GET;
+				return g_method_GET;
 			case HttpMethod::HEAD:
-				return _g_priv_http_method_HEAD;
+				return g_method_HEAD;
 			case HttpMethod::POST:
-				return _g_priv_http_method_POST;
+				return g_method_POST;
 			case HttpMethod::PUT:
-				return _g_priv_http_method_PUT;
+				return g_method_PUT;
 			case HttpMethod::DELETE:
-				return _g_priv_http_method_DELETE;
+				return g_method_DELETE;
 			case HttpMethod::CONNECT:
-				return _g_priv_http_method_CONNECT;
+				return g_method_CONNECT;
 			case HttpMethod::OPTIONS:
-				return _g_priv_http_method_OPTIONS;
+				return g_method_OPTIONS;
 			case HttpMethod::TRACE:
-				return _g_priv_http_method_TRACE;
+				return g_method_TRACE;
 			case HttpMethod::PATCH:
-				return _g_priv_http_method_PATCH;
+				return g_method_PATCH;
 			default:
 				break;
 		}
 		return sl_null;
 	}
 
-	class _priv_HttpMethod_Mapping
-	{
-	public:
-		CHashMap<String, HttpMethod> maps;
-		
-		_priv_HttpMethod_Mapping()
-		{
-			maps.put_NoLock(_g_priv_http_method_GET, HttpMethod::GET);
-			maps.put_NoLock(_g_priv_http_method_HEAD, HttpMethod::HEAD);
-			maps.put_NoLock(_g_priv_http_method_POST, HttpMethod::POST);
-			maps.put_NoLock(_g_priv_http_method_PUT, HttpMethod::PUT);
-			maps.put_NoLock(_g_priv_http_method_DELETE, HttpMethod::DELETE);
-			maps.put_NoLock(_g_priv_http_method_CONNECT, HttpMethod::CONNECT);
-			maps.put_NoLock(_g_priv_http_method_OPTIONS, HttpMethod::OPTIONS);
-			maps.put_NoLock(_g_priv_http_method_TRACE, HttpMethod::TRACE);
-			maps.put_NoLock(_g_priv_http_method_PATCH, HttpMethod::PATCH);
-		}
-	};
-
 	HttpMethod HttpMethods::fromString(const String& method)
 	{
-		SLIB_SAFE_STATIC(_priv_HttpMethod_Mapping, t)
+		SLIB_SAFE_STATIC(HttpMethodMapping, t)
 		if (SLIB_SAFE_STATIC_CHECK_FREED(t)) {
 			return HttpMethod::Unknown;
 		}
@@ -480,14 +514,6 @@ namespace slib
 		return sb.merge();
 	}
 	
-	SLIB_STATIC_STRING(_g_priv_http_set_cookie_expires, "Expires")
-	SLIB_STATIC_STRING(_g_priv_http_set_cookie_max_age, "Max-Age")
-	SLIB_STATIC_STRING(_g_priv_http_set_cookie_domain, "Domain")
-	SLIB_STATIC_STRING(_g_priv_http_set_cookie_path, "Path")
-	SLIB_STATIC_STRING(_g_priv_http_set_cookie_secure, "Secure")
-	SLIB_STATIC_STRING(_g_priv_http_set_cookie_http_only, "HttpOnly")
-	SLIB_STATIC_STRING(_g_priv_http_set_cookie_same_site, "SameSite")
-	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(HttpCookie)
 	
 	HttpCookie::HttpCookie()
@@ -499,25 +525,25 @@ namespace slib
 		HttpHeaderValueMap map;
 		map.put_NoLock(name, value);
 		if (expires.isNotZero()) {
-			map.put_NoLock(_g_priv_http_set_cookie_expires, expires.toHttpDate());
+			map.put_NoLock(g_setCookie_expires, expires.toHttpDate());
 		}
 		if (max_age.isNotNull()) {
-			map.put_NoLock(_g_priv_http_set_cookie_max_age, String::fromInt32(max_age));
+			map.put_NoLock(g_setCookie_max_age, String::fromInt32(max_age));
 		}
 		if (domain.isNotNull()) {
-			map.put_NoLock(_g_priv_http_set_cookie_domain, domain);
+			map.put_NoLock(g_setCookie_domain, domain);
 		}
 		if (path.isNotNull()) {
-			map.put_NoLock(_g_priv_http_set_cookie_path, path);
+			map.put_NoLock(g_setCookie_path, path);
 		}
 		if (secure) {
-			map.put_NoLock(_g_priv_http_set_cookie_path, sl_null);
+			map.put_NoLock(g_setCookie_path, sl_null);
 		}
 		if (http_only) {
-			map.put_NoLock(_g_priv_http_set_cookie_http_only, sl_null);
+			map.put_NoLock(g_setCookie_http_only, sl_null);
 		}
 		if (same_site.isNotNull()) {
-			map.put_NoLock(_g_priv_http_set_cookie_same_site, same_site);
+			map.put_NoLock(g_setCookie_same_site, same_site);
 		}
 		return HttpHeaders::mergeValueMap(map, ';');
 	}
@@ -535,22 +561,22 @@ namespace slib
 			value.setNull();
 		}
 		Time t;
-		if (t.parseHttpDate(map.getValue_NoLock(_g_priv_http_set_cookie_expires))) {
+		if (t.parseHttpDate(map.getValue_NoLock(g_setCookie_expires))) {
 			expires = t;
 		} else {
 			expires.setZero();
 		}
 		sl_int32 n;
-		if (map.getValue_NoLock(_g_priv_http_set_cookie_max_age).parseInt32(10, &n)) {
+		if (map.getValue_NoLock(g_setCookie_max_age).parseInt32(10, &n)) {
 			max_age = n;
 		} else {
 			max_age.setNull();
 		}
-		domain = map.getValue_NoLock(_g_priv_http_set_cookie_domain);
-		path = map.getValue_NoLock(_g_priv_http_set_cookie_path);
-		secure = map.find_NoLock(_g_priv_http_set_cookie_secure);
-		http_only = map.find_NoLock(_g_priv_http_set_cookie_http_only);
-		same_site = map.getValue_NoLock(_g_priv_http_set_cookie_same_site);
+		domain = map.getValue_NoLock(g_setCookie_domain);
+		path = map.getValue_NoLock(g_setCookie_path);
+		secure = map.find_NoLock(g_setCookie_secure);
+		http_only = map.find_NoLock(g_setCookie_http_only);
+		same_site = map.getValue_NoLock(g_setCookie_same_site);
 	}
 	
 	
@@ -970,46 +996,30 @@ namespace slib
 		}
 	}
 	
-	SLIB_STATIC_STRING(_g_priv_http_cache_control_max_age, "max-age")
-	SLIB_STATIC_STRING(_g_priv_http_cache_control_max_stale, "max-stale")
-	SLIB_STATIC_STRING(_g_priv_http_cache_control_min_fresh, "min-fresh")
-	SLIB_STATIC_STRING(_g_priv_http_cache_control_no_cache, "no-cache")
-	SLIB_STATIC_STRING(_g_priv_http_cache_control_no_store, "no-store")
-	SLIB_STATIC_STRING(_g_priv_http_cache_control_no_transform, "no-transform")
-	SLIB_STATIC_STRING(_g_priv_http_cache_control_only_if_cached, "only-if-cached")
-	SLIB_STATIC_STRING(_g_priv_http_cache_control_must_revalidate, "must-revalidate")
-	SLIB_STATIC_STRING(_g_priv_http_cache_control_public, "public")
-	SLIB_STATIC_STRING(_g_priv_http_cache_control_private, "private")
-	SLIB_STATIC_STRING(_g_priv_http_cache_control_proxy_revalidate, "proxy-revalidate")
-	SLIB_STATIC_STRING(_g_priv_http_cache_control_s_maxage, "s-maxage")
-	SLIB_STATIC_STRING(_g_priv_http_cache_control_immutable, "immutable")
-	SLIB_STATIC_STRING(_g_priv_http_cache_control_stale_while_revalidate, "stale-while-revalidate")
-	SLIB_STATIC_STRING(_g_priv_http_cache_control_stale_if_error, "stale-if-error")
-
 	HttpCacheControlRequest HttpRequest::getRequestCacheControl() const
 	{
 		HttpCacheControlRequest cc;
 		HttpHeaderValueMap map = getRequestHeaderValueMap(HttpHeaders::CacheControl);
 		sl_int32 n;
-		if (map.getValue_NoLock(_g_priv_http_cache_control_max_age).parseInt32(10, &n)) {
+		if (map.getValue_NoLock(g_cacheControl_max_age).parseInt32(10, &n)) {
 			cc.max_age = n;
 		}
-		if (map.getValue_NoLock(_g_priv_http_cache_control_max_stale).parseInt32(10, &n)) {
+		if (map.getValue_NoLock(g_cacheControl_max_stale).parseInt32(10, &n)) {
 			cc.max_stale = n;
 		}
-		if (map.getValue_NoLock(_g_priv_http_cache_control_min_fresh).parseInt32(10, &n)) {
+		if (map.getValue_NoLock(g_cacheControl_min_fresh).parseInt32(10, &n)) {
 			cc.min_fresh = n;
 		}
-		if (map.find_NoLock(_g_priv_http_cache_control_no_cache)) {
+		if (map.find_NoLock(g_cacheControl_no_cache)) {
 			cc.no_cache = sl_true;
 		}
-		if (map.find_NoLock(_g_priv_http_cache_control_no_store)) {
+		if (map.find_NoLock(g_cacheControl_no_store)) {
 			cc.no_store = sl_true;
 		}
-		if (map.find_NoLock(_g_priv_http_cache_control_no_transform)) {
+		if (map.find_NoLock(g_cacheControl_no_transform)) {
 			cc.no_transform = sl_true;
 		}
-		if (map.find_NoLock(_g_priv_http_cache_control_only_if_cached)) {
+		if (map.find_NoLock(g_cacheControl_only_if_cached)) {
 			cc.only_if_cached = sl_true;
 		}
 		return cc;
@@ -1019,25 +1029,25 @@ namespace slib
 	{
 		HttpHeaderValueMap map;
 		if (cc.max_age.isNotNull()) {
-			map.put_NoLock(_g_priv_http_cache_control_max_age, String::fromInt32(cc.max_age));
+			map.put_NoLock(g_cacheControl_max_age, String::fromInt32(cc.max_age));
 		}
 		if (cc.max_stale.isNotNull()) {
-			map.put_NoLock(_g_priv_http_cache_control_max_stale, String::fromInt32(cc.max_stale));
+			map.put_NoLock(g_cacheControl_max_stale, String::fromInt32(cc.max_stale));
 		}
 		if (cc.min_fresh.isNotNull()) {
-			map.put_NoLock(_g_priv_http_cache_control_min_fresh, String::fromInt32(cc.min_fresh));
+			map.put_NoLock(g_cacheControl_min_fresh, String::fromInt32(cc.min_fresh));
 		}
 		if (cc.no_cache) {
-			map.put_NoLock(_g_priv_http_cache_control_no_cache, sl_null);
+			map.put_NoLock(g_cacheControl_no_cache, sl_null);
 		}
 		if (cc.no_store) {
-			map.put_NoLock(_g_priv_http_cache_control_no_store, sl_null);
+			map.put_NoLock(g_cacheControl_no_store, sl_null);
 		}
 		if (cc.no_transform) {
-			map.put_NoLock(_g_priv_http_cache_control_no_transform, sl_null);
+			map.put_NoLock(g_cacheControl_no_transform, sl_null);
 		}
 		if (cc.only_if_cached) {
-			map.put_NoLock(_g_priv_http_cache_control_only_if_cached, sl_null);
+			map.put_NoLock(g_cacheControl_only_if_cached, sl_null);
 		}
 		if (map.isNotEmpty()) {
 			setRequestHeaderValueMap(HttpHeaders::CacheControl, map);
@@ -1857,40 +1867,40 @@ namespace slib
 		HttpCacheControlResponse cc;
 		HttpHeaderValueMap map = getResponseHeaderValueMap(HttpHeaders::CacheControl);
 		sl_int32 n;
-		if (map.find_NoLock(_g_priv_http_cache_control_must_revalidate)) {
+		if (map.find_NoLock(g_cacheControl_must_revalidate)) {
 			cc.must_revalidate = sl_true;
 		}
-		if (map.find_NoLock(_g_priv_http_cache_control_no_cache)) {
+		if (map.find_NoLock(g_cacheControl_no_cache)) {
 			cc.no_cache = sl_true;
 		}
-		if (map.find_NoLock(_g_priv_http_cache_control_no_store)) {
+		if (map.find_NoLock(g_cacheControl_no_store)) {
 			cc.no_store = sl_true;
 		}
-		if (map.find_NoLock(_g_priv_http_cache_control_no_transform)) {
+		if (map.find_NoLock(g_cacheControl_no_transform)) {
 			cc.no_transform = sl_true;
 		}
-		if (map.find_NoLock(_g_priv_http_cache_control_public)) {
+		if (map.find_NoLock(g_cacheControl_public)) {
 			cc.public_ = sl_true;
 		}
-		if (map.find_NoLock(_g_priv_http_cache_control_private)) {
+		if (map.find_NoLock(g_cacheControl_private)) {
 			cc.private_ = sl_true;
 		}
-		if (map.find_NoLock(_g_priv_http_cache_control_proxy_revalidate)) {
+		if (map.find_NoLock(g_cacheControl_proxy_revalidate)) {
 			cc.proxy_revalidate = sl_true;
 		}
-		if (map.getValue_NoLock(_g_priv_http_cache_control_max_age).parseInt32(10, &n)) {
+		if (map.getValue_NoLock(g_cacheControl_max_age).parseInt32(10, &n)) {
 			cc.max_age = n;
 		}
-		if (map.getValue_NoLock(_g_priv_http_cache_control_s_maxage).parseInt32(10, &n)) {
+		if (map.getValue_NoLock(g_cacheControl_s_maxage).parseInt32(10, &n)) {
 			cc.s_maxage = n;
 		}
-		if (map.find_NoLock(_g_priv_http_cache_control_immutable)) {
+		if (map.find_NoLock(g_cacheControl_immutable)) {
 			cc.immutable = sl_true;
 		}
-		if (map.getValue_NoLock(_g_priv_http_cache_control_stale_while_revalidate).parseInt32(10, &n)) {
+		if (map.getValue_NoLock(g_cacheControl_stale_while_revalidate).parseInt32(10, &n)) {
 			cc.stale_while_revalidate = n;
 		}
-		if (map.getValue_NoLock(_g_priv_http_cache_control_stale_if_error).parseInt32(10, &n)) {
+		if (map.getValue_NoLock(g_cacheControl_stale_if_error).parseInt32(10, &n)) {
 			cc.stale_if_error = n;
 		}
 		return cc;
@@ -1900,40 +1910,40 @@ namespace slib
 	{
 		HttpHeaderValueMap map;
 		if (cc.must_revalidate) {
-			map.put_NoLock(_g_priv_http_cache_control_must_revalidate, sl_null);
+			map.put_NoLock(g_cacheControl_must_revalidate, sl_null);
 		}
 		if (cc.no_cache) {
-			map.put_NoLock(_g_priv_http_cache_control_no_cache, sl_null);
+			map.put_NoLock(g_cacheControl_no_cache, sl_null);
 		}
 		if (cc.no_store) {
-			map.put_NoLock(_g_priv_http_cache_control_no_store, sl_null);
+			map.put_NoLock(g_cacheControl_no_store, sl_null);
 		}
 		if (cc.no_transform) {
-			map.put_NoLock(_g_priv_http_cache_control_no_transform, sl_null);
+			map.put_NoLock(g_cacheControl_no_transform, sl_null);
 		}
 		if (cc.public_) {
-			map.put_NoLock(_g_priv_http_cache_control_public, sl_null);
+			map.put_NoLock(g_cacheControl_public, sl_null);
 		}
 		if (cc.private_) {
-			map.put_NoLock(_g_priv_http_cache_control_private, sl_null);
+			map.put_NoLock(g_cacheControl_private, sl_null);
 		}
 		if (cc.proxy_revalidate) {
-			map.put_NoLock(_g_priv_http_cache_control_proxy_revalidate, sl_null);
+			map.put_NoLock(g_cacheControl_proxy_revalidate, sl_null);
 		}
 		if (cc.max_age.isNotNull()) {
-			map.put_NoLock(_g_priv_http_cache_control_max_age, String::fromInt32(cc.max_age));
+			map.put_NoLock(g_cacheControl_max_age, String::fromInt32(cc.max_age));
 		}
 		if (cc.s_maxage.isNotNull()) {
-			map.put_NoLock(_g_priv_http_cache_control_s_maxage, String::fromInt32(cc.s_maxage));
+			map.put_NoLock(g_cacheControl_s_maxage, String::fromInt32(cc.s_maxage));
 		}
 		if (cc.immutable) {
-			map.put_NoLock(_g_priv_http_cache_control_immutable, sl_null);
+			map.put_NoLock(g_cacheControl_immutable, sl_null);
 		}
 		if (cc.stale_while_revalidate.isNotNull()) {
-			map.put_NoLock(_g_priv_http_cache_control_stale_while_revalidate, String::fromInt32(cc.stale_while_revalidate));
+			map.put_NoLock(g_cacheControl_stale_while_revalidate, String::fromInt32(cc.stale_while_revalidate));
 		}
 		if (cc.stale_if_error.isNotNull()) {
-			map.put_NoLock(_g_priv_http_cache_control_stale_if_error, String::fromInt32(cc.stale_if_error));
+			map.put_NoLock(g_cacheControl_stale_if_error, String::fromInt32(cc.stale_if_error));
 		}
 		if (map.isNotEmpty()) {
 			setResponseHeaderValueMap(HttpHeaders::CacheControl, map);

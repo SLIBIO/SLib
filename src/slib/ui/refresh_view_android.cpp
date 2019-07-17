@@ -31,49 +31,59 @@
 namespace slib
 {
 
-	void JNICALL _priv_AndroidRefreshView_nativeOnRefresh(JNIEnv* env, jobject _this, jlong instance);
-
-	SLIB_JNI_BEGIN_CLASS(JAndroidRefreshView, "slib/platform/android/ui/view/UiRefreshView")
-
-		SLIB_JNI_STATIC_METHOD(create, "_create", "(Landroid/content/Context;)Landroid/view/View;");
-
-		SLIB_JNI_STATIC_METHOD(setRefreshing, "_setRefreshing", "(Landroid/view/View;Z)V");
-
-		SLIB_JNI_NATIVE(nativeOnRefresh, "nativeOnRefresh", "(J)V", _priv_AndroidRefreshView_nativeOnRefresh);
-
-	SLIB_JNI_END_CLASS
-
-	class _priv_RefreshView : public RefreshView
+	namespace priv
 	{
-	public:
-		void _applyProperties(jobject handle, ViewInstance* viewInstance)
+		namespace refresh_view
 		{
-		}
 
-		void _onRefresh()
-		{
-			_onRefresh_NW();
-		}
-	};
+			void JNICALL OnRefresh(JNIEnv* env, jobject _this, jlong instance);
 
-	void JNICALL _priv_AndroidRefreshView_nativeOnRefresh(JNIEnv* env, jobject _this, jlong instance)
-	{
-		Ref<View> _view = Android_ViewInstance::findView(instance);
-		if (_priv_RefreshView* view = CastInstance<_priv_RefreshView>(_view.get())) {
-			view->_onRefresh();
+			SLIB_JNI_BEGIN_CLASS(JRefreshView, "slib/platform/android/ui/view/UiRefreshView")
+
+				SLIB_JNI_STATIC_METHOD(create, "_create", "(Landroid/content/Context;)Landroid/view/View;");
+
+				SLIB_JNI_STATIC_METHOD(setRefreshing, "_setRefreshing", "(Landroid/view/View;Z)V");
+
+				SLIB_JNI_NATIVE(nativeOnRefresh, "nativeOnRefresh", "(J)V", OnRefresh);
+
+			SLIB_JNI_END_CLASS
+
+			class RefreshViewHelper : public RefreshView
+			{
+			public:
+				void _applyProperties(jobject handle, ViewInstance* viewInstance)
+				{
+				}
+
+				void _onRefresh()
+				{
+					_onRefresh_NW();
+				}
+			};
+
+			void JNICALL OnRefresh(JNIEnv* env, jobject _this, jlong instance)
+			{
+				Ref<View> _view = Android_ViewInstance::findView(instance);
+				if (RefreshViewHelper* view = CastInstance<RefreshViewHelper>(_view.get())) {
+					view->_onRefresh();
+				}
+			}
+			
 		}
 	}
+
+	using namespace priv::refresh_view;
 
 	Ref<ViewInstance> RefreshView::createNativeWidget(ViewInstance* _parent)
 	{
 		Ref<Android_ViewInstance> ret;
 		Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 		if (parent) {
-			JniLocal<jobject> handle = JAndroidRefreshView::create.callObject(sl_null, parent->getContext());
+			JniLocal<jobject> handle = JRefreshView::create.callObject(sl_null, parent->getContext());
 			ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 			if (ret.isNotNull()) {
 				jobject handle = ret->getHandle();
-				((_priv_RefreshView*)this)->_applyProperties(handle, ret.get());
+				((RefreshViewHelper*)this)->_applyProperties(handle, ret.get());
 			}
 		}
 		return ret;
@@ -83,7 +93,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			JAndroidRefreshView::setRefreshing.call(sl_null, handle, flag ? 1 : 0);
+			JRefreshView::setRefreshing.call(sl_null, handle, flag ? 1 : 0);
 		}
 	}
 

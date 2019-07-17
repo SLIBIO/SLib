@@ -596,7 +596,68 @@ namespace slib
 		return ret;
 	}
 
+	
+	Ref<ViewInstance> UIPlatform::createViewInstance(NSView* handle)
+	{
+		Ref<ViewInstance> ret = UIPlatform::_getViewInstance((__bridge void*)handle);
+		if (ret.isNotNull()) {
+			return ret;
+		}
+		return macOS_ViewInstance::create(handle);
+	}
+	
+	void UIPlatform::registerViewInstance(NSView* handle, ViewInstance* instance)
+	{
+		UIPlatform::_registerViewInstance((__bridge void*)handle, instance);
+	}
+	
+	Ref<ViewInstance> UIPlatform::getViewInstance(NSView* handle)
+	{
+		return UIPlatform::_getViewInstance((__bridge void*)handle);
+	}
+	
+	void UIPlatform::removeViewInstance(NSView* handle)
+	{
+		UIPlatform::_removeViewInstance((__bridge void*)handle);
+	}
+	
+	NSView* UIPlatform::getViewHandle(ViewInstance* _instance)
+	{
+		macOS_ViewInstance* instance = (macOS_ViewInstance*)_instance;
+		if (instance) {
+			return instance->getHandle();
+		} else {
+			return nil;
+		}
+	}
+	
+	NSView* UIPlatform::getViewHandle(View* view)
+	{
+		if (view) {
+			Ref<ViewInstance> instance = view->getViewInstance();
+			if (instance.isNotNull()) {
+				macOS_ViewInstance* _instance = (macOS_ViewInstance*)(instance.get());
+				return _instance->getHandle();
+			}
+		}
+		return nil;
+	}
+	
+	sl_bool UIPlatform::measureNativeWidgetFittingSize(View* view, UISize& _out)
+	{
+		NSView* handle = UIPlatform::getViewHandle(view);
+		if (handle != nil) {
+			NSSize size = handle.fittingSize;
+			_out.x = (sl_ui_len)(size.width);
+			_out.y = (sl_ui_len)(size.height);
+			return sl_true;
+		}
+		return sl_false;
+	}
+
 }
+
+using namespace slib;
 
 @implementation SLIBViewBaseHandle
 
@@ -649,14 +710,14 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 	m_trackingArea = [[NSTrackingArea alloc] initWithRect:rc options: (NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved | NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect) owner:self userInfo:nil];
 	if (m_trackingArea != nil) {
 		[self addTrackingArea:m_trackingArea];
-		slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+		Ref<macOS_ViewInstance> instance = m_viewInstance;
 		if (instance.isNotNull()) {
 			NSPoint mouseLocation = [[self window] mouseLocationOutsideOfEventStream];
 			mouseLocation = [self convertPoint: mouseLocation fromView: nil];
 			if (NSPointInRect(mouseLocation, [self bounds])) {
-				instance->onEventMouse(slib::UIAction::MouseEnter, mouseLocation);
+				instance->onEventMouse(UIAction::MouseEnter, mouseLocation);
 			} else {
-				instance->onEventMouse(slib::UIAction::MouseLeave, mouseLocation);
+				instance->onEventMouse(UIAction::MouseLeave, mouseLocation);
 			}
 		}
 	}
@@ -671,7 +732,7 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 - (void)drawRect:(NSRect)dirtyRect
 {
 	if (m_flagDrawing) {
-		slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+		Ref<macOS_ViewInstance> instance = m_viewInstance;
 		if (instance.isNotNull()) {
 			instance->onDraw(dirtyRect);
 		}
@@ -680,10 +741,10 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 
 - (void)keyDown:(NSEvent*)theEvent
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::UIEventFlags flags = instance->onEventKey(sl_true, theEvent);
-		if (flags & slib::UIEventFlags::StopPropagation) {
+		UIEventFlags flags = instance->onEventKey(sl_true, theEvent);
+		if (flags & UIEventFlags::StopPropagation) {
 			return;
 		}
 	}
@@ -692,10 +753,10 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 
 - (void)keyUp:(NSEvent*)theEvent
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::UIEventFlags flags = instance->onEventKey(sl_false, theEvent);
-		if (flags & slib::UIEventFlags::StopPropagation) {
+		UIEventFlags flags = instance->onEventKey(sl_false, theEvent);
+		if (flags & UIEventFlags::StopPropagation) {
 			return;
 		}
 	}
@@ -704,10 +765,10 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::UIEventFlags flags = instance->onEventMouse(slib::UIAction::LeftButtonDown, theEvent);
-		if (flags & slib::UIEventFlags::StopPropagation) {
+		UIEventFlags flags = instance->onEventMouse(UIAction::LeftButtonDown, theEvent);
+		if (flags & UIEventFlags::StopPropagation) {
 			return;
 		}
 	}
@@ -716,14 +777,14 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::UIEventFlags flags = instance->onEventMouse(slib::UIAction::LeftButtonUp, theEvent);
+		UIEventFlags flags = instance->onEventMouse(UIAction::LeftButtonUp, theEvent);
 		NSInteger clicks = [theEvent clickCount];
 		if (clicks == 2) {
-			flags |= instance->onEventMouse(slib::UIAction::LeftButtonDoubleClick, theEvent);
+			flags |= instance->onEventMouse(UIAction::LeftButtonDoubleClick, theEvent);
 		}
-		if (flags & slib::UIEventFlags::StopPropagation) {
+		if (flags & UIEventFlags::StopPropagation) {
 			return;
 		}
 	}
@@ -732,10 +793,10 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 
 - (void)mouseDragged:(NSEvent *)theEvent
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::UIEventFlags flags = instance->onEventMouse(slib::UIAction::LeftButtonDrag, theEvent);
-		if (flags & slib::UIEventFlags::StopPropagation) {
+		UIEventFlags flags = instance->onEventMouse(UIAction::LeftButtonDrag, theEvent);
+		if (flags & UIEventFlags::StopPropagation) {
 			return;
 		}
 	}
@@ -744,10 +805,10 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 
 - (void)rightMouseDown:(NSEvent *)theEvent
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::UIEventFlags flags = instance->onEventMouse(slib::UIAction::RightButtonDown, theEvent);
-		if (flags & slib::UIEventFlags::StopPropagation) {
+		UIEventFlags flags = instance->onEventMouse(UIAction::RightButtonDown, theEvent);
+		if (flags & UIEventFlags::StopPropagation) {
 			return;
 		}
 	}
@@ -756,14 +817,14 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 
 - (void)rightMouseUp:(NSEvent *)theEvent
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::UIEventFlags flags = instance->onEventMouse(slib::UIAction::RightButtonUp, theEvent);
+		UIEventFlags flags = instance->onEventMouse(UIAction::RightButtonUp, theEvent);
 		NSInteger clicks = [theEvent clickCount];
 		if (clicks == 2) {
-			flags |= instance->onEventMouse(slib::UIAction::RightButtonDoubleClick, theEvent);
+			flags |= instance->onEventMouse(UIAction::RightButtonDoubleClick, theEvent);
 		}
-		if (flags & slib::UIEventFlags::StopPropagation) {
+		if (flags & UIEventFlags::StopPropagation) {
 			return;
 		}
 	}
@@ -772,10 +833,10 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 
 - (void)rightMouseDragged:(NSEvent *)theEvent
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::UIEventFlags flags = instance->onEventMouse(slib::UIAction::RightButtonDrag, theEvent);
-		if (flags & slib::UIEventFlags::StopPropagation) {
+		UIEventFlags flags = instance->onEventMouse(UIAction::RightButtonDrag, theEvent);
+		if (flags & UIEventFlags::StopPropagation) {
 			return;
 		}
 	}
@@ -784,10 +845,10 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 
 - (void)otherMouseDown:(NSEvent *)theEvent
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::UIEventFlags flags = instance->onEventMouse(slib::UIAction::MiddleButtonDown, theEvent);
-		if (flags & slib::UIEventFlags::StopPropagation) {
+		UIEventFlags flags = instance->onEventMouse(UIAction::MiddleButtonDown, theEvent);
+		if (flags & UIEventFlags::StopPropagation) {
 			return;
 		}
 	}
@@ -796,14 +857,14 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 
 - (void)otherMouseUp:(NSEvent *)theEvent
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::UIEventFlags flags = instance->onEventMouse(slib::UIAction::MiddleButtonUp, theEvent);
+		UIEventFlags flags = instance->onEventMouse(UIAction::MiddleButtonUp, theEvent);
 		NSInteger clicks = [theEvent clickCount];
 		if (clicks == 2) {
-			flags |= instance->onEventMouse(slib::UIAction::MiddleButtonDoubleClick, theEvent);
+			flags |= instance->onEventMouse(UIAction::MiddleButtonDoubleClick, theEvent);
 		}
-		if (flags & slib::UIEventFlags::StopPropagation) {
+		if (flags & UIEventFlags::StopPropagation) {
 			return;
 		}
 	}
@@ -812,10 +873,10 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 
 - (void)otherMouseDragged:(NSEvent *)theEvent
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::UIEventFlags flags = instance->onEventMouse(slib::UIAction::MiddleButtonDrag, theEvent);
-		if (flags & slib::UIEventFlags::StopPropagation) {
+		UIEventFlags flags = instance->onEventMouse(UIAction::MiddleButtonDrag, theEvent);
+		if (flags & UIEventFlags::StopPropagation) {
 			return;
 		}
 	}
@@ -825,10 +886,10 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 - (void)mouseMoved:(NSEvent *)theEvent
 {
 	[[self window] invalidateCursorRectsForView:self];
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::UIEventFlags flags = instance->onEventMouse(slib::UIAction::MouseMove, theEvent);
-		if (flags & slib::UIEventFlags::StopPropagation) {
+		UIEventFlags flags = instance->onEventMouse(UIAction::MouseMove, theEvent);
+		if (flags & UIEventFlags::StopPropagation) {
 			return;
 		}
 	}
@@ -837,10 +898,10 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 
 - (void)mouseEntered:(NSEvent *)theEvent
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::UIEventFlags flags = instance->onEventMouse(slib::UIAction::MouseEnter, theEvent);
-		if (flags & slib::UIEventFlags::StopPropagation) {
+		UIEventFlags flags = instance->onEventMouse(UIAction::MouseEnter, theEvent);
+		if (flags & UIEventFlags::StopPropagation) {
 			return;
 		}
 	}
@@ -849,10 +910,10 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 
 - (void)mouseExited:(NSEvent *)theEvent
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::UIEventFlags flags = instance->onEventMouse(slib::UIAction::MouseLeave, theEvent);
-		if (flags & slib::UIEventFlags::StopPropagation) {
+		UIEventFlags flags = instance->onEventMouse(UIAction::MouseLeave, theEvent);
+		if (flags & UIEventFlags::StopPropagation) {
 			return;
 		}
 	}
@@ -861,10 +922,10 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 
 - (void)scrollWheel:(NSEvent *)theEvent
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::UIEventFlags flags = instance->onEventMouseWheel(theEvent);
-		if (flags & slib::UIEventFlags::StopPropagation) {
+		UIEventFlags flags = instance->onEventMouseWheel(theEvent);
+		if (flags & UIEventFlags::StopPropagation) {
 			return;
 		}
 	}
@@ -873,10 +934,10 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 
 - (void)cursorUpdate:(NSEvent *)theEvent
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::UIEventFlags flags = instance->onEventUpdateCursor(theEvent);
-		if (flags & slib::UIEventFlags::PreventDefault) {
+		UIEventFlags flags = instance->onEventUpdateCursor(theEvent);
+		if (flags & UIEventFlags::PreventDefault) {
 			return;
 		}
 	}
@@ -885,16 +946,16 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 
 - (NSView *)hitTest:(NSPoint)aPoint
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::Ref<slib::View> view = instance->getView();
+		Ref<View> view = instance->getView();
 		if (view.isNotNull()) {
 			if (!(view->isEnabled())) {
 				return nil;
 			}
-			slib::Function<sl_bool(const slib::UIPoint&)> hitTestCapture(view->getCapturingChildInstanceEvents());
+			Function<sl_bool(const UIPoint&)> hitTestCapture(view->getCapturingChildInstanceEvents());
 			if (hitTestCapture.isNotNull()) {
-				if (hitTestCapture(slib::UIPoint((sl_ui_pos)(aPoint.x), (sl_ui_pos)(aPoint.y)))) {
+				if (hitTestCapture(UIPoint((sl_ui_pos)(aPoint.x), (sl_ui_pos)(aPoint.y)))) {
 					return self;
 				}
 			}
@@ -904,61 +965,5 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 }
 
 @end
-
-
-/******************************************
-				UIPlatform
-******************************************/
-
-namespace slib
-{
-
-	Ref<ViewInstance> UIPlatform::createViewInstance(NSView* handle)
-	{
-		Ref<ViewInstance> ret = UIPlatform::_getViewInstance((__bridge void*)handle);
-		if (ret.isNotNull()) {
-			return ret;
-		}
-		return macOS_ViewInstance::create(handle);
-	}
-
-	void UIPlatform::registerViewInstance(NSView* handle, ViewInstance* instance)
-	{
-		UIPlatform::_registerViewInstance((__bridge void*)handle, instance);
-	}
-
-	Ref<ViewInstance> UIPlatform::getViewInstance(NSView* handle)
-	{
-		return UIPlatform::_getViewInstance((__bridge void*)handle);
-	}
-
-	void UIPlatform::removeViewInstance(NSView* handle)
-	{
-		UIPlatform::_removeViewInstance((__bridge void*)handle);
-	}
-
-	NSView* UIPlatform::getViewHandle(ViewInstance* _instance)
-	{
-		macOS_ViewInstance* instance = (macOS_ViewInstance*)_instance;
-		if (instance) {
-			return instance->getHandle();
-		} else {
-			return nil;
-		}
-	}
-
-	NSView* UIPlatform::getViewHandle(View* view)
-	{
-		if (view) {
-			Ref<ViewInstance> instance = view->getViewInstance();
-			if (instance.isNotNull()) {
-				macOS_ViewInstance* _instance = (macOS_ViewInstance*)(instance.get());
-				return _instance->getHandle();
-			}
-		}
-		return nil;
-	}
-
-}
 
 #endif

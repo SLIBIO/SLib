@@ -166,24 +166,6 @@ namespace slib
 		}
 	}
 	
-	namespace priv
-	{
-		namespace check_box
-		{
-			UISize measureNativeWidgetSize(CheckBox* view);
-		}
-	}
-
-	UISize CheckBox::measureLayoutContentSize(sl_ui_len widthFrame, sl_ui_len heightFrame)
-	{
-#if defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_WIN32)
-		if (isNativeWidget()) {
-			return priv::check_box::measureNativeWidgetSize(this);
-		}
-#endif
-		return measureContentSize(widthFrame, heightFrame);
-	}
-
 	void CheckBox::dispatchClickEvent(UIEvent* ev)
 	{
 		if (isNativeWidget()) {
@@ -206,6 +188,11 @@ namespace slib
 
 	void CheckBox::_setChecked_NW(sl_bool flag)
 	{
+	}
+
+	sl_bool CheckBox::_measureSize_NW(UISize& _out)
+	{
+		return sl_false;
 	}
 #endif
 

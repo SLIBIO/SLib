@@ -105,7 +105,8 @@ namespace slib
 		static void removeViewInstance(NSView* handle);
 		static NSView* getViewHandle(ViewInstance* instance);
 		static NSView* getViewHandle(View* view);
-		
+		static sl_bool measureNativeWidgetFittingSize(View* view, UISize& _out);
+
 		static Ref<WindowInstance> createWindowInstance(NSWindow* handle);
 		static void registerWindowInstance(NSWindow* handle, WindowInstance* instance);
 		static Ref<WindowInstance> getWindowInstance(NSWindow* handle);
@@ -124,7 +125,7 @@ namespace slib
 		static NSMenuItem* getMenuItemHandle(const Ref<MenuItem>& menu);
 		
 		static NSString* getKeyEquivalent(const KeycodeAndModifiers& km, NSUInteger& outMask);
-
+		
 #	endif		
 #elif defined(SLIB_UI_IS_IOS)
 #	if defined(__OBJC__)

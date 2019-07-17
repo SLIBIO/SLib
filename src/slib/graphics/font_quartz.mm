@@ -35,6 +35,179 @@ typedef NSFont UIFont;
 namespace slib
 {
 
+	namespace priv
+	{
+		namespace quartz
+		{
+
+			class FontPlatformObject : public Referable
+			{
+			public:
+				CTFontRef m_fontCoreText;
+				sl_bool m_flagCreatedCoreText;
+				
+				UIFont* m_fontUI;
+				sl_bool m_flagCreatedUI;
+				CGFloat m_lastUIScaleFactor;
+				
+				SpinLock m_lock;
+				
+			public:
+				FontPlatformObject()
+				{
+					m_fontCoreText = nil;
+					m_flagCreatedCoreText = sl_false;
+					
+					m_fontUI = nil;
+					m_flagCreatedUI = sl_false;
+					m_lastUIScaleFactor = 0;
+				}
+				
+				~FontPlatformObject()
+				{
+					if (m_fontCoreText) {
+						CFRelease(m_fontCoreText);
+					}
+					m_fontUI = nil;
+				}
+				
+			public:
+				void _createCoreText(const FontDesc& desc)
+				{
+					if (m_flagCreatedCoreText) {
+						return;
+					}
+					
+					SpinLocker lock(&m_lock);
+					
+					if (m_flagCreatedCoreText) {
+						return;
+					}
+					
+					m_flagCreatedCoreText = sl_true;
+					
+					float size = desc.size;
+					
+					NSMutableDictionary* attributes = [NSMutableDictionary dictionary];
+					NSString* familyName = Apple::getNSStringFromString(desc.familyName);
+					[attributes setObject:familyName forKey:(id)kCTFontFamilyNameAttribute];
+					
+					NSMutableDictionary* traits = [NSMutableDictionary dictionary];
+					CTFontSymbolicTraits symbolicTraits = 0;
+					if (desc.flagBold) {
+						symbolicTraits |= kCTFontTraitBold;
+					}
+					if (desc.flagItalic) {
+						symbolicTraits |= kCTFontTraitItalic;
+					}
+					[traits setObject:[NSNumber numberWithUnsignedInt:symbolicTraits] forKey:(id)kCTFontSymbolicTrait];
+					[attributes setObject:traits forKey:(id)kCTFontTraitsAttribute];
+					
+					[attributes setObject:[NSNumber numberWithFloat:size] forKey:(id)kCTFontSizeAttribute];
+					
+					CTFontDescriptorRef descriptor = CTFontDescriptorCreateWithAttributes((CFDictionaryRef)attributes);
+					if (descriptor) {
+						CTFontRef font = CTFontCreateWithFontDescriptor(descriptor, size, NULL);
+						if (font) {
+							m_fontCoreText = font;
+						}
+						CFRelease(descriptor);
+					}
+				}
+				
+				
+				UIFont* _createUI(const FontDesc& desc, CGFloat scaleFactor)
+				{
+					SpinLocker lock(&m_lock);
+					
+					if (m_flagCreatedUI && m_lastUIScaleFactor == scaleFactor) {
+						return m_fontUI;
+					}
+					
+					m_flagCreatedUI = sl_true;
+					
+					float size = desc.size / scaleFactor;
+					NSString* familyName = Apple::getNSStringFromString(desc.familyName);
+					uint32_t traits = 0;
+#if defined(SLIB_PLATFORM_IS_MACOS)
+					NSFontDescriptor* nsFontDesc = [NSFontDescriptor fontDescriptorWithName:familyName size:size];
+					if (nsFontDesc == nil) {
+						return nil;
+					}
+					if (desc.flagBold) {
+						traits |= NSFontBoldTrait;
+					}
+					if (desc.flagItalic) {
+						traits |= NSFontItalicTrait;
+					}
+					NSFontDescriptor* nsFontDescWithTraits = [nsFontDesc fontDescriptorWithSymbolicTraits:traits];
+					if (nsFontDescWithTraits != nil) {
+						nsFontDesc = nsFontDescWithTraits;
+					}
+					m_fontUI = [NSFont fontWithDescriptor:nsFontDesc size:size];
+#else
+					UIFontDescriptor* uiFontDesc = [UIFontDescriptor fontDescriptorWithName:familyName size:size];
+					if (uiFontDesc == nil) {
+						return nil;
+					}
+					if (desc.flagBold) {
+						traits |= UIFontDescriptorTraitBold;
+					}
+					if (desc.flagItalic) {
+						traits |= UIFontDescriptorTraitItalic;
+					}
+					UIFontDescriptor* uiFontDescWithTraits = [uiFontDesc fontDescriptorWithSymbolicTraits:traits];
+					if (uiFontDescWithTraits != nil) {
+						uiFontDesc = uiFontDescWithTraits;
+					}
+					m_fontUI = [UIFont fontWithDescriptor:uiFontDesc size:size];
+#endif
+					m_lastUIScaleFactor = scaleFactor;
+					return m_fontUI;
+				}
+
+			};
+
+			class FontHelper : public Font
+			{
+			public:
+				FontPlatformObject* getPlatformObject()
+				{
+					if (m_platformObject.isNull()) {
+						SpinLocker lock(&m_lock);
+						if (m_platformObject.isNull()) {
+							m_platformObject = new FontPlatformObject;
+						}
+					}
+					return (FontPlatformObject*)(m_platformObject.get());;
+				}
+				
+				CTFontRef getCoreText()
+				{
+					FontPlatformObject* po = getPlatformObject();
+					if (po) {
+						po->_createCoreText(m_desc);
+						return po->m_fontCoreText;
+					}
+					return NULL;
+				}
+				
+				UIFont* getUI(CGFloat scaleFactor)
+				{
+					FontPlatformObject* po = getPlatformObject();
+					if (po) {
+						return po->_createUI(m_desc, scaleFactor);
+					}
+					return nil;
+				}
+				
+			};
+
+		}
+	}
+	
+	using namespace priv::quartz;
+
 	sl_bool Font::_getFontMetrics_PO(FontMetrics& _out)
 	{
 		CTFontRef handle = GraphicsPlatform::getCoreTextFont(this);
@@ -84,173 +257,10 @@ namespace slib
 		return ret;
 	}
 
-	class Apple_FontObject : public Referable
-	{
-	public:
-		CTFontRef m_fontCoreText;
-		sl_bool m_flagCreatedCoreText;
-		
-		UIFont* m_fontUI;
-		sl_bool m_flagCreatedUI;
-		CGFloat m_lastUIScaleFactor;
-		
-		SpinLock m_lock;
-		
-	public:
-		Apple_FontObject()
-		{
-			m_fontCoreText = nil;
-			m_flagCreatedCoreText = sl_false;
-			
-			m_fontUI = nil;
-			m_flagCreatedUI = sl_false;
-			m_lastUIScaleFactor = 0;
-		}
-		
-		~Apple_FontObject()
-		{
-			if (m_fontCoreText) {
-				CFRelease(m_fontCoreText);
-			}
-			m_fontUI = nil;
-		}
-		
-	public:
-		void _createCoreText(const FontDesc& desc)
-		{
-			if (m_flagCreatedCoreText) {
-				return;
-			}
-			
-			SpinLocker lock(&m_lock);
-			
-			if (m_flagCreatedCoreText) {
-				return;
-			}
-			
-			m_flagCreatedCoreText = sl_true;
-			
-			float size = desc.size;
-			
-			NSMutableDictionary* attributes = [NSMutableDictionary dictionary];
-			NSString* familyName = Apple::getNSStringFromString(desc.familyName);
-			[attributes setObject:familyName forKey:(id)kCTFontFamilyNameAttribute];
-			
-			NSMutableDictionary* traits = [NSMutableDictionary dictionary];
-			CTFontSymbolicTraits symbolicTraits = 0;
-			if (desc.flagBold) {
-				symbolicTraits |= kCTFontTraitBold;
-			}
-			if (desc.flagItalic) {
-				symbolicTraits |= kCTFontTraitItalic;
-			}
-			[traits setObject:[NSNumber numberWithUnsignedInt:symbolicTraits] forKey:(id)kCTFontSymbolicTrait];
-			[attributes setObject:traits forKey:(id)kCTFontTraitsAttribute];
-			
-			[attributes setObject:[NSNumber numberWithFloat:size] forKey:(id)kCTFontSizeAttribute];
-			
-			CTFontDescriptorRef descriptor = CTFontDescriptorCreateWithAttributes((CFDictionaryRef)attributes);
-			if (descriptor) {
-				CTFontRef font = CTFontCreateWithFontDescriptor(descriptor, size, NULL);
-				if (font) {
-					m_fontCoreText = font;
-				}
-				CFRelease(descriptor);
-			}
-		}
-		
-		
-		UIFont* _createUI(const FontDesc& desc, CGFloat scaleFactor)
-		{
-			SpinLocker lock(&m_lock);
-			
-			if (m_flagCreatedUI && m_lastUIScaleFactor == scaleFactor) {
-				return m_fontUI;
-			}
-			
-			m_flagCreatedUI = sl_true;
-			
-			float size = desc.size / scaleFactor;
-			NSString* familyName = Apple::getNSStringFromString(desc.familyName);
-			uint32_t traits = 0;
-#if defined(SLIB_PLATFORM_IS_MACOS)
-			NSFontDescriptor* nsFontDesc = [NSFontDescriptor fontDescriptorWithName:familyName size:size];
-			if (nsFontDesc == nil) {
-				return nil;
-			}
-			if (desc.flagBold) {
-				traits |= NSFontBoldTrait;
-			}
-			if (desc.flagItalic) {
-				traits |= NSFontItalicTrait;
-			}
-			NSFontDescriptor* nsFontDescWithTraits = [nsFontDesc fontDescriptorWithSymbolicTraits:traits];
-			if (nsFontDescWithTraits != nil) {
-				nsFontDesc = nsFontDescWithTraits;
-			}
-			m_fontUI = [NSFont fontWithDescriptor:nsFontDesc size:size];
-#else
-			UIFontDescriptor* uiFontDesc = [UIFontDescriptor fontDescriptorWithName:familyName size:size];
-			if (uiFontDesc == nil) {
-				return nil;
-			}
-			if (desc.flagBold) {
-				traits |= UIFontDescriptorTraitBold;
-			}
-			if (desc.flagItalic) {
-				traits |= UIFontDescriptorTraitItalic;
-			}
-			UIFontDescriptor* uiFontDescWithTraits = [uiFontDesc fontDescriptorWithSymbolicTraits:traits];
-			if (uiFontDescWithTraits != nil) {
-				uiFontDesc = uiFontDescWithTraits;
-			}
-			m_fontUI = [UIFont fontWithDescriptor:uiFontDesc size:size];
-#endif
-			m_lastUIScaleFactor = scaleFactor;
-			return m_fontUI;
-		}
-
-	};
-
-	class Font_Ext : public Font
-	{
-	public:
-		Apple_FontObject* getPlatformObject()
-		{
-			if (m_platformObject.isNull()) {
-				SpinLocker lock(&m_lock);
-				if (m_platformObject.isNull()) {
-					m_platformObject = new Apple_FontObject;
-				}
-			}
-			return (Apple_FontObject*)(m_platformObject.get());;
-		}
-		
-		CTFontRef getCoreText()
-		{
-			Apple_FontObject* po = getPlatformObject();
-			if (po) {
-				po->_createCoreText(m_desc);
-				return po->m_fontCoreText;
-			}
-			return NULL;
-		}
-		
-		UIFont* getUI(CGFloat scaleFactor)
-		{
-			Apple_FontObject* po = getPlatformObject();
-			if (po) {
-				return po->_createUI(m_desc, scaleFactor);
-			}
-			return nil;
-		}
-		
-	};
-
 	CTFontRef GraphicsPlatform::getCoreTextFont(Font* _font)
 	{
 		if (_font) {
-			Font_Ext* font = (Font_Ext*)_font;
+			FontHelper* font = (FontHelper*)_font;
 			return font->getCoreText();
 		}
 		return NULL;
@@ -263,7 +273,7 @@ namespace slib
 #endif
 	{
 		if (_font) {
-			Font_Ext* font = (Font_Ext*)_font;
+			FontHelper* font = (FontHelper*)_font;
 			return font->getUI(scaleFactor);
 		}
 		return nil;

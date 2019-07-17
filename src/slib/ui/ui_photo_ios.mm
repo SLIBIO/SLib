@@ -31,7 +31,7 @@
 
 #include <Photos/Photos.h>
 
-@interface _priv_SLib_TakePictureController : UIImagePickerController<UINavigationControllerDelegate, UIImagePickerControllerDelegate>
+@interface SLIBTakePhotoController : UIImagePickerController<UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 {
 	@public slib::TakePhoto takePhoto;
 }
@@ -39,74 +39,84 @@
 
 namespace slib
 {
-	
-	class _priv_TakePhotoResult : public TakePhotoResult
+
+	namespace priv
 	{
-	public:
-		void setResult(UIImage* image)
+		namespace ui_photo
 		{
-			if (image != nil) {
-				drawable = GraphicsPlatform::createImageDrawable(image.CGImage);
-				if (drawable.isNotNull()) {
-					UIImageOrientation orientation = image.imageOrientation;
-					if (orientation != UIImageOrientationUp) {
-						switch (orientation) {
-							case UIImageOrientationDown:
-								drawable = drawable->rotate(RotationMode::Rotate180);
-								break;
-							case UIImageOrientationLeft:
-								drawable = drawable->rotate(RotationMode::Rotate270);
-								break;
-							case UIImageOrientationRight:
-								drawable = drawable->rotate(RotationMode::Rotate90);
-								break;
-							case UIImageOrientationUpMirrored:
-								drawable = drawable->flip(FlipMode::Horizontal);
-								break;
-							case UIImageOrientationDownMirrored:
-								drawable = drawable->flip(FlipMode::Vertical);
-								break;
-							case UIImageOrientationLeftMirrored:
-								drawable = drawable->rotate(RotationMode::Rotate270, FlipMode::Horizontal);
-								break;
-							case UIImageOrientationRightMirrored:
-								drawable = drawable->rotate(RotationMode::Rotate90, FlipMode::Horizontal);
-								break;
-							default:
-								break;
-						}
-						if (drawable.isNull()) {
-							return;
+		
+			class TakePhotoResultEx : public TakePhotoResult
+			{
+			public:
+				void setResult(UIImage* image)
+				{
+					if (image != nil) {
+						drawable = GraphicsPlatform::createImageDrawable(image.CGImage);
+						if (drawable.isNotNull()) {
+							UIImageOrientation orientation = image.imageOrientation;
+							if (orientation != UIImageOrientationUp) {
+								switch (orientation) {
+									case UIImageOrientationDown:
+										drawable = drawable->rotate(RotationMode::Rotate180);
+										break;
+									case UIImageOrientationLeft:
+										drawable = drawable->rotate(RotationMode::Rotate270);
+										break;
+									case UIImageOrientationRight:
+										drawable = drawable->rotate(RotationMode::Rotate90);
+										break;
+									case UIImageOrientationUpMirrored:
+										drawable = drawable->flip(FlipMode::Horizontal);
+										break;
+									case UIImageOrientationDownMirrored:
+										drawable = drawable->flip(FlipMode::Vertical);
+										break;
+									case UIImageOrientationLeftMirrored:
+										drawable = drawable->rotate(RotationMode::Rotate270, FlipMode::Horizontal);
+										break;
+									case UIImageOrientationRightMirrored:
+										drawable = drawable->rotate(RotationMode::Rotate90, FlipMode::Horizontal);
+										break;
+									default:
+										break;
+								}
+								if (drawable.isNull()) {
+									return;
+								}
+							}
+							flagSuccess = sl_true;
 						}
 					}
-					flagSuccess = sl_true;
+				}		
+			};
+			
+			static void RunTakePhoto(TakePhoto& takePhoto, SLIBTakePhotoController* controller)
+			{
+				controller->takePhoto = takePhoto;
+				[controller setDelegate:controller];
+				
+				UIViewController* rootController = UIPlatform::getCurrentViewController(takePhoto.parent);
+				if (rootController != nil) {
+					if (![rootController isBeingPresented]) {
+						[rootController presentViewController:controller animated:YES completion:nil];
+						return;
+					}
 				}
+				TakePhotoResult result;
+				takePhoto.onComplete(result);
 			}
-		}		
-	};
-	
-	static void _priv_TakePhoto_run(TakePhoto& takePhoto, _priv_SLib_TakePictureController* controller)
-	{
-		controller->takePhoto = takePhoto;
-		[controller setDelegate:controller];
-		
-		UIViewController* rootController = UIPlatform::getCurrentViewController(takePhoto.parent);
-		if (rootController != nil) {
-			if (![rootController isBeingPresented]) {
-				[rootController presentViewController:controller animated:YES completion:nil];
-				return;
-			}
+
 		}
-		TakePhotoResult result;
-		takePhoto.onComplete(result);
 	}
+
+	using namespace priv::ui_photo;
 	
 	void TakePhoto::takeFromCamera()
 	{
-		_priv_SLib_TakePictureController* controller = [[_priv_SLib_TakePictureController alloc] init];
+		SLIBTakePhotoController* controller = [[SLIBTakePhotoController alloc] init];
 		if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
 			[controller setSourceType:UIImagePickerControllerSourceTypeCamera];
-			_priv_TakePhoto_run(*this, controller);
+			RunTakePhoto(*this, controller);
 		} else {
 			TakePhotoResult result;
 			onComplete(result);
@@ -115,14 +125,17 @@ namespace slib
 	
 	void TakePhoto::chooseFromLibrary()
 	{
-		_priv_SLib_TakePictureController* controller = [[_priv_SLib_TakePictureController alloc] init];
+		SLIBTakePhotoController* controller = [[SLIBTakePhotoController alloc] init];
 		[controller setSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
-		_priv_TakePhoto_run(*this, controller);
+		RunTakePhoto(*this, controller);
 	}
 
 }
 
-@implementation _priv_SLib_TakePictureController
+using namespace slib;
+using namespace slib::priv::ui_photo;
+
+@implementation SLIBTakePhotoController
 
 - (void)imagePickerController:(UIImagePickerController*)picker didFinishPickingMediaWithInfo:(NSDictionary*)info
 {
@@ -131,7 +144,7 @@ namespace slib
 	if (image == nil) {
 		image = [info objectForKey:UIImagePickerControllerOriginalImage];
 	}
-	slib::_priv_TakePhotoResult result;
+	TakePhotoResultEx result;
 	result.setResult(image);
 	takePhoto.onComplete(result);
 }
@@ -139,7 +152,7 @@ namespace slib
 - (void)imagePickerControllerDidCancel:(UIImagePickerController*)picker
 {
 	[picker dismissViewControllerAnimated:YES completion:nil];
-	slib::TakePhotoResult result;
+	TakePhotoResult result;
 	result.flagCancel = sl_true;
 	takePhoto.onComplete(result);
 }

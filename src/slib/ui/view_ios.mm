@@ -32,10 +32,6 @@
 namespace slib
 {
 	
-/******************************************
-			iOS_ViewInstance
-******************************************/
-	
 	iOS_ViewInstance::iOS_ViewInstance()
 	{
 		m_handle = nil;
@@ -578,10 +574,6 @@ namespace slib
 	}
 	
 	
-/******************************************
-				View
-******************************************/
-	
 	Ref<ViewInstance> View::createGenericInstance(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
@@ -595,108 +587,7 @@ namespace slib
 		return ret;
 	}
 	
-}
-
-@implementation SLIBViewHandle
-
-- (void)drawRect:(CGRect)dirtyRect
-{
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		instance->onDraw(dirtyRect);
-	}
-}
-
-- (UIView *)hitTest:(CGPoint)aPoint withEvent:(UIEvent *)event
-{
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		slib::Ref<slib::View> view = instance->getView();
-		if (view.isNotNull()) {
-			if (!(view->isEnabled())) {
-				return nil;
-			}
-			slib::Function<sl_bool(const slib::UIPoint&)> hitTestCapture(view->getCapturingChildInstanceEvents());
-			if (hitTestCapture.isNotNull()) {
-				CGFloat f = slib::UIPlatform::getGlobalScaleFactor();
-				if (hitTestCapture(slib::UIPoint((sl_ui_pos)(aPoint.x * f), (sl_ui_pos)(aPoint.y * f)))) {
-					return self;
-				}
-			}
-		}
-	}
-	return [super hitTest:aPoint withEvent:event];
-}
-
-IOS_VIEW_EVENTS
-
-@end
-
-@interface SLIBViewTiledLayer : CATiledLayer
-{
-	@public sl_int32 m_updateId;
-}
-@end
-
-@implementation SLIBViewTiledLayer
-
-+(CFTimeInterval)fadeDuration
-{
-	return 0.0;
-}
-
--(id)init
-{
-	self = [super init];
-	if (self != nil) {
-		m_updateId = 0;
-		slib::UISize screenSize = slib::UI::getScreenSize();
-		CGFloat m = slib::Math::min(screenSize.x, screenSize.y);
-		self.tileSize = CGSizeMake(m, m);
-	}
-	return self;
-}
-
--(void)setNeedsDisplay
-{
-	slib::Base::interlockedIncrement32(&m_updateId);
-	[super setNeedsDisplay];
-}
-
--(void)setNeedsDisplayInRect:(CGRect)r
-{
-	slib::Base::interlockedIncrement32(&m_updateId);
-	[super setNeedsDisplayInRect:r];
-}
-
--(void)drawInContext:(CGContextRef)ctx
-{
-	sl_int32 updateId = m_updateId;
-	[super drawInContext:ctx];
-	dispatch_async(dispatch_get_main_queue(), ^{
-		if (updateId != self->m_updateId) {
-			[self setNeedsDisplay];
-		}
-	});
-}
-
-@end
-
-@implementation SLIBScrollContentViewHandle
-
-+(Class)layerClass
-{
-	return SLIBViewTiledLayer.class;
-}
-
-@end
-
-/******************************************
-			UIPlatform
-******************************************/
-
-namespace slib
-{
+	
 	Ref<ViewInstance> UIPlatform::createViewInstance(UIView* handle)
 	{
 		Ref<ViewInstance> ret = UIPlatform::_getViewInstance((__bridge void*)handle);
@@ -786,11 +677,106 @@ namespace slib
 			}
 		}
 		return sl_false;
-	}	
+	}
+	
 }
 
-#endif
+using namespace slib;
+using ::UIEvent;
 
+@implementation SLIBViewHandle
+
+- (void)drawRect:(CGRect)dirtyRect
+{
+	Ref<iOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		instance->onDraw(dirtyRect);
+	}
+}
+
+- (UIView *)hitTest:(CGPoint)aPoint withEvent:(::UIEvent *)event
+{
+	Ref<iOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		Ref<View> view = instance->getView();
+		if (view.isNotNull()) {
+			if (!(view->isEnabled())) {
+				return nil;
+			}
+			Function<sl_bool(const UIPoint&)> hitTestCapture(view->getCapturingChildInstanceEvents());
+			if (hitTestCapture.isNotNull()) {
+				CGFloat f = UIPlatform::getGlobalScaleFactor();
+				if (hitTestCapture(UIPoint((sl_ui_pos)(aPoint.x * f), (sl_ui_pos)(aPoint.y * f)))) {
+					return self;
+				}
+			}
+		}
+	}
+	return [super hitTest:aPoint withEvent:event];
+}
+
+IOS_VIEW_EVENTS
+
+@end
+
+@interface SLIBViewTiledLayer : CATiledLayer
+{
+	@public sl_int32 m_updateId;
+}
+@end
+
+@implementation SLIBViewTiledLayer
+
++(CFTimeInterval)fadeDuration
+{
+	return 0.0;
+}
+
+-(id)init
+{
+	self = [super init];
+	if (self != nil) {
+		m_updateId = 0;
+		UISize screenSize = UI::getScreenSize();
+		CGFloat m = Math::min(screenSize.x, screenSize.y);
+		self.tileSize = CGSizeMake(m, m);
+	}
+	return self;
+}
+
+-(void)setNeedsDisplay
+{
+	Base::interlockedIncrement32(&m_updateId);
+	[super setNeedsDisplay];
+}
+
+-(void)setNeedsDisplayInRect:(CGRect)r
+{
+	Base::interlockedIncrement32(&m_updateId);
+	[super setNeedsDisplayInRect:r];
+}
+
+-(void)drawInContext:(CGContextRef)ctx
+{
+	sl_int32 updateId = m_updateId;
+	[super drawInContext:ctx];
+	dispatch_async(dispatch_get_main_queue(), ^{
+		if (updateId != self->m_updateId) {
+			[self setNeedsDisplay];
+		}
+	});
+}
+
+@end
+
+@implementation SLIBScrollContentViewHandle
+
++(Class)layerClass
+{
+	return SLIBViewTiledLayer.class;
+}
+
+@end
 
 @interface SLIBEmptyViewController : UIViewController
 @end
@@ -809,3 +795,4 @@ namespace slib
 
 @end
 
+#endif

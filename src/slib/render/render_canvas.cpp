@@ -36,6 +36,330 @@
 
 namespace slib
 {
+
+	namespace priv
+	{
+		namespace render_canvas
+		{
+			
+			SLIB_RENDER_PROGRAM_STATE_BEGIN(RenderCanvasProgramState, RenderVertex2D_Position)
+				SLIB_RENDER_PROGRAM_STATE_UNIFORM_MATRIX3(Transform, u_Transform)
+				SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(Color, u_Color)
+				SLIB_RENDER_PROGRAM_STATE_UNIFORM_TEXTURE(Texture, u_Texture)
+				SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(ColorFilterR, u_ColorFilterR)
+				SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(ColorFilterG, u_ColorFilterG)
+				SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(ColorFilterB, u_ColorFilterB)
+				SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(ColorFilterA, u_ColorFilterA)
+				SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(ColorFilterC, u_ColorFilterC)
+				SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(RectSrc, u_RectSrc)
+				SLIB_RENDER_PROGRAM_STATE_UNIFORM_MATRIX3_ARRAY(ClipTransform, u_ClipTransform)
+				SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4_ARRAY(ClipRect, u_ClipRect)
+			
+				SLIB_RENDER_PROGRAM_STATE_ATTRIBUTE_FLOAT(position, a_Position)
+			SLIB_RENDER_PROGRAM_STATE_END
+			
+			class RenderCanvasProgramParam
+			{
+			public:
+				sl_bool flagUseTexture;
+				sl_bool flagUseColorFilter;
+				RenderCanvasClip* clips[MAX_SHADER_CLIP + 1];
+				sl_uint32 countClips;
+				
+			public:
+				RenderCanvasProgramParam()
+				{
+					flagUseTexture = sl_false;
+					flagUseColorFilter = sl_false;
+					countClips = 0;
+				}
+				
+				void prepare(RenderCanvasState* state, sl_bool flagIgnoreRectClip)
+				{
+					countClips = 0;
+					if (!flagIgnoreRectClip && state->flagClipRect) {
+						storageRectClip.type = RenderCanvasClipType::Rectangle;
+						storageRectClip.region = state->clipRect;
+						clips[0] = &storageRectClip;
+						countClips++;
+					}
+					ListElements<RenderCanvasClip> stateClips(state->clips);
+					for (sl_size i = 0; i < stateClips.count; i++) {
+						clips[countClips] = &(stateClips[i]);
+						countClips++;
+						if (countClips >= MAX_SHADER_CLIP) {
+							break;
+						}
+					}
+				}
+				
+				void addFinalClip(RenderCanvasClip* clip)
+				{
+					clips[countClips] = clip;
+					countClips++;
+				}
+				
+				void applyToProgramState(RenderCanvasProgramState* state, const Matrix3& transform)
+				{
+					Matrix3 clipTransforms[MAX_SHADER_CLIP + 1];
+					Vector4 clipRects[MAX_SHADER_CLIP + 1];
+					for (sl_uint32 i = 0; i < countClips; i++) {
+						RenderCanvasClip* clip = clips[i];
+						Rectangle& r = clip->region;
+						clipRects[i] = Vector4(r.left, r.top, r.right, r.bottom);
+						if (clip->flagTransform) {
+							clipTransforms[i] = transform * clip->transform;
+						} else {
+							clipTransforms[i] = transform;
+						}
+					}
+					state->setClipRect(clipRects, countClips);
+					state->setClipTransform(clipTransforms, countClips);
+				}
+				
+			private:
+				RenderCanvasClip storageRectClip;
+				
+			};
+			
+			class RenderCanvasProgram : public RenderProgramT<RenderCanvasProgramState>
+			{
+			public:
+				String m_vertexShader;
+				String m_fragmentShader;
+				
+			public:
+				String getGLSLVertexShader(RenderEngine* engine) override
+				{
+					return m_vertexShader;
+				}
+				
+				String getGLSLFragmentShader(RenderEngine* engine) override
+				{
+					return m_fragmentShader;
+				}
+				
+				static void generateShaderSources(const RenderCanvasProgramParam& param, char* signatures, StringBuffer* bufVertexShader, StringBuffer* bufFragmentShader)
+				{
+					StringBuffer bufVBHeader;
+					StringBuffer bufVBContent;
+					StringBuffer bufFBHeader;
+					StringBuffer bufFBContent;
+					
+					if (signatures) {
+						*(signatures++) = 'S';
+					}
+					
+					if (bufVertexShader) {
+						bufVBHeader.add(SLIB_STRINGIFY(
+													   uniform mat3 u_Transform;
+													   attribute vec2 a_Position;
+													   ));
+						bufVBContent.add("void main() {");
+						bufVBContent.add(SLIB_STRINGIFY(
+														gl_Position = vec4((vec3(a_Position, 1.0) * u_Transform).xy, 0.0, 1.0);
+														));
+						bufFBHeader.add(SLIB_STRINGIFY(
+													   uniform vec4 u_Color;
+													   ));
+						bufFBContent.add("void main() { vec4 l_Color = u_Color; ");
+					}
+					
+					if (param.countClips > 0) {
+						if (bufVertexShader) {
+							bufVBHeader.add(String::format(SLIB_STRINGIFY(
+																		  varying vec2 v_ClipPos[%d];
+																		  uniform vec4 u_ClipRect[%d];
+																		  uniform mat3 u_ClipTransform[%d];
+																		  ), param.countClips));
+							bufFBHeader.add(String::format(SLIB_STRINGIFY(
+																		  varying vec2 v_ClipPos[%d];
+																		  uniform vec4 u_ClipRect[%d];
+																		  ), param.countClips));
+						}
+						for (sl_uint32 i = 0; i < param.countClips; i++) {
+							RenderCanvasClipType type = param.clips[i]->type;
+							if (type == RenderCanvasClipType::Ellipse) {
+								sl_bool flagOval = Math::isAlmostZero(param.clips[i]->region.getWidth() - param.clips[i]->region.getHeight());
+								if (signatures) {
+									if (flagOval) {
+										*(signatures++) = 'O';
+									} else {
+										*(signatures++) = 'E';
+									}
+								}
+								if (bufVertexShader) {
+									bufVBContent.add(String::format(SLIB_STRINGIFY(
+																				   v_ClipPos[%d] = (vec3(a_Position, 1.0) * u_ClipTransform[%d]).xy - (u_ClipRect[%d].xy + u_ClipRect[%d].zw) / 2.0;
+																				   ), i));
+									bufFBContent.add(String::format(SLIB_STRINGIFY(
+																				   float wClip%d = (u_ClipRect[%d].z - u_ClipRect[%d].x) / 2.0;
+																				   float hClip%d = (u_ClipRect[%d].w - u_ClipRect[%d].y) / 2.0;
+																				   float xClip%d = v_ClipPos[%d].x / wClip%d;
+																				   float yClip%d = v_ClipPos[%d].y / hClip%d;
+																				   float lenClip%d = xClip%d * xClip%d + yClip%d * yClip%d;
+																				   if (lenClip%d > 1.0) {
+																					   discard;
+																				   }
+																				   ), i));
+									if (flagOval) {
+										bufFBContent.add(String::format(SLIB_STRINGIFY(
+																					   else {
+																						   lenClip%d = sqrt(lenClip%d);
+																						   l_Color.w *= smoothstep(0.0, 1.5/sqrt(wClip%d * hClip%d), 1.0-lenClip%d);
+																					   }), i));
+									}
+								}
+							} else {
+								if (signatures) {
+									*(signatures++) = 'C';
+								}
+								if (bufVertexShader) {
+									bufVBContent.add(String::format(SLIB_STRINGIFY(
+																				   v_ClipPos[%d] = (vec3(a_Position, 1.0) * u_ClipTransform[%d]).xy;
+																				   ), i));
+									bufFBContent.add(String::format(SLIB_STRINGIFY(
+																				   float fClip%d = step(u_ClipRect[%d].x, v_ClipPos[%d].x) * step(u_ClipRect[%d].y, v_ClipPos[%d].y) * step(v_ClipPos[%d].x, u_ClipRect[%d].z) * step(v_ClipPos[%d].y, u_ClipRect[%d].w);
+																				   if (fClip%d < 0.5) {
+																					   discard;
+																				   }
+																				   ), i));
+								}
+							}
+						}
+					}
+					
+					if (param.flagUseTexture) {
+						if (signatures) {
+							*(signatures++) = 'T';
+						}
+						if (bufVertexShader) {
+							bufVBHeader.add(SLIB_STRINGIFY(
+														   uniform vec4 u_RectSrc;
+														   varying vec2 v_TexCoord;
+														   ));
+							bufVBContent.add(SLIB_STRINGIFY(
+															v_TexCoord = a_Position * u_RectSrc.zw + u_RectSrc.xy;
+															));
+							bufFBHeader.add(SLIB_STRINGIFY(
+														   uniform sampler2D u_Texture;
+														   varying vec2 v_TexCoord;
+														   ));
+						}
+						
+						if (param.flagUseColorFilter) {
+							if (signatures) {
+								*(signatures++) = 'F';
+							}
+							if (bufVertexShader) {
+								bufFBHeader.add(SLIB_STRINGIFY(
+															   uniform vec4 u_ColorFilterR;
+															   uniform vec4 u_ColorFilterG;
+															   uniform vec4 u_ColorFilterB;
+															   uniform vec4 u_ColorFilterA;
+															   uniform vec4 u_ColorFilterC;
+															   ));
+								bufFBContent.add(SLIB_STRINGIFY(
+																vec4 color = texture2D(u_Texture, v_TexCoord);
+																color = vec4(dot(color, u_ColorFilterR), dot(color, u_ColorFilterG), dot(color, u_ColorFilterB), dot(color, u_ColorFilterA)) + u_ColorFilterC;
+																color = color * l_Color;
+																));
+							}
+						} else {
+							if (bufVertexShader) {
+								bufFBContent.add(SLIB_STRINGIFY(
+																vec4 color = texture2D(u_Texture, v_TexCoord) * l_Color;
+																));
+							}
+						}
+					} else {
+						if (bufVertexShader) {
+							bufFBContent.add(SLIB_STRINGIFY(
+															vec4 color = l_Color;
+															));
+						}
+					}
+					
+					
+					if (bufVertexShader) {
+						bufFBContent.add(SLIB_STRINGIFY(
+														gl_FragColor = color;
+														));
+						bufVBContent.add("}");
+						bufFBContent.add("}");
+						bufVertexShader->link(bufVBHeader);
+						bufVertexShader->link(bufVBContent);
+						bufFragmentShader->link(bufFBHeader);
+						bufFragmentShader->link(bufFBContent);
+					}
+					
+				}
+				
+				static Ref<RenderCanvasProgram> create(const RenderCanvasProgramParam& param)
+				{
+					StringBuffer sbVB;
+					StringBuffer sbFB;
+					RenderCanvasProgram::generateShaderSources(param, sl_null, &sbVB, &sbFB);
+					String vertexShader = sbVB.merge();
+					String fragmentShader = sbFB.merge();
+					if (vertexShader.isNotEmpty() && fragmentShader.isNotEmpty()) {
+						Ref<RenderCanvasProgram> ret = new RenderCanvasProgram;
+						if (ret.isNotNull()) {
+							ret->m_vertexShader = vertexShader;
+							ret->m_fragmentShader = fragmentShader;
+							return ret;
+						}
+					}
+					return sl_null;
+				}
+				
+			};
+			
+			class SharedContext
+			{
+			public:
+				CHashMap< String, Ref<RenderCanvasProgram> > programs;
+				Ref<VertexBuffer> vbRectangle;
+				
+			public:
+				SharedContext()
+				{
+					static RenderVertex2D_Position v[] = {
+						{ { 0, 0 } }
+						, { { 1, 0 } }
+						, { { 0, 1 } }
+						, { { 1, 1 } }
+					};
+					vbRectangle = VertexBuffer::create(v, sizeof(v));
+				}
+				
+				Ref<RenderCanvasProgram> getProgram(const RenderCanvasProgramParam& param)
+				{
+					char sig[64] = {0};
+					RenderCanvasProgram::generateShaderSources(param, sig, sl_null, sl_null);
+					Ref<RenderCanvasProgram> program;
+					if (!(programs.get_NoLock(sig, &program))) {
+						program = RenderCanvasProgram::create(param);
+						if (program.isNull()) {
+							return sl_null;
+						}
+						if (programs.getCount() > MAX_PROGRAM_COUNT) {
+							programs.removeAll_NoLock();
+						}
+						programs.put_NoLock(sig, program);
+					}
+					return program;
+				}
+				
+			};
+			
+			SLIB_SAFE_STATIC_GETTER(SharedContext, GetSharedContext)
+						
+		}
+	}
+
+	using namespace priv::render_canvas;
+	
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(RenderCanvasClip)
 	
@@ -50,320 +374,6 @@ namespace slib
 	 : matrix(Matrix3::identity()), flagClipRect(sl_false)
 	{
 	}
-	
-	
-	SLIB_RENDER_PROGRAM_STATE_BEGIN(RenderCanvasProgramState, RenderVertex2D_Position)
-	SLIB_RENDER_PROGRAM_STATE_UNIFORM_MATRIX3(Transform, u_Transform)
-	SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(Color, u_Color)
-	SLIB_RENDER_PROGRAM_STATE_UNIFORM_TEXTURE(Texture, u_Texture)
-	SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(ColorFilterR, u_ColorFilterR)
-	SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(ColorFilterG, u_ColorFilterG)
-	SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(ColorFilterB, u_ColorFilterB)
-	SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(ColorFilterA, u_ColorFilterA)
-	SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(ColorFilterC, u_ColorFilterC)
-	SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(RectSrc, u_RectSrc)
-	SLIB_RENDER_PROGRAM_STATE_UNIFORM_MATRIX3_ARRAY(ClipTransform, u_ClipTransform)
-	SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4_ARRAY(ClipRect, u_ClipRect)
-	
-	SLIB_RENDER_PROGRAM_STATE_ATTRIBUTE_FLOAT(position, a_Position)
-	SLIB_RENDER_PROGRAM_STATE_END
-	
-	class RenderCanvasProgramParam
-	{
-	public:
-		sl_bool flagUseTexture;
-		sl_bool flagUseColorFilter;
-		RenderCanvasClip* clips[MAX_SHADER_CLIP + 1];
-		sl_uint32 countClips;
-		
-	public:
-		RenderCanvasProgramParam()
-		{
-			flagUseTexture = sl_false;
-			flagUseColorFilter = sl_false;
-			countClips = 0;
-		}
-		
-		void prepare(RenderCanvasState* state, sl_bool flagIgnoreRectClip)
-		{
-			countClips = 0;
-			if (!flagIgnoreRectClip && state->flagClipRect) {
-				storageRectClip.type = RenderCanvasClipType::Rectangle;
-				storageRectClip.region = state->clipRect;
-				clips[0] = &storageRectClip;
-				countClips++;
-			}
-			ListElements<RenderCanvasClip> stateClips(state->clips);
-			for (sl_size i = 0; i < stateClips.count; i++) {
-				clips[countClips] = &(stateClips[i]);
-				countClips++;
-				if (countClips >= MAX_SHADER_CLIP) {
-					break;
-				}
-			}
-		}
-		
-		void addFinalClip(RenderCanvasClip* clip)
-		{
-			clips[countClips] = clip;
-			countClips++;
-		}
-		
-		void applyToProgramState(RenderCanvasProgramState* state, const Matrix3& transform)
-		{
-			Matrix3 clipTransforms[MAX_SHADER_CLIP + 1];
-			Vector4 clipRects[MAX_SHADER_CLIP + 1];
-			for (sl_uint32 i = 0; i < countClips; i++) {
-				RenderCanvasClip* clip = clips[i];
-				Rectangle& r = clip->region;
-				clipRects[i] = Vector4(r.left, r.top, r.right, r.bottom);
-				if (clip->flagTransform) {
-					clipTransforms[i] = transform * clip->transform;
-				} else {
-					clipTransforms[i] = transform;
-				}
-			}
-			state->setClipRect(clipRects, countClips);
-			state->setClipTransform(clipTransforms, countClips);
-		}
-		
-	private:
-		RenderCanvasClip storageRectClip;
-		
-	};
-	
-	class RenderCanvasProgram : public RenderProgramT<RenderCanvasProgramState>
-	{
-	public:
-		String m_vertexShader;
-		String m_fragmentShader;
-		
-	public:
-		String getGLSLVertexShader(RenderEngine* engine) override
-		{
-			return m_vertexShader;
-		}
-		
-		String getGLSLFragmentShader(RenderEngine* engine) override
-		{
-			return m_fragmentShader;
-		}
-		
-		static void generateShaderSources(const RenderCanvasProgramParam& param, char* signatures, StringBuffer* bufVertexShader, StringBuffer* bufFragmentShader)
-		{
-			StringBuffer bufVBHeader;
-			StringBuffer bufVBContent;
-			StringBuffer bufFBHeader;
-			StringBuffer bufFBContent;
-			
-			if (signatures) {
-				*(signatures++) = 'S';
-			}
-			
-			if (bufVertexShader) {
-				bufVBHeader.add(SLIB_STRINGIFY(
-											   uniform mat3 u_Transform;
-											   attribute vec2 a_Position;
-											   ));
-				bufVBContent.add("void main() {");
-				bufVBContent.add(SLIB_STRINGIFY(
-												gl_Position = vec4((vec3(a_Position, 1.0) * u_Transform).xy, 0.0, 1.0);
-												));
-				bufFBHeader.add(SLIB_STRINGIFY(
-											   uniform vec4 u_Color;
-											   ));
-				bufFBContent.add("void main() { vec4 l_Color = u_Color; ");
-			}
-			
-			if (param.countClips > 0) {
-				if (bufVertexShader) {
-					bufVBHeader.add(String::format(SLIB_STRINGIFY(
-																  varying vec2 v_ClipPos[%d];
-																  uniform vec4 u_ClipRect[%d];
-																  uniform mat3 u_ClipTransform[%d];
-																  ), param.countClips));
-					bufFBHeader.add(String::format(SLIB_STRINGIFY(
-																  varying vec2 v_ClipPos[%d];
-																  uniform vec4 u_ClipRect[%d];
-																  ), param.countClips));
-				}
-				for (sl_uint32 i = 0; i < param.countClips; i++) {
-					RenderCanvasClipType type = param.clips[i]->type;
-					if (type == RenderCanvasClipType::Ellipse) {
-						sl_bool flagOval = Math::isAlmostZero(param.clips[i]->region.getWidth() - param.clips[i]->region.getHeight());
-						if (signatures) {
-							if (flagOval) {
-								*(signatures++) = 'O';
-							} else {
-								*(signatures++) = 'E';
-							}
-						}
-						if (bufVertexShader) {
-							bufVBContent.add(String::format(SLIB_STRINGIFY(
-																		   v_ClipPos[%d] = (vec3(a_Position, 1.0) * u_ClipTransform[%d]).xy - (u_ClipRect[%d].xy + u_ClipRect[%d].zw) / 2.0;
-																		   ), i));
-							bufFBContent.add(String::format(SLIB_STRINGIFY(
-																		   float wClip%d = (u_ClipRect[%d].z - u_ClipRect[%d].x) / 2.0;
-																		   float hClip%d = (u_ClipRect[%d].w - u_ClipRect[%d].y) / 2.0;
-																		   float xClip%d = v_ClipPos[%d].x / wClip%d;
-																		   float yClip%d = v_ClipPos[%d].y / hClip%d;
-																		   float lenClip%d = xClip%d * xClip%d + yClip%d * yClip%d;
-																		   if (lenClip%d > 1.0) {
-																			   discard;
-																		   }
-																		   ), i));
-							if (flagOval) {
-								bufFBContent.add(String::format(SLIB_STRINGIFY(
-																			   else {
-																				   lenClip%d = sqrt(lenClip%d);
-																				   l_Color.w *= smoothstep(0.0, 1.5/sqrt(wClip%d * hClip%d), 1.0-lenClip%d);
-																			   }), i));
-							}
-						}
-					} else {
-						if (signatures) {
-							*(signatures++) = 'C';
-						}
-						if (bufVertexShader) {
-							bufVBContent.add(String::format(SLIB_STRINGIFY(
-																		   v_ClipPos[%d] = (vec3(a_Position, 1.0) * u_ClipTransform[%d]).xy;
-																		   ), i));
-							bufFBContent.add(String::format(SLIB_STRINGIFY(
-																		   float fClip%d = step(u_ClipRect[%d].x, v_ClipPos[%d].x) * step(u_ClipRect[%d].y, v_ClipPos[%d].y) * step(v_ClipPos[%d].x, u_ClipRect[%d].z) * step(v_ClipPos[%d].y, u_ClipRect[%d].w);
-																		   if (fClip%d < 0.5) {
-																			   discard;
-																		   }
-																		   ), i));
-						}
-					}
-				}
-			}
-			
-			if (param.flagUseTexture) {
-				if (signatures) {
-					*(signatures++) = 'T';
-				}
-				if (bufVertexShader) {
-					bufVBHeader.add(SLIB_STRINGIFY(
-												   uniform vec4 u_RectSrc;
-												   varying vec2 v_TexCoord;
-												   ));
-					bufVBContent.add(SLIB_STRINGIFY(
-													v_TexCoord = a_Position * u_RectSrc.zw + u_RectSrc.xy;
-													));
-					bufFBHeader.add(SLIB_STRINGIFY(
-												   uniform sampler2D u_Texture;
-												   varying vec2 v_TexCoord;
-												   ));
-				}
-				
-				if (param.flagUseColorFilter) {
-					if (signatures) {
-						*(signatures++) = 'F';
-					}
-					if (bufVertexShader) {
-						bufFBHeader.add(SLIB_STRINGIFY(
-													   uniform vec4 u_ColorFilterR;
-													   uniform vec4 u_ColorFilterG;
-													   uniform vec4 u_ColorFilterB;
-													   uniform vec4 u_ColorFilterA;
-													   uniform vec4 u_ColorFilterC;
-													   ));
-						bufFBContent.add(SLIB_STRINGIFY(
-														vec4 color = texture2D(u_Texture, v_TexCoord);
-														color = vec4(dot(color, u_ColorFilterR), dot(color, u_ColorFilterG), dot(color, u_ColorFilterB), dot(color, u_ColorFilterA)) + u_ColorFilterC;
-														color = color * l_Color;
-														));
-					}
-				} else {
-					if (bufVertexShader) {
-						bufFBContent.add(SLIB_STRINGIFY(
-														vec4 color = texture2D(u_Texture, v_TexCoord) * l_Color;
-														));
-					}
-				}
-			} else {
-				if (bufVertexShader) {
-					bufFBContent.add(SLIB_STRINGIFY(
-													vec4 color = l_Color;
-													));
-				}
-			}
-			
-			
-			if (bufVertexShader) {
-				bufFBContent.add(SLIB_STRINGIFY(
-												gl_FragColor = color;
-												));
-				bufVBContent.add("}");
-				bufFBContent.add("}");
-				bufVertexShader->link(bufVBHeader);
-				bufVertexShader->link(bufVBContent);
-				bufFragmentShader->link(bufFBHeader);
-				bufFragmentShader->link(bufFBContent);
-			}
-			
-		}
-		
-		static Ref<RenderCanvasProgram> create(const RenderCanvasProgramParam& param)
-		{
-			StringBuffer sbVB;
-			StringBuffer sbFB;
-			RenderCanvasProgram::generateShaderSources(param, sl_null, &sbVB, &sbFB);
-			String vertexShader = sbVB.merge();
-			String fragmentShader = sbFB.merge();
-			if (vertexShader.isNotEmpty() && fragmentShader.isNotEmpty()) {
-				Ref<RenderCanvasProgram> ret = new RenderCanvasProgram;
-				if (ret.isNotNull()) {
-					ret->m_vertexShader = vertexShader;
-					ret->m_fragmentShader = fragmentShader;
-					return ret;
-				}
-			}
-			return sl_null;
-		}
-		
-	};
-	
-	class _priv_RenderCanvas_Shared
-	{
-	public:
-		CHashMap< String, Ref<RenderCanvasProgram> > programs;
-		Ref<VertexBuffer> vbRectangle;
-		
-	public:
-		_priv_RenderCanvas_Shared()
-		{
-			static RenderVertex2D_Position v[] = {
-				{ { 0, 0 } }
-				, { { 1, 0 } }
-				, { { 0, 1 } }
-				, { { 1, 1 } }
-			};
-			vbRectangle = VertexBuffer::create(v, sizeof(v));
-		}
-		
-		Ref<RenderCanvasProgram> getProgram(const RenderCanvasProgramParam& param)
-		{
-			char sig[64] = {0};
-			RenderCanvasProgram::generateShaderSources(param, sig, sl_null, sl_null);
-			Ref<RenderCanvasProgram> program;
-			if (!(programs.get_NoLock(sig, &program))) {
-				program = RenderCanvasProgram::create(param);
-				if (program.isNull()) {
-					return sl_null;
-				}
-				if (programs.getCount() > MAX_PROGRAM_COUNT) {
-					programs.removeAll_NoLock();
-				}
-				programs.put_NoLock(sig, program);
-			}
-			return program;
-		}
-		
-	};
-	
-	SLIB_SAFE_STATIC_GETTER(_priv_RenderCanvas_Shared, _priv_RenderCanvas_getShared)
 	
 	
 	SLIB_DEFINE_OBJECT(RenderCanvas, Canvas)
@@ -628,7 +638,7 @@ namespace slib
 			return;
 		}
 		
-		_priv_RenderCanvas_Shared* shared = _priv_RenderCanvas_getShared();
+		SharedContext* shared = GetSharedContext();
 		if (!shared) {
 			return;
 		}
@@ -851,7 +861,7 @@ namespace slib
 	
 	void RenderCanvas::_fillRectangle(const Rectangle& _rect, const Color& _color)
 	{
-		_priv_RenderCanvas_Shared* shared = _priv_RenderCanvas_getShared();
+		SharedContext* shared = GetSharedContext();
 		if (!shared) {
 			return;
 		}
@@ -893,7 +903,7 @@ namespace slib
 	
 	void RenderCanvas::drawEllipse(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush)
 	{
-		_priv_RenderCanvas_Shared* shared = _priv_RenderCanvas_getShared();
+		SharedContext* shared = GetSharedContext();
 		if (!shared) {
 			return;
 		}
@@ -947,7 +957,7 @@ namespace slib
 	void RenderCanvas::drawTexture(const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& _rectSrc, const DrawParam& param, const Color4f& color)
 	{
 		
-		_priv_RenderCanvas_Shared* shared = _priv_RenderCanvas_getShared();
+		SharedContext* shared = GetSharedContext();
 		if (!shared) {
 			return;
 		}
@@ -1022,7 +1032,7 @@ namespace slib
 	void RenderCanvas::drawTexture(const Rectangle& _rectDst, const Ref<Texture>& texture, const Rectangle& _rectSrc, const DrawParam& param, const Color4f& color)
 	{
 		
-		_priv_RenderCanvas_Shared* shared = _priv_RenderCanvas_getShared();
+		SharedContext* shared = GetSharedContext();
 		if (!shared) {
 			return;
 		}
@@ -1126,7 +1136,7 @@ namespace slib
 	
 	void RenderCanvas::drawRectangle(const Rectangle& rect, RenderProgramState2D_Position* programState, const DrawParam& param)
 	{
-		_priv_RenderCanvas_Shared* shared = _priv_RenderCanvas_getShared();
+		SharedContext* shared = GetSharedContext();
 		if (!shared) {
 			return;
 		}

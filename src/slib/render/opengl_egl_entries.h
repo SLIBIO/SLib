@@ -85,14 +85,23 @@
 
 namespace slib
 {
-	struct _priv_EGL_EntryPoints
+	namespace priv
 	{
-		PRIV_SLIB_RENDER_EGL_ENTRIES
-	};
-	extern _priv_EGL_EntryPoints _priv_EGL_entries;
+		namespace egl
+		{
+
+			struct EntryPoints
+			{
+				PRIV_SLIB_RENDER_EGL_ENTRIES
+			};
+
+			extern EntryPoints g_entries;
+
+		}
+	}
 }
 
-#define PRIV_EGL_ENTRY(name) _priv_EGL_entries.name
+#define PRIV_EGL_ENTRY(name) slib::priv::egl::g_entries.name
 
 #else
 

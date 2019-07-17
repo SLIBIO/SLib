@@ -34,28 +34,194 @@
 namespace slib
 {
 
-	class Win32_FontStatic
+	namespace priv
 	{
-	public:
-		Gdiplus::Bitmap* image;
-		Gdiplus::Graphics* graphics;
-
-	public:
-		Win32_FontStatic()
+		namespace gdi
 		{
-			graphics = sl_null;
-			image = new Gdiplus::Bitmap(1, 1, PixelFormat24bppRGB);
-			if (image) {
-				graphics = new Gdiplus::Graphics(image);
-			}
-		}
 
-		~Win32_FontStatic()
-		{
-			delete graphics;
-			delete image;
+			class FontStaticContext
+			{
+			public:
+				Gdiplus::Bitmap* image;
+				Gdiplus::Graphics* graphics;
+
+			public:
+				FontStaticContext()
+				{
+					graphics = sl_null;
+					image = new Gdiplus::Bitmap(1, 1, PixelFormat24bppRGB);
+					if (image) {
+						graphics = new Gdiplus::Graphics(image);
+					}
+				}
+
+				~FontStaticContext()
+				{
+					delete graphics;
+					delete image;
+				}
+			};
+
+			class FontPlatformObject : public Referable
+			{
+			public:
+				Gdiplus::Font* m_fontGdiplus;
+				sl_bool m_flagCreatedGdiplus;
+
+				HFONT m_fontGDI;
+				sl_bool m_flagCreatedGDI;
+
+				SpinLock m_lock;
+
+			public:
+				FontPlatformObject()
+				{
+					m_fontGdiplus = sl_null;
+					m_flagCreatedGdiplus = sl_false;
+
+					m_fontGDI = NULL;
+					m_flagCreatedGDI = sl_false;
+				}
+
+				~FontPlatformObject()
+				{
+					delete m_fontGdiplus;
+					if (m_fontGDI) {
+						::DeleteObject(m_fontGDI);
+					}
+				}
+				
+			public:
+				void _createGdiplus(const FontDesc& desc)
+				{
+					if (m_flagCreatedGdiplus) {
+						return;
+					}
+
+					SpinLocker lock(&m_lock);
+
+					if (m_flagCreatedGdiplus) {
+						return;
+					}
+
+					m_flagCreatedGdiplus = sl_true;
+
+					int style = 0;
+					if (desc.flagBold) {
+						style |= Gdiplus::FontStyleBold;
+					}
+					if (desc.flagItalic) {
+						style |= Gdiplus::FontStyleItalic;
+					}
+					if (desc.flagUnderline) {
+						style |= Gdiplus::FontStyleUnderline;
+					}
+					if (desc.flagStrikeout) {
+						style |= Gdiplus::FontStyleStrikeout;
+					}
+					String16 fontName = desc.familyName;
+					Gdiplus::Font* font = new Gdiplus::Font(
+						(LPCWSTR)(fontName.getData()),
+						desc.size,
+						style,
+						Gdiplus::UnitPixel);
+
+					m_fontGdiplus = font;
+
+				}
+
+				void _createGDI(const FontDesc& desc)
+				{
+					if (m_flagCreatedGDI) {
+						return;
+					}
+
+					SpinLocker lock(&m_lock);
+
+					if (m_flagCreatedGDI) {
+						return;
+					}
+
+					m_flagCreatedGDI = sl_true;
+
+					int height = (int)(desc.size);
+					int weight;
+					if (desc.flagBold) {
+						weight = 400;
+					} else {
+						weight = 700;
+					}
+					DWORD bItalic;
+					if (desc.flagItalic) {
+						bItalic = TRUE;
+					} else {
+						bItalic = FALSE;
+					}
+					DWORD bUnderline;
+					if (desc.flagUnderline) {
+						bUnderline = TRUE;
+					} else {
+						bUnderline = FALSE;
+					}
+					DWORD bStrikeout;
+					if (desc.flagStrikeout) {
+						bStrikeout = TRUE;
+					} else {
+						bStrikeout = FALSE;
+					}
+					String16 fontName = desc.familyName;
+					HFONT hFont = ::CreateFontW(height, 0, 0, 0, weight, bItalic, bUnderline, bStrikeout,
+						DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+						ANTIALIASED_QUALITY,
+						DEFAULT_PITCH,
+						(LPCWSTR)(fontName.getData()));
+
+					m_fontGDI = hFont;
+
+				}
+
+			};
+
+			class FontHelper : public Font
+			{
+			public:
+				FontPlatformObject* getPlatformObject()
+				{
+					if (m_platformObject.isNull()) {
+						SpinLocker lock(&m_lock);
+						if (m_platformObject.isNull()) {
+							m_platformObject = new FontPlatformObject;
+						}
+					}
+					return (FontPlatformObject*)(m_platformObject.get());;
+				}
+
+				Gdiplus::Font* getGdiplus()
+				{
+					FontPlatformObject* po = getPlatformObject();
+					if (po) {
+						po->_createGdiplus(m_desc);
+						return po->m_fontGdiplus;
+					}
+					return sl_null;
+				}
+
+				HFONT getGDI()
+				{
+					FontPlatformObject* po = getPlatformObject();
+					if (po) {
+						po->_createGDI(m_desc);
+						return po->m_fontGDI;
+					}
+					return sl_null;
+				}
+
+			};
+
 		}
-	};
+	}
+
+	using namespace priv::gdi;
 
 	sl_bool Font::_getFontMetrics_PO(FontMetrics& _out)
 	{
@@ -81,7 +247,7 @@ namespace slib
 			return Size::zero();
 		}
 
-		SLIB_SAFE_STATIC(Win32_FontStatic, fs)
+		SLIB_SAFE_STATIC(FontStaticContext, fs)
 		if (SLIB_SAFE_STATIC_CHECK_FREED(fs)) {
 			return Size::zero();
 		}
@@ -102,166 +268,10 @@ namespace slib
 
 	}
 
-	class Win32_FontObject : public Referable
-	{
-	public:
-		Gdiplus::Font* m_fontGdiplus;
-		sl_bool m_flagCreatedGdiplus;
-
-		HFONT m_fontGDI;
-		sl_bool m_flagCreatedGDI;
-
-		SpinLock m_lock;
-
-	public:
-		Win32_FontObject()
-		{
-			m_fontGdiplus = sl_null;
-			m_flagCreatedGdiplus = sl_false;
-
-			m_fontGDI = NULL;
-			m_flagCreatedGDI = sl_false;
-		}
-
-		~Win32_FontObject()
-		{
-			delete m_fontGdiplus;
-			if (m_fontGDI) {
-				::DeleteObject(m_fontGDI);
-			}
-		}
-		
-	public:
-		void _createGdiplus(const FontDesc& desc)
-		{
-			if (m_flagCreatedGdiplus) {
-				return;
-			}
-
-			SpinLocker lock(&m_lock);
-
-			if (m_flagCreatedGdiplus) {
-				return;
-			}
-
-			m_flagCreatedGdiplus = sl_true;
-
-			int style = 0;
-			if (desc.flagBold) {
-				style |= Gdiplus::FontStyleBold;
-			}
-			if (desc.flagItalic) {
-				style |= Gdiplus::FontStyleItalic;
-			}
-			if (desc.flagUnderline) {
-				style |= Gdiplus::FontStyleUnderline;
-			}
-			if (desc.flagStrikeout) {
-				style |= Gdiplus::FontStyleStrikeout;
-			}
-			String16 fontName = desc.familyName;
-			Gdiplus::Font* font = new Gdiplus::Font(
-				(LPCWSTR)(fontName.getData()),
-				desc.size,
-				style,
-				Gdiplus::UnitPixel);
-
-			m_fontGdiplus = font;
-
-		}
-
-		void _createGDI(const FontDesc& desc)
-		{
-			if (m_flagCreatedGDI) {
-				return;
-			}
-
-			SpinLocker lock(&m_lock);
-
-			if (m_flagCreatedGDI) {
-				return;
-			}
-
-			m_flagCreatedGDI = sl_true;
-
-			int height = (int)(desc.size);
-			int weight;
-			if (desc.flagBold) {
-				weight = 400;
-			} else {
-				weight = 700;
-			}
-			DWORD bItalic;
-			if (desc.flagItalic) {
-				bItalic = TRUE;
-			} else {
-				bItalic = FALSE;
-			}
-			DWORD bUnderline;
-			if (desc.flagUnderline) {
-				bUnderline = TRUE;
-			} else {
-				bUnderline = FALSE;
-			}
-			DWORD bStrikeout;
-			if (desc.flagStrikeout) {
-				bStrikeout = TRUE;
-			} else {
-				bStrikeout = FALSE;
-			}
-			String16 fontName = desc.familyName;
-			HFONT hFont = ::CreateFontW(height, 0, 0, 0, weight, bItalic, bUnderline, bStrikeout,
-				DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-				ANTIALIASED_QUALITY,
-				DEFAULT_PITCH,
-				(LPCWSTR)(fontName.getData()));
-
-			m_fontGDI = hFont;
-
-		}
-
-	};
-
-	class Font_Ext : public Font
-	{
-	public:
-		Win32_FontObject* getPlatformObject()
-		{
-			if (m_platformObject.isNull()) {
-				SpinLocker lock(&m_lock);
-				if (m_platformObject.isNull()) {
-					m_platformObject = new Win32_FontObject;
-				}
-			}
-			return (Win32_FontObject*)(m_platformObject.get());;
-		}
-
-		Gdiplus::Font* getGdiplus()
-		{
-			Win32_FontObject* po = getPlatformObject();
-			if (po) {
-				po->_createGdiplus(m_desc);
-				return po->m_fontGdiplus;
-			}
-			return sl_null;
-		}
-
-		HFONT getGDI()
-		{
-			Win32_FontObject* po = getPlatformObject();
-			if (po) {
-				po->_createGDI(m_desc);
-				return po->m_fontGDI;
-			}
-			return sl_null;
-		}
-
-	};
-
 	Gdiplus::Font* GraphicsPlatform::getGdiplusFont(Font* _font)
 	{
 		if (_font) {
-			Font_Ext* font = (Font_Ext*)_font;
+			FontHelper* font = (FontHelper*)_font;
 			return font->getGdiplus();
 		}
 		return NULL;
@@ -270,7 +280,7 @@ namespace slib
 	HFONT GraphicsPlatform::getGdiFont(Font* _font)
 	{
 		if (_font) {
-			Font_Ext* font = (Font_Ext*)_font;
+			FontHelper* font = (FontHelper*)_font;
 			return font->getGDI();
 		}
 		return NULL;

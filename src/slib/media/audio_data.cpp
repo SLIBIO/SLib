@@ -111,302 +111,310 @@ namespace slib
 		}
 		return 0;
 	}
-
-	class AUDIO_INT8_PROC
+	
+	namespace priv
 	{
-	public:
-		SLIB_INLINE static sl_uint8 readSample(sl_uint8*& p)
+		namespace audio_data
 		{
-			sl_uint8 v = *p;
-			p++;
-			return v;
-		}
-		
-		SLIB_INLINE static void writeSample(sl_uint8*& p, sl_uint8 v)
-		{
-			*p = v;
-			p++;
-		}
-	};
 
-	class AUDIO_INT16LE_PROC
-	{
-	public:
-		SLIB_INLINE static sl_uint16 readSample(sl_uint8*& p)
-		{
-			sl_uint16 v = p[0] | (((sl_uint16)(p[1])) << 8);
-			p += 2;
-			return v;
-		}
-		
-		SLIB_INLINE static void writeSample(sl_uint8*& p, sl_uint16 v)
-		{
-			p[0] = (sl_uint8)(v);
-			p[1] = (sl_uint8)(v >> 8);
-			p += 2;
-		}
-	};
-
-	class AUDIO_INT16BE_PROC
-	{
-	public:
-		SLIB_INLINE static sl_uint16 readSample(sl_uint8*& p)
-		{
-			sl_uint16 v = p[1] | (((sl_uint16)(p[0])) << 8);
-			p += 2;
-			return v;
-		}
-		
-		SLIB_INLINE static void writeSample(sl_uint8*& p, sl_uint16 v)
-		{
-			p[1] = (sl_uint8)(v);
-			p[0] = (sl_uint8)(v >> 8);
-			p += 2;
-		}
-	};
-
-	class AUDIO_FLOAT_LE_PROC
-	{
-	public:
-		SLIB_INLINE static float readSample(sl_uint8*& p)
-		{
-			sl_uint32 n = p[0] | (((sl_uint32)(p[1])) << 8) | (((sl_uint32)(p[2])) << 16) | (((sl_uint32)(p[3])) << 24);
-			p += 4;
-			return *((float*)((void*)(&n)));
-		}
-		
-		SLIB_INLINE static void writeSample(sl_uint8*& p, float v)
-		{
-			sl_uint32& n = *((sl_uint32*)((void*)(&v)));
-			p[0] = (sl_uint8)(n);
-			p[1] = (sl_uint8)(n >> 8);
-			p[2] = (sl_uint8)(n >> 16);
-			p[3] = (sl_uint8)(n >> 24);
-			p += 4;
-		}
-	};
-
-	class AUDIO_FLOAT_BE_PROC
-	{
-	public:
-		SLIB_INLINE static float readSample(sl_uint8*& p)
-		{
-			sl_uint32 n = p[3] | (((sl_uint32)(p[2])) << 8) | (((sl_uint32)(p[1])) << 16) | (((sl_uint32)(p[0])) << 24);
-			p += 4;
-			return *((float*)((void*)(&n)));
-		}
-		
-		SLIB_INLINE static void writeSample(sl_uint8*& p, float v)
-		{
-			sl_uint32& n = *((sl_uint32*)((void*)(&v)));
-			p[3] = (sl_uint8)(n);
-			p[2] = (sl_uint8)(n >> 8);
-			p[1] = (sl_uint8)(n >> 16);
-			p[0] = (sl_uint8)(n >> 24);
-			p += 4;
-		}
-	};
-
-	template <class IN_PROC, class IN_TYPE, class OUT_PROC, class OUT_TYPE>
-	void _priv_AudioData_copySamples_Step2(sl_size count, AudioFormat format_in, sl_uint8* data_in, sl_uint8* data_in1, AudioFormat format_out, sl_uint8* data_out, sl_uint8* data_out1)
-	{
-		IN_TYPE _in;
-		IN_TYPE _in1;
-		OUT_TYPE _out;
-		OUT_TYPE _out1;
-		sl_uint32 nChannels_in = AudioFormats::getChannelsCount(format_in);
-		sl_uint32 nChannels_out = AudioFormats::getChannelsCount(format_out);
-		if (nChannels_in == 1) {
-			if (nChannels_out == 1) {
-				for (sl_size i = 0; i < count; i++) {
-					_in = IN_PROC::readSample(data_in);
-					AudioUtil::convertSample(_in, _out);
-					OUT_PROC::writeSample(data_out, _out);
+			class AUDIO_INT8_PROC
+			{
+			public:
+				SLIB_INLINE static sl_uint8 readSample(sl_uint8*& p)
+				{
+					sl_uint8 v = *p;
+					p++;
+					return v;
 				}
-			} else if (nChannels_out == 2) {
-				if (AudioFormats::isNonInterleaved(format_out)) {
-					for (sl_size i = 0; i < count; i++) {
-						_in = IN_PROC::readSample(data_in);
-						AudioUtil::convertSample(_in, _out);
-						OUT_PROC::writeSample(data_out, _out);
-						OUT_PROC::writeSample(data_out1, _out);
+				
+				SLIB_INLINE static void writeSample(sl_uint8*& p, sl_uint8 v)
+				{
+					*p = v;
+					p++;
+				}
+			};
+
+			class AUDIO_INT16LE_PROC
+			{
+			public:
+				SLIB_INLINE static sl_uint16 readSample(sl_uint8*& p)
+				{
+					sl_uint16 v = p[0] | (((sl_uint16)(p[1])) << 8);
+					p += 2;
+					return v;
+				}
+				
+				SLIB_INLINE static void writeSample(sl_uint8*& p, sl_uint16 v)
+				{
+					p[0] = (sl_uint8)(v);
+					p[1] = (sl_uint8)(v >> 8);
+					p += 2;
+				}
+			};
+
+			class AUDIO_INT16BE_PROC
+			{
+			public:
+				SLIB_INLINE static sl_uint16 readSample(sl_uint8*& p)
+				{
+					sl_uint16 v = p[1] | (((sl_uint16)(p[0])) << 8);
+					p += 2;
+					return v;
+				}
+				
+				SLIB_INLINE static void writeSample(sl_uint8*& p, sl_uint16 v)
+				{
+					p[1] = (sl_uint8)(v);
+					p[0] = (sl_uint8)(v >> 8);
+					p += 2;
+				}
+			};
+
+			class AUDIO_FLOAT_LE_PROC
+			{
+			public:
+				SLIB_INLINE static float readSample(sl_uint8*& p)
+				{
+					sl_uint32 n = p[0] | (((sl_uint32)(p[1])) << 8) | (((sl_uint32)(p[2])) << 16) | (((sl_uint32)(p[3])) << 24);
+					p += 4;
+					return *((float*)((void*)(&n)));
+				}
+				
+				SLIB_INLINE static void writeSample(sl_uint8*& p, float v)
+				{
+					sl_uint32& n = *((sl_uint32*)((void*)(&v)));
+					p[0] = (sl_uint8)(n);
+					p[1] = (sl_uint8)(n >> 8);
+					p[2] = (sl_uint8)(n >> 16);
+					p[3] = (sl_uint8)(n >> 24);
+					p += 4;
+				}
+			};
+
+			class AUDIO_FLOAT_BE_PROC
+			{
+			public:
+				SLIB_INLINE static float readSample(sl_uint8*& p)
+				{
+					sl_uint32 n = p[3] | (((sl_uint32)(p[2])) << 8) | (((sl_uint32)(p[1])) << 16) | (((sl_uint32)(p[0])) << 24);
+					p += 4;
+					return *((float*)((void*)(&n)));
+				}
+				
+				SLIB_INLINE static void writeSample(sl_uint8*& p, float v)
+				{
+					sl_uint32& n = *((sl_uint32*)((void*)(&v)));
+					p[3] = (sl_uint8)(n);
+					p[2] = (sl_uint8)(n >> 8);
+					p[1] = (sl_uint8)(n >> 16);
+					p[0] = (sl_uint8)(n >> 24);
+					p += 4;
+				}
+			};
+
+			template <class IN_PROC, class IN_TYPE, class OUT_PROC, class OUT_TYPE>
+			void CopySamples_Step2(sl_size count, AudioFormat format_in, sl_uint8* data_in, sl_uint8* data_in1, AudioFormat format_out, sl_uint8* data_out, sl_uint8* data_out1)
+			{
+				IN_TYPE _in;
+				IN_TYPE _in1;
+				OUT_TYPE _out;
+				OUT_TYPE _out1;
+				sl_uint32 nChannels_in = AudioFormats::getChannelsCount(format_in);
+				sl_uint32 nChannels_out = AudioFormats::getChannelsCount(format_out);
+				if (nChannels_in == 1) {
+					if (nChannels_out == 1) {
+						for (sl_size i = 0; i < count; i++) {
+							_in = IN_PROC::readSample(data_in);
+							AudioUtil::convertSample(_in, _out);
+							OUT_PROC::writeSample(data_out, _out);
+						}
+					} else if (nChannels_out == 2) {
+						if (AudioFormats::isNonInterleaved(format_out)) {
+							for (sl_size i = 0; i < count; i++) {
+								_in = IN_PROC::readSample(data_in);
+								AudioUtil::convertSample(_in, _out);
+								OUT_PROC::writeSample(data_out, _out);
+								OUT_PROC::writeSample(data_out1, _out);
+							}
+						} else {
+							for (sl_size i = 0; i < count; i++) {
+								_in = IN_PROC::readSample(data_in);
+								AudioUtil::convertSample(_in, _out);
+								OUT_PROC::writeSample(data_out, _out);
+								OUT_PROC::writeSample(data_out, _out);
+							}
+						}
 					}
-				} else {
-					for (sl_size i = 0; i < count; i++) {
-						_in = IN_PROC::readSample(data_in);
-						AudioUtil::convertSample(_in, _out);
-						OUT_PROC::writeSample(data_out, _out);
-						OUT_PROC::writeSample(data_out, _out);
+				} else if (nChannels_in == 2) {
+					if (AudioFormats::isNonInterleaved(format_in)) {
+						if (nChannels_out == 1) {
+							for (sl_size i = 0; i < count; i++) {
+								_in = IN_PROC::readSample(data_in);
+								_in1 = IN_PROC::readSample(data_in1);
+								AudioUtil::mixSamples(_in, _in1, _in);
+								AudioUtil::convertSample(_in, _out);
+								OUT_PROC::writeSample(data_out, _out);
+							}
+						} else if (nChannels_out == 2) {
+							if (AudioFormats::isNonInterleaved(format_out)) {
+								for (sl_size i = 0; i < count; i++) {
+									_in = IN_PROC::readSample(data_in);
+									AudioUtil::convertSample(_in, _out);
+									_in1 = IN_PROC::readSample(data_in1);
+									AudioUtil::convertSample(_in1, _out1);
+									OUT_PROC::writeSample(data_out, _out);
+									OUT_PROC::writeSample(data_out1, _out1);
+								}
+							} else {
+								for (sl_size i = 0; i < count; i++) {
+									_in = IN_PROC::readSample(data_in);
+									AudioUtil::convertSample(_in, _out);
+									_in1 = IN_PROC::readSample(data_in1);
+									AudioUtil::convertSample(_in1, _out1);
+									OUT_PROC::writeSample(data_out, _out);
+									OUT_PROC::writeSample(data_out, _out1);
+								}
+							}
+						}
+					} else {
+						if (nChannels_out == 1) {
+							for (sl_size i = 0; i < count; i++) {
+								_in = IN_PROC::readSample(data_in);
+								_in1 = IN_PROC::readSample(data_in);
+								AudioUtil::mixSamples(_in, _in1, _in);
+								AudioUtil::convertSample(_in, _out);
+								OUT_PROC::writeSample(data_out, _out);
+							}
+						} else if (nChannels_out == 2) {
+							if (AudioFormats::isNonInterleaved(format_out)) {
+								for (sl_size i = 0; i < count; i++) {
+									_in = IN_PROC::readSample(data_in);
+									AudioUtil::convertSample(_in, _out);
+									_in1 = IN_PROC::readSample(data_in);
+									AudioUtil::convertSample(_in1, _out1);
+									OUT_PROC::writeSample(data_out, _out);
+									OUT_PROC::writeSample(data_out1, _out1);
+								}
+							} else {
+								for (sl_size i = 0; i < count; i++) {
+									_in = IN_PROC::readSample(data_in);
+									AudioUtil::convertSample(_in, _out);
+									_in1 = IN_PROC::readSample(data_in);
+									AudioUtil::convertSample(_in1, _out1);
+									OUT_PROC::writeSample(data_out, _out);
+									OUT_PROC::writeSample(data_out, _out1);
+								}
+							}
+						}
 					}
 				}
 			}
-		} else if (nChannels_in == 2) {
-			if (AudioFormats::isNonInterleaved(format_in)) {
-				if (nChannels_out == 1) {
-					for (sl_size i = 0; i < count; i++) {
-						_in = IN_PROC::readSample(data_in);
-						_in1 = IN_PROC::readSample(data_in1);
-						AudioUtil::mixSamples(_in, _in1, _in);
-						AudioUtil::convertSample(_in, _out);
-						OUT_PROC::writeSample(data_out, _out);
-					}
-				} else if (nChannels_out == 2) {
-					if (AudioFormats::isNonInterleaved(format_out)) {
-						for (sl_size i = 0; i < count; i++) {
-							_in = IN_PROC::readSample(data_in);
-							AudioUtil::convertSample(_in, _out);
-							_in1 = IN_PROC::readSample(data_in1);
-							AudioUtil::convertSample(_in1, _out1);
-							OUT_PROC::writeSample(data_out, _out);
-							OUT_PROC::writeSample(data_out1, _out1);
+
+
+			template<class IN_PROC, class IN_TYPE>
+			void CopySamples_Step1(sl_size count, AudioFormat format_in, sl_uint8* data_in, sl_uint8* data_in1, AudioFormat format_out, sl_uint8* data_out, sl_uint8* data_out1)
+			{
+				switch (AudioFormats::getSampleType(format_out)) {
+					case AudioSampleType::Int8:
+						CopySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT8_PROC, sl_int8>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						break;
+					case AudioSampleType::Uint8:
+						CopySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT8_PROC, sl_uint8>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						break;
+					case AudioSampleType::Int16:
+						if (Endian::isLE()) {
+							CopySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT16LE_PROC, sl_int16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						} else {
+							CopySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT16BE_PROC, sl_int16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
 						}
-					} else {
-						for (sl_size i = 0; i < count; i++) {
-							_in = IN_PROC::readSample(data_in);
-							AudioUtil::convertSample(_in, _out);
-							_in1 = IN_PROC::readSample(data_in1);
-							AudioUtil::convertSample(_in1, _out1);
-							OUT_PROC::writeSample(data_out, _out);
-							OUT_PROC::writeSample(data_out, _out1);
+						break;
+					case AudioSampleType::Int16LE:
+						CopySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT16LE_PROC, sl_int16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						break;
+					case AudioSampleType::Int16BE:
+						CopySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT16BE_PROC, sl_int16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						break;
+					case AudioSampleType::Uint16:
+						if (Endian::isLE()) {
+							CopySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT16LE_PROC, sl_uint16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						} else {
+							CopySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT16BE_PROC, sl_uint16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
 						}
-					}
-				}
-			} else {
-				if (nChannels_out == 1) {
-					for (sl_size i = 0; i < count; i++) {
-						_in = IN_PROC::readSample(data_in);
-						_in1 = IN_PROC::readSample(data_in);
-						AudioUtil::mixSamples(_in, _in1, _in);
-						AudioUtil::convertSample(_in, _out);
-						OUT_PROC::writeSample(data_out, _out);
-					}
-				} else if (nChannels_out == 2) {
-					if (AudioFormats::isNonInterleaved(format_out)) {
-						for (sl_size i = 0; i < count; i++) {
-							_in = IN_PROC::readSample(data_in);
-							AudioUtil::convertSample(_in, _out);
-							_in1 = IN_PROC::readSample(data_in);
-							AudioUtil::convertSample(_in1, _out1);
-							OUT_PROC::writeSample(data_out, _out);
-							OUT_PROC::writeSample(data_out1, _out1);
+						break;
+					case AudioSampleType::Uint16LE:
+						CopySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT16LE_PROC, sl_uint16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						break;
+					case AudioSampleType::Uint16BE:
+						CopySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT16BE_PROC, sl_uint16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						break;
+					case AudioSampleType::Float:
+						if (Endian::isLE()) {
+							CopySamples_Step2<IN_PROC, IN_TYPE, AUDIO_FLOAT_LE_PROC, float>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						} else {
+							CopySamples_Step2<IN_PROC, IN_TYPE, AUDIO_FLOAT_BE_PROC, float>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
 						}
-					} else {
-						for (sl_size i = 0; i < count; i++) {
-							_in = IN_PROC::readSample(data_in);
-							AudioUtil::convertSample(_in, _out);
-							_in1 = IN_PROC::readSample(data_in);
-							AudioUtil::convertSample(_in1, _out1);
-							OUT_PROC::writeSample(data_out, _out);
-							OUT_PROC::writeSample(data_out, _out1);
-						}
-					}
+						break;
+					case AudioSampleType::FloatLE:
+						CopySamples_Step2<IN_PROC, IN_TYPE, AUDIO_FLOAT_LE_PROC, float>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						break;
+					case AudioSampleType::FloatBE:
+						CopySamples_Step2<IN_PROC, IN_TYPE, AUDIO_FLOAT_BE_PROC, float>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						break;
 				}
 			}
-		}
-	}
 
 
-	template<class IN_PROC, class IN_TYPE>
-	void _priv_AudioData_copySamples_Step1(sl_size count, AudioFormat format_in, sl_uint8* data_in, sl_uint8* data_in1, AudioFormat format_out, sl_uint8* data_out, sl_uint8* data_out1)
-	{
-		switch (AudioFormats::getSampleType(format_out)) {
-			case AudioSampleType::Int8:
-				_priv_AudioData_copySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT8_PROC, sl_int8>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				break;
-			case AudioSampleType::Uint8:
-				_priv_AudioData_copySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT8_PROC, sl_uint8>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				break;
-			case AudioSampleType::Int16:
-				if (Endian::isLE()) {
-					_priv_AudioData_copySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT16LE_PROC, sl_int16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				} else {
-					_priv_AudioData_copySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT16BE_PROC, sl_int16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+			void CopySamples(sl_size count, AudioFormat format_in, sl_uint8* data_in, sl_uint8* data_in1, AudioFormat format_out, sl_uint8* data_out, sl_uint8* data_out1)
+			{
+				switch (AudioFormats::getSampleType(format_in)) {
+					case AudioSampleType::Int8:
+						CopySamples_Step1<AUDIO_INT8_PROC, sl_int8>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						break;
+					case AudioSampleType::Uint8:
+						CopySamples_Step1<AUDIO_INT8_PROC, sl_uint8>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						break;
+					case AudioSampleType::Int16:
+						if (Endian::isLE()) {
+							CopySamples_Step1<AUDIO_INT16LE_PROC, sl_int16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						} else {
+							CopySamples_Step1<AUDIO_INT16BE_PROC, sl_int16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						}
+						break;
+					case AudioSampleType::Int16LE:
+						CopySamples_Step1<AUDIO_INT16LE_PROC, sl_int16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						break;
+					case AudioSampleType::Int16BE:
+						CopySamples_Step1<AUDIO_INT16BE_PROC, sl_int16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						break;
+					case AudioSampleType::Uint16:
+						if (Endian::isLE()) {
+							CopySamples_Step1<AUDIO_INT16LE_PROC, sl_uint16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						} else {
+							CopySamples_Step1<AUDIO_INT16BE_PROC, sl_uint16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						}
+						break;
+					case AudioSampleType::Uint16LE:
+						CopySamples_Step1<AUDIO_INT16LE_PROC, sl_uint16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						break;
+					case AudioSampleType::Uint16BE:
+						CopySamples_Step1<AUDIO_INT16BE_PROC, sl_uint16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						break;
+					case AudioSampleType::Float:
+						if (Endian::isLE()) {
+							CopySamples_Step1<AUDIO_FLOAT_LE_PROC, float>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						} else {
+							CopySamples_Step1<AUDIO_FLOAT_BE_PROC, float>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						}
+						break;
+					case AudioSampleType::FloatLE:
+						CopySamples_Step1<AUDIO_FLOAT_LE_PROC, float>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						break;
+					case AudioSampleType::FloatBE:
+						CopySamples_Step1<AUDIO_FLOAT_BE_PROC, float>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
+						break;
 				}
-				break;
-			case AudioSampleType::Int16LE:
-				_priv_AudioData_copySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT16LE_PROC, sl_int16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				break;
-			case AudioSampleType::Int16BE:
-				_priv_AudioData_copySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT16BE_PROC, sl_int16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				break;
-			case AudioSampleType::Uint16:
-				if (Endian::isLE()) {
-					_priv_AudioData_copySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT16LE_PROC, sl_uint16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				} else {
-					_priv_AudioData_copySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT16BE_PROC, sl_uint16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				}
-				break;
-			case AudioSampleType::Uint16LE:
-				_priv_AudioData_copySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT16LE_PROC, sl_uint16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				break;
-			case AudioSampleType::Uint16BE:
-				_priv_AudioData_copySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT16BE_PROC, sl_uint16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				break;
-			case AudioSampleType::Float:
-				if (Endian::isLE()) {
-					_priv_AudioData_copySamples_Step2<IN_PROC, IN_TYPE, AUDIO_FLOAT_LE_PROC, float>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				} else {
-					_priv_AudioData_copySamples_Step2<IN_PROC, IN_TYPE, AUDIO_FLOAT_BE_PROC, float>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				}
-				break;
-			case AudioSampleType::FloatLE:
-				_priv_AudioData_copySamples_Step2<IN_PROC, IN_TYPE, AUDIO_FLOAT_LE_PROC, float>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				break;
-			case AudioSampleType::FloatBE:
-				_priv_AudioData_copySamples_Step2<IN_PROC, IN_TYPE, AUDIO_FLOAT_BE_PROC, float>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				break;
-		}
-	}
-
-
-	void _priv_AudioData_copySamples(sl_size count, AudioFormat format_in, sl_uint8* data_in, sl_uint8* data_in1, AudioFormat format_out, sl_uint8* data_out, sl_uint8* data_out1)
-	{
-		switch (AudioFormats::getSampleType(format_in)) {
-			case AudioSampleType::Int8:
-				_priv_AudioData_copySamples_Step1<AUDIO_INT8_PROC, sl_int8>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				break;
-			case AudioSampleType::Uint8:
-				_priv_AudioData_copySamples_Step1<AUDIO_INT8_PROC, sl_uint8>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				break;
-			case AudioSampleType::Int16:
-				if (Endian::isLE()) {
-					_priv_AudioData_copySamples_Step1<AUDIO_INT16LE_PROC, sl_int16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				} else {
-					_priv_AudioData_copySamples_Step1<AUDIO_INT16BE_PROC, sl_int16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				}
-				break;
-			case AudioSampleType::Int16LE:
-				_priv_AudioData_copySamples_Step1<AUDIO_INT16LE_PROC, sl_int16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				break;
-			case AudioSampleType::Int16BE:
-				_priv_AudioData_copySamples_Step1<AUDIO_INT16BE_PROC, sl_int16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				break;
-			case AudioSampleType::Uint16:
-				if (Endian::isLE()) {
-					_priv_AudioData_copySamples_Step1<AUDIO_INT16LE_PROC, sl_uint16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				} else {
-					_priv_AudioData_copySamples_Step1<AUDIO_INT16BE_PROC, sl_uint16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				}
-				break;
-			case AudioSampleType::Uint16LE:
-				_priv_AudioData_copySamples_Step1<AUDIO_INT16LE_PROC, sl_uint16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				break;
-			case AudioSampleType::Uint16BE:
-				_priv_AudioData_copySamples_Step1<AUDIO_INT16BE_PROC, sl_uint16>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				break;
-			case AudioSampleType::Float:
-				if (Endian::isLE()) {
-					_priv_AudioData_copySamples_Step1<AUDIO_FLOAT_LE_PROC, float>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				} else {
-					_priv_AudioData_copySamples_Step1<AUDIO_FLOAT_BE_PROC, float>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				}
-				break;
-			case AudioSampleType::FloatLE:
-				_priv_AudioData_copySamples_Step1<AUDIO_FLOAT_LE_PROC, float>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				break;
-			case AudioSampleType::FloatBE:
-				_priv_AudioData_copySamples_Step1<AUDIO_FLOAT_BE_PROC, float>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
-				break;
+			}
+			
 		}
 	}
 
@@ -452,7 +460,7 @@ namespace slib
 			return;
 		}
 		
-		_priv_AudioData_copySamples(countSamples, format, data_in, data_in1, other.format, data_out, data_out1);
+		priv::audio_data::CopySamples(countSamples, format, data_in, data_in1, other.format, data_out, data_out1);
 	}
 
 	void AudioData::copySamplesFrom(const AudioData& other) const

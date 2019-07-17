@@ -28,6 +28,34 @@
 namespace slib
 {
 
+	namespace priv
+	{
+		namespace texture
+		{
+
+			class TextureBitmap : public Bitmap
+			{
+				friend class slib::Texture;
+			};
+			
+			class TextureBitmapCache : public BitmapCache
+			{
+			public:
+				Ref<Texture> texture;
+				
+			public:
+				void update(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height) override
+				{
+					texture->update(x, y, width, height);
+				}
+				
+			};
+						
+		}
+	}
+
+	using namespace priv::texture;
+
 	SLIB_DEFINE_OBJECT(TextureInstance, RenderBaseObjectInstance)
 	
 	TextureInstance::TextureInstance()
@@ -125,23 +153,6 @@ namespace slib
 		return create(Image::loadFromAsset(path));
 	}
 	
-	class _priv_TextureBitmap : public Bitmap
-	{
-		friend class Texture;
-	};
-	
-	class _priv_TextureBitmapCache : public BitmapCache
-	{
-	public:
-		Ref<Texture> texture;
-		
-		void update(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height) override
-		{
-			texture->update(x, y, width, height);
-		}
-		
-	};
-	
 	Ref<Texture> Texture::getBitmapRenderingCache(const Ref<Bitmap>& source)
 	{
 		if (source.isNotNull()) {
@@ -149,17 +160,17 @@ namespace slib
 			if (width > 0) {
 				sl_uint32 height = source->getHeight();
 				if (height > 0) {
-					_priv_TextureBitmap* tb = (_priv_TextureBitmap*)(source.get());
+					TextureBitmap* tb = (TextureBitmap*)(source.get());
 					Ref<BitmapCache> cache = tb->m_renderingTextureCached;
 					if (cache.isNotNull()) {
-						return ((_priv_TextureBitmapCache*)(cache.get()))->texture;
+						return ((TextureBitmapCache*)(cache.get()))->texture;
 					}
 					Ref<Texture> ret = new Texture;
 					if (ret.isNotNull()) {
 						ret->m_sourceWeak = tb;
 						ret->m_width = width;
 						ret->m_height = height;
-						Ref<_priv_TextureBitmapCache> tc = new _priv_TextureBitmapCache;
+						Ref<TextureBitmapCache> tc = new TextureBitmapCache;
 						if (tc.isNotNull()) {
 							tc->texture = ret;
 							tb->m_renderingTextureCached = tc;

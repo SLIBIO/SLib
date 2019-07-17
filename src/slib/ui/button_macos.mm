@@ -68,27 +68,15 @@ namespace slib
 		}
 	}
 
+	sl_bool Button::_measureSize_NW(UISize& _out)
+	{
+		return UIPlatform::measureNativeWidgetFittingSize(this, _out);
+	}
+	
 	void Button::_setFont_NW(const Ref<Font>& font)
 	{
 	}
 
-	namespace priv
-	{
-		namespace button
-		{
-			UISize measureNativeWidgetSize(Button* view)
-			{
-				NSView* handle = UIPlatform::getViewHandle(view);
-				if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
-					NSButton* button = (NSButton*)handle;
-					NSSize size = button.fittingSize;
-					return UISize((sl_ui_len)(size.width), (sl_ui_len)(size.height));
-				}
-				return UISize::zero();
-			}
-		}
-	}
-	
 }
 
 @implementation SLIBButtonHandle

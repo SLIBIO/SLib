@@ -82,30 +82,40 @@
 namespace slib
 {
 
-	SLIB_DEFINE_OBJECT(ScrollBar, View)
-	
-	class _priv_ScrollBar_Static
+	namespace priv
 	{
-	public:
-		Ref<Drawable> defaultThumb;
-		Ref<Drawable> defaultPressedThumb;
-		Ref<Drawable> defaultHoverThumb;
-		
-		Ref<Drawable> defaultHoverTrack;
-		Ref<Drawable> defaultPressedTrack;
-		
-		_priv_ScrollBar_Static()
+		namespace scroll_bar
 		{
-			defaultThumb = ColorDrawable::create(Color(0, 0, 0, 150));
-			defaultPressedThumb = ColorDrawable::create(Color(0, 0, 0, 200));
-			defaultHoverThumb = ColorDrawable::create(Color(0, 50, 255, 110));
+
+			class StaticContext
+			{
+			public:
+				Ref<Drawable> defaultThumb;
+				Ref<Drawable> defaultPressedThumb;
+				Ref<Drawable> defaultHoverThumb;
+				
+				Ref<Drawable> defaultHoverTrack;
+				Ref<Drawable> defaultPressedTrack;
+				
+				StaticContext()
+				{
+					defaultThumb = ColorDrawable::create(Color(0, 0, 0, 150));
+					defaultPressedThumb = ColorDrawable::create(Color(0, 0, 0, 200));
+					defaultHoverThumb = ColorDrawable::create(Color(0, 50, 255, 110));
+					
+					defaultHoverTrack = ColorDrawable::create(Color(255, 255, 255, 50));
+					defaultPressedTrack = ColorDrawable::create(Color(255, 255, 255, 100));
+				}
+			};
 			
-			defaultHoverTrack = ColorDrawable::create(Color(255, 255, 255, 50));
-			defaultPressedTrack = ColorDrawable::create(Color(255, 255, 255, 100));
+			SLIB_SAFE_STATIC_GETTER(StaticContext, GetStaticContext)
+
 		}
-	};
-	
-	SLIB_SAFE_STATIC_GETTER(_priv_ScrollBar_Static, _priv_ScrollBar_getStatic)
+	}
+
+	using namespace priv::scroll_bar;
+
+	SLIB_DEFINE_OBJECT(ScrollBar, View)
 	
 	ScrollBar::ScrollBar(LayoutOrientation orientation)
 	{
@@ -121,7 +131,7 @@ namespace slib
 		m_valueDown = 0;
 		m_posDown = 0;
 		
-		_priv_ScrollBar_Static* s = _priv_ScrollBar_getStatic();
+		StaticContext* s = GetStaticContext();
 		if (s) {
 			m_thumb = s->defaultThumb;
 			m_pressedThumb = s->defaultPressedThumb;

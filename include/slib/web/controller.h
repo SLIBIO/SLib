@@ -97,7 +97,7 @@ namespace SWEB_MODULE_##NAME { \
 
 #define SWEB_HANDLER(METHOD, PATH, NAME) \
 	slib::Variant NAME(SWEB_HANDLER_PARAMS_LIST); \
-	class _priv_slib_WebHandlerRegisterer_##NAME { public: _priv_slib_WebHandlerRegisterer_##NAME() { getModule()->addHandler(slib::HttpMethod::METHOD, PATH, &NAME); } } _priv_slib_WebHandlerRegisterer_instance_##NAME; \
+	class WebHandlerRegisterer_##NAME { public: WebHandlerRegisterer_##NAME() { getModule()->addHandler(slib::HttpMethod::METHOD, PATH, &NAME); } } WebHandlerRegisterer_instance_##NAME; \
 	slib::Variant NAME(SWEB_HANDLER_PARAMS_LIST)
 
 #define SWEB_STRING_PARAM(NAME) slib::String NAME = context->getParameter(#NAME);

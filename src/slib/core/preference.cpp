@@ -26,28 +26,36 @@
 
 namespace slib
 {
+
+	namespace priv
+	{
+		namespace preference
+		{
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicString, g_appKey)
+		}
+	}
+
+	using namespace priv::preference;
 	
 	void Preference::removeValue(const String& key)
 	{
 		setValue(key, sl_null);
 	}
 
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicString, _g_preference_app_key)
-
 	String Preference::getApplicationKeyName()
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_preference_app_key)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_appKey)) {
 			return sl_null;
 		}
-		return _g_preference_app_key;
+		return g_appKey;
 	}
 
 	void Preference::setApplicationKeyName(const String& name)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_preference_app_key)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_appKey)) {
 			return;
 		}
-		_g_preference_app_key = name;
+		g_appKey = name;
 	}
 
 }

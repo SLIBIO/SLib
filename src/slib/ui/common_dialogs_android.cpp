@@ -43,7 +43,7 @@ namespace slib
 
 			void OnResultShowAlertDialog(JNIEnv* env, jobject _this, jlong _alert, int result);
 
-			SLIB_JNI_BEGIN_CLASS(JAndroidAlert, "slib/platform/android/ui/Alert")
+			SLIB_JNI_BEGIN_CLASS(JAlert, "slib/platform/android/ui/Alert")
 				SLIB_JNI_INT_FIELD(type);
 				SLIB_JNI_STRING_FIELD(text);
 				SLIB_JNI_BOOLEAN_FIELD(flagHyperText);
@@ -130,28 +130,28 @@ namespace slib
 			if (result.isNotNull()) {
 				result->onResult = SLIB_FUNCTION_REF(AlertDialog, _onResult, this);
 
-				JniLocal<jobject> jalert = JAndroidAlert::init.newObject(sl_null);
+				JniLocal<jobject> jalert = JAlert::init.newObject(sl_null);
 				if (jalert.isNotNull()) {
-					JAndroidAlert::type.set(jalert, (int)(buttons));
-					JAndroidAlert::caption.set(jalert, caption);
-					JAndroidAlert::text.set(jalert, text);
-					JAndroidAlert::flagHyperText.set(jalert, flagHyperText);
+					JAlert::type.set(jalert, (int)(buttons));
+					JAlert::caption.set(jalert, caption);
+					JAlert::text.set(jalert, text);
+					JAlert::flagHyperText.set(jalert, flagHyperText);
 					jlong lresult = (jlong)(result.get());
-					JAndroidAlert::nativeObject.set(jalert, lresult);
-					JAndroidAlert::titleOk.set(jalert, titleOk);
-					JAndroidAlert::titleCancel.set(jalert, titleCancel);
+					JAlert::nativeObject.set(jalert, lresult);
+					JAlert::titleOk.set(jalert, titleOk);
+					JAlert::titleCancel.set(jalert, titleCancel);
 					String _titleYes = titleYes;
 					if (_titleYes.isEmpty()) {
 						_titleYes = string::yes::get();
 					}
-					JAndroidAlert::titleYes.set(jalert, _titleYes);
+					JAlert::titleYes.set(jalert, _titleYes);
 					String _titleNo = titleNo;
 					if (_titleNo.isEmpty()) {
 						_titleNo = string::no::get();
 					}
-					JAndroidAlert::titleNo.set(jalert, _titleNo);
+					JAlert::titleNo.set(jalert, _titleNo);
 					alertMap->put(lresult, result);
-					if (JAndroidAlert::show.callBoolean(jalert, jactivity)) {
+					if (JAlert::show.callBoolean(jalert, jactivity)) {
 						return sl_true;
 					}
 					alertMap->remove(lresult);

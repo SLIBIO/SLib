@@ -687,13 +687,14 @@ namespace slib
 	
 }
 
+using namespace slib;
 using namespace slib::priv::camera;
 
 @implementation SLIBCameraCallback
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
-	slib::Ref<CameraImpl> camera(m_camera);
+	Ref<CameraImpl> camera(m_camera);
 	if (camera.isNotNull()) {
 		camera->_onFrame(sampleBuffer);
 	}
@@ -710,7 +711,7 @@ previewPhotoSampleBuffer:(CMSampleBufferRef)previewPhotoSampleBuffer
 	if (error != nil) {
 		NSLog(@"%@", error.localizedDescription);
 	}
-	slib::Ref<CameraImpl> camera(m_camera);
+	Ref<CameraImpl> camera(m_camera);
 	if (camera.isNotNull()) {
 		if (rawSampleBuffer != nil) {
 			camera->_onCapturePhoto([AVCapturePhotoOutput JPEGPhotoDataRepresentationForJPEGSampleBuffer:rawSampleBuffer previewPhotoSampleBuffer:nil]);
@@ -723,14 +724,15 @@ previewPhotoSampleBuffer:(CMSampleBufferRef)previewPhotoSampleBuffer
 - (void)captureOutput:(AVCapturePhotoOutput *)output
 didFinishProcessingPhoto:(AVCapturePhoto *)photo
 				error:(NSError *)error
-API_AVAILABLE(ios(11.0)){
+				API_AVAILABLE(ios(11.0))
+{
 	if (photo.isRawPhoto) {
 		return;
 	}
 	if (error != nil) {
 		NSLog(@"%@", error.localizedDescription);
 	}
-	slib::Ref<CameraImpl> camera(m_camera);
+	Ref<CameraImpl> camera(m_camera);
 	if (camera.isNotNull()) {
 		camera->_onCapturePhoto([photo fileDataRepresentation]);
 	}

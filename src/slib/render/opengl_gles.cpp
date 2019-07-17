@@ -31,7 +31,7 @@
 
 #define PRIV_OPENGL_ES_IMPL
 #define GL_BASE GLES
-#define GL_ENGINE _priv_GLES_Engine
+#define GL_ENGINE GLES_Engine
 #define GL_ENTRY(x) PRIV_GLES_ENTRY(x)
 #include "opengl_impl.h"
 
@@ -41,15 +41,27 @@
 
 namespace slib
 {
-	_priv_GLES_EntryPoints _priv_GLES_entries;
+
+	namespace priv
+	{
+		namespace gles
+		{
+
+			EntryPoints g_entries;
+	
+			static sl_bool g_flagLoadedEntryPoints = sl_false;
+
+		}
+	}
+
+	using namespace priv::gles;
 	
 #undef PRIV_SLIB_RENDER_GLES_ENTRY
 #define PRIV_SLIB_RENDER_GLES_ENTRY(TYPE, name, ...) \
 	proc = ::GetProcAddress(hDll, #name); \
-	*((FARPROC*)(&(_priv_GLES_entries.name))) = proc;
+	*((FARPROC*)(&(g_entries.name))) = proc;
 	
-	static sl_bool _g_render_GLES_flagLoadedEntryPoints = sl_false;
-	
+
 	void GLES::loadEntries(const String& _pathDll, sl_bool flagReload)
 	{
 		String16 pathDll = _pathDll;
@@ -57,7 +69,7 @@ namespace slib
 			return;
 		}
 		if (!flagReload) {
-			if (_g_render_GLES_flagLoadedEntryPoints) {
+			if (g_flagLoadedEntryPoints) {
 				return;
 			}
 		}
@@ -68,7 +80,7 @@ namespace slib
 		}
 		FARPROC proc;
 		PRIV_SLIB_RENDER_GLES_ENTRIES
-		_g_render_GLES_flagLoadedEntryPoints = sl_true;
+		g_flagLoadedEntryPoints = sl_true;
 	}
 	
 	void GLES::loadEntries(sl_bool flagReload)
@@ -79,7 +91,7 @@ namespace slib
 	
 	sl_bool GLES::isAvailable()
 	{
-		return _g_render_GLES_flagLoadedEntryPoints;
+		return g_flagLoadedEntryPoints;
 	}
 }
 

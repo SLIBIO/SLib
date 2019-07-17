@@ -1069,11 +1069,62 @@ namespace slib
 		}
 	}
 	
+	using namespace priv::window;
+	
 	Ref<WindowInstance> Window::createWindowInstance(const WindowInstanceParam& param)
 	{
-		return priv::window::macOS_WindowInstance::create(param);
+		return macOS_WindowInstance::create(param);
 	}
 
+	
+	Ref<WindowInstance> UIPlatform::createWindowInstance(NSWindow* window)
+	{
+		Ref<WindowInstance> ret = UIPlatform::_getWindowInstance((__bridge void*)window);
+		if (ret.isNotNull()) {
+			return ret;
+		}
+		return macOS_WindowInstance::create(window);
+	}
+	
+	void UIPlatform::registerWindowInstance(NSWindow* window, WindowInstance* instance)
+	{
+		UIPlatform::_registerWindowInstance((__bridge void*)window, instance);
+	}
+	
+	Ref<WindowInstance> UIPlatform::getWindowInstance(NSWindow* window)
+	{
+		return UIPlatform::_getWindowInstance((__bridge void*)window);
+	}
+	
+	void UIPlatform::removeWindowInstance(NSWindow* window)
+	{
+		UIPlatform::_removeWindowInstance((__bridge void*)window);
+	}
+	
+	NSWindow* UIPlatform::getWindowHandle(WindowInstance* instance)
+	{
+		macOS_WindowInstance* window = (macOS_WindowInstance*)instance;
+		if (window) {
+			return window->m_window;
+		} else {
+			return nil;
+		}
+	}
+	
+	NSWindow* UIPlatform::getWindowHandle(Window* window)
+	{
+		if (window) {
+			Ref<WindowInstance> instance = window->getWindowInstance();
+			if (instance.isNotNull()) {
+				macOS_WindowInstance* _instance = (macOS_WindowInstance*)(instance.get());
+				if (_instance) {
+					return _instance->m_window;
+				}
+			}
+		}
+		return nil;
+	}
+	
 }
 
 using namespace slib;
@@ -1235,58 +1286,5 @@ using namespace slib::priv::window;
 }
 
 @end
-
-namespace slib
-{
-
-	Ref<WindowInstance> UIPlatform::createWindowInstance(NSWindow* window)
-	{
-		Ref<WindowInstance> ret = UIPlatform::_getWindowInstance((__bridge void*)window);
-		if (ret.isNotNull()) {
-			return ret;
-		}
-		return macOS_WindowInstance::create(window);
-	}
-
-	void UIPlatform::registerWindowInstance(NSWindow* window, WindowInstance* instance)
-	{
-		UIPlatform::_registerWindowInstance((__bridge void*)window, instance);
-	}
-
-	Ref<WindowInstance> UIPlatform::getWindowInstance(NSWindow* window)
-	{
-		return UIPlatform::_getWindowInstance((__bridge void*)window);
-	}
-
-	void UIPlatform::removeWindowInstance(NSWindow* window)
-	{
-		UIPlatform::_removeWindowInstance((__bridge void*)window);
-	}
-
-	NSWindow* UIPlatform::getWindowHandle(WindowInstance* instance)
-	{
-		macOS_WindowInstance* window = (macOS_WindowInstance*)instance;
-		if (window) {
-			return window->m_window;
-		} else {
-			return nil;
-		}
-	}
-
-	NSWindow* UIPlatform::getWindowHandle(Window* window)
-	{
-		if (window) {
-			Ref<WindowInstance> instance = window->getWindowInstance();
-			if (instance.isNotNull()) {
-				macOS_WindowInstance* _instance = (macOS_WindowInstance*)(instance.get());
-				if (_instance) {
-					return _instance->m_window;
-				}
-			}
-		}
-		return nil;
-	}
-
-}
 
 #endif

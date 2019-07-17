@@ -25,38 +25,94 @@
 namespace slib
 {
 
-	class TreeContentViewImpl : public View
+	namespace priv
 	{
-	public:
-		AtomicWeakRef<TreeView> m_tree;
-		
-	public:
-		TreeContentViewImpl()
+		namespace tree_view
 		{
+			
+			class TreeContentViewImpl : public View
+			{
+			public:
+				AtomicWeakRef<TreeView> m_tree;
+				
+			public:
+				TreeContentViewImpl()
+				{
 #if !defined(SLIB_PLATFORM_IS_MOBILE)
-			setFocusable(sl_true);
+					setFocusable(sl_true);
 #endif
-		}
-		
-	public:
-		void onDraw(Canvas* canvas) override
-		{
-			Ref<TreeView> tree = m_tree;
-			if (tree.isNotNull()) {
-				tree->_drawContent(canvas);
-			}
-		}
-		
-		void onMouseEvent(UIEvent* ev) override
-		{
-			Ref<TreeView> tree = m_tree;
-			if (tree.isNotNull()) {
-				tree->_processMouseEvent(ev);
-			}
-		}
-		
-	};
-	
+				}
+				
+			public:
+				void onDraw(Canvas* canvas) override
+				{
+					Ref<TreeView> tree = m_tree;
+					if (tree.isNotNull()) {
+						tree->_drawContent(canvas);
+					}
+				}
+				
+				void onMouseEvent(UIEvent* ev) override
+				{
+					Ref<TreeView> tree = m_tree;
+					if (tree.isNotNull()) {
+						tree->_processMouseEvent(ev);
+					}
+				}
+				
+			};
+
+			class DefaultIndentIcon : public Drawable
+			{
+			public:
+				Ref<Brush> m_brush;
+				Point m_pts[3];
+				
+			public:
+				DefaultIndentIcon(sl_bool flagCollapse)
+				{
+					m_brush = Brush::createSolidBrush(Color(50, 50, 50));
+					if (flagCollapse) {
+						m_pts[0] = Point(0.33f, 0.34f);
+						m_pts[1] = Point(0.67f, 0.51f);
+						m_pts[2] = Point(0.33f, 0.68f);
+					} else {
+						m_pts[0] = Point(0.3f, 0.35f);
+						m_pts[1] = Point(0.5f, 0.65f);
+						m_pts[2] = Point(0.7f, 0.35f);
+					}
+				}
+				
+			public:
+				sl_real getDrawableWidth() override
+				{
+					return 16;
+				}
+				
+				sl_real getDrawableHeight() override
+				{
+					return 16;
+				}
+				
+				void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
+				{
+					if (m_brush.isNotNull()) {
+						Point pts[3];
+						for (int i = 0; i < 3; i++) {
+							pts[i].x = rectDst.left + rectDst.getWidth() * m_pts[i].x;
+							pts[i].y = rectDst.top + rectDst.getHeight() * m_pts[i].y;
+						}
+						canvas->fillPolygon(pts, 3, m_brush);
+					}
+				}
+				
+			};
+
+		}	
+	}
+
+	using namespace priv::tree_view;
+
 	SLIB_DEFINE_OBJECT(TreeViewItem, Object)
 	
 	TreeViewItem::TreeViewItem()
@@ -439,51 +495,6 @@ namespace slib
 		return sl_null;
 	}
 	
-	class _priv_TreeView_DefaultIdentIcon : public Drawable
-	{
-	public:
-		Ref<Brush> m_brush;
-		Point m_pts[3];
-		
-	public:
-		_priv_TreeView_DefaultIdentIcon(sl_bool flagCollapse)
-		{
-			m_brush = Brush::createSolidBrush(Color(50, 50, 50));
-			if (flagCollapse) {
-				m_pts[0] = Point(0.33f, 0.34f);
-				m_pts[1] = Point(0.67f, 0.51f);
-				m_pts[2] = Point(0.33f, 0.68f);
-			} else {
-				m_pts[0] = Point(0.3f, 0.35f);
-				m_pts[1] = Point(0.5f, 0.65f);
-				m_pts[2] = Point(0.7f, 0.35f);
-			}
-		}
-		
-	public:
-		sl_real getDrawableWidth() override
-		{
-			return 16;
-		}
-		
-		sl_real getDrawableHeight() override
-		{
-			return 16;
-		}
-		
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
-		{
-			if (m_brush.isNotNull()) {
-				Point pts[3];
-				for (int i = 0; i < 3; i++) {
-					pts[i].x = rectDst.left + rectDst.getWidth() * m_pts[i].x;
-					pts[i].y = rectDst.top + rectDst.getHeight() * m_pts[i].y;
-				}
-				canvas->fillPolygon(pts, 3, m_brush);
-			}
-		}
-		
-	};
 	
 	SLIB_DEFINE_OBJECT(TreeView, ScrollView)
 	
@@ -508,8 +519,8 @@ namespace slib
 		m_itemIndent = 16;
 		m_textIndent = 4;
 		
-		m_iconCollapsed = new _priv_TreeView_DefaultIdentIcon(sl_true);
-		m_iconExpanded = new _priv_TreeView_DefaultIdentIcon(sl_false);
+		m_iconCollapsed = new DefaultIndentIcon(sl_true);
+		m_iconExpanded = new DefaultIndentIcon(sl_false);
 	}
 	
 	TreeView::~TreeView()

@@ -31,84 +31,94 @@
 namespace slib
 {
 
-	SLIB_DEFINE_OBJECT(SelectView, View)
-	
-	enum
+	namespace priv
 	{
-		ICON_NONE = 0,
-		ICON_LEFT = 1,
-		ICON_RIGHT = 2,
-		ICON_DOWN = 3
-	};
-	
-	class _priv_SelectView_DefaultIcon : public Drawable
-	{
-	public:
-		Ref<Brush> m_brush;
-		Point m_pts[3];
-		
-	public:
-		_priv_SelectView_DefaultIcon(int type)
+		namespace select_view
 		{
-			m_brush = Brush::createSolidBrush(Color::Black);
-			if (type == ICON_LEFT) {
-				m_pts[0] = Point(0.67f, 0.24f);
-				m_pts[1] = Point(0.33f, 0.51f);
-				m_pts[2] = Point(0.67f, 0.78f);
-			} else if (type == ICON_RIGHT) {
-				m_pts[0] = Point(0.33f, 0.24f);
-				m_pts[1] = Point(0.67f, 0.51f);
-				m_pts[2] = Point(0.33f, 0.78f);
-			} else if (type == ICON_DOWN) {
-				m_pts[0] = Point(0.3f, 0.35f);
-				m_pts[1] = Point(0.5f, 0.65f);
-				m_pts[2] = Point(0.7f, 0.35f);
-			}
-		}
-		
-	public:
-		sl_real getDrawableWidth() override
-		{
-			return 1;
-		}
-		
-		sl_real getDrawableHeight() override
-		{
-			return 1;
-		}
-		
-		void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
-		{
-			if (m_brush.isNotNull()) {
-				Point pts[3];
-				for (int i = 0; i < 3; i++) {
-					pts[i].x = rectDst.left + rectDst.getWidth() * m_pts[i].x;
-					pts[i].y = rectDst.top + rectDst.getHeight() * m_pts[i].y;
+
+			enum
+			{
+				ICON_NONE = 0,
+				ICON_LEFT = 1,
+				ICON_RIGHT = 2,
+				ICON_DOWN = 3
+			};
+			
+			class DefaultIcon : public Drawable
+			{
+			public:
+				Ref<Brush> m_brush;
+				Point m_pts[3];
+				
+			public:
+				DefaultIcon(int type)
+				{
+					m_brush = Brush::createSolidBrush(Color::Black);
+					if (type == ICON_LEFT) {
+						m_pts[0] = Point(0.67f, 0.24f);
+						m_pts[1] = Point(0.33f, 0.51f);
+						m_pts[2] = Point(0.67f, 0.78f);
+					} else if (type == ICON_RIGHT) {
+						m_pts[0] = Point(0.33f, 0.24f);
+						m_pts[1] = Point(0.67f, 0.51f);
+						m_pts[2] = Point(0.33f, 0.78f);
+					} else if (type == ICON_DOWN) {
+						m_pts[0] = Point(0.3f, 0.35f);
+						m_pts[1] = Point(0.5f, 0.65f);
+						m_pts[2] = Point(0.7f, 0.35f);
+					}
 				}
-				canvas->fillPolygon(pts, 3, m_brush);
-			}
+				
+			public:
+				sl_real getDrawableWidth() override
+				{
+					return 1;
+				}
+				
+				sl_real getDrawableHeight() override
+				{
+					return 1;
+				}
+				
+				void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
+				{
+					if (m_brush.isNotNull()) {
+						Point pts[3];
+						for (int i = 0; i < 3; i++) {
+							pts[i].x = rectDst.left + rectDst.getWidth() * m_pts[i].x;
+							pts[i].y = rectDst.top + rectDst.getHeight() * m_pts[i].y;
+						}
+						canvas->fillPolygon(pts, 3, m_brush);
+					}
+				}
+				
+			};
+			
+			class DefaultResources
+			{
+			public:
+				Ref<Drawable> leftIcon;
+				Ref<Drawable> rightIcon;
+				Ref<Drawable> downIcon;
+				
+			public:
+				DefaultResources()
+				{
+					leftIcon = new DefaultIcon(ICON_LEFT);
+					rightIcon = new DefaultIcon(ICON_RIGHT);
+					downIcon = new DefaultIcon(ICON_DOWN);
+				}
+				
+			};
+			
+			SLIB_SAFE_STATIC_GETTER(DefaultResources, GetDefaultResources)
+
 		}
-		
-	};
-	
-	class _priv_SelectView_DefaultResources
-	{
-	public:
-		Ref<Drawable> leftIcon;
-		Ref<Drawable> rightIcon;
-		Ref<Drawable> downIcon;
-		
-	public:
-		_priv_SelectView_DefaultResources()
-		{
-			leftIcon = new _priv_SelectView_DefaultIcon(ICON_LEFT);
-			rightIcon = new _priv_SelectView_DefaultIcon(ICON_RIGHT);
-			downIcon = new _priv_SelectView_DefaultIcon(ICON_DOWN);
-		}
-		
-	};
-	
-	SLIB_SAFE_STATIC_GETTER(_priv_SelectView_DefaultResources, _priv_SelectView_getDefaultResources)
+	}
+
+	using namespace priv::select_view;
+
+	SLIB_DEFINE_OBJECT(SelectView, View)
 	
 	SelectView::SelectView()
 	{
@@ -131,7 +141,7 @@ namespace slib
 		m_textAlignment = Alignment::MiddleLeft;
 		m_textColor = Color::Black;
 		
-		_priv_SelectView_DefaultResources* def = _priv_SelectView_getDefaultResources();
+		DefaultResources* def = GetDefaultResources();
 		if (def) {
 			m_leftIcon = def->leftIcon;
 			m_rightIcon = def->rightIcon;
@@ -430,8 +440,6 @@ namespace slib
 		}
 	}
 	
-	UISize _priv_SelectView_macOS_measureSize(SelectView* view);
-
 	void SelectView::onUpdateLayout()
 	{
 		sl_bool flagHorizontal = isWidthWrapping();
@@ -441,18 +449,19 @@ namespace slib
 			return;
 		}
 		
-#ifdef SLIB_UI_IS_MACOS
 		if (isNativeWidget()) {
-			UISize size = _priv_SelectView_macOS_measureSize(this);
-			if (flagHorizontal) {
-				setLayoutWidth(size.x);
+			UISize size;
+			if (_measureSize_NW(size)) {
+				if (flagHorizontal) {
+					setLayoutWidth(size.x);
+				}
+				if (flagVertical) {
+					setLayoutHeight(size.y);
+				}
+				return;
 			}
-			if (flagVertical) {
-				setLayoutHeight(size.y);
-			}
-			return;
 		}
-#endif
+
 		Ref<Font> font = getFont();
 		if (flagHorizontal) {
 			sl_ui_pos width = m_iconSize.x * 2 + getPaddingLeft() + getPaddingRight();
@@ -588,6 +597,13 @@ namespace slib
 	
 	void SelectView::_setBackgroundColor_NW(const Color& color)
 	{
+	}
+#endif
+
+#if !defined(SLIB_UI_IS_MACOS)
+	sl_bool SelectView::_measureSize_NW(UISize& _out)
+	{
+		return sl_false;
 	}
 #endif
 

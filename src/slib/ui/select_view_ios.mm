@@ -29,7 +29,7 @@
 
 #include "view_ios.h"
 
-@interface _priv_Slib_iOS_SelectView : UITextField<UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate>
+@interface SLIBSelectViewHandle : UITextField<UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate>
 {
 	@public UIPickerView* m_picker;
 	
@@ -41,82 +41,93 @@
 
 namespace slib
 {
-	class _priv_SelectView : public SelectView
+	
+	namespace priv
 	{
-	public:
-		sl_uint32 _getItemsCount()
+		namespace select_view
 		{
-			return (sl_uint32)(m_titles.getCount());
+			
+			class SelectViewHelper : public SelectView
+			{
+			public:
+				sl_uint32 _getItemsCount()
+				{
+					return (sl_uint32)(m_titles.getCount());
+				}
+				
+				NSString* _getItemTitle(sl_uint32 row)
+				{
+					String s = m_titles.getValueAt(row);
+					return Apple::getNSStringFromString(s);
+				}
+				
+				void _onSelectItem(SLIBSelectViewHandle* v, sl_uint32 row)
+				{
+					v.text = _getItemTitle(row);
+					dispatchSelectItem(row);
+				}
+				
+				void _onStartSelection(SLIBSelectViewHandle* v)
+				{
+					sl_uint32 n = m_indexSelected;
+					v->m_selectionBefore = n;
+					UIPickerView* picker = v->m_picker;
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[picker selectRow:n inComponent:0 animated:NO];
+					});
+				}
+				
+				void _onCancelSelection(SLIBSelectViewHandle* v)
+				{
+					_onSelectItem(v, v->m_selectionBefore);
+				}
+				
+				void _selectItem(SLIBSelectViewHandle* v, sl_uint32 row)
+				{
+					v.text = _getItemTitle(row);
+					[v->m_picker selectRow:row inComponent:0 animated:NO];
+				}
+				
+				static NSTextAlignment translateAlignment(Alignment _align)
+				{
+					Alignment align = _align & Alignment::HorizontalMask;
+					if (align == Alignment::Center) {
+						return NSTextAlignmentCenter;
+					} else if (align == Alignment::Right) {
+						return NSTextAlignmentRight;
+					}
+					return NSTextAlignmentLeft;
+				}
+				
+				static void setBorder(SLIBSelectViewHandle* handle, sl_bool flagBorder)
+				{
+					if (flagBorder) {
+						[handle.layer setBorderColor:[UIColor grayColor].CGColor];
+						[handle.layer setBorderWidth:(UI::dpToPixel(1) / UIPlatform::getGlobalScaleFactor())];
+						[handle.layer setCornerRadius:(UI::dpToPixel(5) / UIPlatform::getGlobalScaleFactor())];
+					} else {
+						[handle.layer setBorderWidth:0];
+						[handle.layer setCornerRadius:0];
+					}
+				}
+				
+			};
+
 		}
-		
-		NSString* _getItemTitle(sl_uint32 row)
-		{
-			String s = m_titles.getValueAt(row);
-			return Apple::getNSStringFromString(s);
-		}
-		
-		void _onSelectItem(_priv_Slib_iOS_SelectView* v, sl_uint32 row)
-		{
-			v.text = _getItemTitle(row);
-			dispatchSelectItem(row);
-		}
-		
-		void _onStartSelection(_priv_Slib_iOS_SelectView* v)
-		{
-			sl_uint32 n = m_indexSelected;
-			v->m_selectionBefore = n;
-			UIPickerView* picker = v->m_picker;
-			dispatch_async(dispatch_get_main_queue(), ^{
-				[picker selectRow:n inComponent:0 animated:NO];
-			});
-		}
-		
-		void _onCancelSelection(_priv_Slib_iOS_SelectView* v)
-		{
-			_onSelectItem(v, v->m_selectionBefore);
-		}
-		
-		void _selectItem(_priv_Slib_iOS_SelectView* v, sl_uint32 row)
-		{
-			v.text = _getItemTitle(row);
-			[v->m_picker selectRow:row inComponent:0 animated:NO];
-		}
-		
-		static NSTextAlignment translateAlignment(Alignment _align)
-		{
-			Alignment align = _align & Alignment::HorizontalMask;
-			if (align == Alignment::Center) {
-				return NSTextAlignmentCenter;
-			} else if (align == Alignment::Right) {
-				return NSTextAlignmentRight;
-			}
-			return NSTextAlignmentLeft;
-		}
-		
-		static void setBorder(_priv_Slib_iOS_SelectView* handle, sl_bool flagBorder)
-		{
-			if (flagBorder) {
-				[handle.layer setBorderColor:[UIColor grayColor].CGColor];
-				[handle.layer setBorderWidth:(UI::dpToPixel(1) / UIPlatform::getGlobalScaleFactor())];
-				[handle.layer setCornerRadius:(UI::dpToPixel(5) / UIPlatform::getGlobalScaleFactor())];
-			} else {
-				[handle.layer setBorderWidth:0];
-				[handle.layer setCornerRadius:0];
-			}
-		}
-		
-	};
+	}
+
+	using namespace priv::select_view;
 	
 	Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		_priv_Slib_iOS_SelectView* handle = [[_priv_Slib_iOS_SelectView alloc] initWithFrame:frame];
+		SLIBSelectViewHandle* handle = [[SLIBSelectViewHandle alloc] initWithFrame:frame];
 		if (handle != nil) {
-			((_priv_SelectView*)this)->_selectItem(handle, m_indexSelected);
+			((SelectViewHelper*)this)->_selectItem(handle, m_indexSelected);
 			
-			[handle setTextAlignment:(_priv_SelectView::translateAlignment(m_textAlignment))];
+			[handle setTextAlignment:(SelectViewHelper::translateAlignment(m_textAlignment))];
 			[handle setTextColor:(GraphicsPlatform::getUIColorFromColor(m_textColor))];
-			_priv_SelectView::setBorder(handle, isBorder());
+			SelectViewHelper::setBorder(handle, isBorder());
 			Color backColor = getBackgroundColor();
 			[handle setBackgroundColor:(backColor.isZero() ? nil : GraphicsPlatform::getUIColorFromColor(backColor))];
 			
@@ -137,9 +148,9 @@ namespace slib
 			return;
 		}
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
-			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
-			((_priv_SelectView*)this)->_selectItem(v, index);
+		if (handle != nil && [handle isKindOfClass:[SLIBSelectViewHandle class]]) {
+			SLIBSelectViewHandle* v = (SLIBSelectViewHandle*)handle;
+			((SelectViewHelper*)this)->_selectItem(v, index);
 		}
 	}
 	
@@ -150,8 +161,8 @@ namespace slib
 			return;
 		}
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
-			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
+		if (handle != nil && [handle isKindOfClass:[SLIBSelectViewHandle class]]) {
+			SLIBSelectViewHandle* v = (SLIBSelectViewHandle*)handle;
 			[v->m_picker reloadAllComponents];
 		}
 	}
@@ -163,8 +174,8 @@ namespace slib
 			return;
 		}
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
-			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
+		if (handle != nil && [handle isKindOfClass:[SLIBSelectViewHandle class]]) {
+			SLIBSelectViewHandle* v = (SLIBSelectViewHandle*)handle;
 			[v->m_picker reloadAllComponents];
 		}
 	}
@@ -176,8 +187,8 @@ namespace slib
 			return;
 		}
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
-			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
+		if (handle != nil && [handle isKindOfClass:[SLIBSelectViewHandle class]]) {
+			SLIBSelectViewHandle* v = (SLIBSelectViewHandle*)handle;
 			[v->m_picker reloadAllComponents];
 		}
 	}
@@ -189,9 +200,9 @@ namespace slib
 			return;
 		}
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
-			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
-			[v setTextAlignment:(_priv_SelectView::translateAlignment(align))];
+		if (handle != nil && [handle isKindOfClass:[SLIBSelectViewHandle class]]) {
+			SLIBSelectViewHandle* v = (SLIBSelectViewHandle*)handle;
+			[v setTextAlignment:(SelectViewHelper::translateAlignment(align))];
 		}
 	}
 	
@@ -202,8 +213,8 @@ namespace slib
 			return;
 		}
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
-			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
+		if (handle != nil && [handle isKindOfClass:[SLIBSelectViewHandle class]]) {
+			SLIBSelectViewHandle* v = (SLIBSelectViewHandle*)handle;
 			[v setTextColor:(GraphicsPlatform::getUIColorFromColor(color))];
 		}
 	}
@@ -215,9 +226,9 @@ namespace slib
 			return;
 		}
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
-			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
-			_priv_SelectView::setBorder(v, flag);
+		if (handle != nil && [handle isKindOfClass:[SLIBSelectViewHandle class]]) {
+			SLIBSelectViewHandle* v = (SLIBSelectViewHandle*)handle;
+			SelectViewHelper::setBorder(v, flag);
 		}
 	}
 	
@@ -228,8 +239,8 @@ namespace slib
 			return;
 		}
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
-			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
+		if (handle != nil && [handle isKindOfClass:[SLIBSelectViewHandle class]]) {
+			SLIBSelectViewHandle* v = (SLIBSelectViewHandle*)handle;
 			[v setBackgroundColor:(color.isZero() ? nil : GraphicsPlatform::getUIColorFromColor(color))];
 		}
 	}
@@ -241,8 +252,8 @@ namespace slib
 			return;
 		}
 		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_priv_Slib_iOS_SelectView class]]) {
-			_priv_Slib_iOS_SelectView* v = (_priv_Slib_iOS_SelectView*)handle;
+		if (handle != nil && [handle isKindOfClass:[SLIBSelectViewHandle class]]) {
+			SLIBSelectViewHandle* v = (SLIBSelectViewHandle*)handle;
 			UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
 			if (hFont != nil) {
 				[v setFont:hFont];
@@ -252,16 +263,19 @@ namespace slib
 	
 }
 
+using namespace slib;
+using namespace slib::priv::select_view;
+
 #define DROP_ICON_WIDTH 20
 #define DROP_ICON_HEIGHT 12
 
-@interface _priv_Slib_iOS_SelectView_DropIcon : UIView
+@interface SLIBSelectViewHandle_DropIcon : UIView
 {
-	@public __weak _priv_Slib_iOS_SelectView* parent;
+	@public __weak SLIBSelectViewHandle* parent;
 }
 @end
 
-@implementation _priv_Slib_iOS_SelectView_DropIcon
+@implementation SLIBSelectViewHandle_DropIcon
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -285,21 +299,21 @@ namespace slib
 	CGContextMoveToPoint(context, pl, ph);
 	CGContextAddLineToPoint(context, pl + (DROP_ICON_WIDTH - pl - pr) / 2, DROP_ICON_HEIGHT - ph);
 	CGContextAddLineToPoint(context, DROP_ICON_WIDTH - pr, ph);
-	CGContextSetLineWidth(context, slib::UI::dpToPixel(2) / slib::UIPlatform::getGlobalScaleFactor());
+	CGContextSetLineWidth(context, UI::dpToPixel(2) / UIPlatform::getGlobalScaleFactor());
 	CGContextSetLineCap(context, kCGLineCapRound);
 	CGContextSetLineJoin(context, kCGLineJoinRound);
 	CGContextSetRGBStrokeColor(context, 0.5, 0.5, 0.5, 1);
 	CGContextStrokePath(context);
 }
 
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)theEvent
+- (void)touchesBegan:(NSSet *)touches withEvent:(::UIEvent *)theEvent
 {
 	[super touchesBegan:touches withEvent:theEvent];
 	[parent becomeFirstResponder];
 }
 @end
 
-@implementation _priv_Slib_iOS_SelectView
+@implementation SLIBSelectViewHandle
 
 IOS_VIEW_DEFINE_ON_FOCUS
 
@@ -317,7 +331,7 @@ IOS_VIEW_DEFINE_ON_FOCUS
 		[[self valueForKey:@"textInputTraits"] setValue:[UIColor clearColor] forKey:@"insertionPointColor"];
 		
 		// add icon
-		_priv_Slib_iOS_SelectView_DropIcon* icon = [[_priv_Slib_iOS_SelectView_DropIcon alloc] initWithFrame:(CGRectMake(0, 0, DROP_ICON_WIDTH, DROP_ICON_HEIGHT))];
+		SLIBSelectViewHandle_DropIcon* icon = [[SLIBSelectViewHandle_DropIcon alloc] initWithFrame:(CGRectMake(0, 0, DROP_ICON_WIDTH, DROP_ICON_HEIGHT))];
 		icon->parent = self;
 		self.rightView =  icon;
 		self.rightViewMode = UITextFieldViewModeAlways;
@@ -346,8 +360,8 @@ IOS_VIEW_DEFINE_ON_FOCUS
 
 - (CGRect)textRectForBounds:(CGRect)bounds
 {
-	bounds.origin.x += slib::UI::dpToPixel(4) / slib::UIPlatform::getGlobalScaleFactor();
-	bounds.size.width -= slib::UI::dpToPixel(8) / slib::UIPlatform::getGlobalScaleFactor();
+	bounds.origin.x += UI::dpToPixel(4) / UIPlatform::getGlobalScaleFactor();
+	bounds.size.width -= UI::dpToPixel(8) / UIPlatform::getGlobalScaleFactor();
 	return bounds;
 }
 
@@ -363,10 +377,10 @@ IOS_VIEW_DEFINE_ON_FOCUS
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	Ref<iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::Ref<slib::View> view = instance->getView();
-		if (slib::_priv_SelectView* _view = slib::CastInstance<slib::_priv_SelectView>(view.get())) {
+		Ref<View> view = instance->getView();
+		if (SelectViewHelper* _view = CastInstance<SelectViewHelper>(view.get())) {
 			_view->_onSelectItem(self, (sl_uint32)row);
 		}
 	}
@@ -374,10 +388,10 @@ IOS_VIEW_DEFINE_ON_FOCUS
 
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component;
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	Ref<iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::Ref<slib::View> view = instance->getView();
-		if (slib::_priv_SelectView* _view = slib::CastInstance<slib::_priv_SelectView>(view.get())) {
+		Ref<View> view = instance->getView();
+		if (SelectViewHelper* _view = CastInstance<SelectViewHelper>(view.get())) {
 			return (NSInteger)(_view->_getItemsCount());
 		}
 	}
@@ -386,10 +400,10 @@ IOS_VIEW_DEFINE_ON_FOCUS
 
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component;
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	Ref<iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::Ref<slib::View> view = instance->getView();
-		if (slib::_priv_SelectView* _view = slib::CastInstance<slib::_priv_SelectView>(view.get())) {
+		Ref<View> view = instance->getView();
+		if (SelectViewHelper* _view = CastInstance<SelectViewHelper>(view.get())) {
 			return _view->_getItemTitle((sl_uint32)row);
 		}
 	}
@@ -398,10 +412,10 @@ IOS_VIEW_DEFINE_ON_FOCUS
 
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)aTextField
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	Ref<iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::Ref<slib::View> view = instance->getView();
-		if (slib::_priv_SelectView* _view = slib::CastInstance<slib::_priv_SelectView>(view.get())) {
+		Ref<View> view = instance->getView();
+		if (SelectViewHelper* _view = CastInstance<SelectViewHelper>(view.get())) {
 			if ((NSInteger)(_view->_getItemsCount()) > 0) {
 				return YES;
 			}
@@ -413,10 +427,10 @@ IOS_VIEW_DEFINE_ON_FOCUS
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
 	[self sendActionsForControlEvents:UIControlEventEditingDidBegin];
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	Ref<iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::Ref<slib::View> view = instance->getView();
-		if (slib::_priv_SelectView* _view = slib::CastInstance<slib::_priv_SelectView>(view.get())) {
+		Ref<View> view = instance->getView();
+		if (SelectViewHelper* _view = CastInstance<SelectViewHelper>(view.get())) {
 			_view->_onStartSelection(self);
 		}
 	}
@@ -441,10 +455,10 @@ IOS_VIEW_DEFINE_ON_FOCUS
 -(void)cancelClicked:(id)sender
 {
 	[self resignFirstResponder];
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	Ref<iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::Ref<slib::View> view = instance->getView();
-		if (slib::_priv_SelectView* _view = slib::CastInstance<slib::_priv_SelectView>(view.get())) {
+		Ref<View> view = instance->getView();
+		if (SelectViewHelper* _view = CastInstance<SelectViewHelper>(view.get())) {
 			_view->_onCancelSelection(self);
 		}
 	}

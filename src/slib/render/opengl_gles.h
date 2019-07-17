@@ -181,14 +181,23 @@
 
 namespace slib
 {
-	struct _priv_GLES_EntryPoints
+	namespace priv
 	{
-		PRIV_SLIB_RENDER_GLES_ENTRIES
-	};
-	extern _priv_GLES_EntryPoints _priv_GLES_entries;
+		namespace gles
+		{
+			
+			struct EntryPoints
+			{
+				PRIV_SLIB_RENDER_GLES_ENTRIES
+			};
+
+			extern EntryPoints g_entries;
+
+		}
+	}
 }
 
-#define PRIV_GLES_ENTRY(name) _priv_GLES_entries.name
+#define PRIV_GLES_ENTRY(name) slib::priv::gles::g_entries.name
 
 #else
 

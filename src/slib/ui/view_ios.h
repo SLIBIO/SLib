@@ -158,7 +158,7 @@ IOS_VIEW_DEFINE_ON_FOCUS \
 { \
 	return NO; \
 } \
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)theEvent \
+- (void)touchesBegan:(NSSet *)touches withEvent:(::UIEvent *)theEvent \
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \
@@ -169,7 +169,7 @@ IOS_VIEW_DEFINE_ON_FOCUS \
 	} \
 	[super touchesBegan:touches withEvent:theEvent]; \
 } \
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)theEvent \
+- (void)touchesMoved:(NSSet *)touches withEvent:(::UIEvent *)theEvent \
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \
@@ -180,7 +180,7 @@ IOS_VIEW_DEFINE_ON_FOCUS \
 	} \
 	[super touchesMoved:touches withEvent:theEvent]; \
 } \
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)theEvent \
+- (void)touchesEnded:(NSSet *)touches withEvent:(::UIEvent *)theEvent \
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \
@@ -191,7 +191,7 @@ IOS_VIEW_DEFINE_ON_FOCUS \
 	} \
 	[super touchesEnded:touches withEvent:theEvent]; \
 } \
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)theEvent \
+- (void)touchesCancelled:(NSSet *)touches withEvent:(::UIEvent *)theEvent \
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \

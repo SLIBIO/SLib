@@ -22,13 +22,13 @@
 
 #include "ui_text_ios.h"
 /*
-@interface _priv_Slib_iOS_TextInput : UIResponder<UITextInput>
+@interface SLIBTextInput : UIResponder<UITextInput>
 {
 	@public slib::Ref<slib::TextInput> m_textInput;
 }
 @end
 
-@interface _priv_Slib_iOS_TextRange : UITextRange
+@interface SLIBTextRange : UITextRange
 {
 	@public slib::sl_text_pos location;
 	@public slib::sl_text_pos length;
@@ -37,42 +37,50 @@
 
 namespace slib
 {
-	
+		
+	namespace priv
+	{
+		namespace ui_text
+		{
+
+			SLIB_INLINE static UITextRange* ToNative(const TextRange& range)
+			{
+				SLIBTextRange* ret = [[SLIBTextRange alloc] init];
+				if (ret != nil) {
+					ret->location = range.location;
+					ret->length = range.length;
+					return ret;
+				}
+				return nil;
+			}
+			
+			SLIB_INLINE static TextRange FromNative(UITextRange* _range)
+			{
+				if (!_range) {
+					return TextRange();
+				}
+				SLIBTextRange* range = (SLIBTextRange*)_range;
+				return TextRange(range->location, range->length);
+			}
+			
+		}
+	}
+
 	UIResponder* iOS_TextInput::getNativeInstance(TextInput* input)
 	{
 		if (!input) {
 			return nil;
 		}
-		_priv_Slib_iOS_TextInput* instance = [[_priv_Slib_iOS_TextInput alloc] init];
+		SLIBTextInput* instance = [[SLIBTextInput alloc] init];
 		if (instance != nil) {
 			instance->m_textInput = input;
 		}
 		return instance;
 	}
-	
-	SLIB_INLINE static UITextRange* _priv_TextRange_toNative(const TextRange& range)
-	{
-		_priv_Slib_iOS_TextRange* ret = [[_priv_Slib_iOS_TextRange alloc] init];
-		if (ret != nil) {
-			ret->location = range.location;
-			ret->length = range.length;
-			return ret;
-		}
-		return nil;
-	}
-	
-	SLIB_INLINE static TextRange _priv_TextRange_fromNative(UITextRange* _range)
-	{
-		if (!_range) {
-			return TextRange();
-		}
-		_priv_Slib_iOS_TextRange* range = (_priv_Slib_iOS_TextRange*)_range;
-		return TextRange(range->location, range->length);
-	}
-	
+
 }
 
-@implementation _priv_Slib_iOS_TextInput
+@implementation SLIBTextInput
 
 - (BOOL)canBecomeFirstResponder {
 	return YES;
@@ -90,22 +98,22 @@ namespace slib
 
 - (UITextRange*)selectedTextRange
 {
-	return slib::_priv_TextRange_toNative(m_textInput->getSelectedRange());
+	return slib::ToNative(m_textInput->getSelectedRange());
 }
 
 - (void)setSelectedTextRange:(UITextRange*)selectedTextRange
 {
-	m_textInput->setSelectedRange(slib::_priv_TextRange_fromNative(selectedTextRange));
+	m_textInput->setSelectedRange(slib::FromNative(selectedTextRange));
 }
 
 - (NSString*)textInRange:(UITextRange*)range
 {
-	return slib::Apple::getNSStringFromString(m_textInput->getTextInRange(slib::_priv_TextRange_fromNative(range)));
+	return slib::Apple::getNSStringFromString(m_textInput->getTextInRange(slib::FromNative(range)));
 }
 
 - (void)replaceRange:(UITextRange*)range withText:(NSString*)text
 {
-	m_textInput->replaceText(slib::_priv_TextRange_fromNative(range), slib::Apple::getStringFromNSString(text));
+	m_textInput->replaceText(slib::FromNative(range), slib::Apple::getStringFromNSString(text));
 }
 
 - (UITextWritingDirection)baseWritingDirectionForPosition:(nonnull UITextPosition *)position inDirection:(UITextStorageDirection)direction

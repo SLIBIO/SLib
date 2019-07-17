@@ -30,28 +30,38 @@
 namespace slib
 {
 
-	class _priv_macOS_Cursor : public Cursor
+	namespace priv
 	{
-	public:
-		NSCursor* m_cursor;
-		
-	public:
-		static Ref<_priv_macOS_Cursor> create(NSCursor* cursor)
+		namespace cursor
 		{
-			Ref<_priv_macOS_Cursor> ret;
-			if (cursor != nil) {
-				ret = new _priv_macOS_Cursor;
-				if (ret.isNotNull()) {
-					ret->m_cursor = cursor;
+
+			class NativeCursorImpl : public Cursor
+			{
+			public:
+				NSCursor* m_cursor;
+				
+			public:
+				static Ref<NativeCursorImpl> create(NSCursor* cursor)
+				{
+					Ref<NativeCursorImpl> ret;
+					if (cursor != nil) {
+						ret = new NativeCursorImpl;
+						if (ret.isNotNull()) {
+							ret->m_cursor = cursor;
+						}
+					}
+					return ret;
 				}
-			}
-			return ret;
+			};
+
 		}
-	};
+	}
+	
+	using namespace priv::cursor;
 
 	Ref<Cursor> UIPlatform::createCursor(NSCursor* cursor)
 	{
-		return _priv_macOS_Cursor::create(cursor);
+		return NativeCursorImpl::create(cursor);
 	}
 
 	NSCursor* UIPlatform::getCursorHandle(const Ref<Cursor>& cursor)
@@ -59,7 +69,7 @@ namespace slib
 		if (cursor.isNull()) {
 			return nil;
 		}
-		_priv_macOS_Cursor* c = (_priv_macOS_Cursor*)(cursor.get());
+		NativeCursorImpl* c = (NativeCursorImpl*)(cursor.get());
 		return c->m_cursor;
 	}
 
@@ -98,7 +108,7 @@ namespace slib
 		if (cursor.isNull()) {
 			return;
 		}
-		_priv_macOS_Cursor* c = (_priv_macOS_Cursor*)(cursor.get());
+		NativeCursorImpl* c = (NativeCursorImpl*)(cursor.get());
 		[c->m_cursor set];
 	}
 

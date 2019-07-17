@@ -33,7 +33,8 @@
 
 #include <GLKit/GLKit.h>
 
-@interface SLIBGLViewHandle : GLKView {
+@interface SLIBGLViewHandle : GLKView
+{
 	
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
 	
@@ -89,7 +90,7 @@ namespace slib
 	}	
 }
 
-@interface SLib_iOS_GLViewRenderer : NSObject
+@interface SLIBGLViewRenderer : NSObject
 {
 	@public __weak SLIBGLViewHandle* m_view;
 	@public __weak CADisplayLink* m_displayLink;
@@ -100,7 +101,7 @@ namespace slib
 }
 @end
 
-@implementation SLib_iOS_GLViewRenderer
+@implementation SLIBGLViewRenderer
 
 - (void)onGLRenderFrame
 {
@@ -202,7 +203,7 @@ namespace slib
 	self.drawableColorFormat = GLKViewDrawableColorFormatRGBA8888;
 	self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
 	
-	SLib_iOS_GLViewRenderer* renderer = [[SLib_iOS_GLViewRenderer alloc] init];
+	SLIBGLViewRenderer* renderer = [[SLIBGLViewRenderer alloc] init];
 	renderer->m_view = self;
 	m_displayLink = [CADisplayLink displayLinkWithTarget:renderer selector:@selector(onGLRenderFrame)];
 	renderer->m_displayLink = m_displayLink;

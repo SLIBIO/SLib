@@ -28,6 +28,16 @@
 namespace slib
 {
 
+	namespace priv
+	{
+		namespace font
+		{
+			sl_real g_defaultSize = 12;
+		}
+	}
+
+	using namespace priv::font;
+
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(FontDesc)
 	
 	FontDesc::FontDesc()
@@ -39,7 +49,6 @@ namespace slib
 		flagStrikeout = sl_false;
 	}
 
-	sl_real _g_graphics_font_default_size = 12;
 
 	SLIB_DEFINE_ROOT_OBJECT(Font)
 
@@ -54,12 +63,12 @@ namespace slib
 
 	sl_real Font::getDefaultFontSize()
 	{
-		return _g_graphics_font_default_size;
+		return g_defaultSize;
 	}
 
 	void Font::setDefaultFontSize(sl_real size)
 	{
-		_g_graphics_font_default_size = size;
+		g_defaultSize = size;
 	}
 
 	Ref<Font> Font::getDefault()

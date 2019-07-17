@@ -965,7 +965,7 @@ namespace slib
 		namespace bigint
 		{
 			template <class CT>
-			SLIB_INLINE static sl_reg parseString(CBigInt* _out, const CT* sz, sl_size posBegin, sl_size len, sl_uint32 radix) noexcept
+			SLIB_INLINE static sl_reg ParseString(CBigInt* _out, const CT* sz, sl_size posBegin, sl_size len, sl_uint32 radix) noexcept
 			{
 				if (radix < 2 || radix > 64) {
 					return SLIB_PARSE_ERROR;;
@@ -1053,13 +1053,13 @@ namespace slib
 	template <>
 	sl_reg IntParser<CBigInt, sl_char8>::parse(CBigInt* _out, sl_uint32 radix, const sl_char8 *sz, sl_size posBegin, sl_size len) noexcept
 	{
-		return priv::bigint::parseString(_out, sz, posBegin, len, radix);
+		return priv::bigint::ParseString(_out, sz, posBegin, len, radix);
 	}
 
 	template <>
 	sl_reg IntParser<CBigInt, sl_char16>::parse(CBigInt* _out, sl_uint32 radix, const sl_char16 *sz, sl_size posBegin, sl_size len) noexcept
 	{
-		return priv::bigint::parseString(_out, sz, posBegin, len, radix);
+		return priv::bigint::ParseString(_out, sz, posBegin, len, radix);
 	}
 	
 	CBigInt* CBigInt::fromString(sl_uint32 radix, const sl_char8* sz, sl_size len) noexcept
@@ -1067,7 +1067,7 @@ namespace slib
 		if (sz && len) {
 			CBigInt* ret = new CBigInt;
 			if (ret) {
-				if (priv::bigint::parseString(ret, sz, 0, len, radix) == len) {
+				if (priv::bigint::ParseString(ret, sz, 0, len, radix) == len) {
 					return ret;
 				}
 				delete ret;

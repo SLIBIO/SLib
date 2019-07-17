@@ -266,11 +266,13 @@ namespace slib
 	private:
 		void _invalidateButtonState();
 		
-	public:
+	protected:
 		virtual void _setText_NW(const String& text);
 		
 		virtual void _setDefaultButton_NW(sl_bool flag);
 
+		virtual sl_bool _measureSize_NW(UISize& _out);
+		
 		void _setFont_NW(const Ref<Font>& font) override;
 		
 	private:

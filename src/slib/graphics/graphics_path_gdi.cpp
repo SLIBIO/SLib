@@ -34,47 +34,87 @@
 namespace slib
 {
 
-	static Gdiplus::FillMode _priv_Gdiplus_convertFillMode(FillMode _mode)
+	namespace priv
 	{
-		Gdiplus::FillMode fillMode;
-		switch (_mode) {
-		case FillMode::Winding:
-			fillMode = Gdiplus::FillModeWinding;
-			break;
-		case FillMode::Alternate:
-		default:
-			fillMode = Gdiplus::FillModeAlternate;
-			break;
+		namespace gdi
+		{
+
+			static Gdiplus::FillMode ConvertFillMode(FillMode _mode)
+			{
+				Gdiplus::FillMode fillMode;
+				switch (_mode) {
+				case FillMode::Winding:
+					fillMode = Gdiplus::FillModeWinding;
+					break;
+				case FillMode::Alternate:
+				default:
+					fillMode = Gdiplus::FillModeAlternate;
+					break;
+				}
+				return fillMode;
+			}
+
+			class GraphicsPathPlatformObject : public Referable
+			{
+			public:
+				Gdiplus::GraphicsPath* path;
+				sl_real lastX;
+				sl_real lastY;
+
+			public:
+				GraphicsPathPlatformObject()
+				{
+					path = new Gdiplus::GraphicsPath(Gdiplus::FillModeWinding);
+					lastX = 0;
+					lastY = 0;
+				}
+
+				~GraphicsPathPlatformObject()
+				{
+					delete path;
+				}
+
+			};
+
+			class GraphicsPathHelper : public GraphicsPath
+			{
+			public:
+				Gdiplus::GraphicsPath* createHandle()
+				{
+					ListElements<GraphicsPathPoint> points(m_points);
+					sl_size n = points.count;
+					if (n > 0) {
+						SLIB_SCOPED_BUFFER(Gdiplus::PointF, 1024, pts, n);
+						SLIB_SCOPED_BUFFER(BYTE, 1024, types, n);
+						for (sl_size i = 0; i < n; i++) {
+							pts[i].X = points[i].pt.x;
+							pts[i].Y = points[i].pt.y;
+							types[i] = points[i].type;
+						}
+						Gdiplus::GraphicsPath* handle = new Gdiplus::GraphicsPath(pts, types, (INT)n, ConvertFillMode(getFillMode()));
+						return handle;
+					}
+					return NULL;
+				}
+
+				Gdiplus::GraphicsPath* getPlatformPath()
+				{
+					GraphicsPathPlatformObject* po = (GraphicsPathPlatformObject*)(m_platformObject.get());
+					if (po) {
+						return po->path;
+					}
+					return NULL;
+				}
+			};
+
 		}
-		return fillMode;
 	}
 
-	class _priv_Gdiplus_GraphicsPathObject : public Referable
-	{
-	public:
-		Gdiplus::GraphicsPath* path;
-		sl_real lastX;
-		sl_real lastY;
-
-	public:
-		_priv_Gdiplus_GraphicsPathObject()
-		{
-			path = new Gdiplus::GraphicsPath(Gdiplus::FillModeWinding);
-			lastX = 0;
-			lastY = 0;
-		}
-
-		~_priv_Gdiplus_GraphicsPathObject()
-		{
-			delete path;
-		}
-
-	};
-
+	using namespace priv::gdi;
 
 	void GraphicsPath::_initialize_PO()
 	{
-		Ref<_priv_Gdiplus_GraphicsPathObject> po = new _priv_Gdiplus_GraphicsPathObject;
+		Ref<GraphicsPathPlatformObject> po = new GraphicsPathPlatformObject;
 		if (po.isNotNull() && po->path) {
 			m_platformObject = po;
 		}
@@ -82,7 +122,7 @@ namespace slib
 
 	void GraphicsPath::_moveTo_PO(sl_real x, sl_real y)
 	{
-		_priv_Gdiplus_GraphicsPathObject* po = (_priv_Gdiplus_GraphicsPathObject*)(m_platformObject.get());
+		GraphicsPathPlatformObject* po = (GraphicsPathPlatformObject*)(m_platformObject.get());
 		if (po) {
 			po->lastX = x;
 			po->lastY = y;
@@ -91,7 +131,7 @@ namespace slib
 
 	void GraphicsPath::_lineTo_PO(sl_real x, sl_real y)
 	{
-		_priv_Gdiplus_GraphicsPathObject* po = (_priv_Gdiplus_GraphicsPathObject*)(m_platformObject.get());
+		GraphicsPathPlatformObject* po = (GraphicsPathPlatformObject*)(m_platformObject.get());
 		if (po) {
 			po->path->AddLine((Gdiplus::REAL)(po->lastX), (Gdiplus::REAL)(po->lastY), (Gdiplus::REAL)(x), (Gdiplus::REAL)(y));
 			po->lastX = x;
@@ -101,7 +141,7 @@ namespace slib
 
 	void GraphicsPath::_cubicTo_PO(sl_real xc1, sl_real yc1, sl_real xc2, sl_real yc2, sl_real xe, sl_real ye)
 	{
-		_priv_Gdiplus_GraphicsPathObject* po = (_priv_Gdiplus_GraphicsPathObject*)(m_platformObject.get());
+		GraphicsPathPlatformObject* po = (GraphicsPathPlatformObject*)(m_platformObject.get());
 		if (po) {
 			po->path->AddBezier(
 				(Gdiplus::REAL)(po->lastX), (Gdiplus::REAL)(po->lastY), 
@@ -116,7 +156,7 @@ namespace slib
 
 	void GraphicsPath::_closeSubpath_PO()
 	{
-		_priv_Gdiplus_GraphicsPathObject* po = (_priv_Gdiplus_GraphicsPathObject*)(m_platformObject.get());
+		GraphicsPathPlatformObject* po = (GraphicsPathPlatformObject*)(m_platformObject.get());
 		if (po) {
 			po->path->CloseFigure();
 		}
@@ -124,15 +164,15 @@ namespace slib
 
 	void GraphicsPath::_setFillMode_PO(FillMode mode)
 	{
-		_priv_Gdiplus_GraphicsPathObject* po = (_priv_Gdiplus_GraphicsPathObject*)(m_platformObject.get());
+		GraphicsPathPlatformObject* po = (GraphicsPathPlatformObject*)(m_platformObject.get());
 		if (po) {
-			po->path->SetFillMode(_priv_Gdiplus_convertFillMode(mode));
+			po->path->SetFillMode(ConvertFillMode(mode));
 		}
 	}
 
 	Rectangle GraphicsPath::_getBounds_PO()
 	{
-		_priv_Gdiplus_GraphicsPathObject* po = (_priv_Gdiplus_GraphicsPathObject*)(m_platformObject.get());
+		GraphicsPathPlatformObject* po = (GraphicsPathPlatformObject*)(m_platformObject.get());
 		if (po) {
 			Rectangle ret;
 			Gdiplus::RectF rc;
@@ -148,48 +188,17 @@ namespace slib
 
 	sl_bool GraphicsPath::_containsPoint_PO(sl_real x, sl_real y)
 	{
-		_priv_Gdiplus_GraphicsPathObject* po = (_priv_Gdiplus_GraphicsPathObject*)(m_platformObject.get());
+		GraphicsPathPlatformObject* po = (GraphicsPathPlatformObject*)(m_platformObject.get());
 		if (po) {
 			return (po->path->IsVisible((Gdiplus::REAL)x, (Gdiplus::REAL)y)) != FALSE;
 		}
 		return sl_false;
 	}
 
-	class _priv_GraphicsPath : public GraphicsPath
-	{
-	public:
-		Gdiplus::GraphicsPath* createHandle()
-		{
-			ListElements<GraphicsPathPoint> points(m_points);
-			sl_size n = points.count;
-			if (n > 0) {
-				SLIB_SCOPED_BUFFER(Gdiplus::PointF, 1024, pts, n);
-				SLIB_SCOPED_BUFFER(BYTE, 1024, types, n);
-				for (sl_size i = 0; i < n; i++) {
-					pts[i].X = points[i].pt.x;
-					pts[i].Y = points[i].pt.y;
-					types[i] = points[i].type;
-				}
-				Gdiplus::GraphicsPath* handle = new Gdiplus::GraphicsPath(pts, types, (INT)n, _priv_Gdiplus_convertFillMode(getFillMode()));
-				return handle;
-			}
-			return NULL;
-		}
-
-		Gdiplus::GraphicsPath* getPlatformPath()
-		{
-			_priv_Gdiplus_GraphicsPathObject* po = (_priv_Gdiplus_GraphicsPathObject*)(m_platformObject.get());
-			if (po) {
-				return po->path;
-			}
-			return NULL;
-		}
-	};
-
 	Gdiplus::GraphicsPath* GraphicsPlatform::getGraphicsPath(GraphicsPath* path)
 	{
 		if (path) {
-			return ((_priv_GraphicsPath*)path)->getPlatformPath();
+			return ((GraphicsPathHelper*)path)->getPlatformPath();
 		}
 		return NULL;
 	}

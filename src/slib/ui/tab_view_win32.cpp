@@ -34,145 +34,155 @@
 namespace slib
 {
 
-	class _priv_TabView : public TabView
+	namespace priv
 	{
-	public:
-		void _applyTabsCount(HWND hWnd)
+		namespace tab_view
 		{
-			ObjectLocker lock(this);
-			sl_uint32 nOrig = (sl_uint32)(::SendMessageW(hWnd, TCM_GETITEMCOUNT, 0, 0));
-			sl_uint32 nNew = (sl_uint32)(m_items.getCount());
-			if (nOrig == nNew) {
-				return;
-			}
-			if (nOrig > nNew) {
-				if (nNew > 0) {
-					for (sl_uint32 i = nOrig; i > nNew; i--) {
-						::SendMessageW(hWnd, TCM_GETITEMCOUNT, (WPARAM)(i - 1), 0);
+			
+			class TabViewHelper : public TabView
+			{
+			public:
+				void _applyTabsCount(HWND hWnd)
+				{
+					ObjectLocker lock(this);
+					sl_uint32 nOrig = (sl_uint32)(::SendMessageW(hWnd, TCM_GETITEMCOUNT, 0, 0));
+					sl_uint32 nNew = (sl_uint32)(m_items.getCount());
+					if (nOrig == nNew) {
+						return;
 					}
-				} else {
-					::SendMessageW(hWnd, TCM_DELETEALLITEMS, 0, 0);
-				}
-			} else {
-				for (sl_uint32 i = nOrig; i < nNew; i++) {
-					TCITEMW tci;
-					Base::zeroMemory(&tci, sizeof(tci));
-					::SendMessageW(hWnd, TCM_INSERTITEM, (WPARAM)i, (LPARAM)(&tci));
-				}
-			}
-		}
-
-		void _copyTabs(HWND hWnd, ViewInstance* viewInstance)
-		{
-			_applyTabsCount(hWnd);
-			ListLocker<TabViewItem> items(m_items);
-			for (sl_size i = 0; i < items.count; i++) {
-				TCITEMW tci;
-				Base::zeroMemory(&tci, sizeof(tci));
-				tci.mask = TCIF_TEXT;
-				String16 label = items[i].label;
-				tci.pszText = (LPWSTR)(label.getData());
-				::SendMessageW(hWnd, TCM_SETITEMW, (WPARAM)i, (LPARAM)&tci);
-			}
-			_selectTab(hWnd, viewInstance, m_indexSelected);
-		}
-
-		void _setTabLabel(HWND hWnd, sl_uint32 index, const String& _label)
-		{
-			TCITEMW tci;
-			Base::zeroMemory(&tci, sizeof(tci));
-			tci.mask = TCIF_TEXT;
-			String16 label = _label;
-			tci.pszText = (LPWSTR)(label.getData());
-			::SendMessageW(hWnd, TCM_SETITEMW, (WPARAM)index, (LPARAM)(&tci));
-		}
-
-		void _selectTab(HWND hWnd, ViewInstance* viewInstance, sl_uint32 index)
-		{
-			sl_uint32 n = (sl_uint32)(m_items.getCount());
-			if (index >= n) {
-				index = 0;
-			}
-			::SendMessageW(hWnd, TCM_SETCURSEL, (WPARAM)m_indexSelected, 0);
-			_applyTabContents(hWnd, viewInstance);
-		}
-
-		sl_uint32 _getSelectedIndex(HWND hWnd)
-		{
-			return (sl_uint32)(::SendMessageW(hWnd, TCM_GETCURSEL, 0, 0));
-		}
-
-		void _onSelectTab(HWND hWnd, ViewInstance* viewInstance)
-		{
-			sl_uint32 index = _getSelectedIndex(hWnd);
-			dispatchSelectTab(index);
-			_applyTabContents(hWnd, viewInstance);
-		}
-
-		void _applyTabContents(HWND hWnd, ViewInstance* viewInstance)
-		{
-			UIRect rc = _getClientBounds(hWnd);
-			sl_size sel = m_indexSelected;
-			ListLocker<TabViewItem> items(m_items);
-			for (sl_size i = 0; i < items.count; i++) {
-				Ref<View> view = items[i].contentView;
-				if (view.isNotNull()) {
-					view->setFrame(rc);
-					if (i == sel) {
-						view->setVisible(sl_true);
-						if (view->getViewInstance().isNull()) {
-							view->attachToNewInstance(viewInstance);
+					if (nOrig > nNew) {
+						if (nNew > 0) {
+							for (sl_uint32 i = nOrig; i > nNew; i--) {
+								::SendMessageW(hWnd, TCM_GETITEMCOUNT, (WPARAM)(i - 1), 0);
+							}
+						} else {
+							::SendMessageW(hWnd, TCM_DELETEALLITEMS, 0, 0);
 						}
 					} else {
-						view->setVisible(sl_false);
+						for (sl_uint32 i = nOrig; i < nNew; i++) {
+							TCITEMW tci;
+							Base::zeroMemory(&tci, sizeof(tci));
+							::SendMessageW(hWnd, TCM_INSERTITEM, (WPARAM)i, (LPARAM)(&tci));
+						}
 					}
 				}
-			}
-		}
 
-		void _applyClientBounds(HWND hWnd)
-		{
-			UIRect rc = _getClientBounds(hWnd);
-			ListLocker<TabViewItem> items(m_items);
-			for (sl_size i = 0; i < items.count; i++) {
-				Ref<View> view = items[i].contentView;
-				if (view.isNotNull()) {
-					view->setFrame(rc);
+				void _copyTabs(HWND hWnd, ViewInstance* viewInstance)
+				{
+					_applyTabsCount(hWnd);
+					ListLocker<TabViewItem> items(m_items);
+					for (sl_size i = 0; i < items.count; i++) {
+						TCITEMW tci;
+						Base::zeroMemory(&tci, sizeof(tci));
+						tci.mask = TCIF_TEXT;
+						String16 label = items[i].label;
+						tci.pszText = (LPWSTR)(label.getData());
+						::SendMessageW(hWnd, TCM_SETITEMW, (WPARAM)i, (LPARAM)&tci);
+					}
+					_selectTab(hWnd, viewInstance, m_indexSelected);
 				}
-			}
-		}
 
-		UIRect _getClientBounds(HWND hWnd)
-		{
-			RECT rc;
-			rc.left = -2;
-			rc.top = 0;
-			rc.right = (int)(getWidth());
-			rc.bottom = (int)(getHeight()) + 1;
-			::SendMessageW(hWnd, TCM_ADJUSTRECT, FALSE, (LPARAM)(&rc));
-			return UIRect((sl_ui_pos)(rc.left), (sl_ui_pos)(rc.top), (sl_ui_pos)(rc.right), (sl_ui_pos)(rc.bottom));
-		}
-	};
+				void _setTabLabel(HWND hWnd, sl_uint32 index, const String& _label)
+				{
+					TCITEMW tci;
+					Base::zeroMemory(&tci, sizeof(tci));
+					tci.mask = TCIF_TEXT;
+					String16 label = _label;
+					tci.pszText = (LPWSTR)(label.getData());
+					::SendMessageW(hWnd, TCM_SETITEMW, (WPARAM)index, (LPARAM)(&tci));
+				}
 
-	class _priv_Win32_TabViewInstance : public Win32_ViewInstance
-	{
-	public:
-		sl_bool processNotify(NMHDR* nmhdr, LRESULT& result) override
-		{
-			HWND handle = getHandle();
-			if (handle) {
-				Ref<View> _view = getView();
-				if (_priv_TabView* view = CastInstance<_priv_TabView>(_view.get())) {
-					UINT code = nmhdr->code;
-					if (code == TCN_SELCHANGE) {
-						view->_onSelectTab(handle, this);
-						return sl_true;
+				void _selectTab(HWND hWnd, ViewInstance* viewInstance, sl_uint32 index)
+				{
+					sl_uint32 n = (sl_uint32)(m_items.getCount());
+					if (index >= n) {
+						index = 0;
+					}
+					::SendMessageW(hWnd, TCM_SETCURSEL, (WPARAM)m_indexSelected, 0);
+					_applyTabContents(hWnd, viewInstance);
+				}
+
+				sl_uint32 _getSelectedIndex(HWND hWnd)
+				{
+					return (sl_uint32)(::SendMessageW(hWnd, TCM_GETCURSEL, 0, 0));
+				}
+
+				void _onSelectTab(HWND hWnd, ViewInstance* viewInstance)
+				{
+					sl_uint32 index = _getSelectedIndex(hWnd);
+					dispatchSelectTab(index);
+					_applyTabContents(hWnd, viewInstance);
+				}
+
+				void _applyTabContents(HWND hWnd, ViewInstance* viewInstance)
+				{
+					UIRect rc = _getClientBounds(hWnd);
+					sl_size sel = m_indexSelected;
+					ListLocker<TabViewItem> items(m_items);
+					for (sl_size i = 0; i < items.count; i++) {
+						Ref<View> view = items[i].contentView;
+						if (view.isNotNull()) {
+							view->setFrame(rc);
+							if (i == sel) {
+								view->setVisible(sl_true);
+								if (view->getViewInstance().isNull()) {
+									view->attachToNewInstance(viewInstance);
+								}
+							} else {
+								view->setVisible(sl_false);
+							}
+						}
 					}
 				}
-			}
-			return sl_false;
+
+				void _applyClientBounds(HWND hWnd)
+				{
+					UIRect rc = _getClientBounds(hWnd);
+					ListLocker<TabViewItem> items(m_items);
+					for (sl_size i = 0; i < items.count; i++) {
+						Ref<View> view = items[i].contentView;
+						if (view.isNotNull()) {
+							view->setFrame(rc);
+						}
+					}
+				}
+
+				UIRect _getClientBounds(HWND hWnd)
+				{
+					RECT rc;
+					rc.left = -2;
+					rc.top = 0;
+					rc.right = (int)(getWidth());
+					rc.bottom = (int)(getHeight()) + 1;
+					::SendMessageW(hWnd, TCM_ADJUSTRECT, FALSE, (LPARAM)(&rc));
+					return UIRect((sl_ui_pos)(rc.left), (sl_ui_pos)(rc.top), (sl_ui_pos)(rc.right), (sl_ui_pos)(rc.bottom));
+				}
+			};
+
+			class TabViewInstance : public Win32_ViewInstance
+			{
+			public:
+				sl_bool processNotify(NMHDR* nmhdr, LRESULT& result) override
+				{
+					HWND handle = getHandle();
+					if (handle) {
+						Ref<View> _view = getView();
+						if (TabViewHelper* view = CastInstance<TabViewHelper>(_view.get())) {
+							UINT code = nmhdr->code;
+							if (code == TCN_SELCHANGE) {
+								view->_onSelectTab(handle, this);
+								return sl_true;
+							}
+						}
+					}
+					return sl_false;
+				}
+			};
+
 		}
-	};
+	}
+
+	using namespace priv::tab_view;
 
 	Ref<ViewInstance> TabView::createNativeWidget(ViewInstance* parent)
 	{
@@ -184,7 +194,7 @@ namespace slib
 		DWORD style = WS_CLIPCHILDREN;
 		DWORD styleEx = WS_EX_CONTROLPARENT;
 
-		Ref<_priv_Win32_TabViewInstance> ret = Win32_ViewInstance::create<_priv_Win32_TabViewInstance>(this, parent, L"SysTabControl32", L"", style, styleEx);
+		Ref<TabViewInstance> ret = Win32_ViewInstance::create<TabViewInstance>(this, parent, L"SysTabControl32", L"", style, styleEx);
 		
 		if (ret.isNotNull()) {
 
@@ -196,7 +206,7 @@ namespace slib
 				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 			}
 
-			((_priv_TabView*)this)->_copyTabs(handle, ret.get());
+			((TabViewHelper*)this)->_copyTabs(handle, ret.get());
 		}
 		return ret;
 	}
@@ -205,7 +215,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_priv_TabView*)this)->_applyTabsCount(handle);
+			((TabViewHelper*)this)->_applyTabsCount(handle);
 		}
 	}
 
@@ -213,7 +223,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_priv_TabView*)this)->_applyClientBounds(handle);
+			((TabViewHelper*)this)->_applyClientBounds(handle);
 		}
 	}
 
@@ -221,7 +231,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			((_priv_TabView*)this)->_setTabLabel(handle, index, text);
+			((TabViewHelper*)this)->_setTabLabel(handle, index, text);
 		}
 	}
 
@@ -230,7 +240,7 @@ namespace slib
 		Ref<ViewInstance> viewInstance = getViewInstance();
 		if (viewInstance.isNotNull()) {
 			HWND handle = UIPlatform::getViewHandle(viewInstance.get());
-			((_priv_TabView*)this)->_applyTabContents(handle, viewInstance.get());
+			((TabViewHelper*)this)->_applyTabContents(handle, viewInstance.get());
 		}
 	}
 
@@ -239,7 +249,7 @@ namespace slib
 		Ref<ViewInstance> viewInstance = getViewInstance();
 		if (viewInstance.isNotNull()) {
 			HWND handle = UIPlatform::getViewHandle(viewInstance.get());
-			((_priv_TabView*)this)->_selectTab(handle, viewInstance.get(), index);
+			((TabViewHelper*)this)->_selectTab(handle, viewInstance.get(), index);
 		}
 	}
 
@@ -247,7 +257,7 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			return ((_priv_TabView*)this)->_getClientBounds(handle).getSize();
+			return ((TabViewHelper*)this)->_getClientBounds(handle).getSize();
 		}
 		return UISize::zero();
 	}

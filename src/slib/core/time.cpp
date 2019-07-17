@@ -79,10 +79,16 @@ namespace slib
 		return m_offset;
 	}
 	
-
-	SLIB_STATIC_ZERO_INITIALIZED(TimeZone, _g_timezone_Local)
-	const TimeZone& TimeZone::Local = _g_timezone_Local;
+	namespace priv
+	{
+		namespace time
+		{
+			SLIB_STATIC_ZERO_INITIALIZED(TimeZone, g_local)
+		}
+	}
 	
+	const TimeZone& TimeZone::Local = priv::time::g_local;
+
 	const TimeZone& TimeZone::UTC() noexcept
 	{
 		SLIB_SAFE_STATIC(TimeZone, utc, TimeZone::create(0));

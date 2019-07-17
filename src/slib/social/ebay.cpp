@@ -31,7 +31,42 @@ namespace slib
 	{
 		namespace ebay
 		{
+			
 			SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Ebay>, g_instance)
+
+			static String GetSimpleXMLValue(const String& xml, const String& tagName)
+			{
+				sl_reg index1 = xml.indexOf("<" + tagName + ">");
+				if (index1 < 0) {
+					return sl_null;
+				}
+				sl_reg index2 = xml.indexOf("</" + tagName + ">", index1 + 1);
+				if (index2 < 0) {
+					return sl_null;
+				}
+				return xml.substring(index1 + tagName.getLength() + 2, index2);
+			}
+			
+			/*
+			static List<String> GetSimpleXMLValues(const String& xml, const String& tagName) {
+				List<String> ret;
+				sl_reg index = 0;
+				while (true) {
+					sl_reg index1 = xml.indexOf("<" + tagName + ">", index);
+					if (index1 < 0) {
+						return sl_null;
+					}
+					sl_reg index2 = xml.indexOf("</" + tagName + ">", index1 + 1);
+					if (index2 < 0) {
+						return sl_null;
+					}
+					ret.add(xml.substring(index1 + tagName.getLength() + 2, index2));
+					index = index2 + 1;
+				}
+				return ret;
+			}
+			*/
+			
 		}
 	}
 	
@@ -154,38 +189,6 @@ namespace slib
 		UrlRequest::send(rp);
 	}
 	
-	static String _priv_Ebay_getSimpleXMLValue(const String& xml, const String& tagName) {
-		sl_reg index1 = xml.indexOf("<" + tagName + ">");
-		if (index1 < 0) {
-			return sl_null;
-		}
-		sl_reg index2 = xml.indexOf("</" + tagName + ">", index1 + 1);
-		if (index2 < 0) {
-			return sl_null;
-		}
-		return xml.substring(index1 + tagName.getLength() + 2, index2);
-	}
-	
-	/*
-	static List<String> _priv_Ebay_getSimpleXMLValues(const String& xml, const String& tagName) {
-		List<String> ret;
-		sl_reg index = 0;
-		while (true) {
-			sl_reg index1 = xml.indexOf("<" + tagName + ">", index);
-			if (index1 < 0) {
-				return sl_null;
-			}
-			sl_reg index2 = xml.indexOf("</" + tagName + ">", index1 + 1);
-			if (index2 < 0) {
-				return sl_null;
-			}
-			ret.add(xml.substring(index1 + tagName.getLength() + 2, index2));
-			index = index2 + 1;
-		}
-		return ret;
-	}
-	*/
-	
 	void Ebay::getUser(const Function<void(EbayResult&, EbayUser&)>& onComplete)
 	{
 		String request = SLIB_STRINGIFY(
@@ -196,8 +199,8 @@ namespace slib
 			EbayResult result(request);
 			EbayUser user;
 			if (!(request->isError())) {
-				user.userId = _priv_Ebay_getSimpleXMLValue(result.response, "UserID");
-				user.email = _priv_Ebay_getSimpleXMLValue(result.response, "Email");
+				user.userId = GetSimpleXMLValue(result.response, "UserID");
+				user.email = GetSimpleXMLValue(result.response, "Email");
 				result.flagSuccess = user.userId.isNotEmpty();
 			}
 			onComplete(result, user);

@@ -28,18 +28,15 @@
 
 #include "view_ios.h"
 
-@interface _priv_Slib_iOS_TextField : UITextField<UITextFieldDelegate> {
-	
-	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
-	
+@interface SLIBEditViewHandle : UITextField<UITextFieldDelegate>
+{	
+	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;	
 }
-
 @end
 
-@interface _priv_Slib_iOS_TextArea : UITextView<UITextViewDelegate> {
-	
-	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
-	
+@interface SLIBTextAreaHandle : UITextView<UITextViewDelegate>
+{	
+	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;	
 }
 
 @property (nonatomic, retain) NSString *placeholder;
@@ -52,219 +49,230 @@
 
 namespace slib
 {
-	class EditView_Impl : public EditView
-	{
-	public:
-		static ::UIReturnKeyType convertReturnKeyType(UIReturnKeyType type)
-		{
-			switch (type) {
-				case UIReturnKeyType::Search:
-					return UIReturnKeySearch;
-				case UIReturnKeyType::Next:
-					return UIReturnKeyNext;
-				case UIReturnKeyType::Continue:
-					return UIReturnKeyContinue;
-				case UIReturnKeyType::Go:
-					return UIReturnKeyGo;
-				case UIReturnKeyType::Send:
-					return UIReturnKeySend;
-				case UIReturnKeyType::Join:
-					return UIReturnKeyJoin;
-				case UIReturnKeyType::Route:
-					return UIReturnKeyRoute;
-				case UIReturnKeyType::EmergencyCall:
-					return UIReturnKeyEmergencyCall;
-				case UIReturnKeyType::Google:
-					return UIReturnKeyGoogle;
-				case UIReturnKeyType::Yahoo:
-					return UIReturnKeyYahoo;
-				case UIReturnKeyType::Return:
-					return UIReturnKeyDefault;
-				case UIReturnKeyType::Default:
-				case UIReturnKeyType::Done:
-				default:
-					return UIReturnKeyDone;
-			}
-		}
-		
-		static ::UIKeyboardType convertKeyboardType(UIKeyboardType type)
-		{
-			switch (type) {
-				case UIKeyboardType::Numpad:
-					return UIKeyboardTypeNumberPad;
-				case UIKeyboardType::Phone:
-					return UIKeyboardTypePhonePad;
-				case UIKeyboardType::Email:
-					return UIKeyboardTypeEmailAddress;
-				case UIKeyboardType::Alphabet:
-					return UIKeyboardTypeAlphabet;
-				case UIKeyboardType::Url:
-					return UIKeyboardTypeURL;
-				case UIKeyboardType::WebSearch:
-					return UIKeyboardTypeWebSearch;
-				case UIKeyboardType::Twitter:
-					return UIKeyboardTypeTwitter;
-				case UIKeyboardType::NumbersAndPunctuation:
-				case UIKeyboardType::Decimal:
-					return UIKeyboardTypeNumbersAndPunctuation;
-				case UIKeyboardType::NamePhone:
-					return UIKeyboardTypeNamePhonePad;
-				case UIKeyboardType::Ascii:
-					return UIKeyboardTypeASCIICapable;
-				case UIKeyboardType::AsciiNumpad:
-					return UIKeyboardTypeASCIICapableNumberPad;
-				case UIKeyboardType::Default:
-				default:
-					return UIKeyboardTypeDefault;
-			}
-		}
-		
-		static ::UITextAutocapitalizationType convertAutoCapitalizationType(UIAutoCapitalizationType type)
-		{
-			switch (type) {
-				case UIAutoCapitalizationType::None :
-					return UITextAutocapitalizationTypeNone;
-				case UIAutoCapitalizationType::Words:
-					return UITextAutocapitalizationTypeWords;
-				case UIAutoCapitalizationType::Sentences:
-					return UITextAutocapitalizationTypeSentences;
-				case UIAutoCapitalizationType::AllCharacters:
-					return UITextAutocapitalizationTypeAllCharacters;
-				default:
-					return UITextAutocapitalizationTypeSentences;
-			}
-		}
-	
-		void applyPlaceholder(UITextField* handle)
-		{
-			NSAttributedString* attr;
-			String _text = m_hintText;
-			if (_text.isEmpty()) {
-				attr = nil;
-			} else {
-				NSString* text = Apple::getNSStringFromString(_text);
-				UIColor* color = GraphicsPlatform::getUIColorFromColor(m_hintTextColor);
-				NSMutableParagraphStyle* paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-				[paragraphStyle setAlignment:translateAlignment(m_textAlignment)];
-				UIFont* hFont = handle.font;
-				if (hFont != nil) {
-					attr = [[NSAttributedString alloc] initWithString:text attributes:@{NSForegroundColorAttributeName: color, NSParagraphStyleAttributeName: paragraphStyle, NSFontAttributeName: hFont}];
-				} else {
-					attr = [[NSAttributedString alloc] initWithString:text attributes:@{NSForegroundColorAttributeName: color, NSParagraphStyleAttributeName: paragraphStyle}];
-				}
-			}
-			[handle setAttributedPlaceholder: attr];
-		}
-		
-		void applyProperties(UITextField* handle)
-		{
-			[handle setText:(Apple::getNSStringFromString(m_text))];
-			[handle setTextAlignment:translateAlignment(m_textAlignment)];
-			[handle setBorderStyle:(isBorder()?UITextBorderStyleRoundedRect:UITextBorderStyleNone)];
-			applyPlaceholder(handle);
-			[handle setTextColor:(GraphicsPlatform::getUIColorFromColor(m_textColor))];
-			[handle setBackgroundColor:(GraphicsPlatform::getUIColorFromColor(getBackgroundColor()))];
-			[handle setEnabled:(m_flagReadOnly ? NO : YES)];
-			[handle setSecureTextEntry:(m_flagPassword ? YES : NO)];
-			Ref<Font> font = getFont();
-			UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
-			if (hFont != nil) {
-				[handle setFont:hFont];
-			}
-			[handle setReturnKeyType:convertReturnKeyType(m_returnKeyType)];
-			[handle setKeyboardType:convertKeyboardType(m_keyboardType)];
-			[handle setAutocapitalizationType:convertAutoCapitalizationType(m_autoCapitalizationType)];
-		}
-		
-		void applyProperties(_priv_Slib_iOS_TextArea* handle)
-		{
-			[handle setScrollEnabled:!(isHeightWrapping())];
-			[handle setShowsHorizontalScrollIndicator:isHorizontalScrollBarVisible()?YES:NO];
-			[handle setShowsVerticalScrollIndicator:(isVerticalScrollBarVisible() && !(isHeightWrapping()))?YES:NO];
-			[handle setText:(Apple::getNSStringFromString(m_text))];
-			[handle setTextAlignment:translateAlignment(m_textAlignment)];
-			if (isBorder()) {
-				[handle.layer setBorderColor:([[UIColor grayColor] CGColor])];
-				[handle.layer setBorderWidth:1];
-			} else {
-				[handle.layer setBorderWidth:0];
-			}
-			[handle setTextColor:(GraphicsPlatform::getUIColorFromColor(m_textColor))];
-			[handle setBackgroundColor:(GraphicsPlatform::getUIColorFromColor(getBackgroundColor()))];
-			[handle setEditable:(m_flagReadOnly?FALSE:TRUE)];
-			[handle setPlaceholder:(Apple::getNSStringFromString(m_hintText))];
-			[handle setPlaceholderColor:(GraphicsPlatform::getUIColorFromColor(m_hintTextColor))];
-			[handle refreshPlaceholder];
-			[handle setSelectable:TRUE];
-			Ref<Font> font = getFont();
-			UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
-			if (hFont != nil) {
-				[handle setFont:hFont];
-			}
-			[handle setReturnKeyType:convertReturnKeyType(m_returnKeyType)];
-			[handle setKeyboardType:convertKeyboardType(m_keyboardType)];
-			[handle setAutocapitalizationType:convertAutoCapitalizationType(m_autoCapitalizationType)];
-		}
-		
-		static NSTextAlignment translateAlignment(Alignment _align)
-		{
-			Alignment align = _align & Alignment::HorizontalMask;
-			if (align == Alignment::Center) {
-				return NSTextAlignmentCenter;
-			} else if (align == Alignment::Right) {
-				return NSTextAlignmentRight;
-			}
-			return NSTextAlignmentLeft;
-		}
-		
-		static void onChangeText(iOS_ViewInstance* instance, UITextField* field, UITextView* area)
-		{
-			Ref<View> _view = instance->getView();
-			if (EditView_Impl* view = CastInstance<EditView_Impl>(_view.get())) {
-				String text;
-				if (field != nil) {
-					text = Apple::getStringFromNSString([field text]);
-				} else if (area != nil) {
-					text = Apple::getStringFromNSString([area text]);
-				}
-				String textNew = text;
-				view->dispatchChange(&textNew);
-				if (text != textNew) {
-					NSString* str = Apple::getNSStringFromString(textNew);
-					if (field != nil) {
-						[field setText:str];
-					}
-					if (area != nil) {
-						[area setText:str];
-					}
-				}
-			}
-		}
-		
-		static void onEnterAction(iOS_ViewInstance* instance, UITextField* field, UITextView* area)
-		{
-			Ref<View> _view = instance->getView();
-			if (EditView_Impl* view = CastInstance<EditView_Impl>(_view.get())) {
-				view->dispatchReturnKey();
-				if (view->getMultiLine() == MultiLineMode::Single && view->isAutoDismissKeyboard()) {
-					if (field != nil) {
-						[field resignFirstResponder];
-					}
-					if (area != nil) {
-						[area resignFirstResponder];
-					}
-				}
-			}
-		}
 
-	};
+	namespace priv
+	{
+		namespace edit_view
+		{
+
+			class EditViewHelper : public EditView
+			{
+			public:
+				static ::UIReturnKeyType convertReturnKeyType(UIReturnKeyType type)
+				{
+					switch (type) {
+						case UIReturnKeyType::Search:
+							return UIReturnKeySearch;
+						case UIReturnKeyType::Next:
+							return UIReturnKeyNext;
+						case UIReturnKeyType::Continue:
+							return UIReturnKeyContinue;
+						case UIReturnKeyType::Go:
+							return UIReturnKeyGo;
+						case UIReturnKeyType::Send:
+							return UIReturnKeySend;
+						case UIReturnKeyType::Join:
+							return UIReturnKeyJoin;
+						case UIReturnKeyType::Route:
+							return UIReturnKeyRoute;
+						case UIReturnKeyType::EmergencyCall:
+							return UIReturnKeyEmergencyCall;
+						case UIReturnKeyType::Google:
+							return UIReturnKeyGoogle;
+						case UIReturnKeyType::Yahoo:
+							return UIReturnKeyYahoo;
+						case UIReturnKeyType::Return:
+							return UIReturnKeyDefault;
+						case UIReturnKeyType::Default:
+						case UIReturnKeyType::Done:
+						default:
+							return UIReturnKeyDone;
+					}
+				}
+				
+				static ::UIKeyboardType convertKeyboardType(UIKeyboardType type)
+				{
+					switch (type) {
+						case UIKeyboardType::Numpad:
+							return UIKeyboardTypeNumberPad;
+						case UIKeyboardType::Phone:
+							return UIKeyboardTypePhonePad;
+						case UIKeyboardType::Email:
+							return UIKeyboardTypeEmailAddress;
+						case UIKeyboardType::Alphabet:
+							return UIKeyboardTypeAlphabet;
+						case UIKeyboardType::Url:
+							return UIKeyboardTypeURL;
+						case UIKeyboardType::WebSearch:
+							return UIKeyboardTypeWebSearch;
+						case UIKeyboardType::Twitter:
+							return UIKeyboardTypeTwitter;
+						case UIKeyboardType::NumbersAndPunctuation:
+						case UIKeyboardType::Decimal:
+							return UIKeyboardTypeNumbersAndPunctuation;
+						case UIKeyboardType::NamePhone:
+							return UIKeyboardTypeNamePhonePad;
+						case UIKeyboardType::Ascii:
+							return UIKeyboardTypeASCIICapable;
+						case UIKeyboardType::AsciiNumpad:
+							return UIKeyboardTypeASCIICapableNumberPad;
+						case UIKeyboardType::Default:
+						default:
+							return UIKeyboardTypeDefault;
+					}
+				}
+				
+				static ::UITextAutocapitalizationType convertAutoCapitalizationType(UIAutoCapitalizationType type)
+				{
+					switch (type) {
+						case UIAutoCapitalizationType::None :
+							return UITextAutocapitalizationTypeNone;
+						case UIAutoCapitalizationType::Words:
+							return UITextAutocapitalizationTypeWords;
+						case UIAutoCapitalizationType::Sentences:
+							return UITextAutocapitalizationTypeSentences;
+						case UIAutoCapitalizationType::AllCharacters:
+							return UITextAutocapitalizationTypeAllCharacters;
+						default:
+							return UITextAutocapitalizationTypeSentences;
+					}
+				}
+			
+				void applyPlaceholder(UITextField* handle)
+				{
+					NSAttributedString* attr;
+					String _text = m_hintText;
+					if (_text.isEmpty()) {
+						attr = nil;
+					} else {
+						NSString* text = Apple::getNSStringFromString(_text);
+						UIColor* color = GraphicsPlatform::getUIColorFromColor(m_hintTextColor);
+						NSMutableParagraphStyle* paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+						[paragraphStyle setAlignment:translateAlignment(m_textAlignment)];
+						UIFont* hFont = handle.font;
+						if (hFont != nil) {
+							attr = [[NSAttributedString alloc] initWithString:text attributes:@{NSForegroundColorAttributeName: color, NSParagraphStyleAttributeName: paragraphStyle, NSFontAttributeName: hFont}];
+						} else {
+							attr = [[NSAttributedString alloc] initWithString:text attributes:@{NSForegroundColorAttributeName: color, NSParagraphStyleAttributeName: paragraphStyle}];
+						}
+					}
+					[handle setAttributedPlaceholder: attr];
+				}
+				
+				void applyProperties(UITextField* handle)
+				{
+					[handle setText:(Apple::getNSStringFromString(m_text))];
+					[handle setTextAlignment:translateAlignment(m_textAlignment)];
+					[handle setBorderStyle:(isBorder()?UITextBorderStyleRoundedRect:UITextBorderStyleNone)];
+					applyPlaceholder(handle);
+					[handle setTextColor:(GraphicsPlatform::getUIColorFromColor(m_textColor))];
+					[handle setBackgroundColor:(GraphicsPlatform::getUIColorFromColor(getBackgroundColor()))];
+					[handle setEnabled:(m_flagReadOnly ? NO : YES)];
+					[handle setSecureTextEntry:(m_flagPassword ? YES : NO)];
+					Ref<Font> font = getFont();
+					UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
+					if (hFont != nil) {
+						[handle setFont:hFont];
+					}
+					[handle setReturnKeyType:convertReturnKeyType(m_returnKeyType)];
+					[handle setKeyboardType:convertKeyboardType(m_keyboardType)];
+					[handle setAutocapitalizationType:convertAutoCapitalizationType(m_autoCapitalizationType)];
+				}
+				
+				void applyProperties(SLIBTextAreaHandle* handle)
+				{
+					[handle setScrollEnabled:!(isHeightWrapping())];
+					[handle setShowsHorizontalScrollIndicator:isHorizontalScrollBarVisible()?YES:NO];
+					[handle setShowsVerticalScrollIndicator:(isVerticalScrollBarVisible() && !(isHeightWrapping()))?YES:NO];
+					[handle setText:(Apple::getNSStringFromString(m_text))];
+					[handle setTextAlignment:translateAlignment(m_textAlignment)];
+					if (isBorder()) {
+						[handle.layer setBorderColor:([[UIColor grayColor] CGColor])];
+						[handle.layer setBorderWidth:1];
+					} else {
+						[handle.layer setBorderWidth:0];
+					}
+					[handle setTextColor:(GraphicsPlatform::getUIColorFromColor(m_textColor))];
+					[handle setBackgroundColor:(GraphicsPlatform::getUIColorFromColor(getBackgroundColor()))];
+					[handle setEditable:(m_flagReadOnly?FALSE:TRUE)];
+					[handle setPlaceholder:(Apple::getNSStringFromString(m_hintText))];
+					[handle setPlaceholderColor:(GraphicsPlatform::getUIColorFromColor(m_hintTextColor))];
+					[handle refreshPlaceholder];
+					[handle setSelectable:TRUE];
+					Ref<Font> font = getFont();
+					UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
+					if (hFont != nil) {
+						[handle setFont:hFont];
+					}
+					[handle setReturnKeyType:convertReturnKeyType(m_returnKeyType)];
+					[handle setKeyboardType:convertKeyboardType(m_keyboardType)];
+					[handle setAutocapitalizationType:convertAutoCapitalizationType(m_autoCapitalizationType)];
+				}
+				
+				static NSTextAlignment translateAlignment(Alignment _align)
+				{
+					Alignment align = _align & Alignment::HorizontalMask;
+					if (align == Alignment::Center) {
+						return NSTextAlignmentCenter;
+					} else if (align == Alignment::Right) {
+						return NSTextAlignmentRight;
+					}
+					return NSTextAlignmentLeft;
+				}
+				
+				static void onChangeText(iOS_ViewInstance* instance, UITextField* field, UITextView* area)
+				{
+					Ref<View> _view = instance->getView();
+					if (EditViewHelper* view = CastInstance<EditViewHelper>(_view.get())) {
+						String text;
+						if (field != nil) {
+							text = Apple::getStringFromNSString([field text]);
+						} else if (area != nil) {
+							text = Apple::getStringFromNSString([area text]);
+						}
+						String textNew = text;
+						view->dispatchChange(&textNew);
+						if (text != textNew) {
+							NSString* str = Apple::getNSStringFromString(textNew);
+							if (field != nil) {
+								[field setText:str];
+							}
+							if (area != nil) {
+								[area setText:str];
+							}
+						}
+					}
+				}
+				
+				static void onEnterAction(iOS_ViewInstance* instance, UITextField* field, UITextView* area)
+				{
+					Ref<View> _view = instance->getView();
+					if (EditViewHelper* view = CastInstance<EditViewHelper>(_view.get())) {
+						view->dispatchReturnKey();
+						if (view->getMultiLine() == MultiLineMode::Single && view->isAutoDismissKeyboard()) {
+							if (field != nil) {
+								[field resignFirstResponder];
+							}
+							if (area != nil) {
+								[area resignFirstResponder];
+							}
+						}
+					}
+				}
+
+			};
+
+		}
+	}
+
+	using namespace priv::edit_view;
 	
 	Ref<ViewInstance> EditView::createNativeWidget(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		_priv_Slib_iOS_TextField* handle = [[_priv_Slib_iOS_TextField alloc] initWithFrame:frame];
+		SLIBEditViewHandle* handle = [[SLIBEditViewHandle alloc] initWithFrame:frame];
 		if (handle != nil) {
-			((EditView_Impl*)this)->applyProperties(handle);
+			((EditViewHelper*)this)->applyProperties(handle);
 		}
 		IOS_VIEW_CREATE_INSTANCE_END
 		return ret;
@@ -273,9 +281,9 @@ namespace slib
 	Ref<ViewInstance> TextArea::createNativeWidget(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		_priv_Slib_iOS_TextArea* handle = [[_priv_Slib_iOS_TextArea alloc] initWithFrame:frame];
+		SLIBTextAreaHandle* handle = [[SLIBTextAreaHandle alloc] initWithFrame:frame];
 		if (handle != nil) {
-			((EditView_Impl*)this)->applyProperties(handle);
+			((EditViewHelper*)this)->applyProperties(handle);
 		}
 		IOS_VIEW_CREATE_INSTANCE_END
 		return ret;
@@ -325,11 +333,11 @@ namespace slib
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
 				UITextField* tv = (UITextField*)handle;
-				[tv setTextAlignment:EditView_Impl::translateAlignment(align)];
-				((EditView_Impl*)this)->applyPlaceholder(tv);
+				[tv setTextAlignment:EditViewHelper::translateAlignment(align)];
+				((EditViewHelper*)this)->applyPlaceholder(tv);
 			} else if ([handle isKindOfClass:[UITextView class]]) {
 				UITextView* tv = (UITextView*)handle;
-				[tv setTextAlignment:EditView_Impl::translateAlignment(align)];
+				[tv setTextAlignment:EditViewHelper::translateAlignment(align)];
 			}
 		}
 	}
@@ -344,9 +352,9 @@ namespace slib
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
 				UITextField* tv = (UITextField*)handle;
-				((EditView_Impl*)this)->applyPlaceholder(tv);
-			} else if ([handle isKindOfClass:[_priv_Slib_iOS_TextArea class]]) {
-				_priv_Slib_iOS_TextArea* tv = (_priv_Slib_iOS_TextArea*)handle;
+				((EditViewHelper*)this)->applyPlaceholder(tv);
+			} else if ([handle isKindOfClass:[SLIBTextAreaHandle class]]) {
+				SLIBTextAreaHandle* tv = (SLIBTextAreaHandle*)handle;
 				NSString* s = Apple::getNSStringFromString(value);
 				[tv setPlaceholder:s];
 				[tv refreshPlaceholder];
@@ -419,9 +427,9 @@ namespace slib
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
 				UITextField* tv = (UITextField*)handle;
-				((EditView_Impl*)this)->applyPlaceholder(tv);
-			} else if ([handle isKindOfClass:[_priv_Slib_iOS_TextArea class]]) {
-				_priv_Slib_iOS_TextArea* tv = (_priv_Slib_iOS_TextArea*)handle;
+				((EditViewHelper*)this)->applyPlaceholder(tv);
+			} else if ([handle isKindOfClass:[SLIBTextAreaHandle class]]) {
+				SLIBTextAreaHandle* tv = (SLIBTextAreaHandle*)handle;
 				[tv setPlaceholderColor:(GraphicsPlatform::getUIColorFromColor(value))];
 				[tv refreshPlaceholder];
 			}
@@ -438,10 +446,10 @@ namespace slib
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
 				UITextField* tv = (UITextField*)handle;
-				[tv setReturnKeyType:EditView_Impl::convertReturnKeyType(type)];
+				[tv setReturnKeyType:EditViewHelper::convertReturnKeyType(type)];
 			} else if ([handle isKindOfClass:[UITextView class]]) {
 				UITextView* tv = (UITextView*)handle;
-				[tv setReturnKeyType:EditView_Impl::convertReturnKeyType(type)];
+				[tv setReturnKeyType:EditViewHelper::convertReturnKeyType(type)];
 			}
 		}
 	}
@@ -456,10 +464,10 @@ namespace slib
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
 				UITextField* tv = (UITextField*)handle;
-				[tv setKeyboardType:EditView_Impl::convertKeyboardType(type)];
+				[tv setKeyboardType:EditViewHelper::convertKeyboardType(type)];
 			} else if ([handle isKindOfClass:[UITextView class]]) {
 				UITextView* tv = (UITextView*)handle;
-				[tv setKeyboardType:EditView_Impl::convertKeyboardType(type)];
+				[tv setKeyboardType:EditViewHelper::convertKeyboardType(type)];
 			}
 		}
 	}
@@ -474,10 +482,10 @@ namespace slib
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UITextField class]]) {
 				UITextField* tv = (UITextField*)handle;
-				[tv setAutocapitalizationType:EditView_Impl::convertAutoCapitalizationType(type)];
+				[tv setAutocapitalizationType:EditViewHelper::convertAutoCapitalizationType(type)];
 			} else if ([handle isKindOfClass:[UITextView class]]) {
 				UITextView* tv = (UITextView*)handle;
-				[tv setAutocapitalizationType:EditView_Impl::convertAutoCapitalizationType(type)];
+				[tv setAutocapitalizationType:EditViewHelper::convertAutoCapitalizationType(type)];
 			}
 		}
 	}
@@ -505,7 +513,7 @@ namespace slib
 				UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
 				if (hFont != nil) {
 					[tv setFont:hFont];
-					((EditView_Impl*)this)->applyPlaceholder(tv);
+					((EditViewHelper*)this)->applyPlaceholder(tv);
 				}
 			} else if ([handle isKindOfClass:[UITextView class]]) {
 				UITextView* tv = (UITextView*)handle;
@@ -576,7 +584,10 @@ namespace slib
 	
 }
 
-@implementation _priv_Slib_iOS_TextField
+using namespace slib;
+using namespace slib::priv::edit_view;
+
+@implementation SLIBEditViewHandle
 
 IOS_VIEW_DEFINE_ON_FOCUS
 
@@ -592,9 +603,9 @@ IOS_VIEW_DEFINE_ON_FOCUS
 
 -(void)textFieldDidChange
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	Ref<iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::EditView_Impl::onChangeText(instance.get(), self, nil);
+		EditViewHelper::onChangeText(instance.get(), self, nil);
 	}
 }
 
@@ -603,16 +614,16 @@ IOS_VIEW_DEFINE_ON_FOCUS
 }
 
 -(BOOL) textFieldShouldReturn:(UITextField *)textField{
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	Ref<iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::EditView_Impl::onEnterAction(instance.get(), self, nil);
+		EditViewHelper::onEnterAction(instance.get(), self, nil);
 	}
 	return NO;
 }
 
 @end
 
-@implementation _priv_Slib_iOS_TextArea
+@implementation SLIBTextAreaHandle
 
 IOS_VIEW_DEFINE_ON_FOCUS
 
@@ -666,9 +677,9 @@ IOS_VIEW_DEFINE_ON_FOCUS
 
 -(void)textViewDidChange:(UITextView *)textView
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	Ref<iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::EditView_Impl::onChangeText(instance.get(), nil, self);
+		EditViewHelper::onChangeText(instance.get(), nil, self);
 		
 		if([[self placeholder] length] > 0) {
 			[UIView animateWithDuration:0.25f animations:^{
@@ -685,10 +696,10 @@ IOS_VIEW_DEFINE_ON_FOCUS
 - (void)insertText:(NSString *)text
 {
 	[super insertText:text];
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	Ref<iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		if ([text isEqualToString:@"\n"]) {
-			slib::EditView_Impl::onEnterAction(instance.get(), nil, self);
+			EditViewHelper::onEnterAction(instance.get(), nil, self);
 		}
 	}
 }

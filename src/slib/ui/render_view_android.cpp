@@ -73,7 +73,7 @@ namespace slib
 				}
 			}
 
-			SLIB_JNI_BEGIN_CLASS(JAndroidGLView, "slib/platform/android/ui/view/UiGLView")
+			SLIB_JNI_BEGIN_CLASS(JGLView, "slib/platform/android/ui/view/UiGLView")
 
 				SLIB_JNI_STATIC_METHOD(create, "_create", "(Landroid/content/Context;)Lslib/platform/android/ui/view/UiGLView;")
 
@@ -95,11 +95,11 @@ namespace slib
 		Ref<Android_ViewInstance> ret;
 		Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 		if (parent) {
-			JniLocal<jobject> handle = JAndroidGLView::create.callObject(sl_null, parent->getContext());
+			JniLocal<jobject> handle = JGLView::create.callObject(sl_null, parent->getContext());
 			ret = Android_ViewInstance::create<RenderViewInstance>(this, parent, handle.get());
 			if (ret.isNotNull()) {
 				jobject handle = ret->getHandle();
-				JAndroidGLView::setRenderMode.callBoolean(sl_null, handle, m_redrawMode);
+				JGLView::setRenderMode.callBoolean(sl_null, handle, m_redrawMode);
 			}
 		}
 		return ret;
@@ -109,7 +109,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			JAndroidGLView::setRenderMode.callBoolean(sl_null, handle, mode);
+			JGLView::setRenderMode.callBoolean(sl_null, handle, mode);
 		}
 	}
 
@@ -117,7 +117,7 @@ namespace slib
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			JAndroidGLView::requestRender.call(sl_null, handle);
+			JGLView::requestRender.call(sl_null, handle);
 		}
 	}
 

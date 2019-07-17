@@ -481,30 +481,37 @@ namespace slib
 		close();
 	}
 
-	class _priv_HttpServerConnection_SendResponseAndCloseListener : public Referable
+	namespace priv
 	{
-	public:
-		WeakRef<HttpServerConnection> m_connection;
-
-		_priv_HttpServerConnection_SendResponseAndCloseListener(HttpServerConnection* connection)
+		namespace http_server
 		{
-			m_connection = connection;
-		}
+			class SendResponseAndCloseListener : public Referable
+			{
+			public:
+				WeakRef<HttpServerConnection> m_connection;
 
-		void onWriteStream(AsyncStreamResult& result)
-		{
-			Ref<HttpServerConnection> connection = m_connection;
-			if (connection.isNotNull()) {
-				connection->close();
-			}
+			public:
+				SendResponseAndCloseListener(HttpServerConnection* connection)
+				{
+					m_connection = connection;
+				}
+
+				void onWriteStream(AsyncStreamResult& result)
+				{
+					Ref<HttpServerConnection> connection = m_connection;
+					if (connection.isNotNull()) {
+						connection->close();
+					}
+				}
+			};
 		}
-	};
+	}
 
 	void HttpServerConnection::sendResponseAndClose(const Memory& mem)
 	{
 		if (mem.isNotNull()) {
-			Ref<_priv_HttpServerConnection_SendResponseAndCloseListener> listener(new _priv_HttpServerConnection_SendResponseAndCloseListener(this));
-			if (m_io->writeFromMemory(mem, SLIB_FUNCTION_REF(_priv_HttpServerConnection_SendResponseAndCloseListener, onWriteStream, listener))) {
+			Ref<priv::http_server::SendResponseAndCloseListener> listener(new priv::http_server::SendResponseAndCloseListener(this));
+			if (m_io->writeFromMemory(mem, SLIB_FUNCTION_REF(priv::http_server::SendResponseAndCloseListener, onWriteStream, listener))) {
 				return;
 			}
 		}
@@ -565,74 +572,82 @@ namespace slib
 		m_server = server;
 	}
 
-	class _priv_DefaultHttpServerConnectionProvider : public HttpServerConnectionProvider
+	namespace priv
 	{
-	public:
-		Ref<AsyncTcpServer> m_server;
-		Ref<AsyncIoLoop> m_loop;
-
-	public:
-		_priv_DefaultHttpServerConnectionProvider()
+		namespace http_server
 		{
-		}
 
-		~_priv_DefaultHttpServerConnectionProvider()
-		{
-			release();
-		}
+			class DefaultConnectionProvider : public HttpServerConnectionProvider
+			{
+			public:
+				Ref<AsyncTcpServer> m_server;
+				Ref<AsyncIoLoop> m_loop;
 
-	public:
-		static Ref<HttpServerConnectionProvider> create(HttpServer* server, const SocketAddress& addressListen)
-		{
-			Ref<AsyncIoLoop> loop = server->getAsyncIoLoop();
-			if (loop.isNotNull()) {
-				Ref<_priv_DefaultHttpServerConnectionProvider> ret = new _priv_DefaultHttpServerConnectionProvider;
-				if (ret.isNotNull()) {
-					ret->m_loop = loop;
-					ret->setServer(server);
-					AsyncTcpServerParam sp;
-					sp.bindAddress = addressListen;
-					sp.onAccept = SLIB_FUNCTION_WEAKREF(_priv_DefaultHttpServerConnectionProvider, onAccept, ret);
-					sp.ioLoop = loop;
-					Ref<AsyncTcpServer> server = AsyncTcpServer::create(sp);
-					if (server.isNotNull()) {
-						ret->m_server = server;
-						return ret;
+			public:
+				DefaultConnectionProvider()
+				{
+				}
+
+				~DefaultConnectionProvider()
+				{
+					release();
+				}
+
+			public:
+				static Ref<HttpServerConnectionProvider> create(HttpServer* server, const SocketAddress& addressListen)
+				{
+					Ref<AsyncIoLoop> loop = server->getAsyncIoLoop();
+					if (loop.isNotNull()) {
+						Ref<DefaultConnectionProvider> ret = new DefaultConnectionProvider;
+						if (ret.isNotNull()) {
+							ret->m_loop = loop;
+							ret->setServer(server);
+							AsyncTcpServerParam sp;
+							sp.bindAddress = addressListen;
+							sp.onAccept = SLIB_FUNCTION_WEAKREF(DefaultConnectionProvider, onAccept, ret);
+							sp.ioLoop = loop;
+							Ref<AsyncTcpServer> server = AsyncTcpServer::create(sp);
+							if (server.isNotNull()) {
+								ret->m_server = server;
+								return ret;
+							}
+						}
+					}
+					return sl_null;
+				}
+				
+				void release() override
+				{
+					ObjectLocker lock(this);
+					if (m_server.isNotNull()) {
+						m_server->close();
 					}
 				}
-			}
-			return sl_null;
-		}
-		
-		void release() override
-		{
-			ObjectLocker lock(this);
-			if (m_server.isNotNull()) {
-				m_server->close();
-			}
-		}
 
-		void onAccept(AsyncTcpServer* socketListen, const Ref<Socket>& socketAccept, const SocketAddress& address)
-		{
-			Ref<HttpServer> server = getServer();
-			if (server.isNotNull()) {
-				Ref<AsyncIoLoop> loop = m_loop;
-				if (loop.isNull()) {
-					return;
+				void onAccept(AsyncTcpServer* socketListen, const Ref<Socket>& socketAccept, const SocketAddress& address)
+				{
+					Ref<HttpServer> server = getServer();
+					if (server.isNotNull()) {
+						Ref<AsyncIoLoop> loop = m_loop;
+						if (loop.isNull()) {
+							return;
+						}
+						AsyncTcpSocketParam cp;
+						cp.socket = socketAccept;
+						cp.ioLoop = loop;
+						Ref<AsyncTcpSocket> stream = AsyncTcpSocket::create(cp);
+						if (stream.isNotNull()) {
+							SocketAddress addrLocal;
+							socketAccept->getLocalAddress(addrLocal);
+							server->addConnection(stream.get(), address, addrLocal);
+						}
+					}
 				}
-				AsyncTcpSocketParam cp;
-				cp.socket = socketAccept;
-				cp.ioLoop = loop;
-				Ref<AsyncTcpSocket> stream = AsyncTcpSocket::create(cp);
-				if (stream.isNotNull()) {
-					SocketAddress addrLocal;
-					socketAccept->getLocalAddress(addrLocal);
-					server->addConnection(stream.get(), address, addrLocal);
-				}
-			}
-		}
 
-	};
+			};
+
+		}
+	}
 	
 /******************************************************
 					HttpServer
@@ -1535,7 +1550,7 @@ namespace slib
 
 	sl_bool HttpServer::addHttpBinding(const SocketAddress& addr)
 	{
-		Ref<HttpServerConnectionProvider> provider = _priv_DefaultHttpServerConnectionProvider::create(this, addr);
+		Ref<HttpServerConnectionProvider> provider = priv::http_server::DefaultConnectionProvider::create(this, addr);
 		if (provider.isNotNull()) {
 			addConnectionProvider(provider);
 			return sl_true;

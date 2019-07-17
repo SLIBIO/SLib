@@ -32,62 +32,73 @@
 
 namespace slib
 {
-	SLIB_JNI_BEGIN_CLASS(JAndroidPoint, "android/graphics/Point")
-		SLIB_JNI_INT_FIELD(x);
-		SLIB_JNI_INT_FIELD(y);
-	SLIB_JNI_END_CLASS
 
-	SLIB_JNI_BEGIN_CLASS(JAndroidDevice, "slib/platform/android/device/Device")
-		SLIB_JNI_STATIC_METHOD(checkPermissions, "checkPermissions", "(Landroid/app/Activity;I)Z");
-		SLIB_JNI_STATIC_METHOD(grantPermissions, "grantPermissions", "(Landroid/app/Activity;I)V");
-		SLIB_JNI_STATIC_METHOD(getIMEIs, "getIMEIs", "(Landroid/app/Activity;)Ljava/lang/String;");
-		SLIB_JNI_STATIC_METHOD(getPhoneNumbers, "getPhoneNumbers", "(Landroid/app/Activity;)Ljava/lang/String;");
-		SLIB_JNI_STATIC_METHOD(getDeviceId, "getDeviceId", "(Landroid/app/Activity;)Ljava/lang/String;");
-		SLIB_JNI_STATIC_METHOD(getDeviceOSVersion, "getDeviceOSVersion", "()Ljava/lang/String;");
-		SLIB_JNI_STATIC_METHOD(getDeviceName, "getDeviceName", "()Ljava/lang/String;");
-		SLIB_JNI_STATIC_METHOD(getScreenSize, "getScreenSize", "(Landroid/app/Activity;)Landroid/graphics/Point;");
-		SLIB_JNI_STATIC_METHOD(getScreenPPI, "getScreenPPI", "(Landroid/app/Activity;)I");
-	SLIB_JNI_END_CLASS
+	namespace priv
+	{
+		namespace device
+		{
+
+			SLIB_JNI_BEGIN_CLASS(JPoint, "android/graphics/Point")
+				SLIB_JNI_INT_FIELD(x);
+				SLIB_JNI_INT_FIELD(y);
+			SLIB_JNI_END_CLASS
+
+			SLIB_JNI_BEGIN_CLASS(JDevice, "slib/platform/android/device/Device")
+				SLIB_JNI_STATIC_METHOD(checkPermissions, "checkPermissions", "(Landroid/app/Activity;I)Z");
+				SLIB_JNI_STATIC_METHOD(grantPermissions, "grantPermissions", "(Landroid/app/Activity;I)V");
+				SLIB_JNI_STATIC_METHOD(getIMEIs, "getIMEIs", "(Landroid/app/Activity;)Ljava/lang/String;");
+				SLIB_JNI_STATIC_METHOD(getPhoneNumbers, "getPhoneNumbers", "(Landroid/app/Activity;)Ljava/lang/String;");
+				SLIB_JNI_STATIC_METHOD(getDeviceId, "getDeviceId", "(Landroid/app/Activity;)Ljava/lang/String;");
+				SLIB_JNI_STATIC_METHOD(getDeviceOSVersion, "getDeviceOSVersion", "()Ljava/lang/String;");
+				SLIB_JNI_STATIC_METHOD(getDeviceName, "getDeviceName", "()Ljava/lang/String;");
+				SLIB_JNI_STATIC_METHOD(getScreenSize, "getScreenSize", "(Landroid/app/Activity;)Landroid/graphics/Point;");
+				SLIB_JNI_STATIC_METHOD(getScreenPPI, "getScreenPPI", "(Landroid/app/Activity;)I");
+			SLIB_JNI_END_CLASS
+
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void()>, g_callbackOnGrantPermission);
+
+			SLIB_JNI_BEGIN_CLASS_SECTION(JDevice)
+				SLIB_JNI_NATIVE_IMPL(nativeOnCallbackGrantPermissions, "nativeOnCallbackGrantPermissions", "()V", void, jlong instance)
+				{
+					if (SLIB_SAFE_STATIC_CHECK_FREED(g_callbackOnGrantPermission)) {
+						return;
+					}
+					g_callbackOnGrantPermission();
+					g_callbackOnGrantPermission.setNull();
+				}
+			SLIB_JNI_END_CLASS_SECTION
+
+		}
+	}
+
+	using namespace priv::device;
 
 	sl_bool Device::checkPermissions(const DevicePermissions& permissions)
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			return JAndroidDevice::checkPermissions.callBoolean(sl_null, jactivity, (int)permissions);
+			return JDevice::checkPermissions.callBoolean(sl_null, jactivity, (int)permissions);
 		}
 		return sl_null;
 	}
 	
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void()>, _g_priv_onGrantPermissionCallback);
-
 	void Device::grantPermissions(const DevicePermissions& permissions, const Function<void()>& callback)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_onGrantPermissionCallback)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_callbackOnGrantPermission)) {
 			return;
 		}
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			_g_priv_onGrantPermissionCallback = callback;
-			JAndroidDevice::grantPermissions.call(sl_null, jactivity, (int)permissions);
+			g_callbackOnGrantPermission = callback;
+			JDevice::grantPermissions.call(sl_null, jactivity, (int)permissions);
 		}
 	}
-
-	SLIB_JNI_BEGIN_CLASS_SECTION(JAndroidDevice)
-		SLIB_JNI_NATIVE_IMPL(nativeOnCallbackGrantPermissions, "nativeOnCallbackGrantPermissions", "()V", void, jlong instance)
-		{
-			if (SLIB_SAFE_STATIC_CHECK_FREED(_g_priv_onGrantPermissionCallback)) {
-				return;
-			}
-			_g_priv_onGrantPermissionCallback();
-			_g_priv_onGrantPermissionCallback.setNull();
-		}
-	SLIB_JNI_END_CLASS_SECTION
 
 	List<String> Device::getIMEIs()
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			return JAndroidDevice::getIMEIs.callString(sl_null, jactivity).split(";");
+			return JDevice::getIMEIs.callString(sl_null, jactivity).split(";");
 		}
 		return sl_null;
 	}
@@ -96,7 +107,7 @@ namespace slib
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			return JAndroidDevice::getPhoneNumbers.callString(sl_null, jactivity).split(";");
+			return JDevice::getPhoneNumbers.callString(sl_null, jactivity).split(";");
 		}
 		return sl_null;
 	}
@@ -105,7 +116,7 @@ namespace slib
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			return JAndroidDevice::getDeviceId.callString(sl_null, jactivity);
+			return JDevice::getDeviceId.callString(sl_null, jactivity);
 		}
 		return sl_null;
 	}
@@ -114,7 +125,7 @@ namespace slib
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			return JAndroidDevice::getDeviceName.callString(sl_null);
+			return JDevice::getDeviceName.callString(sl_null);
 		}
 		return sl_null;
 	}
@@ -123,7 +134,7 @@ namespace slib
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			return JAndroidDevice::getDeviceOSVersion.callString(sl_null);
+			return JDevice::getDeviceOSVersion.callString(sl_null);
 		}
 		return sl_null;
 	}
@@ -138,11 +149,11 @@ namespace slib
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			JniLocal<jobject> jpt = JAndroidDevice::getScreenSize.callObject(sl_null, jactivity);
+			JniLocal<jobject> jpt = JDevice::getScreenSize.callObject(sl_null, jactivity);
 			if (jpt.isNotNull()) {
 				Sizei ret;
-				ret.x = JAndroidPoint::x.get(jpt);
-				ret.y = JAndroidPoint::y.get(jpt);
+				ret.x = JPoint::x.get(jpt);
+				ret.y = JPoint::y.get(jpt);
 				return ret;
 			}
 		}
@@ -153,7 +164,7 @@ namespace slib
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			return JAndroidDevice::getScreenPPI.callInt(sl_null, jactivity);
+			return JDevice::getScreenPPI.callInt(sl_null, jactivity);
 		}
 		return 0;
 	}

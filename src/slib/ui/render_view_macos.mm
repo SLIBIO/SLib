@@ -30,8 +30,8 @@
 
 #include "view_macos.h"
 
-@interface SLIBGLViewHandle : SLIBViewHandle {
-	
+@interface SLIBGLViewHandle : SLIBViewHandle
+{
 	@public sl_bool m_flagRenderingContinuously;
 	@public sl_bool m_flagRequestRender;
 	@public sl_bool m_flagUpdate;

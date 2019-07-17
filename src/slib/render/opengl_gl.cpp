@@ -58,7 +58,7 @@ namespace slib
 
 #define PRIV_OPENGL_IMPL
 #define GL_BASE GL
-#define GL_ENGINE _priv_GL_Engine
+#define GL_ENGINE GL_Engine
 #define GL_ENTRY(x) PRIV_GL_ENTRY(x)
 #include "opengl_impl.h"
 
@@ -66,7 +66,20 @@ namespace slib
 
 namespace slib
 {
-	_priv_GL_EntryPoints _priv_GL_entries;
+
+	namespace priv
+	{
+		namespace gl
+		{
+
+			EntryPoints g_entries;
+
+			static sl_bool g_flagLoadedEntryPoints = sl_false;
+
+		}
+	}
+
+	using namespace priv::gl;
 	
 #undef PRIV_SLIB_RENDER_GL_ENTRY
 #define PRIV_SLIB_RENDER_GL_ENTRY(TYPE, name, ...) \
@@ -81,20 +94,18 @@ namespace slib
 	if (proc == 0) { \
 		flagSupport = sl_false; \
 	} \
-	*((FARPROC*)(&(_priv_GL_entries.name))) = proc;
+	*((FARPROC*)(&(g_entries.name))) = proc;
 	
 #undef PRIV_SLIB_RENDER_GL_SUPPORT
 #define PRIV_SLIB_RENDER_GL_SUPPORT(name) \
-	_priv_GL_entries.flagSupports##name = flagSupport; \
+	g_entries.flagSupports##name = flagSupport; \
 	flagSupport = sl_true;
-	
-	static sl_bool _g_render_GL_flagLoadedEntryPoints = sl_false;
 	
 	void GL::loadEntries(const String& _pathDll, sl_bool flagReload)
 	{
 		String16 pathDll = _pathDll;
 		if (!flagReload) {
-			if (_g_render_GL_flagLoadedEntryPoints) {
+			if (g_flagLoadedEntryPoints) {
 				return;
 			}
 		}
@@ -115,7 +126,7 @@ namespace slib
 		FARPROC proc;
 		sl_bool flagSupport = sl_true;
 		PRIV_SLIB_RENDER_GL_ENTRIES
-		_g_render_GL_flagLoadedEntryPoints = sl_true;
+		g_flagLoadedEntryPoints = sl_true;
 	}
 	
 	void GL::loadEntries(sl_bool flagReload)
@@ -125,7 +136,7 @@ namespace slib
 	
 	sl_bool GL::isAvailable()
 	{
-		return _g_render_GL_flagLoadedEntryPoints;
+		return g_flagLoadedEntryPoints;
 	}
 }
 

@@ -30,73 +30,83 @@
 #include "slib/ui/platform.h"
 #include "slib/ui/app.h"
 
-@interface _priv_Slib_macOS_AppDelegate : NSObject <NSApplicationDelegate>
+@interface SLIBAppDelegate : NSObject <NSApplicationDelegate>
 @end
 
 namespace slib
 {
-
-	class _priv_macOS_Screen : public Screen
+	
+	namespace priv
 	{
-	public:
-		NSScreen* m_screen;
-		UIRect m_region;
-		
-	public:
-		static Ref<_priv_macOS_Screen> create(NSScreen* screen, NSScreen* primary)
+		namespace core
 		{
-			Ref<_priv_macOS_Screen> ret;
-			if (screen != nil) {
-				ret = new _priv_macOS_Screen();
-				if (ret.isNotNull()) {
-					ret->m_screen = screen;
-					UIRect region;
-					sl_ui_pos leftBottom = 0;
-					if (primary == nil) {
-						primary = getPrimaryScreen();
+			
+			class ScreenImpl : public Screen
+			{
+			public:
+				NSScreen* m_screen;
+				UIRect m_region;
+				
+			public:
+				static Ref<ScreenImpl> create(NSScreen* screen, NSScreen* primary)
+				{
+					Ref<ScreenImpl> ret;
+					if (screen != nil) {
+						ret = new ScreenImpl();
+						if (ret.isNotNull()) {
+							ret->m_screen = screen;
+							UIRect region;
+							sl_ui_pos leftBottom = 0;
+							if (primary == nil) {
+								primary = getPrimaryScreen();
+							}
+							if (primary != nil) {
+								NSRect rect = [primary frame];
+								leftBottom = (sl_ui_pos)(rect.origin.y + rect.size.height);
+							}
+							NSRect rect = [screen frame];
+							region.left = (sl_ui_pos)(rect.origin.x);
+							region.top = leftBottom - (sl_ui_pos)(rect.origin.y + rect.size.height);
+							region.setWidth((sl_ui_pos)(rect.size.width));
+							region.setHeight((sl_ui_pos)(rect.size.height));
+							ret->m_region = region;
+						}
 					}
-					if (primary != nil) {
-						NSRect rect = [primary frame];
-						leftBottom = (sl_ui_pos)(rect.origin.y + rect.size.height);
-					}
-					NSRect rect = [screen frame];
-					region.left = (sl_ui_pos)(rect.origin.x);
-					region.top = leftBottom - (sl_ui_pos)(rect.origin.y + rect.size.height);
-					region.setWidth((sl_ui_pos)(rect.size.width));
-					region.setHeight((sl_ui_pos)(rect.size.height));
-					ret->m_region = region;
+					return ret;
 				}
-			}
-			return ret;
-		}
-		
-		static NSScreen* getPrimaryScreen()
-		{
-			NSArray* arr = [NSScreen screens];
-			sl_size n = [arr count];
-			if (n == 0) {
-				return nil;
-			}
-			NSScreen* primary = [arr objectAtIndex:0];
-			return primary;
-		}
-		
-	public:
-		UIRect getRegion() override
-		{
-			return m_region;
-		}
+				
+				static NSScreen* getPrimaryScreen()
+				{
+					NSArray* arr = [NSScreen screens];
+					sl_size n = [arr count];
+					if (n == 0) {
+						return nil;
+					}
+					NSScreen* primary = [arr objectAtIndex:0];
+					return primary;
+				}
+				
+			public:
+				UIRect getRegion() override
+				{
+					return m_region;
+				}
+				
+			};
 
-	};
+		}
+	}
+
+	using namespace priv::core;
 
 	Ref<Screen> UIPlatform::createScreen(NSScreen* screen)
 	{
-		return _priv_macOS_Screen::create(screen, nil);
+		return ScreenImpl::create(screen, nil);
 	}
 
 	NSScreen* UIPlatform::getScreenHandle(Screen* _screen)
 	{
-		_priv_macOS_Screen* screen = (_priv_macOS_Screen*)_screen;
+		ScreenImpl* screen = (ScreenImpl*)_screen;
 		if (screen) {
 			return screen->m_screen;
 		}
@@ -122,14 +132,14 @@ namespace slib
 		NSScreen* primary = [arr objectAtIndex:0];
 		for (sl_size i = 0; i < n; i++) {
 			NSScreen* _screen = [arr objectAtIndex:i];
-			ret.add_NoLock(_priv_macOS_Screen::create(_screen, primary));
+			ret.add_NoLock(ScreenImpl::create(_screen, primary));
 		}
 		return ret;
 	}
 
 	Ref<Screen> UI::getPrimaryScreen()
 	{
-		NSScreen* screen = _priv_macOS_Screen::getPrimaryScreen();
+		NSScreen* screen = ScreenImpl::getPrimaryScreen();
 		return UIPlatform::createScreen(screen);
 	}
 
@@ -189,7 +199,7 @@ namespace slib
 	{
 		[NSApplication sharedApplication];
 		[[NSBundle mainBundle] loadNibNamed:@"MainMenu" owner:NSApp topLevelObjects:nil];
-		_priv_Slib_macOS_AppDelegate * delegate = [[_priv_Slib_macOS_AppDelegate alloc] init];
+		SLIBAppDelegate * delegate = [[SLIBAppDelegate alloc] init];
 		[NSApp setDelegate:delegate];
 		
 		@autoreleasepool {
@@ -210,14 +220,18 @@ namespace slib
 
 }
 
-@implementation _priv_Slib_macOS_AppDelegate
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+@implementation SLIBAppDelegate
+
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+{
 	slib::UIApp::dispatchStartToApp();
 }
 
-- (void)applicationWillTerminate:(NSNotification *)aNotification {
+- (void)applicationWillTerminate:(NSNotification *)aNotification
+{
 	slib::UIApp::dispatchExitToApp();
 }
+
 @end
 
 

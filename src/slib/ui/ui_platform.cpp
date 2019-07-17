@@ -31,12 +31,25 @@
 namespace slib
 {
 
-	typedef CHashMap<const void*, WeakRef<ViewInstance> > _priv_UiViewInstanceMap;
-	SLIB_SAFE_STATIC_GETTER(_priv_UiViewInstanceMap, _priv_UI_getViewInstances)
+	namespace priv
+	{
+		namespace ui_platform
+		{
+
+			typedef CHashMap<const void*, WeakRef<ViewInstance> > ViewInstanceMap;
+			SLIB_SAFE_STATIC_GETTER(ViewInstanceMap, GetViewInstanceMap)
 	
+			typedef CHashMap<const void*, WeakRef<WindowInstance> > WindowInstanceMap;
+			SLIB_SAFE_STATIC_GETTER(WindowInstanceMap, GetWindowInstanceMap)
+	
+		}
+	}
+
+	using namespace priv::ui_platform;
+
 	void UIPlatform::_registerViewInstance(const void* handle, ViewInstance* instance)
 	{
-		_priv_UiViewInstanceMap* map = _priv_UI_getViewInstances();
+		ViewInstanceMap* map = GetViewInstanceMap();
 		if (map) {
 			map->put(handle, instance);
 		}
@@ -44,7 +57,7 @@ namespace slib
 	
 	Ref<ViewInstance> UIPlatform::_getViewInstance(const void* handle)
 	{
-		_priv_UiViewInstanceMap* map = _priv_UI_getViewInstances();
+		ViewInstanceMap* map = GetViewInstanceMap();
 		if (map) {
 			return map->getValue(handle, WeakRef<ViewInstance>::null());
 		}
@@ -53,18 +66,15 @@ namespace slib
 	
 	void UIPlatform::_removeViewInstance(const void* handle)
 	{
-		_priv_UiViewInstanceMap* map = _priv_UI_getViewInstances();
+		ViewInstanceMap* map = GetViewInstanceMap();
 		if (map) {
 			map->remove(handle);
 		}
 	}
 	
-	typedef CHashMap<const void*, WeakRef<WindowInstance> > _priv_UiWindowInstanceMap;
-	SLIB_SAFE_STATIC_GETTER(_priv_UiWindowInstanceMap, _priv_UI_getWindowInstances)
-	
 	void UIPlatform::_registerWindowInstance(const void* handle, WindowInstance* instance)
 	{
-		_priv_UiWindowInstanceMap* map = _priv_UI_getWindowInstances();
+		WindowInstanceMap* map = GetWindowInstanceMap();
 		if (map) {
 			map->put(handle, instance);
 		}
@@ -72,7 +82,7 @@ namespace slib
 	
 	Ref<WindowInstance> UIPlatform::_getWindowInstance(const void* handle)
 	{
-		_priv_UiWindowInstanceMap* map = _priv_UI_getWindowInstances();
+		WindowInstanceMap* map = GetWindowInstanceMap();
 		if (map) {
 			return map->getValue(handle, WeakRef<WindowInstance>::null());
 		}
@@ -81,7 +91,7 @@ namespace slib
 	
 	void UIPlatform::_removeWindowInstance(const void* handle)
 	{
-		_priv_UiWindowInstanceMap* map = _priv_UI_getWindowInstances();
+		WindowInstanceMap* map = GetWindowInstanceMap();
 		if (map) {
 			map->remove(handle);
 		}

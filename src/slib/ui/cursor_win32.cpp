@@ -30,46 +30,56 @@
 namespace slib
 {
 
-	class _priv_Win32_Cursor : public Cursor
+	namespace priv
 	{
-	public:
-		HCURSOR m_hCursor;
-		sl_bool m_flagDestroyOnRelease;
-
-	public:
-		_priv_Win32_Cursor()
+		namespace cursor
 		{
-		}
 
-		~_priv_Win32_Cursor()
-		{
-			if (m_flagDestroyOnRelease) {
-				::DestroyCursor(m_hCursor);
-			}
-		}
+			class NativeCursorImpl : public Cursor
+			{
+			public:
+				HCURSOR m_hCursor;
+				sl_bool m_flagDestroyOnRelease;
 
-	public:
-		static Ref<_priv_Win32_Cursor> create(HCURSOR hCursor, sl_bool flagFreeOnDestroy)
-		{
-			Ref<_priv_Win32_Cursor> ret;
-			if (hCursor) {
-				ret = new _priv_Win32_Cursor;
-				if (ret.isNotNull()) {
-					ret->m_hCursor = hCursor;
-					ret->m_flagDestroyOnRelease = flagFreeOnDestroy;
+			public:
+				NativeCursorImpl()
+				{
+				}
+
+				~NativeCursorImpl()
+				{
+					if (m_flagDestroyOnRelease) {
+						::DestroyCursor(m_hCursor);
+					}
+				}
+
+			public:
+				static Ref<NativeCursorImpl> create(HCURSOR hCursor, sl_bool flagFreeOnDestroy)
+				{
+					Ref<NativeCursorImpl> ret;
+					if (hCursor) {
+						ret = new NativeCursorImpl;
+						if (ret.isNotNull()) {
+							ret->m_hCursor = hCursor;
+							ret->m_flagDestroyOnRelease = flagFreeOnDestroy;
+							return ret;
+						}
+						if (flagFreeOnDestroy) {
+							::DestroyCursor(hCursor);
+						}
+					}
 					return ret;
 				}
-				if (flagFreeOnDestroy) {
-					::DestroyCursor(hCursor);
-				}
-			}
-			return ret;
+			};
+
 		}
-	};
+	}
+
+	using namespace priv::cursor;
 
 	Ref<Cursor> UIPlatform::createCursor(HCURSOR hCursor, sl_bool flagDestroyOnRelease)
 	{
-		return _priv_Win32_Cursor::create(hCursor, flagDestroyOnRelease);
+		return NativeCursorImpl::create(hCursor, flagDestroyOnRelease);
 	}
 
 	HCURSOR UIPlatform::getCursorHandle(const Ref<Cursor>& cursor)
@@ -77,7 +87,7 @@ namespace slib
 		if (cursor.isNull()) {
 			return NULL;
 		}
-		_priv_Win32_Cursor* c = (_priv_Win32_Cursor*)(cursor.get());
+		NativeCursorImpl* c = (NativeCursorImpl*)(cursor.get());
 		return c->m_hCursor;
 	}
 
@@ -122,7 +132,7 @@ namespace slib
 		if (cursor.isNull()) {
 			return;
 		}
-		_priv_Win32_Cursor* c = (_priv_Win32_Cursor*)(cursor.get());
+		NativeCursorImpl* c = (NativeCursorImpl*)(cursor.get());
 		::SetCursor(c->m_hCursor);
 	}
 

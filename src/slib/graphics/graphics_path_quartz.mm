@@ -31,29 +31,52 @@
 namespace slib
 {
 
-	class _priv_Quartz_GraphicsPathObject : public Referable
+	namespace priv
 	{
-	public:
-		CGMutablePathRef path;
-		
-	public:
-		_priv_Quartz_GraphicsPathObject()
+		namespace quartz
 		{
-			path = CGPathCreateMutable();
+
+			class GraphicsPathPlatformObject : public Referable
+			{
+			public:
+				CGMutablePathRef path;
+				
+			public:
+				GraphicsPathPlatformObject()
+				{
+					path = CGPathCreateMutable();
+				}
+				
+				~GraphicsPathPlatformObject()
+				{
+					if (path) {
+						CGPathRelease(path);
+					}
+				}
+				
+			};
+
+			class GraphicsPathHelper : public GraphicsPath
+			{
+			public:
+				CGPathRef getPlatformPath()
+				{
+					GraphicsPathPlatformObject* po = (GraphicsPathPlatformObject*)(m_platformObject.get());
+					if (po) {
+						return po->path;
+					}
+					return NULL;
+				}
+			};
+
 		}
-		
-		~_priv_Quartz_GraphicsPathObject()
-		{
-			if (path) {
-				CGPathRelease(path);
-			}
-		}
-		
-	};
+	}
+
+	using namespace priv::quartz;
 
 	void GraphicsPath::_initialize_PO()
 	{
-		Ref<_priv_Quartz_GraphicsPathObject> po = new _priv_Quartz_GraphicsPathObject;
+		Ref<GraphicsPathPlatformObject> po = new GraphicsPathPlatformObject;
 		if (po.isNotNull() && po->path) {
 			m_platformObject = po;
 		}
@@ -61,7 +84,7 @@ namespace slib
 
 	void GraphicsPath::_moveTo_PO(sl_real x, sl_real y)
 	{
-		_priv_Quartz_GraphicsPathObject* po = (_priv_Quartz_GraphicsPathObject*)(m_platformObject.get());
+		GraphicsPathPlatformObject* po = (GraphicsPathPlatformObject*)(m_platformObject.get());
 		if (po) {
 			CGPathMoveToPoint(po->path, NULL, x, y);
 		}
@@ -69,7 +92,7 @@ namespace slib
 
 	void GraphicsPath::_lineTo_PO(sl_real x, sl_real y)
 	{
-		_priv_Quartz_GraphicsPathObject* po = (_priv_Quartz_GraphicsPathObject*)(m_platformObject.get());
+		GraphicsPathPlatformObject* po = (GraphicsPathPlatformObject*)(m_platformObject.get());
 		if (po) {
 			CGPathAddLineToPoint(po->path, NULL, x, y);
 		}
@@ -77,7 +100,7 @@ namespace slib
 
 	void GraphicsPath::_cubicTo_PO(sl_real xc1, sl_real yc1, sl_real xc2, sl_real yc2, sl_real xe, sl_real ye)
 	{
-		_priv_Quartz_GraphicsPathObject* po = (_priv_Quartz_GraphicsPathObject*)(m_platformObject.get());
+		GraphicsPathPlatformObject* po = (GraphicsPathPlatformObject*)(m_platformObject.get());
 		if (po) {
 			CGPathAddCurveToPoint(po->path, NULL, xc1, yc1, xc2, yc2, xe, ye);
 		}
@@ -85,7 +108,7 @@ namespace slib
 
 	void GraphicsPath::_closeSubpath_PO()
 	{
-		_priv_Quartz_GraphicsPathObject* po = (_priv_Quartz_GraphicsPathObject*)(m_platformObject.get());
+		GraphicsPathPlatformObject* po = (GraphicsPathPlatformObject*)(m_platformObject.get());
 		if (po) {
 			CGPathCloseSubpath(po->path);
 		}
@@ -97,7 +120,7 @@ namespace slib
 
 	Rectangle GraphicsPath::_getBounds_PO()
 	{
-		_priv_Quartz_GraphicsPathObject* po = (_priv_Quartz_GraphicsPathObject*)(m_platformObject.get());
+		GraphicsPathPlatformObject* po = (GraphicsPathPlatformObject*)(m_platformObject.get());
 		if (po) {
 			Rectangle ret;
 			CGRect rc = CGPathGetPathBoundingBox(po->path);
@@ -112,7 +135,7 @@ namespace slib
 
 	sl_bool GraphicsPath::_containsPoint_PO(sl_real x, sl_real y)
 	{
-		_priv_Quartz_GraphicsPathObject* po = (_priv_Quartz_GraphicsPathObject*)(m_platformObject.get());
+		GraphicsPathPlatformObject* po = (GraphicsPathPlatformObject*)(m_platformObject.get());
 		if (po) {
 			CGPoint pt;
 			pt.x = x;
@@ -122,23 +145,10 @@ namespace slib
 		return sl_false;
 	}
 
-	class _priv_GraphicsPath : public GraphicsPath
-	{
-	public:
-		CGPathRef getPlatformPath()
-		{
-			_priv_Quartz_GraphicsPathObject* po = (_priv_Quartz_GraphicsPathObject*)(m_platformObject.get());
-			if (po) {
-				return po->path;
-			}
-			return NULL;
-		}
-	};
-
 	CGPathRef GraphicsPlatform::getGraphicsPath(GraphicsPath* path)
 	{
 		if (path) {
-			return ((_priv_GraphicsPath*)path)->getPlatformPath();
+			return ((GraphicsPathHelper*)path)->getPlatformPath();
 		}
 		return NULL;
 	}

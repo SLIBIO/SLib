@@ -144,6 +144,8 @@ namespace slib
 		void _setTextAlignment_NW(Alignment align);
 
 		void _setTextColor_NW(const Color& color);
+		
+		sl_bool _measureSize_NW(UISize& _out);
 
 		void _setBorder_NW(sl_bool flag) override;
 		

@@ -28,47 +28,57 @@
 namespace slib
 {
 
-	sl_ui_len _g_priv_ui_resource_screenWidth = 0;
-	sl_ui_len _g_priv_ui_resource_screenHeight = 0;
-	sl_ui_len _g_priv_ui_resource_defaultScreenWidth = 0;
-	sl_ui_len _g_priv_ui_resource_defaultScreenHeight = 0;
-	double _g_priv_ui_resource_screenPPI = 0;
-	double _g_priv_ui_resource_defaultScreenPPI = 0;
-	sl_ui_len _g_priv_ui_resource_statusBarHeight = -1;
-	sl_ui_len _g_priv_ui_resource_defaultStatusBarHeight = -1;
-	sl_ui_len _g_priv_ui_resource_safeAreaLeft = -1;
-	sl_ui_len _g_priv_ui_resource_safeAreaTop = -1;
-	sl_ui_len _g_priv_ui_resource_safeAreaRight = -1;
-	sl_ui_len _g_priv_ui_resource_safeAreaBottom = -1;
-	sl_ui_len _g_priv_ui_resource_defaultSafeAreaLeft = -1;
-	sl_ui_len _g_priv_ui_resource_defaultSafeAreaTop = -1;
-	sl_ui_len _g_priv_ui_resource_defaultSafeAreaRight = -1;
-	sl_ui_len _g_priv_ui_resource_defaultSafeAreaBottom = -1;
+	namespace priv
+	{
+		namespace ui_resource
+		{
+
+			sl_ui_len g_screenWidth = 0;
+			sl_ui_len g_screenHeight = 0;
+			sl_ui_len g_defaultScreenWidth = 0;
+			sl_ui_len g_defaultScreenHeight = 0;
+			double g_screenPPI = 0;
+			double g_defaultScreenPPI = 0;
+			sl_ui_len g_statusBarHeight = -1;
+			sl_ui_len g_defaultStatusBarHeight = -1;
+			sl_ui_len g_safeAreaLeft = -1;
+			sl_ui_len g_safeAreaTop = -1;
+			sl_ui_len g_safeAreaRight = -1;
+			sl_ui_len g_safeAreaBottom = -1;
+			sl_ui_len g_defaultSafeAreaLeft = -1;
+			sl_ui_len g_defaultSafeAreaTop = -1;
+			sl_ui_len g_defaultSafeAreaRight = -1;
+			sl_ui_len g_defaultSafeAreaBottom = -1;
+
+		}
+	}
+
+	using namespace priv::ui_resource;
 
 	void UIResource::updateDefaultScreenSize()
 	{
 		UISize size = UI::getScreenSize();
-		_g_priv_ui_resource_defaultScreenWidth = size.x;
-		_g_priv_ui_resource_defaultScreenHeight = size.y;
-		_g_priv_ui_resource_defaultScreenPPI = UI::getScreenPPI();
-		_g_priv_ui_resource_defaultStatusBarHeight = UI::getStatusBarHeight();
+		g_defaultScreenWidth = size.x;
+		g_defaultScreenHeight = size.y;
+		g_defaultScreenPPI = UI::getScreenPPI();
+		g_defaultStatusBarHeight = UI::getStatusBarHeight();
 		UIEdgeInsets insets = UI::getSafeAreaInsets();
-		_g_priv_ui_resource_defaultSafeAreaLeft = insets.left;
-		_g_priv_ui_resource_defaultSafeAreaTop = insets.top;
-		_g_priv_ui_resource_defaultSafeAreaRight = insets.right;
-		_g_priv_ui_resource_defaultSafeAreaBottom = insets.bottom;
+		g_defaultSafeAreaLeft = insets.left;
+		g_defaultSafeAreaTop = insets.top;
+		g_defaultSafeAreaRight = insets.right;
+		g_defaultSafeAreaBottom = insets.bottom;
 		GraphicsResource::setScreenWidth(size.x);
 		GraphicsResource::setScreenHeight(size.y);
 	}
 	
 	sl_ui_len UIResource::getScreenWidth()
 	{
-		sl_ui_len ret = _g_priv_ui_resource_screenWidth;
+		sl_ui_len ret = g_screenWidth;
 		if (ret < 1) {
-			if (_g_priv_ui_resource_defaultScreenWidth < 1) {
+			if (g_defaultScreenWidth < 1) {
 				updateDefaultScreenSize();
 			}
-			ret = _g_priv_ui_resource_defaultScreenWidth;
+			ret = g_defaultScreenWidth;
 			if (ret < 1) {
 				ret = 1;
 			}
@@ -78,17 +88,17 @@ namespace slib
 	
 	void UIResource::setScreenWidth(sl_ui_len width)
 	{
-		_g_priv_ui_resource_screenWidth = width;
+		g_screenWidth = width;
 	}
 	
 	sl_ui_len UIResource::getScreenHeight()
 	{
-		sl_ui_len ret = _g_priv_ui_resource_screenHeight;
+		sl_ui_len ret = g_screenHeight;
 		if (ret < 1) {
-			if (_g_priv_ui_resource_defaultScreenHeight < 1) {
+			if (g_defaultScreenHeight < 1) {
 				updateDefaultScreenSize();
 			}
-			ret = _g_priv_ui_resource_defaultScreenHeight;
+			ret = g_defaultScreenHeight;
 			if (ret < 1) {
 				ret = 1;
 			}
@@ -98,7 +108,7 @@ namespace slib
 	
 	void UIResource::setScreenHeight(sl_ui_len height)
 	{
-		_g_priv_ui_resource_screenHeight = height;
+		g_screenHeight = height;
 	}
 	
 	sl_ui_len UIResource::getScreenMinimum()
@@ -113,12 +123,12 @@ namespace slib
 	
 	double UIResource::getScreenPPI()
 	{
-		double ret = _g_priv_ui_resource_screenPPI;
+		double ret = g_screenPPI;
 		if (ret < 1) {
-			if (_g_priv_ui_resource_defaultScreenPPI < 1) {
+			if (g_defaultScreenPPI < 1) {
 				updateDefaultScreenSize();
 			}
-			ret = _g_priv_ui_resource_defaultScreenPPI;
+			ret = g_defaultScreenPPI;
 			if (ret < 1) {
 				ret = 1;
 			}
@@ -128,17 +138,17 @@ namespace slib
 	
 	void UIResource::setScreenPPI(double ppi)
 	{
-		_g_priv_ui_resource_screenPPI = ppi;
+		g_screenPPI = ppi;
 	}
 	
 	sl_ui_len UIResource::getStatusBarHeight()
 	{
-		sl_ui_len ret = _g_priv_ui_resource_statusBarHeight;
+		sl_ui_len ret = g_statusBarHeight;
 		if (ret < 0) {
-			if (_g_priv_ui_resource_defaultStatusBarHeight < 0) {
+			if (g_defaultStatusBarHeight < 0) {
 				updateDefaultScreenSize();
 			}
-			ret = _g_priv_ui_resource_defaultStatusBarHeight;
+			ret = g_defaultStatusBarHeight;
 			if (ret < 0) {
 				ret = 0;
 			}
@@ -148,17 +158,17 @@ namespace slib
 	
 	void UIResource::setStatusBarHeight(sl_ui_len height)
 	{
-		_g_priv_ui_resource_statusBarHeight = height;
+		g_statusBarHeight = height;
 	}
 	
 	sl_ui_len UIResource::getSafeAreaInsetLeft()
 	{
-		sl_ui_len ret = _g_priv_ui_resource_safeAreaLeft;
+		sl_ui_len ret = g_safeAreaLeft;
 		if (ret < 0) {
-			if (_g_priv_ui_resource_defaultSafeAreaLeft < 0) {
+			if (g_defaultSafeAreaLeft < 0) {
 				updateDefaultScreenSize();
 			}
-			ret = _g_priv_ui_resource_defaultSafeAreaLeft;
+			ret = g_defaultSafeAreaLeft;
 			if (ret < 0) {
 				ret = 0;
 			}
@@ -168,17 +178,17 @@ namespace slib
 	
 	void UIResource::setSafeAreaInsetLeft(sl_ui_len left)
 	{
-		_g_priv_ui_resource_safeAreaLeft = left;
+		g_safeAreaLeft = left;
 	}
 	
 	sl_ui_len UIResource::getSafeAreaInsetTop()
 	{
-		sl_ui_len ret = _g_priv_ui_resource_safeAreaTop;
+		sl_ui_len ret = g_safeAreaTop;
 		if (ret < 0) {
-			if (_g_priv_ui_resource_defaultSafeAreaTop < 0) {
+			if (g_defaultSafeAreaTop < 0) {
 				updateDefaultScreenSize();
 			}
-			ret = _g_priv_ui_resource_defaultSafeAreaTop;
+			ret = g_defaultSafeAreaTop;
 			if (ret < 0) {
 				ret = 0;
 			}
@@ -188,17 +198,17 @@ namespace slib
 	
 	void UIResource::setSafeAreaInsetTop(sl_ui_len top)
 	{
-		_g_priv_ui_resource_safeAreaTop = top;
+		g_safeAreaTop = top;
 	}
 	
 	sl_ui_len UIResource::getSafeAreaInsetRight()
 	{
-		sl_ui_len ret = _g_priv_ui_resource_safeAreaRight;
+		sl_ui_len ret = g_safeAreaRight;
 		if (ret < 0) {
-			if (_g_priv_ui_resource_defaultSafeAreaRight < 0) {
+			if (g_defaultSafeAreaRight < 0) {
 				updateDefaultScreenSize();
 			}
-			ret = _g_priv_ui_resource_defaultSafeAreaRight;
+			ret = g_defaultSafeAreaRight;
 			if (ret < 0) {
 				ret = 0;
 			}
@@ -208,17 +218,17 @@ namespace slib
 	
 	void UIResource::setSafeAreaInsetRight(sl_ui_len right)
 	{
-		_g_priv_ui_resource_safeAreaRight = right;
+		g_safeAreaRight = right;
 	}
 	
 	sl_ui_len UIResource::getSafeAreaInsetBottom()
 	{
-		sl_ui_len ret = _g_priv_ui_resource_safeAreaBottom;
+		sl_ui_len ret = g_safeAreaBottom;
 		if (ret < 0) {
-			if (_g_priv_ui_resource_defaultSafeAreaBottom < 0) {
+			if (g_defaultSafeAreaBottom < 0) {
 				updateDefaultScreenSize();
 			}
-			ret = _g_priv_ui_resource_defaultSafeAreaBottom;
+			ret = g_defaultSafeAreaBottom;
 			if (ret < 0) {
 				ret = 0;
 			}
@@ -228,7 +238,7 @@ namespace slib
 	
 	void UIResource::setSafeAreaInsetBottom(sl_ui_len bottom)
 	{
-		_g_priv_ui_resource_safeAreaBottom = bottom;
+		g_safeAreaBottom = bottom;
 	}
 	
 	sl_ui_len UIResource::getSafeAreaWidth()

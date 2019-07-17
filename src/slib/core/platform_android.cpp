@@ -32,35 +32,45 @@
 namespace slib
 {
 
-	SLIB_JNI_BEGIN_CLASS(JAndroid, "slib/platform/android/Android")
-		SLIB_JNI_STATIC_METHOD(finishActivity, "finishActivity", "(Landroid/app/Activity;)V")
-		SLIB_JNI_STATIC_METHOD(openAsset, "openAsset", "(Landroid/app/Activity;Ljava/lang/String;)Ljava/io/InputStream;")
-		SLIB_JNI_STATIC_METHOD(showKeyboard, "showKeyboard", "(Landroid/app/Activity;)V")
-		SLIB_JNI_STATIC_METHOD(dismissKeyboard, "dismissKeyboard", "(Landroid/app/Activity;)V")
-		SLIB_JNI_STATIC_METHOD(sendFile, "sendFile", "(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V")
-	SLIB_JNI_END_CLASS
+	namespace priv
+	{
+		namespace android
+		{
+
+			SLIB_JNI_BEGIN_CLASS(JAndroid, "slib/platform/android/Android")
+				SLIB_JNI_STATIC_METHOD(finishActivity, "finishActivity", "(Landroid/app/Activity;)V")
+				SLIB_JNI_STATIC_METHOD(openAsset, "openAsset", "(Landroid/app/Activity;Ljava/lang/String;)Ljava/io/InputStream;")
+				SLIB_JNI_STATIC_METHOD(showKeyboard, "showKeyboard", "(Landroid/app/Activity;)V")
+				SLIB_JNI_STATIC_METHOD(dismissKeyboard, "dismissKeyboard", "(Landroid/app/Activity;)V")
+				SLIB_JNI_STATIC_METHOD(sendFile, "sendFile", "(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V")
+			SLIB_JNI_END_CLASS
+
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicJniGlobal<jobject>, g_activityCurrent);
+
+		}
+	}
+
+	using namespace priv::android;
 
 	void Android::initialize(JavaVM* jvm)
 	{
 		Jni::initialize(jvm);
 	}
 
-	SLIB_STATIC_ZERO_INITIALIZED(AtomicJniGlobal<jobject>, _g_android_current_activity);
-
 	jobject Android::getCurrentActivity()
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_android_current_activity)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_activityCurrent)) {
 			return 0;
 		}
-		return _g_android_current_activity.get();
+		return g_activityCurrent.get();
 	}
 
 	void Android::setCurrentActivity(jobject activity)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(_g_android_current_activity)) {
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_activityCurrent)) {
 			return;
 		}
-		_g_android_current_activity = activity;
+		g_activityCurrent = activity;
 	}
 
 	void Android::finishActivity()

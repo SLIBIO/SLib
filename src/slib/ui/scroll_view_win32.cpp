@@ -35,98 +35,108 @@
 namespace slib
 {
 
-	class _priv_ScrollView : public ScrollView
+	namespace priv
 	{
-	public:
-		friend class _priv_Win32_ScrollViewInstance;
-	};
-		
-	class _priv_Win32_ScrollViewInstance : public Win32_ViewInstance
-	{
-	public:
-		Color m_backgroundColor;
-
-	public:
-		sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
+		namespace scroll_view
 		{
-			HWND handle = getHandle();
-			Ref<View> view = getView();
-			if (_priv_ScrollView* sv = CastInstance<_priv_ScrollView>(view.get())) {
-				sl_bool flagUpdateScroll = sl_false;
-				if (sv->isHorizontalScrolling()) {
-					if (Windows::processWindowHorizontalScrollEvents(handle, msg, wParam, lParam, PRIV_SCROLL_LINE_SIZE, PRIV_SCROLL_WHEEL_SIZE)) {
-						flagUpdateScroll = sl_true;
+
+			class ScrollViewHelper : public ScrollView
+			{
+			public:
+				friend class ScrollViewInstance;
+			};
+				
+			class ScrollViewInstance : public Win32_ViewInstance
+			{
+			public:
+				Color m_backgroundColor;
+
+			public:
+				sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
+				{
+					HWND handle = getHandle();
+					Ref<View> view = getView();
+					if (ScrollViewHelper* sv = CastInstance<ScrollViewHelper>(view.get())) {
+						sl_bool flagUpdateScroll = sl_false;
+						if (sv->isHorizontalScrolling()) {
+							if (Windows::processWindowHorizontalScrollEvents(handle, msg, wParam, lParam, PRIV_SCROLL_LINE_SIZE, PRIV_SCROLL_WHEEL_SIZE)) {
+								flagUpdateScroll = sl_true;
+							}
+						}
+						if (sv->isVerticalScrolling()) {
+							if (Windows::processWindowVerticalScrollEvents(handle, msg, wParam, lParam, PRIV_SCROLL_LINE_SIZE, PRIV_SCROLL_WHEEL_SIZE)) {
+								flagUpdateScroll = sl_true;
+							}
+						}
+						if (flagUpdateScroll) {
+							SCROLLINFO si;
+							Base::zeroMemory(&si, sizeof(si));
+							si.cbSize = sizeof(si);
+							si.fMask = SIF_POS;
+							::GetScrollInfo(handle, SB_HORZ, &si);
+							int x = si.nPos;
+							::GetScrollInfo(handle, SB_VERT, &si);
+							int y = si.nPos;
+							_refreshContentPosition(sv, (sl_scroll_pos)x, (sl_scroll_pos)y, sl_true);
+							result = 0;
+							return sl_true;
+						}
+					}
+					return Win32_ViewInstance::processWindowMessage(msg, wParam, lParam, result);
+				}
+
+				void _setContentView(const Ref<View>& viewChild, ScrollViewHelper* viewParent)
+				{
+					_refreshContentSize(viewParent);
+				}
+
+				void _refreshContentSize(ScrollViewHelper* view)
+				{
+					HWND handle = getHandle();
+					if (handle) {
+						Sizei sizeContent = view->getContentSize();
+						Sizei sizeParent = view->getSize();
+						if (view->isHorizontalScrolling()) {
+							Windows::setWindowHorizontalScrollParam(handle, 0, sizeContent.x - 1, sizeParent.x);
+						}
+						if (view->isVerticalScrolling()) {
+							Windows::setWindowVerticalScrollParam(handle, 0, sizeContent.y - 1, sizeParent.y);
+						}
+						_refreshContentPosition(view, view->getScrollX(), view->getScrollY(), sl_false);
 					}
 				}
-				if (sv->isVerticalScrolling()) {
-					if (Windows::processWindowVerticalScrollEvents(handle, msg, wParam, lParam, PRIV_SCROLL_LINE_SIZE, PRIV_SCROLL_WHEEL_SIZE)) {
-						flagUpdateScroll = sl_true;
+
+				void _refreshContentPosition(ScrollViewHelper* view, sl_scroll_pos x, sl_scroll_pos y, sl_bool flagFromEvent)
+				{
+					HWND handle = getHandle();
+					if (handle) {
+						Ref<View> viewContent = view->getContentView();
+						if (viewContent.isNotNull()) {
+							viewContent->setLocation((sl_ui_pos)(-x), (sl_ui_pos)(-y), UIUpdateMode::Redraw);
+						}
+						if (flagFromEvent) {
+							view->_onScroll_NW(x, y);
+						}
 					}
 				}
-				if (flagUpdateScroll) {
+
+				static void _scrollTo(HWND handle, sl_scroll_pos x, sl_scroll_pos y)
+				{
 					SCROLLINFO si;
 					Base::zeroMemory(&si, sizeof(si));
 					si.cbSize = sizeof(si);
 					si.fMask = SIF_POS;
-					::GetScrollInfo(handle, SB_HORZ, &si);
-					int x = si.nPos;
-					::GetScrollInfo(handle, SB_VERT, &si);
-					int y = si.nPos;
-					_refreshContentPosition(sv, (sl_scroll_pos)x, (sl_scroll_pos)y, sl_true);
-					result = 0;
-					return sl_true;
+					si.nPos = (int)x;
+					::SetScrollInfo(handle, SB_HORZ, &si, TRUE);
+					si.nPos = (int)y;
+					::SetScrollInfo(handle, SB_VERT, &si, TRUE);
 				}
-			}
-			return Win32_ViewInstance::processWindowMessage(msg, wParam, lParam, result);
+			};
+			
 		}
+	}
 
-		void _setContentView(const Ref<View>& viewChild, _priv_ScrollView* viewParent)
-		{
-			_refreshContentSize(viewParent);
-		}
-
-		void _refreshContentSize(_priv_ScrollView* view)
-		{
-			HWND handle = getHandle();
-			if (handle) {
-				Sizei sizeContent = view->getContentSize();
-				Sizei sizeParent = view->getSize();
-				if (view->isHorizontalScrolling()) {
-					Windows::setWindowHorizontalScrollParam(handle, 0, sizeContent.x - 1, sizeParent.x);
-				}
-				if (view->isVerticalScrolling()) {
-					Windows::setWindowVerticalScrollParam(handle, 0, sizeContent.y - 1, sizeParent.y);
-				}
-				_refreshContentPosition(view, view->getScrollX(), view->getScrollY(), sl_false);
-			}
-		}
-
-		void _refreshContentPosition(_priv_ScrollView* view, sl_scroll_pos x, sl_scroll_pos y, sl_bool flagFromEvent)
-		{
-			HWND handle = getHandle();
-			if (handle) {
-				Ref<View> viewContent = view->getContentView();
-				if (viewContent.isNotNull()) {
-					viewContent->setLocation((sl_ui_pos)(-x), (sl_ui_pos)(-y), UIUpdateMode::Redraw);
-				}
-				if (flagFromEvent) {
-					view->_onScroll_NW(x, y);
-				}
-			}
-		}
-
-		static void _scrollTo(HWND handle, sl_scroll_pos x, sl_scroll_pos y)
-		{
-			SCROLLINFO si;
-			Base::zeroMemory(&si, sizeof(si));
-			si.cbSize = sizeof(si);
-			si.fMask = SIF_POS;
-			si.nPos = (int)x;
-			::SetScrollInfo(handle, SB_HORZ, &si, TRUE);
-			si.nPos = (int)y;
-			::SetScrollInfo(handle, SB_VERT, &si, TRUE);
-		}
-	};
+	using namespace priv::scroll_view;
 
 	Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* parent)
 	{
@@ -148,10 +158,10 @@ namespace slib
 		if (isBorder()) {
 			style |= WS_BORDER;
 		}
-		Ref<_priv_Win32_ScrollViewInstance> ret = Win32_ViewInstance::create<_priv_Win32_ScrollViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
+		Ref<ScrollViewInstance> ret = Win32_ViewInstance::create<ScrollViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
 		if (ret.isNotNull()) {
-			ret->_setContentView(m_viewContent, (_priv_ScrollView*)this);
-			_priv_Win32_ScrollViewInstance::_scrollTo(ret->getHandle(), getScrollX(), getScrollY());
+			ret->_setContentView(m_viewContent, (ScrollViewHelper*)this);
+			ScrollViewInstance::_scrollTo(ret->getHandle(), getScrollX(), getScrollY());
 			ret->m_backgroundColor = getBackgroundColor();
 		}
 		return ret;
@@ -160,16 +170,16 @@ namespace slib
 	void ScrollView::_refreshContentSize_NW()
 	{
 		Ref<ViewInstance> instance = getViewInstance();
-		if (_priv_Win32_ScrollViewInstance* _instance = CastInstance<_priv_Win32_ScrollViewInstance>(instance.get())) {
-			_instance->_refreshContentSize((_priv_ScrollView*)this);
+		if (ScrollViewInstance* _instance = CastInstance<ScrollViewInstance>(instance.get())) {
+			_instance->_refreshContentSize((ScrollViewHelper*)this);
 		}
 	}
 
 	void ScrollView::_setContentView_NW(const Ref<View>& view)
 	{
 		Ref<ViewInstance> instance = getViewInstance();
-		if (_priv_Win32_ScrollViewInstance* _instance = CastInstance<_priv_Win32_ScrollViewInstance>(instance.get())) {
-			_instance->_setContentView(view, (_priv_ScrollView*)this);
+		if (ScrollViewInstance* _instance = CastInstance<ScrollViewInstance>(instance.get())) {
+			_instance->_setContentView(view, (ScrollViewHelper*)this);
 		}
 	}
 
@@ -177,10 +187,10 @@ namespace slib
 	{
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
-			_priv_Win32_ScrollViewInstance::_scrollTo(handle, x, y);
+			ScrollViewInstance::_scrollTo(handle, x, y);
 			Ref<ViewInstance> instance = getViewInstance();
-			if (_priv_Win32_ScrollViewInstance* _instance = CastInstance<_priv_Win32_ScrollViewInstance>(instance.get())) {
-				_instance->_refreshContentPosition((_priv_ScrollView*)this, x, y, sl_false);
+			if (ScrollViewInstance* _instance = CastInstance<ScrollViewInstance>(instance.get())) {
+				_instance->_refreshContentPosition((ScrollViewHelper*)this, x, y, sl_false);
 			}
 		}
 	}
@@ -254,7 +264,7 @@ namespace slib
 	void ScrollView::_setBackgroundColor_NW(const Color& color)
 	{
 		Ref<ViewInstance> instance = getViewInstance();
-		if (_priv_Win32_ScrollViewInstance* _instance = CastInstance<_priv_Win32_ScrollViewInstance>(instance.get())) {
+		if (ScrollViewInstance* _instance = CastInstance<ScrollViewInstance>(instance.get())) {
 			_instance->m_backgroundColor = color;
 		}
 	}

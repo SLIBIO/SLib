@@ -28,120 +28,130 @@
 
 #include "view_macos.h"
 
-@interface _priv_Slib_macOS_TabView : NSTabView<NSTabViewDelegate> {
-	
-	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
-	
+@interface SLIBTabViewHandle : NSTabView<NSTabViewDelegate>
+{	
+	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;	
 }
 @end
 
-@interface _priv_Slib_macOS_TabView_EmptyView : NSView {
+@interface SLIBTabViewHandle_EmptyView : NSView
+{
 }
 @end
 
 namespace slib
 {
 
-	class _priv_TabView : public TabView
+	namespace priv
 	{
-	public:
-		void _applyTabsCount(NSTabView* tv)
+		namespace tab_view
 		{
-			ObjectLocker lock(this);
-			sl_uint32 nNew = (sl_uint32)(m_items.getCount());
-			sl_uint32 nOrig = (sl_uint32)([tv numberOfTabViewItems]);
-			if (nOrig == nNew) {
-				return;
-			}
-			if (nOrig > nNew) {
-				for (sl_uint32 i = nOrig; i > nNew; i--) {
-					NSTabViewItem* item = [tv tabViewItemAtIndex:(i - 1)];
-					if (item != nil) {
-						[tv removeTabViewItem:item];
+
+			class TabViewHelper : public TabView
+			{
+			public:
+				void _applyTabsCount(NSTabView* tv)
+				{
+					ObjectLocker lock(this);
+					sl_uint32 nNew = (sl_uint32)(m_items.getCount());
+					sl_uint32 nOrig = (sl_uint32)([tv numberOfTabViewItems]);
+					if (nOrig == nNew) {
+						return;
+					}
+					if (nOrig > nNew) {
+						for (sl_uint32 i = nOrig; i > nNew; i--) {
+							NSTabViewItem* item = [tv tabViewItemAtIndex:(i - 1)];
+							if (item != nil) {
+								[tv removeTabViewItem:item];
+							}
+						}
+					} else {
+						for (sl_uint32 i = nOrig; i < nNew; i++) {
+							NSTabViewItem* item = [[NSTabViewItem alloc] initWithIdentifier:[NSString stringWithFormat:@"%d",i]];
+							if (item != nil) {
+								[tv addTabViewItem:item];
+							}
+						}
 					}
 				}
-			} else {
-				for (sl_uint32 i = nOrig; i < nNew; i++) {
-					NSTabViewItem* item = [[NSTabViewItem alloc] initWithIdentifier:[NSString stringWithFormat:@"%d",i]];
-					if (item != nil) {
-						[tv addTabViewItem:item];
+				
+				void _copyTabs(NSTabView* tv)
+				{
+					ListLocker<TabViewItem> items(m_items);
+					_applyTabsCount(tv);
+					for (sl_uint32 i = 0; i < items.count; i++) {
+						NSTabViewItem* t = [tv tabViewItemAtIndex:i];
+						if (t != nil) {
+							[t setLabel:Apple::getNSStringFromString(items[i].label)];
+							_setTabContentView(tv, i, items[i].contentView);
+						}
+					}
+					if ([tv numberOfTabViewItems] > 0) {
+						[tv selectTabViewItemAtIndex:m_indexSelected];
 					}
 				}
-			}
-		}
-		
-		void _copyTabs(NSTabView* tv)
-		{
-			ListLocker<TabViewItem> items(m_items);
-			_applyTabsCount(tv);
-			for (sl_uint32 i = 0; i < items.count; i++) {
-				NSTabViewItem* t = [tv tabViewItemAtIndex:i];
-				if (t != nil) {
-					[t setLabel:Apple::getNSStringFromString(items[i].label)];
-					_setTabContentView(tv, i, items[i].contentView);
+				
+				void _setTabContentView(NSTabView* tv, sl_uint32 index, const Ref<View>& view)
+				{
+					NSTabViewItem* item = [tv tabViewItemAtIndex:index];
+					if (item == nil) {
+						return;
+					}
+					NSView* handle = nil;
+					if (view.isNotNull()) {
+						Ref<ViewInstance> instance = view->attachToNewInstance(Ref<ViewInstance>::null());
+						if (instance.isNotNull()) {
+							handle = UIPlatform::getViewHandle(instance.get());
+						}
+						NSRect rc = [tv contentRect];
+						view->setFrame((sl_ui_pos)(rc.origin.x), (sl_ui_pos)(rc.origin.y), (sl_ui_pos)(rc.size.width), (sl_ui_pos)(rc.size.height));
+						view->setParent(this);
+					}
+					if (handle == nil) {
+						handle = [[SLIBTabViewHandle_EmptyView alloc] init];
+					}
+					[handle setHidden:NO];
+					[item setView:handle];
 				}
-			}
-			if ([tv numberOfTabViewItems] > 0) {
-				[tv selectTabViewItemAtIndex:m_indexSelected];
-			}
-		}
-		
-		void _setTabContentView(NSTabView* tv, sl_uint32 index, const Ref<View>& view)
-		{
-			NSTabViewItem* item = [tv tabViewItemAtIndex:index];
-			if (item == nil) {
-				return;
-			}
-			NSView* handle = nil;
-			if (view.isNotNull()) {
-				Ref<ViewInstance> instance = view->attachToNewInstance(Ref<ViewInstance>::null());
-				if (instance.isNotNull()) {
-					handle = UIPlatform::getViewHandle(instance.get());
+				
+				void _onSelectTab(NSTabView* tv)
+				{
+					dispatchSelectTab((sl_uint32)([tv indexOfTabViewItem:[tv selectedTabViewItem]]));
 				}
-				NSRect rc = [tv contentRect];
-				view->setFrame((sl_ui_pos)(rc.origin.x), (sl_ui_pos)(rc.origin.y), (sl_ui_pos)(rc.size.width), (sl_ui_pos)(rc.size.height));
-				view->setParent(this);
-			}
-			if (handle == nil) {
-				handle = [[_priv_Slib_macOS_TabView_EmptyView alloc] init];
-			}
-			[handle setHidden:NO];
-			[item setView:handle];
-		}
-		
-		void _onSelectTab(NSTabView* tv)
-		{
-			dispatchSelectTab((sl_uint32)([tv indexOfTabViewItem:[tv selectedTabViewItem]]));
-		}
-		
-		void _updateContentViewSize(_priv_Slib_macOS_TabView* tv)
-		{
-			NSRect rc = [tv contentRect];
-			UIRect frame;
-			sl_ui_pos w = (sl_ui_pos)(rc.size.width);
-			sl_ui_pos h = (sl_ui_pos)(rc.size.height);
-			frame.left = (sl_ui_pos)(rc.origin.x);
-			frame.top = (sl_ui_pos)(rc.origin.y);
-			frame.right = frame.left + w;
-			frame.bottom = frame.top + h;
-			ListLocker<TabViewItem> items(m_items);
-			for (sl_size i = 0; i < items.count; i++) {
-				Ref<View> view = items[i].contentView;
-				if (view.isNotNull()) {
-					view->setFrame(frame);
+				
+				void _updateContentViewSize(SLIBTabViewHandle* tv)
+				{
+					NSRect rc = [tv contentRect];
+					UIRect frame;
+					sl_ui_pos w = (sl_ui_pos)(rc.size.width);
+					sl_ui_pos h = (sl_ui_pos)(rc.size.height);
+					frame.left = (sl_ui_pos)(rc.origin.x);
+					frame.top = (sl_ui_pos)(rc.origin.y);
+					frame.right = frame.left + w;
+					frame.bottom = frame.top + h;
+					ListLocker<TabViewItem> items(m_items);
+					for (sl_size i = 0; i < items.count; i++) {
+						Ref<View> view = items[i].contentView;
+						if (view.isNotNull()) {
+							view->setFrame(frame);
+						}
+					}
 				}
-			}
+			};
+
 		}
-	};
+	}
+
+	using namespace priv::tab_view;
 
 	Ref<ViewInstance> TabView::createNativeWidget(ViewInstance* _parent)
 	{
 		ObjectLocker lock(this);
 		MACOS_VIEW_CREATE_INSTANCE_BEGIN
-		_priv_Slib_macOS_TabView* handle = [[_priv_Slib_macOS_TabView alloc] initWithFrame: frame];
+		SLIBTabViewHandle* handle = [[SLIBTabViewHandle alloc] initWithFrame: frame];
 		if (handle != nil) {
 			[handle setDelegate:handle];
-			((_priv_TabView*)this)->_copyTabs(handle);
+			((TabViewHelper*)this)->_copyTabs(handle);
 			
 			Ref<Font> font = getFont();
 			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
@@ -154,9 +164,9 @@ namespace slib
 	void TabView::_refreshTabsCount_NW()
 	{
 		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_priv_Slib_macOS_TabView class]]) {
-			_priv_Slib_macOS_TabView* tv = (_priv_Slib_macOS_TabView*)handle;
-			((_priv_TabView*)this)->_applyTabsCount(tv);
+		if (handle != nil && [handle isKindOfClass:[SLIBTabViewHandle class]]) {
+			SLIBTabViewHandle* tv = (SLIBTabViewHandle*)handle;
+			((TabViewHelper*)this)->_applyTabsCount(tv);
 		}
 	}
 
@@ -179,9 +189,9 @@ namespace slib
 	void TabView::_setTabContentView_NW(sl_uint32 index, const Ref<View>& view)
 	{
 		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[_priv_Slib_macOS_TabView class]]) {
-			_priv_Slib_macOS_TabView* tv = (_priv_Slib_macOS_TabView*)handle;
-			((_priv_TabView*)this)->_setTabContentView(tv, index, view);
+		if (handle != nil && [handle isKindOfClass:[SLIBTabViewHandle class]]) {
+			SLIBTabViewHandle* tv = (SLIBTabViewHandle*)handle;
+			((TabViewHelper*)this)->_setTabContentView(tv, index, view);
 		}
 	}
 
@@ -220,7 +230,10 @@ namespace slib
 
 }
 
-@implementation _priv_Slib_macOS_TabView
+using namespace slib;
+using namespace slib::priv::tab_view;
+
+@implementation SLIBTabViewHandle
 
 MACOS_VIEW_DEFINE_ON_FOCUS
 MACOS_VIEW_DEFINE_ON_KEY
@@ -236,10 +249,10 @@ MACOS_VIEW_DEFINE_ON_KEY
 -(void)setFrame:(NSRect)frame
 {
 	[super setFrame:frame];
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::Ref<slib::View> view = instance->getView();
-		if (slib::_priv_TabView* _view = slib::CastInstance<slib::_priv_TabView>(view.get())) {
+		Ref<View> view = instance->getView();
+		if (TabViewHelper* _view = CastInstance<TabViewHelper>(view.get())) {
 			_view->_updateContentViewSize(self);
 		}
 	}
@@ -247,17 +260,17 @@ MACOS_VIEW_DEFINE_ON_KEY
 
 - (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
-	slib::Ref<slib::macOS_ViewInstance> instance = m_viewInstance;
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::Ref<slib::View> view = instance->getView();
-		if (slib::_priv_TabView* _view = slib::CastInstance<slib::_priv_TabView>(view.get())) {
+		Ref<View> view = instance->getView();
+		if (TabViewHelper* _view = CastInstance<TabViewHelper>(view.get())) {
 			_view->_onSelectTab(self);
 		}
 	}
 }
 @end
 
-@implementation _priv_Slib_macOS_TabView_EmptyView
+@implementation SLIBTabViewHandle_EmptyView
 
 @end
 

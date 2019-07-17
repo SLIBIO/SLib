@@ -27,49 +27,59 @@
 
 namespace slib
 {
-	
-	SLIB_DEFINE_OBJECT(Slider, ProgressBar)
-	
-	class _priv_Slider_Static
+
+	namespace priv
 	{
-	public:
-		Ref<Drawable> defaultTrack;
-		Ref<Drawable> defaultProgress;
-		Ref<Drawable> defaultProgress2;
-		Ref<Drawable> defaultThumb;
-		Ref<Drawable> defaultPressedThumb;
-		Ref<Drawable> defaultHoverThumb;
-		
-		_priv_Slider_Static()
+		namespace slider
 		{
-			defaultTrack = ColorDrawable::create(Color(0, 0, 0));
-			defaultProgress = ColorDrawable::create(Color(0, 50, 250));
-			defaultProgress2 = ColorDrawable::create(Color(0, 250, 50));
-			defaultThumb = ColorDrawable::create(Color(50, 50, 50, 255));
-			defaultPressedThumb = ColorDrawable::create(Color(0, 100, 250, 255));
-			defaultHoverThumb = ColorDrawable::create(Color(0, 200, 150, 255));
-		}
-	};
-	
-	SLIB_SAFE_STATIC_GETTER(_priv_Slider_Static, _priv_Slider_getStatic)
-	
-	static Ref<Drawable> const& _priv_Slider_resolveDrawable(const Ref<Drawable>& drawableOriginal, const Ref<Drawable>& drawableCommon, const Ref<Drawable>& drawableShared)
-	{
-		if (drawableOriginal.isNotNull()) {
-			return drawableOriginal;
-		}
-		if (drawableCommon.isNotNull()) {
-			if (drawableCommon->isColor()) {
-				return drawableShared;
+
+			class StaticContext
+			{
+			public:
+				Ref<Drawable> defaultTrack;
+				Ref<Drawable> defaultProgress;
+				Ref<Drawable> defaultProgress2;
+				Ref<Drawable> defaultThumb;
+				Ref<Drawable> defaultPressedThumb;
+				Ref<Drawable> defaultHoverThumb;
+				
+				StaticContext()
+				{
+					defaultTrack = ColorDrawable::create(Color(0, 0, 0));
+					defaultProgress = ColorDrawable::create(Color(0, 50, 250));
+					defaultProgress2 = ColorDrawable::create(Color(0, 250, 50));
+					defaultThumb = ColorDrawable::create(Color(50, 50, 50, 255));
+					defaultPressedThumb = ColorDrawable::create(Color(0, 100, 250, 255));
+					defaultHoverThumb = ColorDrawable::create(Color(0, 200, 150, 255));
+				}
+			};
+			
+			SLIB_SAFE_STATIC_GETTER(StaticContext, GetStaticContext)
+			
+			static Ref<Drawable> const& ResolveDrawable(const Ref<Drawable>& drawableOriginal, const Ref<Drawable>& drawableCommon, const Ref<Drawable>& drawableShared)
+			{
+				if (drawableOriginal.isNotNull()) {
+					return drawableOriginal;
+				}
+				if (drawableCommon.isNotNull()) {
+					if (drawableCommon->isColor()) {
+						return drawableShared;
+					}
+					return drawableCommon;
+				}
+				return Ref<Drawable>::null();
 			}
-			return drawableCommon;
+
 		}
-		return Ref<Drawable>::null();
 	}
+
+	using namespace priv::slider;
+
+	SLIB_DEFINE_OBJECT(Slider, ProgressBar)
 	
 	Slider::Slider(LayoutOrientation orientation) : ProgressBar(orientation)
 	{		
-		_priv_Slider_Static* s = _priv_Slider_getStatic();
+		StaticContext* s = GetStaticContext();
 		if (s) {
 			m_track = s->defaultTrack;
 			m_progress = s->defaultProgress;
@@ -197,7 +207,7 @@ namespace slib
 
 	void Slider::onDraw(Canvas* canvas)
 	{
-		_priv_Slider_Static* s = _priv_Slider_getStatic();
+		StaticContext* s = GetStaticContext();
 		if (!s) {
 			return;
 		}
@@ -205,9 +215,9 @@ namespace slib
 		Ref<Drawable> progress2 = m_progress2;
 		Ref<Drawable> thumb;
 		if (m_indexPressedThumb == 0) {
-			thumb = _priv_Slider_resolveDrawable(m_pressedThumb, m_thumb, s->defaultPressedThumb);
+			thumb = ResolveDrawable(m_pressedThumb, m_thumb, s->defaultPressedThumb);
 		} else if (m_indexHoverThumb == 0) {
-			thumb = _priv_Slider_resolveDrawable(m_hoverThumb, m_thumb, s->defaultHoverThumb);
+			thumb = ResolveDrawable(m_hoverThumb, m_thumb, s->defaultHoverThumb);
 		}
 		if (thumb.isNull()) {
 			thumb = m_thumb;
@@ -230,9 +240,9 @@ namespace slib
 		if (isDualValues() && rcThumb2.isValidSize()) {
 			Ref<Drawable> thumb2;
 			if (m_indexPressedThumb == 1) {
-				thumb2 = _priv_Slider_resolveDrawable(m_pressedThumb, m_thumb, s->defaultPressedThumb);
+				thumb2 = ResolveDrawable(m_pressedThumb, m_thumb, s->defaultPressedThumb);
 			} else if (m_indexHoverThumb == 1) {
-				thumb2 = _priv_Slider_resolveDrawable(m_hoverThumb, m_thumb, s->defaultHoverThumb);
+				thumb2 = ResolveDrawable(m_hoverThumb, m_thumb, s->defaultHoverThumb);
 			}
 			if (thumb2.isNull()) {
 				thumb2 = m_thumb;

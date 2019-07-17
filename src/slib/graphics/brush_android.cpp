@@ -31,60 +31,70 @@
 namespace slib
 {
 
-	SLIB_JNI_BEGIN_CLASS(JAndroidBrush, "slib/platform/android/ui/UiBrush")
-		SLIB_JNI_NEW(init, "()V");
-		SLIB_JNI_INT_FIELD(style);
-		SLIB_JNI_INT_FIELD(color);
-	SLIB_JNI_END_CLASS
-
-	class Android_BrushObject : public Referable
+	namespace priv
 	{
-	public:
-		JniGlobal<jobject> m_brush;
-
-	public:
-		Android_BrushObject(const BrushDesc& desc)
+		namespace android
 		{
-			JniLocal<jobject> jbrush = JAndroidBrush::init.newObject(sl_null);
-			if (jbrush.isNotNull()) {
-				JniGlobal<jobject> gbrush = jbrush;
-				if (gbrush.isNotNull()) {
-					JAndroidBrush::color.set(jbrush, desc.color.getARGB());
-					JAndroidBrush::style.set(jbrush, (int)(desc.style));
-					m_brush = gbrush;
+
+			SLIB_JNI_BEGIN_CLASS(JBrush, "slib/platform/android/ui/UiBrush")
+				SLIB_JNI_NEW(init, "()V");
+				SLIB_JNI_INT_FIELD(style);
+				SLIB_JNI_INT_FIELD(color);
+			SLIB_JNI_END_CLASS
+
+			class BrushPlatformObject : public Referable
+			{
+			public:
+				JniGlobal<jobject> m_brush;
+
+			public:
+				BrushPlatformObject(const BrushDesc& desc)
+				{
+					JniLocal<jobject> jbrush = JBrush::init.newObject(sl_null);
+					if (jbrush.isNotNull()) {
+						JniGlobal<jobject> gbrush = jbrush;
+						if (gbrush.isNotNull()) {
+							JBrush::color.set(jbrush, desc.color.getARGB());
+							JBrush::style.set(jbrush, (int)(desc.style));
+							m_brush = gbrush;
+						}
+					}
 				}
-			}
-		}
-	};
+			};
 
-	class Brush_Ext : public Brush
-	{
-	public:
-		Android_BrushObject* getPlatformObject()
-		{
-			if (m_platformObject.isNull()) {
-				SpinLocker lock(&m_lock);
-				if (m_platformObject.isNull()) {
-					m_platformObject = new Android_BrushObject(m_desc);
+			class BrushHelper : public Brush
+			{
+			public:
+				BrushPlatformObject* getPlatformObject()
+				{
+					if (m_platformObject.isNull()) {
+						SpinLocker lock(&m_lock);
+						if (m_platformObject.isNull()) {
+							m_platformObject = new BrushPlatformObject(m_desc);
+						}
+					}
+					return (BrushPlatformObject*)(m_platformObject.get());;
 				}
-			}
-			return (Android_BrushObject*)(m_platformObject.get());;
-		}
 
-		jobject getPlatformHandle()
-		{
-			Android_BrushObject* po = getPlatformObject();
-			if (po) {
-				return po->m_brush.get();
-			}
-			return 0;
+				jobject getPlatformHandle()
+				{
+					BrushPlatformObject* po = getPlatformObject();
+					if (po) {
+						return po->m_brush.get();
+					}
+					return 0;
+				}
+			};
+
 		}
-	};
+	}
+
+	using namespace priv::android;
 
 	jobject GraphicsPlatform::getBrushHandle(Brush* brush)
 	{
 		if (brush) {
-			return ((Brush_Ext*)brush)->getPlatformHandle();
+			return ((BrushHelper*)brush)->getPlatformHandle();
 		}
 		return 0;
 	}

@@ -44,6 +44,7 @@ namespace slib
 	{
 		namespace render_view
 		{
+
 			class RenderViewInstance : public EFL_ViewInstance
 			{
 			public:
@@ -127,7 +128,6 @@ namespace slib
 
 	using namespace priv::render_view;
 
-
 	Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* parent)
 	{
 		Evas_Object* handleParent = UIPlatform::getViewHandle(parent);
@@ -161,9 +161,7 @@ namespace slib
 				}
 			}
 		}
-
 		return sl_null;
-
 	}
 	
 	void RenderView::_setRedrawMode_NW(RedrawMode mode)

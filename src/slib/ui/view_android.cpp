@@ -57,7 +57,7 @@ namespace slib
 				SLIB_JNI_INT_FIELD(pointerId);
 			SLIB_JNI_END_CLASS
 
-			void JNICALL nativeOnDraw(JNIEnv* env, jobject _this, jlong jinstance, jobject jcanvas, jint left, jint top, jint right, jint bottom)
+			void JNICALL OnDraw(JNIEnv* env, jobject _this, jlong jinstance, jobject jcanvas, jint left, jint top, jint right, jint bottom)
 			{
 				Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
 				if (instance.isNotNull()) {
@@ -69,7 +69,7 @@ namespace slib
 				}
 			}
 
-			jboolean JNICALL nativeOnKeyEvent(JNIEnv* env, jobject _this, jlong jinstance, jboolean flagDown, int keycode, jboolean flagControl, jboolean flagShift, jboolean flagAlt, jboolean flagWin, jlong time, jboolean flagDispatchToParent, jboolean flagNotDispatchToChildren)
+			jboolean JNICALL OnKeyEvent(JNIEnv* env, jobject _this, jlong jinstance, jboolean flagDown, int keycode, jboolean flagControl, jboolean flagShift, jboolean flagAlt, jboolean flagWin, jlong time, jboolean flagDispatchToParent, jboolean flagNotDispatchToChildren)
 			{
 				Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
 				if (instance.isNotNull()) {
@@ -107,7 +107,7 @@ namespace slib
 				return 0;
 			}
 
-			jint JNICALL nativeOnTouchEvent(JNIEnv* env, jobject _this, jlong jinstance, int _action, jobjectArray jpoints, jlong time, jboolean flagDispatchToParent, jboolean flagNotDispatchToChildren)
+			jint JNICALL OnTouchEvent(JNIEnv* env, jobject _this, jlong jinstance, int _action, jobjectArray jpoints, jlong time, jboolean flagDispatchToParent, jboolean flagNotDispatchToChildren)
 			{
 				Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
 				if (instance.isNotNull()) {
@@ -144,7 +144,7 @@ namespace slib
 				return 0;
 			}
 
-			void JNICALL nativeOnSetFocus(JNIEnv* env, jobject _this, jlong jinstance)
+			void JNICALL OnSetFocus(JNIEnv* env, jobject _this, jlong jinstance)
 			{
 				Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
 				if (instance.isNotNull()) {
@@ -152,7 +152,7 @@ namespace slib
 				}
 			}
 
-			void JNICALL nativeOnClick(JNIEnv* env, jobject _this, jlong jinstance)
+			void JNICALL OnClick(JNIEnv* env, jobject _this, jlong jinstance)
 			{
 				Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
 				if (instance.isNotNull()) {
@@ -160,7 +160,7 @@ namespace slib
 				}
 			}
 
-			jboolean JNICALL nativeHitTestTouchEvent(JNIEnv* env, jobject _this, jlong jinstance, int x, int y)
+			jboolean JNICALL HitTestTouchEvent(JNIEnv* env, jobject _this, jlong jinstance, int x, int y)
 			{
 				Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
 				if (instance.isNotNull()) {
@@ -180,7 +180,7 @@ namespace slib
 				return 0;
 			}
 
-			void JNICALL nativeOnSwipe(JNIEnv* env, jobject _this, jlong jinstance, int type)
+			void JNICALL OnSwipe(JNIEnv* env, jobject _this, jlong jinstance, int type)
 			{
 				Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
 				if (instance.isNotNull()) {
@@ -220,13 +220,13 @@ namespace slib
 				SLIB_JNI_STATIC_METHOD(bringToFront, "bringToFront", "(Landroid/view/View;)V");
 				SLIB_JNI_STATIC_METHOD(enableGesture, "enableGesture", "(Landroid/view/View;)V");
 
-				SLIB_JNI_NATIVE(onDraw, "nativeOnDraw", "(JLslib/platform/android/ui/Graphics;IIII)V", nativeOnDraw);
-				SLIB_JNI_NATIVE(onKeyEvent, "nativeOnKeyEvent", "(JZIZZZZJZZ)Z", nativeOnKeyEvent);
-				SLIB_JNI_NATIVE(onTouchEvent, "nativeOnTouchEvent", "(JI[Lslib/platform/android/ui/view/UiTouchPoint;JZZ)I", nativeOnTouchEvent);
-				SLIB_JNI_NATIVE(onSetFocus, "nativeOnSetFocus", "(J)V", nativeOnSetFocus);
-				SLIB_JNI_NATIVE(onClick, "nativeOnClick", "(J)V", nativeOnClick);
-				SLIB_JNI_NATIVE(hitTestTouchEvent, "nativeHitTestTouchEvent", "(JII)Z", nativeHitTestTouchEvent);
-				SLIB_JNI_NATIVE(onSwipe, "nativeOnSwipe", "(JI)V", nativeOnSwipe);
+				SLIB_JNI_NATIVE(onDraw, "nativeOnDraw", "(JLslib/platform/android/ui/Graphics;IIII)V", OnDraw);
+				SLIB_JNI_NATIVE(onKeyEvent, "nativeOnKeyEvent", "(JZIZZZZJZZ)Z", OnKeyEvent);
+				SLIB_JNI_NATIVE(onTouchEvent, "nativeOnTouchEvent", "(JI[Lslib/platform/android/ui/view/UiTouchPoint;JZZ)I", OnTouchEvent);
+				SLIB_JNI_NATIVE(onSetFocus, "nativeOnSetFocus", "(J)V", OnSetFocus);
+				SLIB_JNI_NATIVE(onClick, "nativeOnClick", "(J)V", OnClick);
+				SLIB_JNI_NATIVE(hitTestTouchEvent, "nativeHitTestTouchEvent", "(JII)Z", HitTestTouchEvent);
+				SLIB_JNI_NATIVE(onSwipe, "nativeOnSwipe", "(JI)V", OnSwipe);
 
 			SLIB_JNI_END_CLASS
 

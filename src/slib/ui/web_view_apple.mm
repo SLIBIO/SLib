@@ -40,7 +40,7 @@ typedef slib::macOS_ViewInstance WebViewInstance;
 
 typedef WKWebView OSWebView;
 
-@interface _priv_Slib_Apple_WebView : OSWebView<WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler>
+@interface SLIBWebViewHandle : OSWebView<WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler>
 {
 	@public slib::WeakRef<WebViewInstance> m_viewInstance;
 }
@@ -48,87 +48,98 @@ typedef WKWebView OSWebView;
 
 namespace slib
 {
-	class _priv_WebView : public WebView
+
+	namespace priv
 	{
-	public:
-		void _load(OSWebView* handle)
+		namespace web_view
 		{
-			NSString* strURL = Apple::getNSStringFromString(m_urlOrigin);
-			OSWebView* mainFrame = handle;
-			if (m_flagOfflineContent) {
-				NSString* content = Apple::getNSStringFromString(m_offlineContentHTML);
-				if (strURL == nil || strURL.length == 0) {
-					[mainFrame loadHTMLString:content baseURL:nil];
-				} else {
-					NSURL* url = [NSURL URLWithString:strURL];
-					[mainFrame loadHTMLString:content baseURL:url];
+
+			class WebViewHelper : public WebView
+			{
+			public:
+				void _load(OSWebView* handle)
+				{
+					NSString* strURL = Apple::getNSStringFromString(m_urlOrigin);
+					OSWebView* mainFrame = handle;
+					if (m_flagOfflineContent) {
+						NSString* content = Apple::getNSStringFromString(m_offlineContentHTML);
+						if (strURL == nil || strURL.length == 0) {
+							[mainFrame loadHTMLString:content baseURL:nil];
+						} else {
+							NSURL* url = [NSURL URLWithString:strURL];
+							[mainFrame loadHTMLString:content baseURL:url];
+						}
+					} else {
+						if (strURL == nil || strURL.length == 0) {
+							return;
+						}
+						NSURL* url = [NSURL URLWithString:strURL];
+						NSURLRequest* request = [NSURLRequest requestWithURL:url];
+						[mainFrame loadRequest:request];
+					}
 				}
-			} else {
-				if (strURL == nil || strURL.length == 0) {
-					return;
+				
+				void _applyProperties(OSWebView* handle)
+				{
+		#if defined(SLIB_UI_IS_IOS)
+					handle.scrollView.bounces = NO;
+		#endif
+					[handle setCustomUserAgent:(Apple::getNSStringFromString(m_customUserAgent, nil))];
+					_load(handle);
 				}
-				NSURL* url = [NSURL URLWithString:strURL];
-				NSURLRequest* request = [NSURLRequest requestWithURL:url];
-				[mainFrame loadRequest:request];
-			}
-		}
-		
-		void _applyProperties(OSWebView* handle)
-		{
-#if defined(SLIB_UI_IS_IOS)
-			handle.scrollView.bounces = NO;
-#endif
-			[handle setCustomUserAgent:(Apple::getNSStringFromString(m_customUserAgent, nil))];
-			_load(handle);
-		}
-		
-		void _onStartLoad(OSWebView* handle, NSURL* url)
-		{
-			dispatchStartLoad(Apple::getStringFromNSString(url.absoluteString));
-		}
-		
-		void _onFinishLoad(OSWebView* handle)
-		{
-			dispatchFinishLoad(getURL(), sl_false);
-		}
-		
-		void _onLoadError(OSWebView* handle, NSError* error)
-		{
-			m_lastErrorMessage = Apple::getStringFromNSString([error localizedDescription]);
-			if (error != nil && error.userInfo != nil) {
-				NSString* url = error.userInfo[NSURLErrorFailingURLStringErrorKey];
-				if (url != nil) {
-					dispatchFinishLoad(Apple::getStringFromNSString(url), sl_true);
-					return;
+				
+				void _onStartLoad(OSWebView* handle, NSURL* url)
+				{
+					dispatchStartLoad(Apple::getStringFromNSString(url.absoluteString));
 				}
-			}
-			dispatchFinishLoad(getURL(), sl_true);
+				
+				void _onFinishLoad(OSWebView* handle)
+				{
+					dispatchFinishLoad(getURL(), sl_false);
+				}
+				
+				void _onLoadError(OSWebView* handle, NSError* error)
+				{
+					m_lastErrorMessage = Apple::getStringFromNSString([error localizedDescription]);
+					if (error != nil && error.userInfo != nil) {
+						NSString* url = error.userInfo[NSURLErrorFailingURLStringErrorKey];
+						if (url != nil) {
+							dispatchFinishLoad(Apple::getStringFromNSString(url), sl_true);
+							return;
+						}
+					}
+					dispatchFinishLoad(getURL(), sl_true);
+				}
+				
+				void _onInvokeMethod(OSWebView* handle, id body)
+				{
+					NSString* s = [NSString stringWithFormat:@"%@", body];
+					String msg = Apple::getStringFromNSString(s);
+					String param;
+					sl_reg index = msg.indexOf("::");
+					if (index >= 0) {
+						param = msg.substring(index+2);
+						msg = msg.substring(0, index);
+					}
+					if (msg.isNotEmpty()) {
+						dispatchMessageFromJavaScript(msg, param);
+					}
+				}
+				
+			};
+
 		}
-		
-		void _onInvokeMethod(OSWebView* handle, id body)
-		{
-			NSString* s = [NSString stringWithFormat:@"%@", body];
-			String msg = Apple::getStringFromNSString(s);
-			String param;
-			sl_reg index = msg.indexOf("::");
-			if (index >= 0) {
-				param = msg.substring(index+2);
-				msg = msg.substring(0, index);
-			}
-			if (msg.isNotEmpty()) {
-				dispatchMessageFromJavaScript(msg, param);
-			}
-		}
-		
-	};
-	
+	}
+
+	using namespace priv::web_view;
+
 #if defined(SLIB_UI_IS_IOS)
 	Ref<ViewInstance> WebView::createNativeWidget(ViewInstance* _parent)
 	{
 		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		_priv_Slib_Apple_WebView* handle = [[_priv_Slib_Apple_WebView alloc] initWithFrame:frame];
+		SLIBWebViewHandle* handle = [[SLIBWebViewHandle alloc] initWithFrame:frame];
 		if (handle != nil) {
-			((_priv_WebView*)this)->_applyProperties(handle);
+			((WebViewHelper*)this)->_applyProperties(handle);
 		}
 		IOS_VIEW_CREATE_INSTANCE_END
 		return ret;
@@ -137,9 +148,9 @@ namespace slib
 	Ref<ViewInstance> WebView::createNativeWidget(ViewInstance* _parent)
 	{
 		MACOS_VIEW_CREATE_INSTANCE_BEGIN
-		_priv_Slib_Apple_WebView* handle = [[_priv_Slib_Apple_WebView alloc] initWithFrame:frame];
+		SLIBWebViewHandle* handle = [[SLIBWebViewHandle alloc] initWithFrame:frame];
 		if (handle != nil) {
-			((_priv_WebView*)this)->_applyProperties(handle);
+			((WebViewHelper*)this)->_applyProperties(handle);
 		}
 		MACOS_VIEW_CREATE_INSTANCE_END
 		return ret;
@@ -159,7 +170,7 @@ namespace slib
 		OSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
 			OSWebView* wv = (OSWebView*)handle;
-			((_priv_WebView*)this)->_load(wv);
+			((WebViewHelper*)this)->_load(wv);
 		}
 	}
 	
@@ -281,7 +292,10 @@ namespace slib
 	}
 }
 
-@implementation _priv_Slib_Apple_WebView
+using namespace slib;
+using namespace slib::priv::web_view;
+
+@implementation SLIBWebViewHandle
 
 -(id)initWithFrame:(CGRect)frame
 {
@@ -304,7 +318,7 @@ namespace slib
 	[alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
 		completionHandler();
 	}]];
-	UIViewController* rootController = slib::UIPlatform::getCurrentViewController();
+	UIViewController* rootController = UIPlatform::getCurrentViewController();
 	if (rootController != nil) {
 		[rootController presentViewController:alertController animated:YES completion:nil];
 	}
@@ -327,7 +341,7 @@ namespace slib
 	[alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *) {
 		completionHandler(NO);
 	 }]];
-	UIViewController* rootController = slib::UIPlatform::getCurrentViewController();
+	UIViewController* rootController = UIPlatform::getCurrentViewController();
 	if (rootController != nil) {
 		[rootController presentViewController:alertController animated:YES completion:nil];
 	}
@@ -361,7 +375,7 @@ namespace slib
 	[alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
 		completionHandler(nil);
 	}]];
-	UIViewController* rootController = slib::UIPlatform::getCurrentViewController();
+	UIViewController* rootController = UIPlatform::getCurrentViewController();
 	if (rootController != nil) {
 		[rootController presentViewController:alertController animated:YES completion:nil];
 	}
@@ -391,10 +405,10 @@ namespace slib
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 {
 	if (navigationAction.targetFrame != nil && navigationAction.targetFrame.mainFrame) {
-		slib::Ref<WebViewInstance> instance = m_viewInstance;
+		Ref<WebViewInstance> instance = m_viewInstance;
 		if (instance.isNotNull()) {
-			slib::Ref<slib::View> _view = instance->getView();
-			if (slib::_priv_WebView* view = slib::CastInstance<slib::_priv_WebView>(_view.get())) {
+			Ref<View> _view = instance->getView();
+			if (WebViewHelper* view = CastInstance<WebViewHelper>(_view.get())) {
 				view->_onStartLoad(self, navigationAction.request.URL);
 			}
 		}
@@ -404,10 +418,10 @@ namespace slib
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(null_unspecified WKNavigation *)navigation
 {
-	slib::Ref<WebViewInstance> instance = m_viewInstance;
+	Ref<WebViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::Ref<slib::View> _view = instance->getView();
-		if (slib::_priv_WebView* view = slib::CastInstance<slib::_priv_WebView>(_view.get())) {
+		Ref<View> _view = instance->getView();
+		if (WebViewHelper* view = CastInstance<WebViewHelper>(_view.get())) {
 			view->_onFinishLoad(self);
 		}
 	}
@@ -415,10 +429,10 @@ namespace slib
 
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(null_unspecified WKNavigation *)navigation withError:(NSError *)error
 {
-	slib::Ref<WebViewInstance> instance = m_viewInstance;
+	Ref<WebViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::Ref<slib::View> _view = instance->getView();
-		if (slib::_priv_WebView* view = slib::CastInstance<slib::_priv_WebView>(_view.get())) {
+		Ref<View> _view = instance->getView();
+		if (WebViewHelper* view = CastInstance<WebViewHelper>(_view.get())) {
 			view->_onLoadError(self, error);
 		}
 	}
@@ -426,10 +440,10 @@ namespace slib
 
 - (void)webView:(WKWebView *)webView didFailNavigation:(null_unspecified WKNavigation *)navigation withError:(NSError *)error
 {
-	slib::Ref<WebViewInstance> instance = m_viewInstance;
+	Ref<WebViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::Ref<slib::View> _view = instance->getView();
-		if (slib::_priv_WebView* view = slib::CastInstance<slib::_priv_WebView>(_view.get())) {
+		Ref<View> _view = instance->getView();
+		if (WebViewHelper* view = CastInstance<WebViewHelper>(_view.get())) {
 			view->_onLoadError(self, error);
 		}
 	}
@@ -438,10 +452,10 @@ namespace slib
 - (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message
 {
 	id body = message.body;
-	slib::Ref<WebViewInstance> instance = m_viewInstance;
+	Ref<WebViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::Ref<slib::View> _view = instance->getView();
-		if (slib::_priv_WebView* view = slib::CastInstance<slib::_priv_WebView>(_view.get())) {
+		Ref<View> _view = instance->getView();
+		if (WebViewHelper* view = CastInstance<WebViewHelper>(_view.get())) {
 			view->_onInvokeMethod(self, body);
 		}
 	}
@@ -449,7 +463,7 @@ namespace slib
 
 - (BOOL)becomeFirstResponder
 {
-	slib::Ref<WebViewInstance> instance = m_viewInstance;
+	Ref<WebViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		instance->onSetFocus();
 	}

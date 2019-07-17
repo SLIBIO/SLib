@@ -34,167 +34,175 @@
 namespace slib
 {
 
-	class _priv_WGLRendererImpl : public Renderer
+	namespace priv
 	{
-	public:
-		sl_bool m_flagRequestRender;
-
-		HGLRC m_context;
-
-		HWND m_hWindow;
-		HDC m_hDC;
-
-		AtomicRef<Thread> m_threadRender;
-
-	public:
-		_priv_WGLRendererImpl()
+		namespace wgl
 		{
-			m_context = sl_null;
-			m_flagRequestRender = sl_true;
-		}
 
-		~_priv_WGLRendererImpl()
-		{
-			release();
-		}
+			class RendererImpl : public Renderer
+			{
+			public:
+				sl_bool m_flagRequestRender;
 
-	public:
-		static Ref<_priv_WGLRendererImpl> create(void* _windowHandle, const RendererParam& _param)
-		{
-			HWND hWnd = (HWND)_windowHandle;
-			if (hWnd == 0) {
-				return sl_null;
-			}
+				HGLRC m_context;
 
-			HDC hDC = ::GetDC(hWnd);
-			if (hDC) {
+				HWND m_hWindow;
+				HDC m_hDC;
 
-				RendererParam param = _param;
+				AtomicRef<Thread> m_threadRender;
 
-				PIXELFORMATDESCRIPTOR pfd;
-				Base::zeroMemory(&pfd, sizeof(pfd));
-				pfd.nSize = sizeof(pfd);
-				pfd.nVersion = 1;
-				pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-				pfd.iPixelType = PFD_TYPE_RGBA;
-				pfd.cColorBits = param.nRedBits + param.nGreenBits + param.nBlueBits;
-				pfd.cAlphaBits = param.nAlphaBits;
-				pfd.cAccumBits = param.nAccumBits;
-				pfd.cDepthBits = param.nDepthBits;
-				pfd.cStencilBits = param.nStencilBits;
-				pfd.iLayerType = PFD_MAIN_PLANE;
+			public:
+				RendererImpl()
+				{
+					m_context = sl_null;
+					m_flagRequestRender = sl_true;
+				}
 
-				int iPixelFormat = ::ChoosePixelFormat(hDC, &pfd);
-				if (iPixelFormat) {
+				~RendererImpl()
+				{
+					release();
+				}
 
-					if (::SetPixelFormat(hDC, iPixelFormat, &pfd)) {
-						
-						HGLRC context = wglCreateContext(hDC);
-						if (context) {
+			public:
+				static Ref<RendererImpl> create(void* _windowHandle, const RendererParam& _param)
+				{
+					HWND hWnd = (HWND)_windowHandle;
+					if (hWnd == 0) {
+						return sl_null;
+					}
 
-							Ref<_priv_WGLRendererImpl> ret = new _priv_WGLRendererImpl();
+					HDC hDC = ::GetDC(hWnd);
+					if (hDC) {
 
-							if (ret.isNotNull()) {
-								ret->m_hWindow = hWnd;
-								ret->m_hDC = hDC;
-								ret->m_context = context;
+						RendererParam param = _param;
 
-								ret->initWithParam(param);
+						PIXELFORMATDESCRIPTOR pfd;
+						Base::zeroMemory(&pfd, sizeof(pfd));
+						pfd.nSize = sizeof(pfd);
+						pfd.nVersion = 1;
+						pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+						pfd.iPixelType = PFD_TYPE_RGBA;
+						pfd.cColorBits = param.nRedBits + param.nGreenBits + param.nBlueBits;
+						pfd.cAlphaBits = param.nAlphaBits;
+						pfd.cAccumBits = param.nAccumBits;
+						pfd.cDepthBits = param.nDepthBits;
+						pfd.cStencilBits = param.nStencilBits;
+						pfd.iLayerType = PFD_MAIN_PLANE;
 
-								ret->m_threadRender = Thread::start(SLIB_FUNCTION_CLASS(_priv_WGLRendererImpl, run, ret.get()));
+						int iPixelFormat = ::ChoosePixelFormat(hDC, &pfd);
+						if (iPixelFormat) {
+
+							if (::SetPixelFormat(hDC, iPixelFormat, &pfd)) {
 								
-								return ret;
-							}
+								HGLRC context = wglCreateContext(hDC);
+								if (context) {
 
-							wglDeleteContext(context);
+									Ref<RendererImpl> ret = new RendererImpl();
+
+									if (ret.isNotNull()) {
+										ret->m_hWindow = hWnd;
+										ret->m_hDC = hDC;
+										ret->m_context = context;
+
+										ret->initWithParam(param);
+
+										ret->m_threadRender = Thread::start(SLIB_FUNCTION_CLASS(RendererImpl, run, ret.get()));
+										
+										return ret;
+									}
+
+									wglDeleteContext(context);
+								}
+							}
+						}
+						::ReleaseDC(hWnd, hDC);
+					}
+					return sl_null;
+				}
+
+				void release()
+				{
+					ObjectLocker lock(this);
+					
+					Ref<Thread> thread = m_threadRender;
+					if (thread.isNotNull()) {
+						thread->finishAndWait();
+						m_threadRender.setNull();
+					}
+
+					if (m_context) {
+						wglDeleteContext(m_context);
+						::ReleaseDC(m_hWindow, m_hDC);
+						m_context = sl_null;
+					}
+				}
+
+				void run()
+				{
+					wglMakeCurrent(m_hDC, m_context);
+
+					GL::loadEntries();
+
+					Ref<RenderEngine> engine = GL::createEngine();
+					if (engine.isNull()) {
+						return;
+					}
+
+					TimeCounter timer;
+					Ref<Thread> thread = Thread::getCurrent();
+					while (thread.isNull() || thread->isNotStopping()) {
+						runStep(engine.get());
+						if (thread.isNull() || thread->isNotStopping()) {
+							sl_uint64 t = timer.getElapsedMilliseconds();
+							if (t < 10) {
+								Thread::sleep(10 - (sl_uint32)(t));
+							}
+							timer.reset();
+						} else {
+							break;
+						}
+					}
+					wglMakeCurrent(NULL, NULL);
+				}
+
+				void runStep(RenderEngine* engine)
+				{
+					if (!(Windows::isWindowVisible(m_hWindow))) {
+						return;
+					}
+					sl_bool flagUpdate = sl_false;
+					if (isRenderingContinuously()) {
+						flagUpdate = sl_true;
+					} else {
+						if (m_flagRequestRender) {
+							flagUpdate = sl_true;
+						}
+					}
+					m_flagRequestRender = sl_false;
+					if (flagUpdate) {
+						RECT rect;
+						::GetClientRect(m_hWindow, &rect);
+						if (rect.right != 0 && rect.bottom != 0) {
+							engine->setViewport(0, 0, rect.right, rect.bottom);
+							dispatchFrame(engine);
+							::SwapBuffers(m_hDC);
 						}
 					}
 				}
-				::ReleaseDC(hWnd, hDC);
-			}
-			return sl_null;
-		}
 
-		void release()
-		{
-			ObjectLocker lock(this);
-			
-			Ref<Thread> thread = m_threadRender;
-			if (thread.isNotNull()) {
-				thread->finishAndWait();
-				m_threadRender.setNull();
-			}
-
-			if (m_context) {
-				wglDeleteContext(m_context);
-				::ReleaseDC(m_hWindow, m_hDC);
-				m_context = sl_null;
-			}
-		}
-
-		void run()
-		{
-			wglMakeCurrent(m_hDC, m_context);
-
-			GL::loadEntries();
-
-			Ref<RenderEngine> engine = GL::createEngine();
-			if (engine.isNull()) {
-				return;
-			}
-
-			TimeCounter timer;
-			Ref<Thread> thread = Thread::getCurrent();
-			while (thread.isNull() || thread->isNotStopping()) {
-				runStep(engine.get());
-				if (thread.isNull() || thread->isNotStopping()) {
-					sl_uint64 t = timer.getElapsedMilliseconds();
-					if (t < 10) {
-						Thread::sleep(10 - (sl_uint32)(t));
-					}
-					timer.reset();
-				} else {
-					break;
+				void requestRender()
+				{
+					m_flagRequestRender = sl_true;
 				}
-			}
-			wglMakeCurrent(NULL, NULL);
-		}
 
-		void runStep(RenderEngine* engine)
-		{
-			if (!(Windows::isWindowVisible(m_hWindow))) {
-				return;
-			}
-			sl_bool flagUpdate = sl_false;
-			if (isRenderingContinuously()) {
-				flagUpdate = sl_true;
-			} else {
-				if (m_flagRequestRender) {
-					flagUpdate = sl_true;
-				}
-			}
-			m_flagRequestRender = sl_false;
-			if (flagUpdate) {
-				RECT rect;
-				::GetClientRect(m_hWindow, &rect);
-				if (rect.right != 0 && rect.bottom != 0) {
-					engine->setViewport(0, 0, rect.right, rect.bottom);
-					dispatchFrame(engine);
-					::SwapBuffers(m_hDC);
-				}
-			}
-		}
+			};
 
-		void requestRender()
-		{
-			m_flagRequestRender = sl_true;
 		}
-
-	};
+	}
 
 	Ref<Renderer> WGL::createRenderer(void* windowHandle, const RendererParam& param)
 	{
-		return _priv_WGLRendererImpl::create(windowHandle, param);
+		return priv::wgl::RendererImpl::create(windowHandle, param);
 	}
 
 }

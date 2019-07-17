@@ -34,7 +34,13 @@ namespace slib
 
 	class TreeView;
 	
-	class TreeContentViewImpl;
+	namespace priv
+	{
+		namespace tree_view
+		{
+			class TreeContentViewImpl;
+		}
+	}
 	
 	class SLIB_EXPORT TreeViewItem : public Object
 	{
@@ -146,7 +152,7 @@ namespace slib
 		
 		void _redrawTree(UIUpdateMode mode);
 		
-		Ref<TreeContentViewImpl> _getContentView();
+		Ref<priv::tree_view::TreeContentViewImpl> _getContentView();
 		
 	private:
 		AtomicString m_id;
@@ -302,7 +308,7 @@ namespace slib
 		void _processClickItem(TreeViewItem* item);
 		
 	private:
-		Ref<TreeContentViewImpl> m_content;
+		Ref<priv::tree_view::TreeContentViewImpl> m_content;
 		sl_bool m_flagInvalidTreeLayout;
 		
 		Ref<TreeViewItem> m_root;
@@ -332,7 +338,7 @@ namespace slib
 		UIPointf m_pointBeginTapping;
 		
 		friend class TreeViewItem;
-		friend class TreeContentViewImpl;
+		friend class priv::tree_view::TreeContentViewImpl;
 	};
 
 }

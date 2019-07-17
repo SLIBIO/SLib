@@ -28,71 +28,80 @@
 namespace slib
 {
 
-	class _priv_SwitchView_Static
+	namespace priv
 	{
-	public:
-		Ref<Drawable> thumbOff;
-		Ref<Drawable> trackOff;
-		Ref<Drawable> pressedThumbOff;
-		Ref<Drawable> pressedTrackOff;
-		Ref<Drawable> hoverThumbOff;
-		Ref<Drawable> hoverTrackOff;
-		Ref<Drawable> thumbOn;
-		Ref<Drawable> trackOn;
-		Ref<Drawable> pressedThumbOn;
-		Ref<Drawable> pressedTrackOn;
-		Ref<Drawable> hoverThumbOn;
-		Ref<Drawable> hoverTrackOn;
-
-		_priv_SwitchView_Static(sl_bool flagLabel)
+		namespace switch_view
 		{
-			if (flagLabel) {
-				thumbOff = ColorDrawable::create(Color(255, 255, 255));
-				trackOff = ColorDrawable::create(Color(130, 130, 130));
-				pressedThumbOff = ColorDrawable::create(Color(255, 255, 255));
-				pressedTrackOff = ColorDrawable::create(Color(100, 100, 100));
-				hoverThumbOff = ColorDrawable::create(Color(255, 255, 255));
-				hoverTrackOff = ColorDrawable::create(Color(120, 120, 120));
-				thumbOn = thumbOff;
-				trackOn = trackOff;
-				pressedThumbOn = pressedThumbOff;
-				pressedTrackOn = pressedTrackOff;
-				hoverThumbOn = hoverThumbOff;
-				hoverTrackOn = hoverTrackOff;
-			} else {
-				thumbOff = ColorDrawable::create(Color(255, 255, 255));
-				trackOff = ColorDrawable::create(Color(120, 120, 120));
-				pressedThumbOff = ColorDrawable::create(Color(255, 255, 255));
-				pressedTrackOff = ColorDrawable::create(Color(0, 70, 210));
-				hoverThumbOff = ColorDrawable::create(Color(255, 255, 255));
-				hoverTrackOff = ColorDrawable::create(Color(90, 90, 90));
-				thumbOn = ColorDrawable::create(Color(255, 255, 255));
-				trackOn = ColorDrawable::create(Color(0, 80, 230));
-				pressedThumbOn = ColorDrawable::create(Color(255, 255, 255));
-				pressedTrackOn = ColorDrawable::create(Color(90, 90, 90));
-				hoverThumbOn = ColorDrawable::create(Color(255, 255, 255));
-				hoverTrackOn = ColorDrawable::create(Color(0, 70, 210));
-			}
-		}
-	};
-	
-	SLIB_SAFE_STATIC_GETTER(_priv_SwitchView_Static, _priv_SwitchView_getStatic, sl_false)
-	SLIB_SAFE_STATIC_GETTER(_priv_SwitchView_Static, _priv_SwitchLabelView_getStatic, sl_true)
 
-	static Ref<Drawable> const& _priv_SwitchView_resolveDrawable(const Ref<Drawable>& drawableOriginal, const Ref<Drawable>& drawableCommon, const Ref<Drawable>& drawableShared)
-	{
-		if (drawableOriginal.isNotNull()) {
-			return drawableOriginal;
-		}
-		if (drawableCommon.isNotNull()) {
-			if (drawableCommon->isColor()) {
-				return drawableShared;
+			class StaticContext
+			{
+			public:
+				Ref<Drawable> thumbOff;
+				Ref<Drawable> trackOff;
+				Ref<Drawable> pressedThumbOff;
+				Ref<Drawable> pressedTrackOff;
+				Ref<Drawable> hoverThumbOff;
+				Ref<Drawable> hoverTrackOff;
+				Ref<Drawable> thumbOn;
+				Ref<Drawable> trackOn;
+				Ref<Drawable> pressedThumbOn;
+				Ref<Drawable> pressedTrackOn;
+				Ref<Drawable> hoverThumbOn;
+				Ref<Drawable> hoverTrackOn;
+
+				StaticContext(sl_bool flagLabel)
+				{
+					if (flagLabel) {
+						thumbOff = ColorDrawable::create(Color(255, 255, 255));
+						trackOff = ColorDrawable::create(Color(130, 130, 130));
+						pressedThumbOff = ColorDrawable::create(Color(255, 255, 255));
+						pressedTrackOff = ColorDrawable::create(Color(100, 100, 100));
+						hoverThumbOff = ColorDrawable::create(Color(255, 255, 255));
+						hoverTrackOff = ColorDrawable::create(Color(120, 120, 120));
+						thumbOn = thumbOff;
+						trackOn = trackOff;
+						pressedThumbOn = pressedThumbOff;
+						pressedTrackOn = pressedTrackOff;
+						hoverThumbOn = hoverThumbOff;
+						hoverTrackOn = hoverTrackOff;
+					} else {
+						thumbOff = ColorDrawable::create(Color(255, 255, 255));
+						trackOff = ColorDrawable::create(Color(120, 120, 120));
+						pressedThumbOff = ColorDrawable::create(Color(255, 255, 255));
+						pressedTrackOff = ColorDrawable::create(Color(0, 70, 210));
+						hoverThumbOff = ColorDrawable::create(Color(255, 255, 255));
+						hoverTrackOff = ColorDrawable::create(Color(90, 90, 90));
+						thumbOn = ColorDrawable::create(Color(255, 255, 255));
+						trackOn = ColorDrawable::create(Color(0, 80, 230));
+						pressedThumbOn = ColorDrawable::create(Color(255, 255, 255));
+						pressedTrackOn = ColorDrawable::create(Color(90, 90, 90));
+						hoverThumbOn = ColorDrawable::create(Color(255, 255, 255));
+						hoverTrackOn = ColorDrawable::create(Color(0, 70, 210));
+					}
+				}
+			};
+			
+			SLIB_SAFE_STATIC_GETTER(StaticContext, GetStaticContext, sl_false)
+			SLIB_SAFE_STATIC_GETTER(StaticContext, GetStaticLabelContext, sl_true)
+
+			static Ref<Drawable> const& ResolveDrawable(const Ref<Drawable>& drawableOriginal, const Ref<Drawable>& drawableCommon, const Ref<Drawable>& drawableShared)
+			{
+				if (drawableOriginal.isNotNull()) {
+					return drawableOriginal;
+				}
+				if (drawableCommon.isNotNull()) {
+					if (drawableCommon->isColor()) {
+						return drawableShared;
+					}
+					return drawableCommon;
+				}
+				return Ref<Drawable>::null();
 			}
-			return drawableCommon;
+			
 		}
-		return Ref<Drawable>::null();
 	}
-	
+
+	using namespace priv::switch_view;
 	
 	SLIB_DEFINE_OBJECT(SwitchView, View)
 
@@ -100,7 +109,7 @@ namespace slib
 	{
 		m_value = sl_false;
 		
-		_priv_SwitchView_Static* s = _priv_SwitchView_getStatic();
+		StaticContext* s = GetStaticContext();
 		if (s) {
 			m_trackOff = s->trackOff;
 			m_trackOn = s->trackOn;
@@ -192,7 +201,7 @@ namespace slib
 	
 	void SwitchView::onDraw(Canvas* canvas)
 	{
-		_priv_SwitchView_Static* s = _priv_SwitchView_getStatic();
+		StaticContext* s = GetStaticContext();
 		if (!s) {
 			return;
 		}
@@ -204,19 +213,19 @@ namespace slib
 		Ref<Drawable> thumb;
 		if (isPressedState()) {
 			if (m_value) {
-				track = _priv_SwitchView_resolveDrawable(m_pressedTrackOn, m_trackOn, s->pressedTrackOn);
-				thumb = _priv_SwitchView_resolveDrawable(m_pressedThumbOn, m_thumbOn, s->pressedThumbOn);
+				track = ResolveDrawable(m_pressedTrackOn, m_trackOn, s->pressedTrackOn);
+				thumb = ResolveDrawable(m_pressedThumbOn, m_thumbOn, s->pressedThumbOn);
 			} else {
-				track = _priv_SwitchView_resolveDrawable(m_pressedTrackOff, m_trackOff, s->pressedTrackOff);
-				thumb = _priv_SwitchView_resolveDrawable(m_pressedThumbOff, m_thumbOff, s->pressedThumbOff);
+				track = ResolveDrawable(m_pressedTrackOff, m_trackOff, s->pressedTrackOff);
+				thumb = ResolveDrawable(m_pressedThumbOff, m_thumbOff, s->pressedThumbOff);
 			}
 		} else if (isHoverState()) {
 			if (m_value) {
-				track = _priv_SwitchView_resolveDrawable(m_hoverTrackOn, m_trackOn, s->hoverTrackOn);
-				thumb = _priv_SwitchView_resolveDrawable(m_hoverThumbOn, m_thumbOn, s->hoverThumbOn);
+				track = ResolveDrawable(m_hoverTrackOn, m_trackOn, s->hoverTrackOn);
+				thumb = ResolveDrawable(m_hoverThumbOn, m_thumbOn, s->hoverThumbOn);
 			} else {
-				track = _priv_SwitchView_resolveDrawable(m_hoverTrackOff, m_trackOff, s->hoverTrackOff);
-				thumb = _priv_SwitchView_resolveDrawable(m_hoverThumbOff, m_thumbOff, s->hoverThumbOff);
+				track = ResolveDrawable(m_hoverTrackOff, m_trackOff, s->hoverTrackOff);
+				thumb = ResolveDrawable(m_hoverThumbOff, m_thumbOff, s->hoverThumbOff);
 			}
 		} else {
 			if (m_value) {
@@ -356,7 +365,7 @@ namespace slib
 	
 	SwitchLabelView::SwitchLabelView()
 	{
-		_priv_SwitchView_Static* s = _priv_SwitchLabelView_getStatic();
+		StaticContext* s = GetStaticLabelContext();
 		if (s) {
 			m_trackOff = s->trackOff;
 			m_trackOn = s->trackOn;
@@ -434,7 +443,7 @@ namespace slib
 	
 	void SwitchLabelView::onDraw(Canvas* canvas)
 	{
-		_priv_SwitchView_Static* s = _priv_SwitchLabelView_getStatic();
+		StaticContext* s = GetStaticLabelContext();
 		if (!s) {
 			return;
 		}
@@ -446,19 +455,19 @@ namespace slib
 		Ref<Drawable> thumb;
 		if (isPressedState()) {
 			if (m_value) {
-				track = _priv_SwitchView_resolveDrawable(m_pressedTrackOn, m_trackOn, s->pressedTrackOn);
-				thumb = _priv_SwitchView_resolveDrawable(m_pressedThumbOn, m_thumbOn, s->pressedThumbOn);
+				track = ResolveDrawable(m_pressedTrackOn, m_trackOn, s->pressedTrackOn);
+				thumb = ResolveDrawable(m_pressedThumbOn, m_thumbOn, s->pressedThumbOn);
 			} else {
-				track = _priv_SwitchView_resolveDrawable(m_pressedTrackOff, m_trackOff, s->pressedTrackOff);
-				thumb = _priv_SwitchView_resolveDrawable(m_pressedThumbOff, m_thumbOff, s->pressedThumbOff);
+				track = ResolveDrawable(m_pressedTrackOff, m_trackOff, s->pressedTrackOff);
+				thumb = ResolveDrawable(m_pressedThumbOff, m_thumbOff, s->pressedThumbOff);
 			}
 		} else if (isHoverState()) {
 			if (m_value) {
-				track = _priv_SwitchView_resolveDrawable(m_hoverTrackOn, m_trackOn, s->hoverTrackOn);
-				thumb = _priv_SwitchView_resolveDrawable(m_hoverThumbOn, m_thumbOn, s->hoverThumbOn);
+				track = ResolveDrawable(m_hoverTrackOn, m_trackOn, s->hoverTrackOn);
+				thumb = ResolveDrawable(m_hoverThumbOn, m_thumbOn, s->hoverThumbOn);
 			} else {
-				track = _priv_SwitchView_resolveDrawable(m_hoverTrackOff, m_trackOff, s->hoverTrackOff);
-				thumb = _priv_SwitchView_resolveDrawable(m_hoverThumbOff, m_thumbOff, s->hoverThumbOff);
+				track = ResolveDrawable(m_hoverTrackOff, m_trackOff, s->hoverTrackOff);
+				thumb = ResolveDrawable(m_hoverThumbOff, m_thumbOff, s->hoverThumbOff);
 			}
 		} else {
 			if (m_value) {

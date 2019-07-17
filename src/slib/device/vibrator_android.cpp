@@ -31,15 +31,25 @@
 namespace slib
 {
 
-	SLIB_JNI_BEGIN_CLASS(JAndroidVibrator, "slib/platform/android/device/Vibrator")
-		SLIB_JNI_STATIC_METHOD(vibrate, "vibrate", "(Landroid/app/Activity;I)Z");
-	SLIB_JNI_END_CLASS
+	namespace priv
+	{
+		namespace vibrator
+		{
+
+			SLIB_JNI_BEGIN_CLASS(JVibrator, "slib/platform/android/device/Vibrator")
+				SLIB_JNI_STATIC_METHOD(vibrate, "vibrate", "(Landroid/app/Activity;I)Z");
+			SLIB_JNI_END_CLASS
+
+		}
+	}
+
+	using namespace priv::vibrator;
 
 	sl_bool Vibrator::vibrate(sl_int32 millisec)
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			sl_bool ret = JAndroidVibrator::vibrate.callBoolean(sl_null, jactivity, millisec);
+			sl_bool ret = JVibrator::vibrate.callBoolean(sl_null, jactivity, millisec);
 			return ret;
 		}
 		return sl_false;

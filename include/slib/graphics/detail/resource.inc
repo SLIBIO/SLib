@@ -23,44 +23,52 @@
 namespace slib
 {
 	
-	class _priv_ImageResourceEntry
+	namespace priv
 	{
-	public:
-		sl_bool flagValid;
+		namespace graphics_resource
+		{
+			
+			class ImageEntry
+			{
+			public:
+				sl_bool flagValid;
 
-		sl_uint32 width;
-		sl_uint32 height;
+				sl_uint32 width;
+				sl_uint32 height;
 
-		const sl_uint8* source_bytes;
-		sl_uint32 source_size;
+				const sl_uint8* source_bytes;
+				sl_uint32 source_size;
 
-		sl_int32 lock;
-		void* image;
-		sl_bool flag_load;
+				sl_int32 lock;
+				void* image;
+				sl_bool flag_load;
 
-	public:
-		Ref<Image> getImage();
+			public:
+				Ref<Image> getImage();
 
-		Ref<Image> getMatchingImage(sl_uint32 width, sl_uint32 height);
+				Ref<Image> getMatchingImage(sl_uint32 width, sl_uint32 height);
 
-	};
+			};
+			
+			class FreeImageContext
+			{
+			public:
+				FreeImageContext(ImageEntry* entries);
+
+				~FreeImageContext();
+
+			private:
+				ImageEntry* m_entries;
+
+			};
+			
+			Ref<Image> GetImage(ImageEntry* entries, sl_uint32 requiredWidth, sl_uint32 requiredHeight);
+			
+			List< Ref<Image> > GetImages(ImageEntry* entries);
+			
+			Ref<Drawable> GetDrawable(ImageEntry* entries, sl_uint32 width, sl_uint32 height);
+			
+		}
+	}
 	
-	class _priv_ImageResourceFreeStatic
-	{
-	public:
-		_priv_ImageResourceFreeStatic(_priv_ImageResourceEntry* entries);
-
-		~_priv_ImageResourceFreeStatic();
-
-	private:
-		_priv_ImageResourceEntry* m_entries;
-
-	};
-	
-	Ref<Image> _priv_ImageResource_getImage(_priv_ImageResourceEntry* entries, sl_uint32 requiredWidth, sl_uint32 requiredHeight);
-	
-	List< Ref<Image> > _priv_ImageResource_getImages(_priv_ImageResourceEntry* entries);
-	
-	Ref<Drawable> _priv_ImageResource_get(_priv_ImageResourceEntry* entries, sl_uint32 width, sl_uint32 height);
-
 }

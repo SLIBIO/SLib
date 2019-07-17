@@ -45,6 +45,7 @@ ELEMENTARY_GLVIEW_GLOBAL_DEFINE()
 
 namespace slib
 {
+
 	void GL_BASE::setViewport(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
 	{
 		GL_ENTRY(glViewport)(x, y, width, height);
@@ -116,32 +117,38 @@ namespace slib
 		GL_ENTRY(glDepthMask)(flagEnableDepthWrite ? GL_TRUE : GL_FALSE);
 	}
 	
-	static GLenum _priv_GL_getFunctionOp(RenderFunctionOperation op)
+	namespace priv
 	{
-		switch (op) {
-			case RenderFunctionOperation::Never:
-				return GL_NEVER;
-			case RenderFunctionOperation::Always:
+		namespace gl
+		{
+			static GLenum GetFunctionOp(RenderFunctionOperation op)
+			{
+				switch (op) {
+					case RenderFunctionOperation::Never:
+						return GL_NEVER;
+					case RenderFunctionOperation::Always:
+						return GL_ALWAYS;
+					case RenderFunctionOperation::Equal:
+						return GL_EQUAL;
+					case RenderFunctionOperation::NotEqual:
+						return GL_NOTEQUAL;
+					case RenderFunctionOperation::Less:
+						return GL_LESS;
+					case RenderFunctionOperation::LessEqual:
+						return GL_LEQUAL;
+					case RenderFunctionOperation::Greater:
+						return GL_GREATER;
+					case RenderFunctionOperation::GreaterEqual:
+						return GL_GEQUAL;
+				}
 				return GL_ALWAYS;
-			case RenderFunctionOperation::Equal:
-				return GL_EQUAL;
-			case RenderFunctionOperation::NotEqual:
-				return GL_NOTEQUAL;
-			case RenderFunctionOperation::Less:
-				return GL_LESS;
-			case RenderFunctionOperation::LessEqual:
-				return GL_LEQUAL;
-			case RenderFunctionOperation::Greater:
-				return GL_GREATER;
-			case RenderFunctionOperation::GreaterEqual:
-				return GL_GEQUAL;
+			}
 		}
-		return GL_ALWAYS;
 	}
 	
 	void GL_BASE::setDepthFunction(RenderFunctionOperation op)
 	{
-		GL_ENTRY(glDepthFunc)(_priv_GL_getFunctionOp(op));
+		GL_ENTRY(glDepthFunc)(priv::gl::GetFunctionOp(op));
 	}
 	
 	void GL_BASE::setCullFace(sl_bool flagEnableCull, sl_bool flagCullCCW)
@@ -159,71 +166,79 @@ namespace slib
 		}
 	}
 	
-	static GLenum _priv_GL_getBlendingOp(RenderBlendingOperation op)
+	namespace priv
 	{
-		switch (op) {
-			case RenderBlendingOperation::Add:
+		namespace gl
+		{
+
+			static GLenum GetBlendingOp(RenderBlendingOperation op)
+			{
+				switch (op) {
+					case RenderBlendingOperation::Add:
+						return GL_FUNC_ADD;
+					case RenderBlendingOperation::Subtract:
+						return GL_FUNC_SUBTRACT;
+					case RenderBlendingOperation::ReverseSubtract:
+						return GL_FUNC_REVERSE_SUBTRACT;
+				}
 				return GL_FUNC_ADD;
-			case RenderBlendingOperation::Subtract:
-				return GL_FUNC_SUBTRACT;
-			case RenderBlendingOperation::ReverseSubtract:
-				return GL_FUNC_REVERSE_SUBTRACT;
-		}
-		return GL_FUNC_ADD;
-	}
-	
-	static GLenum _priv_GL_getBlendingFactor(RenderBlendingFactor factor)
-	{
-		switch (factor) {
-			case RenderBlendingFactor::One:
-				return GL_ONE;
-			case RenderBlendingFactor::Zero:
+			}
+			
+			static GLenum GetBlendingFactor(RenderBlendingFactor factor)
+			{
+				switch (factor) {
+					case RenderBlendingFactor::One:
+						return GL_ONE;
+					case RenderBlendingFactor::Zero:
+						return GL_ZERO;
+					case RenderBlendingFactor::SrcAlpha:
+						return GL_SRC_ALPHA;
+					case RenderBlendingFactor::OneMinusSrcAlpha:
+						return GL_ONE_MINUS_SRC_ALPHA;
+					case RenderBlendingFactor::DstAlpha:
+						return GL_DST_ALPHA;
+					case RenderBlendingFactor::OneMinusDstAlpha:
+						return GL_ONE_MINUS_DST_ALPHA;
+					case RenderBlendingFactor::SrcColor:
+						return GL_SRC_COLOR;
+					case RenderBlendingFactor::OneMinusSrcColor:
+						return GL_ONE_MINUS_SRC_COLOR;
+					case RenderBlendingFactor::DstColor:
+						return GL_DST_COLOR;
+					case RenderBlendingFactor::OneMinusDstColor:
+						return GL_ONE_MINUS_DST_COLOR;
+					case RenderBlendingFactor::SrcAlphaSaturate:
+						return GL_SRC_ALPHA_SATURATE;
+					case RenderBlendingFactor::Constant:
+						return GL_CONSTANT_COLOR;
+					case RenderBlendingFactor::OneMinusConstant:
+						return GL_ONE_MINUS_CONSTANT_COLOR;
+					case RenderBlendingFactor::ConstantAlpha:
+						return GL_CONSTANT_ALPHA;
+					case RenderBlendingFactor::OneMinusConstantAlpha:
+						return GL_ONE_MINUS_CONSTANT_ALPHA;
+				}
 				return GL_ZERO;
-			case RenderBlendingFactor::SrcAlpha:
-				return GL_SRC_ALPHA;
-			case RenderBlendingFactor::OneMinusSrcAlpha:
-				return GL_ONE_MINUS_SRC_ALPHA;
-			case RenderBlendingFactor::DstAlpha:
-				return GL_DST_ALPHA;
-			case RenderBlendingFactor::OneMinusDstAlpha:
-				return GL_ONE_MINUS_DST_ALPHA;
-			case RenderBlendingFactor::SrcColor:
-				return GL_SRC_COLOR;
-			case RenderBlendingFactor::OneMinusSrcColor:
-				return GL_ONE_MINUS_SRC_COLOR;
-			case RenderBlendingFactor::DstColor:
-				return GL_DST_COLOR;
-			case RenderBlendingFactor::OneMinusDstColor:
-				return GL_ONE_MINUS_DST_COLOR;
-			case RenderBlendingFactor::SrcAlphaSaturate:
-				return GL_SRC_ALPHA_SATURATE;
-			case RenderBlendingFactor::Constant:
-				return GL_CONSTANT_COLOR;
-			case RenderBlendingFactor::OneMinusConstant:
-				return GL_ONE_MINUS_CONSTANT_COLOR;
-			case RenderBlendingFactor::ConstantAlpha:
-				return GL_CONSTANT_ALPHA;
-			case RenderBlendingFactor::OneMinusConstantAlpha:
-				return GL_ONE_MINUS_CONSTANT_ALPHA;
+			}
+
 		}
-		return GL_ZERO;
 	}
-	
+
 	void GL_BASE::setBlending(sl_bool flagEnableBlending, const RenderBlendingParam& param)
 	{
 		if (flagEnableBlending) {
 			GL_ENTRY(glEnable)(GL_BLEND);
-			GLenum op = _priv_GL_getBlendingOp(param.operation);
-			GLenum opAlpha = _priv_GL_getBlendingOp(param.operationAlpha);
+			GLenum op = priv::gl::GetBlendingOp(param.operation);
+			GLenum opAlpha = priv::gl::GetBlendingOp(param.operationAlpha);
 			if (op != opAlpha) {
 				GL_ENTRY(glBlendEquationSeparate)(op, opAlpha);
 			} else {
 				GL_ENTRY(glBlendEquation)(op);
 			}
-			GLenum fSrc = _priv_GL_getBlendingFactor(param.blendSrc);
-			GLenum fDst = _priv_GL_getBlendingFactor(param.blendDst);
-			GLenum fSrcAlpha = _priv_GL_getBlendingFactor(param.blendSrcAlpha);
-			GLenum fDstAlpha = _priv_GL_getBlendingFactor(param.blendDstAlpha);
+			GLenum fSrc = priv::gl::GetBlendingFactor(param.blendSrc);
+			GLenum fDst = priv::gl::GetBlendingFactor(param.blendDst);
+			GLenum fSrcAlpha = priv::gl::GetBlendingFactor(param.blendSrcAlpha);
+			GLenum fDstAlpha = priv::gl::GetBlendingFactor(param.blendDstAlpha);
 			if (fSrc == fSrcAlpha && fDst == fDstAlpha) {
 				GL_ENTRY(glBlendFunc)(fSrc, fDst);
 			} else {
@@ -241,44 +256,50 @@ namespace slib
 		setBlending(flagEnableBlending, param);
 	}
 	
-	static sl_uint32 _priv_GL_createShader(GLenum type, const String& source)
+	namespace priv
 	{
-		GLuint shader = GL_ENTRY(glCreateShader)(type);
-		if (shader) {
-			if (source.isNotEmpty()) {
-				const GLchar* sz = source.getData();
-				GLint len = (GLint)(source.getLength());
-				GL_ENTRY(glShaderSource)(shader, 1, &sz, &len);
-				GL_ENTRY(glCompileShader)(shader);
-				GLint status = 0;
-				GL_ENTRY(glGetShaderiv)(shader, GL_COMPILE_STATUS, &status);
-				if (status != GL_FALSE) {
-					return shader;
-				} else {
-					GLchar log[1025];
-					GLsizei lenLog = 0;
-					GL_ENTRY(glGetShaderInfoLog)(shader, 1024, &lenLog, log);
-					log[lenLog] = 0;
-					if (type == GL_VERTEX_SHADER) {
-						Log("OpenGL Compile Vertex Shader", String(log));
-					} else if (type == GL_FRAGMENT_SHADER) {
-						Log("OpenGL Compile Fragment Shader", String(log));
+		namespace gl
+		{
+			static sl_uint32 CreateShader(GLenum type, const String& source)
+			{
+				GLuint shader = GL_ENTRY(glCreateShader)(type);
+				if (shader) {
+					if (source.isNotEmpty()) {
+						const GLchar* sz = source.getData();
+						GLint len = (GLint)(source.getLength());
+						GL_ENTRY(glShaderSource)(shader, 1, &sz, &len);
+						GL_ENTRY(glCompileShader)(shader);
+						GLint status = 0;
+						GL_ENTRY(glGetShaderiv)(shader, GL_COMPILE_STATUS, &status);
+						if (status != GL_FALSE) {
+							return shader;
+						} else {
+							GLchar log[1025];
+							GLsizei lenLog = 0;
+							GL_ENTRY(glGetShaderInfoLog)(shader, 1024, &lenLog, log);
+							log[lenLog] = 0;
+							if (type == GL_VERTEX_SHADER) {
+								Log("OpenGL Compile Vertex Shader", String(log));
+							} else if (type == GL_FRAGMENT_SHADER) {
+								Log("OpenGL Compile Fragment Shader", String(log));
+							}
+						}
 					}
+					GL_ENTRY(glDeleteShader)(shader);
 				}
+				return 0;
 			}
-			GL_ENTRY(glDeleteShader)(shader);
 		}
-		return 0;
 	}
-	
+
 	sl_uint32 GL_BASE::createVertexShader(const String& source)
 	{
-		return _priv_GL_createShader(GL_VERTEX_SHADER, source);
+		return priv::gl::CreateShader(GL_VERTEX_SHADER, source);
 	}
 	
 	sl_uint32 GL_BASE::createFragmentShader(const String& source)
 	{
-		return _priv_GL_createShader(GL_FRAGMENT_SHADER, source);
+		return priv::gl::CreateShader(GL_FRAGMENT_SHADER, source);
 	}
 	
 	void GL_BASE::deleteShader(sl_uint32 shader)
@@ -346,40 +367,48 @@ namespace slib
 			GL_ENTRY(glDeleteProgram)(program);
 		}
 	}
-	
-	static sl_uint32 _priv_GL_createBuffer(GLenum target, const void* data, sl_size size, sl_bool flagStatic)
+
+	namespace priv
 	{
-		GLuint buffer = 0;
-		GL_ENTRY(glGenBuffers)(1, &buffer);
-		if (buffer) {
-			GL_ENTRY(glBindBuffer)(target, buffer);
-			GL_ENTRY(glBufferData)(target, size, data, flagStatic ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);
-			return buffer;
+		namespace gl
+		{
+
+			static sl_uint32 CreateBuffer(GLenum target, const void* data, sl_size size, sl_bool flagStatic)
+			{
+				GLuint buffer = 0;
+				GL_ENTRY(glGenBuffers)(1, &buffer);
+				if (buffer) {
+					GL_ENTRY(glBindBuffer)(target, buffer);
+					GL_ENTRY(glBufferData)(target, size, data, flagStatic ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW);
+					return buffer;
+				}
+				return 0;
+			}
+			
+			static void UpdateBuffer(GLenum target, sl_uint32 buffer, sl_size offset, const void* data, sl_size size)
+			{
+				if (buffer) {
+					GL_ENTRY(glBindBuffer)(target, buffer);
+					GL_ENTRY(glBufferSubData)(target, buffer, size, data);
+				}
+			}
+
 		}
-		return 0;
 	}
-	
-	static void _priv_GL_updateBuffer(GLenum target, sl_uint32 buffer, sl_size offset, const void* data, sl_size size)
-	{
-		if (buffer) {
-			GL_ENTRY(glBindBuffer)(target, buffer);
-			GL_ENTRY(glBufferSubData)(target, buffer, size, data);
-		}
-	}
-	
+
 	sl_uint32 GL_BASE::createVertexBuffer(const void* data, sl_size size, sl_bool flagStatic)
 	{
-		return _priv_GL_createBuffer(GL_ARRAY_BUFFER, data, size, flagStatic);
+		return priv::gl::CreateBuffer(GL_ARRAY_BUFFER, data, size, flagStatic);
 	}
 	
 	sl_uint32 GL_BASE::createVertexBuffer(sl_size size, sl_bool flagStatic)
 	{
-		return _priv_GL_createBuffer(GL_ARRAY_BUFFER, sl_null, size, flagStatic);
+		return priv::gl::CreateBuffer(GL_ARRAY_BUFFER, sl_null, size, flagStatic);
 	}
 	
 	void GL_BASE::updateVertexBuffer(sl_uint32 buffer, sl_size offset, const void* data, sl_size size)
 	{
-		_priv_GL_updateBuffer(GL_ARRAY_BUFFER, buffer, offset, data, size);
+		priv::gl::UpdateBuffer(GL_ARRAY_BUFFER, buffer, offset, data, size);
 	}
 	
 	void GL_BASE::bindVertexBuffer(sl_uint32 buffer)
@@ -394,17 +423,17 @@ namespace slib
 	
 	sl_uint32 GL_BASE::createIndexBuffer(const void* data, sl_size size, sl_bool flagStatic)
 	{
-		return _priv_GL_createBuffer(GL_ELEMENT_ARRAY_BUFFER, data, size, flagStatic);
+		return priv::gl::CreateBuffer(GL_ELEMENT_ARRAY_BUFFER, data, size, flagStatic);
 	}
 	
 	sl_uint32 GL_BASE::createIndexBuffer(sl_size size, sl_bool flagStatic)
 	{
-		return _priv_GL_createBuffer(GL_ELEMENT_ARRAY_BUFFER, sl_null, size, flagStatic);
+		return priv::gl::CreateBuffer(GL_ELEMENT_ARRAY_BUFFER, sl_null, size, flagStatic);
 	}
 	
 	void GL_BASE::updateIndexBuffer(sl_uint32 buffer, sl_size offset, const void* data, sl_size size)
 	{
-		_priv_GL_updateBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer, offset, data, size);
+		priv::gl::UpdateBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer, offset, data, size);
 	}
 	
 	void GL_BASE::bindIndexBuffer(sl_uint32 buffer)
@@ -434,22 +463,28 @@ namespace slib
 		return -1;
 	}
 	
-	static void _priv_GL_setVertexArrayAttribute(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
+	namespace priv
 	{
-		if (attributeLocation != -1) {
-			GL_ENTRY(glEnableVertexAttribArray)(attributeLocation);
-			GL_ENTRY(glVertexAttribPointer)(attributeLocation, countComponents, GL_FLOAT, flagDoNormalize ? GL_TRUE : GL_FALSE, strideBytes, data);
+		namespace gl
+		{
+			static void SetVertexArrayAttribute(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
+			{
+				if (attributeLocation != -1) {
+					GL_ENTRY(glEnableVertexAttribArray)(attributeLocation);
+					GL_ENTRY(glVertexAttribPointer)(attributeLocation, countComponents, GL_FLOAT, flagDoNormalize ? GL_TRUE : GL_FALSE, strideBytes, data);
+				}
+			}
 		}
 	}
 	
 #define PRIV_DEFINE_SETVERTEXARRAY(t) \
 	void GL_BASE::setVertex##t##ArrayAttributePtr(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize) \
 	{ \
-		_priv_GL_setVertexArrayAttribute(attributeLocation, data, countComponents, strideBytes, flagDoNormalize); \
+		priv::gl::SetVertexArrayAttribute(attributeLocation, data, countComponents, strideBytes, flagDoNormalize); \
 	} \
 	void GL_BASE::setVertex##t##ArrayAttribute(sl_int32 attributeLocation, sl_size offsetValuesOnBuffer, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize) \
 	{ \
-		_priv_GL_setVertexArrayAttribute(attributeLocation, (void*)offsetValuesOnBuffer, countComponents, strideBytes, flagDoNormalize); \
+		priv::gl::SetVertexArrayAttribute(attributeLocation, (void*)offsetValuesOnBuffer, countComponents, strideBytes, flagDoNormalize); \
 	}
 	
 	PRIV_DEFINE_SETVERTEXARRAY(Float)
@@ -743,35 +778,41 @@ namespace slib
 		}
 	}
 	
-	SLIB_INLINE static GLenum _priv_GL_getPrimitiveType(PrimitiveType type)
+	namespace priv
 	{
-		switch (type) {
-			case PrimitiveType::Triangle:
+		namespace gl
+		{
+			SLIB_INLINE static GLenum GetPrimitiveType(PrimitiveType type)
+			{
+				switch (type) {
+					case PrimitiveType::Triangle:
+						return GL_TRIANGLES;
+					case PrimitiveType::TriangleStrip:
+						return GL_TRIANGLE_STRIP;
+					case PrimitiveType::TriangleFan:
+						return GL_TRIANGLE_FAN;
+					case PrimitiveType::Line:
+						return GL_LINES;
+					case PrimitiveType::LineLoop:
+						return GL_LINE_LOOP;
+					case PrimitiveType::LineStrip:
+						return GL_LINE_STRIP;
+					case PrimitiveType::Point:
+						return GL_POINTS;
+				}
 				return GL_TRIANGLES;
-			case PrimitiveType::TriangleStrip:
-				return GL_TRIANGLE_STRIP;
-			case PrimitiveType::TriangleFan:
-				return GL_TRIANGLE_FAN;
-			case PrimitiveType::Line:
-				return GL_LINES;
-			case PrimitiveType::LineLoop:
-				return GL_LINE_LOOP;
-			case PrimitiveType::LineStrip:
-				return GL_LINE_STRIP;
-			case PrimitiveType::Point:
-				return GL_POINTS;
+			}
 		}
-		return GL_TRIANGLES;
 	}
 	
 	void GL_BASE::drawPrimitives(PrimitiveType type, sl_uint32 countVertices, sl_uint32 startIndex)
 	{
-		GL_ENTRY(glDrawArrays)(_priv_GL_getPrimitiveType(type), startIndex, countVertices);
+		GL_ENTRY(glDrawArrays)(priv::gl::GetPrimitiveType(type), startIndex, countVertices);
 	}
 	
 	void GL_BASE::drawElements(PrimitiveType type, sl_uint32 countIndices, sl_size offsetBytes)
 	{
-		GL_ENTRY(glDrawElements)(_priv_GL_getPrimitiveType(type), countIndices, GL_UNSIGNED_SHORT, (void*)offsetBytes);
+		GL_ENTRY(glDrawElements)(priv::gl::GetPrimitiveType(type), countIndices, GL_UNSIGNED_SHORT, (void*)offsetBytes);
 	}
 	
 	void GL_BASE::setLineWidth(float width)
@@ -1003,25 +1044,31 @@ namespace slib
 		GL_ENTRY(glBindTexture)(GL_TEXTURE_2D, 0);
 	}
 	
-	static GLenum _priv_GL_getFilter(TextureFilterMode filter)
+	namespace priv
 	{
-		switch (filter) {
-			case TextureFilterMode::Linear:
-				return GL_LINEAR;
-			case TextureFilterMode::Point:
-				return GL_NEAREST;
+		namespace gl
+		{
+			static GLenum GetFilter(TextureFilterMode filter)
+			{
+				switch (filter) {
+					case TextureFilterMode::Linear:
+						return GL_LINEAR;
+					case TextureFilterMode::Point:
+						return GL_NEAREST;
+				}
+				return GL_NONE;
+			}
 		}
-		return GL_NONE;
 	}
 	
 	void GL_BASE::setTextureFilterMode(sl_uint32 target, TextureFilterMode minFilter, TextureFilterMode magFilter)
 	{
 		GLenum f;
-		f = _priv_GL_getFilter(minFilter);
+		f = priv::gl::GetFilter(minFilter);
 		if (f != GL_NONE) {
 			GL_ENTRY(glTexParameteri)(target, GL_TEXTURE_MIN_FILTER, f);
 		}
-		f = _priv_GL_getFilter(magFilter);
+		f = priv::gl::GetFilter(magFilter);
 		if (f != GL_NONE) {
 			GL_ENTRY(glTexParameteri)(target, GL_TEXTURE_MAG_FILTER, f);
 		}
@@ -1032,27 +1079,33 @@ namespace slib
 		setTextureFilterMode(GL_TEXTURE_2D, minFilter, magFilter);
 	}
 	
-	static GLenum _priv_GL_getWrap(TextureWrapMode wrap)
+	namespace priv
 	{
-		switch (wrap) {
-			case TextureWrapMode::Repeat:
-				return GL_REPEAT;
-			case TextureWrapMode::Mirror:
-				return GL_MIRRORED_REPEAT;
-			case TextureWrapMode::Clamp:
-				return GL_CLAMP_TO_EDGE;
+		namespace gl
+		{
+			static GLenum GetWrap(TextureWrapMode wrap)
+			{
+				switch (wrap) {
+					case TextureWrapMode::Repeat:
+						return GL_REPEAT;
+					case TextureWrapMode::Mirror:
+						return GL_MIRRORED_REPEAT;
+					case TextureWrapMode::Clamp:
+						return GL_CLAMP_TO_EDGE;
+				}
+				return GL_NONE;
+			}
 		}
-		return GL_NONE;
 	}
 	
 	void GL_BASE::setTextureWrapMode(sl_uint32 target, TextureWrapMode wrapX, TextureWrapMode wrapY)
 	{
 		GLenum f;
-		f = _priv_GL_getWrap(wrapX);
+		f = priv::gl::GetWrap(wrapX);
 		if (f != GL_NONE) {
 			GL_ENTRY(glTexParameteri)(target, GL_TEXTURE_WRAP_S, f);
 		}
-		f = _priv_GL_getWrap(wrapY);
+		f = priv::gl::GetWrap(wrapY);
 		if (f != GL_NONE) {
 			GL_ENTRY(glTexParameteri)(target, GL_TEXTURE_WRAP_T, f);
 		}

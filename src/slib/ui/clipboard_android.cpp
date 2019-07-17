@@ -29,17 +29,27 @@
 namespace slib
 {
 
-	SLIB_JNI_BEGIN_CLASS(JAndroidClipboard, "slib/platform/android/ui/Clipboard")
-		SLIB_JNI_STATIC_METHOD(hasText, "hasText", "(Landroid/app/Activity;)Z");
-		SLIB_JNI_STATIC_METHOD(getText, "getText", "(Landroid/app/Activity;)Ljava/lang/String;");
-		SLIB_JNI_STATIC_METHOD(setText, "setText", "(Landroid/app/Activity;Ljava/lang/String;)V");
-	SLIB_JNI_END_CLASS
+	namespace priv
+	{
+		namespace clipboard
+		{
+
+			SLIB_JNI_BEGIN_CLASS(JClipboard, "slib/platform/android/ui/Clipboard")
+				SLIB_JNI_STATIC_METHOD(hasText, "hasText", "(Landroid/app/Activity;)Z");
+				SLIB_JNI_STATIC_METHOD(getText, "getText", "(Landroid/app/Activity;)Ljava/lang/String;");
+				SLIB_JNI_STATIC_METHOD(setText, "setText", "(Landroid/app/Activity;Ljava/lang/String;)V");
+			SLIB_JNI_END_CLASS
+
+		}
+	}
+
+	using namespace priv::clipboard;
 	
 	sl_bool Clipboard::hasText()
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			return JAndroidClipboard::hasText.callBoolean(sl_null, jactivity) != 0;
+			return JClipboard::hasText.callBoolean(sl_null, jactivity) != 0;
 		}
 		return sl_false;
 	}
@@ -48,7 +58,7 @@ namespace slib
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			return JAndroidClipboard::getText.callString(sl_null, jactivity);
+			return JClipboard::getText.callString(sl_null, jactivity);
 		}
 		return sl_null;
 	}
@@ -58,7 +68,7 @@ namespace slib
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			JniLocal<jstring> jtext = Jni::getJniString(text);
-			return JAndroidClipboard::setText.call(sl_null, jactivity, jtext.get());
+			return JClipboard::setText.call(sl_null, jactivity, jtext.get());
 		}
 	}
 

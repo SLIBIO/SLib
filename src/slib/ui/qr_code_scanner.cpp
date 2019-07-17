@@ -29,47 +29,57 @@
 namespace slib
 {
 
-	SLIB_DEFINE_OBJECT(QRCodeScanner, CameraView)
-	
-	class _priv_QRCodeScanner_ScanBar_Program : public RenderProgram2D_Position
+	namespace priv
 	{
-	public:
-		String getGLSLVertexShader(RenderEngine* engine) override
+		namespace qr_code_scanner
 		{
-			String source = SLIB_STRINGIFY(
-										   uniform mat3 u_Transform;
-										   attribute vec2 a_Position;
-										   varying vec2 v_Position;
-										   void main() {
-											   vec3 P = vec3(a_Position.x, a_Position.y, 1.0) * u_Transform;
-											   gl_Position = vec4(P.x, P.y, 0.0, 1.0);
-											   v_Position = a_Position;
-										   }
-										   );
-			return source;
-		}
 
-		String getGLSLFragmentShader(RenderEngine* engine) override
-		{
-			String source = SLIB_STRINGIFY(
-										   uniform vec4 u_Color;
-										   varying vec2 v_Position;
-										   void main() {
-											   float a = 1.0 - (abs(0.5 - v_Position.y) * 2.0);
-											   float c = 1.0 - (abs(0.5 - v_Position.x) * 2.0);
-											   float b = pow(c, 0.2);
-											   gl_FragColor = u_Color*a*b;
-										   }
-										   );
-			return source;
+			class Program_ScanBar : public RenderProgram2D_Position
+			{
+			public:
+				String getGLSLVertexShader(RenderEngine* engine) override
+				{
+					String source = SLIB_STRINGIFY(
+												uniform mat3 u_Transform;
+												attribute vec2 a_Position;
+												varying vec2 v_Position;
+												void main() {
+													vec3 P = vec3(a_Position.x, a_Position.y, 1.0) * u_Transform;
+													gl_Position = vec4(P.x, P.y, 0.0, 1.0);
+													v_Position = a_Position;
+												}
+												);
+					return source;
+				}
+
+				String getGLSLFragmentShader(RenderEngine* engine) override
+				{
+					String source = SLIB_STRINGIFY(
+												uniform vec4 u_Color;
+												varying vec2 v_Position;
+												void main() {
+													float a = 1.0 - (abs(0.5 - v_Position.y) * 2.0);
+													float c = 1.0 - (abs(0.5 - v_Position.x) * 2.0);
+													float b = pow(c, 0.2);
+													gl_FragColor = u_Color*a*b;
+												}
+												);
+					return source;
+				}
+			};
+			
 		}
-	};
+	}
+
+	using namespace priv::qr_code_scanner;
+
+	SLIB_DEFINE_OBJECT(QRCodeScanner, CameraView)
 	
 	QRCodeScanner::QRCodeScanner()
 	{
 		m_flagUpdateCameraFrame = sl_false;
 		setScaleMode(ScaleMode::Cover);
-		m_programScanBar = new _priv_QRCodeScanner_ScanBar_Program;
+		m_programScanBar = new Program_ScanBar;
 	}
 	
 	QRCodeScanner::~QRCodeScanner()

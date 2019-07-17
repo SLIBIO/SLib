@@ -774,6 +774,18 @@ namespace slib
 			return;
 		}
 		
+		if (isNativeWidget()) {
+			UISize size;
+			if (_measureSize_NW(size)) {
+				if (flagHorizontal) {
+					setLayoutWidth(size.x);
+				}
+				if (flagVertical) {
+					setLayoutHeight(size.y);
+				}
+				return;
+			}
+		}
 		UISize size = measureLayoutContentSize(flagHorizontal ? 0 : getLayoutWidth(), flagVertical ? 0 : getLayoutHeight());
 		if (flagHorizontal) {
 			setLayoutWidth(size.x + getPaddingLeft() + getPaddingRight());
@@ -807,24 +819,11 @@ namespace slib
 		return size;
 	}
 
-	namespace priv
-	{
-		namespace button
-		{
-			UISize measureNativeWidgetSize(Button* view);
-		}
-	}
-	
 	UISize Button::measureLayoutContentSize(sl_ui_len widthFrame, sl_ui_len heightFrame)
 	{
-#if defined(SLIB_UI_IS_MACOS)
-		if (isNativeWidget()) {
-			return priv::button::measureNativeWidgetSize(this);
-		}
-#endif
 		return measureContentSize(widthFrame, heightFrame);
 	}
-
+	
 	void Button::layoutIconAndText(sl_ui_len widthFrame, sl_ui_len heightFrame, UISize& sizeContent, UIRect& frameIcon, UIRect& frameText)
 	{
 		sl_ui_pos widthText = 0;
@@ -1149,4 +1148,11 @@ namespace slib
 	}
 #endif
 
+#if !defined(SLIB_UI_IS_MACOS)
+	sl_bool Button::_measureSize_NW(UISize& _out)
+	{
+		return sl_false;
+	}
+#endif
+	
 }

@@ -1127,14 +1127,23 @@
 
 namespace slib
 {
-	struct _priv_GL_EntryPoints
+	namespace priv
 	{
-		PRIV_SLIB_RENDER_GL_ENTRIES
-	};
-	extern _priv_GL_EntryPoints _priv_GL_entries;
+		namespace gl
+		{
+
+			struct EntryPoints
+			{
+				PRIV_SLIB_RENDER_GL_ENTRIES
+			};
+
+			extern EntryPoints g_entries;
+
+		}
+	}
 }
 
-#define PRIV_GL_ENTRY(name) _priv_GL_entries.name
+#define PRIV_GL_ENTRY(name) slib::priv::gl::g_entries.name
 
 #elif defined(SLIB_PLATFORM_IS_MACOS)
 

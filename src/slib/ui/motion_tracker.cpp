@@ -157,104 +157,112 @@ namespace slib
 		}
 		return sl_false;
 	}
-	
-	SLIB_INLINE static sl_real _priv_MotionTracker_getVectorDotProduct(const sl_real* v1, const sl_real* v2, sl_uint32 N)
+
+	namespace priv
 	{
-		sl_real dot = 0;
-		for (sl_uint32 i = 0; i < N; i++) {
-			dot += v1[i] * v2[i];
-		}
-		return dot;
-	}
-	
-	SLIB_INLINE static sl_real _priv_MotionTracker_getVectorLength(const sl_real* v, sl_uint32 N)
-	{
-		sl_real len = 0;
-		for (sl_uint32 i = 0; i < N; i++) {
-			len += v[i] * v[i];
-		}
-		return Math::sqrt(len);
-	}
-	
-	static sl_bool _priv_MotionTracker_solveLeastSquares(const sl_real* x, const sl_real* y, const sl_real* w, sl_uint32 m, sl_uint32 n, sl_real* outB, sl_real* outDet) {
-		// Expand the X vector to a matrix A, pre-multiplied by the weights.
-		sl_real a[MAX_DEGREE + 1][HISTORY_SIZE]; // column-major order
-		for (sl_uint32 h = 0; h < m; h++) {
-			a[0][h] = w[h];
-			for (sl_uint32 i = 1; i < n; i++) {
-				a[i][h] = a[i - 1][h] * x[h];
-			}
-		}
-		// Apply the Gram-Schmidt process to A to obtain its QR decomposition.
-		sl_real q[MAX_DEGREE + 1][HISTORY_SIZE]; // orthonormal basis, column-major order
-		sl_real r[MAX_DEGREE + 1][MAX_DEGREE + 1]; // upper triangular matrix, row-major order
-		for (sl_uint32 j = 0; j < n; j++) {
-			for (sl_uint32 h = 0; h < m; h++) {
-				q[j][h] = a[j][h];
-			}
-			for (sl_uint32 i = 0; i < j; i++) {
-				sl_real dot = _priv_MotionTracker_getVectorDotProduct(&q[j][0], &q[i][0], m);
-				for (sl_uint32 h = 0; h < m; h++) {
-					q[j][h] -= dot * q[i][h];
+		namespace motion_tracker
+		{
+			
+			SLIB_INLINE static sl_real GetVectorDotProduct(const sl_real* v1, const sl_real* v2, sl_uint32 N)
+			{
+				sl_real dot = 0;
+				for (sl_uint32 i = 0; i < N; i++) {
+					dot += v1[i] * v2[i];
 				}
+				return dot;
 			}
-			//sl_real f = q[j][0];
-			sl_real norm = _priv_MotionTracker_getVectorLength(&q[j][0], m);
-			if (norm < 0.000001f) {
-				// vectors are linearly dependent or zero so no solution
-				return sl_false;
+			
+			SLIB_INLINE static sl_real GetVectorLength(const sl_real* v, sl_uint32 N)
+			{
+				sl_real len = 0;
+				for (sl_uint32 i = 0; i < N; i++) {
+					len += v[i] * v[i];
+				}
+				return Math::sqrt(len);
 			}
-			sl_real invNorm = 1.0f / norm;
-			for (sl_uint32 h = 0; h < m; h++) {
-				q[j][h] *= invNorm;
+			
+			static sl_bool SolveLeastSquares(const sl_real* x, const sl_real* y, const sl_real* w, sl_uint32 m, sl_uint32 n, sl_real* outB, sl_real* outDet) {
+				// Expand the X vector to a matrix A, pre-multiplied by the weights.
+				sl_real a[MAX_DEGREE + 1][HISTORY_SIZE]; // column-major order
+				for (sl_uint32 h = 0; h < m; h++) {
+					a[0][h] = w[h];
+					for (sl_uint32 i = 1; i < n; i++) {
+						a[i][h] = a[i - 1][h] * x[h];
+					}
+				}
+				// Apply the Gram-Schmidt process to A to obtain its QR decomposition.
+				sl_real q[MAX_DEGREE + 1][HISTORY_SIZE]; // orthonormal basis, column-major order
+				sl_real r[MAX_DEGREE + 1][MAX_DEGREE + 1]; // upper triangular matrix, row-major order
+				for (sl_uint32 j = 0; j < n; j++) {
+					for (sl_uint32 h = 0; h < m; h++) {
+						q[j][h] = a[j][h];
+					}
+					for (sl_uint32 i = 0; i < j; i++) {
+						sl_real dot = GetVectorDotProduct(&q[j][0], &q[i][0], m);
+						for (sl_uint32 h = 0; h < m; h++) {
+							q[j][h] -= dot * q[i][h];
+						}
+					}
+					//sl_real f = q[j][0];
+					sl_real norm = GetVectorLength(&q[j][0], m);
+					if (norm < 0.000001f) {
+						// vectors are linearly dependent or zero so no solution
+						return sl_false;
+					}
+					sl_real invNorm = 1.0f / norm;
+					for (sl_uint32 h = 0; h < m; h++) {
+						q[j][h] *= invNorm;
+					}
+					for (sl_uint32 i = 0; i < n; i++) {
+						r[j][i] = i < j ? 0 : GetVectorDotProduct(&q[j][0], &a[i][0], m);
+					}
+				}
+				
+				// Solve R B = Qt W Y to find B.  This is easy because R is upper triangular.
+				// We just work from bottom-right to top-left calculating B's coefficients.
+				sl_real wy[HISTORY_SIZE];
+				for (sl_uint32 h = 0; h < m; h++) {
+					wy[h] = y[h] * w[h];
+				}
+				for (sl_uint32 i = n; i != 0; ) {
+					i--;
+					outB[i] = GetVectorDotProduct(&q[i][0], wy, m);
+					for (sl_uint32 j = n - 1; j > i; j--) {
+						outB[i] -= r[i][j] * outB[j];
+					}
+					outB[i] /= r[i][i];
+				}
+				
+				// Calculate the coefficient of determination as 1 - (SSerr / SStot) where
+				// SSerr is the residual sum of squares (variance of the error),
+				// and SStot is the total sum of squares (variance of the data) where each
+				// has been weighted.
+				sl_real ymean = 0;
+				for (sl_uint32 h = 0; h < m; h++) {
+					ymean += y[h];
+				}
+				ymean /= m;
+				sl_real sserr = 0;
+				sl_real sstot = 0;
+				for (sl_uint32 h = 0; h < m; h++) {
+					sl_real err = y[h] - outB[0];
+					sl_real term = 1;
+					for (sl_uint32 i = 1; i < n; i++) {
+						term *= x[h];
+						err -= term * outB[i];
+					}
+					sserr += w[h] * w[h] * err * err;
+					sl_real var = y[h] - ymean;
+					sstot += w[h] * w[h] * var * var;
+				}
+				*outDet = sstot > 0.000001f ? 1.0f - (sserr / sstot) : 1;
+				
+				return sl_true;
 			}
-			for (sl_uint32 i = 0; i < n; i++) {
-				r[j][i] = i < j ? 0 : _priv_MotionTracker_getVectorDotProduct(&q[j][0], &a[i][0], m);
-			}
+
 		}
-		
-		// Solve R B = Qt W Y to find B.  This is easy because R is upper triangular.
-		// We just work from bottom-right to top-left calculating B's coefficients.
-		sl_real wy[HISTORY_SIZE];
-		for (sl_uint32 h = 0; h < m; h++) {
-			wy[h] = y[h] * w[h];
-		}
-		for (sl_uint32 i = n; i != 0; ) {
-			i--;
-			outB[i] = _priv_MotionTracker_getVectorDotProduct(&q[i][0], wy, m);
-			for (sl_uint32 j = n - 1; j > i; j--) {
-				outB[i] -= r[i][j] * outB[j];
-			}
-			outB[i] /= r[i][i];
-		}
-		
-		// Calculate the coefficient of determination as 1 - (SSerr / SStot) where
-		// SSerr is the residual sum of squares (variance of the error),
-		// and SStot is the total sum of squares (variance of the data) where each
-		// has been weighted.
-		sl_real ymean = 0;
-		for (sl_uint32 h = 0; h < m; h++) {
-			ymean += y[h];
-		}
-		ymean /= m;
-		sl_real sserr = 0;
-		sl_real sstot = 0;
-		for (sl_uint32 h = 0; h < m; h++) {
-			sl_real err = y[h] - outB[0];
-			sl_real term = 1;
-			for (sl_uint32 i = 1; i < n; i++) {
-				term *= x[h];
-				err -= term * outB[i];
-			}
-			sserr += w[h] * w[h] * err * err;
-			sl_real var = y[h] - ymean;
-			sstot += w[h] * w[h] * var * var;
-		}
-		*outDet = sstot > 0.000001f ? 1.0f - (sserr / sstot) : 1;
-		
-		return sl_true;
 	}
-	
+		
 	void MotionTracker::_computeVelocity()
 	{
 		if (!m_flagRefreshTrack) {
@@ -298,7 +306,7 @@ namespace slib
 			}
 			if (degree >= 1) {
 				sl_real xdet, ydet;
-				if (_priv_MotionTracker_solveLeastSquares(time, x, w, nHistory, degree + 1, xCoeff, &xdet) && _priv_MotionTracker_solveLeastSquares(time, y, w, nHistory, degree + 1, yCoeff, &ydet)) {
+				if (priv::motion_tracker::SolveLeastSquares(time, x, w, nHistory, degree + 1, xCoeff, &xdet) && priv::motion_tracker::SolveLeastSquares(time, y, w, nHistory, degree + 1, yCoeff, &ydet)) {
 					m_currentConfidence = xdet * ydet;
 					m_currentVelocity.x = xCoeff[1];
 					m_currentVelocity.y = yCoeff[1];
