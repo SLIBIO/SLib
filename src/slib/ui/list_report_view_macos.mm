@@ -277,27 +277,21 @@ using namespace slib::priv::list_report_view;
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView{
-	Ref<macOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		Ref<View> view = instance->getView();
-		if (ListReportView* _view = CastInstance<ListReportView>(view.get())) {
-			return _view->getRowsCount();
-		}
+	Ref<ListReportView> view = GetViewFromInstance<ListReportView, macOS_ViewInstance>(m_viewInstance);
+	if (view.isNotNull()) {
+		return view->getRowsCount();
 	}
 	return 0;
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row{
-	Ref<macOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		Ref<View> view = instance->getView();
-		if (ListReportView* _view = CastInstance<ListReportView>(view.get())) {
-			NSString* _id = tableColumn.identifier;
-			if (_id != nil) {
-				sl_uint32 iRow = (sl_uint32)(row);
-				sl_uint32 iCol = (sl_uint32)(_id.intValue);
-				return Apple::getNSStringFromString(_view->getItemText(iRow, iCol));
-			}
+	Ref<ListReportView> view = GetViewFromInstance<ListReportView, macOS_ViewInstance>(m_viewInstance);
+	if (view.isNotNull()) {
+		NSString* _id = tableColumn.identifier;
+		if (_id != nil) {
+			sl_uint32 iRow = (sl_uint32)(row);
+			sl_uint32 iCol = (sl_uint32)(_id.intValue);
+			return Apple::getNSStringFromString(view->getItemText(iRow, iCol));
 		}
 	}
 	return @"";
@@ -305,14 +299,11 @@ using namespace slib::priv::list_report_view;
 
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
-	Ref<macOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		Ref<View> view = instance->getView();
-		if (ListReportViewHelper* _view = CastInstance<ListReportViewHelper>(view.get())) {
-			sl_int32 n = (sl_int32)([table selectedRow]);
-			if (n >= 0) {
-				_view->dispatchSelectRow(n);
-			}
+	Ref<ListReportView> view = GetViewFromInstance<ListReportView, macOS_ViewInstance>(m_viewInstance);
+	if (view.isNotNull()) {
+		sl_int32 n = (sl_int32)([table selectedRow]);
+		if (n >= 0) {
+			view->dispatchSelectRow(n);
 		}
 	}
 }
@@ -332,22 +323,19 @@ MACOS_VIEW_DEFINE_ON_KEY
 	NSPoint ptView = [self convertPoint:ptWindow fromView:nil];
 	NSInteger indexRow = [self rowAtPoint:ptView];
 	if (indexRow >= 0) {
-		Ref<macOS_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			Ref<View> view = instance->getView();
-			if (ListReportViewHelper* _view = CastInstance<ListReportViewHelper>(view.get())) {
-				if (indexRow == indexRowBefore) {
-					// don't call event callback when it is new selection because it is already called by default
-					_view->dispatchSelectRow((sl_uint32)(indexRow));
-				}
-				sl_ui_posf x = (sl_ui_posf)(ptView.x);
-				sl_ui_posf y = (sl_ui_posf)(ptView.y);
-				NSInteger clicks = [theEvent clickCount];
-				if (clicks == 1) {
-					_view->dispatchClickRow((sl_uint32)(indexRow), UIPointf(x, y));
-				} else if (clicks == 2) {
-					_view->dispatchDoubleClickRow((sl_uint32)(indexRow), UIPointf(x, y));
-				}
+		Ref<ListReportView> view = GetViewFromInstance<ListReportView, macOS_ViewInstance>(m_viewInstance);
+		if (view.isNotNull()) {
+			if (indexRow == indexRowBefore) {
+				// don't call event callback when it is new selection because it is already called by default
+				view->dispatchSelectRow((sl_uint32)(indexRow));
+			}
+			sl_ui_posf x = (sl_ui_posf)(ptView.x);
+			sl_ui_posf y = (sl_ui_posf)(ptView.y);
+			NSInteger clicks = [theEvent clickCount];
+			if (clicks == 1) {
+				view->dispatchClickRow((sl_uint32)(indexRow), UIPointf(x, y));
+			} else if (clicks == 2) {
+				view->dispatchDoubleClickRow((sl_uint32)(indexRow), UIPointf(x, y));
 			}
 		}
 	}
@@ -360,14 +348,11 @@ MACOS_VIEW_DEFINE_ON_KEY
 	NSPoint ptView = [self convertPoint:ptWindow fromView:nil];
 	NSInteger indexRow = [self rowAtPoint:ptView];
 	if (indexRow >= 0) {
-		Ref<macOS_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			Ref<View> view = instance->getView();
-			if (ListReportViewHelper* _view = CastInstance<ListReportViewHelper>(view.get())) {
-				sl_ui_posf x = (sl_ui_posf)(ptView.x);
-				sl_ui_posf y = (sl_ui_posf)(ptView.y);
-				_view->dispatchRightButtonClickRow((sl_uint32)(indexRow), UIPointf(x, y));
-			}
+		Ref<ListReportView> view = GetViewFromInstance<ListReportView, macOS_ViewInstance>(m_viewInstance);
+		if (view.isNotNull()) {
+			sl_ui_posf x = (sl_ui_posf)(ptView.x);
+			sl_ui_posf y = (sl_ui_posf)(ptView.y);
+			view->dispatchRightButtonClickRow((sl_uint32)(indexRow), UIPointf(x, y));
 		}
 	}
 }

@@ -249,23 +249,17 @@ MACOS_VIEW_DEFINE_ON_KEY
 -(void)setFrame:(NSRect)frame
 {
 	[super setFrame:frame];
-	Ref<macOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		Ref<View> view = instance->getView();
-		if (TabViewHelper* _view = CastInstance<TabViewHelper>(view.get())) {
-			_view->_updateContentViewSize(self);
-		}
+	Ref<TabViewHelper> view = GetViewFromInstance<TabViewHelper, macOS_ViewInstance>(m_viewInstance);
+	if (view.isNotNull()) {
+		view->_updateContentViewSize(self);
 	}
 }
 
 - (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
-	Ref<macOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		Ref<View> view = instance->getView();
-		if (TabViewHelper* _view = CastInstance<TabViewHelper>(view.get())) {
-			_view->_onSelectTab(self);
-		}
+	Ref<TabViewHelper> view = GetViewFromInstance<TabViewHelper, macOS_ViewInstance>(m_viewInstance);
+	if (view.isNotNull()) {
+		view->_onSelectTab(self);
 	}
 }
 @end

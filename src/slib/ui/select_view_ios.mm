@@ -377,48 +377,36 @@ IOS_VIEW_DEFINE_ON_FOCUS
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
 {
-	Ref<iOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		Ref<View> view = instance->getView();
-		if (SelectViewHelper* _view = CastInstance<SelectViewHelper>(view.get())) {
-			_view->_onSelectItem(self, (sl_uint32)row);
-		}
+	Ref<SelectViewHelper> view = GetViewFromInstance<SelectViewHelper, iOS_ViewInstance>(m_viewInstance);
+	if (view.isNotNull()) {
+		view->_onSelectItem(self, (sl_uint32)row);
 	}
 }
 
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component;
 {
-	Ref<iOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		Ref<View> view = instance->getView();
-		if (SelectViewHelper* _view = CastInstance<SelectViewHelper>(view.get())) {
-			return (NSInteger)(_view->_getItemsCount());
-		}
+	Ref<SelectViewHelper> view = GetViewFromInstance<SelectViewHelper, iOS_ViewInstance>(m_viewInstance);
+	if (view.isNotNull()) {
+		return (NSInteger)(view->_getItemsCount());
 	}
 	return 0;
 }
 
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component;
 {
-	Ref<iOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		Ref<View> view = instance->getView();
-		if (SelectViewHelper* _view = CastInstance<SelectViewHelper>(view.get())) {
-			return _view->_getItemTitle((sl_uint32)row);
-		}
+	Ref<SelectViewHelper> view = GetViewFromInstance<SelectViewHelper, iOS_ViewInstance>(m_viewInstance);
+	if (view.isNotNull()) {
+		return view->_getItemTitle((sl_uint32)row);
 	}
 	return @"";
 }
 
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)aTextField
 {
-	Ref<iOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		Ref<View> view = instance->getView();
-		if (SelectViewHelper* _view = CastInstance<SelectViewHelper>(view.get())) {
-			if ((NSInteger)(_view->_getItemsCount()) > 0) {
-				return YES;
-			}
+	Ref<SelectViewHelper> view = GetViewFromInstance<SelectViewHelper, iOS_ViewInstance>(m_viewInstance);
+	if (view.isNotNull()) {
+		if ((NSInteger)(view->_getItemsCount()) > 0) {
+			return YES;
 		}
 	}
 	return NO;
@@ -427,12 +415,9 @@ IOS_VIEW_DEFINE_ON_FOCUS
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
 	[self sendActionsForControlEvents:UIControlEventEditingDidBegin];
-	Ref<iOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		Ref<View> view = instance->getView();
-		if (SelectViewHelper* _view = CastInstance<SelectViewHelper>(view.get())) {
-			_view->_onStartSelection(self);
-		}
+	Ref<SelectViewHelper> view = GetViewFromInstance<SelectViewHelper, iOS_ViewInstance>(m_viewInstance);
+	if (view.isNotNull()) {
+		view->_onStartSelection(self);
 	}
 }
 
@@ -455,12 +440,9 @@ IOS_VIEW_DEFINE_ON_FOCUS
 -(void)cancelClicked:(id)sender
 {
 	[self resignFirstResponder];
-	Ref<iOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		Ref<View> view = instance->getView();
-		if (SelectViewHelper* _view = CastInstance<SelectViewHelper>(view.get())) {
-			_view->_onCancelSelection(self);
-		}
+	Ref<SelectViewHelper> view = GetViewFromInstance<SelectViewHelper, iOS_ViewInstance>(m_viewInstance);
+	if (view.isNotNull()) {
+		view->_onCancelSelection(self);
 	}
 }
 @end

@@ -47,6 +47,7 @@ namespace slib
 		
 			SLIB_SAFE_STATIC_GETTER(String, getAppDir, System::getApplicationDirectory())
 			
+#if !defined(SLIB_PLATFORM_IS_MOBILE)
 			static void CrashHandler(int)
 			{
 				Ref<Application> app = Application::getApp();
@@ -57,7 +58,8 @@ namespace slib
 					System::exec(app->getExecutablePath(), s, n);
 				}
 			}
-
+#endif
+			
 		}
 	}
 

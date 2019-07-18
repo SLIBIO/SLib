@@ -195,12 +195,9 @@ MACOS_VIEW_DEFINE_ON_KEY
 
 -(void)onSelect
 {
-	Ref<macOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNotNull()) {
-		Ref<View> view = instance->getView();
-		if (SelectViewHelper* _view = CastInstance<SelectViewHelper>(view.get())) {
-			_view->_onSelectItem(self);
-		}
+	Ref<SelectViewHelper> view = GetViewFromInstance<SelectViewHelper, macOS_ViewInstance>(m_viewInstance);
+	if (view.isNotNull()) {
+		view->_onSelectItem(self);
 	}
 }
 
