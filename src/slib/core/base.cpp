@@ -49,14 +49,14 @@ namespace slib
 {
 	
 #if SLIB_WCHAR_SIZE == 2
-	typedef wchar_t _base_char16;
+	typedef wchar_t sl_base_char16;
 #else
-	typedef char16_t _base_char16;
+	typedef char16_t sl_base_char16;
 #endif
 #if SLIB_WCHAR_SIZE == 4
-	typedef wchar_t _base_char32;
+	typedef wchar_t sl_base_char32;
 #else
-	typedef char32_t _base_char32;
+	typedef char32_t sl_base_char32;
 #endif
 
 	void* Base::createMemory(sl_size size) noexcept
@@ -110,22 +110,22 @@ namespace slib
 
 	void Base::resetMemory2(sl_uint16* dst, sl_uint16 value, sl_size count) noexcept
 	{
-		std::char_traits<_base_char16>::assign((_base_char16*)dst, count, (_base_char16)value);
+		std::char_traits<sl_base_char16>::assign((sl_base_char16*)dst, count, (sl_base_char16)value);
 	}
 
 	void Base::resetMemory2(sl_int16* dst, sl_int16 value, sl_size count) noexcept
 	{
-		std::char_traits<_base_char16>::assign((_base_char16*)dst, count, (_base_char16)value);
+		std::char_traits<sl_base_char16>::assign((sl_base_char16*)dst, count, (sl_base_char16)value);
 	}
 
 	void Base::resetMemory4(sl_uint32* dst, sl_uint32 value, sl_size count) noexcept
 	{
-		std::char_traits<_base_char32>::assign((_base_char32*)dst, count, (_base_char32)value);
+		std::char_traits<sl_base_char32>::assign((sl_base_char32*)dst, count, (sl_base_char32)value);
 	}
 
 	void Base::resetMemory4(sl_int32* dst, sl_int32 value, sl_size count) noexcept
 	{
-		std::char_traits<_base_char32>::assign((_base_char32*)dst, count, (_base_char32)value);
+		std::char_traits<sl_base_char32>::assign((sl_base_char32*)dst, count, (sl_base_char32)value);
 	}
 
 	void Base::resetMemory8(sl_uint64* dst, sl_uint64 value, sl_size count) noexcept
@@ -185,7 +185,7 @@ namespace slib
 
 	sl_compare_result Base::compareMemory2(const sl_uint16* m1, const sl_uint16* m2, sl_size count) noexcept
 	{
-		return (sl_compare_result)(std::char_traits<_base_char16>::compare((_base_char16*)m1, (_base_char16*)m2, count));
+		return (sl_compare_result)(std::char_traits<sl_base_char16>::compare((sl_base_char16*)m1, (sl_base_char16*)m2, count));
 	}
 
 	sl_compare_result Base::compareMemory2(const sl_int16* m1, const sl_int16* m2, sl_size count) noexcept
@@ -195,7 +195,7 @@ namespace slib
 
 	sl_compare_result Base::compareMemory4(const sl_uint32* m1, const sl_uint32* m2, sl_size count) noexcept
 	{
-		return (sl_compare_result)(std::char_traits<_base_char32>::compare((_base_char32*)m1, (_base_char32*)m2, count));
+		return (sl_compare_result)(std::char_traits<sl_base_char32>::compare((sl_base_char32*)m1, (sl_base_char32*)m2, count));
 	}
 
 	sl_compare_result Base::compareMemory4(const sl_int32* m1, const sl_int32* m2, sl_size count) noexcept
@@ -396,22 +396,22 @@ namespace slib
 
 	const sl_uint16* Base::findMemory2(const sl_uint16* m, sl_uint16 pattern, sl_size count) noexcept
 	{
-		return (const sl_uint16*)(std::char_traits<_base_char16>::find((_base_char16*)m, count, (_base_char16)pattern));
+		return (const sl_uint16*)(std::char_traits<sl_base_char16>::find((sl_base_char16*)m, count, (sl_base_char16)pattern));
 	}
 
 	const sl_int16* Base::findMemory2(const sl_int16* m, sl_int16 pattern, sl_size count) noexcept
 	{
-		return (const sl_int16*)(std::char_traits<_base_char16>::find((_base_char16*)m, count, (_base_char16)pattern));
+		return (const sl_int16*)(std::char_traits<sl_base_char16>::find((sl_base_char16*)m, count, (sl_base_char16)pattern));
 	}
 
 	const sl_uint32* Base::findMemory4(const sl_uint32* m, sl_uint32 pattern, sl_size count) noexcept
 	{
-		return (const sl_uint32*)(std::char_traits<_base_char32>::find((_base_char32*)m, count, (_base_char32)pattern));
+		return (const sl_uint32*)(std::char_traits<sl_base_char32>::find((sl_base_char32*)m, count, (sl_base_char32)pattern));
 	}
 
 	const sl_int32* Base::findMemory4(const sl_int32* m, sl_int32 pattern, sl_size count) noexcept
 	{
-		return (const sl_int32*)(std::char_traits<_base_char32>::find((_base_char32*)m, count, (_base_char32)pattern));
+		return (const sl_int32*)(std::char_traits<sl_base_char32>::find((sl_base_char32*)m, count, (sl_base_char32)pattern));
 	}
 
 	const sl_uint64* Base::findMemory8(const sl_uint64* m, sl_uint64 pattern, sl_size count) noexcept

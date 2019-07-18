@@ -119,7 +119,7 @@ namespace slib
 				QuitLoop();
 			}
 			
-			SLIB_STATIC_ZERO_INITIALIZED(AtomicList<ScreenOrientation>, g_listAvailableScreenOrientations);
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicList<ScreenOrientation>, g_listAvailableScreenOrientations)
 
 			UIKeyboardAdjustMode g_keyboardAdjustMode = UIKeyboardAdjustMode::Pan;
 			

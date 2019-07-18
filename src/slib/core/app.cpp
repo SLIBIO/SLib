@@ -46,6 +46,17 @@ namespace slib
 			SLIB_SAFE_STATIC_GETTER(String, getAppPath, System::getApplicationPath())
 		
 			SLIB_SAFE_STATIC_GETTER(String, getAppDir, System::getApplicationDirectory())
+			
+			static void CrashHandler(int)
+			{
+				Ref<Application> app = Application::getApp();
+				if (app.isNotNull()) {
+					List<String> args = app->getArguments();
+					String* s = args.getData();
+					sl_uint32 n = (sl_uint32)(args.getCount());
+					System::exec(app->getExecutablePath(), s, n);
+				}
+			}
 
 		}
 	}
@@ -122,17 +133,6 @@ namespace slib
 		doRun();
 	}
 
-	void _app_crash_handler(int n)
-	{
-		Ref<Application> app = Application::getApp();
-		if (app.isNotNull()) {
-			List<String> args = app->getArguments();
-			String* s = args.getData();
-			sl_uint32 n = (sl_uint32)(args.getCount());
-			System::exec(app->getExecutablePath(), s, n);
-		}
-	}
-
 	void Application::doRun()
 	{
 		Application::setApp(this);
@@ -150,7 +150,7 @@ namespace slib
 		}
 		
 		if (isCrashRecoverySupport()) {
-			System::setCrashHandler(_app_crash_handler);
+			System::setCrashHandler(CrashHandler);
 		}
 		
 #endif
