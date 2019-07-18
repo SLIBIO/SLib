@@ -198,11 +198,11 @@ namespace slib
 							Win32_WindowInstance* w = static_cast<Win32_WindowInstance*>(window.get());
 							HWND hWndParent = w->m_handle;
 							if (hWndParent) {
-								::SetWindowLongPtr(hWnd, GWLP_HWNDPARENT, (LONG_PTR)hWndParent);
+								SetWindowLongPtrW(hWnd, GWLP_HWNDPARENT, (LONG_PTR)hWndParent);
 								return sl_true;
 							}
 						} else {
-							::SetWindowLongPtr(hWnd, GWLP_HWNDPARENT, (LONG_PTR)NULL);
+							SetWindowLongPtrW(hWnd, GWLP_HWNDPARENT, (LONG_PTR)NULL);
 							return sl_true;
 						}
 					}
@@ -442,7 +442,7 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						DWORD dwExStyle = ::GetWindowLong(hWnd, GWL_EXSTYLE);
+						DWORD dwExStyle = GetWindowLongW(hWnd, GWL_EXSTYLE);
 						if (dwExStyle & WS_EX_TOPMOST) {
 							return sl_true;
 						} else {
