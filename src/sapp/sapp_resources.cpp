@@ -283,6 +283,10 @@ namespace slib
 		return sl_false;
 	}
 
+	sl_bool SAppLayoutDatePickerAttributes::isNotRequiredNative()
+	{
+		return sl_false;
+	}
 
 	String SAppLayoutStyle::getXmlAttribute(const String& name)
 	{
@@ -443,6 +447,10 @@ namespace slib
 				prefix = "picker";
 				pN = &nAutoIncreaseNamePicker;
 				break;
+			case SAppLayoutItemType::DatePicker:
+				prefix = "datePicker";
+				pN = &nAutoIncreaseNameDatePicker;
+				break;
 			case SAppLayoutItemType::Pager:
 				prefix = "pager";
 				pN = &nAutoIncreaseNamePager;
@@ -544,6 +552,8 @@ namespace slib
 			type = SAppLayoutItemType::SwitchLabel;
 		} else if (strType == "picker") {
 			type = SAppLayoutItemType::Picker;
+		} else if (strType == "datepicker" || strType == "date-picker") {
+			type = SAppLayoutItemType::DatePicker;
 		} else if (strType == "pager") {
 			type = SAppLayoutItemType::Pager;
 		} else if (strType == "navigation") {

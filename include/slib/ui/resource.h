@@ -342,6 +342,7 @@ namespace slib
 	class SwitchView;
 	class SwitchLabelView;
 	class PickerView;
+	class DatePicker;
 	class ViewPager;
 	class ViewPageNavigationController;
 	class VideoView;

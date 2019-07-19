@@ -1256,6 +1256,33 @@ namespace slib
 	}
 	
 	/************************************************
+	 				Time
+	************************************************/
+	
+	SAppTimeValue::SAppTimeValue()
+	: flagDefined(sl_false), value(Time::zero())
+	{
+	}
+	
+	String SAppTimeValue::getAccessString()
+	{
+		if (!flagDefined) {
+			return "slib::Time::zero()";
+		}
+		return String::format("slib::Time::fromInt(%s)", value.toInt());
+	}
+	
+	sl_bool SAppTimeValue::parse(const String& _str)
+	{
+		String str = _str.trim();
+		if (str.isEmpty()) {
+			flagDefined = sl_false;
+			return sl_true;
+		}
+		return value.parse(str);
+	}
+	
+	/************************************************
 					Drawable
 	************************************************/
 

@@ -351,7 +351,7 @@ namespace slib
 		::OleInitialize(NULL);
 
 		INITCOMMONCONTROLSEX icex;
-		icex.dwICC = ICC_LISTVIEW_CLASSES | ICC_TAB_CLASSES;
+		icex.dwICC = ICC_LISTVIEW_CLASSES | ICC_TAB_CLASSES | ICC_DATE_CLASSES;
 		InitCommonControlsEx(&icex);
 
 		UIApp::dispatchStartToApp();

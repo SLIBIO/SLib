@@ -49,6 +49,7 @@
 #include "ui/slider.h"
 #include "ui/switch_view.h"
 #include "ui/picker_view.h"
+#include "ui/date_picker.h"
 #include "ui/text_view.h"
 
 #include "ui/scroll_bar.h"

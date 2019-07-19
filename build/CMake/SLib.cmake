@@ -303,6 +303,7 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/ui/check_box.cpp"
  "${SLIB_PATH}/src/slib/ui/common_dialogs.cpp"
  "${SLIB_PATH}/src/slib/ui/cursor.cpp"
+ "${SLIB_PATH}/src/slib/ui/date_picker.cpp"
  "${SLIB_PATH}/src/slib/ui/drawer.cpp"
  "${SLIB_PATH}/src/slib/ui/edit_view.cpp"
  "${SLIB_PATH}/src/slib/ui/gesture.cpp"

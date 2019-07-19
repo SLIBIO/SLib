@@ -924,6 +924,7 @@ namespace slib
 			PROCESS_CONTROL_SWITCH(Switch)
 			PROCESS_CONTROL_SWITCH(SwitchLabel)
 			PROCESS_CONTROL_SWITCH(Picker)
+			PROCESS_CONTROL_SWITCH(DatePicker)
 			PROCESS_CONTROL_SWITCH(Pager)
 			PROCESS_CONTROL_SWITCH(Navigation)
 			PROCESS_CONTROL_SWITCH(Video)
@@ -1478,8 +1479,8 @@ namespace slib
 		if (op == OP_PARSE) {
 			LAYOUT_CONTROL_INT_DIMENSION_ATTR(left, setLeft, checkForWindow)
 			LAYOUT_CONTROL_INT_DIMENSION_ATTR(top, setTop, checkForWindow)
-			LAYOUT_CONTROL_INT_DIMENSION_ATTR(width, setWidth, checkForWindowSize)
-			LAYOUT_CONTROL_INT_DIMENSION_ATTR(height, setHeight, checkForWindowSize)
+			LAYOUT_CONTROL_INT_DIMENSION_ATTR(width, setClientWidth, checkForWindowSize)
+			LAYOUT_CONTROL_INT_DIMENSION_ATTR(height, setClientHeight, checkForWindowSize)
 		} else if (op == OP_GENERATE_CPP) {
 			LAYOUT_CONTROL_INT_DIMENSION_ATTR(left, setLeft, checkForWindow)
 			LAYOUT_CONTROL_INT_DIMENSION_ATTR(top, setTop, checkForWindow)
@@ -1487,14 +1488,14 @@ namespace slib
 				if (attr->width.unit == SAppDimensionValue::WRAP) {
 					params->sbDefineInit->add(String::format("%s%s->setWidthWrapping();%n", strTab, name));
 				} else {
-					LAYOUT_CONTROL_INT_DIMENSION_ATTR(width, setWidth, checkForWindowSize)
+					LAYOUT_CONTROL_INT_DIMENSION_ATTR(width, setClientWidth, checkForWindowSize)
 				}
 			}
 			if (attr->height.flagDefined) {
 				if (attr->height.unit == SAppDimensionValue::WRAP) {
 					params->sbDefineInit->add(String::format("%s%s->setHeightWrapping();%n", strTab, name));
 				} else {
-					LAYOUT_CONTROL_INT_DIMENSION_ATTR(height, setHeight, checkForWindowSize)
+					LAYOUT_CONTROL_INT_DIMENSION_ATTR(height, setClientHeight, checkForWindowSize)
 				}
 			}
 		} else if (op == OP_SIMULATE) {
@@ -1506,14 +1507,14 @@ namespace slib
 					if (attr->width.unit == SAppDimensionValue::WRAP) {
 						view->setWidthWrapping();
 					} else {
-						LAYOUT_CONTROL_INT_DIMENSION_ATTR(width, setWidth, checkForWindowSize)
+						LAYOUT_CONTROL_INT_DIMENSION_ATTR(width, setClientWidth, checkForWindowSize)
 					}
 				}
 				if (attr->height.flagDefined) {
 					if (attr->height.unit == SAppDimensionValue::WRAP) {
 						view->setHeightWrapping();
 					} else {
-						LAYOUT_CONTROL_INT_DIMENSION_ATTR(height, setHeight, checkForWindowSize)
+						LAYOUT_CONTROL_INT_DIMENSION_ATTR(height, setClientHeight, checkForWindowSize)
 					}
 				}
 				flagOnLayout = sl_false;
@@ -4059,6 +4060,17 @@ namespace slib
 	}
 	END_PROCESS_LAYOUT_CONTROL
 
+	BEGIN_PROCESS_LAYOUT_CONTROL(DatePicker, DatePicker)
+	{
+		LAYOUT_CONTROL_PROCESS_SUPER(View)
+		
+		LAYOUT_CONTROL_GENERIC_ATTR(date, setDate)
+
+		LAYOUT_CONTROL_ADD_STATEMENT
+
+	}
+	END_PROCESS_LAYOUT_CONTROL
+	
 	BEGIN_PROCESS_LAYOUT_CONTROL(Pager, ViewPager)
 	{
 		LAYOUT_CONTROL_PROCESS_SUPER(View)
@@ -4166,6 +4178,8 @@ namespace slib
 		
 		LAYOUT_CONTROL_GENERIC_ATTR(swipe, setSwipeNavigation)
 		
+		LAYOUT_CONTROL_ADD_STATEMENT
+
 	}
 	END_PROCESS_LAYOUT_CONTROL
 

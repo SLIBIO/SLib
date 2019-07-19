@@ -24,6 +24,7 @@
 #define CHECKHEADER_SLIB_SDEV_SAPP_VALUES
 
 #include "slib/core/string.h"
+#include "slib/core/time.h"
 #include "slib/math/vector2.h"
 #include "slib/math/vector3.h"
 #include "slib/math/vector4.h"
@@ -344,6 +345,22 @@ namespace slib
 		
 	};
 
+	class SAppTimeValue
+	{
+	public:
+		sl_bool flagDefined;
+		Time value;
+		
+	public:
+		SAppTimeValue();
+		
+	public:
+		String getAccessString();
+		
+		sl_bool parse(const String& str);
+		
+	};
+	
 	class SAppDrawableValue : public SAppColorValue
 	{
 	public:

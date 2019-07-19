@@ -713,6 +713,16 @@ namespace slib
 		
 	};
 
+	class SAppLayoutDatePickerAttributes : public Referable
+	{
+	public:
+		SAppTimeValue date;
+		
+	public:
+		sl_bool isNotRequiredNative();
+		
+	};
+
 	struct SAppLayoutPagerItem
 	{
 		SAppBooleanValue selected;
@@ -852,7 +862,8 @@ namespace slib
 		QRCodeScanner = 0x0249,
 		Drawer = 0x024a,
 		Chat = 0x024b,
-		Refresh = 0x024c
+		Refresh = 0x024c,
+		DatePicker = 0x024d
 	};
 
 	class SAppLayoutResourceItem : public Referable
@@ -892,6 +903,7 @@ namespace slib
 		Ref<SAppLayoutSwitchAttributes> attrsSwitch;
 		Ref<SAppLayoutSwitchLabelAttributes> attrsSwitchLabel;
 		Ref<SAppLayoutPickerAttributes> attrsPicker;
+		Ref<SAppLayoutDatePickerAttributes> attrsDatePicker;
 		Ref<SAppLayoutPagerAttributes> attrsPager;
 		Ref<SAppLayoutNavigationAttributes> attrsNavigation;
 		Ref<SAppLayoutVideoAttributes> attrsVideo;
@@ -955,6 +967,7 @@ namespace slib
 		sl_uint32 nAutoIncreaseNameSlider = 0;
 		sl_uint32 nAutoIncreaseNameSwitch = 0;
 		sl_uint32 nAutoIncreaseNamePicker = 0;
+		sl_uint32 nAutoIncreaseNameDatePicker = 0;
 		sl_uint32 nAutoIncreaseNamePager = 0;
 		sl_uint32 nAutoIncreaseNameNavigation = 0;
 		sl_uint32 nAutoIncreaseNameVideo = 0;
