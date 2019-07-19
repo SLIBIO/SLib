@@ -2273,9 +2273,9 @@ namespace slib
 	}
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
-	sl_bool Time::_get(TimeComponents& output, sl_bool flagUTC) const noexcept
+	sl_bool Time::get_SYSTEMTIME(void* _st, sl_bool flagUTC) const noexcept
 	{
-		SYSTEMTIME st;
+		SYSTEMTIME st = *((SYSTEMTIME*)_st);
 		sl_int64 n = (m_time + SLIB_INT64(11644473600000000)) * 10;  // Convert 1970 Based (time_t mode) to 1601 Based (FILETIME mode)
 		if (flagUTC) {
 			if (!(FileTimeToSystemTime((PFILETIME)&n, &st))) {
@@ -2289,6 +2289,20 @@ namespace slib
 			if (!(SystemTimeToTzSpecificLocalTime(NULL, &utc, &st))) {
 				return sl_false;
 			}
+		}
+		return sl_true;
+	}
+
+	void Time::set_SYSTEMTIME(const void* st, sl_bool flagUTC) noexcept
+	{
+		m_time = _set(st, flagUTC);
+	}
+
+	sl_bool Time::_get(TimeComponents& output, sl_bool flagUTC) const noexcept
+	{
+		SYSTEMTIME st;
+		if (!(get_SYSTEMTIME(&st, flagUTC))) {
+			return sl_false;
 		}
 		output.year = st.wYear;
 		output.month = (sl_uint8)(st.wMonth);
@@ -2311,6 +2325,12 @@ namespace slib
 		st.wMinute = (WORD)minute;
 		st.wSecond = (WORD)second;
 		st.wMilliseconds = 0;
+		return _set(&st, flagUTC);
+	}
+
+	sl_int64 Time::_set(const void* _st, sl_bool flagUTC) noexcept
+	{
+		SYSTEMTIME st = *((SYSTEMTIME*)_st);
 		sl_int64 n = 0;
 		if (flagUTC) {
 			SystemTimeToFileTime(&st, (PFILETIME)&n);
