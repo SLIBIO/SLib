@@ -1867,6 +1867,18 @@ namespace slib
 		~ViewGroup();
 		
 	};
+	
+	template <class T, class O>
+	SLIB_INLINE Ref<T> GetViewFromInstance(const Ref<O>& instance)
+	{
+		if (instance.isNotNull()) {
+			Ref<View> view = instance->getView();
+			if (view.isNotNull()) {
+				return CastInstance<T>(view.get());
+			}
+		}
+		return sl_null;
+	}
 
 }
 

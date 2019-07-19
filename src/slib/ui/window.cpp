@@ -459,6 +459,46 @@ namespace slib
 		setClientSize(UISize(width, height));
 	}
 
+	sl_ui_len Window::getClientWidth()
+	{
+		return getClientSize().x;
+	}
+	
+	void Window::setClientWidth(sl_ui_len width)
+	{
+		Ref<WindowInstance> instance = m_instance;
+		if (CHECK_INSTANCE(instance)) {
+			m_flagUseClientSizeRequested = sl_false;
+			if (!(instance->setClientSize(UISize(width, m_clientSizeRequested.y)))) {
+				setWidth(width);
+			}
+		} else {
+			m_flagUseClientSizeRequested = sl_true;
+			m_clientSizeRequested.x = width;
+			m_frame.setWidth(width);
+		}
+	}
+	
+	sl_ui_len Window::getClientHeight()
+	{
+		return getClientSize().y;
+	}
+	
+	void Window::setClientHeight(sl_ui_len height)
+	{
+		Ref<WindowInstance> instance = m_instance;
+		if (CHECK_INSTANCE(instance)) {
+			m_flagUseClientSizeRequested = sl_false;
+			if (!(instance->setClientSize(UISize(m_clientSizeRequested.x, height)))) {
+				setHeight(height);
+			}
+		} else {
+			m_flagUseClientSizeRequested = sl_true;
+			m_clientSizeRequested.y = height;
+			m_frame.setHeight(height);
+		}
+	}
+
 	UIRect Window::getClientBounds()
 	{
 		UISize size = getClientSize();

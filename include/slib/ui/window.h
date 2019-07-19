@@ -181,6 +181,14 @@ namespace slib
 
 		void setClientSize(sl_ui_len width, sl_ui_len height);
 		
+		sl_ui_len getClientWidth();
+		
+		void setClientWidth(sl_ui_len width);
+		
+		sl_ui_len getClientHeight();
+		
+		void setClientHeight(sl_ui_len height);
+
 		UIRect getClientBounds();
 
 		
