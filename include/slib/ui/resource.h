@@ -320,6 +320,7 @@ namespace slib
 	
 	class Button;
 	class LabelView;
+	class LineView;
 	class CheckBox;
 	class RadioButton;
 	class RadioGroup;

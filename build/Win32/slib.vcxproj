@@ -359,6 +359,7 @@
     <ClCompile Include="..\..\src\slib\ui\image_view_url.cpp" />
     <ClCompile Include="..\..\src\slib\ui\label_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\linear_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\line_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\list_report_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\list_report_view_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\list_view.cpp" />

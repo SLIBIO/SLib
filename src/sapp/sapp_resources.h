@@ -405,6 +405,17 @@ namespace slib
 
 	};
 
+	class SAppLayoutLineAttributes : public Referable
+	{
+	public:
+		SAppLayoutOrientationValue orientation;
+		SAppDimensionFloatValue thickness;
+		SAppColorValue lineColor;
+		SAppPenStyleValue lineStyle;
+		SAppAlignmentValue gravity;
+		
+	};
+	
 	class SAppLayoutCheckAttributes : public Referable
 	{
 	public:
@@ -863,7 +874,8 @@ namespace slib
 		Drawer = 0x024a,
 		Chat = 0x024b,
 		Refresh = 0x024c,
-		DatePicker = 0x024d
+		DatePicker = 0x024d,
+		Line = 0x024e
 	};
 
 	class SAppLayoutResourceItem : public Referable
@@ -884,6 +896,7 @@ namespace slib
 		Ref<SAppLayoutImportAttributes> attrsImport;
 		Ref<SAppLayoutButtonAttributes> attrsButton;
 		Ref<SAppLayoutLabelAttributes> attrsLabel;
+		Ref<SAppLayoutLineAttributes> attrsLine;
 		Ref<SAppLayoutCheckAttributes> attrsCheck;
 		Ref<SAppLayoutRadioAttributes> attrsRadio;
 		Ref<SAppLayoutEditAttributes> attrsEdit;
@@ -947,6 +960,7 @@ namespace slib
 		sl_uint32 nAutoIncreaseNameImport = 0;
 		sl_uint32 nAutoIncreaseNameButton = 0;
 		sl_uint32 nAutoIncreaseNameLabel = 0;
+		sl_uint32 nAutoIncreaseNameLine = 0;
 		sl_uint32 nAutoIncreaseNameCheck = 0;
 		sl_uint32 nAutoIncreaseNameRadio = 0;
 		sl_uint32 nAutoIncreaseNameEdit = 0;

@@ -219,6 +219,7 @@ namespace slib
 		sl_bool _processLayoutResourceControl_Import(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_Button(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_Label(LayoutControlProcessParams* params);
+		sl_bool _processLayoutResourceControl_Line(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_Check(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_Radio(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_Edit(LayoutControlProcessParams* params);

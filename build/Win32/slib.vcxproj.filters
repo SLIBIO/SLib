@@ -1238,5 +1238,8 @@
     <ClCompile Include="..\..\src\slib\ui\date_picker_win32.cpp">
       <Filter>src\ui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\ui\line_view.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

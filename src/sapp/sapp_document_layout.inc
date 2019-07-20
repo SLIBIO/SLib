@@ -903,6 +903,7 @@ namespace slib
 			PROCESS_CONTROL_SWITCH(Import)
 			PROCESS_CONTROL_SWITCH(Button)
 			PROCESS_CONTROL_SWITCH(Label)
+			PROCESS_CONTROL_SWITCH(Line)
 			PROCESS_CONTROL_SWITCH(Check)
 			PROCESS_CONTROL_SWITCH(Radio)
 			PROCESS_CONTROL_SWITCH(Edit)
@@ -2772,7 +2773,35 @@ namespace slib
 	}
 	END_PROCESS_LAYOUT_CONTROL
 
+	
+	BEGIN_PROCESS_LAYOUT_CONTROL(Line, LineView)
+	{
+		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(orientation, setOrientation)
+		if (!(attr->orientation.flagDefined)) {
+			if (op == OP_PARSE) {
+				if (element->getName() == "hline") {
+					attr->orientation.flagDefined = sl_true;
+					attr->orientation.value = LayoutOrientation::Horizontal;
+				} else if (element->getName() == "vline") {
+					attr->orientation.flagDefined = sl_true;
+					attr->orientation.value = LayoutOrientation::Vertical;
+				}
+			}
+		}
+		
+		LAYOUT_CONTROL_COLOR_ATTR(lineColor, setLineColor)
+		LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(thickness, setLineThickness, checkScalarSize)
+		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(lineStyle, setLineStyle)
+		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(gravity, setGravity)
+		
+		LAYOUT_CONTROL_PROCESS_SUPER(View)
+		
+		LAYOUT_CONTROL_ADD_STATEMENT
+		
+	}
+	END_PROCESS_LAYOUT_CONTROL
 
+	
 	BEGIN_PROCESS_LAYOUT_CONTROL(Check, CheckBox)
 	{
 		LAYOUT_CONTROL_PROCESS_SUPER(Button)

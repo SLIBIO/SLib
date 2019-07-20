@@ -366,6 +366,10 @@ namespace slib
 				prefix = "label";
 				pN = &nAutoIncreaseNameLabel;
 				break;
+			case SAppLayoutItemType::Line:
+				prefix = "line";
+				pN = &nAutoIncreaseNameLine;
+				break;
 			case SAppLayoutItemType::Check:
 				prefix = "check";
 				pN = &nAutoIncreaseNameCheck;
@@ -510,6 +514,8 @@ namespace slib
 			type = SAppLayoutItemType::Button;
 		} else if (strType == "label") {
 			type = SAppLayoutItemType::Label;
+		} else if (strType == "line" || strType == "hline" || strType == "vline") {
+			type = SAppLayoutItemType::Line;
 		} else if (strType == "check") {
 			type = SAppLayoutItemType::Check;
 		} else if (strType == "radio") {

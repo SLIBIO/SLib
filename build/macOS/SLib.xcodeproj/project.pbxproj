@@ -1211,6 +1211,7 @@
 		26F2F8D91EC2E0EB0074C29E /* red_black_tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F2F8D81EC2E0EB0074C29E /* red_black_tree.cpp */; };
 		26F53F7E22DB4F6D0031D485 /* date_picker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F53F7C22DB4F6C0031D485 /* date_picker.cpp */; };
 		26F53F7F22DB4F6D0031D485 /* date_picker_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26F53F7D22DB4F6D0031D485 /* date_picker_macos.mm */; };
+		26F53FA022E29A000031D485 /* line_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F53F9F22E299FF0031D485 /* line_view.cpp */; };
 		26F5EA6622D6835C00CD1595 /* toast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5EA6522D6835B00CD1595 /* toast.cpp */; };
 		26FADD30215676D50057F7EA /* stun.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FADD2F215676D40057F7EA /* stun.cpp */; };
 		26FBB34B1ED5581F0086C27A /* ui_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FBB34A1ED5581F0086C27A /* ui_text.cpp */; };
@@ -2488,6 +2489,7 @@
 		26F2F8D81EC2E0EB0074C29E /* red_black_tree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = red_black_tree.cpp; sourceTree = "<group>"; };
 		26F53F7C22DB4F6C0031D485 /* date_picker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = date_picker.cpp; sourceTree = "<group>"; };
 		26F53F7D22DB4F6D0031D485 /* date_picker_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = date_picker_macos.mm; sourceTree = "<group>"; };
+		26F53F9F22E299FF0031D485 /* line_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = line_view.cpp; sourceTree = "<group>"; };
 		26F5B3131E9010D100F9FB7F /* earth.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = earth.cpp; sourceTree = "<group>"; };
 		26F5B3141E9010D100F9FB7F /* geo_line.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = geo_line.cpp; sourceTree = "<group>"; };
 		26F5B3151E9010D100F9FB7F /* geo_location.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = geo_location.cpp; sourceTree = "<group>"; };
@@ -4382,6 +4384,7 @@
 				266DD51E1C11940A00D47AB0 /* image_view.cpp */,
 				26C795A2221562E70053C5A1 /* image_view_url.cpp */,
 				266DD50C1C11940A00D47AB0 /* label_view.cpp */,
+				26F53F9F22E299FF0031D485 /* line_view.cpp */,
 				26C7E37D1D00097000C0A769 /* linear_view.cpp */,
 				266DD5111C11940A00D47AB0 /* list_report_view.cpp */,
 				266DD5121C11940A00D47AB0 /* list_report_view_macos.mm */,
@@ -6189,6 +6192,7 @@
 				26D9D91E1E9645CE005F7BD3 /* resource.cpp in Sources */,
 				26D9D9DD1E96468D005F7BD3 /* ui_animation_apple.mm in Sources */,
 				26E1B87A222ABA51007C222E /* pngwutil.c in Sources */,
+				26F53FA022E29A000031D485 /* line_view.cpp in Sources */,
 				26D9D91F1E9645CE005F7BD3 /* ref.cpp in Sources */,
 				26BB17EB2200E20B0089C7EC /* switch_view.cpp in Sources */,
 				26E1B89E222ABAB2007C222E /* jdtrans.c in Sources */,

@@ -41,6 +41,7 @@
 #include "ui/label_view.h"
 #include "ui/button.h"
 #include "ui/image_view.h"
+#include "ui/line_view.h"
 #include "ui/edit_view.h"
 #include "ui/check_box.h"
 #include "ui/radio_button.h"
