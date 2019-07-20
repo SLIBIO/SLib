@@ -67,10 +67,19 @@ namespace slib
 		}
 		Ref<ButtonInstance> ret = Win32_ViewInstance::create<ButtonInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
 		if (ret.isNotNull()) {
+			HWND handle = ret->getHandle();
 			Ref<Font> font = getFont();
 			HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
 			if (hFont) {
-				::SendMessageW(ret->getHandle(), WM_SETFONT, (WPARAM)hFont, TRUE);
+				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
+			}
+			{
+				RECT rc;
+				rc.left = (LONG)(getPaddingLeft());
+				rc.top = (LONG)(getPaddingTop());
+				rc.right = (LONG)(getPaddingRight());
+				rc.bottom = (LONG)(getPaddingBottom());
+				SendMessageW(handle, BCM_SETTEXTMARGIN, 0, (LPARAM)&rc);
 			}
 		}
 		return ret;
@@ -110,6 +119,19 @@ namespace slib
 			return sl_true;
 		}
 		return sl_false;
+	}
+	
+	void Button::onChangePadding_NW()
+	{
+		HWND handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			RECT rc;
+			rc.left = (LONG)(getPaddingLeft());
+			rc.top = (LONG)(getPaddingTop());
+			rc.right = (LONG)(getPaddingRight());
+			rc.bottom = (LONG)(getPaddingBottom());
+			SendMessageW(handle, BCM_SETTEXTMARGIN, 0, (LPARAM)&rc);
+		}
 	}
 
 	void Button::_setFont_NW(const Ref<Font>& font)

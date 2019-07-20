@@ -795,6 +795,13 @@ namespace slib
 		}
 	}
 
+	void Button::onChangePadding()
+	{
+		if (isNativeWidget()) {
+			onChangePadding_NW();
+		}
+	}
+	
 	void Button::onKeyEvent(UIEvent* ev)
 	{
 		if (ev->getAction() == UIAction::KeyDown) {
@@ -1149,6 +1156,12 @@ namespace slib
 	}
 
 	void Button::_setFont_NW(const Ref<Font>& font)
+	{
+	}
+#endif
+	
+#if !defined(SLIB_UI_IS_WIN32)
+	void Button::onChangePadding_NW()
 	{
 	}
 #endif

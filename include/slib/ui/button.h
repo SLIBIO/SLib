@@ -250,8 +250,10 @@ namespace slib
 		
 		void onUpdateLayout() override;
 		
+		void onChangePadding() override;
+		
 		void onKeyEvent(UIEvent* ev) override;
-
+		
 	protected:
 		UISize measureContentSize(sl_ui_len widthFrame, sl_ui_len heightFrame);
 		
@@ -272,6 +274,8 @@ namespace slib
 		virtual void _setDefaultButton_NW(sl_bool flag);
 
 		virtual sl_bool _measureSize_NW(UISize& _out);
+		
+		virtual void onChangePadding_NW();
 		
 		void _setFont_NW(const Ref<Font>& font) override;
 		
