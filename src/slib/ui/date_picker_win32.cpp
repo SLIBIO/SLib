@@ -60,7 +60,7 @@ namespace slib
 		if (!shared) {
 			return sl_null;
 		}
-		DWORD style = WS_BORDER;
+		DWORD style = 0;
 		Ref<DatePickerInstance> ret = Win32_ViewInstance::create<DatePickerInstance>(this, parent, L"SysDateTimePick32", L"DateTime", style, 0);
 		if (ret.isNotNull()) {
 			HWND handle = ret->getHandle();

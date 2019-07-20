@@ -62,6 +62,8 @@ namespace slib
 				}
 			};
 
+			SLIB_SAFE_STATIC_GETTER(FontStaticContext, GetFontStaticContext)
+
 			class FontPlatformObject : public Referable
 			{
 			public:
@@ -125,7 +127,7 @@ namespace slib
 						desc.size,
 						style,
 						Gdiplus::UnitPixel);
-
+					
 					m_fontGdiplus = font;
 
 				}
@@ -143,13 +145,13 @@ namespace slib
 					}
 
 					m_flagCreatedGDI = sl_true;
-
-					int height = (int)(desc.size);
+					
+					int height = -(int)(desc.size);
 					int weight;
 					if (desc.flagBold) {
-						weight = 400;
-					} else {
 						weight = 700;
+					} else {
+						weight = 400;
 					}
 					DWORD bItalic;
 					if (desc.flagItalic) {
@@ -170,7 +172,7 @@ namespace slib
 						bStrikeout = FALSE;
 					}
 					String16 fontName = desc.familyName;
-					HFONT hFont = ::CreateFontW(height, 0, 0, 0, weight, bItalic, bUnderline, bStrikeout,
+					HFONT hFont = CreateFontW(height, 0, 0, 0, weight, bItalic, bUnderline, bStrikeout,
 						DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 						ANTIALIASED_QUALITY,
 						DEFAULT_PITCH,
@@ -247,18 +249,18 @@ namespace slib
 			return Size::zero();
 		}
 
-		SLIB_SAFE_STATIC(FontStaticContext, fs)
-		if (SLIB_SAFE_STATIC_CHECK_FREED(fs)) {
+		FontStaticContext* fs = GetFontStaticContext();
+		if (!fs) {
 			return Size::zero();
 		}
 
 		Size ret(0, 0);
-		if (fs.graphics) {
+		if (fs->graphics) {
 			String16 text = _text;
 			Gdiplus::StringFormat format(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsNoClip | Gdiplus::StringFormatFlagsNoFitBlackBox);
 			Gdiplus::RectF bound;
 			Gdiplus::PointF origin(0, 0);
-			Gdiplus::Status result = fs.graphics->MeasureString((WCHAR*)(text.getData()), (INT)(text.getLength()), handle, origin, Gdiplus::StringFormat::GenericTypographic(), &bound);
+			Gdiplus::Status result = fs->graphics->MeasureString((WCHAR*)(text.getData()), (INT)(text.getLength()), handle, origin, Gdiplus::StringFormat::GenericTypographic(), &bound);
 			if (result == Gdiplus::Ok) {
 				ret.x = bound.Width;
 				ret.y = bound.Height;

@@ -1139,19 +1139,17 @@ namespace slib
 	{
 	}
 
-	void Button::_setFont_NW(const Ref<Font>& font)
-	{
-	}
-
 	void Button::_setDefaultButton_NW(sl_bool flag)
 	{
 	}
-#endif
 
-#if !defined(SLIB_UI_IS_MACOS)
 	sl_bool Button::_measureSize_NW(UISize& _out)
 	{
 		return sl_false;
+	}
+
+	void Button::_setFont_NW(const Ref<Font>& font)
+	{
 	}
 #endif
 	

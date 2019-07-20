@@ -351,9 +351,11 @@ namespace slib
 						nLines = 1;
 					}
 				}
+				
 				Ref<Font> font = getFont();
 				if (font.isNotNull()) {
 					sl_ui_len height = (sl_ui_len)(nLines * font->getFontHeight());
+					height += 2;
 					if (isBorder()) {
 						height += 2;
 					}

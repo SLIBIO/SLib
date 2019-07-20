@@ -28,6 +28,8 @@
 
 #include "view_win32.h"
 
+#include <commctrl.h>
+
 namespace slib
 {
 
@@ -95,6 +97,19 @@ namespace slib
 			::SetWindowPos(handle, NULL, 0, 0, 0, 0
 				, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 		}
+	}
+
+	sl_bool Button::_measureSize_NW(UISize& _out)
+	{
+		HWND handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			SIZE size = { 0, 0 };
+			SendMessageW(handle, BCM_GETIDEALSIZE, 0, (LPARAM)&size);
+			_out.x = (sl_ui_len)(size.cx);
+			_out.y = (sl_ui_len)(size.cy);
+			return sl_true;
+		}
+		return sl_false;
 	}
 
 	void Button::_setFont_NW(const Ref<Font>& font)
