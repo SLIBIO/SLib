@@ -30,6 +30,9 @@ namespace slib
 	DatePicker::DatePicker()
 	{
 		setCreatingNativeWidget(sl_true);
+		setUsingFont(sl_true);
+		setFocusable(sl_true);
+		
 		m_date = Time::now();
 	}
 

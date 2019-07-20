@@ -354,8 +354,8 @@ namespace slib
 				
 				Ref<Font> font = getFont();
 				if (font.isNotNull()) {
-					sl_ui_len height = (sl_ui_len)(nLines * font->getFontHeight());
-					height += 2;
+					sl_ui_len height = nLines * (sl_ui_len)(font->getFontHeight());
+					height += 4;
 					if (isBorder()) {
 						height += 2;
 					}
