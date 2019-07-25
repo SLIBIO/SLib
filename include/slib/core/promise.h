@@ -27,6 +27,7 @@
 
 #include "function.h"
 #include "event.h"
+#include "dispatch.h"
 
 // Javascript-style Promise
 
@@ -137,6 +138,22 @@ namespace slib
 		
 		static Promise<T> raceList(const List< Promise<T> >& promises);
 		
+		static Promise<T> dispatch(const Ref<Dispatcher>& dispatcher, const Function<T()>& task);
+		
+		static Promise<T> dispatch(const Function<T()>& task);
+		
+		static Promise<T> setTimeout(const Ref<Dispatcher>& dispatcher, const Function<T()>& task, sl_uint64 delay_ms);
+		
+		static Promise<T> setTimeout(const Function<T()>& task, sl_uint64 delay_ms);
+
+		static Promise<T> dispatchPromise(const Ref<Dispatcher>& dispatcher, const Function<Promise<T>()>& task);
+		
+		static Promise<T> dispatchPromise(const Function<Promise<T>()>& task);
+		
+		static Promise<T> setTimeoutPromise(const Ref<Dispatcher>& dispatcher, const Function<Promise<T>()>& task, sl_uint64 delay_ms);
+		
+		static Promise<T> setTimeoutPromise(const Function<Promise<T>()>& task, sl_uint64 delay_ms);
+
 	};
 	
 	template <class T>

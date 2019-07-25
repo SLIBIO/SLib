@@ -325,4 +325,124 @@ namespace slib
 		return ret;
 	}
 
+	template <class T>
+	Promise<T> Promise<T>::dispatch(const Ref<Dispatcher>& dispatcher, const Function<T()>& task)
+	{
+		if (dispatcher.isNotNull()) {
+			Promise<T> ret;
+			ret.initialize();
+			if (dispatcher->dispatch([ret, task]() {
+				ret.resolve(task());
+			})) {
+				return ret;
+			}
+		}
+		return sl_null;
+	}
+	
+	template <class T>
+	Promise<T> Promise<T>::dispatch(const Function<T()>& task)
+	{
+		Promise<T> ret;
+		ret.initialize();
+		if (Dispatch::dispatch([ret, task]() {
+			ret.resolve(task());
+		})) {
+			return ret;
+		}
+		return sl_null;
+	}
+	
+	template <class T>
+	Promise<T> Promise<T>::setTimeout(const Ref<Dispatcher>& dispatcher, const Function<T()>& task, sl_uint64 delay_ms)
+	{
+		if (dispatcher.isNotNull()) {
+			Promise<T> ret;
+			ret.initialize();
+			if (dispatcher->dispatch([ret, task]() {
+				ret.resolve(task());
+			}, delay_ms)) {
+				return ret;
+			}
+		}
+		return sl_null;
+	}
+	
+	template <class T>
+	Promise<T> Promise<T>::setTimeout(const Function<T()>& task, sl_uint64 delay_ms)
+	{
+		Promise<T> ret;
+		ret.initialize();
+		if (Dispatch::setTimeout([ret, task]() {
+			ret.resolve(task());
+		}, delay_ms)) {
+			return ret;
+		}
+		return sl_null;
+	}
+
+	template <class T>
+	Promise<T> Promise<T>::dispatchPromise(const Ref<Dispatcher>& dispatcher, const Function<Promise<T>()>& task)
+	{
+		if (dispatcher.isNotNull()) {
+			Promise<T> ret;
+			ret.initialize();
+			if (dispatcher->dispatch([ret, task]() {
+				task().then([ret](T& result) {
+					ret.resolve(result);
+				});
+			})) {
+				return ret;
+			}
+		}
+		return sl_null;
+	}
+	
+	template <class T>
+	Promise<T> Promise<T>::dispatchPromise(const Function<Promise<T>()>& task)
+	{
+		Promise<T> ret;
+		ret.initialize();
+		if (Dispatch::dispatch([ret, task]() {
+			task().then([ret](T& result) {
+				ret.resolve(result);
+			});
+		})) {
+			return ret;
+		}
+		return sl_null;
+	}
+	
+	template <class T>
+	Promise<T> Promise<T>::setTimeoutPromise(const Ref<Dispatcher>& dispatcher, const Function<Promise<T>()>& task, sl_uint64 delay_ms)
+	{
+		if (dispatcher.isNotNull()) {
+			Promise<T> ret;
+			ret.initialize();
+			if (dispatcher->dispatch([ret, task]() {
+				task().then([ret](T& result) {
+					ret.resolve(result);
+				});
+			}, delay_ms)) {
+				return ret;
+			}
+		}
+		return sl_null;
+	}
+	
+	template <class T>
+	Promise<T> Promise<T>::setTimeoutPromise(const Function<Promise<T>()>& task, sl_uint64 delay_ms)
+	{
+		Promise<T> ret;
+		ret.initialize();
+		if (Dispatch::setTimeout([ret, task]() {
+			task().then([ret](T& result) {
+				ret.resolve(result);
+			});
+		}, delay_ms)) {
+			return ret;
+		}
+		return sl_null;
+	}
+
 }
