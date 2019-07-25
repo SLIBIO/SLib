@@ -43,6 +43,8 @@ namespace slib
 	class Window;
 	class WindowInstance;
 	
+	class Variant;
+	
 	namespace priv
 	{
 		namespace window
@@ -357,6 +359,18 @@ namespace slib
 		void setCenterScreenOnCreate(sl_bool flag);
 		
 		
+		sl_bool isCloseOnOK();
+		
+		void setCloseOnOK(sl_bool flag = sl_true);
+		
+		
+		Variant getResult();
+		
+		void setResult(const Variant& result);
+		
+		void close(const Variant& result);
+		
+		
 #if defined(SLIB_UI_IS_ANDROID)
 		void* getActivity();
 		
@@ -374,7 +388,7 @@ namespace slib
 		
 		void forceCreate();
 		
-		void doModal();
+		Variant doModal();
 
 		
 		void addView(const Ref<View>& view);
@@ -461,11 +475,15 @@ namespace slib
 		sl_bool m_flagCenterScreenOnCreate : 1;
 		sl_bool m_flagWidthWrapping : 1;
 		sl_bool m_flagHeightWrapping : 1;
+		sl_bool m_flagCloseOnOK : 1;
 
 		sl_bool m_flagUseClientSizeRequested : 1;
 		sl_bool m_flagStateResizingWidth : 1;
 		sl_bool m_flagStateDoModal : 1;
 		sl_bool m_flagDispatchedDestroy : 1;
+		
+		Variant* m_result;
+		SpinLock m_lockResult;
 
 #if defined(SLIB_UI_IS_ANDROID)
 		// jobject

@@ -26,6 +26,8 @@
 #include "slib/ui/core.h"
 #include "slib/ui/screen.h"
 
+#include "slib/core/variant.h"
+
 namespace slib
 {
 	
@@ -165,11 +167,14 @@ namespace slib
 		m_flagCenterScreenOnCreate = sl_false;
 		m_flagWidthWrapping = sl_false;
 		m_flagHeightWrapping = sl_false;
+		m_flagCloseOnOK = sl_false;
 
 		m_flagUseClientSizeRequested = sl_false;
 		m_flagStateResizingWidth = sl_false;
 		m_flagStateDoModal = sl_false;
 		m_flagDispatchedDestroy = sl_false;
+		
+		m_result = sl_null;
 
 #if defined(SLIB_UI_IS_ANDROID)
 		m_activity = sl_null;
@@ -178,6 +183,9 @@ namespace slib
 
 	Window::~Window()
 	{
+		if (m_result) {
+			delete m_result;
+		}
 	}
 	
 	void Window::init()
@@ -1013,6 +1021,42 @@ namespace slib
 	{
 		m_flagCenterScreenOnCreate = flag;
 	}
+	
+	sl_bool Window::isCloseOnOK()
+	{
+		return m_flagCloseOnOK;
+	}
+	
+	void Window::setCloseOnOK(sl_bool flag)
+	{
+		m_flagCloseOnOK = flag;
+	}
+	
+	Variant Window::getResult()
+	{
+		SpinLocker lock(&m_lockResult);
+		if (m_result) {
+			return *m_result;
+		} else {
+			return sl_null;
+		}
+	}
+	
+	void Window::setResult(const Variant& result)
+	{
+		SpinLocker lock(&m_lockResult);
+		if (m_result) {
+			*m_result = result;
+		} else {
+			m_result = new Variant(result);
+		}
+	}
+	
+	void Window::close(const Variant& result)
+	{
+		setResult(result);
+		close();
+	}
 
 #if defined(SLIB_UI_IS_ANDROID)
 	void* Window::getActivity()
@@ -1209,22 +1253,24 @@ namespace slib
 		}
 	}
 	
-	void Window::doModal()
+	Variant Window::doModal()
 	{
 		if (!(UI::isUiThread())) {
-			return;
+			return sl_null;
 		}
 		setModal(sl_true);
 		forceCreate();
 		Ref<WindowInstance> instance = m_instance;
 		if (instance.isNotNull()) {
 			if (instance->doModal()) {
-				return;
+				return getResult();
 			}
 			m_flagStateDoModal = sl_true;
 			UI::runLoop();
 			m_flagStateDoModal = sl_false;
+			return getResult();
 		}
+		return sl_null;
 	}
 
 	void Window::addView(const Ref<View>& child)
@@ -1392,6 +1438,9 @@ namespace slib
 	void Window::dispatchOK(UIEvent* ev)
 	{
 		SLIB_INVOKE_EVENT_HANDLER(OK, ev)
+		if (m_flagCloseOnOK) {
+			close(DialogResult::Ok);
+		}
 	}
 
 	void Window::dispatchOK()
@@ -1414,7 +1463,7 @@ namespace slib
 		if (ev->isPreventedDefault()) {
 			return;
 		}
-		close();
+		close(DialogResult::Cancel);
 	}
 
 	void Window::dispatchCancel()
