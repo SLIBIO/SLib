@@ -29,13 +29,21 @@
 namespace slib
 {
 
-/*************************************
-			Dispatch
-*************************************/
-	sl_bool Dispatch::dispatch(const Ref<DispatchLoop>& loop, const Function<void()>& task)
+	SLIB_DEFINE_OBJECT(Dispatcher, Object)
+	
+	Dispatcher::Dispatcher()
 	{
-		if (loop.isNotNull()) {
-			return loop->dispatch(task);
+	}
+	
+	Dispatcher::~Dispatcher()
+	{
+	}
+	
+	
+	sl_bool Dispatch::dispatch(const Ref<Dispatcher>& dispatcher, const Function<void()>& task)
+	{
+		if (dispatcher.isNotNull()) {
+			return dispatcher->dispatch(task);
 		}
 		return sl_false;
 	}
@@ -45,10 +53,10 @@ namespace slib
 		return Dispatch::dispatch(DispatchLoop::getDefault(), task);
 	}
 
-	sl_bool Dispatch::setTimeout(const Ref<DispatchLoop>& loop, const Function<void()>& task, sl_uint64 delay_ms)
+	sl_bool Dispatch::setTimeout(const Ref<Dispatcher>& dispatcher, const Function<void()>& task, sl_uint64 delay_ms)
 	{
-		if (loop.isNotNull()) {
-			return loop->dispatch(task, delay_ms);
+		if (dispatcher.isNotNull()) {
+			return dispatcher->dispatch(task, delay_ms);
 		}
 		return sl_false;
 	}
@@ -71,24 +79,6 @@ namespace slib
 		return Dispatch::setInterval(DispatchLoop::getDefault(), task, interval_ms);
 	}
 
-/*************************************
-			Dispatcher
-*************************************/
-
-	SLIB_DEFINE_OBJECT(Dispatcher, Object)
-
-	Dispatcher::Dispatcher()
-	{
-	}
-
-	Dispatcher::~Dispatcher()
-	{
-	}
-
-
-/*************************************
-			DispatchLoop
-*************************************/
 
 	SLIB_DEFINE_OBJECT(DispatchLoop, Dispatcher)
 
