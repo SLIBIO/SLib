@@ -464,6 +464,22 @@ namespace slib
 			colorsDstLine += m_desc.stride;
 		}
 	}
+	
+	void Image::tintColor(const Color& color)
+	{
+		Color* colorsDst;
+		Color* colorsDstLine = m_desc.colors;
+		for (sl_uint32 y = 0; y < m_desc.height; y++) {
+			colorsDst = colorsDstLine;
+			for (sl_uint32 x = 0; x < m_desc.width; x++) {
+				Color& c = colorsDst[x];
+				c.r = color.r;
+				c.g = color.g;
+				c.b = color.b;
+			}
+			colorsDstLine += m_desc.stride;
+		}
+	}
 
 	namespace priv
 	{
@@ -1578,19 +1594,6 @@ namespace slib
 		return sl_null;
 	}
 
-	Ref<Image> Image::loadFromAsset(const String& path)
-	{
-		Memory mem = Assets::readAllBytes(path);
-		if (mem.isNotNull()) {
-			return loadFromMemory(mem);
-		}
-#if defined(SLIB_PLATFORM_IS_APPLE)
-		return Image::createCopyBitmap(Bitmap::loadFromAsset(path));
-#else
-		return sl_null;
-#endif
-	}
-	
 	Ref<AnimationDrawable> Image::loadAnimationFromMemory(const void* mem, sl_size size)
 	{
 		ImageFileType type = getFileType(mem, size);

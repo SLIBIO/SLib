@@ -122,7 +122,9 @@ namespace slib
 		Ref<Canvas> getCanvas() override;
 
 		void fillColor(const Color& color);
-	
+
+		void tintColor(const Color& color);
+
 
 		static void draw(ImageDesc& dst, const ImageDesc& src, BlendMode blend = BlendMode::Copy, StretchMode stretch = StretchMode::Default);
 

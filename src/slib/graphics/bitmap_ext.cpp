@@ -85,4 +85,17 @@ namespace slib
 		return sl_null;
 	}
 
+	Ref<Image> Image::loadFromAsset(const String& path)
+	{
+		Memory mem = Assets::readAllBytes(path);
+		if (mem.isNotNull()) {
+			return loadFromMemory(mem);
+		}
+#if defined(SLIB_PLATFORM_IS_APPLE)
+		return Image::createCopyBitmap(Bitmap::loadFromAsset(path));
+#else
+		return sl_null;
+#endif
+	}
+	
 }
