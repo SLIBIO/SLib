@@ -245,16 +245,16 @@ namespace slib
 	{
 		if (isWidthWrapping()) {
 			if (m_orientation == LayoutOrientation::Horizontal) {
-				setLayoutWidth((sl_real)(300 + getPaddingLeft() + getPaddingRight()));
+				setLayoutWidth(300 + getPaddingLeft() + getPaddingRight());
 			} else {
-				setLayoutWidth((sl_real)(m_thickness + getPaddingLeft() + getPaddingRight()));
+				setLayoutWidth((sl_ui_len)(m_thickness + getPaddingLeft() + getPaddingRight()));
 			}
 		}
 		if (isHeightWrapping()) {
 			if (m_orientation == LayoutOrientation::Horizontal) {
-				setLayoutHeight((sl_real)(m_thickness + getPaddingTop() + getPaddingBottom()));
+				setLayoutHeight((sl_ui_len)(m_thickness + getPaddingTop() + getPaddingBottom()));
 			} else {
-				setLayoutHeight((sl_real)(300 + getPaddingTop() + getPaddingBottom()));
+				setLayoutHeight(300 + getPaddingTop() + getPaddingBottom());
 			}
 		}
 	}
