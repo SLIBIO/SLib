@@ -198,17 +198,20 @@ namespace slib
 
 	void Window::close()
 	{
-		ObjectLocker lock(this);
-		Ref<WindowInstance> instance = m_instance;
-		if (instance.isNotNull()) {
-			instance->close();
-			detach();
-			lock.unlock();
-			dispatchDestroy();
-		}
-		if (m_flagStateDoModal) {
-			m_flagStateDoModal = sl_false;
-			UI::quitLoop();
+		Ref<Window> window = this;
+		{
+			ObjectLocker lock(this);
+			Ref<WindowInstance> instance = m_instance;
+			if (instance.isNotNull()) {
+				instance->close();
+				detach();
+				lock.unlock();
+				dispatchDestroy();
+			}
+			if (m_flagStateDoModal) {
+				m_flagStateDoModal = sl_false;
+				UI::quitLoop();
+			}
 		}
 	}
 
