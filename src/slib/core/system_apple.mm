@@ -47,7 +47,7 @@ namespace slib
 		return pathResolved;
 	}
 
-	String System::getApplicationHomeDirectory()
+	String System::getHomeDirectory()
 	{
 		NSString* path = NSHomeDirectory();
 		return Apple::getStringFromNSString(path);
@@ -60,7 +60,7 @@ namespace slib
 			NSString* path = [paths objectAtIndex:0];
 			return Apple::getStringFromNSString(path);
 		}
-		String dir = getApplicationHomeDirectory() + "/caches";
+		String dir = getHomeDirectory() + "/.caches";
 		File::createDirectory(dir);
 		return dir;
 	}

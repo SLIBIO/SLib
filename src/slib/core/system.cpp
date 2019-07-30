@@ -40,15 +40,17 @@ namespace slib
 		return path;
 	}
 
-#if !defined(SLIB_PLATFORM_IS_APPLE)
-	String System::getApplicationHomeDirectory()
+#if !defined(SLIB_PLATFORM_IS_WINDOWS)
+	String System::getLocalAppDataDirectory()
 	{
-		return getApplicationDirectory();
+		return getHomeDirectory();
 	}
+#endif
 
+#if !defined(SLIB_PLATFORM_IS_APPLE)
 	String System::getCachesDirectory()
 	{
-		String dir = getApplicationDirectory() + "/caches";
+		String dir = getHomeDirectory() + "/.caches";
 		File::createDirectory(dir);
 		return dir;
 	}

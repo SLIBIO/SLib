@@ -31,6 +31,7 @@
 #include <signal.h>
 #include <float.h>
 #include <conio.h>
+#include <shlobj.h>
 
 #if defined(SLIB_PLATFORM_IS_UWP)
 using namespace Windows::Storage;
@@ -57,7 +58,7 @@ namespace slib
 	{
 #if defined(SLIB_PLATFORM_IS_WIN32)
 		sl_char16 bufAppPath[PRIV_PATH_MAX] = {0};
-		::GetModuleFileNameW(GetModuleHandle(NULL), (WCHAR*)bufAppPath, PRIV_PATH_MAX - 1);
+		GetModuleFileNameW(GetModuleHandle(NULL), (WCHAR*)bufAppPath, PRIV_PATH_MAX - 1);
 		return String(bufAppPath);
 #endif
 #if defined(SLIB_PLATFORM_IS_UWP)
@@ -65,15 +66,37 @@ namespace slib
 #endif
 	}
 
+	String System::getHomeDirectory()
+	{
+#if defined(SLIB_PLATFORM_IS_WIN32)
+		WCHAR path[MAX_PATH] = { 0 };
+		if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, 0, path))) {
+			return String::fromUtf16((sl_char16*)path);
+		}
+#endif
+		return getApplicationDirectory();
+	}
+
+	String System::getLocalAppDataDirectory()
+	{
+#if defined(SLIB_PLATFORM_IS_WIN32)
+		WCHAR path[MAX_PATH] = { 0 };
+		if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, path))) {
+			return String::fromUtf16((sl_char16*)path);
+		}
+#endif
+		return getApplicationDirectory();
+	}
+
 	String System::getTempDirectory()
 	{
 #if defined(SLIB_PLATFORM_IS_WIN32)
 		sl_char16 sz[PRIV_PATH_MAX] = {0};
-		sl_int32 n = ::GetTempPathW(PRIV_PATH_MAX - 1, (LPWSTR)sz);
+		sl_int32 n = GetTempPathW(PRIV_PATH_MAX - 1, (LPWSTR)sz);
 		return String(sz, n);
 #else
 		SLIB_STATIC_STRING(temp, "/temp");
-		String dir = System::getApplicationDirectory() + temp;
+		String dir = getApplicationDirectory() + temp;
 		File::createDirectory(dir);
 		return dir;
 #endif
@@ -81,34 +104,48 @@ namespace slib
 
 	String System::getCurrentDirectory()
 	{
+#if defined(SLIB_PLATFORM_IS_WIN32)
 		WCHAR path[PRIV_PATH_MAX] = { 0 };
-		::GetCurrentDirectoryW(PRIV_PATH_MAX - 1, path);
+		GetCurrentDirectoryW(PRIV_PATH_MAX - 1, path);
 		return String(path);
+#else
+		return getApplicationPath();
+#endif
 	}
 
 	sl_bool System::setCurrentDirectory(const String& _dir)
 	{
+#if defined(SLIB_PLATFORM_IS_WIN32)
 		String16 dir = _dir;
-		if (::SetCurrentDirectoryW((LPCWSTR)(dir.getData()))) {
+		if (SetCurrentDirectoryW((LPCWSTR)(dir.getData()))) {
 			return sl_true;
 		}
+#endif
 		return sl_false;
 	}
 
 	String System::getComputerName()
 	{
+#if defined(SLIB_PLATFORM_IS_WIN32)
 		WCHAR buf[512] = { 0 };
 		DWORD nBuf = 500;
 		GetComputerNameW(buf, &nBuf);
 		return String::fromUtf16((sl_char16*)buf, (sl_reg)nBuf);
+#else
+		return sl_null;
+#endif
 	}
 
 	String System::getUserName()
 	{
+#if defined(SLIB_PLATFORM_IS_WIN32)
 		WCHAR buf[512] = { 0 };
 		DWORD nBuf = 500;
 		GetUserNameW(buf, &nBuf);
 		return String::fromUtf16((sl_char16*)buf, (sl_reg)nBuf);
+#else
+		return sl_null;
+#endif
 	}
 	
 	String System::getFullUserName()
@@ -148,12 +185,12 @@ namespace slib
 
 	sl_uint32 System::getProcessId()
 	{
-		return ::GetCurrentProcessId();
+		return GetCurrentProcessId();
 	}
 
 	sl_uint32 System::getThreadId()
 	{
-		return ::GetCurrentThreadId();
+		return GetCurrentThreadId();
 	}
 
 #if defined (SLIB_PLATFORM_IS_WIN32)
@@ -180,13 +217,13 @@ namespace slib
 
 		PROCESS_INFORMATION pi;
 		ZeroMemory(&pi, sizeof(pi));
-		BOOL bRet = ::CreateProcessW((LPCWSTR)(pathExecutable.getData())
+		BOOL bRet = CreateProcessW((LPCWSTR)(pathExecutable.getData())
 			, (LPWSTR)(cmd.getData())
 			, NULL, NULL, FALSE
 			, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi);
 		if (bRet) {
-			::CloseHandle(pi.hProcess);
-			::CloseHandle(pi.hThread);
+			CloseHandle(pi.hProcess);
+			CloseHandle(pi.hThread);
 			return sl_true;
 		} else {
 			return sl_false;
@@ -206,7 +243,7 @@ namespace slib
 		}
 		args[nCmds + 1] = 0;
 
-		::_execvp(exe, args);
+		_execvp(exe, args);
 		::exit(1);
 	}
 
@@ -218,7 +255,7 @@ namespace slib
 
 	void System::sleep(sl_uint32 milliseconds)
 	{
-		::Sleep(milliseconds);
+		Sleep(milliseconds);
 	}
 
 	void System::yield()
@@ -232,7 +269,7 @@ namespace slib
 
 	sl_uint32 System::getLastError()
 	{
-		return (sl_uint32)(::GetLastError());
+		return (sl_uint32)(GetLastError());
 	}
 
 	String System::formatErrorCode(sl_uint32 errorCode)
@@ -240,7 +277,7 @@ namespace slib
 		String ret;
 		if (errorCode > 0) {
 			LPWSTR buf = sl_null;
-			DWORD size = ::FormatMessageW(
+			DWORD size = FormatMessageW(
 				FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_FROM_HMODULE,
 				Windows::loadLibrary_wininet(),
 				errorCode,
@@ -249,7 +286,7 @@ namespace slib
 				NULL);
 			if (buf) {
 				ret = String((sl_char16*)buf, size);
-				::LocalFree(buf);
+				LocalFree(buf);
 			}
 		}
 		if (ret.isEmpty()) {
@@ -263,7 +300,7 @@ namespace slib
 #if defined(SLIB_DEBUG)
 		String16 msg = _msg;
 		String16 file = _file;
-		::_wassert((wchar_t*)(msg.getData()), (wchar_t*)(file.getData()), line);
+		_wassert((wchar_t*)(msg.getData()), (wchar_t*)(file.getData()), line);
 #endif
 	}
 
@@ -318,7 +355,7 @@ namespace slib
 	void System::setCrashHandler(SIGNAL_HANDLER handler)
 	{
 		priv::system::g_handlerSignalCrash = handler;
-		::SetUnhandledExceptionFilter(priv::system::handleException);
+		SetUnhandledExceptionFilter(priv::system::handleException);
 		handler = priv::system::handleSignalCrash;
 		signal(SIGFPE, handler);
 		signal(SIGSEGV, handler);
@@ -351,7 +388,7 @@ namespace slib
 
 				~GlobalUniqueInstanceImpl()
 				{
-					::CloseHandle(m_hMutex);
+					CloseHandle(m_hMutex);
 				}
 			};
 		}
@@ -364,14 +401,14 @@ namespace slib
 			return sl_null;
 		}
 		String16 name = "Global\\" + File::makeSafeFileName(_name);
-		HANDLE hMutex = ::OpenMutexW(MUTEX_ALL_ACCESS, FALSE, (LPCWSTR)(name.getData()));
+		HANDLE hMutex = OpenMutexW(MUTEX_ALL_ACCESS, FALSE, (LPCWSTR)(name.getData()));
 		if (hMutex != NULL) {
-			::CloseHandle(hMutex);
+			CloseHandle(hMutex);
 			return sl_null;
 		}
 		Ref<priv::system::GlobalUniqueInstanceImpl> instance = new priv::system::GlobalUniqueInstanceImpl;
 		if (instance.isNotNull()) {
-			hMutex = ::CreateMutexW(NULL, FALSE, (LPCWSTR)(name.getData()));
+			hMutex = CreateMutexW(NULL, FALSE, (LPCWSTR)(name.getData()));
 			if (hMutex) {
 				instance->m_hMutex = hMutex;
 				return instance;
@@ -386,9 +423,9 @@ namespace slib
 			return sl_false;
 		}
 		String16 name = "Global\\" + File::makeSafeFileName(_name);
-		HANDLE hMutex = ::OpenMutexW(MUTEX_ALL_ACCESS, FALSE, (LPCWSTR)(name.getData()));
+		HANDLE hMutex = OpenMutexW(MUTEX_ALL_ACCESS, FALSE, (LPCWSTR)(name.getData()));
 		if (hMutex != NULL) {
-			::CloseHandle(hMutex);
+			CloseHandle(hMutex);
 			return sl_true;
 		}
 		return sl_false;
@@ -409,15 +446,15 @@ namespace slib
 	void Console::print(const String& _s)
 	{
 		String16 s = _s;
-		::wprintf(L"%s", (LPCWSTR)(s.getData()));
-		::OutputDebugStringW((LPCWSTR)s.getData());
+		wprintf(L"%s", (LPCWSTR)(s.getData()));
+		OutputDebugStringW((LPCWSTR)s.getData());
 	}
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 	String Console::readLine()
 	{
 		char line[512];
-		char* l = ::gets_s(line);
+		char* l = gets_s(line);
 		line[511] = 0;
 		return l;
 	}
@@ -425,9 +462,9 @@ namespace slib
 	sl_char16 Console::readChar(sl_bool flagPrintEcho)
 	{
 		if (flagPrintEcho) {
-			return (sl_char16)(::_getche());
+			return (sl_char16)(_getche());
 		} else {
-			return (sl_char16)(::_getch());
+			return (sl_char16)(_getch());
 		}
 	}
 #endif

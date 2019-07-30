@@ -40,7 +40,9 @@ namespace slib
 
 		static String getApplicationDirectory();
 
-		static String getApplicationHomeDirectory();
+		static String getHomeDirectory();
+
+		static String getLocalAppDataDirectory();
 
 		static String getCachesDirectory();
 

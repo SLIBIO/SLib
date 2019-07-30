@@ -43,6 +43,7 @@
 #include <signal.h>
 #include <fcntl.h>
 #include <termios.h>
+#include <pwd.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -106,6 +107,16 @@ namespace slib
 #	endif
 	}
 
+	String System::getHomeDirectory()
+	{
+#	if defined(SLIB_PLATFORM_IS_MOBILE)
+		return getApplicationDirectory();
+#	else
+		passwd* pwd = getpwuid(getuid());
+		return pwd->pw_dir;
+#	endif
+	}
+
 	String System::getTempDirectory()
 	{
 #	if defined(SLIB_PLATFORM_IS_MOBILE)
@@ -121,7 +132,7 @@ namespace slib
 	String System::getCurrentDirectory()
 	{
 		char path[PRIV_PATH_MAX] = {0};
-		char* r = ::getcwd(path, PRIV_PATH_MAX-1);
+		char* r = getcwd(path, PRIV_PATH_MAX-1);
 		if (r) {
 			return path;
 		}
@@ -130,7 +141,7 @@ namespace slib
 
 	sl_bool System::setCurrentDirectory(const String& dir)
 	{
-		int iRet = ::chdir(dir.getData());
+		int iRet = chdir(dir.getData());
 		if (iRet == 0) {
 			return sl_true;
 		}
