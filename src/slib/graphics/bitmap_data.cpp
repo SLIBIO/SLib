@@ -1689,16 +1689,16 @@ namespace slib
 					for (sl_uint32 j = 0; j < W2; j++) {
 						YUV::convertYUVToRGB(*y0, *u, *v, r, g, b);
 						TargetProc::writeSample(d0, r, g, b, 255);
-						y0 += components[0].sampleStride; d0 += dst_pitch;
+						y0 += components[0].sampleStride; d0 += dst_sample_stride;
 						YUV::convertYUVToRGB(*y0, *u, *v, r, g, b);
 						TargetProc::writeSample(d0, r, g, b, 255);
-						y0 += components[0].sampleStride; d0 += dst_pitch;
+						y0 += components[0].sampleStride; d0 += dst_sample_stride;
 						YUV::convertYUVToRGB(*y1, *u, *v, r, g, b);
 						TargetProc::writeSample(d1, r, g, b, 255);
-						y1 += components[0].sampleStride; d1 += dst_pitch;
+						y1 += components[0].sampleStride; d1 += dst_sample_stride;
 						YUV::convertYUVToRGB(*y1, *u, *v, r, g, b);
 						TargetProc::writeSample(d1, r, g, b, 255);
-						y1 += components[0].sampleStride; d1 += dst_pitch;
+						y1 += components[0].sampleStride; d1 += dst_sample_stride;
 						u += components[1].sampleStride; v += components[2].sampleStride;
 					}
 					row_y += components[0].pitch + components[0].pitch;
