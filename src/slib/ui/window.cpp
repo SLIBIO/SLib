@@ -1118,9 +1118,18 @@ namespace slib
 	void Window::create()
 	{
 		if (UI::isUiThread()) {
-			_create();
+			_create(sl_false);
 		} else {
-			UI::dispatchToUiThread(SLIB_FUNCTION_REF(Window, _create, this));
+			UI::dispatchToUiThread(SLIB_BIND_REF(void(), Window, _create, this, sl_false));
+		}
+	}
+
+	void Window::createAndKeep()
+	{
+		if (UI::isUiThread()) {
+			_create(sl_true);
+		} else {
+			UI::dispatchToUiThread(SLIB_BIND_REF(void(), Window, _create, this, sl_true));
 		}
 	}
 
@@ -1130,7 +1139,13 @@ namespace slib
 		create();
 	}
 
-	void Window::_create()
+	void Window::forceCreateAndKeep()
+	{
+		detach();
+		createAndKeep();
+	}
+
+	void Window::_create(sl_bool flagKeepReference)
 	{
 		if (m_instance.isNotNull()) {
 			return;
@@ -1184,6 +1199,11 @@ namespace slib
 		Ref<WindowInstance> window = createWindowInstance(param);
 		
 		if (window.isNotNull()) {
+			
+			if (flagKeepReference) {
+				increaseReference();
+				window->setKeepWindow(sl_true);
+			}
 			
 			window->setBackgroundColor(m_backgroundColor);
 			
@@ -1276,6 +1296,11 @@ namespace slib
 		return sl_null;
 	}
 
+	void Window::showModal()
+	{
+		UI::dispatchToUiThread(SLIB_BIND_REF(void(), Window, doModal, this));
+	}
+	
 	void Window::addView(const Ref<View>& child)
 	{
 		if (child.isNotNull()) {
@@ -1571,12 +1596,18 @@ namespace slib
 
 	SLIB_DEFINE_OBJECT(WindowInstance, Object)
 
-	WindowInstance::WindowInstance()
+	WindowInstance::WindowInstance(): m_flagKeepWindow(sl_false)
 	{
 	}
 
 	WindowInstance::~WindowInstance()
 	{
+		if (m_flagKeepWindow) {
+			Ref<Window> window = m_window;
+			if (window.isNotNull()) {
+				window->decreaseReference();
+			}
+		}
 	}
 
 	Ref<Window> WindowInstance::getWindow()
@@ -1587,6 +1618,11 @@ namespace slib
 	void WindowInstance::setWindow(const Ref<Window>& window)
 	{
 		m_window = window;
+	}
+	
+	void WindowInstance::setKeepWindow(sl_bool flag)
+	{
+		m_flagKeepWindow = flag;
 	}
 
 	void WindowInstance::setMenu(const Ref<Menu>& menu)

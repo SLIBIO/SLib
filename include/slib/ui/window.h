@@ -386,9 +386,15 @@ namespace slib
 
 		void create();
 		
+		void createAndKeep();
+		
 		void forceCreate();
 		
+		void forceCreateAndKeep();
+		
 		Variant doModal();
+		
+		void showModal();
 
 		
 		void addView(const Ref<View>& view);
@@ -424,7 +430,7 @@ namespace slib
 	private:
 		Ref<WindowInstance> createWindowInstance(const WindowInstanceParam& param);
 
-		void _create();
+		void _create(sl_bool flagKeepReference);
 		
 		void _attachContent();
 		
@@ -507,6 +513,8 @@ namespace slib
 		Ref<Window> getWindow();
 		
 		void setWindow(const Ref<Window>& window);
+		
+		void setKeepWindow(sl_bool flag);
 		
 	public:
 		virtual void close() = 0;
@@ -611,6 +619,7 @@ namespace slib
 
 	private:
 		AtomicWeakRef<Window> m_window;
+		sl_bool m_flagKeepWindow;
 		
 	};
 
