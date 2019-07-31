@@ -101,12 +101,12 @@ namespace slib
 				NSOpenGLContext* context = nil;
 				
 				NSOpenGLPixelFormatAttribute attrs[] = {
-					NSOpenGLPFADoubleBuffer
-					, NSOpenGLPFAColorSize, 24
-					, NSOpenGLPFAAlphaSize, 8
-					, NSOpenGLPFADepthSize, 24
-					, NSOpenGLPFAStencilSize, 8
-					, 0
+					NSOpenGLPFADoubleBuffer,
+					NSOpenGLPFAColorSize, 24,
+					NSOpenGLPFAAlphaSize, 8,
+					NSOpenGLPFADepthSize, 24,
+					NSOpenGLPFAStencilSize, 8,
+					0
 				};
 				NSOpenGLPixelFormat* pf = [[NSOpenGLPixelFormat alloc] initWithAttributes:attrs];
 				if (pf == nil) {
