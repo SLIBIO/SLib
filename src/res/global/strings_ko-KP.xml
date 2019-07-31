@@ -1,0 +1,7 @@
+<sapp>
+	<strings>
+		<string name='open_image'>그림파일선택</string>
+		<string name='file_dialog_filter_image'>그림파일</string>
+		<string name='take_photo'>사진촬영</string>
+	</strings>
+</sapp>

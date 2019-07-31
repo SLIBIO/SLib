@@ -10,5 +10,6 @@ namespace slib
 		class CameraControlView;
 		class MenuPopup;
 		class MobileAlertDialog;
+		class TakePhotoFromCameraDialog;
 	}
 }

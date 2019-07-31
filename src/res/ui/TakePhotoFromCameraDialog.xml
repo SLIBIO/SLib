@@ -1,0 +1,22 @@
+<sapp>
+	<layout
+		type='window'
+		title='@string/take_photo'
+		background='black'
+		width='500'
+		height='500'
+		centerScreen='true'
+		>
+		
+		<camera
+			name='camera'
+			width='fill'
+			height='fill'
+			autoStart='true'
+			device='front'
+			scale='cover'
+			controls='true'
+			/>
+
+ 	</layout>
+</sapp>

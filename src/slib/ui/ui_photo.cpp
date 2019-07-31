@@ -23,6 +23,13 @@
 #include "slib/ui/photo.h"
 
 #include "slib/core/file.h"
+#include "slib/core/variant.h"
+
+#include "slib/ui/core.h"
+#include "slib/ui/camera_view.h"
+#include "slib/ui/common_dialogs.h"
+
+#include "../resources.h"
 
 namespace slib
 {
@@ -95,15 +102,63 @@ namespace slib
 	}
 	
 #if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
+	namespace priv
+	{
+		namespace ui_photo
+		{
+			class TakePhotoResultEx : public TakePhotoResult
+			{
+			public:
+				void setResult(const Ref<Image>& image)
+				{
+					if (image.isNotNull()) {
+						drawable = image;
+						flagSuccess = sl_true;
+					}
+				}
+			};
+		}
+	}
+	
 	void TakePhoto::takeFromCamera()
 	{
+		auto thiz = *this;
+		auto refDlg = New<ui::TakePhotoFromCameraDialog>();
+		auto dlg = refDlg.get();
+		dlg->camera->setOnTakePicture([thiz, dlg](CameraView*, CameraTakePictureResult& result) {
+			priv::ui_photo::TakePhotoResultEx tr;
+			tr.setResult(result.getImage());
+			dlg->close(DialogResult::Ok);
+			thiz.onComplete(tr);
+		});
+		dlg->setOnClose([thiz](Window*, UIEvent*) {
+			TakePhotoResult result;
+			result.flagCancel = sl_true;
+			thiz.onComplete(result);
+		});
+		dlg->showModal();
 	}
 	
 	void TakePhoto::chooseFromLibrary()
 	{
+		FileDialog dlg;
+		dlg.type = FileDialogType::OpenFile;
+		dlg.title = string::open_image::get();
+		dlg.flagShowHiddenFiles = sl_true;
+		dlg.addFilter(string::file_dialog_filter_image::get() + " (*.jpg;*.jpeg;*.png;*.gif;*.bmp)", "*.jpg;*.jpeg;*.png;*.gif;*.bmp");
+		dlg.addFilter(string::file_dialog_filter_all::get() + " (*.*)", "*");
+		priv::ui_photo::TakePhotoResultEx result;
+		if (dlg.run() == DialogResult::Ok) {
+			String path = dlg.selectedPath;
+			if (path.isNotEmpty()) {
+				result.setResult(Image::loadFromFile(path));
+			}
+		} else {
+			result.flagCancel = sl_true;
+		}
+		onComplete(result);
 	}
 #endif
-	
 	
 	SLIB_DEFINE_MEMBER_CLASS_DEFAULT_MEMBERS(PhotoKit, SaveImageParam)
 	

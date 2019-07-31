@@ -10,6 +10,15 @@ namespace slib
 			SLIB_DEFINE_STRING_RESOURCE_VALUE(zh, "\xe5\x8f\x96\xe6\xb6\x88")
 		SLIB_DEFINE_STRING_RESOURCE_END
 
+		SLIB_DEFINE_STRING_RESOURCE_BEGIN(file_dialog_filter_all, "All Files")
+			SLIB_DEFINE_STRING_RESOURCE_VALUE(ko, "\xeb\xaa\xa8\xeb\x93\xa0 \xed\x8c\x8c\xec\x9d\xbc")
+		SLIB_DEFINE_STRING_RESOURCE_END
+
+		SLIB_DEFINE_STRING_RESOURCE_BEGIN(file_dialog_filter_image, "Image Files")
+			SLIB_DEFINE_STRING_RESOURCE_VALUE(ko-KP, "\xea\xb7\xb8\xeb\xa6\xbc\xed\x8c\x8c\xec\x9d\xbc")
+			SLIB_DEFINE_STRING_RESOURCE_VALUE(ko, "\xec\x9d\xb4\xeb\xaf\xb8\xec\xa7\x80 \xed\x8c\x8c\xec\x9d\xbc")
+		SLIB_DEFINE_STRING_RESOURCE_END
+
 		SLIB_DEFINE_STRING_RESOURCE_BEGIN(no, "No")
 			SLIB_DEFINE_STRING_RESOURCE_VALUE(ko, "\xec\x95\x84\xeb\x8b\x88")
 			SLIB_DEFINE_STRING_RESOURCE_VALUE(zh, "\xe5\x90\xa6")
@@ -18,6 +27,16 @@ namespace slib
 		SLIB_DEFINE_STRING_RESOURCE_BEGIN(ok, "OK")
 			SLIB_DEFINE_STRING_RESOURCE_VALUE(ko, "\xed\x99\x95\xec\x9d\xb8")
 			SLIB_DEFINE_STRING_RESOURCE_VALUE(zh, "\xe7\xa1\xae\xe5\xae\x9a")
+		SLIB_DEFINE_STRING_RESOURCE_END
+
+		SLIB_DEFINE_STRING_RESOURCE_BEGIN(open_image, "Open Image")
+			SLIB_DEFINE_STRING_RESOURCE_VALUE(ko-KP, "\xea\xb7\xb8\xeb\xa6\xbc\xed\x8c\x8c\xec\x9d\xbc\xec\x84\xa0\xed\x83\x9d")
+			SLIB_DEFINE_STRING_RESOURCE_VALUE(ko, "\xec\x9d\xb4\xeb\xaf\xb8\xec\xa7\x80 \xed\x8c\x8c\xec\x9d\xbc \xec\x97\xb4\xea\xb8\xb0")
+		SLIB_DEFINE_STRING_RESOURCE_END
+
+		SLIB_DEFINE_STRING_RESOURCE_BEGIN(take_photo, "Take your photo")
+			SLIB_DEFINE_STRING_RESOURCE_VALUE(ko-KP, "\xec\x82\xac\xec\xa7\x84\xec\xb4\xac\xec\x98\x81")
+			SLIB_DEFINE_STRING_RESOURCE_VALUE(ko, "\xec\x82\xac\xec\xa7\x84 \xec\xb4\xac\xec\x98\x81")
 		SLIB_DEFINE_STRING_RESOURCE_END
 
 		SLIB_DEFINE_STRING_RESOURCE_BEGIN(today, "Today")
@@ -37,8 +56,12 @@ namespace slib
 
 		SLIB_DEFINE_STRING_RESOURCE_MAP_BEGIN
 			SLIB_DEFINE_STRING_RESOURCE_MAP_ITEM(cancel)
+			SLIB_DEFINE_STRING_RESOURCE_MAP_ITEM(file_dialog_filter_all)
+			SLIB_DEFINE_STRING_RESOURCE_MAP_ITEM(file_dialog_filter_image)
 			SLIB_DEFINE_STRING_RESOURCE_MAP_ITEM(no)
 			SLIB_DEFINE_STRING_RESOURCE_MAP_ITEM(ok)
+			SLIB_DEFINE_STRING_RESOURCE_MAP_ITEM(open_image)
+			SLIB_DEFINE_STRING_RESOURCE_MAP_ITEM(take_photo)
 			SLIB_DEFINE_STRING_RESOURCE_MAP_ITEM(today)
 			SLIB_DEFINE_STRING_RESOURCE_MAP_ITEM(yes)
 			SLIB_DEFINE_STRING_RESOURCE_MAP_ITEM(yesterday)
