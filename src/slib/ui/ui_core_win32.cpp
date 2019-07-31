@@ -132,7 +132,7 @@ namespace slib
 				if (!shared) {
 					return;
 				}
-				::PostMessageW(shared->hWndMessage, uMsg, wParam, lParam);
+				PostMessageW(shared->hWndMessage, uMsg, wParam, lParam);
 			}
 
 			UINT g_messageTaskbarButtonCreated = 0;
@@ -241,7 +241,7 @@ namespace slib
 
 	sl_bool UI::isUiThread()
 	{
-		return (g_threadMain == ::GetCurrentThreadId());
+		return (g_threadMain == GetCurrentThreadId());
 	}
 
 	void UI::dispatchToUiThread(const Function<void()>& callback, sl_uint32 delayMillis)
@@ -255,7 +255,7 @@ namespace slib
 				return;
 			}
 			if (UIDispatcher::addCallback(callback)) {
-				::PostMessageW(shared->hWndMessage, SLIB_UI_MESSAGE_DISPATCH, 0, 0);
+				PostMessageW(shared->hWndMessage, SLIB_UI_MESSAGE_DISPATCH, 0, 0);
 			}
 		} else {
 			sl_reg callbackId;
@@ -282,9 +282,9 @@ namespace slib
 
 	void UIPlatform::runLoop(sl_uint32 level)
 	{
-		::ReleaseCapture();
+		ReleaseCapture();
 		MSG msg;
-		while (::GetMessageW(&msg, NULL, 0, 0)) {
+		while (GetMessageW(&msg, NULL, 0, 0)) {
 			if (msg.message == WM_QUIT) {
 				break;
 			}
@@ -293,7 +293,7 @@ namespace slib
 			} else if (msg.message == SLIB_UI_MESSAGE_DISPATCH_DELAYED) {
 				UIDispatcher::processDelayedCallback((sl_reg)(msg.lParam));
 			} else if (msg.message == SLIB_UI_MESSAGE_CLOSE) {
-				::DestroyWindow(msg.hwnd);
+				DestroyWindow(msg.hwnd);
 			} else if (msg.message == WM_MENUCOMMAND) {
 				priv::menu::ProcessMenuCommand(msg.wParam, msg.lParam);
 			} else if (g_messageTaskbarButtonCreated && msg.message == g_messageTaskbarButtonCreated) {
@@ -315,16 +315,16 @@ namespace slib
 							}
 						}
 					}
-					HWND hWnd = ::GetActiveWindow();
+					HWND hWnd = GetActiveWindow();
 					if (hWnd) {
-						if (::GetWindowLongW(hWnd, GWL_STYLE) & WS_POPUP) {
-							if (::IsDialogMessageW(hWnd, &msg)) {
+						if (GetWindowLongW(hWnd, GWL_STYLE) & WS_POPUP) {
+							if (IsDialogMessageW(hWnd, &msg)) {
 								break;
 							}
 						}
 					}
-					::TranslateMessage(&msg);
-					::DispatchMessageW(&msg);
+					TranslateMessage(&msg);
+					DispatchMessageW(&msg);
 				} while (0);
 			}
 		}
@@ -335,20 +335,20 @@ namespace slib
 
 	void UIPlatform::quitLoop()
 	{
-		::PostQuitMessage(0);
+		PostQuitMessage(0);
 	}
 
 	void UIPlatform::runApp()
 	{
 		Win32_UI_Shared::get();
 
-		g_threadMain = ::GetCurrentThreadId();
+		g_threadMain = GetCurrentThreadId();
 
 		Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 		ULONG_PTR gdiplusToken;
 		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
-		::OleInitialize(NULL);
+		OleInitialize(NULL);
 
 		INITCOMMONCONTROLSEX icex;
 		icex.dwICC = ICC_LISTVIEW_CLASSES | ICC_TAB_CLASSES | ICC_DATE_CLASSES;
@@ -365,17 +365,17 @@ namespace slib
 
 	void UIPlatform::quitApp()
 	{
-		::PostQuitMessage(0);
+		PostQuitMessage(0);
 	}
 
 	Win32_UI_Shared::Win32_UI_Shared()
 	{
-		hInstance = ::GetModuleHandleW(NULL);
+		hInstance = GetModuleHandleW(NULL);
 		
 		// register view class
 		{
 			WNDCLASSEXW wc;
-			::ZeroMemory(&wc, sizeof(wc));
+			ZeroMemory(&wc, sizeof(wc));
 			wc.cbSize = sizeof(wc);
 			wc.style = CS_DBLCLKS | CS_PARENTDC;
 			wc.lpfnWndProc = priv::view::ViewInstanceProc;
@@ -383,42 +383,42 @@ namespace slib
 			wc.cbWndExtra = 0;
 			wc.hInstance = hInstance;
 			wc.hIcon = NULL;
-			wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
+			wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 			wc.hbrBackground = (HBRUSH)(COLOR_MENU + 1);
 			wc.lpszMenuName = NULL;
 			wc.lpszClassName = L"SLIBUIVIEW";
 			wc.hIconSm = NULL;
-			wndClassForView = ::RegisterClassExW(&wc);
+			wndClassForView = RegisterClassExW(&wc);
 		}
 
 		// register window class
 		{
 			WNDCLASSEXW wc;
-			::ZeroMemory(&wc, sizeof(wc));
+			ZeroMemory(&wc, sizeof(wc));
 			wc.cbSize = sizeof(wc);
 			wc.style = CS_DBLCLKS;
 			wc.lpfnWndProc = priv::window::WindowInstanceProc;
 			wc.cbClsExtra = 0;
 			wc.cbWndExtra = 0;
 			wc.hInstance = hInstance;
-			wc.hIcon = ::LoadIcon(hInstance, IDI_APPLICATION);
-			wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
+			wc.hIcon = LoadIcon(hInstance, IDI_APPLICATION);
+			wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 			wc.hbrBackground = (HBRUSH)(COLOR_MENU + 1);
 			wc.lpszMenuName = NULL;
 			wc.lpszClassName = L"SLIBUIWINDOW";
 			wc.hIconSm = NULL;
-			wndClassForWindow = ::RegisterClassExW(&wc);
+			wndClassForWindow = RegisterClassExW(&wc);
 		}
 
 		// Mesage Window
 		{
 			WNDCLASSW wc;
-			::ZeroMemory(&wc, sizeof(wc));
+			ZeroMemory(&wc, sizeof(wc));
 			wc.hInstance = hInstance;
 			wc.lpfnWndProc = MessageWindowProc;
 			wc.lpszClassName = L"SLIBMESSAGEHANDLER";
-			m_wndClassForMessage = ::RegisterClassW(&wc);
-			hWndMessage = ::CreateWindowExW(0, (LPCWSTR)((LONG_PTR)m_wndClassForMessage), L"", 0, 0, 0, 0, 0, HWND_MESSAGE, 0, hInstance, 0);
+			m_wndClassForMessage = RegisterClassW(&wc);
+			hWndMessage = CreateWindowExW(0, (LPCWSTR)((LONG_PTR)m_wndClassForMessage), L"", 0, 0, 0, 0, 0, HWND_MESSAGE, 0, hInstance, 0);
 		}
 
 	}
@@ -426,7 +426,7 @@ namespace slib
 	Win32_UI_Shared::~Win32_UI_Shared()
 	{
 		if (hWndMessage) {
-			::DestroyWindow(hWndMessage);
+			DestroyWindow(hWndMessage);
 		}
 	}
 

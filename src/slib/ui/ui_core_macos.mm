@@ -30,6 +30,10 @@
 #include "slib/ui/platform.h"
 #include "slib/ui/app.h"
 
+#include "slib/core/safe_static.h"
+
+#include "ui_core_common.h"
+
 @interface SLIBAppDelegate : NSObject <NSApplicationDelegate>
 @end
 
@@ -38,7 +42,7 @@ namespace slib
 	
 	namespace priv
 	{
-		namespace core
+		namespace ui_core
 		{
 			
 			class ScreenImpl : public Screen
@@ -93,11 +97,26 @@ namespace slib
 				}
 				
 			};
+			
+			class StaticContext
+			{
+			public:
+				NSEvent* dispatchEvent;
+				
+			public:
+				StaticContext()
+				{
+					dispatchEvent = [NSEvent otherEventWithType:NSEventTypeApplicationDefined location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil subtype:0 data1:0 data2:0];
+				}
+				
+			};
+			
+			SLIB_SAFE_STATIC_GETTER(StaticContext, GetStaticContext)
 
 		}
 	}
 
-	using namespace priv::core;
+	using namespace priv::ui_core;
 
 	Ref<Screen> UIPlatform::createScreen(NSScreen* screen)
 	{
@@ -163,17 +182,48 @@ namespace slib
 		[[NSApp dockTile] setBadgeLabel:[NSString stringWithFormat:@"%d", number]];
 	}
 	
+	sl_bool UI::isUiThread()
+	{
+		return [NSThread isMainThread];
+	}
+	
+	void UI::dispatchToUiThread(const Function<void()>& callback, sl_uint32 delayMillis)
+	{
+		if (callback.isNull()) {
+			return;
+		}
+		StaticContext* context = GetStaticContext();
+		if (!context) {
+			return;
+		}
+		if (delayMillis == 0) {
+			if (UIDispatcher::addCallback(callback)) {
+				[NSApp postEvent:context->dispatchEvent atStart:NO];
+			}
+		} else {
+			Function<void()> refCallback(callback);
+			dispatch_time_t t = dispatch_time(DISPATCH_TIME_NOW, (sl_int64)(delayMillis) * NSEC_PER_MSEC);
+			dispatch_after(t, dispatch_get_main_queue(), ^{
+				if (UIDispatcher::addCallback(refCallback)) {
+					[NSApp postEvent:context->dispatchEvent atStart:YES];
+				}
+			});
+		}
+	}
+	
 	void UIPlatform::runLoop(sl_uint32 level)
 	{
+		StaticContext* context = GetStaticContext();
+		if (!context) {
+			return;
+		}
 		while (1) {
 			@autoreleasepool {
 				NSDate* date = [NSDate dateWithTimeIntervalSinceNow:1000];
 				NSEvent* ev = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:date inMode:NSDefaultRunLoopMode dequeue:YES];
 				if (ev != nil) {
-					if ([ev type] == NSApplicationDefined) {
-						if ([ev subtype] == NSPowerOffEventType) {
-							break;
-						}
+					if ([ev type] == NSApplicationDefined && [ev subtype] == NSPowerOffEventType) {
+						break;
 					}
 					[NSApp sendEvent:ev];
 				}
@@ -198,9 +248,16 @@ namespace slib
 	void UIPlatform::runApp()
 	{
 		[NSApplication sharedApplication];
+		
 		[[NSBundle mainBundle] loadNibNamed:@"MainMenu" owner:NSApp topLevelObjects:nil];
+		
 		SLIBAppDelegate * delegate = [[SLIBAppDelegate alloc] init];
 		[NSApp setDelegate:delegate];
+		
+		[NSEvent addLocalMonitorForEventsMatchingMask:NSEventMaskApplicationDefined handler:^(NSEvent* ev){
+			UIDispatcher::processCallbacks();
+			return (NSEvent*)nil;
+		}];
 		
 		@autoreleasepool {
 			[NSApp run];
@@ -220,19 +277,21 @@ namespace slib
 
 }
 
+using namespace slib;
+using namespace slib::priv::ui_core;
+
 @implementation SLIBAppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-	slib::UIApp::dispatchStartToApp();
+	UIApp::dispatchStartToApp();
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
 {
-	slib::UIApp::dispatchExitToApp();
+	UIApp::dispatchExitToApp();
 }
 
 @end
-
 
 #endif

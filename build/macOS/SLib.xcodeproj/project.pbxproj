@@ -1108,7 +1108,6 @@
 		26D9D9DD1E96468D005F7BD3 /* ui_animation_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26E63F441E337B2300F50E8A /* ui_animation_apple.mm */; };
 		26D9D9DE1E96468D005F7BD3 /* ui_app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2648D5451D096A8B00819E09 /* ui_app.cpp */; };
 		26D9D9DF1E96468D005F7BD3 /* ui_core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD52B1C11940A00D47AB0 /* ui_core.cpp */; };
-		26D9D9E01E96468D005F7BD3 /* ui_core_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2682C3F21E2D5D0800E9CB98 /* ui_core_apple.mm */; };
 		26D9D9E11E96468D005F7BD3 /* ui_core_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2682C3F71E2D639B00E9CB98 /* ui_core_common.cpp */; };
 		26D9D9E21E96468D005F7BD3 /* ui_core_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD52E1C11940A00D47AB0 /* ui_core_macos.mm */; };
 		26D9D9E31E96468D005F7BD3 /* ui_event.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5301C11940A00D47AB0 /* ui_event.cpp */; };
@@ -2372,7 +2371,6 @@
 		267D008B1E32AA5A002CC949 /* render_drawable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_drawable.cpp; sourceTree = "<group>"; };
 		2682569E21E464630079600F /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		2682C3EA1E2D211600E9CB98 /* parse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = parse.cpp; sourceTree = "<group>"; };
-		2682C3F21E2D5D0800E9CB98 /* ui_core_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_core_apple.mm; sourceTree = "<group>"; };
 		2682C3F71E2D639B00E9CB98 /* ui_core_common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_core_common.cpp; sourceTree = "<group>"; };
 		2682C3F81E2D639B00E9CB98 /* ui_core_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ui_core_common.h; sourceTree = "<group>"; };
 		2688DD841C16F6E200973672 /* video_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_view.cpp; sourceTree = "<group>"; };
@@ -4421,7 +4419,6 @@
 				26E63F441E337B2300F50E8A /* ui_animation_apple.mm */,
 				2648D5451D096A8B00819E09 /* ui_app.cpp */,
 				266DD52B1C11940A00D47AB0 /* ui_core.cpp */,
-				2682C3F21E2D5D0800E9CB98 /* ui_core_apple.mm */,
 				2682C3F71E2D639B00E9CB98 /* ui_core_common.cpp */,
 				2682C3F81E2D639B00E9CB98 /* ui_core_common.h */,
 				266DD52E1C11940A00D47AB0 /* ui_core_macos.mm */,
@@ -6200,7 +6197,6 @@
 				26D9D9201E9645CE005F7BD3 /* preference_apple.mm in Sources */,
 				26D9D9D91E96468D005F7BD3 /* text_view.cpp in Sources */,
 				2628EAE621C410E500D8CD00 /* base64.cpp in Sources */,
-				26D9D9E01E96468D005F7BD3 /* ui_core_apple.mm in Sources */,
 				26D9D9211E9645CE005F7BD3 /* view_frustum.cpp in Sources */,
 				26D9D9AC1E964683005F7BD3 /* render_base.cpp in Sources */,
 				26D9D9821E964675005F7BD3 /* audio_recorder.cpp in Sources */,

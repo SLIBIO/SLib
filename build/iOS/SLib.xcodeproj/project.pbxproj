@@ -938,8 +938,6 @@
 		26D9D8DC1E962976005F7BD3 /* ui_animation_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 268847811E2FEE2700AFA023 /* ui_animation_apple.mm */; };
 		26D9D8DD1E962976005F7BD3 /* ui_app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2648D5471D096AB000819E09 /* ui_app.cpp */; };
 		26D9D8DE1E962976005F7BD3 /* ui_core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2774E291B1CBBFD00538A7B /* ui_core.cpp */; };
-		26D9D8DF1E962976005F7BD3 /* ui_core_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2682C3F01E2D5C6C00E9CB98 /* ui_core_apple.mm */; };
-		26D9D8E01E962976005F7BD3 /* ui_core_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2682C3F41E2D639000E9CB98 /* ui_core_common.cpp */; };
 		26D9D8E11E962976005F7BD3 /* ui_core_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = A25F2F261B039EF600854DAF /* ui_core_ios.mm */; };
 		26D9D8E21E962976005F7BD3 /* ui_event.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F2F291B039EF600854DAF /* ui_event.cpp */; };
 		26D9D8E31E962976005F7BD3 /* ui_event_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2774E271B1CBBF600538A7B /* ui_event_ios.mm */; };
@@ -2156,9 +2154,6 @@
 		267B9D66225D11760057DF2A /* instagram.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = instagram.cpp; sourceTree = "<group>"; };
 		267D00891E32AA3B002CC949 /* render_drawable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_drawable.cpp; sourceTree = "<group>"; };
 		2682C3ED1E2D35A200E9CB98 /* parse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = parse.cpp; sourceTree = "<group>"; };
-		2682C3F01E2D5C6C00E9CB98 /* ui_core_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_core_apple.mm; sourceTree = "<group>"; };
-		2682C3F41E2D639000E9CB98 /* ui_core_common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_core_common.cpp; sourceTree = "<group>"; };
-		2682C3F51E2D639000E9CB98 /* ui_core_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ui_core_common.h; sourceTree = "<group>"; };
 		2683BFAD1C39710C0068AC42 /* atomic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = atomic.cpp; sourceTree = "<group>"; };
 		268847811E2FEE2700AFA023 /* ui_animation_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_animation_apple.mm; sourceTree = "<group>"; };
 		268847831E2FFB1900AFA023 /* ui_animation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ui_animation.h; sourceTree = "<group>"; };
@@ -4198,9 +4193,6 @@
 				268847811E2FEE2700AFA023 /* ui_animation_apple.mm */,
 				2648D5471D096AB000819E09 /* ui_app.cpp */,
 				A2774E291B1CBBFD00538A7B /* ui_core.cpp */,
-				2682C3F01E2D5C6C00E9CB98 /* ui_core_apple.mm */,
-				2682C3F41E2D639000E9CB98 /* ui_core_common.cpp */,
-				2682C3F51E2D639000E9CB98 /* ui_core_common.h */,
 				A25F2F261B039EF600854DAF /* ui_core_ios.mm */,
 				26ACB3F3220984FF0093FF3F /* ui_core_badge_ios.mm */,
 				A25F2F291B039EF600854DAF /* ui_event.cpp */,
@@ -5157,7 +5149,6 @@
 				26E1B8B2222ABBDC007C222E /* gzwrite.c in Sources */,
 				26C795CD2215FC7C0053C5A1 /* strings.cpp in Sources */,
 				26D9D8041E9628E0005F7BD3 /* md5.cpp in Sources */,
-				26D9D8E01E962976005F7BD3 /* ui_core_common.cpp in Sources */,
 				26D9D85E1E962937005F7BD3 /* geo_rectangle.cpp in Sources */,
 				26D9D8BB1E962976005F7BD3 /* cursor.cpp in Sources */,
 				26D9D8051E9628E0005F7BD3 /* matrix2.cpp in Sources */,
@@ -5396,7 +5387,6 @@
 				26D9D8541E96292E005F7BD3 /* sqlite.cpp in Sources */,
 				26D9D8361E9628E0005F7BD3 /* platform_apple.mm in Sources */,
 				26D9D8BC1E962976005F7BD3 /* edit_view.cpp in Sources */,
-				26D9D8DF1E962976005F7BD3 /* ui_core_apple.mm in Sources */,
 				26D9D8BE1E962976005F7BD3 /* gesture.cpp in Sources */,
 				26D9D8D71E962976005F7BD3 /* tab_view.cpp in Sources */,
 				26C1B64620D51D3D00E36539 /* drawable_ext.cpp in Sources */,
