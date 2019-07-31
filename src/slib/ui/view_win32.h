@@ -54,7 +54,7 @@ namespace slib
 					UIPlatform::registerViewInstance(hWnd, ret.get());
 				} else {
 					if (flagDestroyOnRelease) {
-						::PostMessageW(hWnd, SLIB_UI_MESSAGE_CLOSE, 0, 0);
+						PostMessageW(hWnd, SLIB_UI_MESSAGE_CLOSE, 0, 0);
 					}
 				}
 			}

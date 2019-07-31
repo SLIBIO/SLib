@@ -42,7 +42,7 @@ namespace slib
 
 			Color GetDefaultBackColor()
 			{
-				return GraphicsPlatform::getColorFromColorRef(::GetSysColor(COLOR_MENU));
+				return GraphicsPlatform::getColorFromColorRef(GetSysColor(COLOR_MENU));
 			}
 
 			LRESULT CALLBACK ViewInstanceProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -95,7 +95,7 @@ namespace slib
 								HDC hDC = (HDC)(wParam);
 								HBRUSH result = NULL;
 								if (!(instance->processControlColor(uMsg, hDC, result))) {
-									result = (HBRUSH)(::DefWindowProcW(hWnd, uMsg, wParam, lParam));
+									result = (HBRUSH)(DefWindowProcW(hWnd, uMsg, wParam, lParam));
 								}
 								instance->processPostControlColor(uMsg, hDC, result);
 								return (LRESULT)result;
@@ -103,7 +103,7 @@ namespace slib
 						}
 						break;
 				}
-				return ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
+				return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 			}
 
 			sl_bool CaptureChildInstanceEvents(View* view, UINT uMsg)
@@ -120,11 +120,11 @@ namespace slib
 							Win32_ViewInstance* instance = (Win32_ViewInstance*)(_instance.get());
 							HWND hWnd = instance->getHandle();
 							if (hWnd) {
-								DWORD lParam = ::GetMessagePos();
+								DWORD lParam = GetMessagePos();
 								POINT pt;
 								pt.x = (short)(lParam & 0xffff);
 								pt.y = (short)((lParam >> 16) & 0xffff);
-								::ScreenToClient(hWnd, &pt);
+								ScreenToClient(hWnd, &pt);
 								if (hitTestCapture(UIPoint((sl_ui_pos)(pt.x), (sl_ui_pos)(pt.y)))) {
 									LPARAM lParam = POINTTOPOINTS(pt);
 									LRESULT res;
@@ -185,7 +185,7 @@ namespace slib
 		if (m_handle) {
 			UIPlatform::removeViewInstance(m_handle);
 			if (m_flagDestroyOnRelease) {
-				::PostMessageW(m_handle, SLIB_UI_MESSAGE_CLOSE, 0, 0);
+				PostMessageW(m_handle, SLIB_UI_MESSAGE_CLOSE, 0, 0);
 			}
 		}
 	}
@@ -200,7 +200,7 @@ namespace slib
 
 		if (hWndParent) {
 
-			HINSTANCE hInst = ::GetModuleHandleW(NULL);
+			HINSTANCE hInst = GetModuleHandleW(NULL);
 			style |= WS_CHILD;
 			if (view->isVisible()) {
 				style |= WS_VISIBLE;
@@ -212,7 +212,7 @@ namespace slib
 			x += (sl_ui_pos)(t.x);
 			y += (sl_ui_pos)(t.y);
 
-			HWND hWnd = ::CreateWindowExW(
+			HWND hWnd = CreateWindowExW(
 				styleEx // ex-style
 				, wndClass
 				, text
@@ -225,7 +225,7 @@ namespace slib
 				, NULL);
 			if (hWnd) {
 				if (!(view->isEnabled())) {
-					::EnableWindow(hWnd, FALSE);
+					EnableWindow(hWnd, FALSE);
 				}
 				return hWnd;
 			}
@@ -248,7 +248,7 @@ namespace slib
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
-			if (::IsWindow(hWnd)) {
+			if (IsWindow(hWnd)) {
 				return sl_true;
 			}
 		}
@@ -260,10 +260,10 @@ namespace slib
 		HWND hWnd = m_handle;
 		if (hWnd) {
 			if (flag) {
-				::SetFocus(hWnd);
+				SetFocus(hWnd);
 			} else {
-				if (::GetFocus() == hWnd) {
-					::SetFocus(NULL);
+				if (GetFocus() == hWnd) {
+					SetFocus(NULL);
 				}
 			}
 		}
@@ -273,7 +273,7 @@ namespace slib
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
-			::InvalidateRect(hWnd, NULL, TRUE);
+			InvalidateRect(hWnd, NULL, TRUE);
 		}
 	}
 
@@ -286,7 +286,7 @@ namespace slib
 			rc.top = (int)(rect.top);
 			rc.right = (int)(rect.right);
 			rc.bottom = (int)(rect.bottom);
-			::InvalidateRect(hWnd, &rc, TRUE);
+			InvalidateRect(hWnd, &rc, TRUE);
 		}
 	}
 
@@ -318,7 +318,7 @@ namespace slib
 				| SWP_NOCOPYBITS
 				| SWP_ASYNCWINDOWPOS
 				;
-			::SetWindowPos(hWnd, NULL
+			SetWindowPos(hWnd, NULL
 				, (int)(frame.left + m_translation.x), (int)(frame.top + m_translation.y)
 				, (int)(frame.getWidth()), (int)(frame.getHeight())
 				, uFlags
@@ -338,7 +338,7 @@ namespace slib
 				| SWP_NOCOPYBITS
 				| SWP_ASYNCWINDOWPOS
 				;
-			::SetWindowPos(hWnd, NULL
+			SetWindowPos(hWnd, NULL
 				, (int)(m_frame.left + m_translation.x), (int)(m_frame.top + m_translation.y)
 				, (int)(m_frame.getWidth()), (int)(m_frame.getHeight())
 				, uFlags
@@ -350,15 +350,15 @@ namespace slib
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
-			sl_bool f1 = ::IsWindowVisible(hWnd) ? sl_true : sl_false;
+			sl_bool f1 = IsWindowVisible(hWnd) ? sl_true : sl_false;
 			sl_bool f2 = flag ? sl_true : sl_false;
 			if (f1 != f2) {
 				if (f2) {
 					//::ShowWindow(hWnd, SW_SHOW);
-					::ShowWindowAsync(hWnd, SW_SHOW);
+					ShowWindowAsync(hWnd, SW_SHOW);
 				} else {
 					//::ShowWindow(hWnd, SW_HIDE);
-					::ShowWindowAsync(hWnd, SW_HIDE);
+					ShowWindowAsync(hWnd, SW_HIDE);
 				}
 			}
 		}
@@ -368,10 +368,10 @@ namespace slib
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
-			sl_bool f1 = ::IsWindowEnabled(hWnd) ? sl_true : sl_false;
+			sl_bool f1 = IsWindowEnabled(hWnd) ? sl_true : sl_false;
 			sl_bool f2 = flag ? sl_true : sl_false;
 			if (f1 != f2) {
-				::EnableWindow(hWnd, f2);
+				EnableWindow(hWnd, f2);
 			}
 		}
 	}
@@ -399,7 +399,7 @@ namespace slib
 			POINT pt;
 			pt.x = (LONG)(ptScreen.x);
 			pt.y = (LONG)(ptScreen.y);
-			::ScreenToClient(hWnd, &pt);
+			ScreenToClient(hWnd, &pt);
 			return UIPointf((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y));
 		}
 		return ptScreen;
@@ -412,7 +412,7 @@ namespace slib
 			POINT pt;
 			pt.x = (LONG)(ptView.x);
 			pt.y = (LONG)(ptView.y);
-			::ClientToScreen(hWnd, &pt);
+			ClientToScreen(hWnd, &pt);
 			return UIPointf((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y));
 		}
 		return ptView;
@@ -426,7 +426,7 @@ namespace slib
 			if (child) {
 				HWND hWndChild = child->getHandle();
 				if (hWndChild) {
-					::SetParent(hWndChild, hWnd);
+					SetParent(hWndChild, hWnd);
 				}
 			}
 		}
@@ -437,7 +437,7 @@ namespace slib
 		Win32_ViewInstance* child = (Win32_ViewInstance*)(_child.get());
 		HWND hWnd = child->getHandle();
 		if (hWnd) {
-			::SetParent(hWnd, HWND_MESSAGE);
+			SetParent(hWnd, HWND_MESSAGE);
 		}
 	}
 
@@ -445,7 +445,7 @@ namespace slib
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
-			::BringWindowToTop(hWnd);
+			BringWindowToTop(hWnd);
 			Ref<View> view = getView();
 			if (view.isNotNull()) {
 				view->invalidateBoundsInParent();
@@ -474,7 +474,7 @@ namespace slib
 			}
 			Keycode key = UIEvent::getKeycodeFromSystemKeycode(vkey);
 			Time t;
-			t.setMillisecondsCount(::GetMessageTime());
+			t.setMillisecondsCount(GetMessageTime());
 			Ref<UIEvent> ev = UIEvent::createKeyEvent(action, key, vkey, t);
 			if (ev.isNotNull()) {
 				applyModifiers(ev.get());
@@ -499,7 +499,7 @@ namespace slib
 			sl_ui_posf y = (sl_ui_posf)(_y);
 
 			Time t;
-			t.setMillisecondsCount(::GetMessageTime());
+			t.setMillisecondsCount(GetMessageTime());
 			Ref<UIEvent> ev = UIEvent::createMouseEvent(action, x, y, t);
 			if (ev.isNotNull()) {
 				applyModifiers(ev.get());
@@ -526,13 +526,13 @@ namespace slib
 				deltaX = (sl_real)delta;
 				deltaY = 0;
 			}
-			const DWORD lParam = ::GetMessagePos();
+			const DWORD lParam = GetMessagePos();
 			POINT pt;
 			pt.x = (short)(lParam & 0xffff);
 			pt.y = (short)((lParam >> 16) & 0xffff);
-			::ScreenToClient(hWnd, &pt);
+			ScreenToClient(hWnd, &pt);
 			Time t;
-			t.setMillisecondsCount(::GetMessageTime());
+			t.setMillisecondsCount(GetMessageTime());
 			Ref<UIEvent> ev = UIEvent::createMouseWheelEvent((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y), deltaX, deltaY, t);
 			if (ev.isNotNull()) {
 				applyModifiers(ev.get());
@@ -549,13 +549,13 @@ namespace slib
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
-			const DWORD lParam = ::GetMessagePos();
+			const DWORD lParam = GetMessagePos();
 			POINT pt;
 			pt.x = (short)(lParam & 0xffff);
 			pt.y = (short)((lParam >> 16) & 0xffff);
-			::ScreenToClient(hWnd, &pt);
+			ScreenToClient(hWnd, &pt);
 			Time t;
-			t.setMillisecondsCount(::GetMessageTime());
+			t.setMillisecondsCount(GetMessageTime());
 			Ref<UIEvent> ev = UIEvent::createSetCursorEvent((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y), t);
 			if (ev.isNotNull()) {
 				onSetCursor(ev.get());
@@ -624,19 +624,19 @@ namespace slib
 			case WM_PAINT:
 				{
 					PAINTSTRUCT ps;
-					HDC hDC = ::BeginPaint(hWnd, &ps);
+					HDC hDC = BeginPaint(hWnd, &ps);
 					if (hDC) {
 						if (ps.rcPaint.right > ps.rcPaint.left && ps.rcPaint.bottom > ps.rcPaint.top) {
 							Gdiplus::Graphics graphics(hDC);
 							RECT rect;
-							::GetClientRect(hWnd, &rect);
+							GetClientRect(hWnd, &rect);
 							Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, &graphics, rect.right, rect.bottom, sl_false);
 							if (canvas.isNotNull()) {
 								canvas->setInvalidatedRect(Rectangle((sl_real)(ps.rcPaint.left), (sl_real)(ps.rcPaint.top), (sl_real)(ps.rcPaint.right), (sl_real)(ps.rcPaint.bottom)));
 								onDraw(canvas.get());
 							}
 						}
-						::EndPaint(hWnd, &ps);
+						EndPaint(hWnd, &ps);
 					}
 					result = TRUE;
 					return sl_true;
@@ -645,7 +645,7 @@ namespace slib
 				{
 					sl_bool flag = onEventMouse(UIAction::LeftButtonDown, wParam, lParam);
 					m_actionMouseCapture = UIAction::LeftButtonDown;
-					::SetCapture(hWnd);
+					SetCapture(hWnd);
 					return flag;
 				}
 			case WM_LBUTTONDBLCLK:
@@ -655,7 +655,7 @@ namespace slib
 				}
 			case WM_LBUTTONUP:
 				{
-					::ReleaseCapture();
+					ReleaseCapture();
 					sl_bool flag = onEventMouse(UIAction::LeftButtonUp, wParam, lParam);
 					return flag;
 				}
@@ -663,7 +663,7 @@ namespace slib
 				{
 					sl_bool flag = onEventMouse(UIAction::RightButtonDown, wParam, lParam);
 					m_actionMouseCapture = UIAction::RightButtonDown;
-					::SetCapture(hWnd);
+					SetCapture(hWnd);
 					return flag;
 				}
 			case WM_RBUTTONDBLCLK:
@@ -673,7 +673,7 @@ namespace slib
 				}
 			case WM_RBUTTONUP:
 				{
-					::ReleaseCapture();
+					ReleaseCapture();
 					sl_bool flag = onEventMouse(UIAction::RightButtonUp, wParam, lParam);
 					return flag;
 				}
@@ -681,7 +681,7 @@ namespace slib
 				{
 					sl_bool flag = onEventMouse(UIAction::MiddleButtonDown, wParam, lParam);
 					m_actionMouseCapture = UIAction::MiddleButtonDown;
-					::SetCapture(hWnd);
+					SetCapture(hWnd);
 					return flag;
 				}
 			case WM_MBUTTONDBLCLK:
@@ -691,7 +691,7 @@ namespace slib
 				}
 			case WM_MBUTTONUP:
 				{
-					::ReleaseCapture();
+					ReleaseCapture();
 					sl_bool flag = onEventMouse(UIAction::MiddleButtonUp, wParam, lParam);
 					return flag;
 				}
@@ -702,17 +702,17 @@ namespace slib
 					track.dwFlags = TME_LEAVE | TME_QUERY;
 					track.hwndTrack = hWnd;
 					track.dwHoverTime = 0;
-					::TrackMouseEvent(&track);
+					TrackMouseEvent(&track);
 					if (track.dwFlags == 0) {
 						track.cbSize = sizeof(track);
 						track.dwFlags = TME_LEAVE;
 						track.hwndTrack = hWnd;
 						track.dwHoverTime = HOVER_DEFAULT;
-						::TrackMouseEvent(&track);
+						TrackMouseEvent(&track);
 						onEventMouse(UIAction::MouseEnter, wParam, lParam);
 					}
 
-					if (::GetCapture() == hWnd) {
+					if (GetCapture() == hWnd) {
 						if (m_actionMouseCapture == UIAction::LeftButtonDown) {
 							return onEventMouse(UIAction::LeftButtonDrag, wParam, lParam);
 						} else if (m_actionMouseCapture == UIAction::RightButtonDown) {

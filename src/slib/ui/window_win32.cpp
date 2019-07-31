@@ -84,7 +84,7 @@ namespace slib
 							return ret;
 						}
 						if (flagDestroyOnRelease) {
-							::PostMessageW(hWnd, SLIB_UI_MESSAGE_CLOSE, 0, 0);
+							PostMessageW(hWnd, SLIB_UI_MESSAGE_CLOSE, 0, 0);
 						}
 					}
 					return ret;
@@ -97,7 +97,7 @@ namespace slib
 						return NULL;
 					}
 
-					HINSTANCE hInst = ::GetModuleHandleW(NULL);
+					HINSTANCE hInst = GetModuleHandleW(NULL);
 
 					HWND hParent = NULL;
 					if (param.parent.isNotNull()) {
@@ -133,7 +133,7 @@ namespace slib
 						}
 						UIRect frameWindow = param.calculateRegion(frameScreen);
 						String16 title = param.title;
-						hWnd = ::CreateWindowExW(
+						hWnd = CreateWindowExW(
 							styleEx // ex-style
 							, (LPCWSTR)((LONG_PTR)(shared->wndClassForWindow))
 							, (LPCWSTR)(title.getData())
@@ -146,7 +146,7 @@ namespace slib
 							, NULL);
 
 						if (hParent && param.flagModal) {
-							::EnableWindow(hParent, FALSE);
+							EnableWindow(hParent, FALSE);
 						}
 					}
 					return hWnd;
@@ -164,13 +164,13 @@ namespace slib
 					if (hWnd) {
 						HWND hWndParent = Windows::getOwnerWindow(hWnd);
 						if (hWndParent) {
-							::EnableWindow(hWndParent, TRUE);
+							EnableWindow(hWndParent, TRUE);
 						}
 						m_handle = NULL;
 						UIPlatform::removeWindowInstance(hWnd);
 						m_viewContent.setNull();
 						if (m_flagDestroyOnRelease) {
-							::PostMessageW(hWnd, SLIB_UI_MESSAGE_CLOSE, 0, 0);
+							PostMessageW(hWnd, SLIB_UI_MESSAGE_CLOSE, 0, 0);
 						}
 					}
 				}
@@ -213,7 +213,7 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						::SetMenu(hWnd, UIPlatform::getMenuHandle(menu));
+						SetMenu(hWnd, UIPlatform::getMenuHandle(menu));
 					}
 				}
 
@@ -221,7 +221,7 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						::SetForegroundWindow(hWnd);
+						SetForegroundWindow(hWnd);
 						return sl_true;
 					}
 					return sl_false;
@@ -232,7 +232,7 @@ namespace slib
 					HWND hWnd = m_handle;
 					if (hWnd) {
 						RECT rect;
-						::GetWindowRect(hWnd, &rect);
+						GetWindowRect(hWnd, &rect);
 						UIRect frame((sl_ui_pos)(rect.left), (sl_ui_pos)(rect.top)
 							, (sl_ui_pos)(rect.right), (sl_ui_pos)(rect.bottom));
 						return frame;
@@ -245,7 +245,7 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						::SetWindowPos(hWnd, NULL
+						SetWindowPos(hWnd, NULL
 							, (int)(frame.left), (int)(frame.top)
 							, (int)(frame.getWidth()), (int)(frame.getHeight())
 							, SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
@@ -260,16 +260,16 @@ namespace slib
 					if (hWnd) {
 						UIRect ret;
 						RECT rect;
-						::GetClientRect(hWnd, &rect);
+						GetClientRect(hWnd, &rect);
 						POINT pt;
 						pt.x = 0;
 						pt.y = 0;
-						::ClientToScreen(hWnd, &pt);
+						ClientToScreen(hWnd, &pt);
 						ret.left = (sl_ui_pos)(pt.x);
 						ret.top = (sl_ui_pos)(pt.y);
 						pt.x = rect.right;
 						pt.y = rect.bottom;
-						::ClientToScreen(hWnd, &pt);
+						ClientToScreen(hWnd, &pt);
 						ret.right = (sl_ui_pos)(pt.x);
 						ret.bottom = (sl_ui_pos)(pt.y);
 						return ret;
@@ -283,7 +283,7 @@ namespace slib
 					HWND hWnd = m_handle;
 					if (hWnd) {
 						RECT rect;
-						::GetClientRect(hWnd, &rect);
+						GetClientRect(hWnd, &rect);
 						return UISize((sl_ui_pos)(rect.right), (sl_ui_pos)(rect.bottom));
 					} else {
 						return UISize::zero();
@@ -295,12 +295,12 @@ namespace slib
 					HWND hWnd = m_handle;
 					if (hWnd) {
 						RECT rectClient;
-						::GetClientRect(hWnd, &rectClient);
+						GetClientRect(hWnd, &rectClient);
 						RECT rectWindow;
-						::GetWindowRect(hWnd, &rectWindow);
+						GetWindowRect(hWnd, &rectWindow);
 						int dx = rectWindow.right - rectWindow.left - rectClient.right;
 						int dy = rectWindow.bottom - rectWindow.top - rectClient.bottom;
-						::SetWindowPos(hWnd, NULL
+						SetWindowPos(hWnd, NULL
 							, 0, 0
 							, dx + (int)(size.x), dy + (int)(size.y)
 							, SWP_NOMOVE | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
@@ -334,7 +334,7 @@ namespace slib
 					HWND hWnd = m_handle;
 					if (hWnd) {
 						m_backgroundColor = color;
-						::InvalidateRect(hWnd, NULL, TRUE);
+						InvalidateRect(hWnd, NULL, TRUE);
 					}
 					return sl_false;
 				}
@@ -343,7 +343,7 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						BOOL flag = ::IsIconic(hWnd);
+						BOOL flag = IsIconic(hWnd);
 						if (flag) {
 							return sl_true;
 						} else {
@@ -358,13 +358,13 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						sl_bool f1 = ::IsIconic(hWnd) ? sl_true : sl_false;
+						sl_bool f1 = IsIconic(hWnd) ? sl_true : sl_false;
 						sl_bool f2 = flag ? sl_true : sl_false;
 						if (f1 != f2) {
 							if (f2) {
-								::ShowWindowAsync(hWnd, SW_FORCEMINIMIZE);
+								ShowWindowAsync(hWnd, SW_FORCEMINIMIZE);
 							} else {
-								::ShowWindowAsync(hWnd, SW_RESTORE);
+								ShowWindowAsync(hWnd, SW_RESTORE);
 							}
 						}
 						return sl_true;
@@ -376,7 +376,7 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						BOOL flag = ::IsZoomed(hWnd);
+						BOOL flag = IsZoomed(hWnd);
 						if (flag) {
 							return sl_true;
 						} else {
@@ -391,13 +391,13 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						sl_bool f1 = ::IsZoomed(hWnd) ? sl_true : sl_false;
+						sl_bool f1 = IsZoomed(hWnd) ? sl_true : sl_false;
 						sl_bool f2 = flag ? sl_true : sl_false;
 						if (f1 != f2) {
 							if (f2) {
-								::ShowWindowAsync(hWnd, SW_MAXIMIZE);
+								ShowWindowAsync(hWnd, SW_MAXIMIZE);
 							} else {
-								::ShowWindowAsync(hWnd, SW_RESTORE);
+								ShowWindowAsync(hWnd, SW_RESTORE);
 							}
 						}
 						return sl_true;
@@ -409,7 +409,7 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						BOOL flag = ::IsWindowVisible(hWnd);
+						BOOL flag = IsWindowVisible(hWnd);
 						if (flag) {
 							return sl_true;
 						} else {
@@ -424,13 +424,13 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						sl_bool f1 = ::IsWindowVisible(hWnd) ? sl_true : sl_false;
+						sl_bool f1 = IsWindowVisible(hWnd) ? sl_true : sl_false;
 						sl_bool f2 = flag ? sl_true : sl_false;
 						if (f1 != f2) {
 							if (f2) {
-								::ShowWindowAsync(hWnd, SW_SHOW);
+								ShowWindowAsync(hWnd, SW_SHOW);
 							} else {
-								::ShowWindowAsync(hWnd, SW_HIDE);
+								ShowWindowAsync(hWnd, SW_HIDE);
 							}
 						}
 						return sl_true;
@@ -457,10 +457,10 @@ namespace slib
 					HWND hWnd = m_handle;
 					if (hWnd) {
 						if (flag) {
-							::SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0
+							SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0
 								, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 						} else {
-							::SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, 0, 0
+							SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, 0, 0
 								, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 						}
 						return sl_true;
@@ -472,7 +472,7 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						LONG cs = ::GetClassLongW(hWnd, GCL_STYLE);
+						LONG cs = GetClassLongW(hWnd, GCL_STYLE);
 						if (cs & CS_NOCLOSE) {
 							return sl_false;
 						} else {
@@ -486,13 +486,13 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						LONG old = ::GetClassLongW(hWnd, GCL_STYLE);
+						LONG old = GetClassLongW(hWnd, GCL_STYLE);
 						if (flag) {
-							::SetClassLongW(hWnd, GCL_STYLE, old & (~CS_NOCLOSE));
+							SetClassLongW(hWnd, GCL_STYLE, old & (~CS_NOCLOSE));
 						} else {
-							::SetClassLongW(hWnd, GCL_STYLE, old | CS_NOCLOSE);
+							SetClassLongW(hWnd, GCL_STYLE, old | CS_NOCLOSE);
 						}
-						::SetWindowPos(hWnd, NULL, 0, 0, 0, 0
+						SetWindowPos(hWnd, NULL, 0, 0, 0, 0
 							, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 						return sl_true;
 					}
@@ -503,7 +503,7 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						LONG style = ::GetWindowLongW(hWnd, GWL_STYLE);
+						LONG style = GetWindowLongW(hWnd, GWL_STYLE);
 						if (style & WS_MINIMIZEBOX) {
 							return sl_true;
 						} else {
@@ -517,13 +517,13 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						LONG old = ::GetWindowLongW(hWnd, GWL_STYLE);
+						LONG old = GetWindowLongW(hWnd, GWL_STYLE);
 						if (flag) {
-							::SetWindowLongW(hWnd, GWL_STYLE, old | WS_MINIMIZEBOX);
+							SetWindowLongW(hWnd, GWL_STYLE, old | WS_MINIMIZEBOX);
 						} else {
-							::SetWindowLongW(hWnd, GWL_STYLE, old & (~WS_MINIMIZEBOX));
+							SetWindowLongW(hWnd, GWL_STYLE, old & (~WS_MINIMIZEBOX));
 						}
-						::SetWindowPos(hWnd, NULL, 0, 0, 0, 0
+						SetWindowPos(hWnd, NULL, 0, 0, 0, 0
 							, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 						return sl_true;
 					}
@@ -534,7 +534,7 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						LONG style = ::GetWindowLongW(hWnd, GWL_STYLE);
+						LONG style = GetWindowLongW(hWnd, GWL_STYLE);
 						if (style & WS_MAXIMIZEBOX) {
 							return sl_true;
 						} else {
@@ -548,13 +548,13 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						LONG old = ::GetWindowLongW(hWnd, GWL_STYLE);
+						LONG old = GetWindowLongW(hWnd, GWL_STYLE);
 						if (flag) {
-							::SetWindowLongW(hWnd, GWL_STYLE, old | WS_MAXIMIZEBOX);
+							SetWindowLongW(hWnd, GWL_STYLE, old | WS_MAXIMIZEBOX);
 						} else {
-							::SetWindowLongW(hWnd, GWL_STYLE, old & (~WS_MAXIMIZEBOX));
+							SetWindowLongW(hWnd, GWL_STYLE, old & (~WS_MAXIMIZEBOX));
 						}
-						::SetWindowPos(hWnd, NULL, 0, 0, 0, 0
+						SetWindowPos(hWnd, NULL, 0, 0, 0, 0
 							, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 						return sl_true;
 					}
@@ -565,7 +565,7 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						LONG style = ::GetWindowLongW(hWnd, GWL_STYLE);
+						LONG style = GetWindowLongW(hWnd, GWL_STYLE);
 						if (style & WS_BORDER) {
 							if (style & WS_THICKFRAME) {
 								return sl_true;
@@ -579,16 +579,16 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						LONG old = ::GetWindowLongW(hWnd, GWL_STYLE);
+						LONG old = GetWindowLongW(hWnd, GWL_STYLE);
 						if (!(old & WS_BORDER)) {
 							return sl_false;
 						}
 						if (flag) {
-							::SetWindowLongW(hWnd, GWL_STYLE, old | WS_THICKFRAME);
+							SetWindowLongW(hWnd, GWL_STYLE, old | WS_THICKFRAME);
 						} else {
-							::SetWindowLongW(hWnd, GWL_STYLE, old & (~WS_THICKFRAME));
+							SetWindowLongW(hWnd, GWL_STYLE, old & (~WS_THICKFRAME));
 						}
-						::SetWindowPos(hWnd, NULL, 0, 0, 0, 0
+						SetWindowPos(hWnd, NULL, 0, 0, 0, 0
 							, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 						return sl_true;
 					}
@@ -599,11 +599,11 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						LONG style = ::GetWindowLongW(hWnd, GWL_EXSTYLE);
+						LONG style = GetWindowLongW(hWnd, GWL_EXSTYLE);
 						if (style & WS_EX_LAYERED) {
 							BYTE _alpha;
 							DWORD flag;
-							if (::GetLayeredWindowAttributes(hWnd, NULL, &_alpha, &flag)) {
+							if (GetLayeredWindowAttributes(hWnd, NULL, &_alpha, &flag)) {
 								if (flag == LWA_ALPHA) {
 									sl_real alpha = _alpha;
 									return alpha / 255;
@@ -626,19 +626,19 @@ namespace slib
 							alpha = 255;
 						}
 						int a = (int)alpha;
-						LONG old = ::GetWindowLongW(hWnd, GWL_EXSTYLE);
+						LONG old = GetWindowLongW(hWnd, GWL_EXSTYLE);
 						sl_bool flagChangeStyle = sl_false;
 						if (a >= 255) {
 							if (old & WS_EX_LAYERED) {
-								::SetWindowLongW(hWnd, GWL_EXSTYLE, old & (~WS_EX_LAYERED));
+								SetWindowLongW(hWnd, GWL_EXSTYLE, old & (~WS_EX_LAYERED));
 								flagChangeStyle = sl_true;
 							}
 						} else {
 							if (!(old & WS_EX_LAYERED)) {
-								::SetWindowLongW(hWnd, GWL_EXSTYLE, old | WS_EX_LAYERED);
+								SetWindowLongW(hWnd, GWL_EXSTYLE, old | WS_EX_LAYERED);
 								flagChangeStyle = sl_true;
 							}
-							::SetLayeredWindowAttributes(hWnd, 0, a, LWA_ALPHA);
+							SetLayeredWindowAttributes(hWnd, 0, a, LWA_ALPHA);
 						}
 						if (flagChangeStyle) {
 							RedrawWindow(hWnd,
@@ -655,7 +655,7 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						LONG style = ::GetWindowLongW(hWnd, GWL_EXSTYLE);
+						LONG style = GetWindowLongW(hWnd, GWL_EXSTYLE);
 						if (style & WS_EX_TRANSPARENT) {
 							return sl_true;
 						} else {
@@ -669,13 +669,13 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						LONG old = ::GetWindowLongW(hWnd, GWL_EXSTYLE);
+						LONG old = GetWindowLongW(hWnd, GWL_EXSTYLE);
 						if (flag) {
-							::SetWindowLongW(hWnd, GWL_EXSTYLE, old | WS_EX_TRANSPARENT);
+							SetWindowLongW(hWnd, GWL_EXSTYLE, old | WS_EX_TRANSPARENT);
 						} else {
-							::SetWindowLongW(hWnd, GWL_EXSTYLE, old & (~WS_EX_TRANSPARENT));
+							SetWindowLongW(hWnd, GWL_EXSTYLE, old & (~WS_EX_TRANSPARENT));
 						}
-						::SetWindowPos(hWnd, NULL, 0, 0, 0, 0
+						SetWindowPos(hWnd, NULL, 0, 0, 0, 0
 							, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 						return sl_true;
 					}
@@ -687,7 +687,7 @@ namespace slib
 					HWND hWnd = m_handle;
 					if (hWnd) {
 						RECT rect;
-						::GetWindowRect(hWnd, &rect);
+						GetWindowRect(hWnd, &rect);
 						return UIPointf(ptScreen.x - (sl_ui_posf)(rect.left), ptScreen.y - (sl_ui_posf)(rect.top));
 					} else {
 						return ptScreen;
@@ -699,7 +699,7 @@ namespace slib
 					HWND hWnd = m_handle;
 					if (hWnd) {
 						RECT rect;
-						::GetWindowRect(hWnd, &rect);
+						GetWindowRect(hWnd, &rect);
 						return UIPointf(ptWindow.x + (sl_ui_posf)(rect.left), ptWindow.y + (sl_ui_posf)(rect.top));
 					} else {
 						return ptWindow;
@@ -713,7 +713,7 @@ namespace slib
 						POINT pt;
 						pt.x = (int)(ptScreen.x);
 						pt.y = (int)(ptScreen.y);
-						::ScreenToClient(hWnd, &pt);
+						ScreenToClient(hWnd, &pt);
 						return UIPointf((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y));
 					} else {
 						return ptScreen;
@@ -727,7 +727,7 @@ namespace slib
 						POINT pt;
 						pt.x = (int)(ptClient.x);
 						pt.y = (int)(ptClient.y);
-						::ClientToScreen(hWnd, &pt);
+						ClientToScreen(hWnd, &pt);
 						return UIPointf((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y));
 					} else {
 						return ptClient;
@@ -739,11 +739,11 @@ namespace slib
 					HWND hWnd = m_handle;
 					if (hWnd) {
 						RECT rect;
-						::GetWindowRect(hWnd, &rect);
+						GetWindowRect(hWnd, &rect);
 						POINT pt;
 						pt.x = (int)(ptWindow.x) + rect.left;
 						pt.y = (int)(ptWindow.y) + rect.top;
-						::ScreenToClient(hWnd, &pt);
+						ScreenToClient(hWnd, &pt);
 						return UIPointf((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y));
 					} else {
 						return ptWindow;
@@ -757,9 +757,9 @@ namespace slib
 						POINT pt;
 						pt.x = (int)(ptClient.x);
 						pt.y = (int)(ptClient.y);
-						::ClientToScreen(hWnd, &pt);
+						ClientToScreen(hWnd, &pt);
 						RECT rect;
-						::GetWindowRect(hWnd, &rect);
+						GetWindowRect(hWnd, &rect);
 						return UIPointf((sl_ui_posf)(pt.x - rect.left), (sl_ui_posf)(pt.y - rect.top));
 					} else {
 						return ptClient;
@@ -771,9 +771,9 @@ namespace slib
 					HWND hWnd = m_handle;
 					if (hWnd) {
 						RECT rectClient;
-						::GetClientRect(hWnd, &rectClient);
+						GetClientRect(hWnd, &rectClient);
 						RECT rectWindow;
-						::GetWindowRect(hWnd, &rectWindow);
+						GetWindowRect(hWnd, &rectWindow);
 						UISize ret((sl_ui_pos)(rectWindow.right - rectWindow.left - rectClient.right + size.x)
 							, (sl_ui_pos)(rectWindow.bottom - rectWindow.top - rectClient.bottom + size.y));
 						if (ret.x < 0) {
@@ -793,9 +793,9 @@ namespace slib
 					HWND hWnd = m_handle;
 					if (hWnd) {
 						RECT rectClient;
-						::GetClientRect(hWnd, &rectClient);
+						GetClientRect(hWnd, &rectClient);
 						RECT rectWindow;
-						::GetWindowRect(hWnd, &rectWindow);
+						GetWindowRect(hWnd, &rectWindow);
 						UISize ret(size.x - (sl_ui_pos)(rectWindow.right - rectWindow.left - rectClient.right)
 							, size.y - (sl_ui_pos)(rectWindow.bottom - rectWindow.top - rectClient.bottom));
 						if (ret.x < 0) {
@@ -940,12 +940,12 @@ namespace slib
 							HDC hDC = (HDC)(wParam);
 							Color color = window->m_backgroundColor;
 							if (color.a != 0) {
-								HBRUSH hBrush = ::CreateSolidBrush(GraphicsPlatform::getColorRef(color));
+								HBRUSH hBrush = CreateSolidBrush(GraphicsPlatform::getColorRef(color));
 								if (hBrush) {
 									RECT rect;
-									::GetClientRect(hWnd, &rect);
-									::FillRect(hDC, &rect, hBrush);
-									::DeleteObject(hBrush);
+									GetClientRect(hWnd, &rect);
+									FillRect(hDC, &rect, hBrush);
+									DeleteObject(hBrush);
 									return TRUE;
 								}
 							}
