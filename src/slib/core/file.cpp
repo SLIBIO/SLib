@@ -476,6 +476,12 @@ namespace slib
 		if (dirPath.isEmpty()) {
 			return sl_false;
 		}
+		if (File::isDirectory(dirPath)) {
+			return sl_true;
+		}
+		if (File::isFile(dirPath)) {
+			return sl_false;
+		}
 		String parent = File::getParentDirectoryPath(dirPath);
 		if (parent.isEmpty()) {
 			return File::createDirectory(dirPath);
