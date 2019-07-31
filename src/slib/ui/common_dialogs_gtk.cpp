@@ -33,10 +33,6 @@
 namespace slib
 {
 
-/***************************************
-		AlertDialog
-***************************************/
-
 	DialogResult AlertDialog::run()
 	{
 		return _runOnUiThread();
@@ -148,16 +144,12 @@ namespace slib
 	}
 
 
-/***************************************
-		FileDialog
-***************************************/
-
-	sl_bool FileDialog::run()
+	DialogResult FileDialog::run()
 	{
 		return _runOnUiThread();
 	}
 
-	sl_bool FileDialog::_run()
+	DialogResult FileDialog::_run()
 	{
 		const char* szTitle;
 		if (title.isNotEmpty()) {
@@ -178,7 +170,7 @@ namespace slib
 			action = GTK_FILE_CHOOSER_ACTION_SAVE;
 			szButtonAccept = GTK_STOCK_SAVE;
 		} else {
-			return sl_false;
+			return DialogResult::Error;
 		}
 		
 		GtkFileChooserDialog* dialog = (GtkFileChooserDialog*)(
@@ -190,7 +182,7 @@ namespace slib
 										sl_null)
 		);
 		if (!dialog) {
-			return sl_false;
+			return DialogResult::Error;
 		}
 		
 		GtkFileChooser* chooser = GTK_FILE_CHOOSER(dialog);
@@ -226,9 +218,9 @@ namespace slib
 		}
 		
 		if (filters.isNotEmpty()) {
-			ListElements<Filter> list(filters);
+			ListElements<FileDialogFilter> list(filters);
 			for (sl_size i = 0; i < list.count; i++) {
-				Filter& filterDesc = list[i];
+				FileDialogFilter& filterDesc = list[i];
 				GtkFileFilter* filter = gtk_file_filter_new();
 				if (filter) {
 					gtk_file_filter_set_name(filter, filterDesc.title.getData());
@@ -245,9 +237,8 @@ namespace slib
 		
 		selectedPaths.removeAll();
 		
-		sl_bool bRet = sl_false;
+		DialogResult ret = DialogResult::Error;
 		if (response == GTK_RESPONSE_ACCEPT) {
-			bRet = sl_true;
 			gchar* path = gtk_file_chooser_get_uri(chooser);
 			if (path) {
 				selectedPath = path;
@@ -262,13 +253,25 @@ namespace slib
 					} while (item);
 					g_slist_free(list);
 				}
-				bRet = sl_true;
+				ret = DialogResult::Ok;
 			}
+		} else {
+			ret = DialogResult::Cancel;
 		}
 		
 		gtk_widget_destroy((GtkWidget*)dialog);
 		
-		return bRet;
+		return ret;
+	}
+
+	void FileDialog::show()
+	{
+		_showByRun();
+	}
+	
+	sl_bool FileDialog::_show()
+	{
+		return sl_false;
 	}
 
 }

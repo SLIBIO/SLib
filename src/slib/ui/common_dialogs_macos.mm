@@ -34,10 +34,6 @@
 namespace slib
 {
 
-/***************************************
-		AlertDialog
-***************************************/
-
 	DialogResult AlertDialog::run()
 	{
 		return _runOnUiThread();
@@ -142,18 +138,15 @@ namespace slib
 	}
 
 
-/***************************************
-		FileDialog
-***************************************/
-
-	sl_bool FileDialog::run()
+	DialogResult FileDialog::run()
 	{
 		return _runOnUiThread();
 	}
 
-	sl_bool FileDialog::_run()
+	DialogResult FileDialog::_run()
 	{
 		NSSavePanel* panel;
+		
 		if (type == FileDialogType::SelectDirectory) {
 			NSOpenPanel* openPanel = [NSOpenPanel openPanel];
 			if (openPanel != nil) {
@@ -181,6 +174,7 @@ namespace slib
 		} else if (type == FileDialogType::SaveFile) {
 			panel = [NSSavePanel savePanel];
 		}
+		
 		if (panel != nil) {
 			
 			[panel setCanCreateDirectories:YES];
@@ -238,18 +232,30 @@ namespace slib
 					if (paths.getCount() > 0) {
 						selectedPath = paths.getValueAt(0);
 						selectedPaths = paths;
-						return sl_true;
+						return DialogResult::Ok;
 					}
 				} else {
 					String path = Apple::getFilePathFromNSURL([panel URL]);
 					if (path.isNotEmpty()) {
 						selectedPath = path;
 						selectedPaths = List<String>::createFromElement(path);
-						return sl_true;
+						return DialogResult::Ok;
 					}
 				}
+			} else {
+				return DialogResult::Cancel;
 			}
 		}
+		return DialogResult::Error;
+	}
+
+	void FileDialog::show()
+	{
+		_showByRun();
+	}
+	
+	sl_bool FileDialog::_show()
+	{
 		return sl_false;
 	}
 

@@ -190,16 +190,6 @@ namespace slib
 		
 	}
 	
-	sl_bool FileDialog::run()
-	{
-		return sl_false;
-	}
-	
-	sl_bool FileDialog::_run()
-	{
-		return sl_false;
-	}
-	
 }
 
 @implementation SLIBAlertDialogLabelHelper

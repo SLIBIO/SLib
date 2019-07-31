@@ -98,7 +98,7 @@ namespace slib
 		
 		void _showByRun();
 		
-		AlertDialog* getReferable();
+		AlertDialog* _getReferable();
 
 	};
 
@@ -108,6 +108,23 @@ namespace slib
 		OpenFile = 2,
 		OpenFiles = 3,
 		SelectDirectory = 4
+	};
+	
+	class FileDialogFilter
+	{
+	public:
+		String title;
+		
+		// To specify multiple filter patterns for a single display string, use a semicolon to separate the patterns (for example, "*.TXT;*.DOC;*.BAK").
+		String patterns;
+		
+	public:
+		FileDialogFilter();
+		
+		FileDialogFilter(const String& title, const String& patterns);
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(FileDialogFilter)
+		
 	};
 
 	class SLIB_EXPORT FileDialog : public Referable
@@ -127,7 +144,9 @@ namespace slib
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(FileDialog)
 
 	public:
-		sl_bool run();
+		DialogResult run();
+
+		void show();
 
 		// To specify multiple filter patterns for a single display string, use a semicolon to separate the patterns (for example, "*.TXT;*.DOC;*.BAK").
 		void addFilter(const String& title, const String& patterns);
@@ -139,24 +158,33 @@ namespace slib
 		sl_bool flagShowHiddenFiles;
 
 		String defaultFileExt;
-		struct Filter
-		{
-			String title;
+		
+		List<FileDialogFilter> filters;
 
-			// To specify multiple filter patterns for a single display string, use a semicolon to separate the patterns (for example, "*.TXT;*.DOC;*.BAK").
-			String patterns;
-		};
-		List<Filter> filters;
-
+		DialogResult result;
 		String selectedPath;
 		List<String> selectedPaths;
 		
+		Function<void(FileDialog&)> onComplete;
+		
 	public:
-		sl_bool _run();
+		DialogResult _run();
+		
+		sl_bool _show();
+		
+		void _onResult(DialogResult result);
 		
 	protected:
-		sl_bool _runOnUiThread();
+		DialogResult _runOnUiThread();
 		
+		DialogResult _runByShow();
+		
+		void _showOnUiThread();
+		
+		void _showByRun();
+		
+		FileDialog* _getReferable();
+
 	};
 	
 }

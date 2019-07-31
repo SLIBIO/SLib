@@ -46,53 +46,53 @@ namespace slib
 
 			void ProcessCustomMsgBox(WPARAM wParam, LPARAM lParam)
 			{
-				HWND hWndMsg = ::FindWindowW(NULL, L"CustomizedMsgBox");
+				HWND hWndMsg = FindWindowW(NULL, L"CustomizedMsgBox");
 				if (hWndMsg == NULL) {
 					return;
 				}
 				AlertDialog* alert = (AlertDialog*)lParam;
 				String16 caption = alert->caption;
-				::SetWindowTextW(hWndMsg, (LPCWSTR)(caption.getData()));
+				SetWindowTextW(hWndMsg, (LPCWSTR)(caption.getData()));
 
 				switch (alert->buttons) {
 				case AlertDialogButtons::Ok:
 					if (alert->titleOk.isNotNull()) {
 						String16 titleOk = alert->titleOk;
-						::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleOk.getData()));
+						SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleOk.getData()));
 					}
 					break;
 				case AlertDialogButtons::OkCancel:
 					if (alert->titleOk.isNotNull()) {
 						String16 titleOk = alert->titleOk;
-						::SetDlgItemTextW(hWndMsg, 1, (LPCWSTR)(titleOk.getData()));
+						SetDlgItemTextW(hWndMsg, 1, (LPCWSTR)(titleOk.getData()));
 					}
 					if (alert->titleCancel.isNotNull()) {
 						String16 titleCancel = alert->titleCancel;
-						::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleCancel.getData()));
+						SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleCancel.getData()));
 					}
 					break;
 				case AlertDialogButtons::YesNo:
 					if (alert->titleYes.isNotNull()) {
 						String16 titleYes = alert->titleYes;
-						::SetDlgItemTextW(hWndMsg, 6, (LPCWSTR)(titleYes.getData()));
+						SetDlgItemTextW(hWndMsg, 6, (LPCWSTR)(titleYes.getData()));
 					}
 					if (alert->titleNo.isNotNull()) {
 						String16 titleNo = alert->titleNo;
-						::SetDlgItemTextW(hWndMsg, 7, (LPCWSTR)(titleNo.getData()));
+						SetDlgItemTextW(hWndMsg, 7, (LPCWSTR)(titleNo.getData()));
 					}
 					break;
 				case AlertDialogButtons::YesNoCancel:
 					if (alert->titleYes.isNotNull()) {
 						String16 titleYes = alert->titleYes;
-						::SetDlgItemTextW(hWndMsg, 6, (LPCWSTR)(titleYes.getData()));
+						SetDlgItemTextW(hWndMsg, 6, (LPCWSTR)(titleYes.getData()));
 					}
 					if (alert->titleNo.isNotNull()) {
 						String16 titleNo = alert->titleNo;
-						::SetDlgItemTextW(hWndMsg, 7, (LPCWSTR)(titleNo.getData()));
+						SetDlgItemTextW(hWndMsg, 7, (LPCWSTR)(titleNo.getData()));
 					}
 					if (alert->titleCancel.isNotNull()) {
 						String16 titleCancel = alert->titleCancel;
-						::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleCancel.getData()));
+						SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleCancel.getData()));
 					}
 					break;
 				}
@@ -152,11 +152,11 @@ namespace slib
 		String16 text = this->text;
 		Win32_UI_Shared* shared = Win32_UI_Shared::get();
 		if (shared) {
-			::PostMessage(shared->hWndMessage, SLIB_UI_MESSAGE_CUSTOM_MSGBOX, 0, (LPARAM)(this));
-			result = ::MessageBoxW(hWndParent, (LPCWSTR)(text.getData()), L"CustomizedMsgBox", style);
+			PostMessageW(shared->hWndMessage, SLIB_UI_MESSAGE_CUSTOM_MSGBOX, 0, (LPARAM)(this));
+			result = MessageBoxW(hWndParent, (LPCWSTR)(text.getData()), L"CustomizedMsgBox", style);
 		} else {
 			String16 caption = this->caption;
-			result = ::MessageBoxW(hWndParent, (LPCWSTR)(text.getData()), (LPCWSTR)(caption.getData()), style);
+			result = MessageBoxW(hWndParent, (LPCWSTR)(text.getData()), (LPCWSTR)(caption.getData()), style);
 		}
 
 		switch (result) {
@@ -209,20 +209,24 @@ namespace slib
 		}
 	}
 
-	sl_bool FileDialog::run()
+	DialogResult FileDialog::run()
 	{
 		return _runOnUiThread();
 	}
 
-	sl_bool FileDialog::_run()
+	DialogResult FileDialog::_run()
 	{
+		HWND hWndParent = UIPlatform::getWindowHandle(parent.get());
+		if (!hWndParent) {
+			hWndParent = GetActiveWindow();
+		}
 		if (type == FileDialogType::SelectDirectory) {
 			IMalloc* pMalloc;
-			sl_bool result = sl_false;
+			DialogResult result = DialogResult::Error;
 			if (SUCCEEDED(SHGetMalloc(&pMalloc))) {
 				BROWSEINFOW bi;
 				Base::zeroMemory(&bi, sizeof(bi));
-				bi.hwndOwner = UIPlatform::getWindowHandle(parent.get());
+				bi.hwndOwner = hWndParent;
 				String16 _title = title;
 				if (_title.isEmpty()) {
 					bi.lpszTitle = L"Browse for folder...";
@@ -238,13 +242,15 @@ namespace slib
 				if (initialDir.isNotEmpty()) {
 					bi.lParam = (LPARAM)(initialDir.getData());
 				}
-				LPITEMIDLIST pidl = ::SHBrowseForFolderW(&bi);
+				LPITEMIDLIST pidl = SHBrowseForFolderW(&bi);
 				if (pidl) {
 					WCHAR szPath[MAX_PATH + 1];
 					if (SHGetPathFromIDListW(pidl, szPath)) {
 						selectedPath = szPath;
 						selectedPaths = List<String>::createFromElement(selectedPath);
-						result = sl_true;
+						result = DialogResult::Ok;
+					} else {
+						result = DialogResult::Cancel;
 					}
 					pMalloc->Free(pidl);
 				}
@@ -255,7 +261,7 @@ namespace slib
 			OPENFILENAMEW ofn;
 			Base::zeroMemory(&ofn, sizeof(ofn));
 			ofn.lStructSize = sizeof(ofn);
-			ofn.hwndOwner = UIPlatform::getWindowHandle(parent.get());
+			ofn.hwndOwner = hWndParent;
 
 			String16 _defaultFileExt = defaultFileExt;
 			ofn.lpstrDefExt = (LPCWSTR)(_defaultFileExt.getData());
@@ -264,7 +270,7 @@ namespace slib
 			CList<priv::file_dialog::Filter> wfilters;
 			{
 				priv::file_dialog::Filter wfilter;
-				ListLocker<Filter> list(filters);
+				ListLocker<FileDialogFilter> list(filters);
 				for (sl_size i = 0; i < list.count; i++) {
 					wfilter.title = list[i].title;
 					wfilter.patterns = list[i].patterns;
@@ -335,16 +341,18 @@ namespace slib
 			}
 			if (type == FileDialogType::OpenFile) {
 				ofn.Flags |= OFN_FILEMUSTEXIST;
-				if (::GetOpenFileNameW(&ofn)) {
+				if (GetOpenFileNameW(&ofn)) {
 					selectedPath = ofn.lpstrFile;
 					selectedPaths = List<String>::createFromElement(selectedPath);
-					return sl_true;
+					return DialogResult::Ok;
+				} else {
+					return DialogResult::Cancel;
 				}
 			} else if (type == FileDialogType::OpenFiles) {
 				ofn.Flags |= OFN_FILEMUSTEXIST | OFN_ALLOWMULTISELECT;
-				if (::GetOpenFileNameW(&ofn)) {
+				if (GetOpenFileNameW(&ofn)) {
 					WCHAR* sz = ofn.lpstrFile;
-					DWORD attr = ::GetFileAttributesW(sz);
+					DWORD attr = GetFileAttributesW(sz);
 					if (attr != INVALID_FILE_ATTRIBUTES) {
 						if (attr & FILE_ATTRIBUTE_DIRECTORY) {
 							sl_size len = Base::getStringLength2((sl_char16*)sz);
@@ -365,25 +373,39 @@ namespace slib
 								if (files.isNotEmpty()) {
 									selectedPaths = files;
 									selectedPath = files.getValueAt(0);
-									return sl_true;
+									return DialogResult::Ok;
 								}
 							}
 						} else {
 							selectedPath = ofn.lpstrFile;
 							selectedPaths = List<String>::createFromElement(selectedPath);
-							return sl_true;
+							return DialogResult::Ok;
 						}
 					}
+				} else {
+					return DialogResult::Cancel;
 				}
 			} else {
 				ofn.Flags |= OFN_OVERWRITEPROMPT;
-				if (::GetSaveFileNameW(&ofn)) {
+				if (GetSaveFileNameW(&ofn)) {
 					selectedPath = ofn.lpstrFile;
 					selectedPaths = List<String>::createFromElement(selectedPath);
-					return sl_true;
+					return DialogResult::Ok;
+				} else {
+					return DialogResult::Cancel;
 				}
 			}
 		}
+		return DialogResult::Error;
+	}
+
+	void FileDialog::show()
+	{
+		_showByRun();
+	}
+
+	sl_bool FileDialog::_show()
+	{
 		return sl_false;
 	}
 

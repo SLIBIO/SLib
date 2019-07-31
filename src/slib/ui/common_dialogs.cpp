@@ -74,6 +74,7 @@ namespace slib
 				DialogResult result = DialogResult::Error;
 				Ref<Event> event;
 				
+			public:
 				void onComplete(DialogResult _result)
 				{
 					result = _result;
@@ -167,7 +168,7 @@ namespace slib
 	
 	void AlertDialog::_showOnUiThread()
 	{
-		Ref<AlertDialog> alert = getReferable();
+		Ref<AlertDialog> alert = _getReferable();
 		if (alert.isNotNull()) {
 			if (UI::isUiThread()) {
 				priv::alert_dialog::ShowOnUiThread(alert);
@@ -179,7 +180,7 @@ namespace slib
 
 	void AlertDialog::_showByRun()
 	{
-		Ref<AlertDialog> alert = getReferable();
+		Ref<AlertDialog> alert = _getReferable();
 		if (alert.isNotNull()) {
 			UI::dispatchToUiThread(Function<void()>::bind(&(priv::alert_dialog::ShowOnUiThreadByRun), alert));
 		}
@@ -307,7 +308,7 @@ namespace slib
 		
 	}
 	
-	AlertDialog* AlertDialog::getReferable()
+	AlertDialog* AlertDialog::_getReferable()
 	{
 		if (getReferenceCount() > 0) {
 			return this;
@@ -327,7 +328,7 @@ namespace slib
 			public:
 				FileDialog* dlg;
 				Ref<Event> event;
-				sl_bool result = sl_false;
+				DialogResult result = sl_false;
 				
 			public:
 				void run()
@@ -338,7 +339,75 @@ namespace slib
 				
 			};
 			
+			class RunByShowOnUiThread
+			{
+			public:
+				DialogResult result = DialogResult::Error;
+				String path;
+				List<String> list;
+
+			public:
+				void onComplete(FileDialog& dialog)
+				{
+					result = dialog.result;
+					path = dialog.selectedPath;
+					list = dialog.selectedPaths;
+					UI::quitLoop();
+				}
+				
+			};
+			
+			class RunByShowOnWorkingThread
+			{
+			public:
+				Ref<Event> event;
+				DialogResult result = DialogResult::Error;
+				String path;
+				List<String> list;
+
+			public:
+				void onComplete(FileDialog& dialog)
+				{
+					result = dialog.result;
+					path = dialog.selectedPath;
+					list = dialog.selectedPaths;
+					event->set();
+				}
+				
+			};
+			
+			void ShowOnWorkingThread(FileDialog* dialog, RunByShowOnWorkingThread* m)
+			{
+				if (!(dialog->_show())) {
+					dialog->result = DialogResult::Error;
+					m->onComplete(*dialog);
+				}
+			}
+			
+			void ShowOnUiThread(const Ref<FileDialog>& dialog)
+			{
+				if (!(dialog->_show())) {
+					dialog->_onResult(DialogResult::Error);
+				}
+			}
+			
+			void ShowOnUiThreadByRun(const Ref<FileDialog>& dialog)
+			{
+				DialogResult result = dialog->_run();
+				dialog->_onResult(result);
+			}
+			
 		}
+	}
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(FileDialogFilter)
+
+	FileDialogFilter::FileDialogFilter()
+	{
+	}
+	
+	FileDialogFilter::FileDialogFilter(const String& _title, const String& _patterns): title(_title), patterns(_patterns)
+	{
 	}
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(FileDialog)
@@ -351,13 +420,54 @@ namespace slib
 
 	void FileDialog::addFilter(const String& title, const String& patterns)
 	{
-		Filter filter;
-		filter.title = title;
-		filter.patterns = patterns;
-		filters.add(filter);
+		filters.add(FileDialogFilter(title, patterns));
 	}
 
-	sl_bool FileDialog::_runOnUiThread()
+	List<String> FileDialog::openFiles(const Ref<Window>& parent)
+	{
+		FileDialog dlg;
+		dlg.type = FileDialogType::OpenFiles;
+		dlg.parent = parent;
+		if (dlg.run()) {
+			return dlg.selectedPaths;
+		}
+		return sl_null;
+	}
+	
+	String FileDialog::openFile(const Ref<Window>& parent)
+	{
+		FileDialog dlg;
+		dlg.type = FileDialogType::OpenFile;
+		dlg.parent = parent;
+		if (dlg.run()) {
+			return dlg.selectedPath;
+		}
+		return sl_null;
+	}
+	
+	String FileDialog::saveFile(const Ref<Window>& parent)
+	{
+		FileDialog dlg;
+		dlg.type = FileDialogType::SaveFile;
+		dlg.parent = parent;
+		if (dlg.run()) {
+			return dlg.selectedPath;
+		}
+		return sl_null;
+	}
+	
+	String FileDialog::selectDirectory(const Ref<Window>& parent)
+	{
+		FileDialog dlg;
+		dlg.type = FileDialogType::SelectDirectory;
+		dlg.parent = parent;
+		if (dlg.run()) {
+			return dlg.selectedPath;
+		}
+		return sl_null;
+	}
+	
+	DialogResult FileDialog::_runOnUiThread()
 	{
 		if (UI::isUiThread()) {
 			return _run();
@@ -373,49 +483,95 @@ namespace slib
 		}
 		return sl_false;
 	}
-
-	List<String> FileDialog::openFiles(const Ref<Window>& parent)
+	
+	DialogResult FileDialog::_runByShow()
 	{
-		FileDialog dlg;
-		dlg.type = FileDialogType::OpenFiles;
-		dlg.parent = parent;
-		if (dlg.run()) {
-			return dlg.selectedPaths;
+		Ref<FileDialog> dialog = new FileDialog(*this);
+		if (dialog.isNull()) {
+			return DialogResult::Error;
 		}
-		return sl_null;
+		if (UI::isUiThread()) {
+			priv::file_dialog::RunByShowOnUiThread m;
+			dialog->onComplete = SLIB_FUNCTION_CLASS(priv::file_dialog::RunByShowOnUiThread, onComplete, &m);
+			if (dialog->_show()) {
+				UI::runLoop();
+				result = m.result;
+				selectedPath = m.path;
+				selectedPaths = m.list;
+				return m.result;
+			}
+		} else {
+			Ref<Event> ev = Event::create(sl_false);
+			if (ev.isNotNull()) {
+				priv::file_dialog::RunByShowOnWorkingThread m;
+				m.event = ev;
+				dialog->onComplete = SLIB_FUNCTION_CLASS(priv::file_dialog::RunByShowOnWorkingThread, onComplete, &m);
+				UI::dispatchToUiThread(Function<void()>::bind(&(priv::file_dialog::ShowOnWorkingThread), dialog.get(), &m));
+				ev->wait();
+				result = m.result;
+				selectedPath = m.path;
+				selectedPaths = m.list;
+				return m.result;
+			}
+		}
+		return DialogResult::Error;
 	}
-
-	String FileDialog::openFile(const Ref<Window>& parent)
+	
+	void FileDialog::_showOnUiThread()
 	{
-		FileDialog dlg;
-		dlg.type = FileDialogType::OpenFile;
-		dlg.parent = parent;
-		if (dlg.run()) {
-			return dlg.selectedPath;
+		Ref<FileDialog> dialog = _getReferable();
+		if (dialog.isNotNull()) {
+			if (UI::isUiThread()) {
+				priv::file_dialog::ShowOnUiThread(dialog);
+			} else {
+				UI::dispatchToUiThread(Function<void()>::bind(&(priv::file_dialog::ShowOnUiThread), dialog));
+			}
 		}
-		return sl_null;
 	}
-
-	String FileDialog::saveFile(const Ref<Window>& parent)
+	
+	void FileDialog::_showByRun()
 	{
-		FileDialog dlg;
-		dlg.type = FileDialogType::SaveFile;
-		dlg.parent = parent;
-		if (dlg.run()) {
-			return dlg.selectedPath;
+		Ref<FileDialog> dialog = _getReferable();
+		if (dialog.isNotNull()) {
+			UI::dispatchToUiThread(Function<void()>::bind(&(priv::file_dialog::ShowOnUiThreadByRun), dialog));
 		}
-		return sl_null;
 	}
-
-	String FileDialog::selectDirectory(const Ref<Window>& parent)
+	
+	void FileDialog::_onResult(DialogResult _result)
 	{
-		FileDialog dlg;
-		dlg.type = FileDialogType::SelectDirectory;
-		dlg.parent = parent;
-		if (dlg.run()) {
-			return dlg.selectedPath;
-		}
-		return sl_null;
+		result = _result;
+		onComplete(*this);
 	}
+	
+	FileDialog* FileDialog::_getReferable()
+	{
+		if (getReferenceCount() > 0) {
+			return this;
+		} else {
+			return new FileDialog(*this);
+		}
+	}
+	
+#if !defined(SLIB_UI_IS_WIN32) && !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_GTK)
+	DialogResult FileDialog::run()
+	{
+		return DialogResult::Error;
+	}
+	
+	DialogResult FileDialog::_run()
+	{
+		return DialogResult::Error;
+	}
+	
+	void FileDialog::show()
+	{
+		_onResult(DialogResult::Error);
+	}
+	
+	sl_bool FileDialog::_show()
+	{
+		return sl_false;
+	}
+#endif
 	
 }
