@@ -7483,7 +7483,7 @@ namespace slib
 		} else {
 			Ref<View> parent = m_parent;
 			if (parent.isNotNull()) {
-				parent->dispatchToUiThread(callback);
+				parent->dispatchToDrawingThread(callback);
 			} else {
 				UI::dispatchToUiThread(callback);
 			}
