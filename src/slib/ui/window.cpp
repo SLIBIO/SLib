@@ -1106,7 +1106,7 @@ namespace slib
 		Ref<View> view = m_viewContent;
 		if (view.isNotNull()) {
 			view->removeParent();
-			view->detach();
+			view->detachAll();
 		}
 		Ref<WindowInstance> instance = m_instance;
 		if (instance.isNotNull()) {
