@@ -72,7 +72,7 @@ namespace slib
 
 			class UrlRequestImpl;
 
-			class Session
+			class Session: public Referable
 			{
 			public:
 				HINTERNET hInternet;
@@ -90,9 +90,9 @@ namespace slib
 					
 					hInternet = ::WinHttpOpen(L"Windows Client", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, NULL, NULL, WINHTTP_FLAG_ASYNC);
 					::WinHttpSetStatusCallback(hInternet, callback,
-						WINHTTP_CALLBACK_FLAG_REQUEST_ERROR |
+						WINHTTP_CALLBACK_STATUS_REQUEST_ERROR |
 						WINHTTP_CALLBACK_STATUS_SENDREQUEST_COMPLETE |
-						WINHTTP_CALLBACK_FLAG_HEADERS_AVAILABLE |
+						WINHTTP_CALLBACK_STATUS_HEADERS_AVAILABLE |
 						WINHTTP_CALLBACK_STATUS_DATA_AVAILABLE |
 						WINHTTP_CALLBACK_STATUS_READ_COMPLETE,
 						NULL);
@@ -200,19 +200,20 @@ namespace slib
 					clean();
 				}
 
-				static Session* GetSession()
+			public:
+				static Ref<Session> getSession()
 				{
-					SLIB_SAFE_STATIC(Session, session, callbackStatus);
+					SLIB_SAFE_STATIC(AtomicRef<Session>, session, new Session(callbackStatus))
 					if (SLIB_SAFE_STATIC_CHECK_FREED(session)) {
 						return sl_null;
 					}
-					return &session;
+					return session;
 				}
 
 				static Ref<UrlRequestImpl> create(const UrlRequestParam& param, const String& url)
 				{
-					Session* session = GetSession();
-					if (session) {
+					Ref<Session> session = getSession();
+					if (session.isNotNull()) {
 						String16 path;
 						Ref<Connection> connection = session->getConnection(url, path);
 						if (connection.isNotNull()) {
@@ -274,8 +275,8 @@ namespace slib
 					if (m_hRequest) {
 						::WinHttpCloseHandle(m_hRequest);
 						m_hRequest = NULL;
-						Session* session = GetSession();
-						if (session) {
+						Ref<Session> session = getSession();
+						if (session.isNotNull()) {
 							session->requests.remove(m_taskId);
 						}
 						m_connection.setNull();
@@ -507,8 +508,8 @@ namespace slib
 					if (dwContext == 0) {
 						return;
 					}
-					Session* session = GetSession();
-					if (!session) {
+					Ref<Session> session = getSession();
+					if (session.isNull()) {
 						return;
 					}
 					Ref<UrlRequestImpl> request = session->requests.getValue((sl_int32)(dwContext), WeakRef<UrlRequestImpl>::null());
@@ -544,8 +545,8 @@ namespace slib
 					onComplete();
 
 					if (m_sizeContentTotal == m_sizeContentReceived || m_responseHeaders.getValue("Transfer-Encoding").compareIgnoreCase("chunked") == 0) {
-						Session* session = GetSession();
-						if (session) {
+						Ref<Session> session = getSession();
+						if (session.isNotNull()) {
 							if (session->connectionPool.getCount() > MAX_CONNECTION_POOL_SIZE) {
 								session->connectionPool.pop();
 							}
@@ -582,8 +583,8 @@ namespace slib
 			Connection::~Connection()
 			{
 				::WinHttpCloseHandle(hConnect);
-				Session* session = UrlRequestImpl::GetSession();
-				if (session) {
+				Ref<Session> session = UrlRequestImpl::getSession();
+				if (session.isNotNull()) {
 					session->connections.remove(id);
 				}
 			}
