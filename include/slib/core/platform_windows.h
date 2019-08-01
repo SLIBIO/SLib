@@ -35,6 +35,8 @@
 
 namespace slib
 {
+
+	typedef sl_bool(*WINDOWS_DEBUG_ALLOC_HOOK)(void* ptr, sl_size size);
 	
 	typedef BOOL (WINAPI *WINAPI_GetQueuedCompletionStatusEx)
 	(
@@ -118,6 +120,9 @@ namespace slib
 
 	
 		static void setDebugFlags();
+
+		static void setDebugAllocHook(WINDOWS_DEBUG_ALLOC_HOOK hook);
+
 	
 		static HMODULE loadLibrary(const String& path);
 

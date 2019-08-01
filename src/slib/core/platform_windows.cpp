@@ -49,7 +49,7 @@ namespace slib
 	{
 		String16 str = _str;
 		CLSID clsid;
-		HRESULT hr = ::CLSIDFromString((LPWSTR)(str.getData()), &clsid);
+		HRESULT hr = CLSIDFromString((LPWSTR)(str.getData()), &clsid);
 		if (hr == NOERROR) {
 			if (pguid) {
 				*pguid = clsid;
@@ -61,12 +61,12 @@ namespace slib
 
 	HGLOBAL Windows::createGlobalData(const void* data, sl_size size)
 	{
-		HGLOBAL handle = ::GlobalAlloc(GMEM_MOVEABLE, size);
+		HGLOBAL handle = GlobalAlloc(GMEM_MOVEABLE, size);
 		if (handle) {
-			void* dst = ::GlobalLock(handle);
+			void* dst = GlobalLock(handle);
 			if (dst) {
 				Base::copyMemory(dst, data, size);
-				::GlobalUnlock(dst);
+				GlobalUnlock(dst);
 			}
 		}
 		return handle;
@@ -92,26 +92,26 @@ namespace slib
 
 	HWND Windows::getOwnerWindow(HWND hWnd)
 	{
-		return ::GetWindow(hWnd, GW_OWNER);
+		return GetWindow(hWnd, GW_OWNER);
 	}
 
 	HWND Windows::getParentWindow(HWND hWnd)
 	{
-		return ::GetAncestor(hWnd, GA_PARENT);
+		return GetAncestor(hWnd, GA_PARENT);
 	}
 
 	HWND Windows::getRootWindow(HWND hWnd)
 	{
-		return ::GetAncestor(hWnd, GA_ROOT);
+		return GetAncestor(hWnd, GA_ROOT);
 	}
 
 	void Windows::getWindowFrame(HWND hWnd, RECT& rc)
 	{
-		::GetWindowRect(hWnd, &rc);
+		GetWindowRect(hWnd, &rc);
 		HWND hWndParent = Windows::getParentWindow(hWnd);
 		if (hWndParent) {
-			::ScreenToClient(hWnd, (POINT*)(&rc));
-			::ScreenToClient(hWnd, (POINT*)(&rc) + 1);
+			ScreenToClient(hWnd, (POINT*)(&rc));
+			ScreenToClient(hWnd, (POINT*)(&rc) + 1);
 		} else {
 			rc.right -= rc.left;
 			rc.bottom -= rc.top;
@@ -122,11 +122,11 @@ namespace slib
 
 	String Windows::getWindowText(HWND hWnd)
 	{
-		sl_int32 len = ::GetWindowTextLengthW(hWnd);
+		sl_int32 len = GetWindowTextLengthW(hWnd);
 		if (len > 0) {
 			SLIB_SCOPED_BUFFER(WCHAR, 1024, buf, len + 2);
 			if (buf) {
-				len = ::GetWindowTextW(hWnd, buf, len + 1);
+				len = GetWindowTextW(hWnd, buf, len + 1);
 				return String(buf, len);
 			}
 		}
@@ -137,7 +137,7 @@ namespace slib
 	{
 		if (hWnd) {
 			String16 str = _str;
-			::SetWindowTextW(hWnd, (LPCWSTR)(str.getData()));
+			SetWindowTextW(hWnd, (LPCWSTR)(str.getData()));
 		}
 	}
 
@@ -151,7 +151,7 @@ namespace slib
 			Base::zeroMemory(&si, sizeof(si));
 			si.cbSize = sizeof(si);
 			si.fMask = SIF_POS | SIF_PAGE | SIF_RANGE | SIF_TRACKPOS;
-			::GetScrollInfo(hWnd, SB_HORZ, &si);
+			GetScrollInfo(hWnd, SB_HORZ, &si);
 			switch (nSBCode) {
 			case SB_TOP:
 			case SB_LINEUP:
@@ -181,7 +181,7 @@ namespace slib
 			}
 
 			si.fMask = SIF_POS;
-			::SetScrollInfo(hWnd, SB_HORZ, &si, TRUE);
+			SetScrollInfo(hWnd, SB_HORZ, &si, TRUE);
 
 			return sl_true;
 
@@ -195,7 +195,7 @@ namespace slib
 				Base::zeroMemory(&si, sizeof(si));
 				si.cbSize = sizeof(si);
 				si.fMask = SIF_POS | SIF_PAGE | SIF_RANGE;
-				::GetScrollInfo(hWnd, SB_HORZ, &si);
+				GetScrollInfo(hWnd, SB_HORZ, &si);
 
 				si.nPos += delta * (int)nWheel / WHEEL_DELTA;
 				if (si.nPos < si.nMin) {
@@ -206,7 +206,7 @@ namespace slib
 				}
 
 				si.fMask = SIF_POS;
-				::SetScrollInfo(hWnd, SB_HORZ, &si, TRUE);
+				SetScrollInfo(hWnd, SB_HORZ, &si, TRUE);
 			}
 			return sl_true;
 		}
@@ -223,7 +223,7 @@ namespace slib
 			Base::zeroMemory(&si, sizeof(si));
 			si.cbSize = sizeof(si);
 			si.fMask = SIF_POS | SIF_PAGE | SIF_RANGE | SIF_TRACKPOS;
-			::GetScrollInfo(hWnd, SB_VERT, &si);
+			GetScrollInfo(hWnd, SB_VERT, &si);
 
 			switch (nSBCode) {
 			case SB_TOP:
@@ -253,7 +253,7 @@ namespace slib
 				si.nPos = si.nMax - 1;
 			}
 			si.fMask = SIF_POS;
-			::SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
+			SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
 
 			return sl_true;
 
@@ -267,7 +267,7 @@ namespace slib
 				Base::zeroMemory(&si, sizeof(si));
 				si.cbSize = sizeof(si);
 				si.fMask = SIF_POS | SIF_PAGE | SIF_RANGE;
-				::GetScrollInfo(hWnd, SB_VERT, &si);
+				GetScrollInfo(hWnd, SB_VERT, &si);
 
 				si.nPos += delta * (int)nWheel / WHEEL_DELTA;
 				if (si.nPos < si.nMin) {
@@ -278,7 +278,7 @@ namespace slib
 				}
 
 				si.fMask = SIF_POS;
-				::SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
+				SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
 			}
 			return sl_true;
 
@@ -298,7 +298,7 @@ namespace slib
 		si.nMin = nMin;
 		si.nMax = nMax;
 		si.nPage = nPage;
-		::SetScrollInfo(hWnd, SB_HORZ, &si, TRUE);
+		SetScrollInfo(hWnd, SB_HORZ, &si, TRUE);
 	}
 
 	void Windows::setWindowVerticalScrollParam(HWND hWnd, sl_int32 nMin, sl_int32 nMax, sl_int32 nPage)
@@ -313,17 +313,38 @@ namespace slib
 		si.nMin = nMin;
 		si.nMax = nMax;
 		si.nPage = nPage;
-		::SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
+		SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
 	}
 
 	void Windows::setDebugFlags()
 	{
 #ifdef SLIB_DEBUG
-		int flag = ::_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+		int flag = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
 		// logically OR leak check bit
 		flag |= _CRTDBG_LEAK_CHECK_DF;
 		// set the flags again
-		::_CrtSetDbgFlag(flag);
+		_CrtSetDbgFlag(flag);
+#endif
+	}
+
+	namespace priv
+	{
+		namespace platform
+		{
+			WINDOWS_DEBUG_ALLOC_HOOK g_debugAllocHook;
+
+			int DebugAllocHook(int allocType, void *userData, size_t size, int blockType, long requestNumber, const unsigned char *filename, int lineNumber)
+			{
+				return g_debugAllocHook(userData, (sl_size)size);
+			}
+		}
+	}
+
+	void Windows::setDebugAllocHook(WINDOWS_DEBUG_ALLOC_HOOK hook)
+	{
+#ifdef SLIB_DEBUG
+		priv::platform::g_debugAllocHook = hook;
+		_CrtSetAllocHook(priv::platform::DebugAllocHook);
 #endif
 	}
 
@@ -331,7 +352,7 @@ namespace slib
 	{
 		String16 path = _path;
 		if (path.isNotEmpty()) {
-			return ::LoadLibraryW((LPCWSTR)(path.getData()));
+			return LoadLibraryW((LPCWSTR)(path.getData()));
 		} else {
 			return 0;
 		}
@@ -356,7 +377,7 @@ namespace slib
 		if (!flagLoad) { \
 			HMODULE hDll = loadLibrary_##dll(); \
 			if (hDll) { \
-				proc = ::GetProcAddress(hDll, #func); \
+				proc = GetProcAddress(hDll, #func); \
 			} \
 			flagLoad = sl_true; \
 		} \
@@ -392,7 +413,7 @@ namespace slib
 				return sl_false;
 			}
 			hKey = NULL;
-			::RegOpenKeyExW(hKeyParent, (LPCWSTR)(path.getData()), 0, KEY_QUERY_VALUE, &hKey);
+			RegOpenKeyExW(hKeyParent, (LPCWSTR)(path.getData()), 0, KEY_QUERY_VALUE, &hKey);
 			if (!hKey) {
 				return sl_false;
 			}
@@ -401,7 +422,7 @@ namespace slib
 		DWORD type = 0;
 		DWORD size = 0;
 		sl_bool flagSuccess = sl_false;
-		if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, NULL, &size)) {
+		if (ERROR_SUCCESS == RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, NULL, &size)) {
 			if (out) {
 				if (size > 0) {
 					switch (type) {
@@ -409,7 +430,7 @@ namespace slib
 						case REG_MULTI_SZ:
 							{
 								SLIB_SCOPED_BUFFER(BYTE, 512, buf, size);
-								if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, buf, &size)) {
+								if (ERROR_SUCCESS == RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, buf, &size)) {
 									Memory mem = Memory::create(buf, size);
 									if (mem.isNotNull()) {
 										out->setMemory(mem);
@@ -422,7 +443,7 @@ namespace slib
 						case REG_SZ:
 							{
 								SLIB_SCOPED_BUFFER(BYTE, 512, buf, size);
-								if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, buf, &size)) {
+								if (ERROR_SUCCESS == RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, buf, &size)) {
 									String16 s(reinterpret_cast<sl_char16*>(buf), size / 2 - 1);
 									out->setString(s);
 									flagSuccess = sl_true;
@@ -433,7 +454,7 @@ namespace slib
 						case REG_DWORD_BIG_ENDIAN:
 							if (size == 4) {
 								sl_uint32 n;
-								if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, reinterpret_cast<BYTE*>(&n), &size)) {
+								if (ERROR_SUCCESS == RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, reinterpret_cast<BYTE*>(&n), &size)) {
 									if (size == 4) {
 										if (type == REG_DWORD) {
 											out->setUint32(n);
@@ -448,7 +469,7 @@ namespace slib
 						case REG_QWORD:
 							if (size == 8) {
 								sl_uint64 n;
-								if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, reinterpret_cast<BYTE*>(&n), &size)) {
+								if (ERROR_SUCCESS == RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, reinterpret_cast<BYTE*>(&n), &size)) {
 									if (size == 8) {
 										out->setUint64(n);
 										flagSuccess = sl_true;
@@ -470,7 +491,7 @@ namespace slib
 			}
 		}
 		if (flagOpened) {
-			::RegCloseKey(hKey);
+			RegCloseKey(hKey);
 		}
 		return flagSuccess;
 	}
@@ -489,9 +510,9 @@ namespace slib
 				return sl_false;
 			}
 			hKey = NULL;
-			::RegOpenKeyExW(hKeyParent, (LPCWSTR)(path.getData()), 0, KEY_SET_VALUE, &hKey);
+			RegOpenKeyExW(hKeyParent, (LPCWSTR)(path.getData()), 0, KEY_SET_VALUE, &hKey);
 			if (!hKey) {
-				::RegCreateKeyExW(hKeyParent, (LPCWSTR)(path.getData()), NULL, NULL, 0, KEY_ALL_ACCESS, NULL, &hKey, NULL);
+				RegCreateKeyExW(hKeyParent, (LPCWSTR)(path.getData()), NULL, NULL, 0, KEY_ALL_ACCESS, NULL, &hKey, NULL);
 				if (!hKey) {
 					return sl_false;
 				}
@@ -500,34 +521,34 @@ namespace slib
 		}
 		sl_bool flagSuccess = sl_false;
 		if (value.isNull()) {
-			if (ERROR_SUCCESS == ::RegDeleteValueW(hKey, (LPCWSTR)(name.getData()))) {
+			if (ERROR_SUCCESS == RegDeleteValueW(hKey, (LPCWSTR)(name.getData()))) {
 				flagSuccess = sl_true;
 			}
 		} else if (value.isInt64() || value.isUint64()) {
 			sl_uint64 n = value.getUint64();
-			if (ERROR_SUCCESS == ::RegSetValueExW(hKey, (LPCWSTR)(name.getData()), NULL, REG_QWORD, reinterpret_cast<BYTE*>(&n), 8)) {
+			if (ERROR_SUCCESS == RegSetValueExW(hKey, (LPCWSTR)(name.getData()), NULL, REG_QWORD, reinterpret_cast<BYTE*>(&n), 8)) {
 				flagSuccess = sl_true;
 			}
 		} else if (value.isInteger()) {
 			sl_uint32 n = value.getUint32();
-			if (ERROR_SUCCESS == ::RegSetValueExW(hKey, (LPCWSTR)(name.getData()), NULL, REG_DWORD, reinterpret_cast<BYTE*>(&n), 4)) {
+			if (ERROR_SUCCESS == RegSetValueExW(hKey, (LPCWSTR)(name.getData()), NULL, REG_DWORD, reinterpret_cast<BYTE*>(&n), 4)) {
 				flagSuccess = sl_true;
 			}
 		} else if (value.isMemory()) {
 			Memory mem = value.getMemory();
 			if (mem.isNotNull()) {
-				if (ERROR_SUCCESS == ::RegSetValueExW(hKey, (LPCWSTR)(name.getData()), NULL, REG_BINARY, reinterpret_cast<BYTE*>(mem.getData()), (DWORD)(mem.getSize()))) {
+				if (ERROR_SUCCESS == RegSetValueExW(hKey, (LPCWSTR)(name.getData()), NULL, REG_BINARY, reinterpret_cast<BYTE*>(mem.getData()), (DWORD)(mem.getSize()))) {
 					flagSuccess = sl_true;
 				}
 			}
 		} else if (value.isString()) {
 			String16 str = value.getString16();
-			if (ERROR_SUCCESS == ::RegSetValueExW(hKey, (LPCWSTR)(name.getData()), NULL, REG_SZ, reinterpret_cast<BYTE*>(str.getData()), (DWORD)(str.getLength() + 1) * 2)) {
+			if (ERROR_SUCCESS == RegSetValueExW(hKey, (LPCWSTR)(name.getData()), NULL, REG_SZ, reinterpret_cast<BYTE*>(str.getData()), (DWORD)(str.getLength() + 1) * 2)) {
 				flagSuccess = sl_true;
 			}
 		}
 		if (flagOpened) {
-			::RegCloseKey(hKey);
+			RegCloseKey(hKey);
 		}
 		return flagSuccess;
 	}
@@ -556,19 +577,19 @@ namespace slib
 				}
 				if (!flagError) {
 					if (!hTokenToCheck) {
-						::DuplicateToken(hToken, SecurityIdentification, &hTokenToCheck);
+						DuplicateToken(hToken, SecurityIdentification, &hTokenToCheck);
 					}
 					if (hTokenToCheck) {
 						BYTE adminSID[SECURITY_MAX_SID_SIZE];
 						DWORD cbSize = sizeof(adminSID);
 						if (::CreateWellKnownSid(WinBuiltinAdministratorsSid, NULL, &adminSID, &cbSize)) {
-							::CheckTokenMembership(hTokenToCheck, &adminSID, &flagResult);
+							CheckTokenMembership(hTokenToCheck, &adminSID, &flagResult);
 						}
-						::CloseHandle(hTokenToCheck);
+						CloseHandle(hTokenToCheck);
 					}
 				}
 			}
-			::CloseHandle(hToken);
+			CloseHandle(hToken);
 		}
 		return flagResult != FALSE;
 	}
@@ -579,8 +600,8 @@ namespace slib
 		SID_IDENTIFIER_AUTHORITY siAuthority = SECURITY_NT_AUTHORITY;
 		PSID pSidAdmin = NULL;
 		if (::AllocateAndInitializeSid(&siAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0, &pSidAdmin)) {
-			::CheckTokenMembership(NULL, pSidAdmin, &flagResult);
-			::FreeSid(pSidAdmin);
+			CheckTokenMembership(NULL, pSidAdmin, &flagResult);
+			FreeSid(pSidAdmin);
 		}
 		return flagResult != FALSE;
 	}
