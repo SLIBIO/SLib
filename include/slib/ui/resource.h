@@ -255,7 +255,8 @@ namespace slib
 		void dispatchResize(sl_ui_len width, sl_ui_len height) override;
 		
 	protected:
-		void _layoutViews_safe();
+		sl_ui_len m_contentWidth;
+		sl_ui_len m_contentHeight;
 		
 	};
 	

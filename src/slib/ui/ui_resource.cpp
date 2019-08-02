@@ -400,6 +400,8 @@ namespace slib
 	
 	WindowLayout::WindowLayout()
 	{
+		m_contentWidth = 0;
+		m_contentHeight = 0;
 	}
 	
 	WindowLayout::~WindowLayout()
@@ -417,19 +419,19 @@ namespace slib
 
 	UISize WindowLayout::getContentSize()
 	{
-		return getClientSize();
+		if (m_contentWidth && m_contentHeight) {
+			return UISize(m_contentWidth, m_contentHeight);
+		} else {
+			return getClientSize();
+		}
 	}
 	
 	void WindowLayout::dispatchResize(sl_ui_len width, sl_ui_len height)
 	{
-		_layoutViews_safe();
+		m_contentWidth = width;
+		m_contentHeight = height;
+		_layoutViews_safe(width, height);
 		Window::dispatchResize(width, height);
-	}
-	
-	void WindowLayout::_layoutViews_safe()
-	{
-		UISize size = getClientSize();
-		UILayoutResource::_layoutViews_safe(size.x, size.y);
 	}
 	
 	
