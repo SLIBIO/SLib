@@ -614,14 +614,14 @@ namespace slib
 		}
 		ListView::setFrame(frame, mode);
 		if (flagEnd) {
-			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), View, smoothScrollToEndY, this, UIUpdateMode::Redraw));
+			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, smoothScrollToEndY, this, UIUpdateMode::Redraw));
 		}
 	}
 	
 	void ChatView::setFont(const Ref<Font>& font, UIUpdateMode mode)
 	{
 		ListView::setFont(font, UIUpdateMode::None);
-		dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ChatView, _updateListContent, this, UIUpdateMode::UpdateLayout));
+		dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ChatView, _updateListContent, this, UIUpdateMode::UpdateLayout));
 	}
 	
 	SLIB_DEFINE_EVENT_HANDLER(ChatView, DeleteItem, const String& itemId)
@@ -656,7 +656,7 @@ namespace slib
 			}
 		}
 		if (flagUpdateList) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ChatView, _updateListContent, this, UIUpdateMode::UpdateLayout));
+			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ChatView, _updateListContent, this, UIUpdateMode::UpdateLayout));
 		}
 	}
 	

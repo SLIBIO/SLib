@@ -26,6 +26,8 @@
 
 #include "slib/ui/scroll_view.h"
 
+#include "slib/ui/core.h"
+
 #include "view_macos.h"
 
 @interface SLIBScrollViewHandle : NSScrollView
@@ -182,7 +184,7 @@ namespace slib
 	void ScrollView::_setBorder_NW(sl_bool flag)
 	{
 		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ScrollView, _setBorder_NW, this, flag));
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), ScrollView, _setBorder_NW, this, flag));
 			return;
 		}
 		NSView* handle = UIPlatform::getViewHandle(this);
@@ -195,7 +197,7 @@ namespace slib
 	void ScrollView::_setBackgroundColor_NW(const Color& color)
 	{
 		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ScrollView, _setBackgroundColor_NW, this, color));
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), ScrollView, _setBackgroundColor_NW, this, color));
 			return;
 		}
 		NSView* handle = UIPlatform::getViewHandle(this);
@@ -213,7 +215,7 @@ namespace slib
 	void ScrollView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
 	{
 		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ScrollView, _setScrollBarsVisible_NW, this, flagHorizontal, flagVertical));
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), ScrollView, _setScrollBarsVisible_NW, this, flagHorizontal, flagVertical));
 			return;
 		}
 		NSView* handle = UIPlatform::getViewHandle(this);

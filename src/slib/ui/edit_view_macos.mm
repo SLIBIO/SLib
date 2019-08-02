@@ -25,6 +25,7 @@
 #if defined(SLIB_UI_IS_MACOS)
 
 #include "slib/ui/edit_view.h"
+
 #include "slib/ui/core.h"
 
 #include "view_macos.h"
@@ -250,7 +251,7 @@ namespace slib
 	void EditView::_setText_NW(const String& _value)
 	{
 		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setText_NW, this, _value));
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), EditView, _setText_NW, this, _value));
 			return;
 		}
 		NSView* handle = UIPlatform::getViewHandle(this);
@@ -269,7 +270,7 @@ namespace slib
 	void EditView::_setTextAlignment_NW(Alignment align)
 	{
 		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setTextAlignment_NW, this, align));
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), EditView, _setTextAlignment_NW, this, align));
 			return;
 		}
 		NSView* handle = UIPlatform::getViewHandle(this);
@@ -289,7 +290,7 @@ namespace slib
 	void EditView::_setHintText_NW(const String& value)
 	{
 		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setHintText_NW, this, value));
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), EditView, _setHintText_NW, this, value));
 			return;
 		}
 		NSView* handle = UIPlatform::getViewHandle(this);
@@ -301,7 +302,7 @@ namespace slib
 	void EditView::_setReadOnly_NW(sl_bool flag)
 	{
 		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setReadOnly_NW, this, flag));
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), EditView, _setReadOnly_NW, this, flag));
 			return;
 		}
 		NSView* handle = UIPlatform::getViewHandle(this);
@@ -319,7 +320,7 @@ namespace slib
 	void EditView::_setPassword_NW(sl_bool flag)
 	{
 		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setPassword_NW, this, flag));
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), EditView, _setPassword_NW, this, flag));
 			return;
 		}
 		NSView* handle = UIPlatform::getViewHandle(this);
@@ -343,7 +344,7 @@ namespace slib
 	void EditView::_setMultiLine_NW(MultiLineMode mode)
 	{
 		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setMultiLine_NW, this, mode));
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), EditView, _setMultiLine_NW, this, mode));
 			return;
 		}
 		NSView* handle = UIPlatform::getViewHandle(this);
@@ -359,7 +360,7 @@ namespace slib
 	void EditView::_setTextColor_NW(const Color& color)
 	{
 		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setTextColor_NW, this, color));
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), EditView, _setTextColor_NW, this, color));
 			return;
 		}
 		NSView* handle = UIPlatform::getViewHandle(this);
@@ -377,7 +378,7 @@ namespace slib
 	void EditView::_setHintTextColor_NW(const Color& value)
 	{
 		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setHintTextColor_NW, this, value));
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), EditView, _setHintTextColor_NW, this, value));
 			return;
 		}
 		NSView* handle = UIPlatform::getViewHandle(this);
@@ -410,7 +411,7 @@ namespace slib
 	void EditView::_setFont_NW(const Ref<Font>& font)
 	{
 		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setFont_NW, this, font));
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), EditView, _setFont_NW, this, font));
 			return;
 		}
 		NSView* handle = UIPlatform::getViewHandle(this);
@@ -433,7 +434,7 @@ namespace slib
 	void EditView::_setBorder_NW(sl_bool flag)
 	{
 		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setBorder_NW, this, flag));
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), EditView, _setBorder_NW, this, flag));
 			return;
 		}
 		NSView* handle = UIPlatform::getViewHandle(this);
@@ -451,7 +452,7 @@ namespace slib
 	void EditView::_setBackgroundColor_NW(const Color& color)
 	{
 		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setBackgroundColor_NW, this, color));
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), EditView, _setBackgroundColor_NW, this, color));
 			return;
 		}
 		NSView* handle = UIPlatform::getViewHandle(this);
@@ -469,7 +470,7 @@ namespace slib
 	void EditView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
 	{
 		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setScrollBarsVisible_NW, this, flagHorizontal, flagVertical));
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), EditView, _setScrollBarsVisible_NW, this, flagHorizontal, flagVertical));
 			return;
 		}
 		NSView* handle = UIPlatform::getViewHandle(this);

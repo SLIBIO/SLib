@@ -204,23 +204,26 @@ namespace slib
 			Function<void()> refCallback(callback);
 			dispatch_time_t t = dispatch_time(DISPATCH_TIME_NOW, (sl_int64)(delayMillis) * NSEC_PER_MSEC);
 			dispatch_after(t, dispatch_get_main_queue(), ^{
-				if ([[NSRunLoop currentRunLoop] currentMode] == NSEventTrackingRunLoopMode) {
-					refCallback();
-				} else {
-					if (UIDispatcher::addCallback(refCallback)) {
-						[NSApp postEvent:context->dispatchEvent atStart:YES];
-					}
+				if (UIDispatcher::addCallback(refCallback)) {
+					[NSApp postEvent:context->dispatchEvent atStart:YES];
 				}
 			});
 		}
 	}
 	
-	void UI::dispatchToUiThreadUrgently(const Function<void()>& callback)
+	void UI::dispatchToUiThreadUrgently(const Function<void()>& callback, sl_uint32 delayMillis)
 	{
 		Function<void()> refCallback(callback);
-		dispatch_async(dispatch_get_main_queue(), ^{
-			refCallback();
-		});
+		if (delayMillis == 0) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				refCallback();
+			});
+		} else {
+			dispatch_time_t t = dispatch_time(DISPATCH_TIME_NOW, (sl_int64)(delayMillis) * NSEC_PER_MSEC);
+			dispatch_after(t, dispatch_get_main_queue(), ^{
+				refCallback();
+			});
+		}
 	}
 
 	void UIPlatform::runLoop(sl_uint32 level)

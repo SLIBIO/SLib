@@ -141,16 +141,24 @@ namespace slib
 		if (handle != nil) {
 			NSWindow* window = [handle window];
 			if (window != nil) {
-				if (!(UI::isUiThread())) {
-					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), macOS_ViewInstance, setFocus, this, flagFocus));
-					return;
-				}
-				if (flagFocus) {
-					[window makeFirstResponder:handle];
-				} else {
-					if (window.firstResponder == handle) {
-						[window makeFirstResponder:nil];
+				if ([NSThread isMainThread]) {
+					if (flagFocus) {
+						[window makeFirstResponder:handle];
+					} else {
+						if (window.firstResponder == handle) {
+							[window makeFirstResponder:nil];
+						}
 					}
+				} else {
+					dispatch_async(dispatch_get_main_queue(), ^{
+						if (flagFocus) {
+							[window makeFirstResponder:handle];
+						} else {
+							if (window.firstResponder == handle) {
+								[window makeFirstResponder:nil];
+							}
+						}
+					});
 				}
 			}
 		}
@@ -160,7 +168,7 @@ namespace slib
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
-			if (UI::isUiThread()) {
+			if ([NSThread isMainThread]) {
 				[handle setNeedsDisplay: YES];
 				dispatch_async(dispatch_get_main_queue(), ^{
 					[handle displayIfNeeded];
@@ -183,7 +191,7 @@ namespace slib
 			_rect.origin.y = (CGFloat)(rect.top);
 			_rect.size.width = (CGFloat)(rect.getWidth());
 			_rect.size.height = (CGFloat)(rect.getHeight());
-			if (UI::isUiThread()) {
+			if ([NSThread isMainThread]) {
 				[handle setNeedsDisplayInRect: _rect];
 				dispatch_async(dispatch_get_main_queue(), ^{
 					[handle displayIfNeeded];
@@ -215,29 +223,47 @@ namespace slib
 
 	void macOS_ViewInstance::setFrame(const UIRect& frame)
 	{
-		if (!(UI::isUiThread())) {
-			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), macOS_ViewInstance, setFrame, this, frame));
-			return;
+		if ([NSThread isMainThread]) {
+			m_frame = frame;
+			updateFrameAndTransform();
+		} else {
+			UIRect _frame = frame;
+			WeakRef<macOS_ViewInstance> weak(this);
+			dispatch_async(dispatch_get_main_queue(), ^{
+				Ref<macOS_ViewInstance> ref(weak);
+				if (ref.isNull()) {
+					return;
+				}
+				m_frame = _frame;
+				updateFrameAndTransform();
+			});
 		}
-		m_frame = frame;
-		updateFrameAndTransform();
 	}
 
-	void macOS_ViewInstance::setTransform(const Matrix3 &transform)
+	void macOS_ViewInstance::setTransform(const Matrix3& transform)
 	{
-		if (!(UI::isUiThread())) {
-			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), macOS_ViewInstance, setTransform, this, transform));
-			return;
+		if ([NSThread isMainThread]) {
+			m_transform = transform;
+			updateFrameAndTransform();
+		} else {
+			Matrix3 _transform = transform;
+			WeakRef<macOS_ViewInstance> weak(this);
+			dispatch_async(dispatch_get_main_queue(), ^{
+				Ref<macOS_ViewInstance> ref(weak);
+				if (ref.isNull()) {
+					return;
+				}
+				m_transform = _transform;
+				updateFrameAndTransform();
+			});
 		}
-		m_transform = transform;
-		updateFrameAndTransform();
 	}
 
 	void macOS_ViewInstance::setVisible(sl_bool flag)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
-			if (UI::isUiThread()) {
+			if ([NSThread isMainThread]) {
 				[handle setHidden:(flag ? NO : YES)];
 			} else {
 				dispatch_async(dispatch_get_main_queue(), ^{
@@ -253,7 +279,7 @@ namespace slib
 		if (handle != nil) {
 			if ([handle isKindOfClass:[NSControl class]]) {
 				NSControl* control = (NSControl*)handle;
-				if (UI::isUiThread()) {
+				if ([NSThread isMainThread]) {
 					[control setEnabled:(flag ? YES : NO)];
 				} else {
 					dispatch_async(dispatch_get_main_queue(), ^{
@@ -279,7 +305,7 @@ namespace slib
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
-			if (UI::isUiThread()) {
+			if ([NSThread isMainThread]) {
 				[handle setNeedsDisplay: TRUE];
 			} else {
 				dispatch_async(dispatch_get_main_queue(), ^{
@@ -394,7 +420,7 @@ namespace slib
 		if (handle != nil) {
 			NSView* parent = handle.superview;
 			if (parent != nil) {
-				if (UI::isUiThread()) {
+				if ([NSThread isMainThread]) {
 					[handle removeFromSuperviewWithoutNeedingDisplay];
 					[parent addSubview:handle];
 				} else {

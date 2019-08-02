@@ -188,7 +188,7 @@ namespace slib
 					if (UI::isUiThread()) {
 						_setTabContentView_NW(index, view);
 					} else {
-						UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), TabView, _setTabContentView_NW, this, index, view));
+						UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), TabView, _setTabContentView_NW, this, index, view));
 					}
 				} else {
 					selectTab(m_indexSelected, UIUpdateMode::None);
