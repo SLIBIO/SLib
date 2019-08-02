@@ -97,4 +97,21 @@ namespace slib
 		}
 	}
 
+	List< Ref<WindowInstance> > UIPlatform::_getAllWindowInstances()
+	{
+		WindowInstanceMap* map = GetWindowInstanceMap();
+		if (map) {
+			List< Ref<WindowInstance> > ret;
+			ListElements< WeakRef<WindowInstance> > instances(map->getAllValues());
+			for (sl_size i = 0; i < instances.count; i++) {
+				Ref<WindowInstance> instance = instances[i];
+				if (instance.isNotNull()) {
+					ret.add_NoLock(Move(instance));
+				}
+			}
+			return ret;
+		}
+		return sl_null;
+	}
+
 }

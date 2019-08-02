@@ -129,7 +129,9 @@ namespace slib
 		virtual void setMenu(const Ref<Menu>& menu);
 		
 		
-		virtual void setFocus();
+		sl_bool isActive();
+		
+		virtual void activate();
 		
 
 		UIRect getFrame();
@@ -397,13 +399,16 @@ namespace slib
 		void showModal();
 
 		
-		void addView(const Ref<View>& view);
+		void addView(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
-		void removeView(const Ref<View>& view);
+		void removeView(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
 		List< Ref<View> > getViews();
 		
-		void removeAllViews();
+		void removeAllViews(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		
+	public:
+		static Ref<Window> getActiveWindow();
 
 	public:
 		SLIB_DECLARE_EVENT_HANDLER(Window, Create)
@@ -529,7 +534,9 @@ namespace slib
 		virtual void setMenu(const Ref<Menu>& menu);
 		
 		
-		virtual sl_bool setFocus() = 0;
+		virtual sl_bool isActive() = 0;
+
+		virtual sl_bool activate() = 0;
 
 		
 		virtual UIRect getFrame() = 0;

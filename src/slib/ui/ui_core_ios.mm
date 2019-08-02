@@ -271,15 +271,6 @@ namespace slib
 		return nil;
 	}
 	
-	UIWindow* UIPlatform::getKeyWindow()
-	{
-		UIWindow* window = [[UIApplication sharedApplication] keyWindow];
-		if (window != nil) {
-			return window;
-		}
-		return UIPlatform::getMainWindow();
-	}
-	
 	UIViewController* UIPlatform::getCurrentViewController()
 	{
 		return getCurrentViewController(Ref<Window>::null());

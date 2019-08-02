@@ -174,7 +174,7 @@ namespace slib
 								Ref<iOS_WindowInstance> ret = create(window);
 								if (ret.isNotNull()) {
 									controller->m_window = ret;
-									ret->setFocus();
+									ret->activate();
 									return ret;
 								}
 							}
@@ -196,12 +196,7 @@ namespace slib
 					m_window = nil;
 				}
 				
-				Ref<ViewInstance> getContentView()
-				{
-					return m_viewContent;
-				}
-				
-				void close()
+				void close() override
 				{
 					UIView* view = m_window;
 					if (view != nil) {
@@ -216,27 +211,41 @@ namespace slib
 					m_viewContent.setNull();
 				}
 				
-				sl_bool isClosed()
+				sl_bool isClosed() override
 				{
 					return m_window == nil;
 				}
 				
-				Ref<WindowInstance> getParent()
-				{
-					return sl_null;
-				}
-				
-				sl_bool setParent(const Ref<WindowInstance>& window)
+				sl_bool setParent(const Ref<WindowInstance>& window) override
 				{
 					return sl_false;
 				}
 				
-				sl_bool setFocus()
+				Ref<ViewInstance> getContentView() override
+				{
+					return m_viewContent;
+				}
+				
+				sl_bool isActive() override
+				{
+					UIView* view = m_window;
+					if (view != nil) {
+						if ([view isKindOfClass:[UIWindow class]]) {
+							UIWindow* window = (UIWindow*)view;
+							return [window isKeyWindow];
+						} else {
+							return [view isFirstResponder];
+						}
+					}
+					return sl_false;
+				}
+				
+				sl_bool activate() override
 				{
 					UIView* view = m_window;
 					if (view != nil) {
 						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_WindowInstance, setFocus, this));
+							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_WindowInstance, activate, this));
 							return sl_true;
 						}
 						if ([view isKindOfClass:[UIWindow class]]) {
@@ -250,7 +259,7 @@ namespace slib
 					return sl_false;
 				}
 				
-				UIRect getFrame()
+				UIRect getFrame() override
 				{
 					UIView* window = m_window;
 					if (window != nil) {
@@ -267,7 +276,7 @@ namespace slib
 					}
 				}
 				
-				sl_bool setFrame(const UIRect& frame)
+				sl_bool setFrame(const UIRect& frame) override
 				{
 					UIView* window = m_window;
 					if (window != nil) {
@@ -295,12 +304,12 @@ namespace slib
 					return sl_false;
 				}
 				
-				UIRect getClientFrame()
+				UIRect getClientFrame() override
 				{
 					return getFrame();
 				}
 				
-				UISize getClientSize()
+				UISize getClientSize() override
 				{
 					UIView* window = m_window;
 					if (window != nil) {
@@ -321,7 +330,7 @@ namespace slib
 					}
 				}
 				
-				sl_bool setClientSize(const UISize& size)
+				sl_bool setClientSize(const UISize& size) override
 				{
 					UIView* window = m_window;
 					if (window != nil) {
@@ -346,30 +355,12 @@ namespace slib
 					return sl_false;
 				}
 				
-				String getTitle()
-				{
-					return sl_null;
-				}
-				
-				sl_bool setTitle(const String& title)
+				sl_bool setTitle(const String& title) override
 				{
 					return sl_false;
 				}
 				
-				Color getBackgroundColor()
-				{
-					UIView* window = m_window;
-					if (window != nil) {
-						UIColor* color = [window backgroundColor];
-						if (color == nil) {
-							return Color::zero();
-						}
-						return GraphicsPlatform::getColorFromUIColor(color);
-					}
-					return Color::Transparent;
-				}
-				
-				sl_bool setBackgroundColor(const Color& _color)
+				sl_bool setBackgroundColor(const Color& _color) override
 				{
 					UIView* window = m_window;
 					if (window != nil) {
@@ -389,42 +380,27 @@ namespace slib
 					return sl_false;
 				}
 				
-				sl_bool isMinimized()
+				sl_bool isMinimized() override
 				{
 					return sl_false;
 				}
 				
-				sl_bool setMinimized(sl_bool flag)
+				sl_bool setMinimized(sl_bool flag) override
 				{
 					return sl_false;
 				}
 				
-				sl_bool isMaximized()
+				sl_bool isMaximized() override
 				{
 					return sl_false;
 				}
 				
-				sl_bool setMaximized(sl_bool flag)
+				sl_bool setMaximized(sl_bool flag) override
 				{
 					return sl_false;
 				}
 				
-				sl_bool isVisible()
-				{
-					UIView* window = m_window;
-					if (window != nil) {
-						BOOL flag = [window isHidden];
-						if (flag) {
-							return sl_false;
-						} else {
-							return sl_true;
-						}
-					} else {
-						return sl_false;
-					}
-				}
-				
-				sl_bool setVisible(sl_bool flag)
+				sl_bool setVisible(sl_bool flag) override
 				{
 					UIView* window = m_window;
 					if (window != nil) {
@@ -439,23 +415,7 @@ namespace slib
 					}
 				}
 				
-				sl_bool isAlwaysOnTop()
-				{
-					UIView* view = m_window;
-					if (view != nil) {
-						if ([view isKindOfClass:[UIWindow class]]) {
-							UIWindow* window = (UIWindow*)view;
-							if (window.windowLevel >= UIWindowLevelAlert) {
-								return sl_true;
-							} else {
-								return sl_false;
-							}
-						}
-					}
-					return sl_false;
-				}
-				
-				sl_bool setAlwaysOnTop(sl_bool flag)
+				sl_bool setAlwaysOnTop(sl_bool flag) override
 				{
 					UIView* view = m_window;
 					if (view != nil) {
@@ -476,57 +436,27 @@ namespace slib
 					return sl_false;
 				}
 				
-				sl_bool isCloseButtonEnabled()
+				sl_bool setCloseButtonEnabled(sl_bool flag) override
 				{
 					return sl_false;
 				}
 				
-				sl_bool setCloseButtonEnabled(sl_bool flag)
+				sl_bool setMinimizeButtonEnabled(sl_bool flag) override
 				{
 					return sl_false;
 				}
 				
-				sl_bool isMinimizeButtonEnabled()
+				sl_bool setMaximizeButtonEnabled(sl_bool flag) override
 				{
 					return sl_false;
 				}
 				
-				sl_bool setMinimizeButtonEnabled(sl_bool flag)
+				sl_bool setResizable(sl_bool flag) override
 				{
 					return sl_false;
 				}
 				
-				sl_bool isMaximizeButtonEnabled()
-				{
-					return sl_false;
-				}
-				
-				sl_bool setMaximizeButtonEnabled(sl_bool flag)
-				{
-					return sl_false;
-				}
-				
-				sl_bool isResizable()
-				{
-					return sl_false;
-				}
-				
-				sl_bool setResizable(sl_bool flag)
-				{
-					return sl_false;
-				}
-				
-				sl_real getAlpha()
-				{
-					UIView* window = m_window;
-					if (window != nil) {
-						sl_real alpha = (sl_real)(window.alpha);
-						return alpha;
-					}
-					return 1;
-				}
-				
-				sl_bool setAlpha(sl_real _alpha)
+				sl_bool setAlpha(sl_real _alpha) override
 				{
 					UIView* window = m_window;
 					if (window != nil) {
@@ -548,17 +478,12 @@ namespace slib
 					}
 				}
 				
-				sl_bool isTransparent()
+				sl_bool setTransparent(sl_bool flag) override
 				{
 					return sl_false;
 				}
 				
-				sl_bool setTransparent(sl_bool flag)
-				{
-					return sl_false;
-				}
-				
-				UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen)
+				UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen) override
 				{
 					UIView* view = m_window;
 					if (view != nil) {
@@ -591,7 +516,7 @@ namespace slib
 					return ptScreen;
 				}
 				
-				UIPointf convertCoordinateFromWindowToScreen(const UIPointf& ptWindow)
+				UIPointf convertCoordinateFromWindowToScreen(const UIPointf& ptWindow) override
 				{
 					UIView* view = m_window;
 					if (view != nil) {
@@ -624,32 +549,32 @@ namespace slib
 					return ptWindow;
 				}
 				
-				UIPointf convertCoordinateFromScreenToClient(const UIPointf& ptScreen)
+				UIPointf convertCoordinateFromScreenToClient(const UIPointf& ptScreen) override
 				{
 					return convertCoordinateFromScreenToWindow(ptScreen);
 				}
 				
-				UIPointf convertCoordinateFromClientToScreen(const UIPointf& ptClient)
+				UIPointf convertCoordinateFromClientToScreen(const UIPointf& ptClient) override
 				{
 					return convertCoordinateFromWindowToScreen(ptClient);
 				}
 				
-				UIPointf convertCoordinateFromWindowToClient(const UIPointf& ptWindow)
+				UIPointf convertCoordinateFromWindowToClient(const UIPointf& ptWindow) override
 				{
 					return ptWindow;
 				}
 				
-				UIPointf convertCoordinateFromClientToWindow(const UIPointf& ptClient)
+				UIPointf convertCoordinateFromClientToWindow(const UIPointf& ptClient) override
 				{
 					return ptClient;
 				}
 				
-				UISize getWindowSizeFromClientSize(const UISize& sizeClient)
+				UISize getWindowSizeFromClientSize(const UISize& sizeClient) override
 				{
 					return sizeClient;
 				}
 				
-				UISize getClientSizeFromWindowSize(const UISize& sizeWindow)
+				UISize getClientSizeFromWindowSize(const UISize& sizeWindow) override
 				{
 					return sizeWindow;
 				}
@@ -699,6 +624,19 @@ namespace slib
 	{
 		return iOS_WindowInstance::create(param);
 	}
+	
+	Ref<Window> Window::getActiveWindow()
+	{
+		UIView* handle = UIPlatform::getKeyWindow();
+		if (handle != nil) {
+			Ref<WindowInstance> instance = UIPlatform::getWindowInstance(handle);
+			if (instance.isNotNull()) {
+				return instance->getWindow();
+			}
+		}
+		return sl_null;
+	}
+	
 	
 	ScreenOrientation UI::getScreenOrientation()
 	{
@@ -781,6 +719,15 @@ namespace slib
 		}
 	}
 
+	UIWindow* UIPlatform::getKeyWindow()
+	{
+		UIWindow* window = [[UIApplication sharedApplication] keyWindow];
+		if (window != nil) {
+			return window;
+		}
+		return UIPlatform::getMainWindow();
+	}
+	
 }
 
 using namespace slib;

@@ -273,7 +273,11 @@ public class UiWindow extends FrameLayout implements IView, ViewTreeObserver.OnG
 		_setAlpha(alpha);
 	}
 
-	public void focus() {
+	public boolean isActive() {
+		return isFocused();
+	}
+
+	public void activate() {
 		requestFocus();
 	}
 

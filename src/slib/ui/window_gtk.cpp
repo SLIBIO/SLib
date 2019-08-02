@@ -394,12 +394,23 @@ namespace slib
 					}
 					return sl_false;
 				}
+
+				sl_bool isActive() override
+				{
+					if (!m_flagClosed) {
+						GtkWindow* window = m_window;
+						if (window) {
+							return gtk_window_is_active(window);
+						}
+					}
+					return sl_false;
+				}
 				
-				sl_bool setFocus() override
+				sl_bool activate() override
 				{
 					if (!m_flagClosed) {
 						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_WindowInstance, setFocus, this));
+							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_WindowInstance, activate, this));
 							return sl_true;
 						}
 						GtkWindow* window = m_window;
@@ -810,6 +821,15 @@ namespace slib
 		return GTK_WindowInstance::create(param);
 	}
 	
+	Ref<Window> Window::getActiveWindow()
+	{
+		Ref<WindowInstance> instance = UIPlatform::getActiveWindowInstance();
+		if (instance.isNotNull()) {
+			return instance->getWindow();
+		}
+		return sl_null;
+	}
+
 	
 	Ref<WindowInstance> UIPlatform::createWindowInstance(GtkWindow* window)
 	{
@@ -857,6 +877,19 @@ namespace slib
 		return sl_null;
 	}
 	
+	Ref<WindowInstance> UIPlatform::getActiveWindowInstance()
+	{
+		ListElements< Ref<WindowInstance> > instances(UIPlatform::_getAllWindowInstances());
+		for (sl_size i = 0; i < instances.count; i++) {
+			WindowInstance* instance = instances[i].get();
+			GtkWindow* handle = UIPlatform::getWindowHandle(instance);
+			if (gtk_window_is_active(handle)) {
+				return instance;
+			}
+		}
+		return sl_null;
+	}
+
 }
 
 #endif

@@ -199,6 +199,51 @@ namespace slib
 				}
 			}
 
+			void RunLoop(HWND hWndModalDialog)
+			{
+				ReleaseCapture();
+				MSG msg;
+				while (GetMessageW(&msg, NULL, 0, 0)) {
+					if (msg.message == WM_QUIT) {
+						break;
+					}
+					if (msg.message == SLIB_UI_MESSAGE_DISPATCH) {
+						UIDispatcher::processCallbacks();
+					} else if (msg.message == SLIB_UI_MESSAGE_DISPATCH_DELAYED) {
+						UIDispatcher::processDelayedCallback((sl_reg)(msg.lParam));
+					} else if (msg.message == SLIB_UI_MESSAGE_CLOSE || msg.message == WM_DESTROY) {
+						DestroyWindow(msg.hwnd);
+						if (msg.hwnd == hWndModalDialog) {
+							break;
+						}
+					} else if (msg.message == WM_MENUCOMMAND) {
+						priv::menu::ProcessMenuCommand(msg.wParam, msg.lParam);
+					} else if (g_messageTaskbarButtonCreated && msg.message == g_messageTaskbarButtonCreated) {
+						ApplyBadgeNumber();
+					} else {
+						do {
+							if (priv::menu::ProcessMenuShortcutKey(msg)) {
+								break;
+							}
+							Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(msg.hwnd));
+							if (instance.isNotNull()) {
+								Ref<View> view = instance->getView();
+								if (view.isNotNull()) {
+									if (priv::view::CaptureChildInstanceEvents(view.get(), msg)) {
+										break;
+									}
+									if (instance->preprocessWindowMessage(msg)) {
+										break;
+									}
+								}
+							}
+							TranslateMessage(&msg);
+							DispatchMessageW(&msg);
+						} while (0);
+					}
+				}
+			}
+
 			MainContext::MainContext()
 			{
 				m_screenPrimary = new ScreenImpl();
@@ -282,55 +327,7 @@ namespace slib
 
 	void UIPlatform::runLoop(sl_uint32 level)
 	{
-		ReleaseCapture();
-		MSG msg;
-		while (GetMessageW(&msg, NULL, 0, 0)) {
-			if (msg.message == WM_QUIT) {
-				break;
-			}
-			if (msg.message == SLIB_UI_MESSAGE_DISPATCH) {
-				UIDispatcher::processCallbacks();
-			} else if (msg.message == SLIB_UI_MESSAGE_DISPATCH_DELAYED) {
-				UIDispatcher::processDelayedCallback((sl_reg)(msg.lParam));
-			} else if (msg.message == SLIB_UI_MESSAGE_CLOSE) {
-				DestroyWindow(msg.hwnd);
-			} else if (msg.message == WM_MENUCOMMAND) {
-				priv::menu::ProcessMenuCommand(msg.wParam, msg.lParam);
-			} else if (g_messageTaskbarButtonCreated && msg.message == g_messageTaskbarButtonCreated) {
-				ApplyBadgeNumber();
-			} else {
-				do {
-					if (priv::menu::ProcessMenuShortcutKey(msg)) {
-						break;
-					}
-					Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(msg.hwnd));
-					if (instance.isNotNull()) {
-						Ref<View> view = instance->getView();
-						if (view.isNotNull()) {
-							if (priv::view::CaptureChildInstanceEvents(view.get(), msg)) {
-								break;
-							}
-							if (instance->preprocessWindowMessage(msg)) {
-								break;
-							}
-						}
-					}
-					HWND hWnd = GetActiveWindow();
-					if (hWnd) {
-						if (GetWindowLongW(hWnd, GWL_STYLE) & WS_POPUP) {
-							if (IsDialogMessageW(hWnd, &msg)) {
-								break;
-							}
-						}
-					}
-					TranslateMessage(&msg);
-					DispatchMessageW(&msg);
-				} while (0);
-			}
-		}
-
-		UIDispatcher::removeAllCallbacks();
-
+		RunLoop(NULL);
 	}
 
 	void UIPlatform::quitLoop()
@@ -359,6 +356,8 @@ namespace slib
 		runLoop(0);
 
 		UIApp::dispatchExitToApp();
+
+		UIDispatcher::removeAllCallbacks();
 
 		//Gdiplus::GdiplusShutdown(gdiplusToken);
 	}

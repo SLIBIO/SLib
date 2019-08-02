@@ -90,11 +90,11 @@ namespace slib
 							}
 
 							Base::interlockedIncrement32(&g_nCountActiveWindows);
-							::evas_object_smart_callback_add(window, "delete,request", _ui_win_delete_request_cb, sl_null);
-							::evas_object_smart_callback_add(window, "wm,rotation,changed", _ui_win_rotate_cb, NULL);
-							::eext_object_event_callback_add(window, EEXT_CALLBACK_BACK, _ui_win_back_cb, sl_null);
+							evas_object_smart_callback_add(window, "delete,request", _ui_win_delete_request_cb, sl_null);
+							evas_object_smart_callback_add(window, "wm,rotation,changed", _ui_win_rotate_cb, NULL);
+							eext_object_event_callback_add(window, EEXT_CALLBACK_BACK, _ui_win_back_cb, sl_null);
 
-							::evas_object_show(window);
+							evas_object_show(window);
 
 							if (g_windowMain.isNull()) {
 								g_windowMain = ret;
@@ -121,7 +121,7 @@ namespace slib
 					UIPlatform::removeWindowInstance(win);
 					sl_int32 n = Base::interlockedDecrement32(&g_nCountActiveWindows);
 					if (n <= 0) {
-						::ui_app_exit();
+						ui_app_exit();
 					}
 				}
 
@@ -137,19 +137,19 @@ namespace slib
 				static void _ui_win_back_cb(void* data, Evas_Object* win, void* event_info)
 				{
 					if (MobileApp::dispatchBackPressedToApp()) {
-						::elm_win_lower(win);
+						elm_win_lower(win);
 					}
 				}
 
 				static Ref<WindowInstance> create(const WindowInstanceParam& param)
 				{
-					Evas_Object* win = ::elm_win_util_standard_add("", "");
+					Evas_Object* win = elm_win_util_standard_add("", "");
 					if (win) {
 
 						List<ScreenOrientation> orientations = UI::getAvailableScreenOrientations();
 						if (orientations.isNotNull()) {
-							if (::elm_win_wm_rotation_supported_get(win)) {
-								::elm_win_wm_rotation_available_rotations_set(win, (int*)(orientations.getData()), (unsigned int)(orientations.getCount()));
+							if (elm_win_wm_rotation_supported_get(win)) {
+								elm_win_wm_rotation_available_rotations_set(win, (int*)(orientations.getData()), (unsigned int)(orientations.getCount()));
 							}
 						}
 
@@ -171,17 +171,17 @@ namespace slib
 							* Following move&resize code has no effect because Tizen policy fills the window in the screen.
 							* Just left for the further update.
 							*/
-							::evas_object_move(win, (Evas_Coord)(rect.left), (Evas_Coord)(rect.top));
-							::evas_object_resize(win, (Evas_Coord)(rect.getWidth()), (Evas_Coord)(rect.getHeight()));
+							evas_object_move(win, (Evas_Coord)(rect.left), (Evas_Coord)(rect.top));
+							evas_object_resize(win, (Evas_Coord)(rect.getWidth()), (Evas_Coord)(rect.getHeight()));
 						}
 
 						Ref<EFL_WindowInstance> ret = create(win);
 						if (ret.isNotNull()) {
-							::elm_win_autodel_set(win, EINA_TRUE);
+							elm_win_autodel_set(win, EINA_TRUE);
 							return ret;
 						}
 
-						::evas_object_del(win);
+						evas_object_del(win);
 
 					}
 					return sl_null;
@@ -189,8 +189,8 @@ namespace slib
 				
 				static void _release_handle(Evas_Object* window)
 				{
-					::elm_win_lower(window);
-					::evas_object_del(window);
+					elm_win_lower(window);
+					evas_object_del(window);
 				}
 
 				void _release()
@@ -208,12 +208,7 @@ namespace slib
 					m_window = sl_null;
 				}
 				
-				Ref<ViewInstance> getContentView()
-				{
-					return m_viewContent;
-				}
-				
-				void close()
+				void close() override
 				{
 					Evas_Object* window = m_window;
 					if (window) {
@@ -222,24 +217,34 @@ namespace slib
 							return;
 						}
 						UIPlatform::removeWindowInstance(window);
-						::elm_win_lower(window);
-						::evas_object_del(window);
+						elm_win_lower(window);
+						evas_object_del(window);
 					}
 					m_window = sl_null;
 					m_viewContent.setNull();
 				}
 				
-				sl_bool isClosed()
+				sl_bool isClosed() override
 				{
 					return m_window == sl_null;
 				}
 				
-				sl_bool setParent(const Ref<WindowInstance>& window)
+				sl_bool setParent(const Ref<WindowInstance>& window) override
 				{
 					return sl_false;
 				}
+
+				Ref<ViewInstance> getContentView() override
+				{
+					return m_viewContent;
+				}
 				
-				sl_bool setFocus()
+				sl_bool isActive() override
+				{
+					return sl_true;
+				}
+				
+				sl_bool activate() override
 				{
 					Evas_Object* window = m_window;
 					if (window) {
@@ -247,67 +252,67 @@ namespace slib
 							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EFL_WindowInstance, setFocus, this));
 							return sl_true;
 						}
-						::elm_win_raise(window);
+						elm_win_raise(window);
 					}
 					return sl_false;
 				}
 				
-				UIRect getFrame()
+				UIRect getFrame() override
 				{
 					return UI::getScreenBounds();
 				}
 				
-				sl_bool setFrame(const UIRect& _frame)
+				sl_bool setFrame(const UIRect& _frame) override
 				{
 					return sl_false;
 				}
 				
-				UIRect getClientFrame()
+				UIRect getClientFrame() override
 				{
 					return getFrame();
 				}
 				
-				UISize getClientSize()
+				UISize getClientSize() override
 				{
 					return getFrame().getSize();
 				}
 				
-				sl_bool setClientSize(const UISize& _size)
+				sl_bool setClientSize(const UISize& _size) override
 				{
 					return sl_false;
 				}
 				
-				sl_bool setTitle(const String& title)
+				sl_bool setTitle(const String& title) override
 				{
 					return sl_false;
 				}
 				
-				sl_bool setBackgroundColor(const Color& _color)
+				sl_bool setBackgroundColor(const Color& _color) override
 				{
 					return sl_false;
 				}
 				
-				sl_bool isMinimized()
+				sl_bool isMinimized() override
 				{
 					return sl_false;
 				}
 				
-				sl_bool setMinimized(sl_bool flag)
+				sl_bool setMinimized(sl_bool flag) override
 				{
 					return sl_false;
 				}
 				
-				sl_bool isMaximized()
+				sl_bool isMaximized() override
 				{
 					return sl_false;
 				}
 				
-				sl_bool setMaximized(sl_bool flag)
+				sl_bool setMaximized(sl_bool flag) override
 				{
 					return sl_false;
 				}
 				
-				sl_bool setVisible(sl_bool flag)
+				sl_bool setVisible(sl_bool flag) override
 				{
 					Evas_Object* window = m_window;
 					if (window) {
@@ -316,9 +321,9 @@ namespace slib
 							return sl_true;
 						}
 						if (flag) {
-							::evas_object_show(window);
+							evas_object_show(window);
 						} else {
-							::evas_object_hide(window);
+							evas_object_hide(window);
 						}
 						return sl_true;
 					} else {
@@ -326,77 +331,77 @@ namespace slib
 					}
 				}
 				
-				sl_bool setAlwaysOnTop(sl_bool flag)
+				sl_bool setAlwaysOnTop(sl_bool flag) override
 				{
 					return sl_false;
 				}
 				
-				sl_bool setCloseButtonEnabled(sl_bool flag)
+				sl_bool setCloseButtonEnabled(sl_bool flag) override
 				{
 					return sl_false;
 				}
 				
-				sl_bool setMinimizeButtonEnabled(sl_bool flag)
+				sl_bool setMinimizeButtonEnabled(sl_bool flag) override
 				{
 					return sl_false;
 				}
 				
-				sl_bool setMaximizeButtonEnabled(sl_bool flag)
+				sl_bool setMaximizeButtonEnabled(sl_bool flag) override
 				{
 					return sl_false;
 				}
 				
-				sl_bool setResizable(sl_bool flag)
+				sl_bool setResizable(sl_bool flag) override
 				{
 					return sl_false;
 				}
 				
-				sl_bool setAlpha(sl_real _alpha)
+				sl_bool setAlpha(sl_real _alpha) override
 				{
 					return sl_false;
 				}
 				
-				sl_bool setTransparent(sl_bool flag)
+				sl_bool setTransparent(sl_bool flag) override
 				{
 					return sl_false;
 				}
 				
-				UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen)
+				UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen) override
 				{
 					return ptScreen;
 				}
 				
-				UIPointf convertCoordinateFromWindowToScreen(const UIPointf& ptWindow)
+				UIPointf convertCoordinateFromWindowToScreen(const UIPointf& ptWindow) override
 				{
 					return ptWindow;
 				}
 				
-				UIPointf convertCoordinateFromScreenToClient(const UIPointf& ptScreen)
+				UIPointf convertCoordinateFromScreenToClient(const UIPointf& ptScreen) override
 				{
 					return convertCoordinateFromScreenToWindow(ptScreen);
 				}
 				
-				UIPointf convertCoordinateFromClientToScreen(const UIPointf& ptClient)
+				UIPointf convertCoordinateFromClientToScreen(const UIPointf& ptClient) override
 				{
 					return convertCoordinateFromWindowToScreen(ptClient);
 				}
 				
-				UIPointf convertCoordinateFromWindowToClient(const UIPointf& ptWindow)
+				UIPointf convertCoordinateFromWindowToClient(const UIPointf& ptWindow) override
 				{
 					return ptWindow;
 				}
 				
-				UIPointf convertCoordinateFromClientToWindow(const UIPointf& ptClient)
+				UIPointf convertCoordinateFromClientToWindow(const UIPointf& ptClient) override
 				{
 					return ptClient;
 				}
 				
-				UISize getWindowSizeFromClientSize(const UISize& sizeClient)
+				UISize getWindowSizeFromClientSize(const UISize& sizeClient) override
 				{
 					return sizeClient;
 				}
 				
-				UISize getClientSizeFromWindowSize(const UISize& sizeWindow)
+				UISize getClientSizeFromWindowSize(const UISize& sizeWindow) override
 				{
 					return sizeWindow;
 				}

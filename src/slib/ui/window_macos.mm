@@ -228,11 +228,6 @@ namespace slib
 					close();
 				}
 				
-				Ref<ViewInstance> getContentView() override
-				{
-					return m_viewContent;
-				}
-				
 				void close() override
 				{
 					m_viewContent.setNull();
@@ -263,18 +258,6 @@ namespace slib
 					return m_window == nil;
 				}
 				
-				Ref<WindowInstance> getParent()
-				{
-					NSWindow* window = m_window;
-					if (window != nil) {
-						NSWindow* parent = m_parent;
-						if (parent != nil) {
-							return UIPlatform::createWindowInstance(parent);
-						}
-					}
-					return sl_null;
-				}
-				
 				sl_bool setParent(const Ref<WindowInstance>& windowInst) override
 				{
 					NSWindow* window = m_window;
@@ -299,11 +282,34 @@ namespace slib
 					return sl_false;
 				}
 				
-				sl_bool setFocus() override
+				Ref<ViewInstance> getContentView() override
+				{
+					return m_viewContent;
+				}
+				
+				sl_bool isActive() override
 				{
 					NSWindow* window = m_window;
 					if (window != nil) {
-						[window makeKeyAndOrderFront:NSApp];
+						return [window isKeyWindow];
+						return sl_true;
+					}
+					return sl_false;
+				}
+				
+				sl_bool activate() override
+				{
+					NSWindow* window = m_window;
+					if (window != nil) {
+						if ([NSThread isMainThread]) {
+							[window makeKeyAndOrderFront:NSApp];
+							[NSApp activateIgnoringOtherApps:YES];
+						} else {
+							dispatch_async(dispatch_get_main_queue(), ^{
+								[window makeKeyAndOrderFront:NSApp];
+								[NSApp activateIgnoringOtherApps:YES];
+							});
+						}
 						return sl_true;
 					}
 					return sl_false;
@@ -385,16 +391,6 @@ namespace slib
 					return sl_false;
 				}
 				
-				String getTitle()
-				{
-					NSWindow* window = m_window;
-					if (window != nil) {
-						NSString* title = [window title];
-						return Apple::getStringFromNSString(title);
-					}
-					return sl_null;
-				}
-				
 				sl_bool setTitle(const String& title) override
 				{
 					NSWindow* window = m_window;
@@ -404,19 +400,6 @@ namespace slib
 						return sl_true;
 					}
 					return sl_false;
-				}
-				
-				Color getBackgroundColor()
-				{
-					NSWindow* window = m_window;
-					if (window != nil) {
-						NSColor* color = [window backgroundColor];
-						if (color == [NSColor windowBackgroundColor]) {
-							return Color::zero();
-						}
-						return GraphicsPlatform::getColorFromNSColor(color);
-					}
-					return Color::Transparent;
 				}
 				
 				sl_bool setBackgroundColor(const Color& _color) override
@@ -527,21 +510,6 @@ namespace slib
 					return sl_false;
 				}
 				
-				sl_bool isVisible()
-				{
-					NSWindow* window = m_window;
-					if (window != nil) {
-						BOOL flag = [window isVisible];
-						if (flag) {
-							return sl_true;
-						} else {
-							return sl_false;
-						}
-					} else {
-						return sl_false;
-					}
-				}
-				
 				sl_bool setVisible(sl_bool flag) override
 				{
 					NSWindow* window = m_window;
@@ -576,20 +544,6 @@ namespace slib
 					return sl_false;
 				}
 				
-				sl_bool isAlwaysOnTop()
-				{
-					NSWindow* window = m_window;
-					if (window != nil) {
-						NSInteger level = [window level];
-						if (level == NSNormalWindowLevel) {
-							return sl_false;
-						} else {
-							return sl_true;
-						}
-					}
-					return sl_false;
-				}
-				
 				sl_bool setAlwaysOnTop(sl_bool flag) override
 				{
 					NSWindow* window = m_window;
@@ -609,23 +563,6 @@ namespace slib
 								}
 							});
 						}
-					}
-					return sl_false;
-				}
-				
-				sl_bool isCloseButtonEnabled()
-				{
-					NSWindow* window = m_window;
-					if (window != nil) {
-						NSUInteger style = [window styleMask];
-						if (style & NSBorderlessWindowMask) {
-							return sl_false;
-						}
-						if (!(style & NSTitledWindowMask)) {
-							return sl_false;
-						}
-						sl_bool f = (style & NSClosableWindowMask) ? sl_true : sl_false;
-						return f;
 					}
 					return sl_false;
 				}
@@ -662,23 +599,6 @@ namespace slib
 					return sl_false;
 				}
 				
-				sl_bool isMinimizeButtonEnabled()
-				{
-					NSWindow* window = m_window;
-					if (window != nil) {
-						NSUInteger style = [window styleMask];
-						if (style & NSBorderlessWindowMask) {
-							return sl_false;
-						}
-						if (!(style & NSTitledWindowMask)) {
-							return sl_false;
-						}
-						sl_bool f = (style & NSMiniaturizableWindowMask) ? sl_true : sl_false;
-						return f;
-					}
-					return sl_false;
-				}
-				
 				sl_bool setMinimizeButtonEnabled(sl_bool flag) override
 				{
 					NSWindow* window = m_window;
@@ -711,21 +631,6 @@ namespace slib
 					return sl_false;
 				}
 				
-				sl_bool isMaximizeButtonEnabled()
-				{
-					NSWindow* window = m_window;
-					if (window != nil) {
-						NSUInteger style = [window styleMask];
-						if (style & NSBorderlessWindowMask) {
-							return sl_false;
-						}
-						NSButton* buttonZoom = [window standardWindowButton:NSWindowZoomButton];
-						sl_bool f = [buttonZoom isEnabled] ? sl_true : sl_false;
-						return f;
-					}
-					return sl_false;
-				}
-				
 				sl_bool setMaximizeButtonEnabled(sl_bool flag) override
 				{
 					NSWindow* window = m_window;
@@ -747,20 +652,6 @@ namespace slib
 							}
 						}
 						return sl_true;
-					}
-					return sl_false;
-				}
-				
-				sl_bool isResizable()
-				{
-					NSWindow* window = m_window;
-					if (window != nil) {
-						NSUInteger style = [window styleMask];
-						if (style & NSBorderlessWindowMask) {
-							return sl_false;
-						}
-						sl_bool f = (style & NSResizableWindowMask) ? sl_true : sl_false;
-						return f;
 					}
 					return sl_false;
 				}
@@ -797,16 +688,6 @@ namespace slib
 					return sl_false;
 				}
 				
-				sl_real getAlpha()
-				{
-					NSWindow* window = m_window;
-					if (window != nil) {
-						sl_real alpha = (sl_real)([window alphaValue]);
-						return alpha;
-					}
-					return 1;
-				}
-				
 				sl_bool setAlpha(sl_real _alpha) override
 				{
 					NSWindow* window = m_window;
@@ -826,16 +707,6 @@ namespace slib
 							});
 						}
 						return sl_true;
-					}
-					return sl_false;
-				}
-				
-				sl_bool isTransparent()
-				{
-					NSWindow* window = m_window;
-					if (window != nil) {
-						BOOL f = [window ignoresMouseEvents];
-						return f ? sl_true : sl_false;
 					}
 					return sl_false;
 				}
@@ -1076,6 +947,18 @@ namespace slib
 		return macOS_WindowInstance::create(param);
 	}
 
+	Ref<Window> Window::getActiveWindow()
+	{
+		NSWindow* handle = UIPlatform::getKeyWindow();
+		if (handle != nil) {
+			Ref<WindowInstance> instance = UIPlatform::getWindowInstance(handle);
+			if (instance.isNotNull()) {
+				return instance->getWindow();
+			}
+		}
+		return sl_null;
+	}
+	
 	
 	Ref<WindowInstance> UIPlatform::createWindowInstance(NSWindow* window)
 	{
@@ -1123,6 +1006,20 @@ namespace slib
 			}
 		}
 		return nil;
+	}
+	
+	NSWindow* UIPlatform::getMainWindow()
+	{
+		return [NSApp mainWindow];
+	}
+	
+	NSWindow* UIPlatform::getKeyWindow()
+	{
+		NSWindow* window = [NSApp keyWindow];
+		if (window != nil) {
+			return window;
+		}
+		return UIPlatform::getMainWindow();
 	}
 	
 }

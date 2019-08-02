@@ -36,6 +36,12 @@ namespace slib
 
 	namespace priv
 	{
+
+		namespace ui_core
+		{
+			void RunLoop(HWND hWndModalDialog);
+		}
+
 		namespace window
 		{
 
@@ -134,38 +140,25 @@ namespace slib
 						UIRect frameWindow = param.calculateRegion(frameScreen);
 						String16 title = param.title;
 						hWnd = CreateWindowExW(
-							styleEx // ex-style
-							, (LPCWSTR)((LONG_PTR)(shared->wndClassForWindow))
-							, (LPCWSTR)(title.getData())
-							, style
-							, (int)(frameWindow.left), (int)(frameWindow.top)
-							, (int)(frameWindow.getWidth()), (int)(frameWindow.getHeight())
-							, hParent // parent
-							, UIPlatform::getMenuHandle(param.menu) // menu
-							, hInst
-							, NULL);
-
-						if (hParent && param.flagModal) {
-							EnableWindow(hParent, FALSE);
-						}
+							styleEx, // ex-style
+							(LPCWSTR)((LONG_PTR)(shared->wndClassForWindow)),
+							(LPCWSTR)(title.getData()),
+							style,
+							(int)(frameWindow.left), (int)(frameWindow.top),
+							(int)(frameWindow.getWidth()), (int)(frameWindow.getHeight()),
+							hParent, // parent
+							UIPlatform::getMenuHandle(param.menu), // menu
+							hInst,
+							NULL);						
 					}
 					return hWnd;
 				}
 
-				Ref<ViewInstance> getContentView()
-				{
-					return m_viewContent;
-				}
-
-				void close()
+				void close() override
 				{
 					ObjectLocker lock(this);
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						HWND hWndParent = Windows::getOwnerWindow(hWnd);
-						if (hWndParent) {
-							EnableWindow(hWndParent, TRUE);
-						}
 						m_handle = NULL;
 						UIPlatform::removeWindowInstance(hWnd);
 						m_viewContent.setNull();
@@ -175,22 +168,12 @@ namespace slib
 					}
 				}
 
-				sl_bool isClosed()
+				sl_bool isClosed() override
 				{
 					return m_handle == NULL;
 				}
 
-				Ref<WindowInstance> getParent()
-				{
-					HWND hWnd = m_handle;
-					if (hWnd) {
-						HWND hParent = Windows::getOwnerWindow(hWnd);
-						return UIPlatform::createWindowInstance(hParent, sl_false);
-					}
-					return sl_null;
-				}
-
-				sl_bool setParent(const Ref<WindowInstance>& window)
+				sl_bool setParent(const Ref<WindowInstance>& window) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -209,7 +192,12 @@ namespace slib
 					return sl_false;
 				}
 
-				void setMenu(const Ref<Menu>& menu)
+				Ref<ViewInstance> getContentView() override
+				{
+					return m_viewContent;
+				}
+
+				void setMenu(const Ref<Menu>& menu) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -217,7 +205,16 @@ namespace slib
 					}
 				}
 
-				sl_bool setFocus()
+				sl_bool isActive() override
+				{
+					HWND hWnd = m_handle;
+					if (hWnd) {
+						return hWnd == GetActiveWindow();
+					}
+					return sl_false;
+				}
+
+				sl_bool activate() override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -227,34 +224,32 @@ namespace slib
 					return sl_false;
 				}
 
-				UIRect getFrame()
+				UIRect getFrame() override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
 						RECT rect;
 						GetWindowRect(hWnd, &rect);
-						UIRect frame((sl_ui_pos)(rect.left), (sl_ui_pos)(rect.top)
-							, (sl_ui_pos)(rect.right), (sl_ui_pos)(rect.bottom));
-						return frame;
+						return UIRect((sl_ui_pos)(rect.left), (sl_ui_pos)(rect.top), (sl_ui_pos)(rect.right), (sl_ui_pos)(rect.bottom));
 					} else {
 						return UIRect::zero();
 					}
 				}
 
-				sl_bool setFrame(const UIRect& frame)
+				sl_bool setFrame(const UIRect& frame) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						SetWindowPos(hWnd, NULL
-							, (int)(frame.left), (int)(frame.top)
-							, (int)(frame.getWidth()), (int)(frame.getHeight())
-							, SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+						SetWindowPos(hWnd, NULL,
+							(int)(frame.left), (int)(frame.top),
+							(int)(frame.getWidth()), (int)(frame.getHeight()),
+							SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 						return sl_true;
 					}
 					return sl_false;
 				}
 
-				UIRect getClientFrame()
+				UIRect getClientFrame() override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -278,7 +273,7 @@ namespace slib
 					}
 				}
 
-				UISize getClientSize()
+				UISize getClientSize() override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -290,7 +285,7 @@ namespace slib
 					}
 				}
 
-				sl_bool setClientSize(const UISize& size)
+				sl_bool setClientSize(const UISize& size) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -300,21 +295,16 @@ namespace slib
 						GetWindowRect(hWnd, &rectWindow);
 						int dx = rectWindow.right - rectWindow.left - rectClient.right;
 						int dy = rectWindow.bottom - rectWindow.top - rectClient.bottom;
-						SetWindowPos(hWnd, NULL
-							, 0, 0
-							, dx + (int)(size.x), dy + (int)(size.y)
-							, SWP_NOMOVE | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+						SetWindowPos(hWnd, NULL,
+							0, 0,
+							dx + (int)(size.x), dy + (int)(size.y),
+							SWP_NOMOVE | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 						return sl_true;
 					}
 					return sl_false;
 				}
 
-				String getTitle()
-				{
-					return Windows::getWindowText(m_handle);
-				}
-
-				sl_bool setTitle(const String& title)
+				sl_bool setTitle(const String& title) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -324,12 +314,7 @@ namespace slib
 					return sl_false;
 				}
 
-				Color getBackgroundColor()
-				{
-					return m_backgroundColor;
-				}
-
-				sl_bool setBackgroundColor(const Color& color)
+				sl_bool setBackgroundColor(const Color& color) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -339,7 +324,7 @@ namespace slib
 					return sl_false;
 				}
 
-				sl_bool isMinimized()
+				sl_bool isMinimized() override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -354,7 +339,7 @@ namespace slib
 					}
 				}
 
-				sl_bool setMinimized(sl_bool flag)
+				sl_bool setMinimized(sl_bool flag) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -372,7 +357,7 @@ namespace slib
 					return sl_false;
 				}
 
-				sl_bool isMaximized()
+				sl_bool isMaximized() override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -387,7 +372,7 @@ namespace slib
 					}
 				}
 
-				sl_bool setMaximized(sl_bool flag)
+				sl_bool setMaximized(sl_bool flag) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -405,22 +390,7 @@ namespace slib
 					return sl_false;
 				}
 
-				sl_bool isVisible()
-				{
-					HWND hWnd = m_handle;
-					if (hWnd) {
-						BOOL flag = IsWindowVisible(hWnd);
-						if (flag) {
-							return sl_true;
-						} else {
-							return sl_false;
-						}
-					} else {
-						return sl_false;
-					}
-				}
-
-				sl_bool setVisible(sl_bool flag)
+				sl_bool setVisible(sl_bool flag) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -438,51 +408,23 @@ namespace slib
 					return sl_false;
 				}
 
-				sl_bool isAlwaysOnTop()
-				{
-					HWND hWnd = m_handle;
-					if (hWnd) {
-						DWORD dwExStyle = GetWindowLongW(hWnd, GWL_EXSTYLE);
-						if (dwExStyle & WS_EX_TOPMOST) {
-							return sl_true;
-						} else {
-							return sl_false;
-						}
-					}
-					return sl_false;
-				}
-
-				sl_bool setAlwaysOnTop(sl_bool flag)
+				sl_bool setAlwaysOnTop(sl_bool flag) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
 						if (flag) {
-							SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0
-								, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+							SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0,
+								SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 						} else {
-							SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, 0, 0
-								, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+							SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, 0, 0,
+								SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 						}
 						return sl_true;
 					}
 					return sl_false;
 				}
 
-				sl_bool isCloseButtonEnabled()
-				{
-					HWND hWnd = m_handle;
-					if (hWnd) {
-						LONG cs = GetClassLongW(hWnd, GCL_STYLE);
-						if (cs & CS_NOCLOSE) {
-							return sl_false;
-						} else {
-							return sl_true;
-						}
-					}
-					return sl_false;
-				}
-
-				sl_bool setCloseButtonEnabled(sl_bool flag)
+				sl_bool setCloseButtonEnabled(sl_bool flag) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -492,28 +434,14 @@ namespace slib
 						} else {
 							SetClassLongW(hWnd, GCL_STYLE, old | CS_NOCLOSE);
 						}
-						SetWindowPos(hWnd, NULL, 0, 0, 0, 0
-							, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+						SetWindowPos(hWnd, NULL, 0, 0, 0, 0,
+							SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 						return sl_true;
 					}
 					return sl_false;
 				}
 
-				sl_bool isMinimizeButtonEnabled()
-				{
-					HWND hWnd = m_handle;
-					if (hWnd) {
-						LONG style = GetWindowLongW(hWnd, GWL_STYLE);
-						if (style & WS_MINIMIZEBOX) {
-							return sl_true;
-						} else {
-							return sl_false;
-						}
-					}
-					return sl_false;
-				}
-
-				sl_bool setMinimizeButtonEnabled(sl_bool flag)
+				sl_bool setMinimizeButtonEnabled(sl_bool flag) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -523,28 +451,14 @@ namespace slib
 						} else {
 							SetWindowLongW(hWnd, GWL_STYLE, old & (~WS_MINIMIZEBOX));
 						}
-						SetWindowPos(hWnd, NULL, 0, 0, 0, 0
-							, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+						SetWindowPos(hWnd, NULL, 0, 0, 0, 0,
+							SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 						return sl_true;
 					}
 					return sl_false;
 				}
 
-				sl_bool isMaximizeButtonEnabled()
-				{
-					HWND hWnd = m_handle;
-					if (hWnd) {
-						LONG style = GetWindowLongW(hWnd, GWL_STYLE);
-						if (style & WS_MAXIMIZEBOX) {
-							return sl_true;
-						} else {
-							return sl_false;
-						}
-					}
-					return sl_false;
-				}
-
-				sl_bool setMaximizeButtonEnabled(sl_bool flag)
+				sl_bool setMaximizeButtonEnabled(sl_bool flag) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -554,28 +468,14 @@ namespace slib
 						} else {
 							SetWindowLongW(hWnd, GWL_STYLE, old & (~WS_MAXIMIZEBOX));
 						}
-						SetWindowPos(hWnd, NULL, 0, 0, 0, 0
-							, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+						SetWindowPos(hWnd, NULL, 0, 0, 0, 0,
+							SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 						return sl_true;
 					}
 					return sl_false;
 				}
 
-				sl_bool isResizable()
-				{
-					HWND hWnd = m_handle;
-					if (hWnd) {
-						LONG style = GetWindowLongW(hWnd, GWL_STYLE);
-						if (style & WS_BORDER) {
-							if (style & WS_THICKFRAME) {
-								return sl_true;
-							}
-						}
-					}
-					return sl_false;
-				}
-
-				sl_bool setResizable(sl_bool flag)
+				sl_bool setResizable(sl_bool flag) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -588,33 +488,14 @@ namespace slib
 						} else {
 							SetWindowLongW(hWnd, GWL_STYLE, old & (~WS_THICKFRAME));
 						}
-						SetWindowPos(hWnd, NULL, 0, 0, 0, 0
-							, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+						SetWindowPos(hWnd, NULL, 0, 0, 0, 0,
+							SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 						return sl_true;
 					}
 					return sl_false;
 				}
 
-				sl_real getAlpha()
-				{
-					HWND hWnd = m_handle;
-					if (hWnd) {
-						LONG style = GetWindowLongW(hWnd, GWL_EXSTYLE);
-						if (style & WS_EX_LAYERED) {
-							BYTE _alpha;
-							DWORD flag;
-							if (GetLayeredWindowAttributes(hWnd, NULL, &_alpha, &flag)) {
-								if (flag == LWA_ALPHA) {
-									sl_real alpha = _alpha;
-									return alpha / 255;
-								}
-							}
-						}
-					}
-					return 1;
-				}
-
-				sl_bool setAlpha(sl_real _alpha)
+				sl_bool setAlpha(sl_real _alpha) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -651,21 +532,7 @@ namespace slib
 					return sl_false;
 				}
 
-				sl_bool isTransparent()
-				{
-					HWND hWnd = m_handle;
-					if (hWnd) {
-						LONG style = GetWindowLongW(hWnd, GWL_EXSTYLE);
-						if (style & WS_EX_TRANSPARENT) {
-							return sl_true;
-						} else {
-							return sl_false;
-						}
-					}
-					return sl_false;
-				}
-
-				sl_bool setTransparent(sl_bool flag)
+				sl_bool setTransparent(sl_bool flag) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -675,14 +542,14 @@ namespace slib
 						} else {
 							SetWindowLongW(hWnd, GWL_EXSTYLE, old & (~WS_EX_TRANSPARENT));
 						}
-						SetWindowPos(hWnd, NULL, 0, 0, 0, 0
-							, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+						SetWindowPos(hWnd, NULL, 0, 0, 0, 0,
+							SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 						return sl_true;
 					}
 					return sl_false;
 				}
 
-				UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen)
+				UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -694,7 +561,7 @@ namespace slib
 					}
 				}
 
-				UIPointf convertCoordinateFromWindowToScreen(const UIPointf& ptWindow)
+				UIPointf convertCoordinateFromWindowToScreen(const UIPointf& ptWindow) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -706,7 +573,7 @@ namespace slib
 					}
 				}
 
-				UIPointf convertCoordinateFromScreenToClient(const UIPointf& ptScreen)
+				UIPointf convertCoordinateFromScreenToClient(const UIPointf& ptScreen) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -720,7 +587,7 @@ namespace slib
 					}
 				}
 
-				UIPointf convertCoordinateFromClientToScreen(const UIPointf& ptClient)
+				UIPointf convertCoordinateFromClientToScreen(const UIPointf& ptClient) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -734,7 +601,7 @@ namespace slib
 					}
 				}
 
-				UIPointf convertCoordinateFromWindowToClient(const UIPointf& ptWindow)
+				UIPointf convertCoordinateFromWindowToClient(const UIPointf& ptWindow) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -750,7 +617,7 @@ namespace slib
 					}
 				}
 
-				UIPointf convertCoordinateFromClientToWindow(const UIPointf& ptClient)
+				UIPointf convertCoordinateFromClientToWindow(const UIPointf& ptClient) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -766,7 +633,7 @@ namespace slib
 					}
 				}
 
-				UISize getWindowSizeFromClientSize(const UISize& size)
+				UISize getWindowSizeFromClientSize(const UISize& size) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -774,8 +641,8 @@ namespace slib
 						GetClientRect(hWnd, &rectClient);
 						RECT rectWindow;
 						GetWindowRect(hWnd, &rectWindow);
-						UISize ret((sl_ui_pos)(rectWindow.right - rectWindow.left - rectClient.right + size.x)
-							, (sl_ui_pos)(rectWindow.bottom - rectWindow.top - rectClient.bottom + size.y));
+						UISize ret((sl_ui_pos)(rectWindow.right - rectWindow.left - rectClient.right + size.x),
+							(sl_ui_pos)(rectWindow.bottom - rectWindow.top - rectClient.bottom + size.y));
 						if (ret.x < 0) {
 							ret.x = 0;
 						}
@@ -788,7 +655,7 @@ namespace slib
 					}
 				}
 
-				UISize getClientSizeFromWindowSize(const UISize& size)
+				UISize getClientSizeFromWindowSize(const UISize& size) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
@@ -796,8 +663,8 @@ namespace slib
 						GetClientRect(hWnd, &rectClient);
 						RECT rectWindow;
 						GetWindowRect(hWnd, &rectWindow);
-						UISize ret(size.x - (sl_ui_pos)(rectWindow.right - rectWindow.left - rectClient.right)
-							, size.y - (sl_ui_pos)(rectWindow.bottom - rectWindow.top - rectClient.bottom));
+						UISize ret(size.x - (sl_ui_pos)(rectWindow.right - rectWindow.left - rectClient.right),
+							size.y - (sl_ui_pos)(rectWindow.bottom - rectWindow.top - rectClient.bottom));
 						if (ret.x < 0) {
 							ret.x = 0;
 						}
@@ -808,6 +675,27 @@ namespace slib
 					} else {
 						return size;
 					}
+				}
+
+				sl_bool doModal() override
+				{
+					HWND hWnd = m_handle;
+					if (hWnd) {
+						HWND hWndParent = Windows::getOwnerWindow(hWnd);
+						sl_bool flagEnableParent = sl_false;
+						if (hWndParent) {
+							if (hWndParent != GetDesktopWindow() && IsWindowEnabled(hWndParent)) {
+								EnableWindow(hWndParent, FALSE);
+								flagEnableParent = sl_true;
+							}
+						}
+						ui_core::RunLoop(hWnd);
+						if (flagEnableParent) {
+							EnableWindow(hWndParent, TRUE);
+							SetForegroundWindow(hWndParent);
+						}
+					}
+					return sl_true;
 				}
 
 			};
@@ -969,6 +857,19 @@ namespace slib
 		}
 		return sl_null;
 	}
+
+	Ref<Window> Window::getActiveWindow()
+	{
+		HWND hWnd = GetActiveWindow();
+		if (hWnd) {
+			Ref<WindowInstance> instance = UIPlatform::getWindowInstance(hWnd);
+			if (instance.isNotNull()) {
+				return instance->getWindow();
+			}
+		}
+		return sl_null;
+	}
+
 
 	Ref<WindowInstance> UIPlatform::createWindowInstance(HWND hWnd, sl_bool flagDestroyOnRelease)
 	{

@@ -113,6 +113,8 @@ namespace slib
 		static void removeWindowInstance(NSWindow* handle);
 		static NSWindow* getWindowHandle(WindowInstance* instance);
 		static NSWindow* getWindowHandle(Window* window);
+		static NSWindow* getMainWindow();
+		static NSWindow* getKeyWindow();
 		
 		static Ref<Screen> createScreen(NSScreen* handle);
 		static NSScreen* getScreenHandle(Screen* screen);
@@ -126,7 +128,7 @@ namespace slib
 		
 		static NSString* getKeyEquivalent(const KeycodeAndModifiers& km, NSUInteger& outMask);
 		
-#	endif		
+#	endif
 #elif defined(SLIB_UI_IS_IOS)
 #	if defined(__OBJC__)
 		static Ref<ViewInstance> createViewInstance(UIView* handle);
@@ -141,12 +143,12 @@ namespace slib
 		static Ref<WindowInstance> getWindowInstance(UIView* handle);
 		static void removeWindowInstance(UIView* handle);
 		static UIView* getWindowHandle(WindowInstance* instance);
-		
+		static UIWindow* getMainWindow();
+		static UIWindow* getKeyWindow();
+
 		static Ref<Screen> createScreen(UIScreen* handle);
 		static UIScreen* getScreenHandle(Screen* screen);
 		
-		static UIWindow* getMainWindow();
-		static UIWindow* getKeyWindow();
 		static UIViewController* getCurrentViewController();
 		static UIViewController* getCurrentViewController(const Ref<Window>& parentWindow);
 		static UIView* findFirstResponder(UIView* rootView);
@@ -194,6 +196,8 @@ namespace slib
 
 		static Ref<Screen> createScreen(GdkScreen* handle);
 		static GdkScreen* getScreenHandle(Screen* screen);
+
+		static Ref<WindowInstance> getActiveWindowInstance();
 		
 		static sl_bool initializeGtk();
 		static void getGdkColor(const Color& color, GdkColor* outGdkColor);
@@ -226,6 +230,7 @@ namespace slib
 		static Ref<WindowInstance> _getWindowInstance(const void* handle);
 		static void _registerWindowInstance(const void* handle, WindowInstance* instance);
 		static void _removeWindowInstance(const void* handle);
+		static List< Ref<WindowInstance> > _getAllWindowInstances();
 	};
 
 }

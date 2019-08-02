@@ -59,19 +59,16 @@ namespace slib
 
 				SLIB_JNI_METHOD(getContentView, "getContentView", "()Landroid/view/View;");
 				SLIB_JNI_METHOD(close, "close", "()V");
-				SLIB_JNI_METHOD(getBackgroundColor, "getWindowBackgroundColor", "()I");
-				SLIB_JNI_METHOD(setBackgroundColor, "setWindowBackgroundColor", "(I)V");
+				SLIB_JNI_METHOD(isActive, "isActive", "()Z");
+				SLIB_JNI_METHOD(activate, "activate", "()V");
 				SLIB_JNI_METHOD(getFrame, "getFrame", "()Landroid/graphics/Rect;");
 				SLIB_JNI_METHOD(setFrame, "setFrame", "(IIII)V");
 				SLIB_JNI_METHOD(getSize, "getSize", "()Landroid/graphics/Point;");
 				SLIB_JNI_METHOD(setSize, "setSize", "(II)V");
-				SLIB_JNI_METHOD(isVisible, "isVisible", "()Z");
+				SLIB_JNI_METHOD(setBackgroundColor, "setWindowBackgroundColor", "(I)V");
 				SLIB_JNI_METHOD(setVisible, "setVisible", "(Z)V");
-				SLIB_JNI_METHOD(isAlwaysOnTop, "isAlwaysOnTop", "()Z");
 				SLIB_JNI_METHOD(setAlwaysOnTop, "setAlwaysOnTop", "(Z)V");
-				SLIB_JNI_METHOD(getAlpha, "getWindowAlpha", "()F");
 				SLIB_JNI_METHOD(setAlpha, "setWindowAlpha", "(F)V");
-				SLIB_JNI_METHOD(focus, "focus", "()V");
 				SLIB_JNI_METHOD(convertCoordinateFromScreenToWindow, "convertCoordinateFromScreenToWindow", "(II)Landroid/graphics/Point;");
 				SLIB_JNI_METHOD(convertCoordinateFromWindowToScreen, "convertCoordinateFromWindowToScreen", "(II)Landroid/graphics/Point;");
 
@@ -135,12 +132,7 @@ namespace slib
 					return jwindow;
 				}
 
-				Ref<ViewInstance> getContentView()
-				{
-					return m_viewContent;
-				}
-
-				void close()
+				void close() override
 				{
 					ObjectLocker lock(this);
 					m_viewContent.setNull();
@@ -153,33 +145,43 @@ namespace slib
 					}
 				}
 
-				sl_bool isClosed()
+				sl_bool isClosed() override
 				{
 					return m_window.isNull();
 				}
 
-				Ref<WindowInstance> getParent()
-				{
-					return sl_null;
-				}
-
-				sl_bool setParent(const Ref<WindowInstance>& window)
+				sl_bool setParent(const Ref<WindowInstance>& window) override
 				{
 					return sl_false;
 				}
-				
-				sl_bool setFocus()
+
+				Ref<ViewInstance> getContentView() override
+				{
+					return m_viewContent;
+				}
+
+				sl_bool isActive() override
 				{
 					JniGlobal<jobject> _jwindow(m_window);
 					jobject jwindow = _jwindow;
 					if (jwindow) {
-						JWindow::focus.call(jwindow);
+						return JWindow::isActive.callBoolean(jwindow);
+					}
+					return sl_false;
+				}
+				
+				sl_bool activate() override
+				{
+					JniGlobal<jobject> _jwindow(m_window);
+					jobject jwindow = _jwindow;
+					if (jwindow) {
+						JWindow::activate.call(jwindow);
 						return sl_true;
 					}
 					return sl_false;
 				}
 
-				UIRect getFrame()
+				UIRect getFrame() override
 				{
 					JniGlobal<jobject> _jwindow(m_window);
 					jobject jwindow = _jwindow;
@@ -198,7 +200,7 @@ namespace slib
 					return UIRect::zero();
 				}
 
-				sl_bool setFrame(const UIRect& frame)
+				sl_bool setFrame(const UIRect& frame) override
 				{
 					JniGlobal<jobject> _jwindow(m_window);
 					jobject jwindow = _jwindow;
@@ -209,12 +211,12 @@ namespace slib
 					return sl_false;
 				}
 
-				UIRect getClientFrame()
+				UIRect getClientFrame() override
 				{
 					return getFrame();
 				}
 
-				UISize getClientSize()
+				UISize getClientSize() override
 				{
 					JniGlobal<jobject> _jwindow(m_window);
 					jobject jwindow = _jwindow;
@@ -230,7 +232,7 @@ namespace slib
 					return UISize::zero();
 				}
 
-				sl_bool setClientSize(const UISize& size)
+				sl_bool setClientSize(const UISize& size) override
 				{
 					JniGlobal<jobject> _jwindow(m_window);
 					jobject jwindow = _jwindow;
@@ -241,30 +243,12 @@ namespace slib
 					return sl_false;
 				}
 
-				String getTitle()
-				{
-					return sl_null;
-				}
-
-				sl_bool setTitle(const String& title)
+				sl_bool setTitle(const String& title) override
 				{
 					return sl_false;
 				}
 
-				Color getBackgroundColor()
-				{
-					JniGlobal<jobject> _jwindow(m_window);
-					jobject jwindow = _jwindow;
-					if (jwindow) {
-						int color = JWindow::getBackgroundColor.callInt(jwindow);
-						Color ret;
-						ret.setARGB(color);
-						return ret;
-					}
-					return Color::zero();
-				}
-
-				sl_bool setBackgroundColor(const Color& _color)
+				sl_bool setBackgroundColor(const Color& _color) override
 				{
 					JniGlobal<jobject> _jwindow(m_window);
 					jobject jwindow = _jwindow;
@@ -278,37 +262,27 @@ namespace slib
 					return sl_false;
 				}
 
-				sl_bool isMinimized()
+				sl_bool isMinimized() override
 				{
 					return sl_false;
 				}
 
-				sl_bool setMinimized(sl_bool flag)
+				sl_bool setMinimized(sl_bool flag) override
 				{
 					return sl_false;
 				}
 
-				sl_bool isMaximized()
+				sl_bool isMaximized() override
 				{
 					return sl_false;
 				}
 
-				sl_bool setMaximized(sl_bool flag)
+				sl_bool setMaximized(sl_bool flag) override
 				{
 					return sl_false;
 				}
 
-				sl_bool isVisible()
-				{
-					JniGlobal<jobject> _jwindow(m_window);
-					jobject jwindow = _jwindow;
-					if (jwindow) {
-						return JWindow::isVisible.callBoolean(jwindow) != 0;
-					}
-					return sl_false;
-				}
-
-				sl_bool setVisible(sl_bool flag)
+				sl_bool setVisible(sl_bool flag) override
 				{
 					JniGlobal<jobject> _jwindow(m_window);
 					jobject jwindow = _jwindow;
@@ -319,17 +293,7 @@ namespace slib
 					return sl_false;
 				}
 
-				sl_bool isAlwaysOnTop()
-				{
-					JniGlobal<jobject> _jwindow(m_window);
-					jobject jwindow = _jwindow;
-					if (jwindow) {
-						return JWindow::isAlwaysOnTop.callBoolean(jwindow) != 0;
-					}
-					return sl_false;
-				}
-
-				sl_bool setAlwaysOnTop(sl_bool flag)
+				sl_bool setAlwaysOnTop(sl_bool flag) override
 				{
 					JniGlobal<jobject> _jwindow(m_window);
 					jobject jwindow = _jwindow;
@@ -340,57 +304,27 @@ namespace slib
 					return sl_false;
 				}
 
-				sl_bool isCloseButtonEnabled()
+				sl_bool setCloseButtonEnabled(sl_bool flag) override
 				{
 					return sl_false;
 				}
 
-				sl_bool setCloseButtonEnabled(sl_bool flag)
+				sl_bool setMinimizeButtonEnabled(sl_bool flag) override
 				{
 					return sl_false;
 				}
 
-				sl_bool isMinimizeButtonEnabled()
+				sl_bool setMaximizeButtonEnabled(sl_bool flag) override
 				{
 					return sl_false;
 				}
 
-				sl_bool setMinimizeButtonEnabled(sl_bool flag)
+				sl_bool setResizable(sl_bool flag) override
 				{
 					return sl_false;
 				}
 
-				sl_bool isMaximizeButtonEnabled()
-				{
-					return sl_false;
-				}
-
-				sl_bool setMaximizeButtonEnabled(sl_bool flag)
-				{
-					return sl_false;
-				}
-
-				sl_bool isResizable()
-				{
-					return sl_false;
-				}
-
-				sl_bool setResizable(sl_bool flag)
-				{
-					return sl_false;
-				}
-
-				sl_real getAlpha()
-				{
-					JniGlobal<jobject> _jwindow(m_window);
-					jobject jwindow = _jwindow;
-					if (jwindow) {
-						return (sl_real)(JWindow::getAlpha.callFloat(jwindow));
-					}
-					return sl_false;
-				}
-
-				sl_bool setAlpha(sl_real alpha)
+				sl_bool setAlpha(sl_real alpha) override
 				{
 					JniGlobal<jobject> _jwindow(m_window);
 					jobject jwindow = _jwindow;
@@ -401,17 +335,12 @@ namespace slib
 					return sl_false;
 				}
 
-				sl_bool isTransparent()
+				sl_bool setTransparent(sl_bool flag) override
 				{
 					return sl_false;
 				}
 
-				sl_bool setTransparent(sl_bool flag)
-				{
-					return sl_false;
-				}
-
-				UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen)
+				UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen) override
 				{
 					JniGlobal<jobject> _jwindow(m_window);
 					jobject jwindow = _jwindow;
@@ -427,7 +356,7 @@ namespace slib
 					return ptScreen;
 				}
 
-				UIPointf convertCoordinateFromWindowToScreen(const UIPointf& ptWindow)
+				UIPointf convertCoordinateFromWindowToScreen(const UIPointf& ptWindow) override
 				{
 					JniGlobal<jobject> _jwindow(m_window);
 					jobject jwindow = _jwindow;
@@ -443,32 +372,32 @@ namespace slib
 					return ptWindow;
 				}
 
-				UIPointf convertCoordinateFromScreenToClient(const UIPointf& ptScreen)
+				UIPointf convertCoordinateFromScreenToClient(const UIPointf& ptScreen) override
 				{
 					return convertCoordinateFromScreenToWindow(ptScreen);
 				}
 
-				UIPointf convertCoordinateFromClientToScreen(const UIPointf& ptClient)
+				UIPointf convertCoordinateFromClientToScreen(const UIPointf& ptClient) override
 				{
 					return convertCoordinateFromWindowToScreen(ptClient);
 				}
 
-				UIPointf convertCoordinateFromWindowToClient(const UIPointf& ptWindow)
+				UIPointf convertCoordinateFromWindowToClient(const UIPointf& ptWindow) override
 				{
 					return ptWindow;
 				}
 
-				UIPointf convertCoordinateFromClientToWindow(const UIPointf& ptClient)
+				UIPointf convertCoordinateFromClientToWindow(const UIPointf& ptClient) override
 				{
 					return ptClient;
 				}
 
-				UISize getWindowSizeFromClientSize(const UISize& size)
+				UISize getWindowSizeFromClientSize(const UISize& size) override
 				{
 					return size;
 				}
 
-				UISize getClientSizeFromWindowSize(const UISize& size)
+				UISize getClientSizeFromWindowSize(const UISize& size) override
 				{
 					return size;
 				}

@@ -280,12 +280,20 @@ namespace slib
 		}
 	}
 
-
-	void Window::setFocus()
+	sl_bool Window::isActive()
 	{
 		Ref<WindowInstance> instance = m_instance;
 		if (CHECK_INSTANCE(instance)) {
-			instance->setFocus();
+			return instance->isActive();
+		}
+		return sl_false;
+	}
+
+	void Window::activate()
+	{
+		Ref<WindowInstance> instance = m_instance;
+		if (CHECK_INSTANCE(instance)) {
+			instance->activate();
 		}
 	}
 
@@ -1302,22 +1310,22 @@ namespace slib
 		UI::dispatchToUiThread(SLIB_BIND_REF(void(), Window, doModal, this));
 	}
 	
-	void Window::addView(const Ref<View>& child)
+	void Window::addView(const Ref<View>& child, UIUpdateMode mode)
 	{
 		if (child.isNotNull()) {
 			Ref<View> view = m_viewContent;
 			if (view.isNotNull()) {
-				view->addChild(child);
+				view->addChild(child, mode);
 			}
 		}
 	}
 
-	void Window::removeView(const Ref<View>& child)
+	void Window::removeView(const Ref<View>& child, UIUpdateMode mode)
 	{
 		if (child.isNotNull()) {
 			Ref<View> view = m_viewContent;
 			if (view.isNotNull()) {
-				view->removeChild(child);
+				view->removeChild(child, mode);
 			}
 		}
 	}
@@ -1331,13 +1339,20 @@ namespace slib
 		return sl_null;
 	}
 
-	void Window::removeAllViews()
+	void Window::removeAllViews(UIUpdateMode mode)
 	{
 		Ref<View> view = m_viewContent;
 		if (view.isNotNull()) {
-			view->removeAllChildren();
+			view->removeAllChildren(mode);
 		}
 	}
+	
+#if !defined(SLIB_UI_IS_WIN32) && !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_GTK)
+	Ref<Window> Window::getActiveWindow()
+	{
+		return sl_null;
+	}
+#endif
 
 	SLIB_DEFINE_EVENT_HANDLER(Window, Create)
 	
