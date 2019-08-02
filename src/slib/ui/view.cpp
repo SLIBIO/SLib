@@ -7479,13 +7479,17 @@ namespace slib
 	void View::dispatchToDrawingThread(const Function<void()>& callback, sl_uint32 delayMillis)
 	{
 		if (m_instance.isNotNull()) {
-			UI::dispatchToUiThread(callback, delayMillis);
+			if (delayMillis) {
+				UI::dispatchToUiThread(callback, delayMillis);
+			} else {
+				UI::dispatchToUiThreadUrgently(callback);
+			}
 		} else {
 			Ref<View> parent = m_parent;
 			if (parent.isNotNull()) {
-				parent->dispatchToDrawingThread(callback);
+				parent->dispatchToDrawingThread(callback, delayMillis);
 			} else {
-				UI::dispatchToUiThread(callback);
+				UI::dispatchToUiThread(callback, delayMillis);
 			}
 		}
 	}

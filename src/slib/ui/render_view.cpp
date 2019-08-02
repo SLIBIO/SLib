@@ -200,8 +200,12 @@ namespace slib
 	void RenderView::dispatchToDrawingThread(const Function<void()>& callback, sl_uint32 delayMillis)
 	{
 		if (isNativeWidget()) {
-			m_queuePostedCallbacks.push(callback);
-			requestRender();
+			if (delayMillis) {
+				Dispatch::setTimeout(SLIB_BIND_WEAKREF(void(), RenderView, dispatchToDrawingThread, this, callback, 0), delayMillis);
+			} else {
+				m_queuePostedCallbacks.push(callback);
+				requestRender();
+			}
 		} else {
 			View::dispatchToDrawingThread(callback, delayMillis);
 		}

@@ -584,6 +584,13 @@ namespace slib
 		alert.show();
 	}
 	
+#if !defined(SLIB_UI_IS_MACOS)
+	void UI::dispatchToUiThreadUrgently(const Function<void()>& callback)
+	{
+		dispatchToUiThread(callback);
+	}
+#endif
+	
 	void UI::runOnUiThread(const Function<void()>& callback)
 	{
 		if (callback.isNotNull()) {

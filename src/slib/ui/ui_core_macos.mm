@@ -198,19 +198,31 @@ namespace slib
 		}
 		if (delayMillis == 0) {
 			if (UIDispatcher::addCallback(callback)) {
-				[NSApp postEvent:context->dispatchEvent atStart:NO];
+				[NSApp postEvent:context->dispatchEvent atStart:YES];
 			}
 		} else {
 			Function<void()> refCallback(callback);
 			dispatch_time_t t = dispatch_time(DISPATCH_TIME_NOW, (sl_int64)(delayMillis) * NSEC_PER_MSEC);
 			dispatch_after(t, dispatch_get_main_queue(), ^{
-				if (UIDispatcher::addCallback(refCallback)) {
-					[NSApp postEvent:context->dispatchEvent atStart:YES];
+				if ([[NSRunLoop currentRunLoop] currentMode] == NSEventTrackingRunLoopMode) {
+					refCallback();
+				} else {
+					if (UIDispatcher::addCallback(refCallback)) {
+						[NSApp postEvent:context->dispatchEvent atStart:YES];
+					}
 				}
 			});
 		}
 	}
 	
+	void UI::dispatchToUiThreadUrgently(const Function<void()>& callback)
+	{
+		Function<void()> refCallback(callback);
+		dispatch_async(dispatch_get_main_queue(), ^{
+			refCallback();
+		});
+	}
+
 	void UIPlatform::runLoop(sl_uint32 level)
 	{
 		StaticContext* context = GetStaticContext();

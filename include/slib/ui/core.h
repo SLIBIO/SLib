@@ -189,6 +189,8 @@ namespace slib
 		
 		static void dispatchToUiThread(const Function<void()>& callback, sl_uint32 delayMillis = 0);
 		
+		static void dispatchToUiThreadUrgently(const Function<void()>& callback);
+		
 		static void runOnUiThread(const Function<void()>& callback);
 		
 		static Function<void()> getCallbackOnUiThread(const Function<void()>& callback);
