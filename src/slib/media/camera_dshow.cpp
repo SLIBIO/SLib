@@ -115,11 +115,13 @@ namespace slib
 				}
 
 			public:
-				static void logError(String error) {
+				static void logError(String error)
+				{
 					Log("Camera", error);
 				}
 
-				static void logError(String error, HRESULT hr) {
+				static void logError(String error, HRESULT hr)
+				{
 					Log("Camera", "%s (Result=%d)", error, (sl_int32)hr);
 				}
 

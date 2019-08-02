@@ -24,6 +24,8 @@
 
 #include "slib/ui/resource.h"
 
+#include "slib/ui/core.h"
+
 #include "../resources.h"
 
 namespace slib
@@ -42,6 +44,10 @@ namespace slib
 	
 	CameraView::~CameraView()
 	{
+		Ref<Camera> camera = m_camera;
+		if (camera.isNotNull()) {
+			Dispatch::dispatch([camera]() {});
+		}
 	}
 
 	void CameraView::start()
