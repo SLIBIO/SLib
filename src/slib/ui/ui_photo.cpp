@@ -138,7 +138,7 @@ namespace slib
 			dlg->close(DialogResult::Ok);
 			thiz.onComplete(tr);
 		});
-		dlg->addView(camera);
+		dlg->addView(camera, UIUpdateMode::Init);
 		dlg->setOnClose([thiz](Window*, UIEvent*) {
 			TakePhotoResult result;
 			result.flagCancel = sl_true;
