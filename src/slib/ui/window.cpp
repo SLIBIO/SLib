@@ -1281,6 +1281,7 @@ namespace slib
 		if (!(UI::isUiThread())) {
 			return sl_null;
 		}
+		setDialog(sl_true);
 		setModal(sl_true);
 		forceCreate();
 		Ref<WindowInstance> instance = m_instance;
@@ -1416,7 +1417,7 @@ namespace slib
 
 	void Window::dispatchResize(sl_ui_len clientWidth, sl_ui_len clientHeight)
 	{
-		_refreshSize();
+		_refreshSize(UISize(clientWidth, clientHeight));
 		if (clientWidth > 0 && clientHeight > 0) {
 			Ref<View> viewContent = m_viewContent;
 			if (viewContent.isNotNull()) {
@@ -1447,7 +1448,7 @@ namespace slib
 
 	void Window::dispatchMaximize()
 	{
-		_refreshSize();
+		_refreshSize(getClientSize());
 		
 		SLIB_INVOKE_EVENT_HANDLER(Maximize)
 	}
@@ -1456,7 +1457,7 @@ namespace slib
 
 	void Window::dispatchDemaximize()
 	{
-		_refreshSize();
+		_refreshSize(getClientSize());
 		
 		SLIB_INVOKE_EVENT_HANDLER(Demaximize)
 	}
@@ -1502,13 +1503,13 @@ namespace slib
 		}
 	}
 
-	void Window::_refreshSize()
+	void Window::_refreshSize(const UISize& size)
 	{
 		Ref<View> view = m_viewContent;
 		if (view.isNotNull()) {
 			UIRect rect;
 			rect.setLeftTop(UIPoint::zero());
-			rect.setSize(getClientSize());
+			rect.setSize(size);
 			view->setFrame(rect);
 		}
 	}

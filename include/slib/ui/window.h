@@ -434,7 +434,7 @@ namespace slib
 		
 		void _attachContent();
 		
-		void _refreshSize();
+		void _refreshSize(const UISize& size);
 		
 		void _constrainSize(UISize& size, sl_bool flagAdjustHeight);
 		
