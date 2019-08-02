@@ -125,12 +125,20 @@ namespace slib
 		auto thiz = *this;
 		auto refDlg = New<ui::TakePhotoFromCameraDialog>();
 		auto dlg = refDlg.get();
-		dlg->camera->setOnTakePicture([thiz, dlg](CameraView*, CameraTakePictureResult& result) {
+		dlg->setParent(Window::getActiveWindow());
+		Ref<CameraView> camera = new CameraView;
+		camera->setWidthFilling(1, UIUpdateMode::Init);
+		camera->setHeightFilling(1, UIUpdateMode::Init);
+		camera->setAutoStart(sl_true);
+		camera->setScaleMode(ScaleMode::Cover);
+		camera->setControlsVisible(sl_true, UIUpdateMode::Init);
+		camera->setOnTakePicture([thiz, dlg](CameraView*, CameraTakePictureResult& result) {
 			priv::ui_photo::TakePhotoResultEx tr;
 			tr.setResult(result.getImage());
 			dlg->close(DialogResult::Ok);
 			thiz.onComplete(tr);
 		});
+		dlg->addView(camera);
 		dlg->setOnClose([thiz](Window*, UIEvent*) {
 			TakePhotoResult result;
 			result.flagCancel = sl_true;

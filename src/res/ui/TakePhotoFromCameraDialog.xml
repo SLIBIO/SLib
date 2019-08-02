@@ -8,15 +8,5 @@
 		centerScreen='true'
 		>
 		
-		<camera
-			name='camera'
-			width='fill'
-			height='fill'
-			autoStart='true'
-			device='front'
-			scale='cover'
-			controls='true'
-			/>
-
  	</layout>
 </sapp>
