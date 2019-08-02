@@ -32,17 +32,17 @@ namespace slib
 		namespace ui_core
 		{
 			
-			SLIB_SAFE_STATIC_GETTER(LinkedQueue< Function<void()> >, getDispatchQueue);
+			SLIB_SAFE_STATIC_GETTER(LinkedQueue< Function<void()> >, GetDispatchQueue)
 			
 			typedef CHashMap< sl_reg, Function<void()> > DelayedDispatchMap;
-			SLIB_SAFE_STATIC_GETTER(DelayedDispatchMap, getDelayedDispatchMap);
+			SLIB_SAFE_STATIC_GETTER(DelayedDispatchMap, GetDelayedDispatchMap)
 			sl_reg g_idLastDelayedDispatch = 0;
 			
 
 			sl_bool UIDispatcher::addCallback(const Function<void()>& callback)
 			{
 				if (callback.isNotNull()) {
-					LinkedQueue< Function<void()> >* queue = getDispatchQueue();
+					LinkedQueue< Function<void()> >* queue = GetDispatchQueue();
 					if (queue) {
 						return queue->push(callback);
 					}
@@ -52,7 +52,7 @@ namespace slib
 			
 			void UIDispatcher::processCallbacks()
 			{
-				LinkedQueue< Function<void()> >* queue = getDispatchQueue();
+				LinkedQueue< Function<void()> >* queue = GetDispatchQueue();
 				if (queue) {
 					sl_size n = queue->getCount();
 					Function<void()> callback;
@@ -66,7 +66,7 @@ namespace slib
 			sl_bool UIDispatcher::addDelayedCallback(const Function<void()>& callback, sl_reg& outId)
 			{
 				if (callback.isNotNull()) {
-					DelayedDispatchMap* map = getDelayedDispatchMap();
+					DelayedDispatchMap* map = GetDelayedDispatchMap();
 					if (map) {
 						sl_reg id = Base::interlockedIncrement(&g_idLastDelayedDispatch);
 						if (map->put(id, callback)) {
@@ -80,7 +80,7 @@ namespace slib
 			
 			void UIDispatcher::processDelayedCallback(sl_reg id)
 			{
-				DelayedDispatchMap* map = getDelayedDispatchMap();
+				DelayedDispatchMap* map = GetDelayedDispatchMap();
 				if (map) {
 					Function<void()> callback;
 					if (map->get(id, &callback)) {
@@ -92,11 +92,11 @@ namespace slib
 			
 			void UIDispatcher::removeAllCallbacks()
 			{
-				LinkedQueue< Function<void()> >* queue = getDispatchQueue();
+				LinkedQueue< Function<void()> >* queue = GetDispatchQueue();
 				if (queue) {
 					queue->removeAll();
 				}
-				DelayedDispatchMap* map = getDelayedDispatchMap();
+				DelayedDispatchMap* map = GetDelayedDispatchMap();
 				if (map) {
 					map->removeAll();
 				}
