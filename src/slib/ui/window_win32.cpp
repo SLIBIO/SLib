@@ -160,6 +160,7 @@ namespace slib
 					HWND hWnd = m_handle;
 					if (hWnd) {
 						m_handle = NULL;
+						_setMenu(hWnd, NULL);
 						UIPlatform::removeWindowInstance(hWnd);
 						m_viewContent.setNull();
 						if (m_flagDestroyOnRelease) {
@@ -201,8 +202,18 @@ namespace slib
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						SetMenu(hWnd, UIPlatform::getMenuHandle(menu));
+						_setMenu(hWnd, UIPlatform::getMenuHandle(menu));
 					}
+				}
+
+				void _setMenu(HWND hWnd, HMENU hMenu)
+				{
+					HMENU hMenuOld = GetMenu(hWnd);
+					Ref<Menu> menuOld = UIPlatform::getMenu(hMenuOld);
+					if (menuOld.isNull()) {
+						DestroyMenu(hMenuOld);
+					}
+					SetMenu(hWnd, hMenu);
 				}
 
 				sl_bool isActive() override
