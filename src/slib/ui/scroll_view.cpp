@@ -73,7 +73,7 @@ namespace slib
 				view->setLeftFree(UIUpdateMode::Init);
 				view->setRightFree(UIUpdateMode::Init);
 			}
-			addChild(view);
+			addChild(view, uiUpdateModeNone);
 			ViewGroup::setContentSize(view->getWidth(), view->getHeight(), uiUpdateModeNone);
 		} else {
 			ViewGroup::setContentSize(0, 0, uiUpdateModeNone);
@@ -94,6 +94,11 @@ namespace slib
 	
 	void ScrollView::setContentSize(sl_scroll_pos _width, sl_scroll_pos _height, UIUpdateMode mode)
 	{
+		_initializeScrollAttributes();
+		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
+		if (attrs.isNull()) {
+			return;
+		}
 		sl_ui_pos width = (sl_ui_pos)(_width);
 		if (width < 0) {
 			width = 0;
@@ -101,6 +106,11 @@ namespace slib
 		sl_ui_pos height = (sl_ui_pos)(_height);
 		if (height < 0) {
 			height = 0;
+		}
+		if (Math::isAlmostZero(width - attrs->contentWidth) && Math::isAlmostZero(height - attrs->contentHeight)) {
+			attrs->contentWidth = width;
+			attrs->contentHeight = height;
+			return;
 		}
 		ObjectLocker lock(this);
 		Ref<View> viewContent = m_viewContent;

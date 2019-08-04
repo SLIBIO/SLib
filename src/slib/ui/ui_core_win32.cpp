@@ -206,15 +206,16 @@ namespace slib
 				while (GetMessageW(&msg, NULL, 0, 0)) {
 					if (msg.message == WM_QUIT) {
 						break;
-					}
-					if (msg.message == SLIB_UI_MESSAGE_DISPATCH) {
+					} else if (msg.message == SLIB_UI_MESSAGE_DISPATCH) {
 						UIDispatcher::processCallbacks();
 					} else if (msg.message == SLIB_UI_MESSAGE_DISPATCH_DELAYED) {
 						UIDispatcher::processDelayedCallback((sl_reg)(msg.lParam));
 					} else if (msg.message == SLIB_UI_MESSAGE_CLOSE || msg.message == WM_DESTROY) {
 						DestroyWindow(msg.hwnd);
-						if (msg.hwnd == hWndModalDialog) {
-							break;
+						if (hWndModalDialog) {
+							if (msg.hwnd == hWndModalDialog) {
+								break;
+							}
 						}
 					} else if (msg.message == WM_MENUCOMMAND) {
 						priv::menu::ProcessMenuCommand(msg.wParam, msg.lParam);
@@ -353,7 +354,7 @@ namespace slib
 
 		UIApp::dispatchStartToApp();
 
-		runLoop(0);
+		RunLoop(NULL);
 
 		UIApp::dispatchExitToApp();
 

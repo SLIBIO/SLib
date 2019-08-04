@@ -42,6 +42,11 @@ namespace slib
 			void RunLoop(HWND hWndModalDialog);
 		}
 
+		namespace view
+		{
+			extern sl_bool g_flagDuringPaint;
+		}
+
 		namespace window
 		{
 
@@ -327,6 +332,10 @@ namespace slib
 
 				sl_bool setBackgroundColor(const Color& color) override
 				{
+					if (!(UI::isUiThread()) || priv::view::g_flagDuringPaint) {
+						UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), WindowInstance, setBackgroundColor, this, color));
+						return sl_true;
+					}
 					HWND hWnd = m_handle;
 					if (hWnd) {
 						m_backgroundColor = color;

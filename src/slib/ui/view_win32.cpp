@@ -169,8 +169,12 @@ namespace slib
 				return CaptureChildInstanceEvents(view, uMsg);
 			}
 
+			sl_bool g_flagDuringPaint = sl_false;
+
 		}
 	}
+
+	using namespace priv::view;
 
 	Win32_ViewInstance::Win32_ViewInstance()
 	{
@@ -271,6 +275,11 @@ namespace slib
 
 	void Win32_ViewInstance::invalidate()
 	{
+		if (!(UI::isUiThread()) || g_flagDuringPaint) {
+			void (ViewInstance::*func)() = &ViewInstance::invalidate;
+			UI::dispatchToUiThread(Function<void()>::fromWeakRef(WeakRef<ViewInstance>(this), func));
+			return;
+		}
 		HWND hWnd = m_handle;
 		if (hWnd) {
 			InvalidateRect(hWnd, NULL, TRUE);
@@ -279,6 +288,11 @@ namespace slib
 
 	void Win32_ViewInstance::invalidate(const UIRect& rect)
 	{
+		if (!(UI::isUiThread()) || g_flagDuringPaint) {
+			void (ViewInstance::*func)(const UIRect&) = &ViewInstance::invalidate;
+			UI::dispatchToUiThread(Function<void()>::bindWeakRef(WeakRef<ViewInstance>(this), func, rect));
+			return;
+		}
 		HWND hWnd = m_handle;
 		if (hWnd) {
 			RECT rc;
@@ -633,7 +647,9 @@ namespace slib
 							Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, &graphics, rect.right, rect.bottom, sl_false);
 							if (canvas.isNotNull()) {
 								canvas->setInvalidatedRect(Rectangle((sl_real)(ps.rcPaint.left), (sl_real)(ps.rcPaint.top), (sl_real)(ps.rcPaint.right), (sl_real)(ps.rcPaint.bottom)));
+								g_flagDuringPaint = sl_true;
 								onDraw(canvas.get());
+								g_flagDuringPaint = sl_false;
 							}
 						}
 						EndPaint(hWnd, &ps);

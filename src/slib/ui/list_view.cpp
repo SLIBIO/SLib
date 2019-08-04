@@ -74,7 +74,6 @@ namespace slib
 				}
 				
 			protected:
-				
 				void dispatchDraw(Canvas* canvas) override
 				{
 					Ref<ListView> lv = m_listView;
@@ -142,7 +141,7 @@ namespace slib
 
 		m_contentView = new priv::list_view::ContentView;
 		m_contentView->setListView(this);
-		ScrollView::setContentView(m_contentView);		
+		setContentView(m_contentView, UIUpdateMode::Init);
 	}
 	
 	Ref<ViewAdapter> ListView::getAdapter()
