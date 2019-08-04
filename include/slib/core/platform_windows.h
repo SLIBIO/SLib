@@ -36,6 +36,37 @@
 namespace slib
 {
 
+#define PRIV_SLIB_WORKSTATION_VERSION_CODE(MAJOR, MINOR, SP) ((MAJOR << 16) | (MINOR << 8) | SP)
+#define PRIV_SLIB_SERVER_VERSION_CODE(MAJOR, MINOR, SP) (0x01000000 | (MAJOR << 16) | (MINOR << 8) | SP)
+
+#define SLIB_WINDOWS_MAJOR_VERSION(v) ((((int)v) >> 16) & 255)
+#define SLIB_WINDOWS_MINOR_VERSION(v) ((((int)v) >> 8) & 255)
+#define SLIB_WINDOWS_SERVICE_PACK(v) (((int)v) & 255)
+
+
+	enum class WindowsVersion
+	{
+		XP = PRIV_SLIB_WORKSTATION_VERSION_CODE(5, 1, 0),
+		XP_SP1 = PRIV_SLIB_WORKSTATION_VERSION_CODE(5, 1, 1),
+		XP_SP2 = PRIV_SLIB_WORKSTATION_VERSION_CODE(5, 1, 2),
+		XP_SP3 = PRIV_SLIB_WORKSTATION_VERSION_CODE(5, 1, 3),
+		XP_64 = PRIV_SLIB_WORKSTATION_VERSION_CODE(5, 2, 0),
+		Vista = PRIV_SLIB_WORKSTATION_VERSION_CODE(6, 0, 0),
+		Vista_SP1 = PRIV_SLIB_WORKSTATION_VERSION_CODE(6, 0, 1),
+		Vista_SP2 = PRIV_SLIB_WORKSTATION_VERSION_CODE(6, 0, 2),
+		Windows7 = PRIV_SLIB_WORKSTATION_VERSION_CODE(6, 1, 0),
+		Windows7_SP1 = PRIV_SLIB_WORKSTATION_VERSION_CODE(6, 1, 1),
+		Windows8 = PRIV_SLIB_WORKSTATION_VERSION_CODE(6, 2, 0),
+		Windows8_1 = PRIV_SLIB_WORKSTATION_VERSION_CODE(6, 3, 0),
+		Windows10 = PRIV_SLIB_WORKSTATION_VERSION_CODE(10, 0, 0),
+		Server2003 = PRIV_SLIB_SERVER_VERSION_CODE(5, 2, 0),
+		Server2008 = PRIV_SLIB_SERVER_VERSION_CODE(6, 0, 0),
+		Server2008_R2 = PRIV_SLIB_SERVER_VERSION_CODE(6, 1, 0),
+		Server2012 = PRIV_SLIB_SERVER_VERSION_CODE(6, 2, 0),
+		Server2012_R2 = PRIV_SLIB_SERVER_VERSION_CODE(6, 3, 0),
+		Server2016 = PRIV_SLIB_SERVER_VERSION_CODE(10, 0, 0)
+	};
+
 	typedef sl_bool(*WINDOWS_DEBUG_ALLOC_HOOK)(void* ptr, sl_size size);
 	
 	typedef BOOL (WINAPI *WINAPI_GetQueuedCompletionStatusEx)
@@ -156,6 +187,8 @@ namespace slib
 	
 		static sl_bool setRegistryValue(HKEY hKey, const String16& subPath, const String16& name, const Variant& value);
 	
+
+		static WindowsVersion getVersion();
 
 		static sl_bool isCurrentProcessInAdminGroup();
 

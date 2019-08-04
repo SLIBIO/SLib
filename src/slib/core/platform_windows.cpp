@@ -333,7 +333,7 @@ namespace slib
 		{
 			WINDOWS_DEBUG_ALLOC_HOOK g_debugAllocHook;
 
-			int DebugAllocHook(int allocType, void *userData, size_t size, int blockType, long requestNumber, const unsigned char *filename, int lineNumber)
+			int DebugAllocHook(int allocType, void* userData, size_t size, int blockType, long requestNumber, const unsigned char* filename, int lineNumber)
 			{
 				return g_debugAllocHook(userData, (sl_size)size);
 			}
@@ -385,21 +385,21 @@ namespace slib
 	}
 
 	LOAD_LIBRARY(kernel32, "kernel32.dll")
-	GET_API(kernel32, GetQueuedCompletionStatusEx)
-	GET_API(kernel32, GetUserDefaultLocaleName)
-	GET_API(kernel32, GetTickCount64)
+		GET_API(kernel32, GetQueuedCompletionStatusEx)
+		GET_API(kernel32, GetUserDefaultLocaleName)
+		GET_API(kernel32, GetTickCount64)
 
-	LOAD_LIBRARY(user32, "user32.dll")
-	GET_API(user32, ShowScrollBar)
+		LOAD_LIBRARY(user32, "user32.dll")
+		GET_API(user32, ShowScrollBar)
 
-	LOAD_LIBRARY(wininet, "wininet.dll")
+		LOAD_LIBRARY(wininet, "wininet.dll")
 
-	LOAD_LIBRARY(bcrypt, "bcrypt.dll")
-	GET_API(bcrypt, BCryptOpenAlgorithmProvider)
-	GET_API(bcrypt, BCryptCloseAlgorithmProvider)
-	GET_API(bcrypt, BCryptGenRandom)
+		LOAD_LIBRARY(bcrypt, "bcrypt.dll")
+		GET_API(bcrypt, BCryptOpenAlgorithmProvider)
+		GET_API(bcrypt, BCryptCloseAlgorithmProvider)
+		GET_API(bcrypt, BCryptGenRandom)
 
-	sl_bool Windows::getRegistryValue(HKEY hKeyParent, const String16& path, const String16& name, Variant* out)
+		sl_bool Windows::getRegistryValue(HKEY hKeyParent, const String16& path, const String16& name, Variant* out)
 	{
 		if (!hKeyParent) {
 			return sl_false;
@@ -426,61 +426,61 @@ namespace slib
 			if (out) {
 				if (size > 0) {
 					switch (type) {
-						case REG_BINARY:
-						case REG_MULTI_SZ:
-							{
-								SLIB_SCOPED_BUFFER(BYTE, 512, buf, size);
-								if (ERROR_SUCCESS == RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, buf, &size)) {
-									Memory mem = Memory::create(buf, size);
-									if (mem.isNotNull()) {
-										out->setMemory(mem);
-										flagSuccess = sl_true;
-									}
-								}
+					case REG_BINARY:
+					case REG_MULTI_SZ:
+					{
+						SLIB_SCOPED_BUFFER(BYTE, 512, buf, size);
+						if (ERROR_SUCCESS == RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, buf, &size)) {
+							Memory mem = Memory::create(buf, size);
+							if (mem.isNotNull()) {
+								out->setMemory(mem);
+								flagSuccess = sl_true;
 							}
-							break;
-						case REG_EXPAND_SZ:
-						case REG_SZ:
-							{
-								SLIB_SCOPED_BUFFER(BYTE, 512, buf, size);
-								if (ERROR_SUCCESS == RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, buf, &size)) {
-									String16 s(reinterpret_cast<sl_char16*>(buf), size / 2 - 1);
-									out->setString(s);
+						}
+					}
+					break;
+					case REG_EXPAND_SZ:
+					case REG_SZ:
+					{
+						SLIB_SCOPED_BUFFER(BYTE, 512, buf, size);
+						if (ERROR_SUCCESS == RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, buf, &size)) {
+							String16 s(reinterpret_cast<sl_char16*>(buf), size / 2 - 1);
+							out->setString(s);
+							flagSuccess = sl_true;
+						}
+					}
+					break;
+					case REG_DWORD:
+					case REG_DWORD_BIG_ENDIAN:
+						if (size == 4) {
+							sl_uint32 n;
+							if (ERROR_SUCCESS == RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, reinterpret_cast<BYTE*>(&n), &size)) {
+								if (size == 4) {
+									if (type == REG_DWORD) {
+										out->setUint32(n);
+									} else {
+										out->setUint32(Endian::swap32(n));
+									}
 									flagSuccess = sl_true;
 								}
 							}
-							break;
-						case REG_DWORD:
-						case REG_DWORD_BIG_ENDIAN:
-							if (size == 4) {
-								sl_uint32 n;
-								if (ERROR_SUCCESS == RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, reinterpret_cast<BYTE*>(&n), &size)) {
-									if (size == 4) {
-										if (type == REG_DWORD) {
-											out->setUint32(n);
-										} else {
-											out->setUint32(Endian::swap32(n));
-										}
-										flagSuccess = sl_true;
-									}
+						}
+						break;
+					case REG_QWORD:
+						if (size == 8) {
+							sl_uint64 n;
+							if (ERROR_SUCCESS == RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, reinterpret_cast<BYTE*>(&n), &size)) {
+								if (size == 8) {
+									out->setUint64(n);
+									flagSuccess = sl_true;
 								}
 							}
-							break;
-						case REG_QWORD:
-							if (size == 8) {
-								sl_uint64 n;
-								if (ERROR_SUCCESS == RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, reinterpret_cast<BYTE*>(&n), &size)) {
-									if (size == 8) {
-										out->setUint64(n);
-										flagSuccess = sl_true;
-									}
-								}
-							}
-							break;
-						default: // REG_NONE
-							out->setNull();
-							flagSuccess = sl_true;
-							break;
+						}
+						break;
+					default: // REG_NONE
+						out->setNull();
+						flagSuccess = sl_true;
+						break;
 					}
 				} else {
 					out->setNull();
@@ -553,40 +553,134 @@ namespace slib
 		return flagSuccess;
 	}
 
+	namespace priv
+	{
+		namespace platform
+		{
+
+			// From VersionHelpers.h
+			static sl_bool IsWindowsVersionOrGreater(WindowsVersion version)
+			{
+				OSVERSIONINFOEXW osvi = { sizeof(osvi), 0, 0, 0, 0, {0}, 0, 0 };
+				DWORDLONG const dwlConditionMask = VerSetConditionMask(
+					VerSetConditionMask(
+						VerSetConditionMask(
+							0, VER_MAJORVERSION, VER_GREATER_EQUAL),
+						VER_MINORVERSION, VER_GREATER_EQUAL),
+					VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL);
+				osvi.dwMajorVersion = SLIB_WINDOWS_MAJOR_VERSION(version);
+				osvi.dwMinorVersion = SLIB_WINDOWS_MINOR_VERSION(version);
+				osvi.wServicePackMajor = SLIB_WINDOWS_SERVICE_PACK(version);
+				return VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR, dwlConditionMask) != FALSE;
+			}
+
+			static sl_bool IsWindowsServer()
+			{
+				OSVERSIONINFOEXW osvi = { sizeof(osvi), 0, 0, 0, 0, {0}, 0, 0, 0, VER_NT_WORKSTATION };
+				DWORDLONG const dwlConditionMask = VerSetConditionMask(0, VER_PRODUCT_TYPE, VER_EQUAL);
+				return !VerifyVersionInfoW(&osvi, VER_PRODUCT_TYPE, dwlConditionMask);
+			}
+
+			static WindowsVersion GetWindowsVersion()
+			{
+				if (IsWindowsServer()) {
+					if (IsWindowsVersionOrGreater(WindowsVersion::Server2016)) {
+						return WindowsVersion::Server2016;
+					}
+					if (IsWindowsVersionOrGreater(WindowsVersion::Server2012_R2)) {
+						return WindowsVersion::Server2012_R2;
+					}
+					if (IsWindowsVersionOrGreater(WindowsVersion::Server2012)) {
+						return WindowsVersion::Server2012;
+					}
+					if (IsWindowsVersionOrGreater(WindowsVersion::Server2008_R2)) {
+						return WindowsVersion::Server2008_R2;
+					}
+					if (IsWindowsVersionOrGreater(WindowsVersion::Server2008)) {
+						return WindowsVersion::Server2008;
+					}
+					return WindowsVersion::Server2003;
+				} else {
+					if (IsWindowsVersionOrGreater(WindowsVersion::Windows10)) {
+						return WindowsVersion::Windows10;
+					}
+					if (IsWindowsVersionOrGreater(WindowsVersion::Windows8_1)) {
+						return WindowsVersion::Windows8_1;
+					}
+					if (IsWindowsVersionOrGreater(WindowsVersion::Windows8)) {
+						return WindowsVersion::Windows8;
+					}
+					if (IsWindowsVersionOrGreater(WindowsVersion::Windows7_SP1)) {
+						return WindowsVersion::Windows7_SP1;
+					}
+					if (IsWindowsVersionOrGreater(WindowsVersion::Windows7)) {
+						return WindowsVersion::Windows7;
+					}
+					if (IsWindowsVersionOrGreater(WindowsVersion::Vista_SP2)) {
+						return WindowsVersion::Vista_SP2;
+					}
+					if (IsWindowsVersionOrGreater(WindowsVersion::Vista_SP1)) {
+						return WindowsVersion::Vista_SP1;
+					}
+					if (IsWindowsVersionOrGreater(WindowsVersion::Vista)) {
+						return WindowsVersion::Vista;
+					}
+					if (IsWindowsVersionOrGreater(WindowsVersion::XP_64)) {
+						return WindowsVersion::XP_64;
+					}
+					if (IsWindowsVersionOrGreater(WindowsVersion::XP_SP3)) {
+						return WindowsVersion::XP_SP3;
+					}
+					if (IsWindowsVersionOrGreater(WindowsVersion::XP_SP2)) {
+						return WindowsVersion::XP_SP2;
+					}
+					if (IsWindowsVersionOrGreater(WindowsVersion::XP_SP1)) {
+						return WindowsVersion::XP_SP1;
+					}
+					return WindowsVersion::XP;
+				}
+			}
+
+		}
+	}
+
+	WindowsVersion Windows::getVersion()
+	{
+		return priv::platform::GetWindowsVersion();
+	}
+
 	sl_bool Windows::isCurrentProcessInAdminGroup()
 	{
 		BOOL flagResult = FALSE;
 		HANDLE hToken;
 		if (::OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY | TOKEN_DUPLICATE, &hToken)) {
-			OSVERSIONINFOW osver = { sizeof(osver) };
-			if (::GetVersionExW(&osver)) {
-				sl_bool flagError = sl_false;
-				HANDLE hTokenToCheck = NULL;
-				if (osver.dwMajorVersion >= 6) { // Windows Vista or later
-					TOKEN_ELEVATION_TYPE elevType;
-					DWORD cbSize = 0;
-					if (::GetTokenInformation(hToken, TokenElevationType, &elevType, sizeof(elevType), &cbSize)) {
-						if (elevType == TokenElevationTypeLimited) {
-							if (!::GetTokenInformation(hToken, TokenLinkedToken, &hTokenToCheck, sizeof(hTokenToCheck), &cbSize)) {
-								flagError = sl_true;
-							}
+			WindowsVersion version = priv::platform::GetWindowsVersion();
+			sl_bool flagError = sl_false;
+			HANDLE hTokenToCheck = NULL;
+			if (SLIB_WINDOWS_MAJOR_VERSION(version) >= 6) { // Windows Vista or later
+				TOKEN_ELEVATION_TYPE elevType;
+				DWORD cbSize = 0;
+				if (::GetTokenInformation(hToken, TokenElevationType, &elevType, sizeof(elevType), &cbSize)) {
+					if (elevType == TokenElevationTypeLimited) {
+						if (!::GetTokenInformation(hToken, TokenLinkedToken, &hTokenToCheck, sizeof(hTokenToCheck), &cbSize)) {
+							flagError = sl_true;
 						}
-					} else {
-						flagError = sl_true;
 					}
+				} else {
+					flagError = sl_true;
 				}
-				if (!flagError) {
-					if (!hTokenToCheck) {
-						DuplicateToken(hToken, SecurityIdentification, &hTokenToCheck);
+			}
+			if (!flagError) {
+				if (!hTokenToCheck) {
+					DuplicateToken(hToken, SecurityIdentification, &hTokenToCheck);
+				}
+				if (hTokenToCheck) {
+					BYTE adminSID[SECURITY_MAX_SID_SIZE];
+					DWORD cbSize = sizeof(adminSID);
+					if (::CreateWellKnownSid(WinBuiltinAdministratorsSid, NULL, &adminSID, &cbSize)) {
+						CheckTokenMembership(hTokenToCheck, &adminSID, &flagResult);
 					}
-					if (hTokenToCheck) {
-						BYTE adminSID[SECURITY_MAX_SID_SIZE];
-						DWORD cbSize = sizeof(adminSID);
-						if (::CreateWellKnownSid(WinBuiltinAdministratorsSid, NULL, &adminSID, &cbSize)) {
-							CheckTokenMembership(hTokenToCheck, &adminSID, &flagResult);
-						}
-						CloseHandle(hTokenToCheck);
-					}
+					CloseHandle(hTokenToCheck);
 				}
 			}
 			CloseHandle(hToken);

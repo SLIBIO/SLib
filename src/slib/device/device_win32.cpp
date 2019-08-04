@@ -27,8 +27,7 @@
 #include "slib/device/device.h"
 
 #include "slib/core/variant.h"
-
-#include <windows.h>
+#include "slib/core/platform_windows.h"
 
 namespace slib
 {
@@ -51,16 +50,11 @@ namespace slib
 		}
 		return "unknown";
 	}
-	
+
 	String Device::getSystemVersion()
 	{
-		OSVERSIONINFOEXW vi;
-		Base::zeroMemory(&vi, sizeof(vi));
-		vi.dwOSVersionInfoSize = sizeof(vi);
-		if (::GetVersionExW((OSVERSIONINFOW*)&vi)) {
-			return String::format("%d.%d", vi.dwMajorVersion, vi.dwMinorVersion);
-		}
-		return sl_null;
+		WindowsVersion version = Windows::getVersion();
+		return String::format("%d.%d", SLIB_WINDOWS_MAJOR_VERSION(version), SLIB_WINDOWS_MINOR_VERSION(version));
 	}
 	
 	/*
@@ -69,69 +63,47 @@ namespace slib
 	*/
 	String Device::getSystemName()
 	{
-		OSVERSIONINFOEXW vi;
-		Base::zeroMemory(&vi, sizeof(vi));
-		vi.dwOSVersionInfoSize = sizeof(vi);
-		if (::GetVersionExW((OSVERSIONINFOW*)&vi)) {
-			switch (vi.dwMajorVersion) {
-			case 10:
-				if (vi.dwMinorVersion == 0) {
-					if (vi.wProductType != VER_NT_WORKSTATION) {
-						return "Windows Server 2016";
-					}
-				}
-				break;
-			case 6:
-				switch (vi.dwMinorVersion) {
-				case 3:
-					if (vi.wProductType == VER_NT_WORKSTATION) {
-						return "Windows 8.1";
-					} else {
-						return "Windows Server 2012 R2";
-					}
-				case 2:
-					if (vi.wProductType == VER_NT_WORKSTATION) {
-						return "Windows 8";
-					} else {
-						return "Windows Server 2012";
-					}
-				case 1:
-					if (vi.wProductType == VER_NT_WORKSTATION) {
-						return "Windows 7";
-					} else {
-						return "Windows Server 2008 R2";
-					}
-				case 0:
-					if (vi.wProductType == VER_NT_WORKSTATION) {
-						return "Windows Vista";
-					} else {
-						return "Windows Server 2008";
-					}
-				}
-				break;
-			case 5:
-				switch (vi.dwMinorVersion) {
-				case 2:
-					if (vi.wProductType == VER_NT_WORKSTATION) {
-						return "Windows XP Professional x64 Edition";
-					} else {
-						if (GetSystemMetrics(SM_SERVERR2) != 0) {
-							return "Windows Server 2003 R2";
-						} else if (vi.wSuiteMask & VER_SUITE_WH_SERVER) {
-							return "Windows Home Server";
-						} else {
-							return "Windows Server 2003";
-						}
-					}
-				case 1:
-					return "Windows XP";
-				case 0:
-					return "Windows 2000";
-				}
-				break;
-			}
+		WindowsVersion version = Windows::getVersion();
+		switch (version) {
+		case WindowsVersion::Server2016:
+			return "Windows Server 2016";
+		case WindowsVersion::Server2012_R2:
+			return "Windows Server 2012 R2";
+		case WindowsVersion::Server2012:
+			return "Windows Server 2012";
+		case WindowsVersion::Server2008_R2:
+			return "Windows Server 2008 R2";
+		case WindowsVersion::Server2008:
+			return "Windows Server 2008";
+		case WindowsVersion::Server2003:
+			return "Windows Server 2003";
+		case WindowsVersion::Windows10:
+			return "Windows 10";
+		case WindowsVersion::Windows8_1:
+			return "Windows 8.1";
+		case WindowsVersion::Windows8:
+			return "Windows 8";
+		case WindowsVersion::Windows7_SP1:
+			return "Windows 7 SP1";
+		case WindowsVersion::Windows7:
+			return "Windows 7";
+		case WindowsVersion::Vista_SP2:
+			return "Windows Vista SP2";
+		case WindowsVersion::Vista_SP1:
+			return "Windows Vista SP1";
+		case WindowsVersion::Vista:
+			return "Windows Vista";
+		case WindowsVersion::XP_64:
+			return "Windows XP 64bit";
+		case WindowsVersion::XP_SP3:
+			return "Windows XP SP3";
+		case WindowsVersion::XP_SP2:
+			return "Windows XP SP2";
+		case WindowsVersion::XP_SP1:
+			return "Windows XP SP1";
+		default:
+			return "Windows XP";
 		}
-		return String::format("Windows %s", getSystemVersion());
 	}
 	
 	double Device::getScreenPPI()
