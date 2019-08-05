@@ -30,6 +30,8 @@
 #include "oned/ODUPCAWriter.h"
 #include "oned/ODUPCEWriter.h"
 
+#include <stdexcept>
+
 namespace ZXing {
 
 namespace {

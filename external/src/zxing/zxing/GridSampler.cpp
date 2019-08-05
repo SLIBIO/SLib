@@ -20,6 +20,8 @@
 #include "BitMatrix.h"
 #include "DecodeStatus.h"
 
+#include <stdexcept>
+
 namespace ZXing {
 
 namespace {

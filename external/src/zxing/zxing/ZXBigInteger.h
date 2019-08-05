@@ -18,6 +18,7 @@
 #include <cstdlib>
 #include <type_traits>
 #include <vector>
+#include <ostream>
 #include <string>
 #include <iosfwd>
 
