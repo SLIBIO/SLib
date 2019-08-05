@@ -25,7 +25,6 @@
     <ProjectGuid>{6AB2A19A-CCF1-4EA2-9CB1-7175B7F85EB2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>sapp</RootNamespace>
-    <WindowsTargetPlatformVersion>7.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

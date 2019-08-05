@@ -31,6 +31,8 @@
 #include <signal.h>
 #include <float.h>
 #include <conio.h>
+
+#pragma warning(disable: 4091)
 #include <shlobj.h>
 
 #if defined(SLIB_PLATFORM_IS_UWP)

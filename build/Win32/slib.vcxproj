@@ -419,7 +419,6 @@
     <ProjectGuid>{FF088AB2-B7A3-4548-8608-4DFACDE182A2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>slib</RootNamespace>
-    <WindowsTargetPlatformVersion>7.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

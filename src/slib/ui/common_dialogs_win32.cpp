@@ -34,7 +34,7 @@
 #include "ui_core_win32.h"
 
 #pragma warning(disable: 4091)
-#include <ShlObj.h>
+#include <shlobj.h>
 
 namespace slib
 {
