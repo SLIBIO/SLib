@@ -136,6 +136,30 @@ namespace slib
 
 		T getValueAt(sl_size index, const T& def) const noexcept;
 
+		sl_bool getFirst_NoLock(T* _out = sl_null) const noexcept;
+		
+		sl_bool getFirst(T* _out = sl_null) const noexcept;
+		
+		T getFirstValue_NoLock() const noexcept;
+		
+		T getFirstValue() const noexcept;
+		
+		T getFirstValue_NoLock(const T& def) const noexcept;
+		
+		T getFirstValue(const T& def) const noexcept;
+
+		sl_bool getLast_NoLock(T* _out = sl_null) const noexcept;
+		
+		sl_bool getLast(T* _out = sl_null) const noexcept;
+		
+		T getLastValue_NoLock() const noexcept;
+		
+		T getLastValue() const noexcept;
+		
+		T getLastValue_NoLock(const T& def) const noexcept;
+		
+		T getLastValue(const T& def) const noexcept;
+
 		template <class VALUE>
 		sl_bool setAt_NoLock(sl_size index, VALUE&& value) const noexcept;
 
@@ -427,6 +451,30 @@ namespace slib
 
 		T getValueAt(sl_size index, const T& def) const noexcept;
 
+		sl_bool getFirst_NoLock(T* _out = sl_null) const noexcept;
+		
+		sl_bool getFirst(T* _out = sl_null) const noexcept;
+		
+		T getFirstValue_NoLock() const noexcept;
+		
+		T getFirstValue() const noexcept;
+		
+		T getFirstValue_NoLock(const T& def) const noexcept;
+		
+		T getFirstValue(const T& def) const noexcept;
+		
+		sl_bool getLast_NoLock(T* _out = sl_null) const noexcept;
+		
+		sl_bool getLast(T* _out = sl_null) const noexcept;
+		
+		T getLastValue_NoLock() const noexcept;
+		
+		T getLastValue() const noexcept;
+		
+		T getLastValue_NoLock(const T& def) const noexcept;
+		
+		T getLastValue(const T& def) const noexcept;
+
 		template <class VALUE>
 		sl_bool setAt_NoLock(sl_size index, VALUE&& value) const noexcept;
 
@@ -683,6 +731,18 @@ namespace slib
 		T getValueAt(sl_size index) const noexcept;
 
 		T getValueAt(sl_size index, const T& def) const noexcept;
+
+		sl_bool getFirst(T* _out = sl_null) const noexcept;
+		
+		T getFirstValue() const noexcept;
+		
+		T getFirstValue(const T& def) const noexcept;
+		
+		sl_bool getLast(T* _out = sl_null) const noexcept;
+		
+		T getLastValue() const noexcept;
+		
+		T getLastValue(const T& def) const noexcept;
 
 		template <class VALUE>
 		sl_bool setAt(sl_size index, VALUE&& value) const noexcept;

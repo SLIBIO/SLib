@@ -360,6 +360,142 @@ namespace slib
 	}
 	
 	template <class T>
+	SLIB_INLINE sl_bool CList<T>::getFirst_NoLock(T* _out) const noexcept
+	{
+		if (m_count) {
+			if (_out) {
+				*_out = m_data[0];
+			}
+			return sl_true;
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	sl_bool CList<T>::getFirst(T* _out) const noexcept
+	{
+		ObjectLocker lock(this);
+		if (m_count) {
+			if (_out) {
+				*_out = m_data[0];
+			}
+			return sl_true;
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	SLIB_INLINE T CList<T>::getFirstValue_NoLock() const noexcept
+	{
+		if (m_count) {
+			return m_data[0];
+		} else {
+			return NullValue<T>::get();
+		}
+	}
+	
+	template <class T>
+	T CList<T>::getFirstValue() const noexcept
+	{
+		ObjectLocker lock(this);
+		if (m_count) {
+			return m_data[0];
+		} else {
+			return NullValue<T>::get();
+		}
+	}
+	
+	template <class T>
+	SLIB_INLINE T CList<T>::getFirstValue_NoLock(const T& def) const noexcept
+	{
+		if (m_count) {
+			return m_data[0];
+		}
+		return def;
+	}
+	
+	template <class T>
+	T CList<T>::getFirstValue(const T& def) const noexcept
+	{
+		ObjectLocker lock(this);
+		if (m_count) {
+			return m_data[0];
+		}
+		return def;
+	}
+	
+	template <class T>
+	SLIB_INLINE sl_bool CList<T>::getLast_NoLock(T* _out) const noexcept
+	{
+		sl_size count = m_count;
+		if (count) {
+			if (_out) {
+				*_out = m_data[count - 1];
+			}
+			return sl_true;
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	sl_bool CList<T>::getLast(T* _out) const noexcept
+	{
+		ObjectLocker lock(this);
+		sl_size count = m_count;
+		if (count) {
+			if (_out) {
+				*_out = m_data[count - 1];
+			}
+			return sl_true;
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	SLIB_INLINE T CList<T>::getLastValue_NoLock() const noexcept
+	{
+		sl_size count = m_count;
+		if (count) {
+			return m_data[count - 1];
+		} else {
+			return NullValue<T>::get();
+		}
+	}
+	
+	template <class T>
+	T CList<T>::getLastValue() const noexcept
+	{
+		ObjectLocker lock(this);
+		sl_size count = m_count;
+		if (count) {
+			return m_data[count - 1];
+		} else {
+			return NullValue<T>::get();
+		}
+	}
+	
+	template <class T>
+	SLIB_INLINE T CList<T>::getLastValue_NoLock(const T& def) const noexcept
+	{
+		sl_size count = m_count;
+		if (count) {
+			return m_data[count - 1];
+		}
+		return def;
+	}
+	
+	template <class T>
+	T CList<T>::getLastValue(const T& def) const noexcept
+	{
+		ObjectLocker lock(this);
+		sl_size count = m_count;
+		if (count) {
+			return m_data[count - 1];
+		}
+		return def;
+	}
+	
+	template <class T>
 	template <class VALUE>
 	SLIB_INLINE sl_bool CList<T>::setAt_NoLock(sl_size index, VALUE&& value) const noexcept
 	{
@@ -1430,6 +1566,130 @@ namespace slib
 		CList<T>* obj = ref._ptr;
 		if (obj) {
 			return obj->getValueAt(index, def);
+		}
+		return def;
+	}
+	
+	template <class T>
+	SLIB_INLINE sl_bool List<T>::getFirst_NoLock(T* _out) const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->getFirst_NoLock(_out);
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	SLIB_INLINE sl_bool List<T>::getFirst(T* _out) const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->getFirst(_out);
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	SLIB_INLINE T List<T>::getFirstValue_NoLock() const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->getFirstValue_NoLock();
+		} else {
+			return NullValue<T>::get();
+		}
+	}
+	
+	template <class T>
+	SLIB_INLINE T List<T>::getFirstValue() const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->getFirstValue();
+		} else {
+			return NullValue<T>::get();
+		}
+	}
+	
+	template <class T>
+	SLIB_INLINE T List<T>::getFirstValue_NoLock(const T& def) const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->getFirstValue_NoLock(def);
+		}
+		return def;
+	}
+	
+	template <class T>
+	SLIB_INLINE T List<T>::getFirstValue(const T& def) const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->getFirstValue(def);
+		}
+		return def;
+	}
+	
+	template <class T>
+	SLIB_INLINE sl_bool List<T>::getLast_NoLock(T* _out) const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->getLast_NoLock(_out);
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	SLIB_INLINE sl_bool List<T>::getLast(T* _out) const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->getLast(_out);
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	SLIB_INLINE T List<T>::getLastValue_NoLock() const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->getLastValue_NoLock();
+		} else {
+			return NullValue<T>::get();
+		}
+	}
+	
+	template <class T>
+	SLIB_INLINE T List<T>::getLastValue() const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->getLastValue();
+		} else {
+			return NullValue<T>::get();
+		}
+	}
+	
+	template <class T>
+	SLIB_INLINE T List<T>::getLastValue_NoLock(const T& def) const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->getLastValue_NoLock(def);
+		}
+		return def;
+	}
+	
+	template <class T>
+	SLIB_INLINE T List<T>::getLastValue(const T& def) const noexcept
+	{
+		CList<T>* obj = ref._ptr;
+		if (obj) {
+			return obj->getLastValue(def);
 		}
 		return def;
 	}
@@ -2556,6 +2816,68 @@ namespace slib
 		return def;
 	}
 
+	template <class T>
+	sl_bool Atomic< List<T> >::getFirst(T* _out) const noexcept
+	{
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->getFirst(_out);
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	T Atomic< List<T> >::getFirstValue() const noexcept
+	{
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->getFirstValue();
+		} else {
+			return NullValue<T>::get();
+		}
+	}
+	
+	template <class T>
+	T Atomic< List<T> >::getFirstValue(const T& def) const noexcept
+	{
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->getFirstValue(def);
+		}
+		return def;
+	}
+	
+	template <class T>
+	sl_bool Atomic< List<T> >::getLast(T* _out) const noexcept
+	{
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->getLast(_out);
+		}
+		return sl_false;
+	}
+	
+	template <class T>
+	T Atomic< List<T> >::getLastValue() const noexcept
+	{
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->getLastValue();
+		} else {
+			return NullValue<T>::get();
+		}
+	}
+	
+	template <class T>
+	T Atomic< List<T> >::getLastValue(const T& def) const noexcept
+	{
+		Ref< CList<T> > obj(ref);
+		if (obj.isNotNull()) {
+			return obj->getLastValue(def);
+		}
+		return def;
+	}
+	
 	template <class T>
 	template <class VALUE>
 	sl_bool Atomic< List<T> >::setAt(sl_size index, VALUE&& value) const noexcept
