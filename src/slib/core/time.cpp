@@ -2275,7 +2275,7 @@ namespace slib
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 	sl_bool Time::get_SYSTEMTIME(void* _st, sl_bool flagUTC) const noexcept
 	{
-		SYSTEMTIME st = *((SYSTEMTIME*)_st);
+		SYSTEMTIME& st = *((SYSTEMTIME*)_st);
 		sl_int64 n = (m_time + SLIB_INT64(11644473600000000)) * 10;  // Convert 1970 Based (time_t mode) to 1601 Based (FILETIME mode)
 		if (flagUTC) {
 			if (!(FileTimeToSystemTime((PFILETIME)&n, &st))) {
