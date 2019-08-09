@@ -125,7 +125,7 @@ namespace slib
 					[[tv textContainer] setContainerSize:NSMakeSize(FLT_MAX, FLT_MAX)];
 
 					[handle setHasHorizontalScroller:(isHorizontalScrollBarVisible()?YES:NO)];
-					[handle setHasVerticalScroller:(isVerticalScrollBarVisible() && (!isHeightWrapping())?YES:NO)];
+					[handle setHasVerticalScroller:(isVerticalScrollBarVisible()?YES:NO)];
 					
 					Ref<Font> font = getFont();
 					NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
@@ -545,29 +545,33 @@ MACOS_VIEW_DEFINE_ON_KEY
 	if (instance.isNotNull()) {
 		instance->onSetFocus();
 	}
-	if (m_placeholderString != nil) {
-		[self setNeedsDisplay:YES];
-	}
 	return [super becomeFirstResponder];
-}
-
-- (BOOL)resignFirstResponder
-{
-	if (m_placeholderString != nil) {
-		[self setNeedsDisplay:YES];
-	}
-	return [super resignFirstResponder];
 }
 
 - (void)drawRect:(NSRect)rect
 {
 	[super drawRect:rect];
 	if (self->m_placeholderString != nil) {
-		if ([[self string] length] == 0 && self != [[self window] firstResponder]) {
-			NSRect rc = [self bounds];
-			rc.origin.x += 2;
-			rc.size.width -= 4;
-			[self->m_placeholderString drawInRect:rc];
+		if ([[self string] length] == 0) {
+			NSSize inset = [self textContainerInset];
+			CGFloat paddingLeft = inset.width;
+			CGFloat paddingRight = inset.width;
+			NSTextContainer* container = [self textContainer];
+			if (container != nil) {
+				CGFloat f = [container lineFragmentPadding];
+				paddingLeft += f;
+				paddingRight += f;
+			}
+			NSParagraphStyle* style = [self defaultParagraphStyle];
+			if (style != nil) {
+				paddingLeft += [style firstLineHeadIndent];
+				paddingLeft += [style headIndent];
+				paddingRight += [style tailIndent];
+			}
+			NSRect rect = [self bounds];
+			rect.origin.x += paddingLeft;
+			rect.size.width -= paddingLeft + paddingRight;
+			[self->m_placeholderString drawInRect:rect];
 		}
 	}
 }
