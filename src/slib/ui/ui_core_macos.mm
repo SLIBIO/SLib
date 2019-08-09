@@ -269,9 +269,50 @@ namespace slib
 		SLIBAppDelegate * delegate = [[SLIBAppDelegate alloc] init];
 		[NSApp setDelegate:delegate];
 		
-		[NSEvent addLocalMonitorForEventsMatchingMask:NSEventMaskApplicationDefined handler:^(NSEvent* ev){
-			UIDispatcher::processCallbacks();
-			return (NSEvent*)nil;
+		[NSEvent addLocalMonitorForEventsMatchingMask:(NSApplicationDefinedMask | NSKeyDownMask) handler:^(NSEvent* event){
+			NSEventType type = [event type];
+			if (type == NSKeyDown) {
+				NSEventModifierFlags modifiers = [event modifierFlags] & NSDeviceIndependentModifierFlagsMask;
+				NSString* key = [event charactersIgnoringModifiers];
+				if (modifiers == NSCommandKeyMask) {
+					if ([key isEqualToString:@"x"]) {
+						if ([NSApp sendAction:NSSelectorFromString(@"cut:") to:nil from:NSApp]) {
+							return (NSEvent*)nil;
+						}
+					}
+					else if ([key isEqualToString:@"c"]) {
+						if ([NSApp sendAction:NSSelectorFromString(@"copy:") to:nil from:NSApp]) {
+							return (NSEvent*)nil;
+						}
+					}
+					else if ([key isEqualToString:@"v"]) {
+						if ([NSApp sendAction:NSSelectorFromString(@"paste:") to:nil from:NSApp]) {
+							return (NSEvent*)nil;
+						}
+					}
+					else if ([key isEqualToString:@"z"]) {
+						if ([NSApp sendAction:NSSelectorFromString(@"undo:") to:nil from:NSApp]) {
+							return (NSEvent*)nil;
+						}
+					}
+					else if ([key isEqualToString:@"a"]) {
+						if ([NSApp sendAction:NSSelectorFromString(@"selectAll:") to:nil from:NSApp]) {
+							return (NSEvent*)nil;
+						}
+					}
+				}
+				else if (modifiers == (NSCommandKeyMask | NSShiftKeyMask)) {
+					if ([key isEqualToString:@"Z"]) {
+						if ([NSApp sendAction:NSSelectorFromString(@"redo:") to:nil from:NSApp]) {
+							return (NSEvent*)nil;
+						}
+					}
+				}
+			} else if (type == NSApplicationDefined) {
+				UIDispatcher::processCallbacks();
+				return (NSEvent*)nil;
+			}
+			return event;
 		}];
 		
 		@autoreleasepool {

@@ -517,6 +517,7 @@ MACOS_VIEW_DEFINE_ON_KEY
 		[m_textView setVerticallyResizable:YES];
 		[m_textView setHorizontallyResizable:YES];
 		[m_textView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+		[m_textView setAllowsUndo:YES];
 		
 		[self setDocumentView:m_textView];
 		
