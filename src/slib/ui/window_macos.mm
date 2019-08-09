@@ -48,6 +48,9 @@ namespace slib
 	@public slib::WeakRef<slib::priv::window::macOS_WindowInstance> m_window;
 	
 	@public sl_bool m_flagStateResizingWidth;
+	
+	@private NSView* m_handleLastHitMouse;
+	
 }
 @end
 
@@ -1154,7 +1157,12 @@ using namespace slib::priv::window;
 
 - (BOOL)acceptsFirstResponder
 {
-	return TRUE;
+	return YES;
+}
+
+- (BOOL)acceptsMouseMovedEvents
+{
+	return YES;
 }
 
 - (void)sendEvent:(NSEvent *)event
@@ -1178,6 +1186,31 @@ using namespace slib::priv::window;
 				}
 			}
 		}
+	} else if (event.type == NSEventTypeMouseMoved) {
+		NSPoint pt = [event locationInWindow];
+		NSView* hit = nil;
+		NSView* content = [self contentView];
+		if (content != nil) {
+			pt = [content convertPoint:pt fromView:nil];
+			hit = [content hitTest:pt];
+		}
+		if (m_handleLastHitMouse != hit) {
+			if (m_handleLastHitMouse != nil) {
+				if ([m_handleLastHitMouse isKindOfClass:[SLIBViewHandle class]]) {
+					[m_handleLastHitMouse mouseExited:event];
+				}
+			}
+			if (hit != nil) {
+				if ([hit isKindOfClass:[SLIBViewHandle class]]) {
+					[hit mouseEntered:event];
+				}
+			}
+			m_handleLastHitMouse = hit;
+		}
+		if (hit != nil) {
+			[hit mouseMoved:event];
+		}
+		return;
 	}
 	[super sendEvent:event];
 }

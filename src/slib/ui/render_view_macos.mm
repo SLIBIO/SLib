@@ -268,22 +268,10 @@ namespace slib
 {
 	slib::MutexLocker lock(&m_lockRender);
 	[super setFrame: frame];
-	[self updateTrackingAreas];
 	m_flagUpdate = sl_true;
 	slib::Ref<slib::Thread> thread = m_thread;
 	if (thread.isNotNull()) {
 		thread->wake();
-	}
-}
-
-- (void)updateTrackingAreas
-{
-	if (m_trackingArea != nil) {
-		[self removeTrackingArea:m_trackingArea];
-	}
-	m_trackingArea = [[NSTrackingArea alloc] initWithRect:[self bounds] options: (NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved | NSTrackingCursorUpdate| NSTrackingActiveInKeyWindow) owner:self userInfo:nil];
-	if (m_trackingArea != nil) {
-		[self addTrackingArea:m_trackingArea];
 	}
 }
 

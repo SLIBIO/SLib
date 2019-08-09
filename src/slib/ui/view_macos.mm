@@ -496,10 +496,15 @@ namespace slib
 						case UIAction::LeftButtonDoubleClick:
 						case UIAction::RightButtonDoubleClick:
 						case UIAction::MiddleButtonDoubleClick:
-						case UIAction::MouseMove:
-						case UIAction::MouseEnter:
-							if ([[window contentView] hitTest:pw] != handle) {
-								ev->addFlag(UIEventFlags::NotDispatchToChildren);
+							{
+								NSView* content = [window contentView];
+								if (content != nil) {
+									NSPoint pc = [content convertPoint:pw fromView:nil];
+									NSView* hit = [content hitTest:pc];
+									if (hit != handle) {
+										ev->addFlag(UIEventFlags::NotDispatchToChildren);
+									}
+								}
 							}
 							break;
 						case UIAction::LeftButtonDrag:
@@ -508,6 +513,8 @@ namespace slib
 						case UIAction::LeftButtonUp:
 						case UIAction::RightButtonUp:
 						case UIAction::MiddleButtonUp:
+						case UIAction::MouseMove:
+						case UIAction::MouseEnter:
 						case UIAction::MouseLeave:
 							break;
 						default:
@@ -702,53 +709,6 @@ using namespace slib;
 @implementation SLIBViewHandle
 
 MACOS_VIEW_DEFINE_ON_FOCUS
-
-- (id)init
-{
-	self = [super init];
-	if (self != nil) {
-		[self updateTrackingAreas];
-	}
-	return self;
-}
-
-- (id)initWithFrame:(NSRect)frame
-{
-	self = [super initWithFrame:frame];
-	if (self != nil) {
-		[self updateTrackingAreas];
-	}
-	return self;
-}
-
-- (void)setFrame:(NSRect)frame
-{
-	[super setFrame:frame];
-	[self updateTrackingAreas];
-}
-
-- (void)updateTrackingAreas
-{
-	if (m_trackingArea != nil) {
-		[self removeTrackingArea:m_trackingArea];
-	}
-	NSRect rc = [self bounds];
-	m_trackingArea = [[NSTrackingArea alloc] initWithRect:rc options: (NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved | NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect) owner:self userInfo:nil];
-	if (m_trackingArea != nil) {
-		[self addTrackingArea:m_trackingArea];
-		Ref<macOS_ViewInstance> instance = m_viewInstance;
-		if (instance.isNotNull()) {
-			NSPoint mouseLocation = [[self window] mouseLocationOutsideOfEventStream];
-			mouseLocation = [self convertPoint: mouseLocation fromView: nil];
-			if (NSPointInRect(mouseLocation, [self bounds])) {
-				instance->onEventMouse(UIAction::MouseEnter, mouseLocation);
-			} else {
-				instance->onEventMouse(UIAction::MouseLeave, mouseLocation);
-			}
-		}
-	}
-	[super updateTrackingAreas];
-}
 
 - (BOOL)acceptsFirstResponder
 {

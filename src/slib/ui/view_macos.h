@@ -134,7 +134,6 @@ namespace slib
 @interface SLIBViewHandle : SLIBViewBaseHandle
 {
 	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
-	NSTrackingArea* m_trackingArea;
 }
 @end
 
