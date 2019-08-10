@@ -89,9 +89,9 @@ namespace slib
 		HWND getHandle();
 
 	public:
-		virtual sl_bool preprocessWindowMessage(MSG& msg);
+		virtual LRESULT processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam);
 
-		virtual sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result);
+		virtual LRESULT processSubclassMessage(UINT msg, WPARAM wParam, LPARAM lParam);
 
 		virtual sl_bool processCommand(SHORT code, LRESULT& result);
 

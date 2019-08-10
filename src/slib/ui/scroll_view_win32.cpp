@@ -52,7 +52,7 @@ namespace slib
 				Color m_backgroundColor;
 
 			public:
-				sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
+				LRESULT processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam) override
 				{
 					HWND handle = getHandle();
 					Ref<View> view = getView();
@@ -78,11 +78,10 @@ namespace slib
 							::GetScrollInfo(handle, SB_VERT, &si);
 							int y = si.nPos;
 							_refreshContentPosition(sv, (sl_scroll_pos)x, (sl_scroll_pos)y, sl_true);
-							result = 0;
-							return sl_true;
+							return 0;
 						}
 					}
-					return Win32_ViewInstance::processWindowMessage(msg, wParam, lParam, result);
+					return Win32_ViewInstance::processWindowMessage(msg, wParam, lParam);
 				}
 
 				void _setContentView(const Ref<View>& viewChild, ScrollViewHelper* viewParent)

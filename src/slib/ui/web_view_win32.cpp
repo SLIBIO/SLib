@@ -65,11 +65,6 @@ namespace slib
 				~WebViewInstance();
 
 			public:
-				sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
-				{
-					return sl_false;
-				}
-
 				sl_bool _initialize();
 
 				void _resize()

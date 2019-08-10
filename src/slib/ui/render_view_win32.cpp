@@ -66,7 +66,7 @@ namespace slib
 					}
 				}
 
-				sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result) override
+				LRESULT processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam) override
 				{
 					if (msg == WM_PAINT) {
 						PAINTSTRUCT ps;
@@ -76,12 +76,11 @@ namespace slib
 						if (renderer.isNotNull()) {
 							renderer->requestRender();
 						}
-						return sl_true;
+						return 0;
 					} else if (msg == WM_ERASEBKGND) {
-						result = TRUE;
-						return sl_true;
+						return TRUE;
 					}
-					return Win32_ViewInstance::processWindowMessage(msg, wParam, lParam, result);
+					return Win32_ViewInstance::processWindowMessage(msg, wParam, lParam);
 				}
 
 				void onFrame(RenderEngine* engine)

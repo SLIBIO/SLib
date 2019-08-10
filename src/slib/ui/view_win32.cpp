@@ -32,6 +32,8 @@
 #include "slib/core/safe_static.h"
 #include "slib/math/transform2d.h"
 
+#include <commctrl.h>
+
 namespace slib
 {
 
@@ -45,15 +47,8 @@ namespace slib
 				return GraphicsPlatform::getColorFromColorRef(GetSysColor(COLOR_MENU));
 			}
 
-			LRESULT CALLBACK ViewInstanceProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+			LRESULT CALLBACK DefaultViewInstanceProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			{
-				Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(hWnd));
-				if (instance.isNotNull()) {
-					LRESULT result = 0;
-					if (instance->processWindowMessage(uMsg, wParam, lParam, result)) {
-						return result;
-					}
-				}
 				switch (uMsg) {
 					case WM_COMMAND:
 						{
@@ -106,6 +101,24 @@ namespace slib
 				return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 			}
 
+			LRESULT CALLBACK ViewInstanceProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+			{
+				Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(hWnd));
+				if (instance.isNotNull()) {
+					return instance->processWindowMessage(uMsg, wParam, lParam);
+				}
+				return DefaultViewInstanceProc(hWnd, uMsg, wParam, lParam);
+			}
+
+			LRESULT CALLBACK ViewInstanceSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+			{
+				Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(hWnd));
+				if (instance.isNotNull()) {
+					return instance->processSubclassMessage(uMsg, wParam, lParam);
+				}
+				return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+			}
+
 			sl_bool CaptureChildInstanceEvents(View* view, UINT uMsg)
 			{
 				Ref<View> parent = view->getParent();
@@ -127,8 +140,7 @@ namespace slib
 								ScreenToClient(hWnd, &pt);
 								if (hitTestCapture(UIPoint((sl_ui_pos)(pt.x), (sl_ui_pos)(pt.y)))) {
 									LPARAM lParam = POINTTOPOINTS(pt);
-									LRESULT res;
-									instance->processWindowMessage(uMsg, 0, lParam, res);
+									instance->processWindowMessage(uMsg, 0, lParam);
 									return sl_true;
 								}
 							}
@@ -230,6 +242,12 @@ namespace slib
 			if (hWnd) {
 				if (!(view->isEnabled())) {
 					EnableWindow(hWnd, FALSE);
+				}
+				Win32_UI_Shared* shared = Win32_UI_Shared::get();
+				if (shared) {
+					if (wndClass != (LPCWSTR)(shared->wndClassForView)) {
+						SetWindowSubclass(hWnd, ViewInstanceSubclassProc, 0, 0);
+					}
 				}
 				return hWnd;
 			}
@@ -602,38 +620,15 @@ namespace slib
 		m_flagGenericView = flag;
 	}
 
-	sl_bool Win32_ViewInstance::preprocessWindowMessage(MSG& msg)
-	{
-		UINT message = msg.message;
-		WPARAM wParam = msg.wParam;
-		LPARAM lParam = msg.lParam;
-		switch (message) {
-			case WM_KEYDOWN:
-				{
-					return onEventKey(sl_true, wParam, lParam);
-				}
-			case WM_KEYUP:
-				{
-					return onEventKey(sl_false, wParam, lParam);
-				}
-			case WM_SETFOCUS:
-				{
-					onSetFocus();
-					return sl_false;
-				}
-		}
-		return sl_false;
-	}
-
-	sl_bool Win32_ViewInstance::processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
+	LRESULT Win32_ViewInstance::processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		HWND hWnd = m_handle;
+		if (!hWnd) {
+			return 0;
+		}
 		switch (msg) {
 			case WM_ERASEBKGND:
-				{
-					result = TRUE;
-					return sl_true;
-				}
+				return TRUE;
 
 			case WM_PAINT:
 				{
@@ -654,62 +649,85 @@ namespace slib
 						}
 						EndPaint(hWnd, &ps);
 					}
-					result = TRUE;
-					return sl_true;
+					return 0;
 				}
 			case WM_LBUTTONDOWN:
 				{
 					sl_bool flag = onEventMouse(UIAction::LeftButtonDown, wParam, lParam);
 					m_actionMouseCapture = UIAction::LeftButtonDown;
 					SetCapture(hWnd);
-					return flag;
+					if (flag) {
+						return 0;
+					}
+					break;
 				}
 			case WM_LBUTTONDBLCLK:
 				{
 					onEventMouse(UIAction::LeftButtonDown, wParam, lParam);
-					return onEventMouse(UIAction::LeftButtonDoubleClick, wParam, lParam);
+					if (onEventMouse(UIAction::LeftButtonDoubleClick, wParam, lParam)) {
+						return 0;
+					}
+					break;
 				}
 			case WM_LBUTTONUP:
 				{
 					ReleaseCapture();
-					sl_bool flag = onEventMouse(UIAction::LeftButtonUp, wParam, lParam);
-					return flag;
+					if (onEventMouse(UIAction::LeftButtonUp, wParam, lParam)) {
+						return 0;
+					}
+					break;
 				}
 			case WM_RBUTTONDOWN:
 				{
 					sl_bool flag = onEventMouse(UIAction::RightButtonDown, wParam, lParam);
 					m_actionMouseCapture = UIAction::RightButtonDown;
 					SetCapture(hWnd);
-					return flag;
+					if (flag) {
+						return 0;
+					}
+					break;
 				}
 			case WM_RBUTTONDBLCLK:
 				{
 					onEventMouse(UIAction::RightButtonDown, wParam, lParam);
-					return onEventMouse(UIAction::RightButtonDoubleClick, wParam, lParam);
+					if (onEventMouse(UIAction::RightButtonDoubleClick, wParam, lParam)) {
+						return 0;
+					}
+					break;
 				}
 			case WM_RBUTTONUP:
 				{
 					ReleaseCapture();
-					sl_bool flag = onEventMouse(UIAction::RightButtonUp, wParam, lParam);
-					return flag;
+					if (onEventMouse(UIAction::RightButtonUp, wParam, lParam)) {
+						return 0;
+					}
+					break;
 				}
 			case WM_MBUTTONDOWN:
 				{
 					sl_bool flag = onEventMouse(UIAction::MiddleButtonDown, wParam, lParam);
 					m_actionMouseCapture = UIAction::MiddleButtonDown;
 					SetCapture(hWnd);
-					return flag;
+					if (flag) {
+						return 0;
+					}
+					break;
 				}
 			case WM_MBUTTONDBLCLK:
 				{
 					onEventMouse(UIAction::MiddleButtonDown, wParam, lParam);
-					return onEventMouse(UIAction::MiddleButtonDoubleClick, wParam, lParam);
+					if (onEventMouse(UIAction::MiddleButtonDoubleClick, wParam, lParam)) {
+						return 0;
+					}
+					break;
 				}
 			case WM_MBUTTONUP:
 				{
 					ReleaseCapture();
-					sl_bool flag = onEventMouse(UIAction::MiddleButtonUp, wParam, lParam);
-					return flag;
+					if (onEventMouse(UIAction::MiddleButtonUp, wParam, lParam)) {
+						return 0;
+					}
+					break;
 				}
 			case WM_MOUSEMOVE:
 				{
@@ -730,48 +748,167 @@ namespace slib
 
 					if (GetCapture() == hWnd) {
 						if (m_actionMouseCapture == UIAction::LeftButtonDown) {
-							return onEventMouse(UIAction::LeftButtonDrag, wParam, lParam);
+							if (onEventMouse(UIAction::LeftButtonDrag, wParam, lParam)) {
+								return 0;
+							}
 						} else if (m_actionMouseCapture == UIAction::RightButtonDown) {
-							return onEventMouse(UIAction::RightButtonDrag, wParam, lParam);
+							if (onEventMouse(UIAction::RightButtonDrag, wParam, lParam)) {
+								return 0;
+							}
 						} else if (m_actionMouseCapture == UIAction::MiddleButtonDown) {
-							return onEventMouse(UIAction::MiddleButtonDrag, wParam, lParam);
+							if (onEventMouse(UIAction::MiddleButtonDrag, wParam, lParam)) {
+								return 0;
+							}
 						} else {
-							return onEventMouse(UIAction::MouseMove, wParam, lParam);
+							if (onEventMouse(UIAction::MouseMove, wParam, lParam)) {
+								return 0;
+							}
 						}
 					} else {
-						return onEventMouse(UIAction::MouseMove, wParam, lParam);
+						if (onEventMouse(UIAction::MouseMove, wParam, lParam)) {
+							return 0;
+						}
 					}
 					break;
 				}
 			case WM_MOUSELEAVE:
 				{
-					onEventMouse(UIAction::MouseLeave, wParam, lParam);
-					return sl_true;
+					if (onEventMouse(UIAction::MouseLeave, wParam, lParam)) {
+						return 0;
+					}
+					break;
 				}
 			case WM_MOUSEWHEEL:
 				{
 					if (onEventMouseWheel(sl_true, wParam, lParam)) {
-						return sl_true;
+						return 0;
 					}
 					break;
 				}
 			case 0x020E: // WM_MOUSEHWHEEL
 				{
 					if (onEventMouseWheel(sl_false, wParam, lParam)) {
-						return sl_true;
+						return 0;
 					}
+					break;
+				}
+			case WM_KEYDOWN:
+				{
+					if (onEventKey(sl_true, wParam, lParam)) {
+						return 0;
+					}
+					break;
+				}
+			case WM_KEYUP:
+				{
+					if (onEventKey(sl_false, wParam, lParam)) {
+						return 0;
+					}
+					break;
+				}
+			case WM_SETFOCUS:
+				{
+					onSetFocus();
 					break;
 				}
 			case WM_SETCURSOR:
 				{
 					if (onEventSetCursor()) {
-						result = 1;
-						return sl_true;
+						return TRUE;
 					}
 					break;
 				}
 		}
-		return sl_false;
+		return DefaultViewInstanceProc(hWnd, msg, wParam, lParam);
+	}
+
+	LRESULT Win32_ViewInstance::processSubclassMessage(UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		HWND hWnd = m_handle;
+		if (!hWnd) {
+			return 0;
+		}
+		switch (msg) {		
+		case WM_LBUTTONDOWN:
+			if (onEventMouse(UIAction::LeftButtonDown, wParam, lParam)) {
+				return 0;
+			}
+			break;
+		case WM_LBUTTONDBLCLK:
+			if (onEventMouse(UIAction::LeftButtonDoubleClick, wParam, lParam)) {
+				return 0;
+			}
+			break;
+		case WM_LBUTTONUP:
+			if (onEventMouse(UIAction::LeftButtonUp, wParam, lParam)) {
+				return 0;
+			}
+			break;
+		case WM_RBUTTONDOWN:
+			if (onEventMouse(UIAction::RightButtonDown, wParam, lParam)) {
+				return 0;
+			}
+			break;
+		case WM_RBUTTONDBLCLK:
+			if (onEventMouse(UIAction::RightButtonDoubleClick, wParam, lParam)) {
+				return 0;
+			}
+			break;
+		case WM_RBUTTONUP:
+			if (onEventMouse(UIAction::RightButtonUp, wParam, lParam)) {
+				return 0;
+			}
+			break;
+		case WM_MBUTTONDOWN:
+			if (onEventMouse(UIAction::MiddleButtonDown, wParam, lParam)) {
+				return 0;
+			}
+			break;
+		case WM_MBUTTONDBLCLK:
+			if (onEventMouse(UIAction::MiddleButtonDoubleClick, wParam, lParam)) {
+				return 0;
+			}
+			break;
+		case WM_MBUTTONUP:
+			if (onEventMouse(UIAction::MiddleButtonUp, wParam, lParam)) {
+				return 0;
+			}
+			break;
+		case WM_MOUSEMOVE:
+			if (onEventMouse(UIAction::MouseMove, wParam, lParam)) {
+				return 0;
+			}
+			break;
+		case WM_MOUSEWHEEL:
+			if (onEventMouseWheel(sl_true, wParam, lParam)) {
+				return 0;
+			}
+			break;
+		case 0x020E: // WM_MOUSEHWHEEL
+			if (onEventMouseWheel(sl_false, wParam, lParam)) {
+				return 0;
+			}
+			break;
+		case WM_KEYDOWN:
+			if (onEventKey(sl_true, wParam, lParam)) {
+				return 0;
+			}
+			break;
+		case WM_KEYUP:
+			if (onEventKey(sl_false, wParam, lParam)) {
+				return 0;
+			}
+			break;
+		case WM_SETFOCUS:
+			onSetFocus();
+			break;
+		case WM_SETCURSOR:
+			if (onEventSetCursor()) {
+				return TRUE;
+			}
+			break;
+		}
+		return DefSubclassProc(hWnd, msg, wParam, lParam);
 	}
 
 	sl_bool Win32_ViewInstance::processCommand(SHORT code, LRESULT& result)

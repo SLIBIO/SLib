@@ -233,9 +233,6 @@ namespace slib
 									if (priv::view::CaptureChildInstanceEvents(view.get(), msg)) {
 										break;
 									}
-									if (instance->preprocessWindowMessage(msg)) {
-										break;
-									}
 								}
 							}
 							TranslateMessage(&msg);
