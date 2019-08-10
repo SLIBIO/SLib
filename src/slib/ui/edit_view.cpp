@@ -55,6 +55,8 @@ namespace slib
 		m_keyboardType = UIKeyboardType::Default;
 		m_autoCapitalizationType = UIAutoCapitalizationType::None;
 		m_flagAutoDismissKeyboard = sl_true;
+		
+		setPadding((sl_ui_pos)(UI::dpToPixel(2)), UIUpdateMode::Init);
 	}
 
 	EditView::~EditView()
@@ -293,6 +295,13 @@ namespace slib
 		}
 	}
 	
+	void EditView::onChangePadding()
+	{
+		if (isNativeWidget()) {
+			_onChangePadding_NW();
+		}
+	}
+	
 	void EditView::onDraw(Canvas* canvas)
 	{
 		if (m_text.isEmpty()) {
@@ -446,19 +455,13 @@ namespace slib
 		}
 	}
 
-	/**********************
-		PasswordView
-	***********************/
-
+	
 	PasswordView::PasswordView()
 	{
 		m_flagPassword = sl_true;
 	}
 
-	/**********************
-		TextArea
-	***********************/
-
+	
 	SLIB_DEFINE_OBJECT(TextArea, EditView)
 
 	TextArea::TextArea()
@@ -540,6 +543,12 @@ namespace slib
 	Ref<ViewInstance> TextArea::createNativeWidget(ViewInstance* parent)
 	{
 		return sl_null;
+	}
+#endif
+	
+#if !defined(SLIB_UI_IS_WIN32)
+	void EditView::_onChangePadding_NW()
+	{		
 	}
 #endif
 

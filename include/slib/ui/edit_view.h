@@ -97,6 +97,8 @@ namespace slib
 	protected:
 		void onUpdateLayout() override;
 		
+		void onChangePadding() override;
+		
 		void onDraw(Canvas* canvas) override;
 
 		void onClickEvent(UIEvent* ev) override;
@@ -133,6 +135,8 @@ namespace slib
 		
 		sl_ui_len _measureHeight_NW();
 		
+		void _onChangePadding_NW();
+
 		
 		void _setFont_NW(const Ref<Font>& font) override;
 		
