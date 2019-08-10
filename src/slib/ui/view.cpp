@@ -9238,8 +9238,10 @@ namespace slib
 				if (size.y > screenSize.y) {
 					size.y = screenSize.y;
 				}
-				if (bitmap.isNull() || canvasBitmap.isNull() || bitmap->getWidth() < (sl_uint32)(size.x) || bitmap->getHeight() < (sl_uint32)(size.y)) {
-					bitmap = Bitmap::create(size.x, size.y);
+				sl_uint32 widthBitmap = (sl_uint32)(size.x);
+				sl_uint32 heightBitmap = (sl_uint32)(size.y);
+				if (bitmap.isNull() || canvasBitmap.isNull() || bitmap->getWidth() < widthBitmap || bitmap->getHeight() < heightBitmap) {
+					bitmap = Bitmap::create(widthBitmap, heightBitmap);
 					if (bitmap.isNull()) {
 						return;
 					}
@@ -9270,17 +9272,18 @@ namespace slib
 						colorClear = priv::view::GetDefaultBackColor();
 					}
 				} while (0);
-				UIRect rcBack = {0, 0, size.x, size.y};
 				rc.setSize(size);
 				if (colorClear.isNotZero()) {
-					bitmap->resetPixels(rcBack.left, rcBack.top, rcBack.getWidth(), rcBack.getHeight(), colorClear);
+					bitmap->resetPixels(0, 0, widthBitmap, heightBitmap, colorClear);
+				} else {
+					bitmap->resetPixels(0, 0, widthBitmap, 1, Color::White);
 				}
 				canvasBitmap->setInvalidatedRect(rc);
 				CanvasStateScope scope(canvasBitmap.get());
 				canvasBitmap->translate(-(sl_real)(rc.left), -(sl_real)(rc.top));
 				view->dispatchDraw(canvasBitmap.get());
 				canvasBitmap->translate((sl_real)(rc.left), (sl_real)(rc.top));
-				canvas->draw(rc, bitmap, rcBack);
+				canvas->draw(rc, bitmap, Rectangle(0, 0, (sl_real)(size.x), (sl_real)(size.y)));
 			}
 #else
 			view->dispatchDraw(canvas);
