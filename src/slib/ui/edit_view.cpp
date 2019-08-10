@@ -451,6 +451,7 @@ namespace slib
 			}
 			View::dispatchKeyEvent(ev);
 		} else {
+			SLIB_INVOKE_EVENT_HANDLER(KeyEvent, ev)
 			ev->stopPropagation();
 		}
 	}
@@ -548,7 +549,7 @@ namespace slib
 	
 #if !defined(SLIB_UI_IS_WIN32)
 	void EditView::_onChangePadding_NW()
-	{		
+	{
 	}
 #endif
 
