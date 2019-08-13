@@ -183,9 +183,6 @@ namespace slib
 					if (param.shortcutKey.getKeycode() != Keycode::Unknown) {
 						handle.keyEquivalent = UIPlatform::getKeyEquivalent(param.shortcutKey, keMask);
 						handle.keyEquivalentModifierMask = keMask;
-					} else {
-						handle.keyEquivalent = UIPlatform::getKeyEquivalent(param.secondShortcutKey, keMask);
-						handle.keyEquivalentModifierMask = keMask;
 					}
 					handle.enabled = param.flagEnabled ? YES : NO;
 					handle.state = param.flagChecked ? NSOnState : NSOffState;
@@ -236,19 +233,14 @@ namespace slib
 					m_handle.keyEquivalent = UIPlatform::getKeyEquivalent(km, keMask);
 					m_handle.keyEquivalentModifierMask = keMask;
 				} else {
-					m_handle.keyEquivalent = UIPlatform::getKeyEquivalent(m_secondShortcutKey, keMask);
-					m_handle.keyEquivalentModifierMask = keMask;
+					m_handle.keyEquivalent = @"";
+					m_handle.keyEquivalentModifierMask = 0;
 				}
 			}
 			
 			void MenuItemImpl::setSecondShortcutKey(const slib::KeycodeAndModifiers &km)
 			{
 				MenuItem::setSecondShortcutKey(km);
-				NSUInteger keMask;
-				if (m_shortcutKey.getKeycode() == Keycode::Unknown) {
-					m_handle.keyEquivalent = UIPlatform::getKeyEquivalent(km, keMask);
-					m_handle.keyEquivalentModifierMask = keMask;
-				}
 			}
 			
 			void MenuItemImpl::setEnabled(sl_bool flag)
