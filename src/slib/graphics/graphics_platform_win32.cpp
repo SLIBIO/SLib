@@ -40,16 +40,14 @@ namespace slib
 		if (flagStarted) {
 			return;
 		}
-		{
-			SLIB_STATIC_SPINLOCKER(lock)
-			if (flagStarted) {
-				return;
-			}
-			flagStarted = sl_true;
+		SLIB_STATIC_SPINLOCKER(lock)
+		if (flagStarted) {
+			return;
 		}
 		Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 		ULONG_PTR gdiplusToken;
 		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+		flagStarted = sl_true;
 	}
 
 	COLORREF GraphicsPlatform::getColorRef(const Color& color)
