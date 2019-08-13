@@ -45,6 +45,8 @@ namespace slib
 				SLIB_DECLARE_OBJECT
 			public:
 				Gdiplus::Bitmap* m_bitmap;
+				sl_bool m_flagFreeOnRelease;
+				Ref<Referable> m_ref;
 
 			public:
 				BitmapImpl()
@@ -53,24 +55,38 @@ namespace slib
 					
 				~BitmapImpl()
 				{
-					delete m_bitmap;
+					if (m_flagFreeOnRelease) {
+						delete m_bitmap;
+					}
 				}
 				
 			public:
+				static Ref<BitmapImpl> create(Gdiplus::Bitmap* handle, sl_bool flagFreeOnRelease, Referable* ref)
+				{
+					if (handle) {
+						if (handle->GetWidth() > 0 && handle->GetHeight() > 0) {
+							Ref<BitmapImpl> ret = new BitmapImpl();
+							if (ret.isNotNull()) {
+								ret->m_bitmap = handle;
+								ret->m_flagFreeOnRelease = flagFreeOnRelease;
+								ret->m_ref = ref;
+								return ret;
+							}
+						}
+						if (flagFreeOnRelease) {
+							delete handle;
+						}
+					}
+					return sl_null;
+				}
+
 				static Ref<BitmapImpl> create(sl_uint32 width, sl_uint32 height)
 				{
-					GraphicsPlatform::startGdiplus();
 					if (width > 0 && height > 0) {
+						GraphicsPlatform::startGdiplus();
 						Gdiplus::Bitmap* bitmap = new Gdiplus::Bitmap(width, height, PixelFormat32bppARGB);
 						if (bitmap) {
-							if (bitmap->GetWidth() == width && bitmap->GetHeight() == height) {
-								Ref<BitmapImpl> ret = new BitmapImpl();
-								if (ret.isNotNull()) {
-									ret->m_bitmap = bitmap;
-									return ret;
-								}
-							}
-							delete bitmap;
+							return create(bitmap, sl_true, sl_null);
 						}
 					}
 					return sl_null;
@@ -83,13 +99,8 @@ namespace slib
 						GraphicsPlatform::startGdiplus();
 						Gdiplus::Bitmap* bitmap = new Gdiplus::Bitmap(stream);
 						stream->Release();
-						if (bitmap && bitmap->GetWidth() > 0 && bitmap->GetHeight() > 0) {
-							Ref<BitmapImpl> ret = new BitmapImpl();
-							if (ret.isNotNull()) {
-								ret->m_bitmap = bitmap;
-								return ret;
-							}
-							delete bitmap;
+						if (bitmap) {
+							return create(bitmap, sl_true, sl_null);
 						}
 					}
 					return sl_null;
@@ -328,6 +339,27 @@ namespace slib
 	Ref<Bitmap> Bitmap::loadFromMemory(const void* mem, sl_size size)
 	{
 		return BitmapImpl::loadFromMemory(mem, size);
+	}
+
+	Ref<Bitmap> GraphicsPlatform::createBitmap(Gdiplus::Bitmap* bitmap, sl_bool flagFreeOnRelease, Referable* ref)
+	{
+		if (!bitmap) {
+			return sl_null;
+		}
+		return Ref<Bitmap>::from(BitmapImpl::create(bitmap, flagFreeOnRelease, ref));
+	}
+
+	Ref<Bitmap> GraphicsPlatform::createBitmap(HBITMAP hbm)
+	{
+		if (!hbm) {
+			return sl_null;
+		}
+		startGdiplus();
+		Gdiplus::Bitmap* bitmap = new Gdiplus::Bitmap(hbm, NULL);
+		if (bitmap) {
+			return Ref<Bitmap>::from(BitmapImpl::create(bitmap, sl_true, sl_null));
+		}
+		return sl_null;
 	}
 
 	Gdiplus::Bitmap* GraphicsPlatform::getBitmapHandle(Bitmap* _bitmap)

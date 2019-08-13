@@ -76,8 +76,11 @@ namespace slib
 
 		static Ref<Drawable> createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease = sl_true, Referable* ref = sl_null);
 		static Gdiplus::Image* getImageDrawableHandle(Drawable* drawable);
+
+		static Ref<Bitmap> createBitmap(Gdiplus::Bitmap* bitmap, sl_bool flagFreeOnRelease = sl_true, Referable* ref = sl_null);
+		static Ref<Bitmap> createBitmap(HBITMAP hbm);
 		static Gdiplus::Bitmap* getBitmapHandle(Bitmap* bitmap);
-	
+
 #elif defined(SLIB_GRAPHICS_IS_ANDROID)
 
 		static jobject getBrushHandle(Brush* brush);
