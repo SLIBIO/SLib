@@ -469,35 +469,35 @@ namespace slib
 				if (ret.isNotEmpty()) {
 					ret += " | ";
 				}
-				ret = "slib::Modifiers::Option";
+				ret += "slib::Modifiers::Option";
 			}
 		} else {
 			if (km.isAltKey()) {
 				if (ret.isNotEmpty()) {
 					ret += " | ";
 				}
-				ret = "slib::Modifiers::Alt";
+				ret += "slib::Modifiers::Alt";
 			}
 		}
 		if (km.isShiftKey()) {
 			if (ret.isNotEmpty()) {
 				ret += " | ";
 			}
-			ret = "slib::Modifiers::Shift";
+			ret += "slib::Modifiers::Shift";
 		}
 		if (flagMac) {
 			if (km.isCommandKey()) {
 				if (ret.isNotEmpty()) {
 					ret += " | ";
 				}
-				ret = "slib::Modifiers::Command";
+				ret += "slib::Modifiers::Command";
 			}
 		} else {
 			if (km.isWindowsKey()) {
 				if (ret.isNotEmpty()) {
 					ret += " | ";
 				}
-				ret = "slib::Modifiers::Windows";
+				ret += "slib::Modifiers::Windows";
 			}
 		}
 		if (ret.isNotEmpty()) {
