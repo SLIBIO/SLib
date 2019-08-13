@@ -32,6 +32,11 @@ namespace slib
 		return sl_null;
 	}
 	
+	Ref<Image> ScreenCapture::takeScreenshotFromCurrentMonitor()
+	{
+		return sl_null;
+	}
+
 	List< Ref<Image> >  ScreenCapture::takeScreenshotsFromAllMonitors()
 	{
 		return sl_null;

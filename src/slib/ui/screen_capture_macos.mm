@@ -81,6 +81,18 @@ namespace slib
 			
 			SLIB_SAFE_STATIC_GETTER(Helper, GetHelper)
 			
+			Ref<Image> TakeScreenshot(Helper* helper, NSScreen* screen)
+			{
+				NSRect rectScreen = [screen frame];
+				CGImageRef cgImage = CGWindowListCreateImage(rectScreen, kCGWindowListOptionOnScreenOnly, kCGNullWindowID, kCGWindowImageDefault);
+				if (cgImage) {
+					Ref<Image> image = helper->getImage(cgImage);
+					CGImageRelease(cgImage);
+					return image;
+				}
+				return sl_null;
+			}
+			
 		}
 	}
 	
@@ -93,19 +105,34 @@ namespace slib
 			return sl_null;
 		}
 		MutexLocker lock(&(helper->m_lock));
-		NSRect rectScreen = [[NSScreen mainScreen] frame];
-		CGImageRef cgImage = CGWindowListCreateImage(rectScreen, kCGWindowListOptionOnScreenOnly, kCGNullWindowID, kCGWindowImageDefault);
-		if (cgImage) {
-			Ref<Image> image = helper->getImage(cgImage);
-			CGImageRelease(cgImage);
-			return image;
-		}
-		return sl_null;
+		return TakeScreenshot(helper, [[NSScreen screens] objectAtIndex:0]);
 	}
 	
+	Ref<Image> ScreenCapture::takeScreenshotFromCurrentMonitor()
+	{
+		Helper* helper = GetHelper();
+		if (!helper) {
+			return sl_null;
+		}
+		MutexLocker lock(&(helper->m_lock));
+		return TakeScreenshot(helper, [NSScreen mainScreen]);
+	}
+
 	List< Ref<Image> >  ScreenCapture::takeScreenshotsFromAllMonitors()
 	{
-		return List< Ref<Image> >::createFromElement(takeScreenshot());
+		Helper* helper = GetHelper();
+		if (!helper) {
+			return sl_null;
+		}
+		MutexLocker lock(&(helper->m_lock));
+		List< Ref<Image> > ret;
+		for (NSScreen* screen in [NSScreen screens]) {
+			Ref<Image> image = TakeScreenshot(helper, screen);
+			if (image.isNotNull()) {
+				ret.add_NoLock(Move(image));
+			}
+		}
+		return ret;
 	}
 	
 }
