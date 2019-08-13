@@ -61,6 +61,8 @@ namespace slib
 	public:
 #if defined(SLIB_GRAPHICS_IS_GDI)
 
+		static void startGdiplus();
+
 		static Gdiplus::Brush* getBrushHandle(Brush* brush);
 		static Gdiplus::Pen* getPenHandle(Pen* pen);
 		static Gdiplus::GraphicsPath* getGraphicsPath(GraphicsPath* path);

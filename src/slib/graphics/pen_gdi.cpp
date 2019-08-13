@@ -28,8 +28,6 @@
 
 #include "slib/graphics/platform.h"
 
-#pragma comment(lib, "gdiplus.lib")
-
 namespace slib
 {
 
@@ -49,7 +47,10 @@ namespace slib
 					m_pen = NULL;
 					const Color& _color = desc.color;
 					Gdiplus::Color color(_color.a, _color.r, _color.g, _color.b);
+
+					GraphicsPlatform::startGdiplus();
 					Gdiplus::Pen* pen = new Gdiplus::Pen(color, desc.width);
+
 					if (pen) {
 						Gdiplus::LineCap cap;
 						Gdiplus::DashCap dashCap;

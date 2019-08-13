@@ -27,9 +27,30 @@
 #include "slib/graphics/platform.h"
 
 #include "slib/core/scoped.h"
+#include "slib/core/safe_static.h"
+
+#pragma comment(lib, "gdiplus.lib")
 
 namespace slib
 {
+
+	void GraphicsPlatform::startGdiplus()
+	{
+		static sl_bool flagStarted = sl_false;
+		if (flagStarted) {
+			return;
+		}
+		{
+			SLIB_STATIC_SPINLOCKER(lock)
+			if (flagStarted) {
+				return;
+			}
+			flagStarted = sl_true;
+		}
+		Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+		ULONG_PTR gdiplusToken;
+		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+	}
 
 	COLORREF GraphicsPlatform::getColorRef(const Color& color)
 	{

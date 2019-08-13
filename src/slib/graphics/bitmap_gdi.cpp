@@ -29,9 +29,8 @@
 #include "slib/graphics/platform.h"
 #include "slib/core/scoped.h"
 
-#include <Shlwapi.h>
+#include <shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
-#pragma comment(lib, "gdiplus.lib")
 
 namespace slib
 {
@@ -60,6 +59,7 @@ namespace slib
 			public:
 				static Ref<BitmapImpl> create(sl_uint32 width, sl_uint32 height)
 				{
+					GraphicsPlatform::startGdiplus();
 					if (width > 0 && height > 0) {
 						Gdiplus::Bitmap* bitmap = new Gdiplus::Bitmap(width, height, PixelFormat32bppARGB);
 						if (bitmap) {
@@ -80,6 +80,7 @@ namespace slib
 				{
 					IStream* stream = ::SHCreateMemStream((BYTE*)mem, (sl_uint32)size);
 					if (stream) {
+						GraphicsPlatform::startGdiplus();
 						Gdiplus::Bitmap* bitmap = new Gdiplus::Bitmap(stream);
 						stream->Release();
 						if (bitmap && bitmap->GetWidth() > 0 && bitmap->GetHeight() > 0) {

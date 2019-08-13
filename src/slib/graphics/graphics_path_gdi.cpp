@@ -29,8 +29,6 @@
 #include "slib/graphics/platform.h"
 #include "slib/core/scoped.h"
 
-#pragma comment(lib, "gdiplus.lib")
-
 namespace slib
 {
 
@@ -64,6 +62,7 @@ namespace slib
 			public:
 				GraphicsPathPlatformObject()
 				{
+					GraphicsPlatform::startGdiplus();
 					path = new Gdiplus::GraphicsPath(Gdiplus::FillModeWinding);
 					lastX = 0;
 					lastY = 0;
@@ -91,6 +90,7 @@ namespace slib
 							pts[i].Y = points[i].pt.y;
 							types[i] = points[i].type;
 						}
+						GraphicsPlatform::startGdiplus();
 						Gdiplus::GraphicsPath* handle = new Gdiplus::GraphicsPath(pts, types, (INT)n, ConvertFillMode(getFillMode()));
 						return handle;
 					}

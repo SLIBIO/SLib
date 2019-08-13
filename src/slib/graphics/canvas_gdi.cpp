@@ -31,8 +31,6 @@
 #include "slib/graphics/platform.h"
 #include "slib/core/queue.h"
 
-#pragma comment(lib, "gdiplus.lib")
-
 #if defined _M_IX86
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.GdiPlus' version='1.1.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #elif defined _M_X64
@@ -153,7 +151,7 @@ namespace slib
 
 			public:
 				static Ref<CanvasImpl> create(CanvasType type, Gdiplus::Graphics* graphics, sl_real width, sl_real height, sl_bool flagFreeOnRelease, Referable* ref)
-				{		
+				{
 					if (graphics) {
 						Ref<CanvasImpl> ret = new CanvasImpl();
 						if (ret.isNotNull()) {

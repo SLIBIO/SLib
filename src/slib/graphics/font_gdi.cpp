@@ -29,8 +29,6 @@
 #include "slib/graphics/platform.h"
 #include "slib/core/safe_static.h"
 
-#pragma comment (lib, "gdiplus.lib")
-
 namespace slib
 {
 
@@ -49,6 +47,8 @@ namespace slib
 				FontStaticContext()
 				{
 					graphics = sl_null;
+
+					GraphicsPlatform::startGdiplus();
 					image = new Gdiplus::Bitmap(1, 1, PixelFormat24bppRGB);
 					if (image) {
 						graphics = new Gdiplus::Graphics(image);
@@ -122,6 +122,8 @@ namespace slib
 						style |= Gdiplus::FontStyleStrikeout;
 					}
 					String16 fontName = desc.familyName;
+
+					GraphicsPlatform::startGdiplus();
 					Gdiplus::Font* font = new Gdiplus::Font(
 						(LPCWSTR)(fontName.getData()),
 						desc.size,

@@ -30,9 +30,8 @@
 #include "slib/graphics/platform.h"
 #include "slib/core/scoped.h"
 
-#include <Shlwapi.h>
+#include <shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
-#pragma comment(lib, "gdiplus.lib")
 
 namespace slib
 {
@@ -113,6 +112,7 @@ namespace slib
 	{
 		IStream* stream = ::SHCreateMemStream((BYTE*)buf, (sl_uint32)size);
 		if (stream) {
+			GraphicsPlatform::startGdiplus();
 			Gdiplus::Image* image = new Gdiplus::Image(stream);
 			stream->Release();
 			if (image && image->GetWidth() > 0 && image->GetHeight() > 0) {

@@ -46,7 +46,6 @@
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #endif
 
-#pragma comment(lib, "gdiplus.lib")
 #pragma comment(lib, "comctl32.lib")
 
 namespace slib
@@ -335,13 +334,11 @@ namespace slib
 
 	void UIPlatform::runApp()
 	{
+		GraphicsPlatform::startGdiplus();
+
 		Win32_UI_Shared::get();
 
 		g_threadMain = GetCurrentThreadId();
-
-		Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-		ULONG_PTR gdiplusToken;
-		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
 		OleInitialize(NULL);
 
@@ -357,7 +354,6 @@ namespace slib
 
 		UIDispatcher::removeAllCallbacks();
 
-		//Gdiplus::GdiplusShutdown(gdiplusToken);
 	}
 
 	void UIPlatform::quitApp()

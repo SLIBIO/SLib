@@ -28,8 +28,6 @@
 
 #include "slib/graphics/platform.h"
 
-#pragma comment(lib, "gdiplus.lib")
-
 namespace slib
 {
 
@@ -50,6 +48,7 @@ namespace slib
 					const Color& _color = desc.color;
 					Gdiplus::Color color(_color.a, _color.r, _color.g, _color.b);
 					if (desc.style == BrushStyle::Solid) {
+						GraphicsPlatform::startGdiplus();
 						Gdiplus::Brush* brush = new Gdiplus::SolidBrush(color);
 						if (brush) {
 							m_brush = brush;
