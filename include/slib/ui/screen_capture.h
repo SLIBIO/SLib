@@ -35,6 +35,8 @@ namespace slib
 	public:
 		static Ref<Image> takeScreenshot();
 		
+		static Ref<Image> takeScreenshotFromCurrentMonitor();
+
 		static List< Ref<Image> > takeScreenshotsFromAllMonitors();
 		
 	};

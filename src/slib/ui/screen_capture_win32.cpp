@@ -91,7 +91,7 @@ namespace slib
 						BitBlt(m_hdcCache, 0, 0, (int)width, (int)height, hdcSource, x, y, SRCCOPY);
 						Ref<Bitmap> bitmap = GraphicsPlatform::createBitmap(m_hbmCache);
 						if (bitmap.isNotNull()) {
-							return bitmap->toImage();
+							return Image::createCopyBitmap(bitmap, 0, 0, width, height);
 						}
 					}
 					return sl_null;
@@ -185,6 +185,37 @@ namespace slib
 			Ref<Image> image = helper->getImage(hDC, 0, 0, width, height);
 			DeleteDC(hDC);
 			return image;
+		}
+		return sl_null;
+	}
+
+	Ref<Image> ScreenCapture::takeScreenshotFromCurrentMonitor()
+	{
+		Helper* helper = GetHelper();
+		if (!helper) {
+			return sl_null;
+		}
+		MutexLocker lock(&(helper->m_lock));
+		POINT pt;
+		GetCursorPos(&pt);
+		HMONITOR hMonitor = MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
+		if (hMonitor) {			
+			MONITORINFOEXW info;
+			Base::zeroMemory(&info, sizeof(info));
+			info.cbSize = sizeof(info);
+			if (GetMonitorInfoW(hMonitor, &info)) {
+				HDC hDC = CreateDCW(L"DISPLAY", NULL, NULL, NULL);
+				if (hDC) {
+					Ref<Image> image = helper->getImage(
+						hDC,
+						(sl_int32)(info.rcMonitor.left),
+						(sl_int32)(info.rcMonitor.top),
+						(sl_int32)(info.rcMonitor.right - info.rcMonitor.left),
+						(sl_int32)(info.rcMonitor.bottom - info.rcMonitor.top));
+					DeleteDC(hDC);
+					return image;
+				}
+			}
 		}
 		return sl_null;
 	}
