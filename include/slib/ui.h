@@ -83,5 +83,6 @@
 #include "ui/clipboard.h"
 #include "ui/notification.h"
 #include "ui/photo.h"
+#include "ui/screen_capture.h"
 
 #endif

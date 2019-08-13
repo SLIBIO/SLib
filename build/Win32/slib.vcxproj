@@ -374,6 +374,8 @@
     <ClCompile Include="..\..\src\slib\ui\refresh_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\render_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\render_view_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\screen_capture.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\screen_capture_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\scroll_bar.cpp" />
     <ClCompile Include="..\..\src\slib\ui\scroll_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\scroll_view_win32.cpp" />

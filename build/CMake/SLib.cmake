@@ -324,6 +324,7 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/ui/radio_button.cpp"
  "${SLIB_PATH}/src/slib/ui/refresh_view.cpp"
  "${SLIB_PATH}/src/slib/ui/render_view.cpp"
+ "${SLIB_PATH}/src/slib/ui/screen_capture.cpp"
  "${SLIB_PATH}/src/slib/ui/scroll_bar.cpp"
  "${SLIB_PATH}/src/slib/ui/scroll_view.cpp"
  "${SLIB_PATH}/src/slib/ui/select_view.cpp"

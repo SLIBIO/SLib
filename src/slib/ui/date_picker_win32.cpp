@@ -102,10 +102,20 @@ namespace slib
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
 			SIZE size = { 0, 0 };
-			SendMessageW(handle, DTM_GETIDEALSIZE, 0, (LPARAM)&size);
-			_out.x = (sl_ui_len)(size.cx);
-			_out.y = (sl_ui_len)(size.cy);
-			return sl_true;
+			SendMessageW(handle, (DTM_FIRST + 15) /*DTM_GETIDEALSIZE*/, 0, (LPARAM)&size);
+			if (size.cx > 0 && size.cy > 0) {
+				_out.x = (sl_ui_len)(size.cx);
+				_out.y = (sl_ui_len)(size.cy);
+				return sl_true;
+			} else {
+				Ref<Font> font = getFont();
+				if (font.isNotNull()) {
+					Size size = font->measureText("0000-00-00");
+					_out.x = (sl_ui_len)(size.x + size.y * 2);
+					_out.y = (sl_ui_len)(size.y * 1.5f);
+					return sl_true;
+				}
+			}
 		}
 		return sl_false;
 	}

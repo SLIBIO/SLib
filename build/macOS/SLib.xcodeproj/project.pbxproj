@@ -844,6 +844,8 @@
 		264AF14021B05AAE004E58CB /* sapp_util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF13121B05AAE004E58CB /* sapp_util.cpp */; };
 		264AF14221B05AAE004E58CB /* sapp_values.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF13321B05AAE004E58CB /* sapp_values.cpp */; };
 		264DF0F022455E46007DB734 /* chat_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264DF0EF22455E46007DB734 /* chat_view.cpp */; };
+		265A93462301E42700B155A2 /* screen_capture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265A93452301E42700B155A2 /* screen_capture.cpp */; };
+		265A934A2301E43000B155A2 /* screen_capture_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 265A93482301E43000B155A2 /* screen_capture_macos.mm */; };
 		26635CA322670708005E4BA6 /* ui_photo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26635CA222670708005E4BA6 /* ui_photo.cpp */; };
 		266E66E121D7F68F00D92386 /* locale_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266E66E021D7F68F00D92386 /* locale_apple.mm */; };
 		2671F99321E07F8200B39842 /* drawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2671F99221E07F8100B39842 /* drawer.cpp */; };
@@ -2254,6 +2256,8 @@
 		264DF0EF22455E46007DB734 /* chat_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_view.cpp; sourceTree = "<group>"; };
 		2653358E1E2E8A5A00199C76 /* ui_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_animation.cpp; sourceTree = "<group>"; };
 		26599DB91BEA5DD2008659BB /* thread_pool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_pool.cpp; sourceTree = "<group>"; };
+		265A93452301E42700B155A2 /* screen_capture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = screen_capture.cpp; sourceTree = "<group>"; };
+		265A93482301E43000B155A2 /* screen_capture_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = screen_capture_macos.mm; sourceTree = "<group>"; };
 		265EBF1F1C23041600AD81D9 /* database_cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database_cursor.cpp; sourceTree = "<group>"; };
 		265EBF201C23041600AD81D9 /* database_statement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database_statement.cpp; sourceTree = "<group>"; };
 		265EBF211C23041600AD81D9 /* database.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database.cpp; sourceTree = "<group>"; };
@@ -4399,6 +4403,8 @@
 				2698A54D226A383400662528 /* refresh_view.cpp */,
 				266DD5171C11940A00D47AB0 /* render_view.cpp */,
 				266DD51A1C11940A00D47AB0 /* render_view_macos.mm */,
+				265A93452301E42700B155A2 /* screen_capture.cpp */,
+				265A93482301E43000B155A2 /* screen_capture_macos.mm */,
 				267C16B81CE779D8000318C2 /* scroll_bar.cpp */,
 				266DD5231C11940A00D47AB0 /* scroll_view.cpp */,
 				266DD5261C11940A00D47AB0 /* scroll_view_macos.mm */,
@@ -6351,6 +6357,7 @@
 				26E1B88C222ABAB2007C222E /* jcsample.c in Sources */,
 				26D9D9461E9645CE005F7BD3 /* app.cpp in Sources */,
 				26D9D9471E9645CE005F7BD3 /* sphere.cpp in Sources */,
+				265A93462301E42700B155A2 /* screen_capture.cpp in Sources */,
 				26D9D9961E96467B005F7BD3 /* http_server.cpp in Sources */,
 				26D9D9481E9645CE005F7BD3 /* line_segment.cpp in Sources */,
 				26D9D9A11E96467B005F7BD3 /* socket.cpp in Sources */,
@@ -6369,6 +6376,7 @@
 				263916EC21C8F462008B335B /* qr_code_scanner.cpp in Sources */,
 				26E1B8A3222ABAB2007C222E /* jidctflt.c in Sources */,
 				26BAE01E222062D20085B5AB /* facebook_sdk.cpp in Sources */,
+				265A934A2301E43000B155A2 /* screen_capture_macos.mm in Sources */,
 				26D9D9B61E96468D005F7BD3 /* camera_view.cpp in Sources */,
 				26D9D9B91E96468D005F7BD3 /* common_dialogs.cpp in Sources */,
 				26D9D94D1E9645CE005F7BD3 /* dispatch.cpp in Sources */,
