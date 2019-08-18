@@ -54,9 +54,6 @@ namespace slib
 
 	SAppLayoutViewAttributes::SAppLayoutViewAttributes()
 	{
-		finalFontBold = sl_false;
-		finalFontItalic = sl_false;
-		finalFontUnderline = sl_false;
 	}
 
 	sl_bool SAppLayoutViewAttributes::isNotRequiredNative(sl_bool flagCheckBackgroundColor)

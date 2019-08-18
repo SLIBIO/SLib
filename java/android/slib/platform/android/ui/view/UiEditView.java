@@ -31,14 +31,18 @@ import slib.platform.android.ui.Util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Layout;
 import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.text.TextWatcher;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -63,8 +67,7 @@ public class UiEditView extends EditText implements IView {
 			if (type == 0) {
 				// EditView
 				UiEditView view = new UiEditView(context);
-				view.setPadding(3, 0, 3, 0);
-				return view;				
+				return view;
 			} else if (type == 2) {
 				// TextArea
 				UiTextArea view = new UiTextArea(context);
@@ -135,6 +138,23 @@ public class UiEditView extends EditText implements IView {
 		return false;
 	}
 
+	public static boolean _setTextColor(final View view, final int color) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_setTextColor(view, color);
+				}
+			});
+			return true;
+		}
+		if (view instanceof TextView) {
+			TextView tv = (TextView)view;
+			tv.setTextColor(color);
+			return true;
+		}
+		return false;
+	}
+
 	public static boolean _setHintText(final View view, String text) {
 		if (!(UiThread.isUiThread())) {
 			final String t = text;
@@ -145,7 +165,12 @@ public class UiEditView extends EditText implements IView {
 			});
 			return true;
 		}
-		if (view instanceof TextView) {
+		if (view instanceof UiEditView) {
+			UiEditView tv = (UiEditView)view;
+			tv.mHintText = text;
+			tv.applyHint();
+			return true;
+		} else if (view instanceof TextView) {
 			if (text == null) {
 				text = "";
 			}
@@ -154,7 +179,65 @@ public class UiEditView extends EditText implements IView {
 		}
 		return false;
 	}
-	
+
+	public static boolean _setHintAlignment(final View view, final int align) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_setHintAlignment(view, align);
+				}
+			});
+			return true;
+		}
+		if (view instanceof UiEditView) {
+			UiEditView tv = (UiEditView)view;
+			tv.mHintAlign = Util.getAndroidAlignment(align);
+			tv.applyHint();
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean _setHintTextColor(final View view, final int color) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_setHintTextColor(view, color);
+				}
+			});
+			return true;
+		}
+		if (view instanceof UiEditView) {
+			UiEditView tv = (UiEditView)view;
+			tv.mHintColor = color;
+			tv.applyHint();
+			return true;
+		} else if (view instanceof TextView) {
+			TextView tv = (TextView)view;
+			tv.setHintTextColor(color);
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean _setHintFont(final View view, final UiFont font) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_setHintFont(view, font);
+				}
+			});
+			return true;
+		}
+		if (view instanceof UiEditView) {
+			UiEditView tv = (UiEditView)view;
+			tv.mHintFont = font;
+			tv.applyHint();
+			return true;
+		}
+		return false;
+	}
+
 	public static boolean _setReadOnly(final View view, final boolean flag) {
 		if (!(UiThread.isUiThread())) {
 			view.post(new Runnable() {
@@ -189,40 +272,6 @@ public class UiEditView extends EditText implements IView {
 				type &= ~(EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE);
 			}
 			tv.setInputType(type);
-			return true;
-		}
-		return false;
-	}
-
-	public static boolean _setTextColor(final View view, final int color) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setTextColor(view, color);
-				}
-			});
-			return true;
-		}
-		if (view instanceof TextView) {
-			TextView tv = (TextView)view;
-			tv.setTextColor(color);				
-			return true;
-		}
-		return false;
-	}
-
-	public static boolean _setHintTextColor(final View view, final int color) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setHintTextColor(view, color);
-				}
-			});
-			return true;
-		}
-		if (view instanceof TextView) {
-			TextView tv = (TextView)view;
-			tv.setHintTextColor(color);
 			return true;
 		}
 		return false;
@@ -466,7 +515,17 @@ public class UiEditView extends EditText implements IView {
 	}
 
 	public UiEditView(Context context) {
+
 		super(context);
+
+		int padding = 3;
+		try {
+			padding = (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3, context.getResources().getDisplayMetrics()));
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		setPadding(padding, 0, padding, 0);
+
 		this.addTextChangedListener(new TextWatcher() {
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 			}
@@ -533,6 +592,39 @@ public class UiEditView extends EditText implements IView {
 		setMeasuredDimension(UiView.resolveMeasure(mRight-mLeft, widthMeasureSpec), UiView.resolveMeasure(mBottom-mTop, heightMeasureSpec));
 	}
 
+	@Override
+	protected void onSizeChanged(int w, int h, int oldW, int oldH) {
+		super.onSizeChanged(w, h, oldW, oldH);
+		if (mHintLayout != null) {
+			applyHint();
+		}
+	}
+
+	@Override
+	protected void onDraw(Canvas canvas) {
+		super.onDraw(canvas);
+		Editable text = getText();
+		if (text != null && text.length() > 0) {
+			return;
+		}
+		prepareHint();
+		if (mHintLayout != null) {
+			canvas.save();
+			int paddingLeft = getCompoundPaddingLeft();
+			int paddingTop = getCompoundPaddingTop();
+			int paddingBottom = getCompoundPaddingBottom();
+			if ((mHintAlign & Gravity.TOP) == Gravity.TOP) {
+				canvas.translate(paddingLeft, paddingTop);
+			} else if ((mHintAlign & Gravity.BOTTOM) == Gravity.BOTTOM) {
+				canvas.translate(paddingLeft, getHeight() - paddingBottom - mHintLayout.getHeight());
+			} else {
+				canvas.translate(paddingLeft, paddingTop + (getHeight() - paddingBottom - paddingTop - mHintLayout.getHeight()) / 2.0f);
+			}
+			mHintLayout.draw(canvas);
+			canvas.restore();
+		}
+	}
+
 	void applyBackground() {
 		applyBackground(this, mFlagBorder, mBackgroundColor);
 	}
@@ -544,5 +636,47 @@ public class UiEditView extends EditText implements IView {
 			view.setBackgroundColor(color);
 		}
 	}
+
+	void applyHint() {
+		mHintLayout = null;
+		invalidate();
+	}
+
+	void prepareHint() {
+		if (mHintText != null && mHintText.length() > 0) {
+			if (mHintLayout != null) {
+				return;
+			}
+			TextPaint paint = new TextPaint();
+			if (mHintFont != null) {
+				paint.setTypeface(mHintFont.getTypeface());
+				paint.setTextSize(mHintFont.getSize());
+			} else {
+				paint.setTypeface(getTypeface());
+				paint.setTextSize(getTextSize());
+			}
+			paint.setColor(mHintColor);
+			Layout.Alignment align = Layout.Alignment.ALIGN_CENTER;
+			if ((mHintAlign & Gravity.LEFT) == Gravity.LEFT) {
+				align = Layout.Alignment.ALIGN_NORMAL;
+			} else if ((mHintAlign & Gravity.RIGHT) == Gravity.RIGHT) {
+				align = Layout.Alignment.ALIGN_OPPOSITE;
+			}
+			int width = getWidth() - getCompoundPaddingLeft() - getCompoundPaddingRight();
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				mHintLayout = StaticLayout.Builder.obtain(mHintText, 0, mHintText.length(), paint, width).setAlignment(align).build();
+			} else {
+				mHintLayout = new StaticLayout(mHintText, paint, width, align, 1, 0, true);
+			}
+		} else {
+			mHintLayout = null;
+		}
+	}
+
+	private String mHintText;
+	private int mHintAlign = Gravity.CENTER;
+	private int mHintColor = 0xFF000000;
+	private UiFont mHintFont;
+	private StaticLayout mHintLayout;
 
 }

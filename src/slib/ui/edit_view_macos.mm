@@ -40,6 +40,7 @@
 {	
 	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 	@public NSAttributedString* m_placeholderString;
+	@public slib::Alignment m_placeholderVerticalAlignment;
 }
 @end
 
@@ -61,20 +62,18 @@ namespace slib
 			class EditViewHelper : public EditView
 			{
 			public:
-				void _applyPlaceholder(NSView* handle, NSFont* hFont)
+				void _applyPlaceholder(NSView* handle)
 				{
 					NSAttributedString* attr = nil;
-					if (hFont == nil) {
-						Ref<Font> font = getFont();
-						hFont = GraphicsPlatform::getNSFont(font.get());
-					}
+					Ref<Font> font = getHintFont();
+					NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
 					if (hFont != nil) {
 						String _text = m_hintText;
 						if (_text.isNotEmpty()) {
 							NSString* text = Apple::getNSStringFromString(_text, @"");
 							NSColor* color = GraphicsPlatform::getNSColorFromColor(m_hintTextColor);
 							NSMutableParagraphStyle* paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-							[paragraphStyle setAlignment:translateAlignment(m_textAlignment)];
+							[paragraphStyle setAlignment:translateAlignment(m_hintTextAlignment)];
 							attr = [[NSAttributedString alloc] initWithString:text attributes:@{NSForegroundColorAttributeName: color, NSParagraphStyleAttributeName: paragraphStyle, NSFontAttributeName: hFont}];
 						}
 					}
@@ -84,6 +83,7 @@ namespace slib
 					} else if ([handle isKindOfClass:[SLIBTextAreaHandle class]]) {
 						SLIBTextAreaHandle* tv = (SLIBTextAreaHandle*)handle;
 						tv->m_textView->m_placeholderString = attr;
+						tv->m_textView->m_placeholderVerticalAlignment = m_hintTextAlignment & Alignment::VerticalMask;
 						if (m_text.isEmpty() && attr != nil) {
 							[tv setNeedsDisplay:YES];
 						}
@@ -106,15 +106,14 @@ namespace slib
 					
 					[handle setStringValue:(Apple::getNSStringFromString(m_text, @""))];
 					[handle setAlignment:translateAlignment(m_textAlignment)];
+					[handle setTextColor:(GraphicsPlatform::getNSColorFromColor(m_textColor))];
 					[handle setBordered: (isBorder() ? YES : NO)];
 					[handle setBezeled: (isBorder() ? YES : NO)];
-					[handle setTextColor:(GraphicsPlatform::getNSColorFromColor(m_textColor))];
-					[handle setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(getBackgroundColor()))];
 					[handle setEditable:(m_flagReadOnly? NO : YES)];
 					[handle setSelectable:YES];
-					
-					_applyPlaceholder(handle, hFont);
+					[handle setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(getBackgroundColor()))];
 
+					_applyPlaceholder(handle);
 				}
 				
 				void _applyProperties(SLIBTextAreaHandle* handle)
@@ -134,13 +133,13 @@ namespace slib
 					NSString* text = Apple::getNSStringFromString(m_text, @"");
 					[tv setString:text];
 					[tv setAlignment:translateAlignment(m_textAlignment)];
-					[handle setBorderType:(isBorder() ? NSBezelBorder : NSNoBorder)];
 					[tv setTextColor:(GraphicsPlatform::getNSColorFromColor(m_textColor))];
-					[tv setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(getBackgroundColor()))];
+					[handle setBorderType:(isBorder() ? NSBezelBorder : NSNoBorder)];
 					[tv setEditable:(m_flagReadOnly?NO:YES)];
 					[tv setSelectable:YES];
-					
-					_applyPlaceholder(handle, hFont);
+					[tv setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(getBackgroundColor()))];
+
+					_applyPlaceholder(handle);
 				}
 				
 				static void _applyFont(NSTextView* tv, NSFont* font, sl_bool flagSet)
@@ -278,15 +277,31 @@ namespace slib
 			if ([handle isKindOfClass:[NSTextField class]]) {
 				NSTextField* tv = (NSTextField*)handle;
 				[tv setAlignment:EditViewHelper::translateAlignment(align)];
-				((EditViewHelper*)this)->_applyPlaceholder(handle, nil);
 			} else if ([handle isKindOfClass:[SLIBTextAreaHandle class]]) {
 				SLIBTextAreaHandle* tv = (SLIBTextAreaHandle*)handle;
 				[tv->m_textView setAlignment:EditViewHelper::translateAlignment(align)];
-				((EditViewHelper*)this)->_applyPlaceholder(handle, nil);
 			}
 		}
 	}
 
+	void EditView::_setTextColor_NW(const Color& color)
+	{
+		if (!(isUiThread())) {
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), EditView, _setTextColor_NW, this, color));
+			return;
+		}
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil) {
+			if ([handle isKindOfClass:[NSTextField class]]) {
+				NSTextField* tv = (NSTextField*)handle;
+				[tv setTextColor:(GraphicsPlatform::getNSColorFromColor(color))];
+			} else if ([handle isKindOfClass:[SLIBTextAreaHandle class]]) {
+				SLIBTextAreaHandle* tv = (SLIBTextAreaHandle*)handle;
+				[tv->m_textView setTextColor:(GraphicsPlatform::getNSColorFromColor(color))];
+			}
+		}
+	}
+	
 	void EditView::_setHintText_NW(const String& value)
 	{
 		if (!(isUiThread())) {
@@ -295,7 +310,43 @@ namespace slib
 		}
 		NSView* handle = UIPlatform::getViewHandle(this);
 		if (handle != nil) {
-			((EditViewHelper*)this)->_applyPlaceholder(handle, nil);
+			((EditViewHelper*)this)->_applyPlaceholder(handle);
+		}
+	}
+	
+	void EditView::_setHintTextAlignment_NW(Alignment align)
+	{
+		if (!(isUiThread())) {
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), EditView, _setTextAlignment_NW, this, align));
+			return;
+		}
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil) {
+			((EditViewHelper*)this)->_applyPlaceholder(handle);
+		}
+	}
+	
+	void EditView::_setHintTextColor_NW(const Color& color)
+	{
+		if (!(isUiThread())) {
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), EditView, _setHintTextColor_NW, this, color));
+			return;
+		}
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil) {
+			((EditViewHelper*)this)->_applyPlaceholder(handle);
+		}
+	}
+	
+	void EditView::_setHintFont_NW(const Ref<Font>& font)
+	{
+		if (!(isUiThread())) {
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), EditView, _setHintFont_NW, this, font));
+			return;
+		}
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil) {
+			((EditViewHelper*)this)->_applyPlaceholder(handle);
 		}
 	}
 	
@@ -357,36 +408,6 @@ namespace slib
 		}
 	}
 
-	void EditView::_setTextColor_NW(const Color& color)
-	{
-		if (!(isUiThread())) {
-			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), EditView, _setTextColor_NW, this, color));
-			return;
-		}
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil) {
-			if ([handle isKindOfClass:[NSTextField class]]) {
-				NSTextField* tv = (NSTextField*)handle;
-				[tv setTextColor:(GraphicsPlatform::getNSColorFromColor(color))];
-			} else if ([handle isKindOfClass:[SLIBTextAreaHandle class]]) {
-				SLIBTextAreaHandle* tv = (SLIBTextAreaHandle*)handle;
-				[tv->m_textView setTextColor:(GraphicsPlatform::getNSColorFromColor(color))];
-			}
-		}
-	}
-	
-	void EditView::_setHintTextColor_NW(const Color& value)
-	{
-		if (!(isUiThread())) {
-			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), EditView, _setHintTextColor_NW, this, value));
-			return;
-		}
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil) {
-			((EditViewHelper*)this)->_applyPlaceholder(handle, nil);
-		}
-	}
-	
 	sl_ui_len EditView::_measureHeight_NW()
 	{
 		sl_ui_len height = 0;
@@ -421,11 +442,11 @@ namespace slib
 				if ([handle isKindOfClass:[NSTextField class]]) {
 					NSTextField* tv = (NSTextField*)handle;
 					[tv setFont:hFont];
-					((EditViewHelper*)this)->_applyPlaceholder(handle, hFont);
+					((EditViewHelper*)this)->_applyPlaceholder(handle);
 				} else if ([handle isKindOfClass:[SLIBTextAreaHandle class]]) {
 					SLIBTextAreaHandle* tv = (SLIBTextAreaHandle*)handle;
 					EditViewHelper::_applyFont(tv->m_textView, hFont, sl_true);
-					((EditViewHelper*)this)->_applyPlaceholder(handle, hFont);
+					((EditViewHelper*)this)->_applyPlaceholder(handle);
 				}
 			}
 		}
@@ -572,7 +593,19 @@ MACOS_VIEW_DEFINE_ON_KEY
 			NSRect rect = [self bounds];
 			rect.origin.x += paddingLeft;
 			rect.size.width -= paddingLeft + paddingRight;
-			[self->m_placeholderString drawInRect:rect];
+			if (self->m_placeholderVerticalAlignment == Alignment::Top) {
+				[self->m_placeholderString drawInRect:rect];
+			} else if (self->m_placeholderVerticalAlignment == Alignment::Bottom) {
+				CGSize size = [self->m_placeholderString size];
+				rect.origin.y += rect.size.height - size.height;
+				rect.size.height = size.height;
+				[self->m_placeholderString drawInRect:rect];
+			} else {
+				CGSize size = [self->m_placeholderString size];
+				rect.origin.y += (rect.size.height - size.height) / 2;
+				rect.size.height = size.height;
+				[self->m_placeholderString drawInRect:rect];
+			}
 		}
 	}
 }

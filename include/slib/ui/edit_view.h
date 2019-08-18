@@ -48,9 +48,25 @@ namespace slib
 		
 		virtual void setGravity(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
+		Color getTextColor();
+		
+		virtual void setTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
 		String getHintText();
 		
 		virtual void setHintText(const String& str, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		Alignment getHintGravity();
+		
+		virtual void setHintGravity(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		Color getHintTextColor();
+		
+		virtual void setHintTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		Ref<Font> getHintFont();
+		
+		virtual void setHintFont(const Ref<Font>& font, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		sl_bool isReadOnly();
 		
@@ -63,14 +79,6 @@ namespace slib
 		MultiLineMode getMultiLine();
 		
 		virtual void setMultiLine(MultiLineMode multiLineMode, UIUpdateMode updateMode = UIUpdateMode::UpdateLayout);
-		
-		Color getTextColor();
-		
-		virtual void setTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
-		
-		Color getHintTextColor();
-		
-		virtual void setHintTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		UIReturnKeyType getReturnKeyType();
 		
@@ -115,17 +123,21 @@ namespace slib
 		
 		void _setTextAlignment_NW(Alignment align);
 		
+		void _setTextColor_NW(const Color& color);
+		
 		void _setHintText_NW(const String& str);
 		
+		void _setHintTextAlignment_NW(Alignment align);
+		
+		void _setHintTextColor_NW(const Color& color);
+		
+		void _setHintFont_NW(const Ref<Font>& font);
+
 		void _setReadOnly_NW(sl_bool flag);
 		
 		void _setPassword_NW(sl_bool flag);
 
 		void _setMultiLine_NW(MultiLineMode mode);
-		
-		void _setTextColor_NW(const Color& color);
-		
-		void _setHintTextColor_NW(const Color& color);
 		
 		void _setReturnKeyType_NW(UIReturnKeyType type);
 		
@@ -158,12 +170,14 @@ namespace slib
 	protected:
 		AtomicString m_text;
 		Alignment m_textAlignment;
+		Color m_textColor;
 		AtomicString m_hintText;
+		Alignment m_hintTextAlignment;
+		Color m_hintTextColor;
+		AtomicRef<Font> m_hintFont;
 		sl_bool m_flagReadOnly;
 		sl_bool m_flagPassword;
 		MultiLineMode m_multiLine;
-		Color m_textColor;
-		Color m_hintTextColor;
 		UIReturnKeyType m_returnKeyType;
 		UIKeyboardType m_keyboardType;
 		UIAutoCapitalizationType m_autoCapitalizationType;

@@ -1641,6 +1641,39 @@ namespace slib
 		flagDefined = sl_true;
 		return sl_true;
 	}
+	
+	
+	/************************************************
+	 				Font
+	************************************************/
+	
+	SAppFontValue::SAppFontValue()
+	{
+	}
+	
+	sl_bool SAppFontValue::isDefined()
+	{
+		return family.flagDefined || size.flagDefined || bold.flagDefined || italic.flagDefined || underline.flagDefined;
+	}
+	
+	void SAppFontValue::inheritFrom(const SAppFontValue& parent)
+	{
+		if (!(family.flagDefined)) {
+			family = parent.family;
+		}
+		if (!(size.flagDefined)) {
+			size = parent.size;
+		}
+		if (!(bold.flagDefined)) {
+			bold = parent.bold;
+		}
+		if (!(italic.flagDefined)) {
+			italic = parent.italic;
+		}
+		if (!(underline.flagDefined)) {
+			underline = parent.underline;
+		}
+	}
 
 	/************************************************
 					Menu

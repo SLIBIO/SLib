@@ -288,17 +288,9 @@ namespace slib
 		SAppDimensionFloatValue contentRadiusY;
 		SAppDimensionFloatValue contentRadius;
 		
-		SAppStringValue fontFamily;
-		SAppDimensionFloatValue fontSize;
-		SAppBooleanValue fontBold;
-		SAppBooleanValue fontItalic;
-		SAppBooleanValue fontUnderline;
-		SAppStringValue finalFontFamily;
-		SAppDimensionFloatValue finalFontSize;
-		sl_bool finalFontBold;
-		sl_bool finalFontItalic;
-		sl_bool finalFontUnderline;
-		
+		SAppFontValue font;
+		SAppFontValue finalFont;
+
 		SAppBooleanValue opaque;
 		SAppFloatValue alpha;
 		SAppBooleanValue layer;
@@ -436,12 +428,14 @@ namespace slib
 	public:
 		SAppStringValue text;
 		SAppAlignmentValue gravity;
+		SAppColorValue textColor;
 		SAppStringValue hintText;
+		SAppAlignmentValue hintGravity;
+		SAppColorValue hintTextColor;
+		SAppFontValue hintFont;
 		SAppBooleanValue readOnly;
 		SAppBooleanValue password;
 		SAppMultiLineModeValue multiLine;
-		SAppColorValue textColor;
-		SAppColorValue hintTextColor;
 		SAppUIReturnKeyTypeValue returnKey;
 		SAppUIKeyboardTypeValue keyboard;
 		SAppUIAutoCapitalizationTypeValue autoCap;

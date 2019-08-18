@@ -46,11 +46,13 @@ namespace slib
 				SLIB_JNI_STATIC_METHOD(getText, "_getText", "(Landroid/view/View;)Ljava/lang/String;");
 				SLIB_JNI_STATIC_METHOD(setText, "_setText", "(Landroid/view/View;Ljava/lang/String;)Z");
 				SLIB_JNI_STATIC_METHOD(setAlignment, "_setAlignment", "(Landroid/view/View;I)Z");
+				SLIB_JNI_STATIC_METHOD(setTextColor, "_setTextColor", "(Landroid/view/View;I)Z");
 				SLIB_JNI_STATIC_METHOD(setHintText, "_setHintText", "(Landroid/view/View;Ljava/lang/String;)Z");
+				SLIB_JNI_STATIC_METHOD(setHintAlignment, "_setHintAlignment", "(Landroid/view/View;I)Z");
+				SLIB_JNI_STATIC_METHOD(setHintTextColor, "_setHintTextColor", "(Landroid/view/View;I)Z");
+				SLIB_JNI_STATIC_METHOD(setHintFont, "_setHintFont", "(Landroid/view/View;Lslib/platform/android/ui/UiFont;)Z");
 				SLIB_JNI_STATIC_METHOD(setReadOnly, "_setReadOnly", "(Landroid/view/View;Z)Z");
 				SLIB_JNI_STATIC_METHOD(setMultiLine, "_setMultiLine", "(Landroid/view/View;Z)Z");
-				SLIB_JNI_STATIC_METHOD(setTextColor, "_setTextColor", "(Landroid/view/View;I)Z");
-				SLIB_JNI_STATIC_METHOD(setHintTextColor, "_setHintTextColor", "(Landroid/view/View;I)Z");
 				SLIB_JNI_STATIC_METHOD(setReturnKeyType, "_setReturnKeyType", "(Landroid/view/View;I)Z");
 				SLIB_JNI_STATIC_METHOD(setInputType, "_setInputType", "(Landroid/view/View;IIZ)Z");
 				SLIB_JNI_STATIC_METHOD(measureHeight, "_measureHeight", "(Landroid/view/View;)I");
@@ -72,17 +74,27 @@ namespace slib
 					JEditView::setText.callBoolean(sl_null, handle, jtext.get());
 					JEditView::setBorder.callBoolean(sl_null, handle, isBorder());
 					JEditView::setAlignment.callBoolean(sl_null, handle, m_textAlignment.value);
+					JEditView::setTextColor.callBoolean(sl_null, handle, m_textColor.getARGB());
 					JniLocal<jstring> jhintText = Jni::getJniString(m_hintText);
 					JEditView::setHintText.callBoolean(sl_null, handle, jhintText.get());
+					JEditView::setHintAlignment.callBoolean(sl_null, handle, m_hintTextAlignment.value);
+					JEditView::setHintTextColor.callBoolean(sl_null, handle, m_hintTextColor.getARGB());
+					{
+						Ref<Font> font = getHintFont();
+						jobject jfont = GraphicsPlatform::getNativeFont(font.get());
+						if (jfont) {
+							JEditView::setHintFont.callBoolean(sl_null, handle, jfont);
+						}
+					}
 					JEditView::setReadOnly.callBoolean(sl_null, handle, m_flagReadOnly);
 					JEditView::setMultiLine.callBoolean(sl_null, handle, m_multiLine != MultiLineMode::Single);
-					JEditView::setTextColor.callBoolean(sl_null, handle, m_textColor.getARGB());
-					JEditView::setHintTextColor.callBoolean(sl_null, handle, m_hintTextColor.getARGB());
 					JEditView::setBackgroundColor.callBoolean(sl_null, handle, getBackgroundColor().getARGB());
-					Ref<Font> font = getFont();
-					jobject jfont = GraphicsPlatform::getNativeFont(font.get());
-					if (jfont) {
-						JEditView::setFont.callBoolean(sl_null, handle, jfont);
+					{
+						Ref<Font> font = getFont();
+						jobject jfont = GraphicsPlatform::getNativeFont(font.get());
+						if (jfont) {
+							JEditView::setFont.callBoolean(sl_null, handle, jfont);
+						}
 					}
 					JEditView::setReturnKeyType.callBoolean(sl_null, handle, (int)m_returnKeyType);
 					JEditView::setInputType.callBoolean(sl_null, handle, (int)m_keyboardType, (int)m_autoCapitalizationType, m_flagPassword ? 1 : 0);
@@ -175,12 +187,47 @@ namespace slib
 		}
 	}
 
+	void EditView::_setTextColor_NW(const Color& color)
+	{
+		jobject handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			JEditView::setTextColor.callBoolean(sl_null, handle, color.getARGB());
+		}
+	}
+
 	void EditView::_setHintText_NW(const String& text)
 	{
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
 			JniLocal<jstring> jstr = Jni::getJniString(text);
 			JEditView::setHintText.callBoolean(sl_null, handle, jstr.get());
+		}
+	}
+
+	void EditView::_setHintTextAlignment_NW(Alignment align)
+	{
+		jobject handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			JEditView::setHintAlignment.callBoolean(sl_null, handle, align.value);
+		}
+	}
+
+	void EditView::_setHintTextColor_NW(const Color& color)
+	{
+		jobject handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			JEditView::setHintTextColor.callBoolean(sl_null, handle, color.getARGB());
+		}
+	}
+
+	void EditView::_setHintFont_NW(const Ref<Font>& font)
+	{
+		jobject handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			jobject jfont = GraphicsPlatform::getNativeFont(font.get());
+			if (jfont) {
+				JEditView::setHintFont.callBoolean(sl_null, handle, jfont);
+			}
 		}
 	}
 
@@ -205,22 +252,6 @@ namespace slib
 		jobject handle = UIPlatform::getViewHandle(this);
 		if (handle) {
 			JEditView::setMultiLine.callBoolean(sl_null, handle, mode != MultiLineMode::Single);
-		}
-	}
-
-	void EditView::_setTextColor_NW(const Color& color)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JEditView::setTextColor.callBoolean(sl_null, handle, color.getARGB());
-		}
-	}
-
-	void EditView::_setHintTextColor_NW(const Color& color)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JEditView::setHintTextColor.callBoolean(sl_null, handle, color.getARGB());
 		}
 	}
 

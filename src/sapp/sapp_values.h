@@ -395,6 +395,25 @@ namespace slib
 		sl_bool parseWhole(const String& str);
 		
 	};
+	
+	class SAppFontValue
+	{
+	public:
+		SAppStringValue family;
+		SAppDimensionFloatValue size;
+		SAppBooleanValue bold;
+		SAppBooleanValue italic;
+		SAppBooleanValue underline;
+		
+	public:
+		SAppFontValue();
+		
+	public:
+		sl_bool isDefined();
+		
+		void inheritFrom(const SAppFontValue& parent);
+		
+	};
 
 	class SAppMenuValue
 	{

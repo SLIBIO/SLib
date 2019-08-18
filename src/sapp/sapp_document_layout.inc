@@ -1245,7 +1245,7 @@ namespace slib
 			_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 			return sl_false; \
 		} \
-		if (flagRoot) { \
+		if (params->parentResourceItem == sl_null) { \
 			if (!(attr->NAME.checkForRootViewMargin())) { \
 				_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
 				return sl_false; \
@@ -1423,6 +1423,96 @@ namespace slib
 		} \
 	}
 
+#define LAYOUT_CONTROL_FONT_ATTR(NAME, SETFUNC) \
+	if (op == OP_PARSE) { \
+		String str_family = resourceItem->getXmlAttribute(#NAME "Family"); \
+		if (!(attr->NAME.family.parse(str_family))) { \
+			LOG_ERROR_LAYOUT_CONTROL_ATTR(family) \
+			return sl_false; \
+		} \
+		String str_size = resourceItem->getXmlAttribute(#NAME "Size"); \
+		if (!(attr->NAME.size.parse(str_size, this))) { \
+			LOG_ERROR_LAYOUT_CONTROL_ATTR(size) \
+			return sl_false; \
+		} \
+		if (params->parentResourceItem == sl_null) { \
+			if (!(attr->NAME.size.checkForRootViewPosition())) { \
+				LOG_ERROR_LAYOUT_CONTROL_ATTR(size) \
+				return sl_false; \
+			} \
+		} else { \
+			if (!(attr->NAME.size.checkPosition())) { \
+				LOG_ERROR_LAYOUT_CONTROL_ATTR(size) \
+				return sl_false; \
+			} \
+		} \
+		String str_bold = resourceItem->getXmlAttribute(#NAME "Bold"); \
+		if (!(attr->NAME.bold.parse(str_bold))) { \
+			LOG_ERROR_LAYOUT_CONTROL_ATTR(bold) \
+			return sl_false; \
+		} \
+		String str_italic = resourceItem->getXmlAttribute(#NAME "Italic"); \
+		if (!(attr->NAME.italic.parse(str_italic))) { \
+			LOG_ERROR_LAYOUT_CONTROL_ATTR(italic) \
+			return sl_false; \
+		} \
+		String str_underline = resourceItem->getXmlAttribute(#NAME "Underline"); \
+		if (!(attr->NAME.underline.parse(str_underline))) { \
+			LOG_ERROR_LAYOUT_CONTROL_ATTR(underline) \
+			return sl_false; \
+		} \
+	} else if (op == OP_GENERATE_CPP) { \
+		if (attr->NAME.isDefined()) { \
+			String size; \
+			if (attr->NAME.size.flagDefined) { \
+				size = attr->NAME.size.getAccessString(); \
+			} else { \
+				size = "slib::UI::getDefaultFontSize()"; \
+			} \
+			StringBuffer* sb; \
+			String strUpdateMode; \
+			if (attr->NAME.size.isNeededOnLayoutFunction()) { \
+				sb = params->sbDefineLayout; \
+				strUpdateMode = "slib::UIUpdateMode::UpdateLayout"; \
+			} else { \
+				sb = params->sbDefineInit; \
+				strUpdateMode = "slib::UIUpdateMode::Init"; \
+			} \
+			if (attr->NAME.family.flagDefined) { \
+				String strFamily; \
+				if (_getStringAccessString(resource->name, attr->NAME.family, element, strFamily)) { \
+					sb->add(String::format("%s%s->" #SETFUNC "(slib::Font::create(%s, ", strTab, name, strFamily)); \
+				} else { \
+					return sl_false; \
+				} \
+			} else { \
+				sb->add(String::format("%s%s->" #SETFUNC "(slib::Font::create(slib::UI::getDefaultFontFamily(), ", strTab, name, name)); \
+			} \
+			sb->add(String::format("%s, %s, %s, %s), %s);%n", size, attr->NAME.bold.value?"sl_true":"sl_false", attr->NAME.italic.value?"sl_true":"sl_false", attr->NAME.underline.value?"sl_true":"sl_false", strUpdateMode)); \
+		} \
+	} else if (op == OP_SIMULATE) { \
+		if (flagOnLayout) { \
+			if (attr->NAME.isDefined()) { \
+				sl_real size; \
+				if (attr->NAME.size.flagDefined) { \
+					size = _getDimensionFloatValue(attr->NAME.size); \
+				} else { \
+					size = UI::getDefaultFontSize(); \
+				} \
+				if (attr->NAME.family.flagDefined) { \
+					String family; \
+					if (_getStringValue(resource->name, attr->NAME.family, element, family)) { \
+						view->SETFUNC(Font::create(family, size, attr->NAME.bold.value, attr->NAME.italic.value, attr->NAME.underline.value, sl_false)); \
+					} else { \
+						return sl_false; \
+					} \
+				} else { \
+					view->SETFUNC(Font::create(UI::getDefaultFontFamily(), size, attr->NAME.bold.value, attr->NAME.italic.value,  attr->NAME.underline.value, sl_false)); \
+				} \
+			} \
+		} \
+	}
+	
 
 #define LAYOUT_CONTROL_PROCESS_SUPER(BASE) \
 	String tempAddStatement = params->addStatement; \
@@ -2199,107 +2289,14 @@ namespace slib
 			LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(contentShape, setContentShape)
 		}
 
+		LAYOUT_CONTROL_FONT_ATTR(font, setFont)
 		if (op == OP_PARSE) {
-			LAYOUT_CONTROL_PARSE_ATTR(attr->, fontFamily)
-			if (attr->fontFamily.flagDefined) {
-				attr->finalFontFamily = attr->fontFamily;
-			} else {
-				if (!flagRoot) {
-					attr->finalFontFamily = params->parentResourceItem->attrsView->finalFontFamily;
-				}
+			attr->finalFont = attr->font;
+			if (!flagRoot) {
+				attr->finalFont.inheritFrom(params->parentResourceItem->attrsView->finalFont);
 			}
-			LAYOUT_CONTROL_PARSE_DIMENSION_ATTR(attr->, fontSize)
-			if (flagRoot) {
-				if (!(attr->fontSize.checkForRootViewPosition())) {
-					LOG_ERROR_LAYOUT_CONTROL_ATTR(fontSize)
-					return sl_false;
-				}
-			} else {
-				if (!(attr->fontSize.checkPosition())) {
-					LOG_ERROR_LAYOUT_CONTROL_ATTR(fontSize)
-					return sl_false;
-				}
-			}
-			if (attr->fontSize.flagDefined) {
-				attr->finalFontSize = attr->fontSize;
-			} else {
-				if (!flagRoot) {
-					attr->finalFontSize = params->parentResourceItem->attrsView->finalFontSize;
-				}
-			}
-			LAYOUT_CONTROL_PARSE_ATTR(attr->, fontBold)
-			if (attr->fontBold.flagDefined) {
-				attr->finalFontBold = attr->fontBold.value;
-			} else {
-				if (!flagRoot) {
-					attr->finalFontBold = params->parentResourceItem->attrsView->finalFontBold;
-				}
-			}
-			LAYOUT_CONTROL_PARSE_ATTR(attr->, fontItalic)
-			if (attr->fontItalic.flagDefined) {
-				attr->finalFontItalic = attr->fontItalic.value;
-			} else {
-				if (!flagRoot) {
-					attr->finalFontItalic = params->parentResourceItem->attrsView->finalFontItalic;
-				}
-			}
-			LAYOUT_CONTROL_PARSE_ATTR(attr->, fontUnderline)
-			if (attr->fontUnderline.flagDefined) {
-				attr->finalFontUnderline = attr->fontUnderline.value;
-			} else {
-				if (!flagRoot) {
-					attr->finalFontUnderline = params->parentResourceItem->attrsView->finalFontUnderline;
-				}
-			}
-		} else if (op == OP_GENERATE_CPP) {
-			if (attr->fontFamily.flagDefined || attr->fontSize.flagDefined || attr->fontBold.flagDefined || attr->fontItalic.flagDefined || attr->fontUnderline.flagDefined) {
-				String fontSize;
-				if (attr->finalFontSize.flagDefined) {
-					fontSize = attr->finalFontSize.getAccessString();
-				} else {
-					fontSize = "slib::UI::getDefaultFontSize()";
-				}
-				StringBuffer* sb;
-				String strUpdateMode;
-				if (attr->finalFontSize.isNeededOnLayoutFunction()) {
-					sb = params->sbDefineLayout;
-					strUpdateMode = "slib::UIUpdateMode::UpdateLayout";
-				} else {
-					sb = params->sbDefineInit;
-					strUpdateMode = "slib::UIUpdateMode::Init";
-				}
-				if (attr->finalFontFamily.flagDefined) {
-					String strFontFamily;
-					if (_getStringAccessString(resource->name, attr->finalFontFamily, element, strFontFamily)) {
-						sb->add(String::format("%s%s->setFont(slib::Font::create(%s, ", strTab, name, strFontFamily));
-					} else {
-						return sl_false;
-					}
-				} else {
-					sb->add(String::format("%s%s->setFont(slib::Font::create(%s->getFontFamily(), ", strTab, name, name));
-				}
-				sb->add(String::format("%s, %s, %s, %s), %s);%n", fontSize, attr->finalFontBold?"sl_true":"sl_false", attr->finalFontItalic?"sl_true":"sl_false", attr->finalFontUnderline?"sl_true":"sl_false", strUpdateMode));
-			}
-		} else if (op == OP_SIMULATE) {
-			if (flagOnLayout) {
-				if (attr->fontFamily.flagDefined || attr->fontSize.flagDefined || attr->fontBold.flagDefined || attr->fontItalic.flagDefined || attr->fontUnderline.flagDefined) {
-					sl_real fontSize;
-					if (attr->finalFontSize.flagDefined) {
-						fontSize = _getDimensionFloatValue(attr->finalFontSize);
-					} else {
-						fontSize = UI::getDefaultFontSize();
-					}
-					if (attr->finalFontFamily.flagDefined) {
-						String fontFamily;
-						if (_getStringValue(resource->name, attr->finalFontFamily, element, fontFamily)) {
-							view->setFont(Font::create(fontFamily, fontSize, attr->finalFontBold, attr->finalFontItalic, attr->finalFontUnderline, sl_false));
-						} else {
-							return sl_false;
-						}
-					} else {
-						view->setFont(Font::create(view->getFontFamily(), fontSize, attr->finalFontBold, attr->finalFontItalic, attr->finalFontUnderline, sl_false));
-					}
-				}
+			if (attr->font.isDefined()) {
+				attr->font = attr->finalFont;
 			}
 		}
 		
@@ -2860,12 +2857,19 @@ namespace slib
 		
 		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(text, setText)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(gravity, setGravity)
+		LAYOUT_CONTROL_COLOR_ATTR(textColor, setTextColor)
 		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(hintText, setHintText)
+		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(hintGravity, setHintGravity)
+		LAYOUT_CONTROL_COLOR_ATTR(hintTextColor, setHintTextColor)
+		LAYOUT_CONTROL_FONT_ATTR(hintFont, setHintFont)
+		if (op == OP_PARSE) {
+			if (attr->hintFont.isDefined()) {
+				attr->hintFont.inheritFrom(resourceItem->attrsView->finalFont);
+			}
+		}
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(readOnly, setReadOnly)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(password, setPassword)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(multiLine, setMultiLine)
-		LAYOUT_CONTROL_COLOR_ATTR(textColor, setTextColor)
-		LAYOUT_CONTROL_COLOR_ATTR(hintTextColor, setHintTextColor)
 		LAYOUT_CONTROL_GENERIC_ATTR(returnKey, setReturnKeyType)
 		LAYOUT_CONTROL_GENERIC_ATTR(keyboard, setKeyboardType)
 		LAYOUT_CONTROL_GENERIC_ATTR(autoCap, setAutoCapitalizationType)

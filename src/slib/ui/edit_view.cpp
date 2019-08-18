@@ -45,17 +45,18 @@ namespace slib
 		setFocusable(sl_true);
 		
 		m_textAlignment = Alignment::MiddleCenter;
+		m_textColor = Color::Black;
+		m_hintTextAlignment = Alignment::MiddleCenter;
+		m_hintTextColor = Color(180, 180, 180);
 		m_flagReadOnly = sl_false;
 		m_flagPassword = sl_false;
 		m_multiLine = MultiLineMode::Single;
-		m_textColor = Color::Black;
-		m_hintTextColor = Color(180, 180, 180);
-		setBorder(sl_true, UIUpdateMode::Init);
 		m_returnKeyType = UIReturnKeyType::Default;
 		m_keyboardType = UIKeyboardType::Default;
 		m_autoCapitalizationType = UIAutoCapitalizationType::None;
 		m_flagAutoDismissKeyboard = sl_true;
 		
+		setBorder(sl_true, UIUpdateMode::Init);
 		setPadding((sl_ui_pos)(UI::dpToPixel(2)), UIUpdateMode::Init);
 	}
 
@@ -103,6 +104,21 @@ namespace slib
 		}
 	}
 
+	Color EditView::getTextColor()
+	{
+		return m_textColor;
+	}
+	
+	void EditView::setTextColor(const Color& color, UIUpdateMode mode)
+	{
+		m_textColor = color;
+		if (isNativeWidget()) {
+			_setTextColor_NW(color);
+		} else {
+			invalidate(mode);
+		}
+	}
+	
 	String EditView::getHintText()
 	{
 		return m_hintText;
@@ -113,6 +129,55 @@ namespace slib
 		m_hintText = str;
 		if (isNativeWidget()) {
 			_setHintText_NW(str);
+		} else {
+			invalidate(mode);
+		}
+	}
+
+	Alignment EditView::getHintGravity()
+	{
+		return m_hintTextAlignment;
+	}
+	
+	void EditView::setHintGravity(Alignment align, UIUpdateMode mode)
+	{
+		m_hintTextAlignment = align;
+		if (isNativeWidget()) {
+			_setHintTextAlignment_NW(align);
+		} else {
+			invalidate(mode);
+		}
+	}
+
+	Color EditView::getHintTextColor()
+	{
+		return m_hintTextColor;
+	}
+	
+	void EditView::setHintTextColor(const Color& color, UIUpdateMode mode)
+	{
+		m_hintTextColor = color;
+		if (isNativeWidget()) {
+			_setHintTextColor_NW(color);
+		} else {
+			invalidate(mode);
+		}
+	}
+
+	Ref<Font> EditView::getHintFont()
+	{
+		Ref<Font> font = m_hintFont;
+		if (font.isNotNull()) {
+			return font;
+		}
+		return getFont();
+	}
+	
+	void EditView::setHintFont(const Ref<Font>& font, UIUpdateMode mode)
+	{
+		m_hintFont = font;
+		if (isNativeWidget()) {
+			_setHintFont_NW(getHintFont());
 		} else {
 			invalidate(mode);
 		}
@@ -161,36 +226,6 @@ namespace slib
 			_setMultiLine_NW(multiLineMode);
 		} else {
 			invalidate(updateMode);
-		}
-	}
-
-	Color EditView::getTextColor()
-	{
-		return m_textColor;
-	}
-
-	void EditView::setTextColor(const Color& color, UIUpdateMode mode)
-	{
-		m_textColor = color;
-		if (isNativeWidget()) {
-			_setTextColor_NW(color);
-		} else {
-			invalidate(mode);
-		}
-	}
-	
-	Color EditView::getHintTextColor()
-	{
-		return m_hintTextColor;
-	}
-	
-	void EditView::setHintTextColor(const Color& color, UIUpdateMode mode)
-	{
-		m_hintTextColor = color;
-		if (isNativeWidget()) {
-			_setHintTextColor_NW(color);
-		} else {
-			invalidate(mode);
 		}
 	}
 
@@ -496,7 +531,23 @@ namespace slib
 	{
 	}
 
+	void EditView::_setTextColor_NW(const Color& color)
+	{
+	}
+	
 	void EditView::_setHintText_NW(const String& str)
+	{
+	}
+
+	void EditView::_setHintTextAlignment_NW(Alignment align)
+	{
+	}
+
+	void EditView::_setHintTextColor_NW(const Color& color)
+	{
+	}
+	
+	void EditView::_setHintFont_NW(const Ref<Font>& font)
 	{
 	}
 
@@ -512,14 +563,6 @@ namespace slib
 	{
 	}
 
-	void EditView::_setTextColor_NW(const Color& color)
-	{
-	}
-	
-	void EditView::_setHintTextColor_NW(const Color& color)
-	{
-	}
-	
 	sl_ui_len EditView::_measureHeight_NW()
 	{
 		return 0;

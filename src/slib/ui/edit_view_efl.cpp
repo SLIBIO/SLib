@@ -191,7 +191,7 @@ namespace slib
 						return;
 					}
 
-					Ref<Font> font = getFont();
+					Ref<Font> font = getHintFont();
 					const char* fontName;
 					String strFontName;
 					const char* fontWeight;
@@ -219,7 +219,7 @@ namespace slib
 					}
 					const char* align;
 					{
-						Alignment ha = m_textAlignment & Alignment::HorizontalMask;
+						Alignment ha = m_hintTextAlignment & Alignment::HorizontalMask;
 						if (ha == Alignment::Left) {
 							align = "Left";
 						} else if (ha == Alignment::Right) {
@@ -401,6 +401,14 @@ namespace slib
 		}
 	}
 	
+	void EditView::_setTextColor_NW(const Color& color)
+	{
+		Evas_Object* handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			((EditViewHelper*)this)->_setStyle(handle);
+		}
+	}
+
 	void EditView::_setHintText_NW(const String& value)
 	{
 		Evas_Object* handle = UIPlatform::getViewHandle(this);
@@ -409,6 +417,30 @@ namespace slib
 		}
 	}
 	
+	void EditView::_setHintTextAlignment_NW(Alignment align)
+	{
+		Evas_Object* handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			((EditViewHelper*)this)->_applyPlaceholder(handle);
+		}
+	}
+	
+	void EditView::_setHintTextColor_NW(const Color& value)
+	{
+		Evas_Object* handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			((EditViewHelper*)this)->_applyPlaceholder(handle);
+		}
+	}
+
+	void EditView::_setHintFont_NW(const Ref<Font>& value)
+	{
+		Evas_Object* handle = UIPlatform::getViewHandle(this);
+		if (handle) {
+			((EditViewHelper*)this)->_applyPlaceholder(handle);
+		}
+	}
+
 	void EditView::_setReadOnly_NW(sl_bool flag)
 	{
 		Evas_Object* handle = UIPlatform::getViewHandle(this);
@@ -433,22 +465,6 @@ namespace slib
 		}
 	}
 	
-	void EditView::_setTextColor_NW(const Color& color)
-	{
-		Evas_Object* handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			((EditViewHelper*)this)->_setStyle(handle);
-		}
-	}
-
-	void EditView::_setHintTextColor_NW(const Color& value)
-	{
-		Evas_Object* handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			((EditViewHelper*)this)->_setStyle(handle);
-		}
-	}
-
 	void EditView::_setFont_NW(const Ref<Font>& font)
 	{
 		Evas_Object* handle = UIPlatform::getViewHandle(this);

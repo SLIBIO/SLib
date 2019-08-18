@@ -37,6 +37,18 @@ namespace slib
 	{
 		namespace edit_view
 		{
+			
+			class EditViewHelper : public EditView
+			{
+			public:
+				String getCurrentText()
+				{
+					return m_text;
+				}
+
+				Ref<ViewInstance> _createInstance(ViewInstance* parent, sl_bool flagTextArea);
+
+			};
 
 			class EditViewInstance : public Win32_ViewInstance
 			{
@@ -50,7 +62,9 @@ namespace slib
 
 				String16 m_hintText;
 				Color m_colorHintText;
-				Ref<Font> m_font;
+				Alignment m_alignmentHintText;
+				Ref<Font> m_fontHintText;
+
 				sl_uint32 m_heightRequested;
 
 			public:
@@ -95,33 +109,15 @@ namespace slib
 					}
 				}
 
-				void setBackgroundColor(const Color& color, sl_bool flagRedraw)
+				void setFont(const Ref<Font>& font)
 				{
 					HWND hWnd = m_handle;
 					if (!hWnd) {
 						return;
 					}
-					if (m_flagRichEdit) {
-						if (color.a == 0) {
-							SendMessageW(hWnd, EM_SETBKGNDCOLOR, 0, (LPARAM)(0xFFFFFF));
-						} else {
-							SendMessageW(hWnd, EM_SETBKGNDCOLOR, 0, (LPARAM)(GraphicsPlatform::getColorRef(color)));
-						}
-					} else {
-						if (m_colorBackground == color) {
-							return;
-						}
-						m_colorBackground = color;
-						if (m_hBrushBackground) {
-							DeleteObject(m_hBrushBackground);
-							m_hBrushBackground = NULL;
-						}
-						if (color.a != 0) {
-							m_hBrushBackground = CreateSolidBrush(GraphicsPlatform::getColorRef(color));
-						}
-						if (flagRedraw) {
-							InvalidateRect(hWnd, NULL, TRUE);
-						}
+					HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
+					if (hFont) {
+						SendMessageW(hWnd, WM_SETFONT, (WPARAM)hFont, TRUE);
 					}
 				}
 
@@ -147,26 +143,66 @@ namespace slib
 					if (!hWnd) {
 						return;
 					}
-					m_colorHintText = color;
 					if (m_flagRichEdit) {
+						m_colorHintText = color;
 						if (flagRedraw) {
 							InvalidateRect(hWnd, NULL, TRUE);
 						}
 					}
 				}
 
-				void setFont(const Ref<Font>& font, sl_bool flagRedraw)
+				void setHintTextAlignment(const Alignment& align, sl_bool flagRedraw)
 				{
 					HWND hWnd = m_handle;
 					if (!hWnd) {
 						return;
 					}
-					HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
-					if (hFont) {
-						SendMessageW(hWnd, WM_SETFONT, (WPARAM)hFont, TRUE);
+					if (m_flagRichEdit) {
+						m_alignmentHintText = align;
+						if (flagRedraw) {
+							InvalidateRect(hWnd, NULL, TRUE);
+						}
+					}
+				}
+
+				void setHintFont(const Ref<Font>& font, sl_bool flagRedraw)
+				{
+					HWND hWnd = m_handle;
+					if (!hWnd) {
+						return;
 					}
 					if (m_flagRichEdit) {
-						m_font = font;
+						m_fontHintText = font;
+						if (flagRedraw) {
+							InvalidateRect(hWnd, NULL, TRUE);
+						}
+					}
+				}
+
+				void setBackgroundColor(const Color& color, sl_bool flagRedraw)
+				{
+					HWND hWnd = m_handle;
+					if (!hWnd) {
+						return;
+					}
+					if (m_flagRichEdit) {
+						if (color.a == 0) {
+							SendMessageW(hWnd, EM_SETBKGNDCOLOR, 0, (LPARAM)(0xFFFFFF));
+						} else {
+							SendMessageW(hWnd, EM_SETBKGNDCOLOR, 0, (LPARAM)(GraphicsPlatform::getColorRef(color)));
+						}
+					} else {
+						if (m_colorBackground == color) {
+							return;
+						}
+						m_colorBackground = color;
+						if (m_hBrushBackground) {
+							DeleteObject(m_hBrushBackground);
+							m_hBrushBackground = NULL;
+						}
+						if (color.a != 0) {
+							m_hBrushBackground = CreateSolidBrush(GraphicsPlatform::getColorRef(color));
+						}
 						if (flagRedraw) {
 							InvalidateRect(hWnd, NULL, TRUE);
 						}
@@ -216,21 +252,31 @@ namespace slib
 						return 0;
 					}
 					if (msg == WM_PAINT) {
-						if (m_flagRichEdit && SendMessageW(hWnd, WM_GETTEXTLENGTH, 0, 0) == 0) {
+						if (m_flagRichEdit && m_hintText.isNotEmpty() && SendMessageW(hWnd, WM_GETTEXTLENGTH, 0, 0) == 0) {
 							Win32_ViewInstance::processSubclassMessage(msg, wParam, lParam);
 							HDC hDC = GetDC(hWnd);
 							if (hDC) {
-								HFONT hFont = GraphicsPlatform::getGdiFont(m_font.get());
+								HFONT hFont = GraphicsPlatform::getGdiFont(m_fontHintText.get());
 								if (hFont) {
 									HFONT hFontOld = (HFONT)(SelectObject(hDC, hFont));
-									LONG style = GetWindowLongW(hWnd, GWL_STYLE);
 									RECT rc;
 									SendMessageW(hWnd, EM_GETRECT, 0, (LPARAM)&rc);
-									UINT format = 0;
-									if (style & ES_RIGHT) {
-										format = DT_RIGHT;
-									} else if (style & ES_CENTER) {
-										format = DT_CENTER;
+									UINT format = DT_EXPANDTABS | DT_WORDBREAK;
+									Alignment halign = m_alignmentHintText & Alignment::HorizontalMask;
+									Alignment valign = m_alignmentHintText & Alignment::VerticalMask;
+									if (halign == Alignment::Right) {
+										format |= DT_RIGHT;
+									} else if (halign == Alignment::Center) {
+										format |= DT_CENTER;
+									}
+									if (valign != Alignment::Top) {
+										RECT rcCalc = rc;
+										DrawTextW(hDC, (LPCWSTR)(m_hintText.getData()), (int)(m_hintText.getLength()), &rcCalc, format | DT_CALCRECT);
+										if (valign == Alignment::Bottom) {
+											rc.top += rc.bottom - rcCalc.bottom;
+										} else {
+											rc.top += (rc.bottom - rcCalc.bottom) / 2;
+										}
 									}
 									SetTextColor(hDC, GraphicsPlatform::getColorRef(m_colorHintText));
 									SetBkMode(hDC, TRANSPARENT);
@@ -252,11 +298,15 @@ namespace slib
 						{
 							Ref<View> _view = getView();
 							if (EditView* view = CastInstance<EditView>(_view.get())) {
+								String textOld = ((EditViewHelper*)view)->getCurrentText();;
 								String text = Windows::getWindowText(m_handle);
 								String textNew = text;
 								view->dispatchChange(&textNew);
 								if (text != textNew) {
 									Windows::setWindowText(m_handle, textNew);
+								}
+								if (textOld.isEmpty() || textNew.isEmpty()) {
+									InvalidateRect(m_handle, NULL, TRUE);
 								}
 							}
 							return sl_true;
@@ -303,76 +353,74 @@ namespace slib
 
 			SLIB_DEFINE_OBJECT(EditViewInstance, Win32_ViewInstance)
 
-			class EditViewHelper : public EditView
+			Ref<ViewInstance> EditViewHelper::_createInstance(ViewInstance* parent, sl_bool flagTextArea)
 			{
-			public:
-				Ref<ViewInstance> _createInstance(ViewInstance* parent, sl_bool flagTextArea)
-				{
-					Win32_UI_Shared* shared = Win32_UI_Shared::get();
-					if (!shared) {
-						return sl_null;
-					}
-
-					LPCWSTR className = L"Edit";
-
-					int style = WS_TABSTOP;
-					if (isBorder()) {
-						style |= WS_BORDER;
-					}
-					Alignment align = m_textAlignment & Alignment::HorizontalMask;
-					if (align == Alignment::Center) {
-						style |= ES_CENTER;
-					} else if (align == Alignment::Right) {
-						style |= ES_RIGHT;
-					}
-					if (flagTextArea) {
-						HMODULE hModule = LoadLibraryW(L"Msftedit.dll");
-						if (hModule) {
-							className = MSFTEDIT_CLASS;
-						} else {
-							LoadLibraryW(L"Riched20.dll");
-							className = RICHEDIT_CLASSW;
-						}
-						style |= ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN;
-						if (isVerticalScrollBarVisible()) {
-							style |= WS_VSCROLL;
-						}
-						if (m_multiLine != MultiLineMode::WordWrap && m_multiLine != MultiLineMode::BreakWord) {
-							style |= ES_AUTOHSCROLL;
-							if (isHorizontalScrollBarVisible()) {
-								style |= WS_HSCROLL;
-							}
-						}
-					} else {
-						if (m_multiLine != MultiLineMode::Single) {
-							style |= ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN;
-						}
-						style |= ES_AUTOHSCROLL;
-					}
-					if (m_flagReadOnly) {
-						style |= ES_READONLY;
-					}
-					if (m_flagPassword) {
-						style |= ES_PASSWORD;
-					}
-					String16 text = m_text;
-					Ref<EditViewInstance> ret = Win32_ViewInstance::create<EditViewInstance>(this, parent, className, (LPCWSTR)(text.getData()), style, 0);
-					if (ret.isNotNull()) {
-						HWND handle = ret->getHandle();
-						if (flagTextArea) {
-							ret->m_flagRichEdit = sl_true;
-							SendMessageW(handle, EM_SETEVENTMASK, 0, ENM_REQUESTRESIZE | ENM_CHANGE);
-						}
-						ret->setFont(getFont(), sl_false);
-						ret->setTextColor(m_textColor, sl_false);
-						ret->setBackgroundColor(getBackgroundColor(), sl_false);
-						ret->setHintText(m_hintText, sl_false);
-						ret->setPadding(getPadding());
-					}
-					return ret;
+				Win32_UI_Shared* shared = Win32_UI_Shared::get();
+				if (!shared) {
+					return sl_null;
 				}
 
-			};
+				LPCWSTR className = L"Edit";
+
+				int style = WS_TABSTOP;
+				if (isBorder()) {
+					style |= WS_BORDER;
+				}
+				Alignment align = m_textAlignment & Alignment::HorizontalMask;
+				if (align == Alignment::Center) {
+					style |= ES_CENTER;
+				} else if (align == Alignment::Right) {
+					style |= ES_RIGHT;
+				}
+				if (flagTextArea) {
+					HMODULE hModule = LoadLibraryW(L"Msftedit.dll");
+					if (hModule) {
+						className = MSFTEDIT_CLASS;
+					} else {
+						LoadLibraryW(L"Riched20.dll");
+						className = RICHEDIT_CLASSW;
+					}
+					style |= ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN;
+					if (isVerticalScrollBarVisible()) {
+						style |= WS_VSCROLL;
+					}
+					if (m_multiLine != MultiLineMode::WordWrap && m_multiLine != MultiLineMode::BreakWord) {
+						style |= ES_AUTOHSCROLL;
+						if (isHorizontalScrollBarVisible()) {
+							style |= WS_HSCROLL;
+						}
+					}
+				} else {
+					if (m_multiLine != MultiLineMode::Single) {
+						style |= ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN;
+					}
+					style |= ES_AUTOHSCROLL;
+				}
+				if (m_flagReadOnly) {
+					style |= ES_READONLY;
+				}
+				if (m_flagPassword) {
+					style |= ES_PASSWORD;
+				}
+				String16 text = m_text;
+				Ref<EditViewInstance> ret = Win32_ViewInstance::create<EditViewInstance>(this, parent, className, (LPCWSTR)(text.getData()), style, 0);
+				if (ret.isNotNull()) {
+					HWND handle = ret->getHandle();
+					if (flagTextArea) {
+						ret->m_flagRichEdit = sl_true;
+						SendMessageW(handle, EM_SETEVENTMASK, 0, ENM_REQUESTRESIZE | ENM_CHANGE);
+					}
+					ret->setFont(getFont());
+					ret->setTextColor(m_textColor, sl_false);
+					ret->setHintFont(getHintFont(), sl_false);
+					ret->setHintText(m_hintText, sl_false);
+					ret->setHintTextAlignment(m_hintTextAlignment, sl_false);
+					ret->setHintTextColor(m_hintTextColor, sl_false);
+					ret->setBackgroundColor(getBackgroundColor(), sl_false);
+					ret->setPadding(getPadding());
+				}
+				return ret;
+			}
 
 		}
 	}
@@ -433,6 +481,18 @@ namespace slib
 		}
 	}
 
+	void EditView::_setTextColor_NW(const Color& color)
+	{
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setTextColor_NW, this, color));
+			return;
+		}
+		Ref<ViewInstance> _instance = getViewInstance();
+		if (EditViewInstance* instance = CastInstance<EditViewInstance>(_instance.get())) {
+			instance->setTextColor(color, sl_true);
+		}
+	}
+
 	void EditView::_setHintText_NW(const String& value)
 	{
 		if (!(UI::isUiThread())) {
@@ -442,6 +502,42 @@ namespace slib
 		Ref<ViewInstance> _instance = getViewInstance();
 		if (EditViewInstance* instance = CastInstance<EditViewInstance>(_instance.get())) {
 			instance->setHintText(value, sl_true);
+		}
+	}
+
+	void EditView::_setHintTextAlignment_NW(Alignment align)
+	{
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setHintTextAlignment_NW, this, align));
+			return;
+		}
+		Ref<ViewInstance> _instance = getViewInstance();
+		if (EditViewInstance* instance = CastInstance<EditViewInstance>(_instance.get())) {
+			instance->setHintTextAlignment(align, sl_true);
+		}
+	}
+
+	void EditView::_setHintTextColor_NW(const Color& color)
+	{
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setHintTextColor_NW, this, color));
+			return;
+		}
+		Ref<ViewInstance> _instance = getViewInstance();
+		if (EditViewInstance* instance = CastInstance<EditViewInstance>(_instance.get())) {
+			instance->setHintTextColor(color, sl_true);
+		}
+	}
+
+	void EditView::_setHintFont_NW(const Ref<Font>& font)
+	{
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setHintFont_NW, this, font));
+			return;
+		}
+		Ref<ViewInstance> _instance = getViewInstance();
+		if (EditViewInstance* instance = CastInstance<EditViewInstance>(_instance.get())) {
+			instance->setHintFont(font, sl_true);
 		}
 	}
 
@@ -472,30 +568,6 @@ namespace slib
 
 	void EditView::_setMultiLine_NW(MultiLineMode multiple)
 	{
-	}
-
-	void EditView::_setTextColor_NW(const Color& color)
-	{
-		if (!(UI::isUiThread())) {
-			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setTextColor_NW, this, color));
-			return;
-		}
-		Ref<ViewInstance> _instance = getViewInstance();
-		if (EditViewInstance* instance = CastInstance<EditViewInstance>(_instance.get())) {
-			instance->setTextColor(color, sl_true); 
-		}
-	}
-
-	void EditView::_setHintTextColor_NW(const Color& color)
-	{
-		if (!(UI::isUiThread())) {
-			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EditView, _setHintTextColor_NW, this, color));
-			return;
-		}
-		Ref<ViewInstance> _instance = getViewInstance();
-		if (EditViewInstance* instance = CastInstance<EditViewInstance>(_instance.get())) {
-			instance->setHintTextColor(color, sl_true);
-		}
 	}
 
 	sl_ui_len EditView::_measureHeight_NW()
@@ -557,7 +629,7 @@ namespace slib
 		}
 		Ref<ViewInstance> _instance = getViewInstance();
 		if (EditViewInstance* instance = CastInstance<EditViewInstance>(_instance.get())) {
-			instance->setFont(font, sl_true);
+			instance->setFont(font);
 		}
 	}
 
