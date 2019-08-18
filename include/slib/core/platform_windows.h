@@ -30,6 +30,7 @@
 #include <windows.h>
 
 #include "string.h"
+#include "time.h"
 #include "event.h"
 #include "object.h"
 
@@ -190,6 +191,7 @@ namespace slib
 
 		static WindowsVersion getVersion();
 
+
 		static sl_bool isCurrentProcessInAdminGroup();
 
 		static sl_bool isCurrentProcessRunAsAdmin();
@@ -214,6 +216,11 @@ namespace slib
 		};
 
 		static sl_bool shellExecute(const ShellExecuteParam& param);
+
+
+		static sl_bool getSYSTEMTIME(const Time& time, sl_bool flagUTC, SYSTEMTIME* _out);
+
+		static Time getTime(const SYSTEMTIME* st, sl_bool flagUTC);
 
 	};
 

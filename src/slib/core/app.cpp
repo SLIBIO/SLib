@@ -24,6 +24,7 @@
 
 #include "slib/core/hash_map.h"
 #include "slib/core/system.h"
+#include "slib/core/process.h"
 #include "slib/core/file.h"
 #include "slib/core/safe_static.h"
 #include "slib/core/string_buffer.h"
@@ -55,7 +56,7 @@ namespace slib
 					List<String> args = app->getArguments();
 					String* s = args.getData();
 					sl_uint32 n = (sl_uint32)(args.getCount());
-					System::exec(app->getExecutablePath(), s, n);
+					Process::exec(app->getExecutablePath(), s, n);
 				}
 			}
 #endif
@@ -413,7 +414,11 @@ Microsoft Specific
 				}
 				commandLine.addStatic("\"", 1);
 			} else {
-				commandLine.add(s);
+				if (s.isEmpty()) {
+					commandLine.addStatic("\"\"", 2);
+				} else {
+					commandLine.add(s);
+				}
 			}
 #else
 			if (s.contains(" ") || s.contains("\t") || s.contains("\r") || s.contains("\n") || s.contains("\"") || s.contains("\\")) {
@@ -423,7 +428,11 @@ Microsoft Specific
 				commandLine.add(s);
 				commandLine.addStatic("\"", 1);
 			} else {
-				commandLine.add(s);
+				if (s.isEmpty()) {
+					commandLine.addStatic("\"\"", 2);
+				} else {
+					commandLine.add(s);
+				}
 			}
 #endif
 		}

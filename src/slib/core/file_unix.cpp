@@ -120,9 +120,9 @@ namespace slib
 		if (isOpened()) {
 			int fd = (int)m_file;
 #if defined(SLIB_PLATFORM_IS_LINUX)
-			off64_t ret = ::lseek64(fd, 0, SEEK_CUR);
+			off64_t ret = lseek64(fd, 0, SEEK_CUR);
 #else
-			off_t ret = ::lseek(fd, 0, SEEK_CUR);
+			off_t ret = lseek(fd, 0, SEEK_CUR);
 #endif
 			if (ret != -1) {
 				return ret;
@@ -146,9 +146,9 @@ namespace slib
 				return sl_false;
 			}
 #if defined(SLIB_PLATFORM_IS_LINUX)
-			off64_t ret = ::lseek64(fd, pos, origin);
+			off64_t ret = lseek64(fd, pos, origin);
 #else
-			off_t ret = ::lseek(fd, pos, origin);
+			off_t ret = lseek(fd, pos, origin);
 #endif
 			if (ret != -1) {
 				return sl_true;
@@ -205,7 +205,7 @@ namespace slib
 	{
 		if (isOpened()) {
 			int fd = (int)m_file;
-			return 0 == ::ftruncate(fd, newSize);
+			return 0 == ftruncate(fd, newSize);
 		}
 		return sl_false;
 	}
@@ -215,7 +215,7 @@ namespace slib
 		int fd = (int)_fd;
 		if (fd != -1) {
 			struct stat st;
-			if (0 == ::fstat(fd, &st)) {
+			if (0 == fstat(fd, &st)) {
 				return st.st_size;
 			} else {
 				return 0;
@@ -231,7 +231,7 @@ namespace slib
 			return 0;
 		}
 		struct stat st;
-		if (0 == ::stat(filePath.getData(), &st)) {
+		if (0 == stat(filePath.getData(), &st)) {
 			return st.st_size;
 		} else {
 			return 0;
@@ -245,16 +245,16 @@ namespace slib
 		int fd = (int)_fd;
 		if (fd != -1) {
 			sl_uint64 nSectors = 0;
-			::ioctl(fd, DKIOCGETBLOCKCOUNT, &nSectors);
+			ioctl(fd, DKIOCGETBLOCKCOUNT, &nSectors);
 			sl_uint32 nSectorSize = 0;
-			::ioctl(fd, DKIOCGETBLOCKSIZE, &nSectorSize);
+			ioctl(fd, DKIOCGETBLOCKSIZE, &nSectorSize);
 			return nSectorSize * nSectors;
 		}
 #	elif defined(SLIB_PLATFORM_IS_LINUX)
 		int fd = (int)_fd;
 		if (fd != -1) {
 			sl_uint64 size = 0;
-			::ioctl(fd, BLKGETSIZE64, &size);
+			ioctl(fd, BLKGETSIZE64, &size);
 			return size;
 		}
 #	endif
@@ -272,7 +272,7 @@ namespace slib
 			fl.l_len = 0;
 			fl.l_type = F_WRLCK;
 			fl.l_whence = SEEK_SET;
-			if (::fcntl(fd, F_SETLK, &fl) >= 0) {
+			if (fcntl(fd, F_SETLK, &fl) >= 0) {
 				return sl_true;
 			}
 		}
@@ -289,7 +289,7 @@ namespace slib
 			fl.l_len = 0;
 			fl.l_type = F_UNLCK;
 			fl.l_whence = SEEK_SET;
-			if (::fcntl(fd, F_SETLK, &fl) >= 0) {
+			if (fcntl(fd, F_SETLK, &fl) >= 0) {
 				return sl_true;
 			}
 		}
@@ -363,7 +363,7 @@ namespace slib
 		if (isOpened()) {
 			int fd = (int)m_file;
 			struct stat st;
-			if (0 == ::fstat(fd, &st)) {
+			if (0 == fstat(fd, &st)) {
 				return priv::file::getModifiedTime(st);
 			}
 		}
@@ -376,7 +376,7 @@ namespace slib
 			return Time::zero();
 		}
 		struct stat st;
-		if (0 == ::stat(filePath.getData(), &st)) {
+		if (0 == stat(filePath.getData(), &st)) {
 			return priv::file::getModifiedTime(st);
 		} else {
 			return Time::zero();
@@ -388,7 +388,7 @@ namespace slib
 		if (isOpened()) {
 			int fd = (int)m_file;
 			struct stat st;
-			if (0 == ::fstat(fd, &st)) {
+			if (0 == fstat(fd, &st)) {
 				return priv::file::getAccessedTime(st);
 			}
 		}
@@ -401,7 +401,7 @@ namespace slib
 			return Time::zero();
 		}
 		struct stat st;
-		if (0 == ::stat(filePath.getData(), &st)) {
+		if (0 == stat(filePath.getData(), &st)) {
 			return priv::file::getAccessedTime(st);
 		} else {
 			return Time::zero();
@@ -413,7 +413,7 @@ namespace slib
 		if (isOpened()) {
 			int fd = (int)m_file;
 			struct stat st;
-			if (0 == ::fstat(fd, &st)) {
+			if (0 == fstat(fd, &st)) {
 				return priv::file::getCreatedTime(st);
 			}
 		}
@@ -426,7 +426,7 @@ namespace slib
 			return Time::zero();
 		}
 		struct stat st;
-		if (0 == ::stat(filePath.getData(), &st)) {
+		if (0 == stat(filePath.getData(), &st)) {
 			return priv::file::getCreatedTime(st);
 		} else {
 			return Time::zero();
@@ -448,7 +448,7 @@ namespace slib
 				t[0].tv_usec = (int)(timeAccess.toInt() % 1000000);
 				t[1].tv_sec = (int)(timeModify.toInt() / 1000000);
 				t[1].tv_usec = (int)(timeModify.toInt() % 1000000);
-				return ::utimes(filePath.getData(), t) == 0;
+				return utimes(filePath.getData(), t) == 0;
 			}
 
 		}
@@ -478,7 +478,7 @@ namespace slib
 			return FileAttributes::NotExist;
 		}
 		struct stat st;
-		if (0 == ::stat(filePath.getData(), &st)) {
+		if (0 == stat(filePath.getData(), &st)) {
 			int ret = 0;
 			if (S_ISDIR(st.st_mode)) {
 				ret |= FileAttributes::Directory;
@@ -511,13 +511,13 @@ namespace slib
 		}
 		List<String> ret;
 		String dirPath = filePath;
-		DIR* dir = ::opendir(dirPath.getData());
+		DIR* dir = opendir(dirPath.getData());
 		if (dir) {
 			dirent* ent;
 			while ((ent = readdir(dir))) {
 				ret.add_NoLock(String::fromUtf8(ent->d_name));
 			}
-			::closedir(dir);
+			closedir(dir);
 		}
 		return ret;
 	}
@@ -527,7 +527,7 @@ namespace slib
 		if (filePath.isEmpty()) {
 			return sl_false;
 		}
-		return 0 == ::mkdir(filePath.getData(), 0777);
+		return 0 == mkdir(filePath.getData(), 0777);
 	}
 
 
@@ -536,7 +536,7 @@ namespace slib
 		if (filePath.isEmpty()) {
 			return sl_false;
 		}
-		return 0 == ::remove(filePath.getData());
+		return 0 == remove(filePath.getData());
 	}
 
 	sl_bool File::_deleteDirectory(const String& filePath)
@@ -545,7 +545,7 @@ namespace slib
 			return sl_false;
 		}
 		String dirPath = normalizeDirectoryPath(filePath);
-		return 0 == ::rmdir(dirPath.getData());
+		return 0 == rmdir(dirPath.getData());
 	}
 
 	sl_bool File::rename(const String& oldPath, const String& newPath)
@@ -561,14 +561,14 @@ namespace slib
 
 	sl_bool File::setNonBlocking(int fd, sl_bool flagEnable)
 	{
-		int flag = ::fcntl(fd, F_GETFL, 0);
+		int flag = fcntl(fd, F_GETFL, 0);
 		if (flag != -1) {
 			if (flagEnable) {
 				flag |= O_NONBLOCK;
 			} else {
 				flag = flag & ~O_NONBLOCK;
 			}
-			int ret = ::fcntl(fd, F_SETFL, flag);
+			int ret = fcntl(fd, F_SETFL, flag);
 			return ret == 0;
 		} else {
 			return sl_false;

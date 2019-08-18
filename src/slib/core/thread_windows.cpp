@@ -22,7 +22,7 @@
 
 #include "slib/core/definition.h"
 
-#if defined(SLIB_PLATFORM_IS_WIN32)
+#if defined(SLIB_PLATFORM_IS_WINDOWS)
 
 #include <windows.h>
 
@@ -35,35 +35,10 @@ namespace slib
 	{
 		namespace thread
 		{
+
 			SLIB_THREAD Thread* g_currentThread = sl_null;
 			SLIB_THREAD sl_uint64 g_uniqueId = 0;
-		}
-	}
 
-	Thread* Thread::_nativeGetCurrentThread()
-	{
-		return priv::thread::g_currentThread;
-	}
-
-	void Thread::_nativeSetCurrentThread(Thread* thread)
-	{
-		priv::thread::g_currentThread = thread;
-	}
-
-	sl_uint64 Thread::_nativeGetCurrentThreadUniqueId()
-	{
-		return priv::thread::g_uniqueId;
-	}
-
-	void Thread::_nativeSetCurrentThreadUniqueId(sl_uint64 n)
-	{
-		priv::thread::g_uniqueId = n;
-	}
-
-	namespace priv
-	{
-		namespace thread
-		{
 			static DWORD CALLBACK ThreadProc(LPVOID lpParam)
 			{
 				Thread* pThread = (Thread*)lpParam;
@@ -71,14 +46,37 @@ namespace slib
 				pThread->decreaseReference();
 				return 0;
 			}
+
 		}
+	}
+
+	using namespace priv::thread;
+
+	Thread* Thread::_nativeGetCurrentThread()
+	{
+		return g_currentThread;
+	}
+
+	void Thread::_nativeSetCurrentThread(Thread* thread)
+	{
+		g_currentThread = thread;
+	}
+
+	sl_uint64 Thread::_nativeGetCurrentThreadUniqueId()
+	{
+		return g_uniqueId;
+	}
+
+	void Thread::_nativeSetCurrentThreadUniqueId(sl_uint64 n)
+	{
+		g_uniqueId = n;
 	}
 
 	void Thread::_nativeStart(sl_uint32 stackSize)
 	{
 		DWORD threadID = 0;
 		this->increaseReference();
-		m_handle = (void*)(CreateThread(NULL, stackSize, priv::thread::ThreadProc, (LPVOID)this, 0, &threadID));
+		m_handle = (void*)(CreateThread(NULL, stackSize, ThreadProc, (LPVOID)this, 0, &threadID));
 		if (!m_handle) {
 			this->decreaseReference();
 		}
@@ -113,6 +111,11 @@ namespace slib
 		if (m_handle) {
 			CloseHandle((HANDLE)m_handle);
 		}
+	}
+
+	sl_uint32 Thread::getCurrentThreadId()
+	{
+		return (sl_uint32)(GetCurrentThreadId());
 	}
 
 }

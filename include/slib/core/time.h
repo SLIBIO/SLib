@@ -664,19 +664,11 @@ namespace slib
 		sl_bool parse(const ST& str, const TimeZone& zone) noexcept
 		{
 			return Parse(str, zone, this);
-		}
-		
-#if defined(SLIB_PLATFORM_IS_WINDOWS)
-		sl_bool get_SYSTEMTIME(void* st, sl_bool flagUTC) const noexcept;
-		
-		void set_SYSTEMTIME(const void* st, sl_bool flagUTC) noexcept;
-#endif
+		}		
 		
 		/* platform functions */
 	protected:
 		sl_bool _get(TimeComponents& output, sl_bool flagUTC) const noexcept;
-
-		static sl_int64 _set(const void* st, sl_bool flagUTC) noexcept;
 
 		static sl_int64 _set(sl_int32 year, sl_int32 month, sl_int32 date, sl_int32 hour, sl_int32 minute, sl_int32 second, sl_bool flagUTC) noexcept;
 

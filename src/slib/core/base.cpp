@@ -23,18 +23,15 @@
 #include "slib/core/base.h"
 
 #include "slib/core/system.h"
-#include "slib/core/math.h"
 
 #if !defined(SLIB_PLATFORM_IS_APPLE)
-#include <malloc.h>
+#	include <malloc.h>
 #endif
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <memory.h>
+#include <string.h>
 #include <wchar.h>
-
 #include <string>
 
 #ifdef SLIB_PLATFORM_IS_WINDOWS
@@ -61,51 +58,51 @@ namespace slib
 
 	void* Base::createMemory(sl_size size) noexcept
 	{
-		return ::malloc(size);
+		return malloc(size);
 	}
 
 	void Base::freeMemory(void* ptr) noexcept
 	{
-		::free(ptr);
+		free(ptr);
 	}
 
 	void* Base::reallocMemory(void* ptr, sl_size sizeNew) noexcept
 	{
 		if (sizeNew == 0) {
-			::free(ptr);
-			return ::malloc(1);
+			free(ptr);
+			return malloc(1);
 		} else {
-			return ::realloc(ptr, sizeNew);
+			return realloc(ptr, sizeNew);
 		}
 	}
 
 	void* Base::createZeroMemory(sl_size size) noexcept
 	{
-		void* ptr = ::malloc(size);
+		void* ptr = malloc(size);
 		if (ptr) {
-			::memset(ptr, 0, size);
+			memset(ptr, 0, size);
 		}
 		return ptr;
 	}
 
 	void Base::copyMemory(void* dst, const void* src, sl_size count) noexcept
 	{
-		::memcpy(dst, src, count);
+		memcpy(dst, src, count);
 	}
 	
 	void Base::moveMemory(void* dst, const void* src, sl_size count) noexcept
 	{
-		::memmove(dst, src, count);
+		memmove(dst, src, count);
 	}
 
 	void Base::zeroMemory(void* dst, sl_size size) noexcept
 	{
-		::memset(dst, 0, size);
+		memset(dst, 0, size);
 	}
 
 	void Base::resetMemory(void* dst, sl_uint8 value, sl_size count) noexcept
 	{
-		::memset(dst, value, count);
+		memset(dst, value, count);
 	}
 
 	void Base::resetMemory2(sl_uint16* dst, sl_uint16 value, sl_size count) noexcept
@@ -140,42 +137,42 @@ namespace slib
 
 	sl_bool Base::equalsMemory(const void* m1, const void* m2, sl_size count) noexcept
 	{
-		return ::memcmp(m1, m2, count) == 0;
+		return memcmp(m1, m2, count) == 0;
 	}
 
 	sl_bool Base::equalsMemory2(const sl_uint16* m1, const sl_uint16* m2, sl_size count) noexcept
 	{
-		return ::memcmp(m1, m2, count << 1) == 0;
+		return memcmp(m1, m2, count << 1) == 0;
 	}
 
 	sl_bool Base::equalsMemory2(const sl_int16* m1, const sl_int16* m2, sl_size count) noexcept
 	{
-		return ::memcmp(m1, m2, count << 1) == 0;
+		return memcmp(m1, m2, count << 1) == 0;
 	}
 
 	sl_bool Base::equalsMemory4(const sl_uint32* m1, const sl_uint32* m2, sl_size count) noexcept
 	{
-		return ::memcmp(m1, m2, count << 2) == 0;
+		return memcmp(m1, m2, count << 2) == 0;
 	}
 
 	sl_bool Base::equalsMemory4(const sl_int32* m1, const sl_int32* m2, sl_size count) noexcept
 	{
-		return ::memcmp(m1, m2, count << 2) == 0;
+		return memcmp(m1, m2, count << 2) == 0;
 	}
 
 	sl_bool Base::equalsMemory8(const sl_uint64* m1, const sl_uint64* m2, sl_size count) noexcept
 	{
-		return ::memcmp(m1, m2, count << 3) == 0;
+		return memcmp(m1, m2, count << 3) == 0;
 	}
 
 	sl_bool Base::equalsMemory8(const sl_int64* m1, const sl_int64* m2, sl_size count) noexcept
 	{
-		return ::memcmp(m1, m2, count << 3) == 0;
+		return memcmp(m1, m2, count << 3) == 0;
 	}
 
 	sl_compare_result Base::compareMemory(const sl_uint8* m1, const sl_uint8* m2, sl_size count) noexcept
 	{
-		return (sl_compare_result)(::memcmp(m1, m2, count));
+		return (sl_compare_result)(memcmp(m1, m2, count));
 	}
 
 	sl_compare_result Base::compareMemory(const sl_int8* m1, const sl_int8* m2, sl_size count) noexcept
@@ -386,12 +383,12 @@ namespace slib
 
 	const sl_uint8* Base::findMemory(const void* mem, sl_uint8 pattern, sl_size count) noexcept
 	{		
-		return (const sl_uint8*)(::memchr(mem, pattern, count));
+		return (const sl_uint8*)(memchr(mem, pattern, count));
 	}
 
 	const sl_int8* Base::findMemory(const sl_int8* mem, sl_int8 pattern, sl_size count) noexcept
 	{
-		return (const sl_int8*)(::memchr(mem, pattern, count));
+		return (const sl_int8*)(memchr(mem, pattern, count));
 	}
 
 	const sl_uint16* Base::findMemory2(const sl_uint16* m, sl_uint16 pattern, sl_size count) noexcept
@@ -518,7 +515,7 @@ namespace slib
 		if (count < 0) {
 			count = STRING_LENGTH_LIMIT;
 		}
-		return ::strncmp(s1, s2, count) == 0;
+		return strncmp(s1, s2, count) == 0;
 	}
 
 	sl_bool Base::equalsString2(const sl_char16 *s1, const sl_char16 *s2, sl_reg count) noexcept
@@ -527,7 +524,7 @@ namespace slib
 			count = STRING_LENGTH_LIMIT;
 		}
 #if SLIB_WCHAR_SIZE == 2
-		return ::wcsncmp((wchar_t*)s1, (wchar_t*)s2, count) == 0;
+		return wcsncmp((wchar_t*)s1, (wchar_t*)s2, count) == 0;
 #else
 		for (sl_reg i = 0; i < count; i++) {
 			if (s1[i] != s2[i]) {
@@ -547,7 +544,7 @@ namespace slib
 			count = STRING_LENGTH_LIMIT;
 		}
 #if SLIB_WCHAR_SIZE == 4
-		return ::wcsncmp((wchar_t*)s1, (wchar_t*)s2, count) == 0;
+		return wcsncmp((wchar_t*)s1, (wchar_t*)s2, count) == 0;
 #else
 		for (sl_reg i = 0; i < count; i++) {
 			if (s1[i] != s2[i]) {
@@ -566,7 +563,7 @@ namespace slib
 		if (count < 0) {
 			count = STRING_LENGTH_LIMIT;
 		}
-		return (sl_compare_result)(::strncmp(s1, s2, count));
+		return (sl_compare_result)(strncmp(s1, s2, count));
 	}
 
 	sl_compare_result Base::compareString2(const sl_char16 *s1, const sl_char16 *s2, sl_reg count) noexcept
@@ -575,7 +572,7 @@ namespace slib
 			count = STRING_LENGTH_LIMIT;
 		}
 #if SLIB_WCHAR_SIZE == 2
-		return (sl_compare_result)(::wcsncmp((wchar_t*)s1, (wchar_t*)s2, count));
+		return (sl_compare_result)(wcsncmp((wchar_t*)s1, (wchar_t*)s2, count));
 #else
 		for (sl_reg i = 0; i < count; i++) {
 			if (s1[i] < s2[i]) {
@@ -597,7 +594,7 @@ namespace slib
 			count = STRING_LENGTH_LIMIT;
 		}
 #if SLIB_WCHAR_SIZE == 4
-		return (sl_compare_result)(::wcsncmp((wchar_t*)s1, (wchar_t*)s2, count));
+		return (sl_compare_result)(wcsncmp((wchar_t*)s1, (wchar_t*)s2, count));
 #else
 		for (sl_reg i = 0; i < count; i++) {
 			if (s1[i] < s2[i]) {
@@ -666,7 +663,7 @@ namespace slib
 		if (count < 0) {
 			count = STRING_LENGTH_LIMIT;
 		}
-		return ::strnlen(sz, count);
+		return strnlen(sz, count);
 	}
 
 	sl_size Base::getStringLength2(const sl_char16* sz, sl_reg count) noexcept
@@ -681,7 +678,7 @@ namespace slib
 			count = STRING_LENGTH_LIMIT;
 		}
 #if SLIB_WCHAR_SIZE == 2
-		return ::wcsnlen((wchar_t*)sz, count);
+		return wcsnlen((wchar_t*)sz, count);
 #else
 		for (sl_reg i = 0; i < count; i++) {
 			if (sz[i] == 0) {
@@ -878,21 +875,6 @@ namespace slib
 #else
 		return interlockedCompareExchange32((sl_int32*)pDst, (sl_int32)value, (sl_int32)comparand);
 #endif
-	}
-
-	void Base::sleep(sl_uint32 millis) noexcept
-	{
-		System::sleep(millis);
-	}
-
-	void Base::yield() noexcept
-	{
-		System::yield();
-	}
-
-	void Base::yield(sl_uint32 elapsed) noexcept
-	{
-		System::yield(elapsed);
 	}
 
 }

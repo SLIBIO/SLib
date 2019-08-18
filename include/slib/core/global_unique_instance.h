@@ -20,62 +20,34 @@
  *   THE SOFTWARE.
  */
 
-#include "slib/network/io.h"
+#ifndef CHECKHEADER_SLIB_CORE_GLOBAL_UNIQUE_INSTANCE
+#define CHECKHEADER_SLIB_CORE_GLOBAL_UNIQUE_INSTANCE
+
+#include "definition.h"
+
+#include "ref.h"
+#include "string.h"
 
 namespace slib
 {
-
-	SLIB_DEFINE_OBJECT(TcpStream, Stream)
-
-	TcpStream::TcpStream()
+	
+	class SLIB_EXPORT GlobalUniqueInstance : public Referable
 	{
-	}
+		SLIB_DECLARE_OBJECT
 
-	TcpStream::TcpStream(const Ref<Socket>& socket) : m_socket(socket)
-	{
-	}
+	public:
+		GlobalUniqueInstance();
 
-	TcpStream::~TcpStream()
-	{
-	}
+		~GlobalUniqueInstance();
 
-	Ref<Socket> TcpStream::getSocket()
-	{
-		return m_socket;
-	}
+	public:
+		static Ref<GlobalUniqueInstance> create(const String& name);
 
-	void TcpStream::setSocket(const Ref<Socket>& socket)
-	{
-		m_socket = socket;
-	}
+		static sl_bool exists(const String& name);
 
-	void TcpStream::close()
-	{
-		Ref<Socket> socket = m_socket;
-		if (socket.isNotNull()) {
-			socket->close();
-			m_socket.setNull();
-		}
-	}
-
-	sl_int32 TcpStream::read32(void* buf, sl_uint32 size)
-	{
-		Ref<Socket> socket = m_socket;
-		if (socket.isNotNull()) {
-			sl_int32 n = socket->receive(buf, size);
-			return n;
-		}
-		return -1;
-	}
-
-	sl_int32 TcpStream::write32(const void* buf, sl_uint32 size)
-	{
-		Ref<Socket> socket = m_socket;
-		if (socket.isNotNull()) {
-			sl_int32 n = socket->send(buf, size);
-			return n;
-		}
-		return -1;
-	}
+	};
 
 }
+
+#endif
+

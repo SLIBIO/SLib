@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -20,62 +20,49 @@
  *   THE SOFTWARE.
  */
 
-#include "slib/network/io.h"
+#include "slib/core/definition.h"
+
+#if defined(SLIB_PLATFORM_IS_WINDOWS)
+
+#include "slib/core/console.h"
+
+#include <windows.h>
+#include <stdio.h>
+#include <conio.h>
 
 namespace slib
 {
 
-	SLIB_DEFINE_OBJECT(TcpStream, Stream)
-
-	TcpStream::TcpStream()
+	void Console::print(const String& _s)
 	{
+		String16 s = _s;
+#if defined(SLIB_PLATFORM_IS_WIN32)
+		wprintf(L"%s", (LPCWSTR)(s.getData()));
+#endif
+#if defined(SLIB_DEBUG)
+		OutputDebugStringW((LPCWSTR)s.getData());
+#endif
 	}
 
-	TcpStream::TcpStream(const Ref<Socket>& socket) : m_socket(socket)
+#if defined(SLIB_PLATFORM_IS_WIN32)
+	String Console::readLine()
 	{
+		char line[512];
+		char* l = gets_s(line);
+		line[511] = 0;
+		return l;
 	}
 
-	TcpStream::~TcpStream()
+	sl_char16 Console::readChar(sl_bool flagPrintEcho)
 	{
-	}
-
-	Ref<Socket> TcpStream::getSocket()
-	{
-		return m_socket;
-	}
-
-	void TcpStream::setSocket(const Ref<Socket>& socket)
-	{
-		m_socket = socket;
-	}
-
-	void TcpStream::close()
-	{
-		Ref<Socket> socket = m_socket;
-		if (socket.isNotNull()) {
-			socket->close();
-			m_socket.setNull();
+		if (flagPrintEcho) {
+			return (sl_char16)(_getche());
+		} else {
+			return (sl_char16)(_getch());
 		}
 	}
-
-	sl_int32 TcpStream::read32(void* buf, sl_uint32 size)
-	{
-		Ref<Socket> socket = m_socket;
-		if (socket.isNotNull()) {
-			sl_int32 n = socket->receive(buf, size);
-			return n;
-		}
-		return -1;
-	}
-
-	sl_int32 TcpStream::write32(const void* buf, sl_uint32 size)
-	{
-		Ref<Socket> socket = m_socket;
-		if (socket.isNotNull()) {
-			sl_int32 n = socket->send(buf, size);
-			return n;
-		}
-		return -1;
-	}
+#endif
 
 }
+
+#endif

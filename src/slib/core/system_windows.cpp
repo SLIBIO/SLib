@@ -24,13 +24,12 @@
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 
-#include <Windows.h>
-#include <stdio.h>
+#include "slib/core/system.h"
+
+#include <windows.h>
 #include <assert.h>
-#include <process.h>
 #include <signal.h>
 #include <float.h>
-#include <conio.h>
 
 #pragma warning(disable: 4091)
 #include <shlobj.h>
@@ -40,16 +39,8 @@ using namespace Windows::Storage;
 using namespace Platform;
 #endif
 
-#include "slib/core/system.h"
-
-#include "slib/core/app.h"
 #include "slib/core/file.h"
-#include "slib/core/console.h"
-#include "slib/core/list.h"
-#include "slib/core/string_buffer.h"
-#include "slib/core/log.h"
 #include "slib/core/platform_windows.h"
-
 
 #define PRIV_PATH_MAX 1024
 
@@ -185,76 +176,6 @@ namespace slib
 #endif
 	}
 
-	sl_uint32 System::getProcessId()
-	{
-		return GetCurrentProcessId();
-	}
-
-	sl_uint32 System::getThreadId()
-	{
-		return GetCurrentThreadId();
-	}
-
-#if defined (SLIB_PLATFORM_IS_WIN32)
-	sl_bool System::createProcess(const String& _pathExecutable, const String* cmds, sl_uint32 nCmds)
-	{
-		String16 pathExecutable = _pathExecutable;
-		String16 cmd;
-		{
-			StringBuffer16 sb;
-			sb.add(SLIB_UNICODE("\""));
-			sb.add(pathExecutable);
-			sb.add(SLIB_UNICODE("\""));
-			String args = Application::buildCommandLine(cmds, nCmds);
-			if (args.isNotEmpty()) {
-				sb.add(SLIB_UNICODE(" "));
-				sb.add(args);
-			}
-			cmd = sb.merge();
-		}
-		STARTUPINFOW si;
-		ZeroMemory(&si, sizeof(si));
-		si.dwFlags |= STARTF_USESTDHANDLES;
-		si.cb = sizeof(si);
-
-		PROCESS_INFORMATION pi;
-		ZeroMemory(&pi, sizeof(pi));
-		BOOL bRet = CreateProcessW((LPCWSTR)(pathExecutable.getData())
-			, (LPWSTR)(cmd.getData())
-			, NULL, NULL, FALSE
-			, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi);
-		if (bRet) {
-			CloseHandle(pi.hProcess);
-			CloseHandle(pi.hThread);
-			return sl_true;
-		} else {
-			return sl_false;
-		}
-	}
-
-	void System::exec(const String& pathExecutable, const String* cmds, sl_uint32 nCmds)
-	{
-		char* exe = pathExecutable.getData();
-		char* args[1024];
-		args[0] = exe;
-		if (nCmds > 1020) {
-			nCmds = 1020;
-		}
-		for (sl_size i = 0; i < nCmds; i++) {
-			args[i + 1] = cmds[i].getData();
-		}
-		args[nCmds + 1] = 0;
-
-		_execvp(exe, args);
-		::exit(1);
-	}
-
-	void System::exit(int code)
-	{
-		::exit(code);
-	}
-#endif
-
 	void System::sleep(sl_uint32 milliseconds)
 	{
 		Sleep(milliseconds);
@@ -372,69 +293,6 @@ namespace slib
 		Windows::setDebugFlags();
 	}
 
-#if defined(SLIB_PLATFORM_IS_WIN32)
-
-	namespace priv
-	{
-		namespace system
-		{
-			class GlobalUniqueInstanceImpl : public GlobalUniqueInstance
-			{
-			public:
-				HANDLE m_hMutex;
-
-			public:
-				GlobalUniqueInstanceImpl()
-				{
-				}
-
-				~GlobalUniqueInstanceImpl()
-				{
-					CloseHandle(m_hMutex);
-				}
-			};
-		}
-	}
-
-
-	Ref<GlobalUniqueInstance> GlobalUniqueInstance::create(const String& _name)
-	{
-		if (_name.isEmpty()) {
-			return sl_null;
-		}
-		String16 name = "Global\\" + File::makeSafeFileName(_name);
-		HANDLE hMutex = OpenMutexW(MUTEX_ALL_ACCESS, FALSE, (LPCWSTR)(name.getData()));
-		if (hMutex != NULL) {
-			CloseHandle(hMutex);
-			return sl_null;
-		}
-		Ref<priv::system::GlobalUniqueInstanceImpl> instance = new priv::system::GlobalUniqueInstanceImpl;
-		if (instance.isNotNull()) {
-			hMutex = CreateMutexW(NULL, FALSE, (LPCWSTR)(name.getData()));
-			if (hMutex) {
-				instance->m_hMutex = hMutex;
-				return instance;
-			}
-		}
-		return sl_null;
-	}
-
-	sl_bool GlobalUniqueInstance::exists(const String& _name)
-	{
-		if (_name.isEmpty()) {
-			return sl_false;
-		}
-		String16 name = "Global\\" + File::makeSafeFileName(_name);
-		HANDLE hMutex = OpenMutexW(MUTEX_ALL_ACCESS, FALSE, (LPCWSTR)(name.getData()));
-		if (hMutex != NULL) {
-			CloseHandle(hMutex);
-			return sl_true;
-		}
-		return sl_false;
-	}
-
-#endif
-
 	namespace priv
 	{
 		void Abort(const char* msg, const char* file, sl_uint32 line) noexcept
@@ -444,32 +302,6 @@ namespace slib
 #endif
 		}
 	}
-
-	void Console::print(const String& _s)
-	{
-		String16 s = _s;
-		wprintf(L"%s", (LPCWSTR)(s.getData()));
-		OutputDebugStringW((LPCWSTR)s.getData());
-	}
-
-#if defined(SLIB_PLATFORM_IS_WIN32)
-	String Console::readLine()
-	{
-		char line[512];
-		char* l = gets_s(line);
-		line[511] = 0;
-		return l;
-	}
-
-	sl_char16 Console::readChar(sl_bool flagPrintEcho)
-	{
-		if (flagPrintEcho) {
-			return (sl_char16)(_getche());
-		} else {
-			return (sl_char16)(_getch());
-		}
-	}
-#endif
 
 }
 

@@ -110,9 +110,10 @@ namespace slib
 		static sl_bool isStoppingCurrent();
 
 		static sl_bool isNotStoppingCurrent();
+		
+		static sl_uint32 getCurrentThreadId();
 
 		static sl_uint64 getCurrentThreadUniqueId();
-	
 
 		// attached objects are removed when the thread is exited
 		Ref<Referable> getAttachedObject(const String& name);

@@ -669,6 +669,12 @@
 		2639196E21CD469E008B335B /* redis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639196C21CD469B008B335B /* redis.cpp */; };
 		264DF0EE22455E3B007DB734 /* chat_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264DF0ED22455E3B007DB734 /* chat_view.cpp */; };
 		265A934C2303558A00B155A2 /* screen_capture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265A934B2303558A00B155A2 /* screen_capture.cpp */; };
+		265A935623043C3400B155A2 /* global_unique_instance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265A935523043C3400B155A2 /* global_unique_instance.cpp */; };
+		265A935823043CBF00B155A2 /* process.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265A935723043CBE00B155A2 /* process.cpp */; };
+		265A935E2304783200B155A2 /* console.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265A935D2304783200B155A2 /* console.cpp */; };
+		265A9360230478E300B155A2 /* time_unix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265A935F230478E300B155A2 /* time_unix.cpp */; };
+		265A936E230485B200B155A2 /* console_unix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265A936D230485B200B155A2 /* console_unix.cpp */; };
+		265A937023048D8600B155A2 /* process_unix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265A936F23048D8600B155A2 /* process_unix.cpp */; };
 		26635C9F226706F3005E4BA6 /* ui_photo_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26635C9E226706F3005E4BA6 /* ui_photo_ios.mm */; };
 		26635CA1226706FD005E4BA6 /* ui_photo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26635CA0226706FD005E4BA6 /* ui_photo.cpp */; };
 		266E66EC21D9566300D92386 /* locale_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266E66EB21D9566300D92386 /* locale_apple.mm */; };
@@ -2058,6 +2064,12 @@
 		264DF0ED22455E3B007DB734 /* chat_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_view.cpp; sourceTree = "<group>"; };
 		265335901E2E96A900199C76 /* ui_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_animation.cpp; sourceTree = "<group>"; };
 		265A934B2303558A00B155A2 /* screen_capture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = screen_capture.cpp; sourceTree = "<group>"; };
+		265A935523043C3400B155A2 /* global_unique_instance.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = global_unique_instance.cpp; sourceTree = "<group>"; };
+		265A935723043CBE00B155A2 /* process.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = process.cpp; sourceTree = "<group>"; };
+		265A935D2304783200B155A2 /* console.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = console.cpp; sourceTree = "<group>"; };
+		265A935F230478E300B155A2 /* time_unix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = time_unix.cpp; sourceTree = "<group>"; };
+		265A936D230485B200B155A2 /* console_unix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = console_unix.cpp; sourceTree = "<group>"; };
+		265A936F23048D8600B155A2 /* process_unix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = process_unix.cpp; sourceTree = "<group>"; };
 		265EBF2A1C23051F00AD81D9 /* database_cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database_cursor.cpp; sourceTree = "<group>"; };
 		265EBF2B1C23051F00AD81D9 /* database_statement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database_statement.cpp; sourceTree = "<group>"; };
 		265EBF2C1C23051F00AD81D9 /* database.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database.cpp; sourceTree = "<group>"; };
@@ -3963,12 +3975,15 @@
 				A25F2ECF1B039EF600854DAF /* base.cpp */,
 				26D6C37C1D1E87E2008720E4 /* charset.cpp */,
 				26C72AD01E22484F00F7D6D0 /* collection.cpp */,
+				265A935D2304783200B155A2 /* console.cpp */,
+				265A936D230485B200B155A2 /* console_unix.cpp */,
 				A234D6ED1B3F12F600ADDF4E /* content_type.cpp */,
 				26BC2EC51E2DFF4900D0801E /* dispatch.cpp */,
 				A25F2ED11B039EF600854DAF /* event.cpp */,
 				A2DE1D9B1B383E7800A74698 /* event_unix.cpp */,
 				A25F2ED21B039EF600854DAF /* file.cpp */,
 				A25F2ED31B039EF600854DAF /* file_unix.cpp */,
+				265A935523043C3400B155A2 /* global_unique_instance.cpp */,
 				26CE672A1DE8271500C1371F /* hash.cpp */,
 				A25F2ED51B039EF600854DAF /* io.cpp */,
 				A2DE1DB91B3888DA00A74698 /* java.cpp */,
@@ -3989,6 +4004,8 @@
 				A25F2EDD1B039EF600854DAF /* platform_windows.cpp */,
 				E1D3A4281E14A2FC00007A98 /* preference.cpp */,
 				E1D3A42A1E14A38C00007A98 /* preference_apple.mm */,
+				265A935723043CBE00B155A2 /* process.cpp */,
+				265A936F23048D8600B155A2 /* process_unix.cpp */,
 				26FAA8851EC768C1007BC67F /* red_black_tree.cpp */,
 				2629F8731DFAF4AE005CF43D /* ref.cpp */,
 				2628EAD021C184D400D8CD00 /* regex.cpp */,
@@ -4005,6 +4022,7 @@
 				A25F2EE81B039EF600854DAF /* thread_apple.mm */,
 				260251FF1BF18BCF00DEFAB1 /* thread_pool.cpp */,
 				A25F2EEB1B039EF600854DAF /* time.cpp */,
+				265A935F230478E300B155A2 /* time_unix.cpp */,
 				26D8AC841E3871EA0092EB81 /* timer.cpp */,
 				A25F2EEC1B039EF600854DAF /* variant.cpp */,
 				269462091CAD1C47001B2130 /* xml.cpp */,
@@ -5148,6 +5166,7 @@
 				26D9D8D81E962976005F7BD3 /* text_view.cpp in Sources */,
 				26D9D8031E9628E0005F7BD3 /* thread.cpp in Sources */,
 				26D9D8A81E962962005F7BD3 /* url_request.cpp in Sources */,
+				265A935623043C3400B155A2 /* global_unique_instance.cpp in Sources */,
 				26E1B8C7222ABBE7007C222E /* pngwtran.c in Sources */,
 				26E1B8B2222ABBDC007C222E /* gzwrite.c in Sources */,
 				26C795CD2215FC7C0053C5A1 /* strings.cpp in Sources */,
@@ -5164,6 +5183,7 @@
 				26D9D9F71E968364005F7BD3 /* http_io.cpp in Sources */,
 				26E1B8DC222ABCDD007C222E /* jcsample.c in Sources */,
 				26E1B8E9222ABCDD007C222E /* jdmarker.c in Sources */,
+				265A935823043CBF00B155A2 /* process.cpp in Sources */,
 				26D9D8B51E962976005F7BD3 /* button.cpp in Sources */,
 				26E1B8D4222ABCDD007C222E /* jchuff.c in Sources */,
 				26B92D5921D3E4FC003F6F82 /* web_service.cpp in Sources */,
@@ -5253,9 +5273,11 @@
 				26DA4B50223C22DE00706393 /* media_player_ffmpeg.cpp in Sources */,
 				26D9D8C21E962976005F7BD3 /* linear_view.cpp in Sources */,
 				26D9D8E21E962976005F7BD3 /* ui_event.cpp in Sources */,
+				265A935E2304783200B155A2 /* console.cpp in Sources */,
 				26BAE01A221FFC830085B5AB /* facebook_sdk.cpp in Sources */,
 				26D9D85F1E962937005F7BD3 /* globe.cpp in Sources */,
 				26D9D8151E9628E0005F7BD3 /* variant.cpp in Sources */,
+				265A936E230485B200B155A2 /* console_unix.cpp in Sources */,
 				26D9D8C91E962976005F7BD3 /* notification_apns_ios.mm in Sources */,
 				26C7959D221538D90053C5A1 /* clipboard.cpp in Sources */,
 				26D9D8161E9628E0005F7BD3 /* platform_android.cpp in Sources */,
@@ -5431,6 +5453,7 @@
 				26E1B8E4222ABCDD007C222E /* jdcolor.c in Sources */,
 				26D9D8411E9628E0005F7BD3 /* block_cipher.cpp in Sources */,
 				26D9D8421E9628E0005F7BD3 /* line.cpp in Sources */,
+				265A9360230478E300B155A2 /* time_unix.cpp in Sources */,
 				26D9D8631E96294F005F7BD3 /* bitmap_format.cpp in Sources */,
 				26E1B8F7222ABCDD007C222E /* jmemnobs.c in Sources */,
 				26AFC60122B197E30034C634 /* crc32c.cpp in Sources */,
@@ -5485,6 +5508,7 @@
 				26D9D84A1E9628E0005F7BD3 /* dispatch.cpp in Sources */,
 				26FADD33215754860057F7EA /* stun.cpp in Sources */,
 				26D9D8AC1E962969005F7BD3 /* opengl_gles.cpp in Sources */,
+				265A937023048D8600B155A2 /* process_unix.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

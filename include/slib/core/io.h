@@ -287,7 +287,40 @@ namespace slib
 		virtual void close() = 0;
 	};
 	
-	class SLIB_EXPORT IO : public Object, public IStream, public ISeekable, public IResizable, public IClosable
+	class SLIB_EXPORT Reader : public Object, public IReader, public IClosable
+	{
+		SLIB_DECLARE_OBJECT
+		
+	public:
+		Reader();
+		
+		~Reader();
+		
+	};
+
+	class SLIB_EXPORT Writer : public Object, public IWriter, public IClosable
+	{
+		SLIB_DECLARE_OBJECT
+		
+	public:
+		Writer();
+		
+		~Writer();
+		
+	};
+
+	class SLIB_EXPORT Stream : public Object, public IStream, public IClosable
+	{
+		SLIB_DECLARE_OBJECT
+		
+	public:
+		Stream();
+		
+		~Stream();
+		
+	};
+
+	class SLIB_EXPORT IO : public Stream, public ISeekable, public IResizable
 	{
 		SLIB_DECLARE_OBJECT
 
@@ -313,6 +346,8 @@ namespace slib
 	
 	class SLIB_EXPORT MemoryIO : public IO
 	{
+		SLIB_DECLARE_OBJECT
+		
 	public:
 		MemoryIO(sl_size size = 0, sl_bool flagResizable = sl_true);
 		
@@ -368,8 +403,10 @@ namespace slib
 	
 	};
 	
-	class SLIB_EXPORT MemoryReader : public Object, public IReader, public ISeekable
+	class SLIB_EXPORT MemoryReader : public Reader, public ISeekable
 	{
+		SLIB_DECLARE_OBJECT
+		
 	public:
 		MemoryReader(const Memory& mem);
 	
@@ -388,6 +425,8 @@ namespace slib
 
 		char* getBuffer();
 
+		void close() override;
+		
 		sl_reg read(void* buf, sl_size size) override;
 
 		sl_uint64 getPosition() override;
@@ -404,8 +443,10 @@ namespace slib
 	
 	};
 	
-	class SLIB_EXPORT MemoryWriter : public Object, public IWriter, public ISeekable
+	class SLIB_EXPORT MemoryWriter : public Writer, public ISeekable
 	{
+		SLIB_DECLARE_OBJECT
+		
 	public:
 		// write-only/appending memory
 		MemoryWriter();
@@ -422,6 +463,8 @@ namespace slib
 		void initialize(const Memory& mem);
 
 		void initialize(void* buf, sl_size size);
+		
+		void close() override;
 
 		sl_reg write(const void* buf, sl_size size) override;
 

@@ -26,9 +26,6 @@
 #include "definition.h"
 
 #include "string.h"
-#include "object.h"
-#include "list.h"
-#include "variant.h"
 
 namespace slib
 {

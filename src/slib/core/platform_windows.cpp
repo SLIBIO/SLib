@@ -738,6 +738,40 @@ namespace slib
 		return sl_false;
 	}
 
+	sl_bool Windows::getSYSTEMTIME(const Time& time, sl_bool flagUTC, SYSTEMTIME* _out)
+	{
+		SYSTEMTIME& st = *_out;
+		sl_int64 n = (time.toInt() + SLIB_INT64(11644473600000000)) * 10;  // Convert 1970 Based (time_t mode) to 1601 Based (FILETIME mode)
+		if (flagUTC) {
+			if (!(FileTimeToSystemTime((PFILETIME)&n, &st))) {
+				return sl_false;
+			}
+		} else {
+			SYSTEMTIME utc;
+			if (!(FileTimeToSystemTime((PFILETIME)&n, &utc))) {
+				return sl_false;
+			}
+			if (!(SystemTimeToTzSpecificLocalTime(NULL, &utc, &st))) {
+				return sl_false;
+			}
+		}
+		return sl_true;
+	}
+
+	Time Windows::getTime(const SYSTEMTIME* _in, sl_bool flagUTC)
+	{
+		const SYSTEMTIME& st = *_in;
+		sl_int64 n = 0;
+		if (flagUTC) {
+			SystemTimeToFileTime(&st, (PFILETIME)&n);
+		} else {
+			SYSTEMTIME utc;
+			TzSpecificLocalTimeToSystemTime(NULL, &st, &utc);
+			SystemTimeToFileTime(&utc, (PFILETIME)&n);
+		}
+		return n / 10 - SLIB_INT64(11644473600000000);  // Convert 1601 Based (FILETIME mode) to 1970 Based (time_t mode)
+	}
+
 }
 
 #endif

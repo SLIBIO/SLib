@@ -70,7 +70,7 @@ namespace slib
 				SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 			}
 			SYSTEMTIME st;
-			m_date.get_SYSTEMTIME(&st, sl_false);
+			Windows::getSYSTEMTIME(m_date, sl_false, &st);
 			SendMessageW(handle, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&st);
 		}
 		return ret;
@@ -82,7 +82,7 @@ namespace slib
 		if (handle) {
 			SYSTEMTIME st;
 			if (GDT_VALID == SendMessageW(handle, DTM_GETSYSTEMTIME, 0, (LPARAM)&st)) {
-				m_date.set_SYSTEMTIME(&st, sl_false);
+				m_date = Windows::getTime(&st, sl_false);
 			}
 		}
 	}
@@ -92,7 +92,7 @@ namespace slib
 		HWND handle = UIPlatform::getViewHandle(this);
 		if (handle) {
 			SYSTEMTIME st;
-			time.get_SYSTEMTIME(&st, sl_false);
+			Windows::getSYSTEMTIME(time, sl_false, &st);
 			SendMessageW(handle, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&st);
 		}
 	}

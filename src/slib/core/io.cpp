@@ -62,10 +62,7 @@ namespace slib
 		return f;
 	}
 
-/***************
-	IReader
-***************/
-
+	
 	IReader::IReader()
 	{
 	}
@@ -79,32 +76,12 @@ namespace slib
 		return (sl_int32)(read(buf, size));
 	}
 
-	sl_reg IReader::read(void* _buf, sl_size size)
+	sl_reg IReader::read(void* buf, sl_size size)
 	{
-		char* buf = (char*)_buf;
-		if (size == 0) {
-			return 0;
+		if (size >= 0x40000000) {
+			size = 0x40000000; // 1GB
 		}
-		sl_size nRead = 0;
-		while (nRead < size) {
-			sl_size n = size - nRead;
-			if (n > 0x40000000) {
-				n = 0x40000000; // 1GB
-			}
-			sl_int32 m = read32(buf + nRead, (sl_uint32)n);
-			if (m <= 0) {
-				if (nRead) {
-					return nRead;
-				} else {
-					return m;
-				}
-			}
-			nRead += m;
-			if (Thread::isStoppingCurrent()) {
-				return nRead;
-			}
-		}
-		return nRead;
+		return read32(buf, (sl_uint32)size);
 	}
 
 	sl_reg IReader::readFully(void* _buf, sl_size size)
@@ -949,9 +926,6 @@ namespace slib
 		return sl_null;
 	}
 
-/***************
-	IWriter
-***************/
 
 	IWriter::IWriter()
 	{
@@ -978,12 +952,13 @@ namespace slib
 			if (n > 0x40000000) {
 				n = 0x40000000; // 1GB
 			}
-			sl_int32 m = write32(buf + nWrite, (sl_uint32)n);
+			sl_uint32 n32 = (sl_uint32)n;
+			sl_int32 m = write32(buf + nWrite, n32);
 			if (m <= 0) {
 				break;
 			}
 			nWrite += m;
-			if (Thread::isStoppingCurrent()) {
+			if (m != n32 || Thread::isStoppingCurrent()) {
 				return nWrite;
 			}
 		}
@@ -1304,10 +1279,6 @@ namespace slib
 	}
 
 
-/****************************
-		IStream
-****************************/
-
 	IStream::IStream()
 	{
 	}
@@ -1316,10 +1287,6 @@ namespace slib
 	{
 	}
 
-
-/****************************
-		ISeekable
-****************************/
 
 	ISeekable::ISeekable()
 	{
@@ -1344,9 +1311,7 @@ namespace slib
 		return seek(0, SeekPosition::End);
 	}
 
-/****************************
-		IResizable
-****************************/
+
 	IResizable::IResizable()
 	{
 	}
@@ -1355,9 +1320,7 @@ namespace slib
 	{
 	}
 
-/****************************
-		IClosable
-****************************/
+
 	IClosable::IClosable()
 	{
 	}
@@ -1366,12 +1329,41 @@ namespace slib
 	{
 	}
 
+	
+	SLIB_DEFINE_OBJECT(Reader, Object)
+	
+	Reader::Reader()
+	{
+	}
+	
+	Reader::~Reader()
+	{
+	}
+	
+	
+	SLIB_DEFINE_OBJECT(Writer, Object)
+	
+	Writer::Writer()
+	{
+	}
+	
+	Writer::~Writer()
+	{
+	}
+	
+	
+	SLIB_DEFINE_OBJECT(Stream, Object)
+	
+	Stream::Stream()
+	{
+	}
+	
+	Stream::~Stream()
+	{
+	}
+	
 
-/****************************
-			IO
-****************************/
-
-	SLIB_DEFINE_OBJECT(IO, Object)
+	SLIB_DEFINE_OBJECT(IO, Stream)
 
 	IO::IO()
 	{
@@ -1540,9 +1532,8 @@ namespace slib
 		return sl_null;
 	}
 	
-/****************************
-		MemoryIO
-****************************/
+
+	SLIB_DEFINE_OBJECT(MemoryIO, IO)
 	
 	MemoryIO::MemoryIO(sl_size size, sl_bool flagResizable)
 	{
@@ -1748,10 +1739,8 @@ namespace slib
 	}
 
 
-/****************************
-	MemoryReader
-****************************/
-
+	SLIB_DEFINE_OBJECT(MemoryReader, Reader)
+	
 	MemoryReader::MemoryReader(const Memory& mem)
 	{
 		initialize(mem);
@@ -1776,12 +1765,14 @@ namespace slib
 	
 	void MemoryReader::initialize(const void* buf, sl_size size)
 	{
-		m_buf = buf;
-		m_size = size;
-		m_offset = 0;
-		if (!buf) {
+		if (buf && size) {
+			m_buf = buf;
+			m_size = size;
+		} else {
+			m_buf = sl_null;
 			m_size = 0;
 		}
+		m_offset = 0;
 	}
 
 	sl_size MemoryReader::getOffset()
@@ -1797,6 +1788,14 @@ namespace slib
 	char* MemoryReader::getBuffer()
 	{
 		return (char*)m_buf;
+	}
+
+	void MemoryReader::close()
+	{
+		m_buf = sl_null;
+		m_size = 0;
+		m_offset = 0;
+		m_mem.setNull();
 	}
 
 	sl_reg MemoryReader::read(void* buf, sl_size size)
@@ -1844,10 +1843,8 @@ namespace slib
 		return getOffset();
 	}
 
-
-/****************************
-	MemoryWriter
-****************************/
+	
+	SLIB_DEFINE_OBJECT(MemoryWriter, Writer)
 
 	MemoryWriter::MemoryWriter()
 	{
@@ -1885,12 +1882,22 @@ namespace slib
 	
 	void MemoryWriter::initialize(void* buf, sl_size size)
 	{
-		if (!buf) {
-			size = 0;
+		if (buf && size) {
+			m_buf = buf;
+			m_size = size;
+		} else {
+			m_buf = sl_null;
+			m_size = 0;
 		}
-		m_buf = buf;
-		m_size = size;
 		m_offset = 0;
+	}
+	
+	void MemoryWriter::close()
+	{
+		m_buf = sl_null;
+		m_size = 0;
+		m_offset = 0;
+		m_mem.setNull();
 	}
 
 	sl_reg MemoryWriter::write(const void* buf, sl_size size)

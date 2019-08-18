@@ -25,6 +25,7 @@
 #if defined(SLIB_PLATFORM_IS_APPLE)
 
 #include "slib/core/system.h"
+
 #include "slib/core/file.h"
 #include "slib/core/platform_apple.h"
 
@@ -105,75 +106,28 @@ namespace slib
 		sl_uint64 t = (sl_uint64)(mach_absolute_time() - start);
 		return t * base.numer / base.denom / 1000000;
 	}
-
-	namespace priv
-	{
-		namespace system
-		{
-			void setBundleLoginItemEnabled(const String& path, sl_bool flagEnabled)
-			{
-#if defined(SLIB_PLATFORM_IS_MACOS)
-				if (path.isEmpty()) {
-					return;
-				}
-				
-				NSURL *itemURL = [NSURL fileURLWithPath:(Apple::getNSStringFromString(path))];
-				LSSharedFileListItemRef existingItem = NULL;
-				
-				LSSharedFileListRef loginItems = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
-				
-				if(loginItems) {
-					UInt32 seed = 0U;
-					NSArray *currentLoginItems = CFBridgingRelease(LSSharedFileListCopySnapshot(loginItems, &seed));
-					for (id itemObject in currentLoginItems) {
-						LSSharedFileListItemRef item = (__bridge LSSharedFileListItemRef)itemObject;
-						UInt32 resolutionFlags = kLSSharedFileListNoUserInteraction | kLSSharedFileListDoNotMountVolumes;
-						CFURLRef URL = NULL;
-						OSStatus err = LSSharedFileListItemResolve(item, resolutionFlags, &URL, NULL);
-						if (err == noErr) {
-							Boolean foundIt = CFEqual(URL, (__bridge CFTypeRef)(itemURL));
-							CFRelease(URL);
-							if (foundIt) {
-								existingItem = item;
-								break;
-							}
-						}
-					}
-					if (flagEnabled) {
-						if (existingItem == NULL) {
-							LSSharedFileListInsertItemURL(loginItems, kLSSharedFileListItemBeforeFirst, NULL, NULL, (__bridge CFURLRef)itemURL, NULL, NULL);
-						}
-					} else {
-						if (existingItem != NULL) {
-							LSSharedFileListItemRemove(loginItems, existingItem);
-						}
-					}
-					CFRelease(loginItems);
-				}
-#endif
-			}
-		}
-	}
 	
+#if defined(SLIB_PLATFORM_IS_MACOS)
 	void System::registerApplicationRunAtStartup(const String& path)
 	{
-		priv::system::setBundleLoginItemEnabled(path, sl_true);
+		Apple::setBundleLoginItemEnabled(path, sl_true);
 	}
 
 	void System::registerApplicationRunAtStartup()
 	{
-		priv::system::setBundleLoginItemEnabled(Apple::getMainBundlePath(), sl_true);
+		Apple::setBundleLoginItemEnabled(Apple::getMainBundlePath(), sl_true);
 	}
 
 	void System::unregisterApplicationRunAtStartup(const String& path)
 	{
-		priv::system::setBundleLoginItemEnabled(path, sl_false);
+		Apple::setBundleLoginItemEnabled(path, sl_false);
 	}
 
 	void System::unregisterApplicationRunAtStartup()
 	{
-		priv::system::setBundleLoginItemEnabled(Apple::getMainBundlePath(), sl_false);
+		Apple::setBundleLoginItemEnabled(Apple::getMainBundlePath(), sl_false);
 	}
+#endif
 
 }
 

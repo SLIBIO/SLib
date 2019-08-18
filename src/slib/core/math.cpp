@@ -24,6 +24,8 @@
 
 #include "slib/core/time.h"
 #include "slib/core/system.h"
+#include "slib/core/process.h"
+#include "slib/core/thread.h"
 #include "slib/core/file.h"
 #include "slib/crypto/sha2.h"
 
@@ -517,7 +519,7 @@ namespace slib
 				static sl_uint32 pid = 0;
 				static char hashAppPath[32] = { 0 };
 				if (!flagStatics) {
-					pid = System::getProcessId();
+					pid = Process::getCurrentProcessId();
 					String str = System::getApplicationPath();
 					SHA256::hash(str, hashAppPath);
 					flagStatics = sl_true;
@@ -525,7 +527,7 @@ namespace slib
 				// 16:4 process id
 				Base::copyMemory(buf + 16, &pid, 4);
 				// 20:4 thread id
-				sl_uint32 tid = System::getThreadId();
+				sl_uint32 tid = Thread::getCurrentThreadId();
 				Base::copyMemory(buf + 20, &tid, 4);
 				// 24:4 new address
 				void* pna = Base::createMemory(1);

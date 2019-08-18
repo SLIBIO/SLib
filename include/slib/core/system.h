@@ -35,7 +35,6 @@ namespace slib
 	class SLIB_EXPORT System
 	{
 	public:
-		// System & Application Information
 		static String getApplicationPath();
 
 		static String getApplicationDirectory();
@@ -60,23 +59,10 @@ namespace slib
 		static String getFullUserName();
 
 
-		// Tick count (milliseconds)
 		static sl_uint32 getTickCount();
 		
 		static sl_uint64 getTickCount64();
 	
-
-		// Process & Thread
-		static sl_uint32 getProcessId();
-
-		static sl_uint32 getThreadId();
-
-		static sl_bool createProcess(const String& pathExecutable, const String* command, sl_uint32 nCommands);
-
-		static void exec(const String& pathExecutable, const String* command, sl_uint32 nCommands);
-
-		static void exit(int code);
-
 		static void sleep(sl_uint32 millis);
 
 		static void yield();
@@ -84,7 +70,6 @@ namespace slib
 		static void yield(sl_uint32 elapsed);
 	
 		
-		// Error Handling
 		static sl_uint32 getLastError();
 		
 		static String formatErrorCode(sl_uint32 errorCode);
@@ -106,22 +91,6 @@ namespace slib
 
 	};
 	
-	class SLIB_EXPORT GlobalUniqueInstance : public Referable
-	{
-		SLIB_DECLARE_OBJECT
-
-	public:
-		GlobalUniqueInstance();
-
-		~GlobalUniqueInstance();
-
-	public:
-		static Ref<GlobalUniqueInstance> create(const String& name);
-
-		static sl_bool exists(const String& name);
-
-	};
-
 }
 
 #endif

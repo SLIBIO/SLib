@@ -25,7 +25,7 @@
 
 #include "slib/core/definition.h"
 
-#if defined(SLIB_PLATFORM_IS_WIN32)
+#if defined(SLIB_PLATFORM_IS_WINDOWS)
 #define ASYNC_USE_IOCP
 #elif defined(SLIB_PLATFORM_IS_APPLE)
 #define ASYNC_USE_KQUEUE

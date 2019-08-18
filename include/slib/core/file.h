@@ -29,7 +29,7 @@
 #include "io.h"
 
 typedef sl_reg sl_file;
-#define SLIB_FILE_INVALID_HANDLE (sl_file)(-1)
+#define SLIB_FILE_INVALID_HANDLE ((sl_file)(-1))
 
 namespace slib
 {

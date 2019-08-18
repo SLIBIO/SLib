@@ -27,6 +27,7 @@
 
 #include "object.h"
 #include "string.h"
+#include "global_unique_instance.h"
 
 namespace slib
 {
@@ -36,9 +37,7 @@ namespace slib
 		UI = 0,
 		Service = 1
 	};
-	
-	class GlobalUniqueInstance;
-	
+		
 	class SLIB_EXPORT Application : public Object
 	{
 		SLIB_DECLARE_OBJECT

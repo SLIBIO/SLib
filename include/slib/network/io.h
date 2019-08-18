@@ -26,12 +26,13 @@
 #include "definition.h"
 
 #include "socket.h"
+
 #include "../core/io.h"
 
 namespace slib
 {
 
-	class SLIB_EXPORT TcpStream : public Object, public IStream, public IClosable
+	class SLIB_EXPORT TcpStream : public Stream
 	{
 		SLIB_DECLARE_OBJECT
 		

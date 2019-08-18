@@ -82,6 +82,10 @@ namespace slib
 		
 		static String getSystemLocalizedString(const String& key);
 	
+#ifdef SLIB_PLATFORM_IS_MACOS
+		static void setBundleLoginItemEnabled(const String& path, sl_bool flagEnabled);
+#endif
+
 	};
 
 }

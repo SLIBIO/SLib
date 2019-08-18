@@ -35,7 +35,7 @@ namespace slib
 	{
 		String16 filePath = _filePath;
 		if (filePath.isEmpty()) {
-			return SLIB_FILE_INVALID_HANDLE;
+			return (sl_file)(INVALID_HANDLE_VALUE);
 		}
 
 		DWORD dwShareMode = 0;
@@ -79,7 +79,7 @@ namespace slib
 			dwFlags |= FILE_FLAG_RANDOM_ACCESS;
 		}
 		
-		HANDLE handle = ::CreateFileW(
+		HANDLE handle = CreateFileW(
 			(LPCWSTR)(filePath.getData())
 			, dwDesiredAccess
 			, dwShareMode
@@ -94,8 +94,8 @@ namespace slib
 	sl_bool File::_close(sl_file file)
 	{
 		HANDLE handle = (HANDLE)file;
-		if (handle != (HANDLE)SLIB_FILE_INVALID_HANDLE) {
-			::CloseHandle(handle);
+		if (handle != INVALID_HANDLE_VALUE) {
+			CloseHandle(handle);
 			return sl_true;
 		}
 		return sl_false;
@@ -106,7 +106,7 @@ namespace slib
 		if (isOpened()) {
 			HANDLE handle = (HANDLE)m_file;
 			sl_int64 pos = 0;
-			DWORD ret = ::SetFilePointer(handle, 0, ((LONG*)&pos) + 1, FILE_CURRENT);
+			DWORD ret = SetFilePointer(handle, 0, ((LONG*)&pos) + 1, FILE_CURRENT);
 			DWORD err = NOERROR;
 			if (ret == -1) {
 				err = GetLastError();
@@ -136,7 +136,7 @@ namespace slib
 			} else {
 				return sl_false;
 			}
-			DWORD ret = ::SetFilePointer(handle, *((LONG*)&location), ((LONG*)&location) + 1, dwFrom);
+			DWORD ret = SetFilePointer(handle, *((LONG*)&location), ((LONG*)&location) + 1, dwFrom);
 			DWORD err = NOERROR;
 			if (ret == -1) {
 				err = GetLastError();
@@ -156,7 +156,7 @@ namespace slib
 			}
 			sl_uint32 ret = 0;
 			HANDLE handle = (HANDLE)m_file;
-			if (::ReadFile(handle, buf, size, (DWORD*)&ret, NULL)) {
+			if (ReadFile(handle, buf, size, (DWORD*)&ret, NULL)) {
 				if (ret > 0) {
 					return ret;
 				}
@@ -173,7 +173,7 @@ namespace slib
 			}
 			sl_uint32 ret = 0;
 			HANDLE handle = (HANDLE)m_file;
-			if (::WriteFile(handle, (LPVOID)buf, size, (DWORD*)&ret, NULL)) {
+			if (WriteFile(handle, (LPVOID)buf, size, (DWORD*)&ret, NULL)) {
 				if (ret > 0) {
 					return ret;
 				}
@@ -188,7 +188,7 @@ namespace slib
 			sl_int64 pos_orig = getPosition();
 			if (seek(size, SeekPosition::Begin)) {
 				HANDLE handle = (HANDLE)m_file;
-				BOOL bRet = ::SetEndOfFile(handle);
+				BOOL bRet = SetEndOfFile(handle);
 				seek(pos_orig, SeekPosition::Begin);
 				return bRet != 0;
 			}
@@ -201,10 +201,10 @@ namespace slib
 		HANDLE handle = (HANDLE)fd;
 		if (handle != INVALID_HANDLE_VALUE) {
 			sl_uint64 ret = 0;
-			if (::GetFileSizeEx(handle, (PLARGE_INTEGER)(&ret))) {
+			if (GetFileSizeEx(handle, (PLARGE_INTEGER)(&ret))) {
 				return ret;
 			} else {
-				int n = ::GetFileType(handle);
+				int n = GetFileType(handle);
 			}
 		}
 		return 0;
@@ -216,7 +216,7 @@ namespace slib
 		if (filePath.isEmpty()) {
 			return 0;
 		}
-		HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getData()), 0, 0, NULL, OPEN_EXISTING, 0, NULL);
+		HANDLE handle = CreateFileW((LPCWSTR)(filePath.getData()), 0, 0, NULL, OPEN_EXISTING, 0, NULL);
 		if (handle != INVALID_HANDLE_VALUE) {
 			return getSize((sl_file)handle);
 		} else {
@@ -230,7 +230,7 @@ namespace slib
 		if (handle != INVALID_HANDLE_VALUE) {
 			sl_uint64 size = 0;
 			DWORD nOutput;
-			::DeviceIoControl(handle, IOCTL_DISK_GET_LENGTH_INFO, NULL, 0, &size, sizeof(size), &nOutput, NULL);
+			DeviceIoControl(handle, IOCTL_DISK_GET_LENGTH_INFO, NULL, 0, &size, sizeof(size), &nOutput, NULL);
 			return size;
 		}
 		return 0;
@@ -239,10 +239,10 @@ namespace slib
 	sl_bool File::lock()
 	{
 		HANDLE handle = (HANDLE)m_file;
-		if (handle != (HANDLE)SLIB_FILE_INVALID_HANDLE) {
+		if (handle != INVALID_HANDLE_VALUE) {
 			OVERLAPPED o;
 			ZeroMemory(&o, sizeof(o));
-			if (::LockFileEx(handle, LOCKFILE_EXCLUSIVE_LOCK | LOCKFILE_FAIL_IMMEDIATELY, 0, 1, 0, &o)) {
+			if (LockFileEx(handle, LOCKFILE_EXCLUSIVE_LOCK | LOCKFILE_FAIL_IMMEDIATELY, 0, 1, 0, &o)) {
 				return sl_true;
 			}
 		}
@@ -252,10 +252,10 @@ namespace slib
 	sl_bool File::unlock()
 	{
 		HANDLE handle = (HANDLE)m_file;
-		if (handle != (HANDLE)SLIB_FILE_INVALID_HANDLE) {
+		if (handle != INVALID_HANDLE_VALUE) {
 			OVERLAPPED o;
 			ZeroMemory(&o, sizeof(o));
-			if (::UnlockFileEx(handle, 0, 0, 0, &o)) {
+			if (UnlockFileEx(handle, 0, 0, 0, &o)) {
 				return sl_true;
 			}
 		}
@@ -270,10 +270,10 @@ namespace slib
 			static Time getModifiedTime(HANDLE handle)
 			{
 				FILETIME ft;
-				BOOL bRet = ::GetFileTime(handle, NULL, NULL, &ft);
+				BOOL bRet = GetFileTime(handle, NULL, NULL, &ft);
 				if (bRet) {
 					FILETIME lft;
-					::FileTimeToLocalFileTime(&ft, &lft);
+					FileTimeToLocalFileTime(&ft, &lft);
 					Time time(*((sl_int64*)&lft) / 10);
 					return time;
 				} else {
@@ -284,10 +284,10 @@ namespace slib
 			static Time getAccessedTime(HANDLE handle)
 			{
 				FILETIME ft;
-				BOOL bRet = ::GetFileTime(handle, NULL, &ft, NULL);
+				BOOL bRet = GetFileTime(handle, NULL, &ft, NULL);
 				if (bRet) {
 					FILETIME lft;
-					::FileTimeToLocalFileTime(&ft, &lft);
+					FileTimeToLocalFileTime(&ft, &lft);
 					Time time(*((sl_int64*)&lft) / 10);
 					return time;
 				} else {
@@ -298,10 +298,10 @@ namespace slib
 			static Time getCreatedTime(HANDLE handle)
 			{
 				FILETIME ft;
-				BOOL bRet = ::GetFileTime(handle, &ft, NULL, NULL);
+				BOOL bRet = GetFileTime(handle, &ft, NULL, NULL);
 				if (bRet) {
 					FILETIME lft;
-					::FileTimeToLocalFileTime(&ft, &lft);
+					FileTimeToLocalFileTime(&ft, &lft);
 					Time time(*((sl_int64*)&lft) / 10);
 					return time;
 				} else {
@@ -327,10 +327,10 @@ namespace slib
 		if (filePath.isEmpty()) {
 			return Time::zero();
 		}
-		HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+		HANDLE handle = CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
 		if (handle != INVALID_HANDLE_VALUE) {
 			Time ret = priv::file::getModifiedTime(handle);
-			::CloseHandle(handle);
+			CloseHandle(handle);
 			return ret;
 		} else {
 			return Time::zero();
@@ -352,10 +352,10 @@ namespace slib
 		if (filePath.isEmpty()) {
 			return Time::zero();
 		}
-		HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+		HANDLE handle = CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
 		if (handle != INVALID_HANDLE_VALUE) {
 			Time ret = priv::file::getAccessedTime(handle);
-			::CloseHandle(handle);
+			CloseHandle(handle);
 			return ret;
 		} else {
 			return Time::zero();
@@ -377,10 +377,10 @@ namespace slib
 		if (filePath.isEmpty()) {
 			return Time::zero();
 		}
-		HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+		HANDLE handle = CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
 		if (handle != INVALID_HANDLE_VALUE) {
 			Time ret = priv::file::getCreatedTime(handle);
-			::CloseHandle(handle);
+			CloseHandle(handle);
 			return ret;
 		} else {
 			return Time::zero();
@@ -393,14 +393,14 @@ namespace slib
 		if (filePath.isEmpty()) {
 			return sl_false;
 		}
-		HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+		HANDLE handle = CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
 		if (handle != INVALID_HANDLE_VALUE) {
 			FILETIME lft;
 			FILETIME ft;
 			*((sl_int64*)&lft) = time.toInt() * 10;
-			::LocalFileTimeToFileTime(&lft, &ft);
-			BOOL bRet = ::SetFileTime(handle, NULL, NULL, &ft);
-			::CloseHandle(handle);
+			LocalFileTimeToFileTime(&lft, &ft);
+			BOOL bRet = SetFileTime(handle, NULL, NULL, &ft);
+			CloseHandle(handle);
 			return bRet != 0;
 		} else {
 			return sl_false;
@@ -413,14 +413,14 @@ namespace slib
 		if (filePath.isEmpty()) {
 			return sl_false;
 		}
-		HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+		HANDLE handle = CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
 		if (handle != INVALID_HANDLE_VALUE) {
 			FILETIME lft;
 			FILETIME ft;
 			*((sl_int64*)&lft) = time.toInt() * 10;
-			::LocalFileTimeToFileTime(&lft, &ft);
-			BOOL bRet = ::SetFileTime(handle, NULL, &ft, NULL);
-			::CloseHandle(handle);
+			LocalFileTimeToFileTime(&lft, &ft);
+			BOOL bRet = SetFileTime(handle, NULL, &ft, NULL);
+			CloseHandle(handle);
 			return bRet != 0;
 		} else {
 			return sl_false;
@@ -433,14 +433,14 @@ namespace slib
 		if (filePath.isEmpty()) {
 			return sl_false;
 		}
-		HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+		HANDLE handle = CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
 		if (handle != INVALID_HANDLE_VALUE) {
 			FILETIME lft;
 			FILETIME ft;
 			*((sl_int64*)&lft) = time.toInt() * 10;
-			::LocalFileTimeToFileTime(&lft, &ft);
-			BOOL bRet = ::SetFileTime(handle, &ft, NULL, NULL);
-			::CloseHandle(handle);
+			LocalFileTimeToFileTime(&lft, &ft);
+			BOOL bRet = SetFileTime(handle, &ft, NULL, NULL);
+			CloseHandle(handle);
 			return bRet != 0;
 		} else {
 			return sl_false;
@@ -453,7 +453,7 @@ namespace slib
 		if (filePath.isEmpty()) {
 			return FileAttributes::NotExist;
 		}
-		DWORD attr = ::GetFileAttributesW((LPCWSTR)(filePath.getData()));
+		DWORD attr = GetFileAttributesW((LPCWSTR)(filePath.getData()));
 		if (attr == -1) {
 			return FileAttributes::NotExist;
 		} else {
@@ -474,7 +474,7 @@ namespace slib
 		if (filePath.isEmpty()) {
 			return sl_false;
 		}
-		DWORD attr = ::GetFileAttributesW((LPCWSTR)(filePath.getData()));
+		DWORD attr = GetFileAttributesW((LPCWSTR)(filePath.getData()));
 		if (attr == -1) {
 			return sl_false;
 		}
@@ -483,7 +483,7 @@ namespace slib
 		} else {
 			attr &= (~FILE_ATTRIBUTE_HIDDEN);
 		}
-		return ::SetFileAttributesW((LPCWSTR)(filePath.getData()), attr) != 0;
+		return SetFileAttributesW((LPCWSTR)(filePath.getData()), attr) != 0;
 	}
 
 	List<String> File::getFiles(const String& _filePath)
@@ -501,7 +501,7 @@ namespace slib
 		SLIB_STATIC_STRING(t, "/*");
 		String16 query = filePath + t;
 		WIN32_FIND_DATAW fd;
-		HANDLE handle = ::FindFirstFileW((LPCWSTR)(query.getData()), &fd);
+		HANDLE handle = FindFirstFileW((LPCWSTR)(query.getData()), &fd);
 		if (handle != INVALID_HANDLE_VALUE) {
 			List<String> ret;
 			BOOL c = TRUE;
@@ -512,9 +512,9 @@ namespace slib
 				if (str != p1 && str != p2) {
 					ret.add_NoLock(str);
 				}
-				c = ::FindNextFileW(handle, &fd);
+				c = FindNextFileW(handle, &fd);
 			}
-			::FindClose(handle);
+			FindClose(handle);
 			return ret;
 		} else {
 			return sl_null;
@@ -527,7 +527,7 @@ namespace slib
 		if (filePath.isEmpty()) {
 			return sl_false;
 		}
-		BOOL ret = ::CreateDirectoryW((LPCWSTR)(filePath.getData()), NULL);
+		BOOL ret = CreateDirectoryW((LPCWSTR)(filePath.getData()), NULL);
 		return ret != 0;
 	}
 
@@ -537,7 +537,7 @@ namespace slib
 		if (filePath.isEmpty()) {
 			return sl_false;
 		}
-		BOOL ret = ::DeleteFileW((LPCWSTR)(filePath.getData()));
+		BOOL ret = DeleteFileW((LPCWSTR)(filePath.getData()));
 		return ret != 0;
 	}
 
@@ -547,7 +547,7 @@ namespace slib
 			return sl_false;
 		}
 		String16 dirPath = normalizeDirectoryPath(filePath);
-		BOOL ret = ::RemoveDirectoryW((LPCWSTR)(dirPath.getData()));
+		BOOL ret = RemoveDirectoryW((LPCWSTR)(dirPath.getData()));
 		return ret != 0;
 	}
 
@@ -561,7 +561,7 @@ namespace slib
 		if (newPath.isEmpty()) {
 			return sl_false;
 		}
-		BOOL ret = ::MoveFileExW((LPCWSTR)(oldPath.getData()), (LPCWSTR)(newPath.getData()), 0);
+		BOOL ret = MoveFileExW((LPCWSTR)(oldPath.getData()), (LPCWSTR)(newPath.getData()), 0);
 		return ret != 0;
 	}
 
@@ -570,7 +570,7 @@ namespace slib
 		String16 path = _filePath;
 		WCHAR buf[4096];
 		buf[0] = 0;
-		if (::GetFullPathNameW((LPCWSTR)(path.getData()), 4096, buf, NULL)) {
+		if (GetFullPathNameW((LPCWSTR)(path.getData()), 4096, buf, NULL)) {
 			return buf;
 		}
 		return sl_null;

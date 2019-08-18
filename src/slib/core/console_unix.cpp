@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -22,62 +22,65 @@
 
 #include "slib/core/definition.h"
 
-#ifdef SLIB_PLATFORM_IS_WIN32
+#if defined(SLIB_PLATFORM_IS_UNIX)
 
-#include <windows.h>
+#include "slib/core/console.h"
 
-#include "slib/core/pipe.h"
+#include "slib/core/log.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#if !defined(SLIB_PLATFORM_IS_MOBILE)
+#	include <termios.h>
+#endif
 
 namespace slib
 {
 
-	sl_bool Pipe::_open(sl_pipe& hRead, sl_pipe& hWrite)
+	void Console::print(const String& s)
 	{
-		HANDLE _hRead, _hWrite;
-		BOOL ret = ::CreatePipe(&_hRead, &_hWrite, NULL, 4096);
-		if (ret) {
-			hRead = (sl_pipe)_hRead;
-			hWrite = (sl_pipe)_hWrite;
-			return sl_true;
+#if defined(SLIB_PLATFORM_IS_ANDROID) || defined(SLIB_PLATFORM_IS_TIZEN)
+		SLIB_STATIC_STRING(c, "Console");
+		Logger::getConsoleLogger()->log(c, s);
+#else
+		String _s = s;
+		printf("%s", _s.getData());
+#endif
+	}
+	
+#if !defined(SLIB_PLATFORM_IS_MOBILE)
+	String Console::readLine()
+	{
+		String ret;
+		char* line = NULL;
+		size_t len = 0;
+		getline(&line, &len, stdin);
+		if (line) {
+			ret = String(line, Base::getStringLength(line, (sl_int32)len));
+			free(line);
 		}
-		return sl_false;
+		return ret;
 	}
-
-	void Pipe::_close(sl_pipe handle)
+	
+	sl_char16 Console::readChar(sl_bool flagPrintEcho)
 	{
-		::CloseHandle((HANDLE)handle);
-	}
-
-	sl_int32 Pipe::read32(void* buf, sl_uint32 size)
-	{
-		if (isOpened()) {
-			if (size == 0) {
-				return 0;
-			}
-			DWORD ret = 0;
-			HANDLE handle = (HANDLE)m_hRead;
-			if (::ReadFile(handle, buf, size, &ret, NULL)) {
-				return ret;
-			}
+		termios tOld, tNew;
+		tcgetattr(0, &tOld);
+		tNew = tOld;
+		tNew.c_lflag &= ~ICANON;
+		if (flagPrintEcho) {
+			tNew.c_lflag |= ECHO;
+		} else {
+			tNew.c_lflag &= ~ECHO;
 		}
-		return -1;
+		tcsetattr(0, TCSANOW, &tNew);
+		sl_char16 ch = (sl_char16)(::getchar());
+		tcsetattr(0, TCSANOW, &tOld);
+		return ch;
 	}
-
-	sl_int32 Pipe::write32(const void* buf, sl_uint32 size)
-	{
-		if (isOpened()) {
-			if (size == 0) {
-				return 0;
-			}
-			DWORD ret = 0;
-			HANDLE handle = (HANDLE)m_hWrite;
-			if (::WriteFile(handle, (LPVOID)buf, size, &ret, NULL)) {
-				return ret;
-			}
-		}
-		return -1;
-	}
-
+#endif
+	
 }
 
 #endif

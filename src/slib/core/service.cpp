@@ -23,8 +23,8 @@
 #include "slib/core/service.h"
 
 #include "slib/core/system.h"
+#include "slib/core/process.h"
 #include "slib/core/log.h"
-#include "slib/core/file.h"
 
 #define TAG "Service"
 #define WAIT_SECONDS 300
@@ -88,7 +88,7 @@ namespace slib
 			Log(TAG, "STARING %s", appName);
 
 			String appPath = System::getApplicationPath();
-			System::createProcess(appPath, sl_null, 0);
+			Process::run(appPath, sl_null, 0);
 
 			for (int i = 0; i < WAIT_SECONDS*10; i++) {
 				if (GlobalUniqueInstance::exists(appName + START_ID)) {

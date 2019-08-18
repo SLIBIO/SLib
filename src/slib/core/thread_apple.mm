@@ -24,27 +24,50 @@
 
 #if defined(SLIB_PLATFORM_IS_APPLE)
 
-#import <Foundation/Foundation.h>
-
 #include "slib/core/thread.h"
 
-@interface SLIBThread : NSObject
-@end
+#import <Foundation/Foundation.h>
 
-@implementation SLIBThread
--(void)run_callback: (NSMutableDictionary*)parameter
-{
-	long long _thread = [[parameter objectForKey:@"thread_object"] longLongValue];
-	slib::Thread* pThread = (slib::Thread*)_thread;
-	@autoreleasepool {
-		pThread->_run();
-	}
-	pThread->decreaseReference();
-}
+#include <sys/syscall.h>
+
+@interface SLIBThread : NSObject
+
+-(void)run_callback: (NSMutableDictionary*)parameter;
+
 @end
 
 namespace slib
 {
+
+	namespace priv
+	{
+		namespace thread
+		{
+			static double GetThreadPriority(ThreadPriority priority)
+			{
+				double min = 0;
+				double max = 1;
+				if (min < 0 || max < 0) {
+					return -1;
+				}
+				switch (priority) {
+					case ThreadPriority::Lowest:
+						return min;
+					case ThreadPriority::BelowNormal:
+						return (min * 3 + max) / 4;
+					case ThreadPriority::Normal:
+						return (min + max) / 2;
+					case ThreadPriority::AboveNormal:
+						return (min + max * 3) / 4;
+					case ThreadPriority::Highest:
+						return max;
+				}
+				return -1;
+			}
+		}
+	}
+	
+	using namespace priv::thread;
 
 	Thread* Thread::_nativeGetCurrentThread() {
 		NSThread *thread_this = [NSThread currentThread];
@@ -108,45 +131,36 @@ namespace slib
 	{
 	}
 
-	namespace priv
-	{
-		namespace thread
-		{
-			
-			static double GetMacPriority(ThreadPriority priority)
-			{
-				double min = 0;
-				double max = 1;
-				if (min < 0 || max < 0) {
-					return -1;
-				}
-				switch (priority) {
-					case ThreadPriority::Lowest:
-						return min;
-					case ThreadPriority::BelowNormal:
-						return (min * 3 + max) / 4;
-					case ThreadPriority::Normal:
-						return (min + max) / 2;
-					case ThreadPriority::AboveNormal:
-						return (min + max * 3) / 4;
-					case ThreadPriority::Highest:
-						return max;
-				}
-				return -1;
-			}
-
-		}
-	}
-
 	void Thread::_nativeSetPriority()
 	{
-		double p = priv::thread::GetMacPriority(m_priority);
+		double p = GetThreadPriority(m_priority);
 		NSThread* thread = (__bridge NSThread*)m_handle;
 		if(thread != NULL) {
 			[thread setThreadPriority:p];
 		}
 	}
 
+	sl_uint32 Thread::getCurrentThreadId()
+	{
+		return syscall(SYS_thread_selfid);
+	}
+
 }
+
+using namespace slib;
+
+@implementation SLIBThread
+
+-(void)run_callback: (NSMutableDictionary*)parameter
+{
+	long long _thread = [[parameter objectForKey:@"thread_object"] longLongValue];
+	Thread* pThread = (Thread*)_thread;
+	@autoreleasepool {
+		pThread->_run();
+	}
+	pThread->decreaseReference();
+}
+
+@end
 
 #endif

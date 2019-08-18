@@ -24,10 +24,12 @@
 
 #if defined(SLIB_PLATFORM_IS_UNIX) && !defined(SLIB_PLATFORM_IS_APPLE)
 
-#include <pthread.h>
-#include <time.h>
-
 #include "slib/core/thread.h"
+
+#include <unistd.h>
+#include <pthread.h>
+
+#include <sys/syscall.h>
 
 namespace slib
 {
@@ -143,6 +145,15 @@ namespace slib
 				pthread_setschedparam(thread, PRIV_UNIX_SCHED_POLICY, &param);
 			}
 		}
+	}
+
+	sl_uint32 Thread::getCurrentThreadId()
+	{
+#if defined(SLIB_PLATFORM_IS_ANDROID)
+		return (sl_uint32)(gettid());
+#else
+		return (sl_uint32)(syscall(SYS_gettid));
+#endif
 	}
 
 }

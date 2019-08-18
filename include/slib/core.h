@@ -86,6 +86,7 @@
 #include "core/system.h"
 #include "core/console.h"
 #include "core/event.h"
+#include "core/process.h"
 #include "core/thread.h"
 #include "core/thread_pool.h"
 #include "core/rw_lock.h"
@@ -99,6 +100,7 @@
 #include "core/dispatch.h"
 #include "core/dispatch_loop.h"
 #include "core/timer.h"
+#include "core/global_unique_instance.h"
 
 #include "core/app.h"
 #include "core/service.h"

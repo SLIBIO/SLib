@@ -20,62 +20,64 @@
  *   THE SOFTWARE.
  */
 
-#include "slib/network/io.h"
+#include "slib/core/definition.h"
+
+#ifdef SLIB_PLATFORM_IS_WINDOWS
+
+#include <windows.h>
+
+#include "slib/core/pipe.h"
 
 namespace slib
 {
 
-	SLIB_DEFINE_OBJECT(TcpStream, Stream)
-
-	TcpStream::TcpStream()
+	sl_bool Pipe::_open(sl_pipe& hRead, sl_pipe& hWrite)
 	{
-	}
-
-	TcpStream::TcpStream(const Ref<Socket>& socket) : m_socket(socket)
-	{
-	}
-
-	TcpStream::~TcpStream()
-	{
-	}
-
-	Ref<Socket> TcpStream::getSocket()
-	{
-		return m_socket;
-	}
-
-	void TcpStream::setSocket(const Ref<Socket>& socket)
-	{
-		m_socket = socket;
-	}
-
-	void TcpStream::close()
-	{
-		Ref<Socket> socket = m_socket;
-		if (socket.isNotNull()) {
-			socket->close();
-			m_socket.setNull();
+		HANDLE _hRead, _hWrite;
+		BOOL ret = ::CreatePipe(&_hRead, &_hWrite, NULL, 4096);
+		if (ret) {
+			hRead = (sl_pipe)_hRead;
+			hWrite = (sl_pipe)_hWrite;
+			return sl_true;
 		}
+		return sl_false;
 	}
 
-	sl_int32 TcpStream::read32(void* buf, sl_uint32 size)
+	void Pipe::_close(sl_pipe handle)
 	{
-		Ref<Socket> socket = m_socket;
-		if (socket.isNotNull()) {
-			sl_int32 n = socket->receive(buf, size);
-			return n;
+		::CloseHandle((HANDLE)handle);
+	}
+
+	sl_int32 Pipe::read32(void* buf, sl_uint32 size)
+	{
+		if (isOpened()) {
+			if (size == 0) {
+				return 0;
+			}
+			DWORD ret = 0;
+			HANDLE handle = (HANDLE)m_hRead;
+			if (::ReadFile(handle, buf, size, &ret, NULL)) {
+				return ret;
+			}
 		}
 		return -1;
 	}
 
-	sl_int32 TcpStream::write32(const void* buf, sl_uint32 size)
+	sl_int32 Pipe::write32(const void* buf, sl_uint32 size)
 	{
-		Ref<Socket> socket = m_socket;
-		if (socket.isNotNull()) {
-			sl_int32 n = socket->send(buf, size);
-			return n;
+		if (isOpened()) {
+			if (size == 0) {
+				return 0;
+			}
+			DWORD ret = 0;
+			HANDLE handle = (HANDLE)m_hWrite;
+			if (::WriteFile(handle, (LPVOID)buf, size, &ret, NULL)) {
+				return ret;
+			}
 		}
 		return -1;
 	}
 
 }
+
+#endif

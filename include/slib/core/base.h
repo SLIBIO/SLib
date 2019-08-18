@@ -223,13 +223,6 @@ namespace slib
 
 		static sl_bool interlockedCompareExchangePtr(void** pDst, const void* value, const void* comparand) noexcept;
 
-
-		static void sleep(sl_uint32 millis) noexcept;
-
-		static void yield() noexcept;
-
-		static void yield(sl_uint32 elapsed) noexcept;
-
 	};
 
 }
