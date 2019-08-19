@@ -40,8 +40,6 @@ namespace slib
 	PushNotificationService::PushNotificationService()
 	{
 		m_flagStarted = sl_false;
-		m_listTokenRefreshCallbacks.create();
-		m_listNotificationReceivedCallbacks.create();
 	}
 	
 	PushNotificationService::~PushNotificationService()
@@ -55,22 +53,22 @@ namespace slib
 	
 	void PushNotificationService::addTokenRefreshCallback(const Function<void(String)>& callback)
 	{
-		m_listTokenRefreshCallbacks.add(callback);
+		m_callbackTokenRefresh.add(callback);
 	}
 	
 	void PushNotificationService::removeTokenRefreshCallback(const Function<void(String)>& callback)
 	{
-		m_listTokenRefreshCallbacks.remove(callback);
+		m_callbackTokenRefresh.remove(callback);
 	}
 	
 	void PushNotificationService::addNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback)
 	{
-		m_listNotificationReceivedCallbacks.add(callback);
+		m_callbackNotificationReceived.add(callback);
 	}
 	
 	void PushNotificationService::removeNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback)
 	{
-		m_listNotificationReceivedCallbacks.remove(callback);
+		m_callbackNotificationReceived.remove(callback);
 	}
 	
 	void PushNotificationService::start()
@@ -88,20 +86,12 @@ namespace slib
 	void PushNotificationService::dispatchTokenRefresh(const String& token)
 	{
 		m_deviceToken = token;
-		for (auto& callback : m_listTokenRefreshCallbacks) {
-			if (callback.isNotNull()) {
-				callback(token);
-			}
-		}
+		m_callbackTokenRefresh(token);
 	}
 	
 	void PushNotificationService::dispatchNotificationReceived(PushNotificationMessage& message)
 	{
-		for (auto& callback : m_listNotificationReceivedCallbacks) {
-			if (callback.isNotNull()) {
-				callback(message);
-			}
-		}
+		m_callbackNotificationReceived(message);
 	}
 	
 	void PushNotificationService::onStart()

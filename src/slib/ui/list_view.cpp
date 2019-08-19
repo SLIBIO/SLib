@@ -211,18 +211,9 @@ namespace slib
 					return;
 				}
 				m_flagResetingAdapter = sl_true;
-				auto weak = ToWeakRef(this);
-				Dispatch::dispatch([weak, this, adapter]() {
-					auto ref = ToRef(weak);
-					if (ref.isNull()) {
-						return;
-					}
+				Dispatch::dispatch(Function<void()>::with(ToWeakRef(this), [this, adapter]() {
 					_initHeights(adapter.get());
-					dispatchToDrawingThread([weak, this, adapter]() {
-						auto ref = ToRef(weak);
-						if (ref.isNull()) {
-							return;
-						}
+					dispatchToDrawingThread(Function<void()>::with(ToWeakRef(this), [this, adapter]() {
 						_initStatus();
 						m_flagResetingAdapter = sl_false;
 						m_adapterCurrent = adapter;
@@ -235,8 +226,8 @@ namespace slib
 							m_flagResetAdapter = sl_true;
 							_checkUpdateContent();
 						}
-					});
-				});
+					}));
+				}));
 			} else {
 				_initHeights(sl_null);
 				_initStatus();

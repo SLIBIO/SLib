@@ -109,6 +109,12 @@ namespace slib
 		template <class CLASS, class FUNC, class... BINDS>
 		static Function<RET_TYPE(ARGS...)> bindWeakRef(const WeakRef<CLASS>& object, FUNC func, const BINDS&... binds) noexcept;
 		
+		template <class CLASS, class FUNC>
+		static Function<RET_TYPE(ARGS...)> with(const Ref<CLASS>& object, FUNC func) noexcept;
+
+		template <class CLASS, class FUNC>
+		static Function<RET_TYPE(ARGS...)> with(const WeakRef<CLASS>& object, FUNC func) noexcept;
+		
 		static Function<RET_TYPE(ARGS...)> fromList(const List< Function<RET_TYPE(ARGS...)> >&) noexcept;
 		
 	public:

@@ -199,6 +199,51 @@ namespace slib
 				}
 			};
 			
+			template <class CLASS, class FUNC, class RET_TYPE, class... ARGS>
+			class CallableWithRef : public Callable<RET_TYPE(ARGS...)>
+			{
+			protected:
+				Ref<CLASS> object;
+				FUNC func;
+				
+			public:
+				template <class T>
+				SLIB_INLINE CallableWithRef(T&& _object, FUNC _func) noexcept
+				: object(Forward<T>(_object)), func(_func)
+				{}
+				
+			public:
+				RET_TYPE invoke(ARGS... params) override
+				{
+					return func(params...);
+				}
+			};
+			
+			template <class CLASS, class FUNC, class RET_TYPE, class... ARGS>
+			class CallableWithWeakRef : public Callable<RET_TYPE(ARGS...)>
+			{
+			protected:
+				WeakRef<CLASS> object;
+				FUNC func;
+				
+			public:
+				template <class T>
+				SLIB_INLINE CallableWithWeakRef(T&& _object, FUNC _func) noexcept
+				: object(Forward<T>(_object)), func(_func)
+				{}
+				
+			public:
+				RET_TYPE invoke(ARGS... params) override
+				{
+					Ref<CLASS> o(object);
+					if (o.isNotNull()) {
+						return func(params...);
+					} else {
+						return NullValue<RET_TYPE>::get();
+					}
+				}
+			};
+			
 		}
 	}
 	
@@ -325,6 +370,26 @@ namespace slib
 	{
 		if (object.isNotNull()) {
 			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::BindFromWeakRef<Tuple<BINDS...>, CLASS, FUNC, RET_TYPE, ARGS...>(object, func, Tuple<BINDS...>(binds...)));
+		}
+		return sl_null;
+	}
+	
+	template <class RET_TYPE, class... ARGS>
+	template <class CLASS, class FUNC>
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::with(const Ref<CLASS>& object, FUNC func) noexcept
+	{
+		if (object.isNotNull()) {
+			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::CallableWithRef<CLASS, FUNC, RET_TYPE, ARGS...>(object, func));
+		}
+		return sl_null;
+	}
+	
+	template <class RET_TYPE, class... ARGS>
+	template <class CLASS, class FUNC>
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::with(const WeakRef<CLASS>& object, FUNC func) noexcept
+	{
+		if (object.isNotNull()) {
+			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::CallableWithWeakRef<CLASS, FUNC, RET_TYPE, ARGS...>(object, func));
 		}
 		return sl_null;
 	}

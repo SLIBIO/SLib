@@ -74,8 +74,9 @@ namespace slib
 					if (parent.isNull()) {
 						return;
 					}
-					Ref<LabelView> view = new LabelView;
-					if (view.isNull()) {
+					Ref<LabelView> refView = new LabelView;
+					LabelView* view = refView.get();
+					if (!view) {
 						return;
 					}
 					view->setCreatingInstance(sl_true);
@@ -95,28 +96,19 @@ namespace slib
 					parent->addChild(view);
 					animation = view->startAlphaAnimation(0, 1, 0.3f, sl_null, AnimationCurve::Linear, AnimationFlags::NotSelfAlive);
 					
-					auto weak = ToWeakRef(view);
-					UI::dispatchToUiThread([this, weak]() {
-						auto view = ToRef(weak);
-						if (view.isNull()) {
-							return;
-						}
+					UI::dispatchToUiThread(Function<void()>::with(ToWeakRef(view), [this, view]() {
 						MutexLocker locker(&lock);
 						if (currentToast.isNotNull()) {
-							animation = currentToast->startAlphaAnimation(1, 0, 0.3f, [this, weak]() {
-								auto view = ToRef(weak);
-								if (view.isNull()) {
-									return;
-								}
+							animation = currentToast->startAlphaAnimation(1, 0, 0.3f, Function<void()>::with(ToWeakRef(view), [this, view]() {
 								MutexLocker locker(&lock);
 								if (currentToast.isNotNull()) {
 									currentToast->removeFromParent();
 									currentToast.setNull();
 									animation.setNull();
 								}
-							}, AnimationCurve::Linear, AnimationFlags::NotSelfAlive);
+							}), AnimationCurve::Linear, AnimationFlags::NotSelfAlive);
 						}
-					}, (sl_uint32)(toast->duration * 1000));
+					}), (sl_uint32)(toast->duration * 1000));
 				}
 				
 			};

@@ -27,7 +27,6 @@
 
 #include "../core/object.h"
 #include "../core/string.h"
-#include "../core/list.h"
 #include "../core/json.h"
 #include "../core/function.h"
 
@@ -90,8 +89,8 @@ namespace slib
 	protected:
 		sl_bool m_flagStarted;
 		AtomicString m_deviceToken;
-		List< Function<void(String)> > m_listTokenRefreshCallbacks;
-		List< Function<void(PushNotificationMessage&)> > m_listNotificationReceivedCallbacks;
+		AtomicFunction<void(String)> m_callbackTokenRefresh;
+		AtomicFunction<void(PushNotificationMessage&)> m_callbackNotificationReceived;
 
 	};
 	

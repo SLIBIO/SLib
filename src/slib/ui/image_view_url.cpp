@@ -44,19 +44,14 @@ namespace slib
 		}
 		UrlRequestParam param = _param;
 		param.flagSelfAlive = sl_false;
-		auto weak = ToWeakRef(this);
-		param.onComplete += [weak](UrlRequest* request) {
-			auto view = ToRef(weak);
-			if (view.isNull()) {
-				return;
-			}
-			view->m_request.setNull();
+		param.onComplete += Function<void(UrlRequest*)>::with(ToWeakRef(this), [this](UrlRequest* request) {
+			m_request.setNull();
 			if (request->isError()) {
 				return;
 			}
 			Memory mem = request->getResponseContent();
-			view->setSource(Image::loadFromMemory(mem));
-		};
+			setSource(Image::loadFromMemory(mem));
+		});
 		m_request = UrlRequest::send(param);
 	}
 
