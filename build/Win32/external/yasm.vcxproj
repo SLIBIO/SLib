@@ -73,27 +73,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(ProjectDir)..\..\..\bin\Windows\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)..\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>yasm</TargetName>
     <IncludePath>$(ProjectDir)..\..\..\external\src\yasm;$(ProjectDir)..\..\..\external\src\yasm\gen_inc;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)..\..\..\bin\Windows\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)..\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>yasm</TargetName>
     <IncludePath>$(ProjectDir)..\..\..\external\src\yasm;$(ProjectDir)..\..\..\external\src\yasm\gen_inc;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(ProjectDir)..\..\..\bin\Windows\$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)..\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>yasm</TargetName>
     <IncludePath>$(ProjectDir)..\..\..\external\src\yasm;$(ProjectDir)..\..\..\external\src\yasm\gen_inc;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)..\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(ProjectDir)..\..\..\bin\Windows\$(Platform)\</OutDir>
     <TargetName>yasm</TargetName>
     <IncludePath>$(ProjectDir)..\..\..\external\src\yasm;$(ProjectDir)..\..\..\external\src\yasm\gen_inc;$(IncludePath)</IncludePath>

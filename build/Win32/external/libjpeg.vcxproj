@@ -116,21 +116,21 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)..\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>libjpeg</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)..\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>libjpeg</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)..\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>libjpeg</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)..\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
     <TargetName>libjpeg</TargetName>
   </PropertyGroup>

@@ -25,7 +25,7 @@
 					<folderInfo id="org.tizen.nativecore.config.sbi.gcc45.lib.debug.930619274." name="/" resourcePath="">
 						<toolChain errorParsers="" id="org.tizen.nativecore.toolchain.sbi.gcc45.lib.debug.150232196" name="Tizen Native Toolchain" nonInternalBuilderId="org.tizen.nativecore.target.sbi.gnu.builder" superClass="org.tizen.nativecore.toolchain.sbi.gcc45.lib.debug">
 							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF" id="org.tizen.nativeide.target.sbi.gnu.platform.base.1704324873" osList="linux,win32" superClass="org.tizen.nativeide.target.sbi.gnu.platform.base"/>
-							<builder buildPath="${PROJ_PATH}/Build/Debug_x86" enableAutoBuild="true" id="org.tizen.nativecore.target.sbi.gnu.builder.1406581441" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Tizen Application Builder" superClass="org.tizen.nativecore.target.sbi.gnu.builder"/>
+							<builder buildPath="${PROJ_PATH}/build\Debug_x86" enableAutoBuild="true" id="org.tizen.nativecore.target.sbi.gnu.builder.1406581441" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Tizen Application Builder" superClass="org.tizen.nativecore.target.sbi.gnu.builder"/>
 							<tool command="i386-linux-gnueabi-ar" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="" id="org.tizen.nativecore.tool.sbi.gnu.archiver.1481793768" name="Archiver" superClass="org.tizen.nativecore.tool.sbi.gnu.archiver">
 								<outputType id="cdt.managedbuild.tool.gnu.archiver.output.2081934706" outputPrefix="../../../lib/Tizen/${BUILD_CONFIG}/lib" superClass="cdt.managedbuild.tool.gnu.archiver.output"/>
 							</tool>

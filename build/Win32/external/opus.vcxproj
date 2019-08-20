@@ -212,24 +212,24 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)..\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>opus</TargetName>
     <IncludePath>$(ProjectDir)..\..\..\external\src\opus;$(ProjectDir)..\..\..\external\src\opus\include;$(ProjectDir)..\..\..\external\src\opus\celt;$(ProjectDir)..\..\..\external\src\opus\silk;$(ProjectDir)..\..\..\external\src\opus\silk\fixed;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)..\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>opus</TargetName>
     <IncludePath>$(ProjectDir)..\..\..\external\src\opus;$(ProjectDir)..\..\..\external\src\opus\include;$(ProjectDir)..\..\..\external\src\opus\celt;$(ProjectDir)..\..\..\external\src\opus\silk;$(ProjectDir)..\..\..\external\src\opus\silk\fixed;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
-    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)..\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>opus</TargetName>
     <IncludePath>$(ProjectDir)..\..\..\external\src\opus;$(ProjectDir)..\..\..\external\src\opus\include;$(ProjectDir)..\..\..\external\src\opus\celt;$(ProjectDir)..\..\..\external\src\opus\silk;$(ProjectDir)..\..\..\external\src\opus\silk\fixed;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IntDir>$(ProjectDir)..\Build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)..\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
     <TargetName>opus</TargetName>
     <IncludePath>$(ProjectDir)..\..\..\external\src\opus;$(ProjectDir)..\..\..\external\src\opus\include;$(ProjectDir)..\..\..\external\src\opus\celt;$(ProjectDir)..\..\..\external\src\opus\silk;$(ProjectDir)..\..\..\external\src\opus\silk\fixed;$(IncludePath)</IncludePath>
