@@ -869,6 +869,8 @@
 		2698A54E226A383500662528 /* refresh_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2698A54D226A383400662528 /* refresh_view.cpp */; };
 		269E31A92255F431005CD0ED /* paypal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31A82255F430005CD0ED /* paypal.cpp */; };
 		269E31AD2255F53B005CD0ED /* paypal_ui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31AC2255F53B005CD0ED /* paypal_ui.cpp */; };
+		26A304BB230B1D2400852FC9 /* global_event_monitor_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26A304BA230B1D2400852FC9 /* global_event_monitor_macos.mm */; };
+		26A304BD230B1D2B00852FC9 /* global_event_monitor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A304BC230B1D2B00852FC9 /* global_event_monitor.cpp */; };
 		26A39D8920EFBCBB004707C9 /* calculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A39D8820EFBCBB004707C9 /* calculator.cpp */; };
 		26A3DA8A2289ED9C0031CBDA /* rc4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A3DA892289ED9B0031CBDA /* rc4.cpp */; };
 		26A3DA8E228A08D40031CBDA /* chacha.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A3DA8D228A08D40031CBDA /* chacha.cpp */; };
@@ -2401,6 +2403,8 @@
 		2699DC8F1D43682D0085EE67 /* list_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list_view.cpp; sourceTree = "<group>"; };
 		269E31A82255F430005CD0ED /* paypal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = paypal.cpp; path = social/paypal.cpp; sourceTree = "<group>"; };
 		269E31AC2255F53B005CD0ED /* paypal_ui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = paypal_ui.cpp; path = social/paypal_ui.cpp; sourceTree = "<group>"; };
+		26A304BA230B1D2400852FC9 /* global_event_monitor_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = global_event_monitor_macos.mm; sourceTree = "<group>"; };
+		26A304BC230B1D2B00852FC9 /* global_event_monitor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = global_event_monitor.cpp; sourceTree = "<group>"; };
 		26A39D8820EFBCBB004707C9 /* calculator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = calculator.cpp; sourceTree = "<group>"; };
 		26A3DA892289ED9B0031CBDA /* rc4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rc4.cpp; sourceTree = "<group>"; };
 		26A3DA8D228A08D40031CBDA /* chacha.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chacha.cpp; sourceTree = "<group>"; };
@@ -4399,6 +4403,8 @@
 				266DD5001C11940A00D47AB0 /* edit_view.cpp */,
 				266DD5031C11940A00D47AB0 /* edit_view_macos.mm */,
 				E17DADF01E0C9A1E006161F6 /* gesture.cpp */,
+				26A304BC230B1D2B00852FC9 /* global_event_monitor.cpp */,
+				26A304BA230B1D2400852FC9 /* global_event_monitor_macos.mm */,
 				266DD51E1C11940A00D47AB0 /* image_view.cpp */,
 				26C795A2221562E70053C5A1 /* image_view_url.cpp */,
 				266DD50C1C11940A00D47AB0 /* label_view.cpp */,
@@ -6241,6 +6247,7 @@
 				26D9D9BF1E96468D005F7BD3 /* gesture.cpp in Sources */,
 				26D9D9231E9645CE005F7BD3 /* bezier.cpp in Sources */,
 				26E1B8A6222ABAB2007C222E /* jmemnobs.c in Sources */,
+				26A304BD230B1D2B00852FC9 /* global_event_monitor.cpp in Sources */,
 				26D9D99E1E96467B005F7BD3 /* network_async_unix.cpp in Sources */,
 				26D9D9241E9645CE005F7BD3 /* sha1.cpp in Sources */,
 				26D9D9901E964675005F7BD3 /* video_codec.cpp in Sources */,
@@ -6321,6 +6328,7 @@
 				26D9D9EB1E96468D005F7BD3 /* view_macos.mm in Sources */,
 				265A937823051C2B00B155A2 /* drawable_ext.cpp in Sources */,
 				26D9D9331E9645CE005F7BD3 /* pipe.cpp in Sources */,
+				26A304BB230B1D2400852FC9 /* global_event_monitor_macos.mm in Sources */,
 				26D9D9341E9645CE005F7BD3 /* md5.cpp in Sources */,
 				26D9D98A1E964675005F7BD3 /* codec_opus.cpp in Sources */,
 				26FBB34B1ED5581F0086C27A /* ui_text.cpp in Sources */,

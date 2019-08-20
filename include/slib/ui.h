@@ -84,5 +84,6 @@
 #include "ui/notification.h"
 #include "ui/photo.h"
 #include "ui/screen_capture.h"
+#include "ui/global_event_monitor.h"
 
 #endif

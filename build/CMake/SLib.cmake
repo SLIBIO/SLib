@@ -315,6 +315,7 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/ui/drawer.cpp"
  "${SLIB_PATH}/src/slib/ui/edit_view.cpp"
  "${SLIB_PATH}/src/slib/ui/gesture.cpp"
+ "${SLIB_PATH}/src/slib/ui/global_event_monitor.cpp"
  "${SLIB_PATH}/src/slib/ui/image_view.cpp"
  "${SLIB_PATH}/src/slib/ui/image_view_url.cpp"
  "${SLIB_PATH}/src/slib/ui/label_view.cpp"
