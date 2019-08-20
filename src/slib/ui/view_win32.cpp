@@ -793,6 +793,7 @@ namespace slib
 					break;
 				}
 			case WM_KEYDOWN:
+			case WM_SYSKEYDOWN:
 				{
 					if (onEventKey(sl_true, wParam, lParam)) {
 						return 0;
@@ -800,6 +801,7 @@ namespace slib
 					break;
 				}
 			case WM_KEYUP:
+			case WM_SYSKEYUP:
 				{
 					if (onEventKey(sl_false, wParam, lParam)) {
 						return 0;
@@ -890,11 +892,13 @@ namespace slib
 			}
 			break;
 		case WM_KEYDOWN:
+		case WM_SYSKEYDOWN:
 			if (onEventKey(sl_true, wParam, lParam)) {
 				return 0;
 			}
 			break;
 		case WM_KEYUP:
+		case WM_SYSKEYUP:
 			if (onEventKey(sl_false, wParam, lParam)) {
 				return 0;
 			}

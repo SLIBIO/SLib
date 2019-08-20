@@ -413,7 +413,7 @@ namespace slib
 
 			sl_bool ProcessMenuShortcutKey(MSG& msg)
 			{
-				if (msg.message != WM_KEYDOWN) {
+				if (msg.message != WM_KEYDOWN && msg.message != WM_SYSKEYDOWN) {
 					return sl_false;
 				}
 				HWND hWnd = Windows::getRootWindow(msg.hwnd);
