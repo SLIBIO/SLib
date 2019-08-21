@@ -22,6 +22,7 @@
 
 #include "slib/ui/global_event_monitor.h"
 
+#include "slib/ui/core.h"
 #include "slib/core/safe_static.h"
 
 namespace slib
@@ -42,7 +43,6 @@ namespace slib
 			class StaticContext
 			{
 			public:
-				Mutex m_lock;
 				Function<void(UIEvent*)> m_callbackMouse;
 				Function<void(UIEvent*)> m_callbackKeyboard;
 				sl_uint32 m_maskCurrent;
@@ -56,7 +56,6 @@ namespace slib
 			public:
 				void add(const Function<void(UIEvent*)>& callback)
 				{
-					MutexLocker lock(&m_lock);
 					m_callbackMouse.add(callback);
 					m_callbackKeyboard.add(callback);
 					updateMonitor();
@@ -64,7 +63,6 @@ namespace slib
 				
 				void remove(const Function<void(UIEvent*)>& callback)
 				{
-					MutexLocker lock(&m_lock);
 					m_callbackMouse.remove(callback);
 					m_callbackKeyboard.remove(callback);
 					updateMonitor();
@@ -72,28 +70,24 @@ namespace slib
 				
 				void addMouse(const Function<void(UIEvent*)>& callback)
 				{
-					MutexLocker lock(&m_lock);
 					m_callbackMouse.add(callback);
 					updateMonitor();
 				}
 				
 				void removeMouse(const Function<void(UIEvent*)>& callback)
 				{
-					MutexLocker lock(&m_lock);
 					m_callbackMouse.remove(callback);
 					updateMonitor();
 				}
 				
 				void addKeyboard(const Function<void(UIEvent*)>& callback)
 				{
-					MutexLocker lock(&m_lock);
 					m_callbackKeyboard.add(callback);
 					updateMonitor();
 				}
 				
 				void removeKeyboard(const Function<void(UIEvent*)>& callback)
 				{
-					MutexLocker lock(&m_lock);
 					m_callbackKeyboard.remove(callback);
 					updateMonitor();
 				}
@@ -136,6 +130,10 @@ namespace slib
 	
 	void GlobalEventMonitor::addMonitor(const Function<void(UIEvent*)>& callback)
 	{
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThread(Function<void()>::bind(&addMonitor, callback));
+			return;
+		}
 		StaticContext* context = GetStaticContext();
 		if (context) {
 			context->add(callback);
@@ -144,6 +142,10 @@ namespace slib
 	
 	void GlobalEventMonitor::removeMonitor(const Function<void(UIEvent*)>& callback)
 	{
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThread(Function<void()>::bind(&removeMonitor, callback));
+			return;
+		}
 		StaticContext* context = GetStaticContext();
 		if (context) {
 			context->remove(callback);
@@ -152,6 +154,10 @@ namespace slib
 	
 	void GlobalEventMonitor::addMouseMonitor(const Function<void(UIEvent*)>& callback)
 	{
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThread(Function<void()>::bind(&addMouseMonitor, callback));
+			return;
+		}
 		StaticContext* context = GetStaticContext();
 		if (context) {
 			context->addMouse(callback);
@@ -160,6 +166,10 @@ namespace slib
 	
 	void GlobalEventMonitor::removeMouseMonitor(const Function<void(UIEvent*)>& callback)
 	{
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThread(Function<void()>::bind(&removeMouseMonitor, callback));
+			return;
+		}
 		StaticContext* context = GetStaticContext();
 		if (context) {
 			context->removeMouse(callback);
@@ -168,6 +178,10 @@ namespace slib
 	
 	void GlobalEventMonitor::addKeyboardMonitor(const Function<void(UIEvent*)>& callback)
 	{
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThread(Function<void()>::bind(&addKeyboardMonitor, callback));
+			return;
+		}
 		StaticContext* context = GetStaticContext();
 		if (context) {
 			context->addKeyboard(callback);
@@ -176,6 +190,10 @@ namespace slib
 	
 	void GlobalEventMonitor::removeKeyboardMonitor(const Function<void(UIEvent*)>& callback)
 	{
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThread(Function<void()>::bind(&removeKeyboardMonitor, callback));
+			return;
+		}
 		StaticContext* context = GetStaticContext();
 		if (context) {
 			context->removeKeyboard(callback);
