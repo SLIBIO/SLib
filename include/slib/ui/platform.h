@@ -67,6 +67,7 @@ namespace slib
 	class Menu;
 	class MenuItem;
 	class PushNotificationMessage;
+	class UIEvent;
 	
 	class SLIB_EXPORT UIPlatform
 	{
@@ -96,6 +97,8 @@ namespace slib
 		
 		static HMENU getMenuHandle(const Ref<Menu>& menu);
 		static Ref<Menu> getMenu(HMENU hMenu);
+
+		static void applyEventModifiers(UIEvent* ev);
 
 #elif defined(SLIB_UI_IS_MACOS)		
 #	if defined(__OBJC__)
@@ -127,8 +130,9 @@ namespace slib
 		static NSMenuItem* getMenuItemHandle(const Ref<MenuItem>& menu);
 		
 		static NSString* getKeyEquivalent(const KeycodeAndModifiers& km, NSUInteger& outMask);
-		
+		static void applyEventModifiers(UIEvent* ev, NSEvent* event);
 #	endif
+		
 #elif defined(SLIB_UI_IS_IOS)
 #	if defined(__OBJC__)
 		static Ref<ViewInstance> createViewInstance(UIView* handle);
@@ -162,8 +166,8 @@ namespace slib
 		static void registerOpenUrlCallback(const Function<BOOL(NSURL*, NSDictionary*)>& callback);
 
 		static sl_bool parseRemoteNotificationInfo(NSDictionary* userInfo, PushNotificationMessage& _out);
-		
 #	endif
+		
 #elif defined(SLIB_UI_IS_ANDROID)
 		static Ref<ViewInstance> createViewInstance(jobject jhandle);
 		static void registerViewInstance(jobject jhandle, ViewInstance* instance);
@@ -202,6 +206,8 @@ namespace slib
 		static sl_bool initializeGtk();
 		static void getGdkColor(const Color& color, GdkColor* outGdkColor);
 		static void getScreenLocationOfWidget(GtkWidget* widget, sl_ui_len* out_x = sl_null, sl_ui_len* out_y = sl_null);
+
+		static void applyEventModifiers(UIEvent* event, guint state);
 
 #elif defined(SLIB_UI_IS_EFL)
 		static Ref<ViewInstance> createViewInstance(EFL_ViewType type, Evas_Object* handle, sl_bool flagFreeOnRelease = sl_true);

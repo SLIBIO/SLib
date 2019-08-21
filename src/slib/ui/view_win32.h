@@ -147,8 +147,6 @@ namespace slib
 
 		sl_bool onEventSetCursor();
 
-		void applyModifiers(UIEvent* ev);
-
 		void setGenericView(sl_bool flag);
 
 	protected:

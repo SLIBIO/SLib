@@ -509,7 +509,7 @@ namespace slib
 			t.setMillisecondsCount(GetMessageTime());
 			Ref<UIEvent> ev = UIEvent::createKeyEvent(action, key, vkey, t);
 			if (ev.isNotNull()) {
-				applyModifiers(ev.get());
+				UIPlatform::applyEventModifiers(ev.get());
 				ev->addFlag(UIEventFlags::DispatchToParent);
 				onKeyEvent(ev.get());
 				if (ev->isPreventedDefault()) {
@@ -534,7 +534,7 @@ namespace slib
 			t.setMillisecondsCount(GetMessageTime());
 			Ref<UIEvent> ev = UIEvent::createMouseEvent(action, x, y, t);
 			if (ev.isNotNull()) {
-				applyModifiers(ev.get());
+				UIPlatform::applyEventModifiers(ev.get());
 				ev->addFlag(UIEventFlags::DispatchToParent);
 				onMouseEvent(ev.get());
 				if (ev->isPreventedDefault()) {
@@ -567,7 +567,7 @@ namespace slib
 			t.setMillisecondsCount(GetMessageTime());
 			Ref<UIEvent> ev = UIEvent::createMouseWheelEvent((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y), deltaX, deltaY, t);
 			if (ev.isNotNull()) {
-				applyModifiers(ev.get());
+				UIPlatform::applyEventModifiers(ev.get());
 				onMouseWheelEvent(ev.get());
 				if (ev->isPreventedDefault()) {
 					return sl_true;
@@ -597,22 +597,6 @@ namespace slib
 			}
 		}
 		return sl_false;
-	}
-
-	void Win32_ViewInstance::applyModifiers(UIEvent* ev)
-	{
-		if (GetKeyState(VK_SHIFT) & 0x8000) {
-			ev->setShiftKey();
-		}
-		if (GetKeyState(VK_MENU) & 0x8000) {
-			ev->setAltKey();
-		}
-		if (GetKeyState(VK_CONTROL) & 0x8000) {
-			ev->setControlKey();
-		}
-		if ((GetKeyState(VK_LWIN) | GetKeyState(VK_RWIN)) & 0x8000) {
-			ev->setWindowsKey();
-		}
 	}
 
 	void Win32_ViewInstance::setGenericView(sl_bool flag)

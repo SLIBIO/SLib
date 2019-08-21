@@ -45,23 +45,6 @@ namespace slib
 				using GlobalEventMonitor::_onEvent;
 			};
 			
-			static void ApplyModifiers(UIEvent* ev, NSEvent* event)
-			{
-				NSUInteger flags = [event modifierFlags];
-				if (flags & NSShiftKeyMask) {
-					ev->setShiftKey();
-				}
-				if (flags & NSAlternateKeyMask) {
-					ev->setOptionKey();
-				}
-				if (flags & NSControlKeyMask) {
-					ev->setControlKey();
-				}
-				if (flags & NSCommandKeyMask) {
-					ev->setCommandKey();
-				}
-			}
-			
 			static void ProcessMouseEvent(UIAction action, NSEvent* event)
 			{
 				NSPoint pt = event.locationInWindow;
@@ -75,7 +58,7 @@ namespace slib
 				t.setSecondsCountf(event.timestamp);
 				Ref<UIEvent> ev = UIEvent::createMouseEvent(action, x, y, t);
 				if (ev.isNotNull()) {
-					ApplyModifiers(ev.get(), event);
+					UIPlatform::applyEventModifiers(ev.get(), event);
 					GlobalEventMonitorHelper::_onEvent(ev.get());
 				}
 			}
@@ -98,7 +81,7 @@ namespace slib
 				t.setSecondsCountf([event timestamp]);
 				Ref<UIEvent> ev = UIEvent::createMouseWheelEvent(x, y, deltaX, deltaY, t);
 				if (ev.isNotNull()) {
-					ApplyModifiers(ev.get(), event);
+					UIPlatform::applyEventModifiers(ev.get(), event);
 					GlobalEventMonitorHelper::_onEvent(ev.get());
 				}
 			}
@@ -111,7 +94,7 @@ namespace slib
 				t.setSecondsCountf([event timestamp]);
 				Ref<UIEvent> ev = UIEvent::createKeyEvent(action, key, vkey, t);
 				if (ev.isNotNull()) {
-					ApplyModifiers(ev.get(), event);
+					UIPlatform::applyEventModifiers(ev.get(), event);
 					GlobalEventMonitorHelper::_onEvent(ev.get());
 				}
 			}

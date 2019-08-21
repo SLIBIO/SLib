@@ -329,6 +329,23 @@ namespace slib
 		return ret;
 	}
 
+	void UIPlatform::applyEventModifiers(UIEvent* ev, NSEvent* event)
+	{
+		NSUInteger flags = [event modifierFlags];
+		if (flags & NSShiftKeyMask) {
+			ev->setShiftKey();
+		}
+		if (flags & NSAlternateKeyMask) {
+			ev->setOptionKey();
+		}
+		if (flags & NSControlKeyMask) {
+			ev->setControlKey();
+		}
+		if (flags & NSCommandKeyMask) {
+			ev->setCommandKey();
+		}
+	}
+
 }
 
 #endif

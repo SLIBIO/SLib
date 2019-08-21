@@ -114,8 +114,6 @@ namespace slib
 		
 		static gboolean eventCallback(GtkWidget* widget, GdkEvent* event, gpointer user_data);
 		
-		static void applyModifiers(UIEvent* event, guint state);
-		
 	public:
 		virtual gboolean onExposeEvent(GdkEventExpose* event);
 		

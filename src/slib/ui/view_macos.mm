@@ -467,7 +467,7 @@ namespace slib
 			t.setSecondsCountf([event timestamp]);
 			Ref<UIEvent> ev = UIEvent::createKeyEvent(action, key, vkey, t);
 			if (ev.isNotNull()) {
-				applyModifiers(ev.get(), event);
+				UIPlatform::applyEventModifiers(ev.get(), event);
 				onKeyEvent(ev.get());
 				return ev->getFlags();
 			}
@@ -520,7 +520,7 @@ namespace slib
 						default:
 							break;
 					}
-					applyModifiers(ev.get(), event);
+					UIPlatform::applyEventModifiers(ev.get(), event);
 					onMouseEvent(ev.get());
 					return ev->getFlags();
 				}
@@ -566,7 +566,7 @@ namespace slib
 			t.setSecondsCountf([event timestamp]);
 			Ref<UIEvent> ev = UIEvent::createMouseWheelEvent(x, y, deltaX, deltaY, t);
 			if (ev.isNotNull()) {
-				applyModifiers(ev.get(), event);
+				UIPlatform::applyEventModifiers(ev.get(), event);
 				onMouseWheelEvent(ev.get());
 				return ev->getFlags();
 			}
@@ -591,23 +591,6 @@ namespace slib
 			}
 		}
 		return 0;
-	}
-
-	void macOS_ViewInstance::applyModifiers(UIEvent* ev, NSEvent* event)
-	{
-		NSUInteger flags = [event modifierFlags];
-		if (flags & NSShiftKeyMask) {
-			ev->setShiftKey();
-		}
-		if (flags & NSAlternateKeyMask) {
-			ev->setOptionKey();
-		}
-		if (flags & NSControlKeyMask) {
-			ev->setControlKey();
-		}
-		if (flags & NSCommandKeyMask) {
-			ev->setCommandKey();
-		}
 	}
 
 	void macOS_ViewInstance::updateFrameAndTransform()

@@ -281,6 +281,22 @@ namespace slib
 		return (GetAsyncKeyState(VK_MBUTTON) & 0x8000) != 0;
 	}
 
+	void UIPlatform::applyEventModifiers(UIEvent* ev)
+	{
+		if (GetKeyState(VK_SHIFT) & 0x8000) {
+			ev->setShiftKey();
+		}
+		if (GetKeyState(VK_MENU) & 0x8000) {
+			ev->setAltKey();
+		}
+		if (GetKeyState(VK_CONTROL) & 0x8000) {
+			ev->setControlKey();
+		}
+		if ((GetKeyState(VK_LWIN) | GetKeyState(VK_RWIN)) & 0x8000) {
+			ev->setWindowsKey();
+		}
+	}
+
 }
 
 #endif

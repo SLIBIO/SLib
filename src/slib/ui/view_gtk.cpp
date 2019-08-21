@@ -398,22 +398,6 @@ namespace slib
 		return sl_true;
 	}
 	
-	void GTK_ViewInstance::applyModifiers(UIEvent* event, guint state)
-	{
-		if (state & GDK_SHIFT_MASK) {
-			event->setShiftKey();
-		}
-		if (state & GDK_CONTROL_MASK) {
-			event->setControlKey();
-		}
-		if (state & GDK_MOD1_MASK) {
-			event->setAltKey();
-		}
-		if (state & GDK_MOD4_MASK) {
-			event->setWindowsKey();
-		}
-	}
-	
 	gboolean GTK_ViewInstance::onExposeEvent(GdkEventExpose* event)
 	{
 		GtkWidget* handle = m_handle;
@@ -447,7 +431,7 @@ namespace slib
 			time.setMillisecondsCount(gevent->time);
 			Ref<UIEvent> event = UIEvent::createMouseEvent(m_actionDrag, gevent->x, gevent->y, time);
 			if (event.isNotNull()) {
-				applyModifiers(event.get(), gevent->state);
+				UIPlatform::applyEventModifiers(event.get(), gevent->state);
 				event->addFlag(UIEventFlags::DispatchToParent);
 				onMouseEvent(event.get());
 				if (event->isPreventedDefault()) {
@@ -509,7 +493,7 @@ namespace slib
 			}
 			Ref<UIEvent> event = UIEvent::createMouseEvent(action, x, y, time);
 			if (event.isNotNull()) {
-				applyModifiers(event.get(), gevent->state);
+				UIPlatform::applyEventModifiers(event.get(), gevent->state);
 				event->addFlag(UIEventFlags::DispatchToParent);
 				onMouseEvent(event.get());
 				if (event->isPreventedDefault()) {
@@ -543,7 +527,7 @@ namespace slib
 			}
 			Ref<UIEvent> event = UIEvent::createMouseEvent(action, x, y, time);
 			if (event.isNotNull()) {
-				applyModifiers(event.get(), gevent->state);
+				UIPlatform::applyEventModifiers(event.get(), gevent->state);
 				event->addFlag(UIEventFlags::DispatchToParent);
 				onMouseEvent(event.get());
 				if (event->isPreventedDefault()) {
@@ -569,7 +553,7 @@ namespace slib
 			time.setMillisecondsCount(gevent->time);
 			Ref<UIEvent> event = UIEvent::createKeyEvent(action, key, gevent->keyval, time);
 			if (event.isNotNull()) {
-				applyModifiers(event.get(), gevent->state);
+				UIPlatform::applyEventModifiers(event.get(), gevent->state);
 				event->addFlag(UIEventFlags::DispatchToParent);
 				ViewInstance::onKeyEvent(event.get());
 				if (event->isPreventedDefault()) {
@@ -616,7 +600,7 @@ namespace slib
 			}
 			Ref<UIEvent> event = UIEvent::createMouseWheelEvent(x, y, dx, dy, time);
 			if (event.isNotNull()) {
-				applyModifiers(event.get(), gevent->state);
+				UIPlatform::applyEventModifiers(event.get(), gevent->state);
 				onMouseWheelEvent(event.get());
 				if (event->isPreventedDefault()) {
 					return sl_true;

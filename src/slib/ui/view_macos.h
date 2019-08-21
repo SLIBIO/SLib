@@ -96,9 +96,7 @@ namespace slib
 		UIEventFlags onEventMouseWheel(NSEvent* event);
 		
 		UIEventFlags onEventUpdateCursor(NSEvent* event);
-		
-		static void applyModifiers(UIEvent* ev, NSEvent* event);
-		
+				
 		void updateFrameAndTransform();
 		
 	private:

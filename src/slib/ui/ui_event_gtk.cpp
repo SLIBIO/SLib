@@ -266,6 +266,22 @@ namespace slib
 		return UIPoint::zero();
 	}
 	
+	void UIPlatform::applyEventModifiers(UIEvent* event, guint state)
+	{
+		if (state & GDK_SHIFT_MASK) {
+			event->setShiftKey();
+		}
+		if (state & GDK_CONTROL_MASK) {
+			event->setControlKey();
+		}
+		if (state & GDK_MOD1_MASK) {
+			event->setAltKey();
+		}
+		if (state & GDK_MOD4_MASK) {
+			event->setWindowsKey();
+		}
+	}
+	
 }
 
 #endif
