@@ -290,6 +290,9 @@ namespace slib
 		if (bitmap.isNull()) {
 			return sl_null;
 		}
+		if (width <= 0 || height <= 0) {
+			return sl_null;
+		}
 		sl_uint32 bw = bitmap->getWidth();
 		sl_uint32 bh = bitmap->getHeight();
 		if (x >= bw) {
