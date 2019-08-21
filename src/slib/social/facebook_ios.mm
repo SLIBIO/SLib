@@ -113,14 +113,21 @@ namespace slib
 	void FacebookSDK::initialize()
 	{
 		UIPlatform::registerDidFinishLaunchingCallback([](NSDictionary* launchOptions) {
-			[[FBSDKApplicationDelegate sharedInstance] application:([::UIApplication sharedApplication]) didFinishLaunchingWithOptions:launchOptions];
+			@try {
+				[[FBSDKApplicationDelegate sharedInstance] application:([UIApplication sharedApplication]) didFinishLaunchingWithOptions:launchOptions];
+			} @catch (NSException*) {				
+			}
 		});
 		UIPlatform::registerOpenUrlCallback([](NSURL* url, NSDictionary* options) {
-			return [[FBSDKApplicationDelegate sharedInstance] application:([::UIApplication sharedApplication])
-																  openURL:url
-														sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey]
-															   annotation:options[UIApplicationOpenURLOptionsAnnotationKey]
-					];
+			@try {
+				return [[FBSDKApplicationDelegate sharedInstance] application:([UIApplication sharedApplication])
+																	  openURL:url
+															sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey]
+																   annotation:options[UIApplicationOpenURLOptionsAnnotationKey]
+						];
+			} @catch(NSException*) {
+				return NO;
+			}
 		});
 	}
 	
