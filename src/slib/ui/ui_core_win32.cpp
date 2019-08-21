@@ -75,6 +75,11 @@ namespace slib
 			LRESULT CALLBACK WindowInstanceProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 		}
 
+		namespace global_event_monitor
+		{
+			void ProcessRawInput(WPARAM wParam, LPARAM lParam);
+		}
+
 		namespace ui_core
 		{
 
@@ -111,15 +116,21 @@ namespace slib
 
 			static LRESULT CALLBACK MessageWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			{
-				if (uMsg == SLIB_UI_MESSAGE_DISPATCH) {
+				switch (uMsg) {
+				case SLIB_UI_MESSAGE_DISPATCH:
 					UIDispatcher::processCallbacks();
-				} else if (uMsg == SLIB_UI_MESSAGE_DISPATCH_DELAYED) {
+					return 0;
+				case SLIB_UI_MESSAGE_DISPATCH_DELAYED:
 					UIDispatcher::processDelayedCallback((sl_reg)lParam);
-				} else if (uMsg == SLIB_UI_MESSAGE_CUSTOM_MSGBOX) {
+					return 0;
+				case SLIB_UI_MESSAGE_CUSTOM_MSGBOX:
 					priv::alert_dialog::ProcessCustomMsgBox(wParam, lParam);
 					return 0;
-				} else if (uMsg == WM_MENUCOMMAND) {
+				case WM_MENUCOMMAND:
 					priv::menu::ProcessMenuCommand(wParam, lParam);
+					return 0;
+				case WM_INPUT:
+					priv::global_event_monitor::ProcessRawInput(wParam, lParam);
 					return 0;
 				}
 				return DefWindowProc(hWnd, uMsg, wParam, lParam);
