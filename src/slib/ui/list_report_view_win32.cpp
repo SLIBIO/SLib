@@ -182,7 +182,7 @@ namespace slib
 
 		DWORD style = LVS_REPORT | LVS_SINGLESEL | LVS_OWNERDATA | WS_TABSTOP | WS_BORDER;
 		DWORD styleEx = 0;
-		Ref<ListReportViewInstance> ret = Win32_ViewInstance::create<ListReportViewInstance>(this, parent, L"SysListView32", L"", style, styleEx);
+		Ref<ListReportViewInstance> ret = Win32_ViewInstance::create<ListReportViewInstance>(this, parent, L"SysListView32", sl_null, style, styleEx);
 		
 		if (ret.isNotNull()) {
 

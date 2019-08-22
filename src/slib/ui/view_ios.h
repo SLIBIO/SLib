@@ -35,17 +35,67 @@ namespace slib
 	
 	class iOS_ViewInstance : public ViewInstance
 	{
+		SLIB_DECLARE_OBJECT
+		
 	public:
 		iOS_ViewInstance();
 		
 		~iOS_ViewInstance();
 		
 	public:
-		static Ref<iOS_ViewInstance> create(UIView* handle);
+		template <class T>
+		static Ref<T> create(UIView* handle)
+		{
+			if (handle != nil) {
+				Ref<T> ret = new T;
+				if (ret.isNotNull()) {
+					ret->initialize(handle);
+					return ret;
+				}
+			}
+			return sl_null;
+		}
 		
-		static Ref<iOS_ViewInstance> create(UIView* handle, UIView* parent, View* view);
+		template <class T>
+		static Ref<T> create(UIView* handle, UIView* parent, View* view)
+		{
+			if (handle != nil) {
+				Ref<T> ret = new T;
+				if (ret.isNotNull()) {
+					ret->initialize(handle, parent, view);
+					return ret;
+				}
+			}
+			return sl_null;
+		}
+		
+		template <class INSTANCE, class HANDLE>
+		static Ref<INSTANCE> create(View* view, ViewInstance* _parent)
+		{
+			UIView* parent = UIPlatform::getViewHandle(_parent);
+			CGRect frame;
+			CGFloat f = UIPlatform::getGlobalScaleFactor();
+			UIRect _frame = view->getFrameInInstance();
+			frame.origin.x = (CGFloat)(_frame.left) / f;
+			frame.origin.y = (CGFloat)(_frame.top) / f;
+			frame.size.width = (CGFloat)(_frame.getWidth()) / f;
+			frame.size.height = (CGFloat)(_frame.getHeight()) / f;
+			HANDLE* handle = [[HANDLE alloc] initWithFrame:frame];
+			if (handle != nil) {
+				Ref<INSTANCE> ret = create<INSTANCE>(handle, parent, view);
+				if (ret.isNotNull()) {
+					handle->m_viewInstance = ret;
+					return ret;
+				}
+			}
+			return sl_null;
+		}
 
 	public:
+		void initialize(UIView* handle);
+		
+		void initialize(UIView* handle, UIView* parent, View* view);
+		
 		UIView* getHandle();
 		
 		sl_bool isValid() override;
@@ -135,7 +185,7 @@ namespace slib
 
 #define IOS_VIEW_CREATE_INSTANCE_END \
 	if (handle != nil) { \
-		ret = iOS_ViewInstance::create(handle, parent, this); \
+		ret = iOS_ViewInstance::create<iOS_ViewInstance>(handle, parent, this); \
 		if (ret.isNotNull()) { \
 			handle->m_viewInstance = ret; \
 		} \

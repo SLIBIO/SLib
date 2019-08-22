@@ -157,7 +157,7 @@ namespace slib
 		if (isBorder()) {
 			style |= WS_BORDER;
 		}
-		Ref<ScrollViewInstance> ret = Win32_ViewInstance::create<ScrollViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
+		Ref<ScrollViewInstance> ret = Win32_ViewInstance::create<ScrollViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), sl_null, style, styleEx);
 		if (ret.isNotNull()) {
 			ret->_setContentView(m_viewContent, (ScrollViewHelper*)this);
 			ScrollViewInstance::_scrollTo(ret->getHandle(), getScrollX(), getScrollY());

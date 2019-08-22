@@ -33,20 +33,90 @@
 namespace slib
 {
 
+	namespace priv
+	{
+		namespace view
+		{
+			NSRect GetViewFrameAndTransform(const UIRect& frame, const Matrix3& transform, sl_real& rotation);
+		}
+	}
+
 	class macOS_ViewInstance : public ViewInstance
 	{
+		SLIB_DECLARE_OBJECT
+		
 	public:
 		macOS_ViewInstance();
 		
 		~macOS_ViewInstance();
 		
 	public:
-		static Ref<macOS_ViewInstance> create(NSView* handle);
+		template <class T>
+		static Ref<T> create(NSView* handle)
+		{
+			if (handle != nil) {
+				Ref<T> ret = new T;
+				if (ret.isNotNull()) {
+					ret->initialize(handle);
+					return ret;
+				}
+			}
+			return sl_null;
+		}
+
+		template <class T>
+		static Ref<T> create(NSView* handle, NSView* parent, View* view)
+		{
+			if (handle != nil) {
+				Ref<T> ret = new T;
+				if (ret.isNotNull()) {
+					ret->initialize(handle, parent, view);
+					return ret;
+				}
+			}
+			return sl_null;
+		}
 		
-		static Ref<macOS_ViewInstance> create(NSView* handle, NSView* parent, View* view);
+		template <class INSTANCE, class HANDLE>
+		static Ref<INSTANCE> create(View* view, ViewInstance* _parent)
+		{
+			NSView* parent = UIPlatform::getViewHandle(_parent);
+			UIRect frameView = view->getFrameInInstance();
+			Matrix3 transformView = view->getFinalTransformInInstance();
+			sl_real rotation;
+			NSRect frame = priv::view::GetViewFrameAndTransform(frameView, transformView, rotation);
+			HANDLE* handle = [[HANDLE alloc] initWithFrame:frame];
+			if (handle != nil) {
+				if (!(Math::isAlmostZero(rotation))) {
+					handle.frameRotation = Math::getDegreesFromRadian(rotation);
+				}
+				Ref<INSTANCE> ret = create<INSTANCE>(handle, parent, view);
+				if (ret.isNotNull()) {
+					ret->m_frame = frameView;
+					ret->m_transform = transformView;
+					handle->m_viewInstance = ret;
+					return ret;
+				}
+			}
+			return sl_null;
+		}
 		
 	public:
+		void initialize(NSView* handle);
+		
+		void initialize(NSView* handle, NSView* parent, View* view);
+		
 		NSView* getHandle();
+		
+		template <class HANDLE>
+		HANDLE* getHandleOf()
+		{
+			NSView* handle = m_handle;
+			if (handle != nil && [handle isKindOfClass:[HANDLE class]]) {
+				return (HANDLE*)handle;
+			}
+			return nil;
+		}
 		
 		sl_bool isValid() override;
 		
@@ -111,14 +181,6 @@ namespace slib
 		
 	};
 
-	namespace priv
-	{
-		namespace view
-		{
-			NSRect GetViewFrameAndTransform(const UIRect& frame, const Matrix3& transform, sl_real& rotation);
-		}
-	}
-
 }
 
 @interface SLIBViewBaseHandle : NSView
@@ -135,13 +197,6 @@ namespace slib
 }
 @end
 
-@interface SLIBButtonHandle : NSButton
-{
-	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
-}
-@end
-
-
 #define MACOS_VIEW_CREATE_INSTANCE_BEGIN \
 	Ref<macOS_ViewInstance> ret; \
 	NSView* parent = UIPlatform::getViewHandle(_parent); \
@@ -155,7 +210,7 @@ namespace slib
 		if (!(Math::isAlmostZero(rotation))) { \
 			handle.frameRotation = Math::getDegreesFromRadian(rotation); \
 		} \
-		ret = macOS_ViewInstance::create(handle, parent, this); \
+		ret = macOS_ViewInstance::create<macOS_ViewInstance>(handle, parent, this); \
 		if (ret.isNotNull()) { \
 			ret->m_frame = frameView; \
 			ret->m_transform = transformView; \

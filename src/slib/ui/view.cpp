@@ -7588,6 +7588,9 @@ namespace slib
 	
 	void View::onChangePadding()
 	{
+		if (isNativeWidget()) {
+			_setPadding_NW(getPadding());
+		}
 	}
 	
 	void View::onUpdatePaging()
@@ -9124,22 +9127,50 @@ namespace slib
 
 	void View::_setBorder_NW(sl_bool flag)
 	{
+		Ref<ViewInstance> instance = m_instance;
+		if (instance.isNotNull() && instance->isNativeWidget()) {
+			instance->setBorder(flag);
+		}
 	}
 
 	void View::_setBackgroundColor_NW(const Color& color)
 	{
+		Ref<ViewInstance> instance = m_instance;
+		if (instance.isNotNull() && instance->isNativeWidget()) {
+			instance->setBackgroundColor(color);
+		}
 	}
 
 	void View::_setFont_NW(const Ref<Font>& font)
 	{
+		Ref<ViewInstance> instance = m_instance;
+		if (instance.isNotNull() && instance->isNativeWidget()) {
+			instance->setFont(font);
+		}
+	}
+	
+	void View::_setPadding_NW(const UIEdgeInsets& padding)
+	{
+		Ref<ViewInstance> instance = m_instance;
+		if (instance.isNotNull() && instance->isNativeWidget()) {
+			instance->setPadding(padding);
+		}
 	}
 	
 	void View::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
 	{
+		Ref<ViewInstance> instance = m_instance;
+		if (instance.isNotNull() && instance->isNativeWidget()) {
+			instance->setScrollBarsVisible(flagHorizontal, flagVertical);
+		}
 	}
 	
 	void View::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate)
 	{
+		Ref<ViewInstance> instance = m_instance;
+		if (instance.isNotNull() && instance->isNativeWidget()) {
+			instance->scrollTo(x, y, flagAnimate);
+		}
 	}
 	
 	void View::_onScroll_NW(sl_scroll_pos x, sl_scroll_pos y)
@@ -9191,6 +9222,30 @@ namespace slib
 	void ViewInstance::setWindowContent(sl_bool flag)
 	{
 		m_flagWindowContent = flag;
+	}
+	
+	void ViewInstance::setBorder(sl_bool flag)
+	{
+	}
+	
+	void ViewInstance::setBackgroundColor(const Color& color)
+	{
+	}
+	
+	void ViewInstance::setFont(const Ref<Font>& font)
+	{
+	}
+
+	void ViewInstance::setPadding(const UIEdgeInsets& padding)
+	{
+	}
+	
+	void ViewInstance::setScrollBarsVisible(sl_bool flagHorizontal, sl_bool flagVertical)
+	{
+	}
+	
+	void ViewInstance::scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate)
+	{
 	}
 
 	namespace priv

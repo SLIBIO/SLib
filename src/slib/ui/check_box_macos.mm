@@ -26,47 +26,31 @@
 
 #include "slib/ui/check_box.h"
 
-#include "view_macos.h"
+#include "button_macos.h"
 
 namespace slib
 {
 
-	Ref<ViewInstance> CheckBox::createNativeWidget(ViewInstance* _parent)
+	using namespace priv::button;
+
+	Ref<ViewInstance> CheckBox::createNativeWidget(ViewInstance* parent)
 	{
-		MACOS_VIEW_CREATE_INSTANCE_BEGIN
-		SLIBButtonHandle* handle = [[SLIBButtonHandle alloc] initWithFrame:frame];
-		if (handle != nil) {
+		Ref<ButtonInstance> ret = macOS_ViewInstance::create<ButtonInstance, SLIBButtonHandle>(this, parent);
+		if (ret.isNotNull()) {
+			SLIBButtonHandle* handle = (SLIBButtonHandle*)(ret->getHandle());
 			handle.title = Apple::getNSStringFromString(getText());
 			[handle setButtonType:NSSwitchButton];
 			[handle setState: (m_flagChecked ? NSOnState : NSOffState)];
+			return ret;
 		}
-		MACOS_VIEW_CREATE_INSTANCE_END
-		return ret;
+		return sl_null;
 	}
 
-	void CheckBox::_getChecked_NW()
+	Ptr<ICheckBoxInstance> CheckBox::getCheckBoxInstance()
 	{
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
-			NSButton* v = (NSButton*)handle;
-			m_flagChecked = (v.state == NSOnState ? sl_true : sl_false);
-		}
-	}
-
-	void CheckBox::_setChecked_NW(sl_bool flag)
-	{
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
-			NSButton* v = (NSButton*)handle;
-			[v setState: (flag ? NSOnState : NSOffState)];
-		}
+		return CastRef<ButtonInstance>(getViewInstance());
 	}
 	
-	sl_bool CheckBox::_measureSize_NW(UISize& _out)
-	{
-		return UIPlatform::measureNativeWidgetFittingSize(this, _out);
-	}
-
 }
 
 #endif

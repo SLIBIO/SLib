@@ -35,6 +35,8 @@ namespace slib
 
 	class Android_ViewInstance : public ViewInstance
 	{
+		SLIB_DECLARE_OBJECT
+
 	public:
 		Android_ViewInstance();
 

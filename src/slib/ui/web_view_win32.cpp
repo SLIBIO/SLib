@@ -897,7 +897,7 @@ namespace slib
 
 		DWORD style = 0;
 		DWORD styleEx = 0;
-		Ref<WebViewInstance> ret = Win32_ViewInstance::create<WebViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
+		Ref<WebViewInstance> ret = Win32_ViewInstance::create<WebViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), sl_null, style, styleEx);
 		if (ret.isNotNull()) {
 			ret->_initialize();
 			((WebViewHelper*)this)->_init(ret.get());

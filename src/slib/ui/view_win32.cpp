@@ -188,6 +188,8 @@ namespace slib
 
 	using namespace priv::view;
 
+	SLIB_DEFINE_OBJECT(Win32_ViewInstance, ViewInstance)
+	
 	Win32_ViewInstance::Win32_ViewInstance()
 	{
 		m_handle = NULL;
@@ -255,8 +257,17 @@ namespace slib
 		return NULL;
 	}
 
-	void Win32_ViewInstance::initialize(View* view, const UIRect& frame, const Matrix3& transform)
+	void Win32_ViewInstance::initialize(HWND hWnd, sl_bool flagDestroyOnRelease)
 	{
+		m_handle = hWnd;
+		m_flagDestroyOnRelease = flagDestroyOnRelease;
+		UIPlatform::registerViewInstance(hWnd, this);
+	}
+
+	void Win32_ViewInstance::initialize(HWND hWnd, View* view, const String16& text, const UIRect& frame, const Matrix3& transform)
+	{
+		initialize(hWnd, sl_true);
+		m_text = text;
 		m_frame = frame;
 		m_translation = Transform2::getTranslationFromMatrix(transform);
 	}
@@ -279,6 +290,10 @@ namespace slib
 
 	void Win32_ViewInstance::setFocus(sl_bool flag)
 	{
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), Win32_ViewInstance, setFocus, this, flag));
+			return;
+		}
 		HWND hWnd = m_handle;
 		if (hWnd) {
 			if (flag) {
@@ -295,7 +310,7 @@ namespace slib
 	{
 		if (!(UI::isUiThread()) || g_flagDuringPaint) {
 			void (ViewInstance::*func)() = &ViewInstance::invalidate;
-			UI::dispatchToUiThread(Function<void()>::fromWeakRef(WeakRef<ViewInstance>(this), func));
+			UI::dispatchToUiThreadUrgently(Function<void()>::fromWeakRef(WeakRef<ViewInstance>(this), func));
 			return;
 		}
 		HWND hWnd = m_handle;
@@ -308,7 +323,7 @@ namespace slib
 	{
 		if (!(UI::isUiThread()) || g_flagDuringPaint) {
 			void (ViewInstance::*func)(const UIRect&) = &ViewInstance::invalidate;
-			UI::dispatchToUiThread(Function<void()>::bindWeakRef(WeakRef<ViewInstance>(this), func, rect));
+			UI::dispatchToUiThreadUrgently(Function<void()>::bindWeakRef(WeakRef<ViewInstance>(this), func, rect));
 			return;
 		}
 		HWND hWnd = m_handle;
@@ -475,12 +490,45 @@ namespace slib
 
 	void Win32_ViewInstance::bringToFront()
 	{
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThreadUrgently(SLIB_FUNCTION_WEAKREF(Win32_ViewInstance, bringToFront, this));
+			return;
+		}
 		HWND hWnd = m_handle;
 		if (hWnd) {
 			BringWindowToTop(hWnd);
 			Ref<View> view = getView();
 			if (view.isNotNull()) {
 				view->invalidateBoundsInParent();
+			}
+		}
+	}
+
+	void Win32_ViewInstance::setText(const String16& text)
+	{
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), Win32_ViewInstance, setText, this, text));
+			return;
+		}
+		HWND handle = getHandle();
+		if (handle) {
+			Windows::setWindowText(handle, text);
+			m_text = text;
+		}
+	}
+
+	void Win32_ViewInstance::setFont(const Ref<Font>& font)
+	{
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), Win32_ViewInstance, setFont, this, font));
+			return;
+		}
+		HWND handle = getHandle();
+		if (handle) {
+			HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
+			if (hFont) {
+				SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
+				m_font = font;
 			}
 		}
 	}
@@ -931,7 +979,7 @@ namespace slib
 			styleEx = WS_EX_CONTROLPARENT;
 			style = WS_CLIPCHILDREN;
 		}
-		Ref<Win32_ViewInstance> ret = Win32_ViewInstance::create<Win32_ViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
+		Ref<Win32_ViewInstance> ret = Win32_ViewInstance::create<Win32_ViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), sl_null, style, styleEx);
 		if (ret.isNotNull()) {
 			ret->setGenericView(sl_true);
 		}

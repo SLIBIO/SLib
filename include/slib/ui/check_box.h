@@ -29,6 +29,15 @@
 
 namespace slib
 {
+	
+	class SLIB_EXPORT ICheckBoxInstance
+	{
+	public:
+		virtual void getChecked(sl_bool& flag) = 0;
+		
+		virtual void setChecked(sl_bool flag) = 0;
+
+	};
 
 	class SLIB_EXPORT CheckBox : public Button
 	{
@@ -49,16 +58,11 @@ namespace slib
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
+		Ptr<ICheckBoxInstance> getCheckBoxInstance();
+		
+	public:
 		void dispatchClickEvent(UIEvent* ev) override;
 		
-	private:
-		void _getChecked_NW();
-		
-		void _setChecked_NW(sl_bool flag);
-
-	protected:
-		sl_bool _measureSize_NW(UISize& _out) override;
-
 	protected:
 		sl_bool m_flagChecked;
 		

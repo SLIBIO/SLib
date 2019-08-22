@@ -235,9 +235,8 @@ namespace slib
 
 	using namespace priv::view;
 
-/******************************************
-			Android_ViewInstance
-******************************************/
+	SLIB_DEFINE_OBJECT(Android_ViewInstance, ViewInstance)
+
 	Android_ViewInstance::Android_ViewInstance()
 	{
 	}

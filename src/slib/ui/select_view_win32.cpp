@@ -124,7 +124,7 @@ namespace slib
 		}
 
 		UINT style = CBS_DROPDOWNLIST | WS_TABSTOP;
-		Ref<SelectViewInstance> ret = Win32_ViewInstance::create<SelectViewInstance>(this, parent, L"COMBOBOX", L"", style, 0);
+		Ref<SelectViewInstance> ret = Win32_ViewInstance::create<SelectViewInstance>(this, parent, L"COMBOBOX", sl_null, style, 0);
 		
 		if (ret.isNotNull()) {
 

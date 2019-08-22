@@ -173,7 +173,7 @@ namespace slib
 	{
 		NewHelper<ButtonCategory>::free(m_categories, m_nCategories);
 	}
-
+	
 	String Button::getText()
 	{
 		return m_text;
@@ -182,8 +182,12 @@ namespace slib
 	void Button::setText(const String& text, UIUpdateMode mode)
 	{
 		m_text = text;
-		if (isNativeWidget()) {
-			_setText_NW(text);
+		Ptr<IButtonInstance> instance = getButtonInstance();
+		if (instance.isNotNull()) {
+			instance->setText(text);
+			if (!SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
+				return;
+			}
 		}
 		invalidateLayoutOfWrappingControl(mode);
 	}
@@ -201,8 +205,9 @@ namespace slib
 		} else {
 			setCurrentCategory(0, UIUpdateMode::None);
 		}
-		if (isNativeWidget()) {
-			_setDefaultButton_NW(flag);
+		Ptr<IButtonInstance> instance = getButtonInstance();
+		if (instance.isNotNull()) {
+			instance->setDefaultButton(flag);
 		} else {
 			invalidate(mode);
 		}
@@ -774,9 +779,10 @@ namespace slib
 			return;
 		}
 		
-		if (isNativeWidget()) {
+		Ptr<IButtonInstance> instance = getButtonInstance();
+		if (instance.isNotNull()) {
 			UISize size;
-			if (_measureSize_NW(size)) {
+			if (instance->measureSize(size)) {
 				if (flagHorizontal) {
 					setLayoutWidth(size.x);
 				}
@@ -795,13 +801,6 @@ namespace slib
 		}
 	}
 
-	void Button::onChangePadding()
-	{
-		if (isNativeWidget()) {
-			onChangePadding_NW();
-		}
-	}
-	
 	void Button::onKeyEvent(UIEvent* ev)
 	{
 		if (ev->getAction() == UIAction::KeyDown) {
@@ -1141,28 +1140,10 @@ namespace slib
 	{
 		return sl_null;
 	}
-
-	void Button::_setText_NW(const String& text)
-	{
-	}
-
-	void Button::_setDefaultButton_NW(sl_bool flag)
-	{
-	}
-
-	sl_bool Button::_measureSize_NW(UISize& _out)
-	{
-		return sl_false;
-	}
-
-	void Button::_setFont_NW(const Ref<Font>& font)
-	{
-	}
-#endif
 	
-#if !defined(SLIB_UI_IS_WIN32)
-	void Button::onChangePadding_NW()
+	Ptr<IButtonInstance> Button::getButtonInstance()
 	{
+		return sl_null;
 	}
 #endif
 	

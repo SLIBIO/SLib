@@ -1913,6 +1913,7 @@
 		260B73F4220D7DF600858EEA /* oauth.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = oauth.cpp; path = social/oauth.cpp; sourceTree = "<group>"; };
 		260B73F9220D872F00858EEA /* twitter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = twitter.cpp; path = social/twitter.cpp; sourceTree = "<group>"; };
 		260B73FD220DCB1D00858EEA /* oauth_ui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = oauth_ui.cpp; path = social/oauth_ui.cpp; sourceTree = "<group>"; };
+		260CB16A230F103500597B56 /* button_macos.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = button_macos.h; sourceTree = "<group>"; };
 		260D8CD120CBDC7C0013B34E /* libyasm.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libyasm.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		2620412A1C88A95E00AF48F2 /* object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = object.cpp; sourceTree = "<group>"; };
 		2620412C1C88AE3B00AF48F2 /* list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list.cpp; sourceTree = "<group>"; };
@@ -4386,6 +4387,7 @@
 			isa = PBXGroup;
 			children = (
 				266DD4EA1C11940A00D47AB0 /* button.cpp */,
+				260CB16A230F103500597B56 /* button_macos.h */,
 				266DD4ED1C11940A00D47AB0 /* button_macos.mm */,
 				2688DD861C16FBDF00973672 /* camera_view.cpp */,
 				264DF0EF22455E46007DB734 /* chat_view.cpp */,

@@ -35,6 +35,8 @@ namespace slib
 
 	class EFL_ViewInstance : public ViewInstance
 	{
+		SLIB_DECLARE_OBJECT
+
 	public:
 		EFL_ViewInstance();
 

@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -20,32 +20,59 @@
  *   THE SOFTWARE.
  */
 
+#ifndef CHECKHEADER_SLIB_UI_BUTTON_MACOS
+#define CHECKHEADER_SLIB_UI_BUTTON_MACOS
+
 #include "slib/core/definition.h"
 
 #if defined(SLIB_UI_IS_MACOS)
 
-#include "slib/ui/radio_button.h"
+#include "slib/ui/button.h"
+#include "slib/ui/check_box.h"
 
-#include "button_macos.h"
+#include "view_macos.h"
 
 namespace slib
 {
 	
-	using namespace priv::button;
-
-	Ref<ViewInstance> RadioButton::createNativeWidget(ViewInstance* parent)
+	namespace priv
 	{
-		Ref<ButtonInstance> ret = macOS_ViewInstance::create<ButtonInstance, SLIBButtonHandle>(this, parent);
-		if (ret.isNotNull()) {
-			SLIBButtonHandle* handle = (SLIBButtonHandle*)(ret->getHandle());
-			handle.title = Apple::getNSStringFromString(getText());
-			[handle setButtonType:NSRadioButton];
-			[handle setState: (isChecked() ? NSOnState : NSOffState)];
-			return ret;
+		namespace button
+		{
+			
+			class ButtonInstance : public macOS_ViewInstance, public IButtonInstance, public ICheckBoxInstance
+			{
+				SLIB_DECLARE_OBJECT
+				
+			public:
+				ButtonInstance();
+				
+				~ButtonInstance();
+				
+			public:
+				void setText(const String& text) override;
+				
+				void setDefaultButton(sl_bool flag) override;
+				
+				sl_bool measureSize(UISize& _out) override;
+				
+				void getChecked(sl_bool& flag) override;
+				
+				void setChecked(sl_bool flag) override;
+				
+			};
+			
 		}
-		return sl_null;
 	}
-
+	
 }
+
+@interface SLIBButtonHandle : NSButton
+{
+	@public slib::WeakRef<slib::priv::button::ButtonInstance> m_viewInstance;
+}
+@end
+
+#endif
 
 #endif

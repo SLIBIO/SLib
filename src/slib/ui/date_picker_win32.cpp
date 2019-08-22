@@ -61,7 +61,8 @@ namespace slib
 			return sl_null;
 		}
 		DWORD style = 0;
-		Ref<DatePickerInstance> ret = Win32_ViewInstance::create<DatePickerInstance>(this, parent, L"SysDateTimePick32", L"DateTime", style, 0);
+		SLIB_STATIC_STRING16(text, "DateTime")
+		Ref<DatePickerInstance> ret = Win32_ViewInstance::create<DatePickerInstance>(this, parent, L"SysDateTimePick32", text, style, 0);
 		if (ret.isNotNull()) {
 			HWND handle = ret->getHandle();
 			Ref<Font> font = getFont();

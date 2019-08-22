@@ -59,6 +59,8 @@ namespace slib
 			}
 		}
 	}
+	
+	SLIB_DEFINE_OBJECT(macOS_ViewInstance, ViewInstance)
 
 	macOS_ViewInstance::macOS_ViewInstance()
 	{
@@ -77,54 +79,33 @@ namespace slib
 		m_handle = nil;
 	}
 
-	Ref<macOS_ViewInstance> macOS_ViewInstance::create(NSView* handle)
+	void macOS_ViewInstance::initialize(NSView* handle)
 	{
-		if (handle != nil) {
-			Ref<macOS_ViewInstance> ret = new macOS_ViewInstance();
-			if (ret.isNotNull()) {
-				ret->m_handle = handle;
-				UIPlatform::registerViewInstance(handle, ret.get());
-				return ret;
-			}
-		}
-		return sl_null;
+		m_handle = handle;
+		UIPlatform::registerViewInstance(handle, this);
 	}
 
-	Ref<macOS_ViewInstance> macOS_ViewInstance::create(NSView* handle, NSView* parent, View* view)
+	void macOS_ViewInstance::initialize(NSView* handle, NSView* parent, View* view)
 	{
-		if (handle != nil) {
-			
-			Ref<macOS_ViewInstance> instance = create(handle);
-			
-			if (instance.isNotNull()) {
-				
-				[handle setHidden:(view->isVisibleInInstance() ? NO : YES)];
-				
-				if (!(view->isEnabled())) {
-					if ([handle isKindOfClass:[NSControl class]]) {
-						NSControl* control = (NSControl*)(handle);
-						[control setEnabled:FALSE];
-					}
-				}
-				if ([handle isKindOfClass:[SLIBViewBaseHandle class]]) {
-					((SLIBViewBaseHandle*)handle)->m_flagOpaque = view->isOpaque();
-					((SLIBViewBaseHandle*)handle)->m_flagClipping = view->isClipping();
-					((SLIBViewBaseHandle*)handle)->m_flagDrawing = view->isDrawing();
-				}
-				
-				if (parent != nil) {
-					[parent addSubview:handle];				
-				}
-				
-				return instance;
-				
+		initialize(handle);
+
+		[handle setHidden:(view->isVisibleInInstance() ? NO : YES)];
+		if (!(view->isEnabled())) {
+			if ([handle isKindOfClass:[NSControl class]]) {
+				NSControl* control = (NSControl*)(handle);
+				[control setEnabled:FALSE];
 			}
 		}
-		
-		return sl_null;
-		
+		if ([handle isKindOfClass:[SLIBViewBaseHandle class]]) {
+			((SLIBViewBaseHandle*)handle)->m_flagOpaque = view->isOpaque();
+			((SLIBViewBaseHandle*)handle)->m_flagClipping = view->isClipping();
+			((SLIBViewBaseHandle*)handle)->m_flagDrawing = view->isDrawing();
+		}
+		if (parent != nil) {
+			[parent addSubview:handle];
+		}
 	}
-
+	
 	NSView* macOS_ViewInstance::getHandle()
 	{
 		return m_handle;
@@ -604,14 +585,12 @@ namespace slib
 		}
 	}
 
-	Ref<ViewInstance> View::createGenericInstance(ViewInstance* _parent)
+	
+	Ref<ViewInstance> View::createGenericInstance(ViewInstance* parent)
 	{
-		MACOS_VIEW_CREATE_INSTANCE_BEGIN
-		SLIBViewHandle* handle = [[SLIBViewHandle alloc] initWithFrame:frame];
-		MACOS_VIEW_CREATE_INSTANCE_END
-		return ret;
+		return macOS_ViewInstance::create<macOS_ViewInstance, SLIBViewHandle>(this, parent);
 	}
-
+	
 	
 	Ref<ViewInstance> UIPlatform::createViewInstance(NSView* handle)
 	{
@@ -619,7 +598,7 @@ namespace slib
 		if (ret.isNotNull()) {
 			return ret;
 		}
-		return macOS_ViewInstance::create(handle);
+		return macOS_ViewInstance::create<macOS_ViewInstance>(handle);
 	}
 	
 	void UIPlatform::registerViewInstance(NSView* handle, ViewInstance* instance)
@@ -671,6 +650,18 @@ namespace slib
 		return sl_false;
 	}
 
+	sl_bool UIPlatform::measureNativeWidgetFittingSize(ViewInstance* instance, UISize& _out)
+	{
+		NSView* handle = UIPlatform::getViewHandle(instance);
+		if (handle != nil) {
+			NSSize size = handle.fittingSize;
+			_out.x = (sl_ui_len)(size.width);
+			_out.y = (sl_ui_len)(size.height);
+			return sl_true;
+		}
+		return sl_false;
+	}
+	
 }
 
 using namespace slib;

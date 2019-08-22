@@ -194,7 +194,7 @@ namespace slib
 		DWORD style = WS_CLIPCHILDREN;
 		DWORD styleEx = WS_EX_CONTROLPARENT;
 
-		Ref<TabViewInstance> ret = Win32_ViewInstance::create<TabViewInstance>(this, parent, L"SysTabControl32", L"", style, styleEx);
+		Ref<TabViewInstance> ret = Win32_ViewInstance::create<TabViewInstance>(this, parent, L"SysTabControl32", sl_null, style, styleEx);
 		
 		if (ret.isNotNull()) {
 

@@ -133,10 +133,22 @@ namespace slib
 		return sl_null;
 	}
 
-	void Windows::setWindowText(HWND hWnd, const String& _str)
+	String16 Windows::getWindowText16(HWND hWnd)
+	{
+		sl_int32 len = GetWindowTextLengthW(hWnd);
+		if (len > 0) {
+			SLIB_SCOPED_BUFFER(WCHAR, 1024, buf, len + 2);
+			if (buf) {
+				len = GetWindowTextW(hWnd, buf, len + 1);
+				return String16(buf, len);
+			}
+		}
+		return sl_null;
+	}
+
+	void Windows::setWindowText(HWND hWnd, const String16& str)
 	{
 		if (hWnd) {
-			String16 str = _str;
 			SetWindowTextW(hWnd, (LPCWSTR)(str.getData()));
 		}
 	}

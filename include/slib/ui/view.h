@@ -1394,6 +1394,8 @@ namespace slib
 		virtual void _setBackgroundColor_NW(const Color& color);
 
 		virtual void _setFont_NW(const Ref<Font>& font);
+		
+		virtual void _setPadding_NW(const UIEdgeInsets& padding);
 
 		virtual void _setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical);
 		
@@ -1832,6 +1834,19 @@ namespace slib
 		
 		virtual void bringToFront() = 0;
 		
+		// extended functions for native widgets
+		virtual void setBorder(sl_bool flag);
+		
+		virtual void setBackgroundColor(const Color& color);
+		
+		virtual void setFont(const Ref<Font>& font);
+
+		virtual void setPadding(const UIEdgeInsets& padding);
+
+		virtual void setScrollBarsVisible(sl_bool flagHorizontal, sl_bool flagVertical);
+
+		virtual void scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate);
+
 	public:
 		void onDraw(Canvas* canvas);
 		

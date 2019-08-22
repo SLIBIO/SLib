@@ -402,8 +402,7 @@ namespace slib
 				if (m_flagPassword) {
 					style |= ES_PASSWORD;
 				}
-				String16 text = m_text;
-				Ref<EditViewInstance> ret = Win32_ViewInstance::create<EditViewInstance>(this, parent, className, (LPCWSTR)(text.getData()), style, 0);
+				Ref<EditViewInstance> ret = Win32_ViewInstance::create<EditViewInstance>(this, parent, className, getText(), style, 0);
 				if (ret.isNotNull()) {
 					HWND handle = ret->getHandle();
 					if (flagTextArea) {

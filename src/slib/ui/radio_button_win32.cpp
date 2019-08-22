@@ -26,34 +26,12 @@
 
 #include "slib/ui/radio_button.h"
 
-#include "view_win32.h"
+#include "button_win32.h"
 
 namespace slib
 {
 
-	namespace priv
-	{
-		namespace radio_button
-		{
-
-			class RadioButtonInstance : public Win32_ViewInstance
-			{
-			public:
-				sl_bool processCommand(SHORT code, LRESULT& result) override
-				{
-					if (code == BN_CLICKED) {
-						::SendMessageW(getHandle(), BM_SETCHECK, BST_CHECKED, 0);
-						onClick();
-						return sl_true;
-					}
-					return sl_false;
-				}
-			};
-
-		}
-	}
-
-	using namespace priv::radio_button;
+	using namespace priv::button;
 
 	Ref<ViewInstance> RadioButton::createNativeWidget(ViewInstance* parent)
 	{
@@ -62,23 +40,15 @@ namespace slib
 			return sl_null;
 		}
 
-		String16 text = getText();
 		UINT style = BS_RADIOBUTTON | WS_TABSTOP;
-		Ref<RadioButtonInstance> ret = Win32_ViewInstance::create<RadioButtonInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
+		Ref<CheckBoxInstance> ret = Win32_ViewInstance::create<CheckBoxInstance>(this, parent, L"BUTTON", getText(), style, 0);
 		if (ret.isNotNull()) {
-			HWND handle = ret->getHandle();
-			if (isChecked()) {
-				::SendMessageW(handle, BM_SETCHECK, BST_CHECKED, 0);
-			} else {
-				::SendMessageW(handle, BM_SETCHECK, BST_UNCHECKED, 0);
-			}
-			Ref<Font> font = getFont();
-			HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
-			if (hFont) {
-				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
-			}
+			ret->setFont(getFont());
+			ret->setPadding(getPadding());
+			ret->setChecked(m_flagChecked);
+			return ret;
 		}
-		return ret;
+		return sl_null;
 	}
 
 }

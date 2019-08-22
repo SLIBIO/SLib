@@ -110,7 +110,7 @@ namespace slib
 
 		DWORD styleEx = 0;
 		DWORD style = 0;
-		Ref<RenderViewInstance> ret = Win32_ViewInstance::create<RenderViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
+		Ref<RenderViewInstance> ret = Win32_ViewInstance::create<RenderViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), sl_null, style, styleEx);
 		if (ret.isNotNull()) {
 			RenderEngineType engineType = getPreferredEngineType();
 			if (engineType == RenderEngineType::OpenGL_ES) {

@@ -149,8 +149,9 @@ namespace slib
 
 	sl_bool CheckBox::isChecked()
 	{
-		if (isNativeWidget()) {
-			_getChecked_NW();
+		Ptr<ICheckBoxInstance> instance = getCheckBoxInstance();
+		if (instance.isNotNull()) {
+			instance->getChecked(m_flagChecked);
 		}
 		return m_flagChecked;
 	}
@@ -158,9 +159,10 @@ namespace slib
 	void CheckBox::setChecked(sl_bool flag, UIUpdateMode mode)
 	{
 		m_flagChecked = flag;
-		if (isNativeWidget()) {
+		Ptr<ICheckBoxInstance> instance = getCheckBoxInstance();
+		if (instance.isNotNull()) {
 			setCurrentCategory(flag ? 1 : 0, UIUpdateMode::None);
-			_setChecked_NW(flag);
+			instance->setChecked(flag);
 		} else {
 			setCurrentCategory(flag ? 1 : 0, mode);
 		}
@@ -169,7 +171,7 @@ namespace slib
 	void CheckBox::dispatchClickEvent(UIEvent* ev)
 	{
 		if (isNativeWidget()) {
-			_getChecked_NW();
+			isChecked();
 		} else {
 			setChecked(!m_flagChecked);
 		}
@@ -181,18 +183,10 @@ namespace slib
 	{
 		return sl_null;
 	}
-
-	void CheckBox::_getChecked_NW()
+	
+	Ptr<ICheckBoxInstance> CheckBox::getCheckBoxInstance()
 	{
-	}
-
-	void CheckBox::_setChecked_NW(sl_bool flag)
-	{
-	}
-
-	sl_bool CheckBox::_measureSize_NW(UISize& _out)
-	{
-		return sl_false;
+		return sl_null;
 	}
 #endif
 

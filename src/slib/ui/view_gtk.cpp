@@ -32,6 +32,8 @@
 namespace slib
 {
 
+	SLIB_DEFINE_OBJECT(GTK_ViewInstance, ViewInstance)
+
 	GTK_ViewInstance::GTK_ViewInstance()
 	{
 		m_handle = sl_null;

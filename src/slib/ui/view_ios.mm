@@ -32,6 +32,8 @@
 namespace slib
 {
 	
+	SLIB_DEFINE_OBJECT(iOS_ViewInstance, ViewInstance)
+	
 	iOS_ViewInstance::iOS_ViewInstance()
 	{
 		m_handle = nil;
@@ -49,69 +51,42 @@ namespace slib
 		m_handle = nil;
 	}
 	
-	Ref<iOS_ViewInstance> iOS_ViewInstance::create(UIView* handle)
+	void iOS_ViewInstance::initialize(UIView* handle)
 	{
-		if (handle != nil) {
-			Ref<iOS_ViewInstance> ret = new iOS_ViewInstance();
-			if (ret.isNotNull()) {
-				ret->m_handle = handle;
-				UIPlatform::registerViewInstance(handle, ret.get());
-				return ret;
-			}
-		}
-		return sl_null;
+		m_handle = handle;
+		UIPlatform::registerViewInstance(handle, this);
 	}
 	
-	Ref<iOS_ViewInstance> iOS_ViewInstance::create(UIView* handle, UIView* parent, View* view)
+	void iOS_ViewInstance::initialize(UIView* handle, UIView* parent, View* view)
 	{
+		initialize(handle);
+		
+		m_flagDrawing = view->isDrawing();
 
-		if (handle != nil) {
-			
-			Ref<iOS_ViewInstance> instance = create(handle);
-			
-			if (instance.isNotNull()) {
-				
-				[handle setMultipleTouchEnabled:YES];
-				
-				instance->m_flagDrawing = view->isDrawing();
-				
-				[handle setClipsToBounds:(view->isClipping() ? YES : NO)];
-				
-				[handle setHidden:(view->isVisibleInInstance() ? NO : YES)];
-				
-				if (!(view->isEnabled())) {
-					if ([handle isKindOfClass:[UIControl class]]) {
-						UIControl* control = (UIControl*)(handle);
-						[control setEnabled:NO];
-					}
-				}
-				
-				[handle setOpaque:(view->isOpaque() ? YES : NO)];
-				[handle setClearsContextBeforeDrawing: (view->isOpaque()? NO : YES)];
-				
-				if (!([handle isKindOfClass:[SLIBViewHandle class]])) {
-					sl_real alpha = view->getAlpha();
-					if (alpha < 0.995f) {
-						[handle setAlpha: alpha];
-					}
-				}
-				
-				Matrix3 transform = view->getFinalTransformInInstance();
-				CGAffineTransform t;
-				GraphicsPlatform::getCGAffineTransform(t, transform, UIPlatform::getGlobalScaleFactor(), 0, 0);
-				[handle setTransform: t];
-				
-				if (parent != nil) {
-					[parent addSubview:handle];
-				}
-				
-				return instance;
-				
+		[handle setMultipleTouchEnabled:YES];
+		[handle setClipsToBounds:(view->isClipping() ? YES : NO)];
+		[handle setHidden:(view->isVisibleInInstance() ? NO : YES)];
+		if (!(view->isEnabled())) {
+			if ([handle isKindOfClass:[UIControl class]]) {
+				UIControl* control = (UIControl*)(handle);
+				[control setEnabled:NO];
 			}
 		}
-		
-		return sl_null;
-		
+		[handle setOpaque:(view->isOpaque() ? YES : NO)];
+		[handle setClearsContextBeforeDrawing: (view->isOpaque()? NO : YES)];
+		if (!([handle isKindOfClass:[SLIBViewHandle class]])) {
+			sl_real alpha = view->getAlpha();
+			if (alpha < 0.995f) {
+				[handle setAlpha: alpha];
+			}
+		}
+		Matrix3 transform = view->getFinalTransformInInstance();
+		CGAffineTransform t;
+		GraphicsPlatform::getCGAffineTransform(t, transform, UIPlatform::getGlobalScaleFactor(), 0, 0);
+		[handle setTransform: t];
+		if (parent != nil) {
+			[parent addSubview:handle];
+		}
 	}
 	
 	UIView* iOS_ViewInstance::getHandle()
@@ -574,17 +549,13 @@ namespace slib
 	}
 	
 	
-	Ref<ViewInstance> View::createGenericInstance(ViewInstance* _parent)
+	Ref<ViewInstance> View::createGenericInstance(ViewInstance* parent)
 	{
-		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		SLIBViewHandle* handle;
 		if (IsInstanceOf<ScrollView>(getParent())) {
-			handle = [[SLIBScrollContentViewHandle alloc] initWithFrame:frame];
+			return iOS_ViewInstance::create<iOS_ViewInstance, SLIBScrollContentViewHandle>(this, parent);
 		} else {
-			handle = [[SLIBViewHandle alloc] initWithFrame:frame];
+			return iOS_ViewInstance::create<iOS_ViewInstance, SLIBViewHandle>(this, parent);
 		}
-		IOS_VIEW_CREATE_INSTANCE_END
-		return ret;
 	}
 	
 	
@@ -594,7 +565,7 @@ namespace slib
 		if (ret.isNotNull()) {
 			return ret;
 		}
-		return iOS_ViewInstance::create(handle);
+		return iOS_ViewInstance::create<iOS_ViewInstance>(handle);
 	}
 	
 	void UIPlatform::registerViewInstance(UIView* handle, ViewInstance* instance)

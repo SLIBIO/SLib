@@ -109,6 +109,7 @@ namespace slib
 		static NSView* getViewHandle(ViewInstance* instance);
 		static NSView* getViewHandle(View* view);
 		static sl_bool measureNativeWidgetFittingSize(View* view, UISize& _out);
+		static sl_bool measureNativeWidgetFittingSize(ViewInstance* instance, UISize& _out);
 
 		static Ref<WindowInstance> createWindowInstance(NSWindow* handle);
 		static void registerWindowInstance(NSWindow* handle, WindowInstance* instance);

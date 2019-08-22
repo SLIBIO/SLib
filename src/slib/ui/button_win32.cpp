@@ -26,7 +26,7 @@
 
 #include "slib/ui/button.h"
 
-#include "view_win32.h"
+#include "button_win32.h"
 
 #include <commctrl.h>
 
@@ -37,18 +37,80 @@ namespace slib
 	{
 		namespace button
 		{
-			class ButtonInstance : public Win32_ViewInstance
+
+			SLIB_DEFINE_OBJECT(ButtonInstance, Win32_ViewInstance)
+
+			ButtonInstance::ButtonInstance()
 			{
-			public:
-				sl_bool processCommand(SHORT code, LRESULT& result) override
-				{
-					if (code == BN_CLICKED) {
-						onClick();
-						return sl_true;
-					}
-					return sl_false;
+			}
+
+			ButtonInstance::~ButtonInstance()
+			{
+			}
+
+			sl_bool ButtonInstance::processCommand(SHORT code, LRESULT& result)
+			{
+				if (code == BN_CLICKED) {
+					onClick();
+					return sl_true;
 				}
-			};
+				return sl_false;
+			}
+
+			void ButtonInstance::setPadding(const UIEdgeInsets& padding)
+			{
+				if (!(UI::isUiThread())) {
+					UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), ButtonInstance, setPadding, this, padding));
+					return;
+				}
+				HWND handle = getHandle();
+				if (handle) {
+					RECT rc;
+					rc.left = (LONG)(padding.left);
+					rc.top = (LONG)(padding.top);
+					rc.right = (LONG)(padding.top);
+					rc.bottom = (LONG)(padding.bottom);
+					SendMessageW(handle, BCM_SETTEXTMARGIN, 0, (LPARAM)&rc);
+				}
+			}
+
+			void ButtonInstance::setText(const String& text)
+			{
+				Win32_ViewInstance::setText(text);
+			}
+
+			void ButtonInstance::setDefaultButton(sl_bool flag)
+			{
+				if (!(UI::isUiThread())) {
+					UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), ButtonInstance, setDefaultButton, this, flag));
+					return;
+				}
+				HWND handle = getHandle();
+				if (handle) {
+					LONG old = ::GetWindowLongW(handle, GWL_STYLE);
+					if (flag) {
+						SetWindowLongW(handle, GWL_STYLE, old | BS_DEFPUSHBUTTON);
+					} else {
+						SetWindowLongW(handle, GWL_STYLE, old & (~(BS_DEFPUSHBUTTON)));
+					}
+					SetWindowPos(handle, NULL, 0, 0, 0, 0
+						, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+				}
+			}
+
+			sl_bool ButtonInstance::measureSize(UISize& _out)
+			{
+				HWND handle = getHandle();
+				if (handle) {
+					SIZE size = { 0, 0 };
+					SendMessageW(handle, BCM_GETIDEALSIZE, 0, (LPARAM)&size);
+					_out.x = (sl_ui_len)(size.cx);
+					_out.y = (sl_ui_len)(size.cy);
+					return sl_true;
+				}
+				return sl_false;
+			}
+
 		}
 	}
 
@@ -60,89 +122,22 @@ namespace slib
 		if (!shared) {
 			return sl_null;
 		}
-		String16 text = m_text;
 		DWORD style = WS_TABSTOP;
 		if (m_flagDefaultButton) {
 			style |= BS_DEFPUSHBUTTON;
 		}
-		Ref<ButtonInstance> ret = Win32_ViewInstance::create<ButtonInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
+		Ref<ButtonInstance> ret = Win32_ViewInstance::create<ButtonInstance>(this, parent, L"BUTTON", getText(), style, 0);
 		if (ret.isNotNull()) {
-			HWND handle = ret->getHandle();
-			Ref<Font> font = getFont();
-			HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
-			if (hFont) {
-				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
-			}
-			{
-				RECT rc;
-				rc.left = (LONG)(getPaddingLeft());
-				rc.top = (LONG)(getPaddingTop());
-				rc.right = (LONG)(getPaddingRight());
-				rc.bottom = (LONG)(getPaddingBottom());
-				SendMessageW(handle, BCM_SETTEXTMARGIN, 0, (LPARAM)&rc);
-			}
+			ret->setFont(getFont());
+			ret->setPadding(getPadding());
+			return ret;
 		}
-		return ret;
+		return sl_null;
 	}
 
-	void Button::_setText_NW(const String& text)
+	Ptr<IButtonInstance> Button::getButtonInstance()
 	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			Windows::setWindowText(handle, text);
-		}
-	}
-
-	void Button::_setDefaultButton_NW(sl_bool flag)
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			LONG old = ::GetWindowLongW(handle, GWL_STYLE);
-			if (flag) {
-				::SetWindowLongW(handle, GWL_STYLE, old | BS_DEFPUSHBUTTON);
-			} else {
-				::SetWindowLongW(handle, GWL_STYLE, old & (~(BS_DEFPUSHBUTTON)));
-			}
-			::SetWindowPos(handle, NULL, 0, 0, 0, 0
-				, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
-		}
-	}
-
-	sl_bool Button::_measureSize_NW(UISize& _out)
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			SIZE size = { 0, 0 };
-			SendMessageW(handle, BCM_GETIDEALSIZE, 0, (LPARAM)&size);
-			_out.x = (sl_ui_len)(size.cx);
-			_out.y = (sl_ui_len)(size.cy);
-			return sl_true;
-		}
-		return sl_false;
-	}
-	
-	void Button::onChangePadding_NW()
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			RECT rc;
-			rc.left = (LONG)(getPaddingLeft());
-			rc.top = (LONG)(getPaddingTop());
-			rc.right = (LONG)(getPaddingRight());
-			rc.bottom = (LONG)(getPaddingBottom());
-			SendMessageW(handle, BCM_SETTEXTMARGIN, 0, (LPARAM)&rc);
-		}
-	}
-
-	void Button::_setFont_NW(const Ref<Font>& font)
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
-			if (hFont) {
-				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
-			}
-		}
+		return CastRef<ButtonInstance>(getViewInstance());
 	}
 
 }

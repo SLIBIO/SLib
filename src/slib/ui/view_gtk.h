@@ -35,6 +35,8 @@ namespace slib
 
 	class GTK_ViewInstance : public ViewInstance
 	{
+		SLIB_DECLARE_OBJECT
+
 	public:
 		GTK_ViewInstance();
 

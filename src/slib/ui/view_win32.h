@@ -36,6 +36,8 @@ namespace slib
 
 	class Win32_ViewInstance : public ViewInstance
 	{
+		SLIB_DECLARE_OBJECT
+
 	public:
 		Win32_ViewInstance();
 		
@@ -45,46 +47,47 @@ namespace slib
 		template <class T>
 		static Ref<T> create(HWND hWnd, sl_bool flagDestroyOnRelease)
 		{
-			Ref<T> ret;
 			if (hWnd) {
-				ret = new T;
+				Ref<T> ret = new T;
 				if (ret.isNotNull()) {
-					ret->m_handle = hWnd;
-					ret->m_flagDestroyOnRelease = flagDestroyOnRelease;
-					UIPlatform::registerViewInstance(hWnd, ret.get());
+					ret->initialize(hWnd, flagDestroyOnRelease);
+					return ret;
 				} else {
 					if (flagDestroyOnRelease) {
 						PostMessageW(hWnd, SLIB_UI_MESSAGE_CLOSE, 0, 0);
 					}
 				}
 			}
-			return ret;
+			return sl_null;
 		}
 
 		template <class T>
 		static Ref<T> create(
-			View* view, ViewInstance* parent
-			, LPCWSTR wndClass, LPCWSTR text
-			, int style, int styleEx)
+			View* view, ViewInstance* parent,
+			LPCWSTR wndClass, const String16& text,
+			int style, int styleEx)
 		{
 			UIRect frame = view->getFrameInInstance();
 			Matrix3 transform = view->getFinalTransformInInstance();
-			HWND handle = createHandle(view, parent, wndClass, text, style, styleEx, frame, transform);
+			HWND handle = createHandle(view, parent, wndClass, (LPCWSTR)(text.getData()), style, styleEx, frame, transform);
 			if (handle) {
-				Ref<T> instance = create<T>(handle, sl_true);
-				if (instance.isNotNull()) {
-					instance->initialize(view, frame, transform);
-					return instance;
+				Ref<T> ret = new T;
+				if (ret.isNotNull()) {
+					ret->initialize(handle, view, text, frame, transform);
+					return ret;
 				}
+				DestroyWindow(handle);
 			}
 			return sl_null;
 		}
 
-		static HWND createHandle(View* view, ViewInstance* parent
-			, LPCWSTR wndClass, LPCWSTR text
-			, int style, int styleEx, const UIRect& rect, const Matrix3& transform);
+		static HWND createHandle(View* view, ViewInstance* parent,
+			LPCWSTR wndClass, LPCWSTR text,
+			int style, int styleEx, const UIRect& rect, const Matrix3& transform);
 
-		void initialize(View* view, const UIRect& rect, const Matrix3& transform);
+		void initialize(HWND hWnd, sl_bool flagDestroyOnRelease);
+
+		void initialize(HWND hWnd, View* view, const String16& text, const UIRect& rect, const Matrix3& transform);
 
 		HWND getHandle();
 
@@ -138,6 +141,11 @@ namespace slib
 
 		void bringToFront() override;
 
+
+		void setText(const String16& text);
+
+		void setFont(const Ref<Font>& font) override;
+
 	public:
 		sl_bool onEventKey(sl_bool flagDown, WPARAM wParam, LPARAM lParam);
 
@@ -157,6 +165,9 @@ namespace slib
 		
 		UIRect m_frame;
 		Vector2 m_translation;
+
+		String16 m_text;
+		Ref<Font> m_font;
 
 	};
 

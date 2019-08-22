@@ -49,6 +49,8 @@ namespace slib
 	}
 
 	using namespace priv::view;
+
+	SLIB_DEFINE_OBJECT(EFL_ViewInstance, ViewInstance)
 	
 	EFL_ViewInstance::EFL_ViewInstance()
 	{

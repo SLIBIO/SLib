@@ -139,8 +139,10 @@ namespace slib
 
 		static String getWindowText(HWND hWnd);
 
-		static void setWindowText(HWND hWnd, const String& text);
-	
+		static String16 getWindowText16(HWND hWnd);
+
+		static void setWindowText(HWND hWnd, const String16& text);
+
 
 		static sl_bool processWindowHorizontalScrollEvents(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, sl_uint32 nLine, sl_uint32 nWheel);
 

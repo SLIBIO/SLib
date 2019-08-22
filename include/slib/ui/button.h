@@ -27,6 +27,8 @@
 
 #include "view.h"
 
+#include "../core/ptr.h"
+
 namespace slib
 {
 
@@ -56,6 +58,17 @@ namespace slib
 		ButtonCategory();
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(ButtonCategory)
+		
+	};
+	
+	class SLIB_EXPORT IButtonInstance
+	{
+	public:
+		virtual void setText(const String& text) = 0;
+		
+		virtual void setDefaultButton(sl_bool flag) = 0;
+		
+		virtual sl_bool measureSize(UISize& _out) = 0;
 		
 	};
 
@@ -235,6 +248,9 @@ namespace slib
 	public:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
+		Ptr<IButtonInstance> getButtonInstance();
+		
+	public:
 		void setEnabled(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::Redraw) override;
 		
 		void setPressedState(sl_bool flagState, UIUpdateMode mode = UIUpdateMode::Redraw) override;
@@ -249,9 +265,7 @@ namespace slib
 		void onDrawBorder(Canvas* canvas) override;
 		
 		void onUpdateLayout() override;
-		
-		void onChangePadding() override;
-		
+				
 		void onKeyEvent(UIEvent* ev) override;
 		
 	protected:
@@ -267,17 +281,6 @@ namespace slib
 		
 	private:
 		void _invalidateButtonState();
-		
-	protected:
-		virtual void _setText_NW(const String& text);
-		
-		virtual void _setDefaultButton_NW(sl_bool flag);
-
-		virtual sl_bool _measureSize_NW(UISize& _out);
-		
-		virtual void onChangePadding_NW();
-		
-		void _setFont_NW(const Ref<Font>& font) override;
 		
 	private:
 		AtomicString m_text;
@@ -308,7 +311,6 @@ namespace slib
 
 		ButtonCategory* m_categories;
 		sl_uint32 m_nCategories;
-		
 		
 	};
 
