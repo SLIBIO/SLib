@@ -37,14 +37,20 @@ namespace slib
 		
 		static void removeMonitor(const Function<void(UIEvent*)>& callback);
 		
+		static void removeAllMonitors();
+		
 		static void addMouseMonitor(const Function<void(UIEvent*)>& callback);
 		
 		static void removeMouseMonitor(const Function<void(UIEvent*)>& callback);
+		
+		static void removeAllMouseMonitors();
 		
 		static void addKeyboardMonitor(const Function<void(UIEvent*)>& callback);
 		
 		static void removeKeyboardMonitor(const Function<void(UIEvent*)>& callback);
 		
+		static void removeAllKeyboardMonitors();
+
 		static sl_bool isKeyboardAccessEnabled();
 		
 		static void authenticateKeyboardAccess();
