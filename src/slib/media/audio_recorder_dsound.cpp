@@ -243,7 +243,7 @@ namespace slib
 					if (m_flagRunning) {
 						return;
 					}
-					m_thread = Thread::start(SLIB_FUNCTION_CLASS(AudioRecorderImpl, run, this));
+					m_thread = Thread::start(SLIB_FUNCTION_MEMBER(AudioRecorderImpl, run, this));
 					if (m_thread.isNotNull()) {
 						m_flagRunning = sl_true;
 					}

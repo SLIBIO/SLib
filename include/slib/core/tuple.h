@@ -43,19 +43,6 @@ namespace slib
 
 		SLIB_INLINE Tuple() = default;
 
-	public:
-		template <class FUNC, class... ARGS>
-		SLIB_INLINE void invoke(const FUNC& func, ARGS&&... args)
-		{
-			func(Forward<ARGS>(args)...);
-		}
-
-		template <class CLASS, class FUNC, class... ARGS>
-		SLIB_INLINE void invokeMember(CLASS* obj, const FUNC& func, ARGS&&... args)
-		{
-			(obj->*func)(Forward<ARGS>(args)...);
-		}
-	
 	};
 	
 	template <class T1>
@@ -73,19 +60,6 @@ namespace slib
 		SLIB_INLINE Tuple(O1&& _m1):
 		 m1(Forward<O1>(_m1))
 		{}
-
-	public:
-		template <class FUNC, class... ARGS>
-		SLIB_INLINE void invoke(const FUNC& func, ARGS&&... args)
-		{
-			func(m1, Forward<ARGS>(args)...);
-		}
-
-		template <class CLASS, class FUNC, class... ARGS>
-		SLIB_INLINE void invokeMember(CLASS* obj, const FUNC& func, ARGS&&... args)
-		{
-			(obj->*func)(m1, Forward<ARGS>(args)...);
-		}
 
 	};
 	
@@ -107,19 +81,6 @@ namespace slib
 		 m2(Forward<O2>(_m2))
 		{}
 
-	public:
-		template <class FUNC, class... ARGS>
-		SLIB_INLINE void invoke(const FUNC& func, ARGS&&... args)
-		{
-			func(m1, m2, Forward<ARGS>(args)...);
-		}
-
-		template <class CLASS, class FUNC, class... ARGS>
-		SLIB_INLINE void invokeMember(CLASS* obj, const FUNC& func, ARGS&&... args)
-		{
-			(obj->*func)(m1, m2, Forward<ARGS>(args)...);
-		}
-	
 	};
 	
 	template <class T1, class T2, class T3>
@@ -141,19 +102,6 @@ namespace slib
 		 m2(Forward<O2>(_m2)),
 		 m3(Forward<O3>(_m3))
 		{}
-
-	public:
-		template <class FUNC, class... ARGS>
-		SLIB_INLINE void invoke(const FUNC& func, ARGS&&... args)
-		{
-			func(m1, m2, m3, Forward<ARGS>(args)...);
-		}
-
-		template <class CLASS, class FUNC, class... ARGS>
-		SLIB_INLINE void invokeMember(CLASS* obj, const FUNC& func, ARGS&&... args)
-		{
-			(obj->*func)(m1, m2, m3, Forward<ARGS>(args)...);
-		}
 
 	};
 	
@@ -179,19 +127,6 @@ namespace slib
 		 m4(Forward<O4>(_m4))
 		{}
 
-	public:
-		template <class FUNC, class... ARGS>
-		SLIB_INLINE void invoke(const FUNC& func, ARGS&&... args)
-		{
-			func(m1, m2, m3, m4, Forward<ARGS>(args)...);
-		}
-
-		template <class CLASS, class FUNC, class... ARGS>
-		SLIB_INLINE void invokeMember(CLASS* obj, const FUNC& func, ARGS&&... args)
-		{
-			(obj->*func)(m1, m2, m3, m4, Forward<ARGS>(args)...);
-		}
-	
 	};
 	
 	template <class T1, class T2, class T3, class T4, class T5>
@@ -217,19 +152,6 @@ namespace slib
 		 m4(Forward<O4>(_m4)),
 		 m5(Forward<O5>(_m5))
 		{}
-
-	public:
-		template <class FUNC, class... ARGS>
-		SLIB_INLINE void invoke(const FUNC& func, ARGS&&... args)
-		{
-			func(m1, m2, m3, m4, m5, Forward<ARGS>(args)...);
-		}
-
-		template <class CLASS, class FUNC, class... ARGS>
-		SLIB_INLINE void invokeMember(CLASS* obj, const FUNC& func, ARGS&&... args)
-		{
-			(obj->*func)(m1, m2, m3, m4, m5, Forward<ARGS>(args)...);
-		}
 	
 	};
 	
@@ -258,19 +180,6 @@ namespace slib
 		 m5(Forward<O5>(_m5)),
 		 m6(Forward<O6>(_m6))
 		{}
-
-	public:
-		template <class FUNC, class... ARGS>
-		SLIB_INLINE void invoke(const FUNC& func, ARGS&&... args)
-		{
-			func(m1, m2, m3, m4, m5, m6, Forward<ARGS>(args)...);
-		}
-
-		template <class CLASS, class FUNC, class... ARGS>
-		SLIB_INLINE void invokeMember(CLASS* obj, const FUNC& func, ARGS&&... args)
-		{
-			(obj->*func)(m1, m2, m3, m4, m5, m6, Forward<ARGS>(args)...);
-		}
 	
 	};
 	
@@ -301,19 +210,6 @@ namespace slib
 		 m6(Forward<O6>(_m6)),
 		 m7(Forward<O7>(_m7))
 		{}
-
-	public:
-		template <class FUNC, class... ARGS>
-		SLIB_INLINE void invoke(const FUNC& func, ARGS&&... args)
-		{
-			func(m1, m2, m3, m4, m5, m6, m7, Forward<ARGS>(args)...);
-		}
-
-		template <class CLASS, class FUNC, class... ARGS>
-		SLIB_INLINE void invokeMember(CLASS* obj, const FUNC& func, ARGS&&... args)
-		{
-			(obj->*func)(m1, m2, m3, m4, m5, m6, m7, Forward<ARGS>(args)...);
-		}
 
 	};
 	
@@ -346,19 +242,6 @@ namespace slib
 		 m7(Forward<O7>(_m7)),
 		 m8(Forward<O8>(_m8))
 		{}
-
-	public:
-		template <class FUNC, class... ARGS>
-		SLIB_INLINE void invoke(const FUNC& func, ARGS&&... args)
-		{
-			func(m1, m2, m3, m4, m5, m6, m7, m8, Forward<ARGS>(args)...);
-		}
-
-		template <class CLASS, class FUNC, class... ARGS>
-		SLIB_INLINE void invokeMember(CLASS* obj, const FUNC& func, ARGS&&... args)
-		{
-			(obj->*func)(m1, m2, m3, m4, m5, m6, m7, m8, Forward<ARGS>(args)...);
-		}
 
 	};
 	
@@ -393,19 +276,6 @@ namespace slib
 		 m8(Forward<O8>(_m8)),
 		 m9(Forward<O9>(_m9))
 		{}
-
-	public:
-		template <class FUNC, class... ARGS>
-		SLIB_INLINE void invoke(const FUNC& func, ARGS&&... args)
-		{
-			func(m1, m2, m3, m4, m5, m6, m7, m8, m9, Forward<ARGS>(args)...);
-		}
-
-		template <class CLASS, class FUNC, class... ARGS>
-		SLIB_INLINE void invokeMember(CLASS* obj, const FUNC& func, ARGS&&... args)
-		{
-			(obj->*func)(m1, m2, m3, m4, m5, m6, m7, m8, m9, Forward<ARGS>(args)...);
-		}
 
 	};
 	
@@ -442,19 +312,6 @@ namespace slib
 		 m9(Forward<O9>(_m9)),
 		 m10(Forward<O10>(_m10))
 		{}
-
-	public:
-		template <class FUNC, class... ARGS>
-		SLIB_INLINE void invoke(const FUNC& func, ARGS&&... args)
-		{
-			func(m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, Forward<ARGS>(args)...);
-		}
-
-		template <class CLASS, class FUNC, class... ARGS>
-		SLIB_INLINE void invokeMember(CLASS* obj, const FUNC& func, ARGS&&... args)
-		{
-			(obj->*func)(m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, Forward<ARGS>(args)...);
-		}
 
 	};
 

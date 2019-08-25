@@ -106,7 +106,7 @@ namespace slib
 
 										ret->initWithParam(param);
 
-										ret->m_threadRender = Thread::start(SLIB_FUNCTION_CLASS(RendererImpl, run, ret.get()));
+										ret->m_threadRender = Thread::start(SLIB_FUNCTION_MEMBER(RendererImpl, run, ret.get()));
 										
 										return ret;
 									}

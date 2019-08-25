@@ -171,7 +171,7 @@ namespace slib
 								ret->m_socket = socket;
 								ret->m_deviceType = deviceType;
 								ret->m_ifaceIndex = iface;
-								ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(RawPacketCapture, _run, ret.get()));
+								ret->m_thread = Thread::create(SLIB_FUNCTION_MEMBER(RawPacketCapture, _run, ret.get()));
 								if (ret->m_thread.isNotNull()) {
 									ret->m_flagInit = sl_true;
 									if (param.flagAutoStart) {
@@ -357,7 +357,7 @@ namespace slib
 								ret->m_socketTCP = socketTCP;
 								ret->m_socketUDP = socketUDP;
 								ret->m_socketICMP = socketICMP;
-								ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(RawIPv4Capture, _run, ret.get()));
+								ret->m_thread = Thread::create(SLIB_FUNCTION_MEMBER(RawIPv4Capture, _run, ret.get()));
 								if (ret->m_thread.isNotNull()) {
 									ret->m_flagInit = sl_true;
 									if (param.flagAutoStart) {

@@ -68,11 +68,11 @@ namespace slib
 
 	public:
 		template <class FUNC>
-		Function(const FUNC& func) noexcept;
+		Function(FUNC&& func) noexcept;
 
 	public:
 		template <class FUNC>
-		Function& operator=(const FUNC& func) noexcept;
+		Function& operator=(FUNC&& func) noexcept;
 
 		RET_TYPE operator()(ARGS... args) const;
 		
@@ -86,34 +86,64 @@ namespace slib
 
 	public:
 		template <class FUNC>
-		static Function<RET_TYPE(ARGS...)> create(const FUNC& func) noexcept;
+		static Function<RET_TYPE(ARGS...)> create(FUNC&& func) noexcept;
 
 		template <class CLASS, class FUNC>
-		static Function<RET_TYPE(ARGS...)> fromClass(CLASS* object, FUNC func) noexcept;
+		static Function<RET_TYPE(ARGS...)> fromMember(CLASS* object, const FUNC& func) noexcept;
 
 		template <class CLASS, class FUNC>
-		static Function<RET_TYPE(ARGS...)> fromRef(const Ref<CLASS>& object, FUNC func) noexcept;
+		static Function<RET_TYPE(ARGS...)> fromRef(CLASS* object, const FUNC& func) noexcept;
 
 		template <class CLASS, class FUNC>
-		static Function<RET_TYPE(ARGS...)> fromWeakRef(const WeakRef<CLASS>& object, FUNC func) noexcept;
-	
-		template <class FUNC, class... BINDS>
-		static Function<RET_TYPE(ARGS...)> bind(const FUNC& func, const BINDS&... binds) noexcept;
-
-		template <class CLASS, class FUNC, class... BINDS>
-		static Function<RET_TYPE(ARGS...)> bindClass(CLASS* object, FUNC func, const BINDS&... binds) noexcept;
-
-		template <class CLASS, class FUNC, class... BINDS>
-		static Function<RET_TYPE(ARGS...)> bindRef(const Ref<CLASS>& object, FUNC func, const BINDS&... binds) noexcept;
-
-		template <class CLASS, class FUNC, class... BINDS>
-		static Function<RET_TYPE(ARGS...)> bindWeakRef(const WeakRef<CLASS>& object, FUNC func, const BINDS&... binds) noexcept;
+		static Function<RET_TYPE(ARGS...)> fromRef(const Ref<CLASS>& object, const FUNC& func) noexcept;
 		
 		template <class CLASS, class FUNC>
-		static Function<RET_TYPE(ARGS...)> with(const Ref<CLASS>& object, FUNC func) noexcept;
+		static Function<RET_TYPE(ARGS...)> fromWeakRef(CLASS* object, const FUNC& func) noexcept;
+		
+		template <class CLASS, class FUNC>
+		static Function<RET_TYPE(ARGS...)> fromWeakRef(const WeakRef<CLASS>& object, const FUNC& func) noexcept;
+		
+		template <class FUNC>
+		static Function<RET_TYPE(ARGS...)> bind(FUNC&& func) noexcept;
+
+		template <class FUNC, class... BINDS>
+		static Function<RET_TYPE(ARGS...)> bind(FUNC&& func, const BINDS&... binds) noexcept;
 
 		template <class CLASS, class FUNC>
-		static Function<RET_TYPE(ARGS...)> with(const WeakRef<CLASS>& object, FUNC func) noexcept;
+		static Function<RET_TYPE(ARGS...)> bindMember(CLASS* object, const FUNC& func) noexcept;
+
+		template <class CLASS, class FUNC, class... BINDS>
+		static Function<RET_TYPE(ARGS...)> bindMember(CLASS* object, const FUNC& func, const BINDS&... binds) noexcept;
+
+		template <class CLASS, class FUNC>
+		static Function<RET_TYPE(ARGS...)> bindRef(CLASS* object, const FUNC& func) noexcept;
+
+		template <class CLASS, class FUNC, class... BINDS>
+		static Function<RET_TYPE(ARGS...)> bindRef(CLASS* object, const FUNC& func, const BINDS&... binds) noexcept;
+
+		template <class CLASS, class FUNC>
+		static Function<RET_TYPE(ARGS...)> bindRef(const Ref<CLASS>& object, const FUNC& func) noexcept;
+
+		template <class CLASS, class FUNC, class... BINDS>
+		static Function<RET_TYPE(ARGS...)> bindRef(const Ref<CLASS>& object, const FUNC& func, const BINDS&... binds) noexcept;
+
+		template <class CLASS, class FUNC>
+		static Function<RET_TYPE(ARGS...)> bindWeakRef(CLASS* object, const FUNC& func) noexcept;
+		
+		template <class CLASS, class FUNC, class... BINDS>
+		static Function<RET_TYPE(ARGS...)> bindWeakRef(CLASS* object, const FUNC& func, const BINDS&... binds) noexcept;
+		
+		template <class CLASS, class FUNC>
+		static Function<RET_TYPE(ARGS...)> bindWeakRef(const WeakRef<CLASS>& object, const FUNC& func) noexcept;
+		
+		template <class CLASS, class FUNC, class... BINDS>
+		static Function<RET_TYPE(ARGS...)> bindWeakRef(const WeakRef<CLASS>& object, const FUNC& func, const BINDS&... binds) noexcept;
+		
+		template <class CLASS, class FUNC>
+		static Function<RET_TYPE(ARGS...)> with(const Ref<CLASS>& object, FUNC&& func) noexcept;
+
+		template <class CLASS, class FUNC>
+		static Function<RET_TYPE(ARGS...)> with(const WeakRef<CLASS>& object, FUNC&& func) noexcept;
 		
 		static Function<RET_TYPE(ARGS...)> fromList(const List< Function<RET_TYPE(ARGS...)> >&) noexcept;
 		
@@ -143,11 +173,11 @@ namespace slib
 
 	public:
 		template <class FUNC>
-		Atomic(const FUNC& func) noexcept;
+		Atomic(FUNC&& func) noexcept;
 
 	public:
 		template <class FUNC>
-		Atomic& operator=(const FUNC& func) noexcept;
+		Atomic& operator=(FUNC&& func) noexcept;
 
 		RET_TYPE operator()(ARGS... args) const;
 		
@@ -202,14 +232,13 @@ namespace slib
 		
 	};
 	
-	
 }
 
-#define SLIB_BIND_CLASS(TYPE, CLASS, CALLBACK, OBJECT, ...) slib::Function<TYPE>::bindClass(OBJECT, &CLASS::CALLBACK, ##__VA_ARGS__)
+#define SLIB_BIND_CLASS(TYPE, CLASS, CALLBACK, OBJECT, ...) slib::Function<TYPE>::bindMember(OBJECT, &CLASS::CALLBACK, ##__VA_ARGS__)
 #define SLIB_BIND_REF(TYPE, CLASS, CALLBACK, OBJECT, ...) slib::Function<TYPE>::bindRef(slib::Ref<CLASS>(OBJECT), &CLASS::CALLBACK, ##__VA_ARGS__)
 #define SLIB_BIND_WEAKREF(TYPE, CLASS, CALLBACK, OBJECT, ...) slib::Function<TYPE>::bindWeakRef(slib::WeakRef<CLASS>(OBJECT), &CLASS::CALLBACK, ##__VA_ARGS__)
 
-#define SLIB_FUNCTION_CLASS(CLASS, CALLBACK, OBJECT) slib::CreateFunctionFromClass(OBJECT, &CLASS::CALLBACK)
+#define SLIB_FUNCTION_MEMBER(CLASS, CALLBACK, OBJECT) slib::CreateFunctionFromMember(OBJECT, &CLASS::CALLBACK)
 #define SLIB_FUNCTION_REF(CLASS, CALLBACK, OBJECT) slib::CreateFunctionFromRef(slib::Ref<CLASS>(OBJECT), &CLASS::CALLBACK)
 #define SLIB_FUNCTION_WEAKREF(CLASS, CALLBACK, OBJECT) slib::CreateFunctionFromWeakRef(slib::WeakRef<CLASS>(OBJECT), &CLASS::CALLBACK)
 

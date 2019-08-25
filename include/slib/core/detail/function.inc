@@ -28,6 +28,316 @@ namespace slib
 		namespace function
 		{
 			
+			template <class RET_TYPE>
+			class FunctionInvoker
+			{
+			public:
+				template <class FUNC, class... ARGS>
+				SLIB_INLINE static RET_TYPE invoke(const FUNC& func, ARGS&&... args)
+				{
+					return func(Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class... ARGS>
+				SLIB_INLINE static RET_TYPE invokeMember(CLASS* obj, const FUNC& func, ARGS&&... args)
+				{
+					return (obj->*func)(Forward<ARGS>(args)...);
+				}
+			};
+			
+			template<>
+			class FunctionInvoker<void>
+			{
+			public:
+				template <class FUNC, class... ARGS>
+				SLIB_INLINE static void invoke(const FUNC& func, ARGS&&... args)
+				{
+					func(Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class... ARGS>
+				SLIB_INLINE static void invokeMember(CLASS* obj, const FUNC& func, ARGS&&... args)
+				{
+					(obj->*func)(Forward<ARGS>(args)...);
+				}
+			};
+
+			template <class RET_TYPE>
+			class BindInvoker
+			{
+			public:
+				template <class FUNC, class... ARGS>
+				SLIB_INLINE static RET_TYPE invoke(const FUNC& func, const Tuple<>& t, ARGS&&... args)
+				{
+					return func(Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class... ARGS>
+				SLIB_INLINE static RET_TYPE invokeMember(CLASS* obj, const FUNC& func, const Tuple<>& t, ARGS&&... args)
+				{
+					return (obj->*func)(Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class... ARGS>
+				SLIB_INLINE static RET_TYPE invoke(const FUNC& func, const Tuple<T1>& t, ARGS&&... args)
+				{
+					return func(t.m1, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class... ARGS>
+				SLIB_INLINE static RET_TYPE invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1>& t, ARGS&&... args)
+				{
+					return (obj->*func)(t.m1, Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class T2, class... ARGS>
+				SLIB_INLINE static RET_TYPE invoke(const FUNC& func, const Tuple<T1, T2>& t, ARGS&&... args)
+				{
+					return func(t.m1, t.m2, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class T2, class... ARGS>
+				SLIB_INLINE static RET_TYPE invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1, T2>& t, ARGS&&... args)
+				{
+					return (obj->*func)(t.m1, t.m2, Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class T2, class T3, class... ARGS>
+				SLIB_INLINE static RET_TYPE invoke(const FUNC& func, const Tuple<T1, T2, T3>& t, ARGS&&... args)
+				{
+					return func(t.m1, t.m2, t.m3, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class T2, class T3, class... ARGS>
+				SLIB_INLINE static RET_TYPE invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1, T2, T3>& t, ARGS&&... args)
+				{
+					return (obj->*func)(t.m1, t.m2, t.m3, Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class T2, class T3, class T4, class... ARGS>
+				SLIB_INLINE static RET_TYPE invoke(const FUNC& func, const Tuple<T1, T2, T3, T4>& t, ARGS&&... args)
+				{
+					return func(t.m1, t.m2, t.m3, t.m4, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class T2, class T3, class T4, class... ARGS>
+				SLIB_INLINE static RET_TYPE invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1, T2, T3, T4>& t, ARGS&&... args)
+				{
+					return (obj->*func)(t.m1, t.m2, t.m3, t.m4, Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class T2, class T3, class T4, class T5, class... ARGS>
+				SLIB_INLINE static RET_TYPE invoke(const FUNC& func, const Tuple<T1, T2, T3, T4, T5>& t, ARGS&&... args)
+				{
+					return func(t.m1, t.m2, t.m3, t.m4, t.m5, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class T2, class T3, class T4, class T5, class... ARGS>
+				SLIB_INLINE static RET_TYPE invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1, T2, T3, T4, T5>& t, ARGS&&... args)
+				{
+					return (obj->*func)(t.m1, t.m2, t.m3, t.m4, t.m5, Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class... ARGS>
+				SLIB_INLINE static RET_TYPE invoke(const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6>& t, ARGS&&... args)
+				{
+					return func(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class... ARGS>
+				SLIB_INLINE static RET_TYPE invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6>& t, ARGS&&... args)
+				{
+					return (obj->*func)(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class... ARGS>
+				SLIB_INLINE static RET_TYPE invoke(const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6, T7>& t, ARGS&&... args)
+				{
+					return func(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, t.m7, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class... ARGS>
+				SLIB_INLINE static RET_TYPE invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6, T7>& t, ARGS&&... args)
+				{
+					return (obj->*func)(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, t.m7, Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class... ARGS>
+				SLIB_INLINE static RET_TYPE invoke(const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6, T7, T8>& t, ARGS&&... args)
+				{
+					return func(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, t.m7, t.m8, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class... ARGS>
+				SLIB_INLINE static RET_TYPE invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6, T7, T8>& t, ARGS&&... args)
+				{
+					return (obj->*func)(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, t.m7, t.m8, Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class... ARGS>
+				SLIB_INLINE static RET_TYPE invoke(const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>& t, ARGS&&... args)
+				{
+					return func(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, t.m7, t.m8, t.m9, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class... ARGS>
+				SLIB_INLINE static RET_TYPE invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>& t, ARGS&&... args)
+				{
+					return (obj->*func)(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, t.m7, t.m8, t.m9, Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class... ARGS>
+				SLIB_INLINE static RET_TYPE invoke(const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>& t, ARGS&&... args)
+				{
+					return func(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, t.m7, t.m8, t.m9, t.m10, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class... ARGS>
+				SLIB_INLINE static RET_TYPE invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>& t, ARGS&&... args)
+				{
+					return (obj->*func)(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, t.m7, t.m8, t.m9, t.m10, Forward<ARGS>(args)...);
+				}
+				
+			};
+			
+			template<>
+			class BindInvoker<void>
+			{
+			public:
+				template <class FUNC, class... ARGS>
+				SLIB_INLINE static void invoke(const FUNC& func, const Tuple<>& t, ARGS&&... args)
+				{
+					func(Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class... ARGS>
+				SLIB_INLINE static void invokeMember(CLASS* obj, const FUNC& func, const Tuple<>& t, ARGS&&... args)
+				{
+					(obj->*func)(Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class... ARGS>
+				SLIB_INLINE static void invoke(const FUNC& func, const Tuple<T1>& t, ARGS&&... args)
+				{
+					func(t.m1, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class... ARGS>
+				SLIB_INLINE static void invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1>& t, ARGS&&... args)
+				{
+					(obj->*func)(t.m1, Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class T2, class... ARGS>
+				SLIB_INLINE static void invoke(const FUNC& func, const Tuple<T1, T2>& t, ARGS&&... args)
+				{
+					func(t.m1, t.m2, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class T2, class... ARGS>
+				SLIB_INLINE static void invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1, T2>& t, ARGS&&... args)
+				{
+					(obj->*func)(t.m1, t.m2, Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class T2, class T3, class... ARGS>
+				SLIB_INLINE static void invoke(const FUNC& func, const Tuple<T1, T2, T3>& t, ARGS&&... args)
+				{
+					func(t.m1, t.m2, t.m3, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class T2, class T3, class... ARGS>
+				SLIB_INLINE static void invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1, T2, T3>& t, ARGS&&... args)
+				{
+					(obj->*func)(t.m1, t.m2, t.m3, Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class T2, class T3, class T4, class... ARGS>
+				SLIB_INLINE static void invoke(const FUNC& func, const Tuple<T1, T2, T3, T4>& t, ARGS&&... args)
+				{
+					func(t.m1, t.m2, t.m3, t.m4, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class T2, class T3, class T4, class... ARGS>
+				SLIB_INLINE static void invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1, T2, T3, T4>& t, ARGS&&... args)
+				{
+					(obj->*func)(t.m1, t.m2, t.m3, t.m4, Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class T2, class T3, class T4, class T5, class... ARGS>
+				SLIB_INLINE static void invoke(const FUNC& func, const Tuple<T1, T2, T3, T4, T5>& t, ARGS&&... args)
+				{
+					func(t.m1, t.m2, t.m3, t.m4, t.m5, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class T2, class T3, class T4, class T5, class... ARGS>
+				SLIB_INLINE static void invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1, T2, T3, T4, T5>& t, ARGS&&... args)
+				{
+					(obj->*func)(t.m1, t.m2, t.m3, t.m4, t.m5, Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class... ARGS>
+				SLIB_INLINE static void invoke(const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6>& t, ARGS&&... args)
+				{
+					func(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class... ARGS>
+				SLIB_INLINE static void invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6>& t, ARGS&&... args)
+				{
+					(obj->*func)(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class... ARGS>
+				SLIB_INLINE static void invoke(const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6, T7>& t, ARGS&&... args)
+				{
+					func(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, t.m7, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class... ARGS>
+				SLIB_INLINE static void invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6, T7>& t, ARGS&&... args)
+				{
+					(obj->*func)(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, t.m7, Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class... ARGS>
+				SLIB_INLINE static void invoke(const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6, T7, T8>& t, ARGS&&... args)
+				{
+					func(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, t.m7, t.m8, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class... ARGS>
+				SLIB_INLINE static void invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6, T7, T8>& t, ARGS&&... args)
+				{
+					(obj->*func)(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, t.m7, t.m8, Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class... ARGS>
+				SLIB_INLINE static void invoke(const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>& t, ARGS&&... args)
+				{
+					func(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, t.m7, t.m8, t.m9, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class... ARGS>
+				SLIB_INLINE static void invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6, T7, T8, T9>& t, ARGS&&... args)
+				{
+					(obj->*func)(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, t.m7, t.m8, t.m9, Forward<ARGS>(args)...);
+				}
+				
+				template <class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class... ARGS>
+				SLIB_INLINE static void invoke(const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>& t, ARGS&&... args)
+				{
+					func(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, t.m7, t.m8, t.m9, t.m10, Forward<ARGS>(args)...);
+				}
+				
+				template <class CLASS, class FUNC, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class... ARGS>
+				SLIB_INLINE static void invokeMember(CLASS* obj, const FUNC& func, const Tuple<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>& t, ARGS&&... args)
+				{
+					(obj->*func)(t.m1, t.m2, t.m3, t.m4, t.m5, t.m6, t.m7, t.m8, t.m9, t.m10, Forward<ARGS>(args)...);
+				}
+				
+			};
+			
 			template <class FUNC, class RET_TYPE, class... ARGS>
 			class CallableFromFunction : public Callable<RET_TYPE(ARGS...)>
 			{
@@ -41,9 +351,9 @@ namespace slib
 				{}
 				
 			public:
-				RET_TYPE invoke(ARGS... params) override
+				RET_TYPE invoke(ARGS... args) override
 				{
-					return func(params...);
+					return FunctionInvoker<RET_TYPE>::invoke(func, Forward<ARGS>(args)...);
 				}
 			};
 			
@@ -61,33 +371,33 @@ namespace slib
 				{}
 				
 			public:
-				RET_TYPE invoke(ARGS... params) override
+				RET_TYPE invoke(ARGS... args) override
 				{
-					return binds.invoke(func, params...);
+					return BindInvoker<RET_TYPE>::invoke(func, binds, Forward<ARGS>(args)...);
 				}
 			};
 			
 			template <class CLASS, class FUNC, class RET_TYPE, class... ARGS>
-			class CallableFromClass : public Callable<RET_TYPE(ARGS...)>
+			class CallableFromMember : public Callable<RET_TYPE(ARGS...)>
 			{
 			protected:
 				CLASS* object;
 				FUNC func;
 				
 			public:
-				SLIB_INLINE CallableFromClass(CLASS* _object, FUNC _func) noexcept
+				SLIB_INLINE CallableFromMember(CLASS* _object, const FUNC& _func) noexcept
 				: object(_object), func(_func)
 				{}
 				
 			public:
-				RET_TYPE invoke(ARGS... params) override
+				RET_TYPE invoke(ARGS... args) override
 				{
-					return (object->*func)(params...);
+					return FunctionInvoker<RET_TYPE>::invokeMember(object, func, Forward<ARGS>(args)...);
 				}
 			};
 			
 			template <class BIND_TUPLE, class CLASS, class FUNC, class RET_TYPE, class... ARGS>
-			class BindFromClass : public Callable<RET_TYPE(ARGS...)>
+			class BindFromMember : public Callable<RET_TYPE(ARGS...)>
 			{
 			protected:
 				CLASS* object;
@@ -96,14 +406,14 @@ namespace slib
 				
 			public:
 				template <class OTHER_BIND_TUPLE>
-				SLIB_INLINE BindFromClass(CLASS* _object, FUNC _func, OTHER_BIND_TUPLE&& _binds) noexcept
+				SLIB_INLINE BindFromMember(CLASS* _object, const FUNC& _func, OTHER_BIND_TUPLE&& _binds) noexcept
 				: object(_object), func(_func), binds(Forward<OTHER_BIND_TUPLE>(_binds))
 				{}
 				
 			public:
-				RET_TYPE invoke(ARGS... params) override
+				RET_TYPE invoke(ARGS... args) override
 				{
-					return binds.invokeMember(object, func, params...);
+					return BindInvoker<RET_TYPE>::invokeMember(object, func, binds, Forward<ARGS>(args)...);
 				}
 			};
 			
@@ -116,14 +426,14 @@ namespace slib
 				
 			public:
 				template <class T>
-				SLIB_INLINE CallableFromRef(T&& _object, FUNC _func) noexcept
+				SLIB_INLINE CallableFromRef(T&& _object, const FUNC& _func) noexcept
 				: object(Forward<T>(_object)), func(_func)
 				{}
 				
 			public:
-				RET_TYPE invoke(ARGS... params) override
+				RET_TYPE invoke(ARGS... args) override
 				{
-					return ((object._ptr)->*func)(params...);
+					return FunctionInvoker<RET_TYPE>::invokeMember(object._ptr, func, Forward<ARGS>(args)...);
 				}
 			};
 			
@@ -137,14 +447,14 @@ namespace slib
 				
 			public:
 				template <class T, class OTHER_BIND_TUPLE>
-				SLIB_INLINE BindFromRef(T&& _object, FUNC _func, OTHER_BIND_TUPLE&& _binds) noexcept
+				SLIB_INLINE BindFromRef(T&& _object, const FUNC& _func, OTHER_BIND_TUPLE&& _binds) noexcept
 				: object(Forward<T>(_object)), func(_func), binds(Forward<OTHER_BIND_TUPLE>(_binds))
 				{}
 				
 			public:
-				RET_TYPE invoke(ARGS... params) override
+				RET_TYPE invoke(ARGS... args) override
 				{
-					return binds.invokeMember(object._ptr, func, params...);
+					return BindInvoker<RET_TYPE>::invokeMember(object._ptr, func, binds, Forward<ARGS>(args)...);
 				}
 			};
 			
@@ -157,16 +467,16 @@ namespace slib
 				
 			public:
 				template <class T>
-				SLIB_INLINE CallableFromWeakRef(T&& _object, FUNC _func) noexcept
+				SLIB_INLINE CallableFromWeakRef(T&& _object, const FUNC& _func) noexcept
 				: object(Forward<T>(_object)), func(_func)
 				{}
 				
 			public:
-				RET_TYPE invoke(ARGS... params) override
+				RET_TYPE invoke(ARGS... args) override
 				{
 					Ref<CLASS> o(object);
 					if (o.isNotNull()) {
-						return ((o._ptr)->*func)(params...);
+						return FunctionInvoker<RET_TYPE>::invokeMember(o._ptr, func, Forward<ARGS>(args)...);
 					} else {
 						return NullValue<RET_TYPE>::get();
 					}
@@ -183,16 +493,16 @@ namespace slib
 				
 			public:
 				template <class T, class OTHER_BIND_TUPLE>
-				SLIB_INLINE BindFromWeakRef(T&& _object, FUNC _func, OTHER_BIND_TUPLE&& _binds) noexcept
+				SLIB_INLINE BindFromWeakRef(T&& _object, const FUNC& _func, OTHER_BIND_TUPLE&& _binds) noexcept
 				: object(Forward<T>(_object)), func(_func), binds(Forward<OTHER_BIND_TUPLE>(_binds))
 				{}
 				
 			public:
-				RET_TYPE invoke(ARGS... params) override
+				RET_TYPE invoke(ARGS... args) override
 				{
 					Ref<CLASS> o(object);
 					if (o.isNotNull()) {
-						return binds.invokeMember(o._ptr, func, params...);
+						return BindInvoker<RET_TYPE>::invokeMember(o._ptr, func, binds, Forward<ARGS>(args)...);
 					} else {
 						return NullValue<RET_TYPE>::get();
 					}
@@ -207,15 +517,15 @@ namespace slib
 				FUNC func;
 				
 			public:
-				template <class T>
-				SLIB_INLINE CallableWithRef(T&& _object, FUNC _func) noexcept
-				: object(Forward<T>(_object)), func(_func)
+				template <class OTHER_CLASS, class OTHER_FUNC>
+				SLIB_INLINE CallableWithRef(OTHER_CLASS&& _object, OTHER_FUNC&& _func) noexcept
+				: object(Forward<OTHER_CLASS>(_object)), func(Forward<OTHER_FUNC>(_func))
 				{}
 				
 			public:
-				RET_TYPE invoke(ARGS... params) override
+				RET_TYPE invoke(ARGS... args) override
 				{
-					return func(params...);
+					return FunctionInvoker<RET_TYPE>::invoke(func, Forward<ARGS>(args)...);
 				}
 			};
 			
@@ -227,17 +537,17 @@ namespace slib
 				FUNC func;
 				
 			public:
-				template <class T>
-				SLIB_INLINE CallableWithWeakRef(T&& _object, FUNC _func) noexcept
-				: object(Forward<T>(_object)), func(_func)
+				template <class OTHER_CLASS, class OTHER_FUNC>
+				SLIB_INLINE CallableWithWeakRef(OTHER_CLASS&& _object, OTHER_FUNC&& _func) noexcept
+				: object(Forward<OTHER_CLASS>(_object)), func(Forward<OTHER_FUNC>(_func))
 				{}
 				
 			public:
-				RET_TYPE invoke(ARGS... params) override
+				RET_TYPE invoke(ARGS... args) override
 				{
 					Ref<CLASS> o(object);
 					if (o.isNotNull()) {
-						return func(params...);
+						return FunctionInvoker<RET_TYPE>::invoke(func, Forward<ARGS>(args)...);
 					} else {
 						return NullValue<RET_TYPE>::get();
 					}
@@ -250,15 +560,15 @@ namespace slib
 	
 	template <class RET_TYPE, class... ARGS>
 	template <class FUNC>
-	SLIB_INLINE Function<RET_TYPE(ARGS...)>::Function(const FUNC& func) noexcept
-	 : ref(new priv::function::CallableFromFunction<FUNC, RET_TYPE, ARGS...>(func))
-	 {}
+	SLIB_INLINE Function<RET_TYPE(ARGS...)>::Function(FUNC&& func) noexcept
+	: ref(new priv::function::CallableFromFunction<typename RemoveConstReference<FUNC>::Type, RET_TYPE, ARGS...>(Forward<FUNC>(func)))
+	{}
 	
 	template <class RET_TYPE, class... ARGS>
 	template <class FUNC>
-	SLIB_INLINE Function<RET_TYPE(ARGS...)>& Function<RET_TYPE(ARGS...)>::operator=(const FUNC& func) noexcept
+	SLIB_INLINE Function<RET_TYPE(ARGS...)>& Function<RET_TYPE(ARGS...)>::operator=(FUNC&& func) noexcept
 	{
-		ref = new priv::function::CallableFromFunction<FUNC, RET_TYPE, ARGS...>(func);
+		ref = new priv::function::CallableFromFunction<typename RemoveConstReference<FUNC>::Type, RET_TYPE, ARGS...>(Forward<FUNC>(func));
 		return *this;
 	}
 	
@@ -276,15 +586,15 @@ namespace slib
 	
 	template <class RET_TYPE, class... ARGS>
 	template <class FUNC>
-	SLIB_INLINE Atomic< Function<RET_TYPE(ARGS...)> >::Atomic(const FUNC& func) noexcept
-	 : ref(new priv::function::CallableFromFunction<FUNC, RET_TYPE, ARGS...>(func))
+	SLIB_INLINE Atomic< Function<RET_TYPE(ARGS...)> >::Atomic(FUNC&& func) noexcept
+	 : ref(new priv::function::CallableFromFunction<typename RemoveConstReference<FUNC>::Type, RET_TYPE, ARGS...>(Forward<FUNC>(func)))
 	 {}
 	
 	template <class RET_TYPE, class... ARGS>
 	template <class FUNC>
-	SLIB_INLINE Atomic< Function<RET_TYPE(ARGS...)> >& Atomic< Function<RET_TYPE(ARGS...)> >::operator=(const FUNC& func) noexcept
+	SLIB_INLINE Atomic< Function<RET_TYPE(ARGS...)> >& Atomic< Function<RET_TYPE(ARGS...)> >::operator=(FUNC&& func) noexcept
 	{
-		ref = new priv::function::CallableFromFunction<FUNC, RET_TYPE, ARGS...>(func);
+		ref = new priv::function::CallableFromFunction<typename RemoveConstReference<FUNC>::Type, RET_TYPE, ARGS...>(Forward<FUNC>(func));
 		return *this;
 	}
 	
@@ -302,24 +612,34 @@ namespace slib
 	
 	template <class RET_TYPE, class... ARGS>
 	template <class FUNC>
-	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::create(const FUNC& func) noexcept
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::create(FUNC&& func) noexcept
 	{
-		return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::CallableFromFunction<FUNC, RET_TYPE, ARGS...>(func));
+		return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::CallableFromFunction<typename RemoveConstReference<FUNC>::Type, RET_TYPE, ARGS...>(Forward<FUNC>(func)));
 	}
 	
 	template <class RET_TYPE, class... ARGS>
 	template <class CLASS, class FUNC>
-	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::fromClass(CLASS* object, FUNC func) noexcept
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::fromMember(CLASS* object, const FUNC& func) noexcept
 	{
 		if (object) {
-			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::CallableFromClass<CLASS, FUNC, RET_TYPE, ARGS...>(object, func));
+			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::CallableFromMember<CLASS, FUNC, RET_TYPE, ARGS...>(object, func));
 		}
 		return sl_null;
 	}
 	
 	template <class RET_TYPE, class... ARGS>
 	template <class CLASS, class FUNC>
-	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::fromRef(const Ref<CLASS>& object, FUNC func) noexcept
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::fromRef(CLASS* object, const FUNC& func) noexcept
+	{
+		if (object) {
+			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::CallableFromRef<CLASS, FUNC, RET_TYPE, ARGS...>(object, func));
+		}
+		return sl_null;
+	}
+	
+	template <class RET_TYPE, class... ARGS>
+	template <class CLASS, class FUNC>
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::fromRef(const Ref<CLASS>& object, const FUNC& func) noexcept
 	{
 		if (object.isNotNull()) {
 			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::CallableFromRef<CLASS, FUNC, RET_TYPE, ARGS...>(object, func));
@@ -329,7 +649,17 @@ namespace slib
 	
 	template <class RET_TYPE, class... ARGS>
 	template <class CLASS, class FUNC>
-	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::fromWeakRef(const WeakRef<CLASS>& object, FUNC func) noexcept
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::fromWeakRef(CLASS* object, const FUNC& func) noexcept
+	{
+		if (object) {
+			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::CallableFromWeakRef<CLASS, FUNC, RET_TYPE, ARGS...>(object, func));
+		}
+		return sl_null;
+	}
+	
+	template <class RET_TYPE, class... ARGS>
+	template <class CLASS, class FUNC>
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::fromWeakRef(const WeakRef<CLASS>& object, const FUNC& func) noexcept
 	{
 		if (object.isNotNull()) {
 			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::CallableFromWeakRef<CLASS, FUNC, RET_TYPE, ARGS...>(object, func));
@@ -338,25 +668,63 @@ namespace slib
 	}
 	
 	template <class RET_TYPE, class... ARGS>
-	template <class FUNC, class... BINDS>
-	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::bind(const FUNC& func, const BINDS&... binds) noexcept
+	template <class FUNC>
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::bind(FUNC&& func) noexcept
 	{
-		return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::BindFromFunction<Tuple<BINDS...>, FUNC, RET_TYPE, ARGS...>(func, Tuple<BINDS...>(binds...)));
+		return create(Forward<FUNC>(func));
+	}
+	
+	template <class RET_TYPE, class... ARGS>
+	template <class FUNC, class... BINDS>
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::bind(FUNC&& func, const BINDS&... binds) noexcept
+	{
+		return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::BindFromFunction<Tuple<BINDS...>, typename RemoveConstReference<FUNC>::Type, RET_TYPE, ARGS...>(Forward<FUNC>(func), Tuple<BINDS...>(binds...)));
+	}
+	
+	template <class RET_TYPE, class... ARGS>
+	template <class CLASS, class FUNC>
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::bindMember(CLASS* object, const FUNC& func) noexcept
+	{
+		return fromMember(object, func);
 	}
 	
 	template <class RET_TYPE, class... ARGS>
 	template <class CLASS, class FUNC, class... BINDS>
-	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::bindClass(CLASS* object, FUNC func, const BINDS&... binds) noexcept
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::bindMember(CLASS* object, const FUNC& func, const BINDS&... binds) noexcept
 	{
 		if (object) {
-			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::BindFromClass<Tuple<BINDS...>, CLASS, FUNC, RET_TYPE, ARGS...>(object, func, Tuple<BINDS...>(binds...)));
+			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::BindFromMember<Tuple<BINDS...>, CLASS, FUNC, RET_TYPE, ARGS...>(object, func, Tuple<BINDS...>(binds...)));
 		}
 		return sl_null;
 	}
 	
 	template <class RET_TYPE, class... ARGS>
+	template <class CLASS, class FUNC>
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::bindRef(CLASS* object, const FUNC& func) noexcept
+	{
+		return fromRef(object, func);
+	}
+	
+	template <class RET_TYPE, class... ARGS>
 	template <class CLASS, class FUNC, class... BINDS>
-	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::bindRef(const Ref<CLASS>& object, FUNC func, const BINDS&... binds) noexcept
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::bindRef(CLASS* object, const FUNC& func, const BINDS&... binds) noexcept
+	{
+		if (object) {
+			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::BindFromRef<Tuple<BINDS...>, CLASS, FUNC, RET_TYPE, ARGS...>(object, func, Tuple<BINDS...>(binds...)));
+		}
+		return sl_null;
+	}
+	
+	template <class RET_TYPE, class... ARGS>
+	template <class CLASS, class FUNC>
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::bindRef(const Ref<CLASS>& object, const FUNC& func) noexcept
+	{
+		return fromRef(object, func);
+	}
+	
+	template <class RET_TYPE, class... ARGS>
+	template <class CLASS, class FUNC, class... BINDS>
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::bindRef(const Ref<CLASS>& object, const FUNC& func, const BINDS&... binds) noexcept
 	{
 		if (object.isNotNull()) {
 			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::BindFromRef<Tuple<BINDS...>, CLASS, FUNC, RET_TYPE, ARGS...>(object, func, Tuple<BINDS...>(binds...)));
@@ -365,8 +733,32 @@ namespace slib
 	}
 	
 	template <class RET_TYPE, class... ARGS>
+	template <class CLASS, class FUNC>
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::bindWeakRef(CLASS* object, const FUNC& func) noexcept
+	{
+		return fromWeakRef(object, func);
+	}
+	
+	template <class RET_TYPE, class... ARGS>
 	template <class CLASS, class FUNC, class... BINDS>
-	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::bindWeakRef(const WeakRef<CLASS>& object, FUNC func, const BINDS&... binds) noexcept
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::bindWeakRef(CLASS* object, const FUNC& func, const BINDS&... binds) noexcept
+	{
+		if (object) {
+			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::BindFromWeakRef<Tuple<BINDS...>, CLASS, FUNC, RET_TYPE, ARGS...>(object, func, Tuple<BINDS...>(binds...)));
+		}
+		return sl_null;
+	}
+	
+	template <class RET_TYPE, class... ARGS>
+	template <class CLASS, class FUNC>
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::bindWeakRef(const WeakRef<CLASS>& object, const FUNC& func) noexcept
+	{
+		return fromWeakRef(object, func);
+	}
+	
+	template <class RET_TYPE, class... ARGS>
+	template <class CLASS, class FUNC, class... BINDS>
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::bindWeakRef(const WeakRef<CLASS>& object, const FUNC& func, const BINDS&... binds) noexcept
 	{
 		if (object.isNotNull()) {
 			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::BindFromWeakRef<Tuple<BINDS...>, CLASS, FUNC, RET_TYPE, ARGS...>(object, func, Tuple<BINDS...>(binds...)));
@@ -376,30 +768,30 @@ namespace slib
 	
 	template <class RET_TYPE, class... ARGS>
 	template <class CLASS, class FUNC>
-	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::with(const Ref<CLASS>& object, FUNC func) noexcept
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::with(const Ref<CLASS>& object, FUNC&& func) noexcept
 	{
 		if (object.isNotNull()) {
-			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::CallableWithRef<CLASS, FUNC, RET_TYPE, ARGS...>(object, func));
+			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::CallableWithRef<CLASS, typename RemoveConstReference<FUNC>::Type, RET_TYPE, ARGS...>(object, Forward<FUNC>(func)));
 		}
 		return sl_null;
 	}
 	
 	template <class RET_TYPE, class... ARGS>
 	template <class CLASS, class FUNC>
-	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::with(const WeakRef<CLASS>& object, FUNC func) noexcept
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::with(const WeakRef<CLASS>& object, FUNC&& func) noexcept
 	{
 		if (object.isNotNull()) {
-			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::CallableWithWeakRef<CLASS, FUNC, RET_TYPE, ARGS...>(object, func));
+			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::CallableWithWeakRef<CLASS, typename RemoveConstReference<FUNC>::Type, RET_TYPE, ARGS...>(object, Forward<FUNC>(func)));
 		}
 		return sl_null;
 	}
 	
 	
 	template <class CLASS, class RET_TYPE, class... ARGS>
-	SLIB_INLINE Function<RET_TYPE(ARGS...)> CreateFunctionFromClass(CLASS* object, RET_TYPE (CLASS::*func)(ARGS...)) noexcept
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> CreateFunctionFromMember(CLASS* object, RET_TYPE (CLASS::*func)(ARGS...)) noexcept
 	{
 		if (object) {
-			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::CallableFromClass<CLASS, RET_TYPE (CLASS::*)(ARGS...), RET_TYPE, ARGS...>(object, func));
+			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::CallableFromMember<CLASS, RET_TYPE (CLASS::*)(ARGS...), RET_TYPE, ARGS...>(object, func));
 		}
 		return sl_null;
 	}
@@ -462,14 +854,14 @@ namespace slib
 	}
 	
 	template <class RET_TYPE, class... ARGS>
-	RET_TYPE FunctionList<RET_TYPE(ARGS...)>::invoke(ARGS... params)
+	RET_TYPE FunctionList<RET_TYPE(ARGS...)>::invoke(ARGS... args)
 	{
 		ListElements< Function<RET_TYPE(ARGS...)> > functions(list);
 		for (sl_size i = 0; i < functions.count; i++) {
 			if (i + 1 == functions.count) {
-				return functions[i](params...);
+				return functions[i](args...);
 			} else {
-				functions[i](params...);
+				functions[i](args...);
 			}
 		}
 		return NullValue<RET_TYPE>::get();

@@ -225,7 +225,7 @@ namespace slib
 					if (m_flagRunning) {
 						return;
 					}
-					m_thread = Thread::start(SLIB_FUNCTION_CLASS(AudioPlayerBufferImpl, run, this));
+					m_thread = Thread::start(SLIB_FUNCTION_MEMBER(AudioPlayerBufferImpl, run, this));
 					if (m_thread.isNotNull()) {
 						m_flagRunning = sl_true;
 					}

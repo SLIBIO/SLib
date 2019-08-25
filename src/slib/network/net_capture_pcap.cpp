@@ -98,7 +98,7 @@ namespace slib
 							if (ret.isNotNull()) {
 								ret->_initWithParam(param);
 								ret->m_handle = handle;
-								ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(PcapCapture, _run, ret.get()));
+								ret->m_thread = Thread::create(SLIB_FUNCTION_MEMBER(PcapCapture, _run, ret.get()));
 								if (ret->m_thread.isNotNull()) {
 									ret->m_flagInit = sl_true;
 									if (param.flagAutoStart) {
@@ -130,7 +130,7 @@ namespace slib
 												if (ret.isNotNull()) {
 													ret->_initWithParam(param);
 													ret->m_handle = handle;
-													ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(PcapCapture, _run, ret.get()));
+													ret->m_thread = Thread::create(SLIB_FUNCTION_MEMBER(PcapCapture, _run, ret.get()));
 													if (ret->m_thread.isNotNull()) {
 														ret->m_flagInit = sl_true;
 														if (param.flagAutoStart) {

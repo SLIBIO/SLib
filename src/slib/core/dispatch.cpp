@@ -114,7 +114,7 @@ namespace slib
 	{
 		Ref<DispatchLoop> ret = new DispatchLoop;
 		if (ret.isNotNull()) {
-			ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(DispatchLoop, _runLoop, ret.get()));
+			ret->m_thread = Thread::create(SLIB_FUNCTION_MEMBER(DispatchLoop, _runLoop, ret.get()));
 			if (ret->m_thread.isNotNull()) {
 				ret->m_flagInit = sl_true;
 				if (flagAutoStart) {

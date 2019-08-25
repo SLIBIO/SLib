@@ -30,7 +30,7 @@ namespace slib
 	WebService::WebService()
 	{
 		m_controller = WebController::create();
-		m_httpParam.onRequest = SLIB_FUNCTION_CLASS(WebService, onHttpRequest, this);
+		m_httpParam.onRequest = SLIB_FUNCTION_MEMBER(WebService, onHttpRequest, this);
 	}
 
 	WebService::~WebService()

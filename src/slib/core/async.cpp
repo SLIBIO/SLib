@@ -69,7 +69,7 @@ namespace slib
 			Ref<AsyncIoLoop> ret = new AsyncIoLoop;
 			if (ret.isNotNull()) {
 				ret->m_handle = handle;
-				ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(AsyncIoLoop, _native_runLoop, ret.get()));
+				ret->m_thread = Thread::create(SLIB_FUNCTION_MEMBER(AsyncIoLoop, _native_runLoop, ret.get()));
 				if (ret->m_thread.isNotNull()) {
 					ret->m_flagInit = sl_true;
 					if (flagAutoStart) {
