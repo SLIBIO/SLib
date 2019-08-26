@@ -510,6 +510,57 @@ namespace slib
 			};
 			
 			template <class CLASS, class FUNC, class RET_TYPE, class... ARGS>
+			class CallableFromPtr : public Callable<RET_TYPE(ARGS...)>
+			{
+			protected:
+				Ptr<CLASS> object;
+				FUNC func;
+				
+			public:
+				template <class T>
+				SLIB_INLINE CallableFromPtr(T&& _object, const FUNC& _func) noexcept
+				: object(Forward<T>(_object)), func(_func)
+				{}
+				
+			public:
+				RET_TYPE invoke(ARGS... args) override
+				{
+					Ptr<CLASS> o(object.lock());
+					if (o.isNotNull()) {
+						return FunctionInvoker<RET_TYPE>::invokeMember(o._ptr, func, Forward<ARGS>(args)...);
+					} else {
+						return NullValue<RET_TYPE>::get();
+					}
+				}
+			};
+			
+			template <class BIND_TUPLE, class CLASS, class FUNC, class RET_TYPE, class... ARGS>
+			class BindFromPtr : public Callable<RET_TYPE(ARGS...)>
+			{
+			protected:
+				Ptr<CLASS> object;
+				FUNC func;
+				BIND_TUPLE binds;
+				
+			public:
+				template <class T, class OTHER_BIND_TUPLE>
+				SLIB_INLINE BindFromPtr(T&& _object, const FUNC& _func, OTHER_BIND_TUPLE&& _binds) noexcept
+				: object(Forward<T>(_object)), func(_func), binds(Forward<OTHER_BIND_TUPLE>(_binds))
+				{}
+				
+			public:
+				RET_TYPE invoke(ARGS... args) override
+				{
+					Ptr<CLASS> o(object.lock());
+					if (o.isNotNull()) {
+						return BindInvoker<RET_TYPE>::invokeMember(o._ptr, func, binds, Forward<ARGS>(args)...);
+					} else {
+						return NullValue<RET_TYPE>::get();
+					}
+				}
+			};
+			
+			template <class CLASS, class FUNC, class RET_TYPE, class... ARGS>
 			class CallableWithRef : public Callable<RET_TYPE(ARGS...)>
 			{
 			protected:
@@ -546,6 +597,31 @@ namespace slib
 				RET_TYPE invoke(ARGS... args) override
 				{
 					Ref<CLASS> o(object);
+					if (o.isNotNull()) {
+						return FunctionInvoker<RET_TYPE>::invoke(func, Forward<ARGS>(args)...);
+					} else {
+						return NullValue<RET_TYPE>::get();
+					}
+				}
+			};
+			
+			template <class CLASS, class FUNC, class RET_TYPE, class... ARGS>
+			class CallableWithPtr : public Callable<RET_TYPE(ARGS...)>
+			{
+			protected:
+				Ptr<CLASS> object;
+				FUNC func;
+				
+			public:
+				template <class OTHER_CLASS, class OTHER_FUNC>
+				SLIB_INLINE CallableWithPtr(OTHER_CLASS&& _object, OTHER_FUNC&& _func) noexcept
+				: object(Forward<OTHER_CLASS>(_object)), func(Forward<OTHER_FUNC>(_func))
+				{}
+				
+			public:
+				RET_TYPE invoke(ARGS... args) override
+				{
+					Ptr<CLASS> o(object.lock());
 					if (o.isNotNull()) {
 						return FunctionInvoker<RET_TYPE>::invoke(func, Forward<ARGS>(args)...);
 					} else {
@@ -668,6 +744,16 @@ namespace slib
 	}
 	
 	template <class RET_TYPE, class... ARGS>
+	template <class CLASS, class FUNC>
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::fromPtr(const Ptr<CLASS>& object, const FUNC& func) noexcept
+	{
+		if (object.isNotNull()) {
+			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::CallableFromPtr<CLASS, FUNC, RET_TYPE, ARGS...>(object, func));
+		}
+		return sl_null;
+	}
+	
+	template <class RET_TYPE, class... ARGS>
 	template <class FUNC>
 	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::bind(FUNC&& func) noexcept
 	{
@@ -768,6 +854,23 @@ namespace slib
 	
 	template <class RET_TYPE, class... ARGS>
 	template <class CLASS, class FUNC>
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::bindPtr(const Ptr<CLASS>& object, const FUNC& func) noexcept
+	{
+		return fromPtr(object, func);
+	}
+	
+	template <class RET_TYPE, class... ARGS>
+	template <class CLASS, class FUNC, class... BINDS>
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::bindPtr(const Ptr<CLASS>& object, const FUNC& func, const BINDS&... binds) noexcept
+	{
+		if (object.isNotNull()) {
+			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::BindFromPtr<Tuple<BINDS...>, CLASS, FUNC, RET_TYPE, ARGS...>(object, func, Tuple<BINDS...>(binds...)));
+		}
+		return sl_null;
+	}
+	
+	template <class RET_TYPE, class... ARGS>
+	template <class CLASS, class FUNC>
 	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::with(const Ref<CLASS>& object, FUNC&& func) noexcept
 	{
 		if (object.isNotNull()) {
@@ -782,6 +885,16 @@ namespace slib
 	{
 		if (object.isNotNull()) {
 			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::CallableWithWeakRef<CLASS, typename RemoveConstReference<FUNC>::Type, RET_TYPE, ARGS...>(object, Forward<FUNC>(func)));
+		}
+		return sl_null;
+	}
+	
+	template <class RET_TYPE, class... ARGS>
+	template <class CLASS, class FUNC>
+	SLIB_INLINE Function<RET_TYPE(ARGS...)> Function<RET_TYPE(ARGS...)>::with(const Ptr<CLASS>& object, FUNC&& func) noexcept
+	{
+		if (object.isNotNull()) {
+			return static_cast<Callable<RET_TYPE(ARGS...)>*>(new priv::function::CallableWithPtr<CLASS, typename RemoveConstReference<FUNC>::Type, RET_TYPE, ARGS...>(object, Forward<FUNC>(func)));
 		}
 		return sl_null;
 	}

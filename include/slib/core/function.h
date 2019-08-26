@@ -26,6 +26,7 @@
 #include "definition.h"
 
 #include "ref.h"
+#include "ptr.h"
 #include "tuple.h"
 #include "null_value.h"
 #include "list.h"
@@ -103,6 +104,9 @@ namespace slib
 		template <class CLASS, class FUNC>
 		static Function<RET_TYPE(ARGS...)> fromWeakRef(const WeakRef<CLASS>& object, const FUNC& func) noexcept;
 		
+		template <class CLASS, class FUNC>
+		static Function<RET_TYPE(ARGS...)> fromPtr(const Ptr<CLASS>& object, const FUNC& func) noexcept;
+		
 		template <class FUNC>
 		static Function<RET_TYPE(ARGS...)> bind(FUNC&& func) noexcept;
 
@@ -140,10 +144,19 @@ namespace slib
 		static Function<RET_TYPE(ARGS...)> bindWeakRef(const WeakRef<CLASS>& object, const FUNC& func, const BINDS&... binds) noexcept;
 		
 		template <class CLASS, class FUNC>
+		static Function<RET_TYPE(ARGS...)> bindPtr(const Ptr<CLASS>& object, const FUNC& func) noexcept;
+		
+		template <class CLASS, class FUNC, class... BINDS>
+		static Function<RET_TYPE(ARGS...)> bindPtr(const Ptr<CLASS>& object, const FUNC& func, const BINDS&... binds) noexcept;
+		
+		template <class CLASS, class FUNC>
 		static Function<RET_TYPE(ARGS...)> with(const Ref<CLASS>& object, FUNC&& func) noexcept;
 
 		template <class CLASS, class FUNC>
 		static Function<RET_TYPE(ARGS...)> with(const WeakRef<CLASS>& object, FUNC&& func) noexcept;
+		
+		template <class CLASS, class FUNC>
+		static Function<RET_TYPE(ARGS...)> with(const Ptr<CLASS>& object, FUNC&& func) noexcept;
 		
 		static Function<RET_TYPE(ARGS...)> fromList(const List< Function<RET_TYPE(ARGS...)> >&) noexcept;
 		
