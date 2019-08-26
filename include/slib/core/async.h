@@ -28,7 +28,6 @@
 #include "dispatch_loop.h"
 #include "file.h"
 #include "variant.h"
-#include "ptr.h"
 #include "function.h"
 
 namespace slib

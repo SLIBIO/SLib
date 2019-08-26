@@ -199,8 +199,10 @@ public: \
 	SLIB_INLINE WRAPPER(sl_null_t) noexcept {} \
 	SLIB_INLINE WRAPPER(__VA_ARGS__* obj) noexcept : ref(obj) {} \
 	SLIB_INLINE WRAPPER(const WRAPPER& other) noexcept : ref(other.ref) {} \
+	SLIB_INLINE WRAPPER(WRAPPER& other) noexcept : ref(other.ref) {} \
 	SLIB_INLINE WRAPPER(WRAPPER&& other) noexcept : ref(Move(other.ref)) {} \
 	WRAPPER(const Atomic<WRAPPER>& other) noexcept : ref(*(reinterpret_cast<const AtomicRef<__VA_ARGS__>*>(&other))) {} \
+	WRAPPER(Atomic<WRAPPER>& other) noexcept : ref(*(reinterpret_cast<const AtomicRef<__VA_ARGS__>*>(&other))) {} \
 	WRAPPER(Atomic<WRAPPER>&& other) noexcept : ref(Move(*(reinterpret_cast<AtomicRef<__VA_ARGS__>*>(&other)))) {} \
 	SLIB_INLINE static const WRAPPER& null() noexcept { return *(reinterpret_cast<WRAPPER const*>(&(priv::ref::g_null))); } \
 	SLIB_INLINE sl_bool isNull() const noexcept { return ref.isNull(); } \
@@ -227,8 +229,10 @@ public: \
 	Atomic(sl_null_t) noexcept {} \
 	Atomic(__VA_ARGS__* obj) noexcept : ref(obj) {} \
 	Atomic(typename RemoveAtomic<Atomic>::Type const& other) noexcept : ref(*(reinterpret_cast<const Ref<__VA_ARGS__>*>(&other))) {} \
+	Atomic(typename RemoveAtomic<Atomic>::Type& other) noexcept : ref(*(reinterpret_cast<const Ref<__VA_ARGS__>*>(&other))) {} \
 	Atomic(typename RemoveAtomic<Atomic>::Type&& other) noexcept : ref(Move(*(reinterpret_cast<Ref<__VA_ARGS__>*>(&other)))) {} \
 	Atomic(const Atomic& other) noexcept : ref(other.ref) {} \
+	Atomic(Atomic& other) noexcept : ref(other.ref) {} \
 	Atomic(Atomic&& other) noexcept : ref(Move(other.ref)) {} \
 	sl_bool isNull() const noexcept { return ref.isNull(); } \
 	sl_bool isNotNull() const noexcept { return ref.isNotNull(); } \

@@ -37,7 +37,6 @@
 #include "definition.h"
 
 #include "../network/url_request.h"
-#include "../core/ptr.h"
 
 namespace slib
 {
@@ -85,8 +84,6 @@ namespace slib
 		virtual void show(const OAuthWebRedirectDialogParam& param) = 0;
 		
 		virtual void close() = 0;
-		
-		virtual void clearCookie();
 		
 	public:
 		static Ptr<OAuthWebRedirectDialog> getDefault();

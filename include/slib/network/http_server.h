@@ -30,7 +30,6 @@
 #include "socket_address.h"
 
 #include "../core/thread_pool.h"
-#include "../core/ptr.h"
 #include "../crypto/tls.h"
 
 namespace slib

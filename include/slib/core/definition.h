@@ -46,6 +46,8 @@ typedef size_t				sl_size_t;
 #	define SLIB_EXPORT
 #	define SLIB_VISIBLE_LOCAL
 
+#	pragma warning(disable: 4521)
+
 #elif defined(SLIB_COMPILER_IS_GCC)
 
 #	if ! defined (__OPTIMIZE__)
