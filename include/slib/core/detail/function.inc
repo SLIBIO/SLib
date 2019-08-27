@@ -357,6 +357,12 @@ namespace slib
 				}
 			};
 			
+			// prevent infinite encapsulation
+			template <class RET_TYPE, class... ARGS>
+			class CallableFromFunction<Function<RET_TYPE(ARGS...)>, RET_TYPE, ARGS...> : public Callable<RET_TYPE(ARGS...)> {};
+			template <class RET_TYPE, class... ARGS>
+			class CallableFromFunction<Atomic< Function<RET_TYPE(ARGS...)> >, RET_TYPE, ARGS...> : public Callable<RET_TYPE(ARGS...)> {};
+
 			template <class BIND_TUPLE, class FUNC, class RET_TYPE, class... ARGS>
 			class BindFromFunction : public Callable<RET_TYPE(ARGS...)>
 			{

@@ -47,6 +47,7 @@ typedef size_t				sl_size_t;
 #	define SLIB_VISIBLE_LOCAL
 
 #	pragma warning(disable: 4521)
+#	pragma warning(disable: 4522)
 
 #elif defined(SLIB_COMPILER_IS_GCC)
 

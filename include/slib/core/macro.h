@@ -200,9 +200,11 @@ public: \
 	SLIB_INLINE WRAPPER(__VA_ARGS__* obj) noexcept : ref(obj) {} \
 	SLIB_INLINE WRAPPER(const WRAPPER& other) noexcept : ref(other.ref) {} \
 	SLIB_INLINE WRAPPER(WRAPPER& other) noexcept : ref(other.ref) {} \
+	SLIB_INLINE WRAPPER(const WRAPPER&& other) noexcept : ref(Move(other.ref)) {} \
 	SLIB_INLINE WRAPPER(WRAPPER&& other) noexcept : ref(Move(other.ref)) {} \
 	WRAPPER(const Atomic<WRAPPER>& other) noexcept : ref(*(reinterpret_cast<const AtomicRef<__VA_ARGS__>*>(&other))) {} \
 	WRAPPER(Atomic<WRAPPER>& other) noexcept : ref(*(reinterpret_cast<const AtomicRef<__VA_ARGS__>*>(&other))) {} \
+	WRAPPER(const Atomic<WRAPPER>&& other) noexcept : ref(Move(*(reinterpret_cast<const AtomicRef<__VA_ARGS__>*>(&other)))) {} \
 	WRAPPER(Atomic<WRAPPER>&& other) noexcept : ref(Move(*(reinterpret_cast<AtomicRef<__VA_ARGS__>*>(&other)))) {} \
 	SLIB_INLINE static const WRAPPER& null() noexcept { return *(reinterpret_cast<WRAPPER const*>(&(priv::ref::g_null))); } \
 	SLIB_INLINE sl_bool isNull() const noexcept { return ref.isNull(); } \
@@ -211,8 +213,12 @@ public: \
 	WRAPPER& operator=(sl_null_t) noexcept { ref.setNull(); return *this; } \
 	WRAPPER& operator=(__VA_ARGS__* obj) noexcept { ref = obj; return *this; } \
 	WRAPPER& operator=(const WRAPPER& other) noexcept { ref = other.ref; return *this; } \
+	WRAPPER& operator=(WRAPPER& other) noexcept { ref = other.ref; return *this; } \
+	WRAPPER& operator=(const WRAPPER&& other) noexcept { ref = Move(other.ref); return *this; } \
 	WRAPPER& operator=(WRAPPER&& other) noexcept { ref = Move(other.ref); return *this; } \
 	WRAPPER& operator=(const Atomic<WRAPPER>& other) noexcept { ref = *(reinterpret_cast<const AtomicRef<__VA_ARGS__>*>(&other)); return *this; } \
+	WRAPPER& operator=(Atomic<WRAPPER>& other) noexcept { ref = *(reinterpret_cast<const AtomicRef<__VA_ARGS__>*>(&other)); return *this; } \
+	WRAPPER& operator=(const Atomic<WRAPPER>&& other) noexcept { ref = Move(*(reinterpret_cast<const AtomicRef<__VA_ARGS__>*>(&other))); return *this; } \
 	WRAPPER& operator=(Atomic<WRAPPER>&& other) noexcept { ref = Move(*(reinterpret_cast<AtomicRef<__VA_ARGS__>*>(&other))); return *this; }
 
 #define SLIB_REF_WRAPPER(WRAPPER, ...) \
@@ -230,9 +236,11 @@ public: \
 	Atomic(__VA_ARGS__* obj) noexcept : ref(obj) {} \
 	Atomic(typename RemoveAtomic<Atomic>::Type const& other) noexcept : ref(*(reinterpret_cast<const Ref<__VA_ARGS__>*>(&other))) {} \
 	Atomic(typename RemoveAtomic<Atomic>::Type& other) noexcept : ref(*(reinterpret_cast<const Ref<__VA_ARGS__>*>(&other))) {} \
+	Atomic(typename RemoveAtomic<Atomic>::Type const&& other) noexcept : ref(Move(*(reinterpret_cast<const Ref<__VA_ARGS__>*>(&other)))) {} \
 	Atomic(typename RemoveAtomic<Atomic>::Type&& other) noexcept : ref(Move(*(reinterpret_cast<Ref<__VA_ARGS__>*>(&other)))) {} \
 	Atomic(const Atomic& other) noexcept : ref(other.ref) {} \
 	Atomic(Atomic& other) noexcept : ref(other.ref) {} \
+	Atomic(const Atomic&& other) noexcept : ref(Move(other.ref)) {} \
 	Atomic(Atomic&& other) noexcept : ref(Move(other.ref)) {} \
 	sl_bool isNull() const noexcept { return ref.isNull(); } \
 	sl_bool isNotNull() const noexcept { return ref.isNotNull(); } \
@@ -240,8 +248,12 @@ public: \
 	Atomic& operator=(sl_null_t) noexcept { ref.setNull(); return *this; } \
 	Atomic& operator=(__VA_ARGS__* obj) noexcept { ref = obj; return *this; } \
 	Atomic& operator=(typename RemoveAtomic<Atomic>::Type const& other) noexcept { ref = *(reinterpret_cast<const Ref<__VA_ARGS__>*>(&other)); return *this; } \
+	Atomic& operator=(typename RemoveAtomic<Atomic>::Type& other) noexcept { ref = *(reinterpret_cast<const Ref<__VA_ARGS__>*>(&other)); return *this; } \
+	Atomic& operator=(typename RemoveAtomic<Atomic>::Type const&& other) noexcept { ref = Move(*(reinterpret_cast<const Ref<__VA_ARGS__>*>(&other))); return *this; } \
 	Atomic& operator=(typename RemoveAtomic<Atomic>::Type&& other) noexcept { ref = Move(*(reinterpret_cast<Ref<__VA_ARGS__>*>(&other))); return *this; } \
 	Atomic& operator=(const Atomic& other) noexcept { ref = other.ref; return *this; } \
+	Atomic& operator=(Atomic& other) noexcept { ref = other.ref; return *this; } \
+	Atomic& operator=(Atomic const&& other) noexcept { ref = Move(other.ref); return *this; } \
 	Atomic& operator=(Atomic&& other) noexcept { ref = Move(other.ref); return *this; }
 
 #define SLIB_ATOMIC_REF_WRAPPER(...) \
