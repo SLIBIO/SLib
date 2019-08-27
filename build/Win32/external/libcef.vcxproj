@@ -1,0 +1,355 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_atomicops_x86_gcc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_bind_helpers.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_callback_helpers.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_callback_internal.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_lock.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_lock_impl.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_logging.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_ref_counted.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_string16.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_thread_checker_impl.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_weak_ptr.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\accessibility_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\app_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\audio_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\base_ref_counted_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\base_scoped_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\browser_process_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\client_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\completion_callback_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\context_menu_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\cookie_access_filter_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\cookie_visitor_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\delete_cookies_callback_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\dialog_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\display_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\domvisitor_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\download_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\download_image_callback_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\drag_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\end_tracing_callback_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\extension_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\find_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\focus_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\jsdialog_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\keyboard_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\life_span_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\load_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\menu_model_delegate_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\navigation_entry_visitor_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\pdf_print_callback_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\print_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\read_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\register_cdm_callback_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\render_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\render_process_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\request_context_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\request_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\resolve_callback_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\resource_bundle_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\resource_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\resource_request_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\response_filter_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\run_file_dialog_callback_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\scheme_handler_factory_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\server_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\set_cookie_callback_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\string_visitor_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\task_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\urlrequest_client_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\v8accessor_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\v8array_buffer_release_callback_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\v8handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\v8interceptor_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\views\browser_view_delegate_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\views\button_delegate_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\views\menu_button_delegate_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\views\panel_delegate_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\views\textfield_delegate_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\views\view_delegate_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\views\window_delegate_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\web_plugin_info_visitor_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\web_plugin_unstable_callback_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\write_handler_cpptoc.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\auth_callback_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\before_download_callback_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\binary_value_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\browser_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\browser_host_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\callback_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\command_line_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\context_menu_params_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\cookie_manager_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\dictionary_value_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\domdocument_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\domnode_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\download_item_callback_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\download_item_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\drag_data_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\extension_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\file_dialog_callback_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\frame_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\get_extension_resource_callback_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\image_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\jsdialog_callback_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\list_value_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\menu_model_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\navigation_entry_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\post_data_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\post_data_element_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\print_dialog_callback_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\print_job_callback_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\print_settings_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\process_message_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\request_callback_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\request_context_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\request_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\resource_bundle_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\resource_read_callback_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\resource_skip_callback_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\response_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\run_context_menu_callback_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\scheme_registrar_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\select_client_certificate_callback_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\server_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\sslinfo_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\sslstatus_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\stream_reader_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\stream_writer_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\task_runner_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\thread_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\urlrequest_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\v8context_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\v8exception_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\v8stack_frame_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\v8stack_trace_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\v8value_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\value_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\waitable_event_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\web_plugin_info_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\x509certificate_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\x509cert_principal_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\xml_reader_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\zip_reader_ctocpp.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\shutdown_checker.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\transfer_util.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\cef_byte_read_handler.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\cef_closure_task.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\cef_message_router.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\cef_resource_manager.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\cef_scoped_temp_dir.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\cef_stream_resource_handler.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\cef_xml_object.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\cef_zip_archive.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\libcef_dll_wrapper.cc" />
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\libcef_dll_wrapper2.cc" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{78039D5C-C2B0-463B-AA81-27BAA602185F}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>slib</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>libcef</TargetName>
+    <IncludePath>$(ProjectDir)../../../external/src/libcef;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>libcef</TargetName>
+    <IncludePath>$(ProjectDir)../../../external/src/libcef;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>libcef</TargetName>
+    <IncludePath>$(ProjectDir)../../../external/src/libcef;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IntDir>$(ProjectDir)..\build\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)..\..\..\lib\Win32\$(Configuration)-$(Platform)\</OutDir>
+    <TargetName>libcef</TargetName>
+    <IncludePath>$(ProjectDir)../../../external/src/libcef;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>WRAPPING_CEF_SHARED;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions>/wd4996 /wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>WRAPPING_CEF_SHARED;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions>/wd4996 /wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WRAPPING_CEF_SHARED;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>/wd4996 /wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WRAPPING_CEF_SHARED;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>/wd4996 /wd4267 %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

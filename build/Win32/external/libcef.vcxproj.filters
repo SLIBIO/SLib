@@ -1,0 +1,460 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{2dfbb5a6-3e6a-4f96-ae7e-c1455f2c5226}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\base">
+      <UniqueIdentifier>{0fff1aa6-7c50-4193-8618-37ea0b023f4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\cpptoc">
+      <UniqueIdentifier>{8d4a6fb4-36e2-4aa5-86b5-92388c6f2fed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\cpptoc\views">
+      <UniqueIdentifier>{b42598f7-381a-4545-8a09-017cb302ce80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ctocpp">
+      <UniqueIdentifier>{030a2c57-f679-4dc8-86c9-9705b4a027d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\wrapper">
+      <UniqueIdentifier>{e59ccc2f-6633-470f-8d9b-7cc6af90fe92}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\shutdown_checker.cc">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\transfer_util.cc">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_atomicops_x86_gcc.cc">
+      <Filter>src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_bind_helpers.cc">
+      <Filter>src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_callback_helpers.cc">
+      <Filter>src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_callback_internal.cc">
+      <Filter>src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_lock.cc">
+      <Filter>src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_lock_impl.cc">
+      <Filter>src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_logging.cc">
+      <Filter>src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_ref_counted.cc">
+      <Filter>src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_string16.cc">
+      <Filter>src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_thread_checker_impl.cc">
+      <Filter>src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\base\cef_weak_ptr.cc">
+      <Filter>src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\accessibility_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\app_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\audio_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\base_ref_counted_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\base_scoped_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\browser_process_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\client_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\completion_callback_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\context_menu_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\cookie_access_filter_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\cookie_visitor_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\delete_cookies_callback_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\dialog_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\display_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\domvisitor_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\download_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\download_image_callback_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\drag_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\end_tracing_callback_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\extension_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\find_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\focus_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\jsdialog_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\keyboard_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\life_span_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\load_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\menu_model_delegate_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\navigation_entry_visitor_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\pdf_print_callback_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\print_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\read_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\register_cdm_callback_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\render_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\render_process_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\request_context_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\request_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\resolve_callback_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\resource_bundle_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\resource_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\resource_request_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\response_filter_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\run_file_dialog_callback_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\scheme_handler_factory_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\server_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\set_cookie_callback_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\string_visitor_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\task_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\urlrequest_client_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\v8accessor_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\v8array_buffer_release_callback_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\v8handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\v8interceptor_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\web_plugin_info_visitor_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\web_plugin_unstable_callback_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\write_handler_cpptoc.cc">
+      <Filter>src\cpptoc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\views\browser_view_delegate_cpptoc.cc">
+      <Filter>src\cpptoc\views</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\views\button_delegate_cpptoc.cc">
+      <Filter>src\cpptoc\views</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\views\menu_button_delegate_cpptoc.cc">
+      <Filter>src\cpptoc\views</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\views\panel_delegate_cpptoc.cc">
+      <Filter>src\cpptoc\views</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\views\textfield_delegate_cpptoc.cc">
+      <Filter>src\cpptoc\views</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\views\view_delegate_cpptoc.cc">
+      <Filter>src\cpptoc\views</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\cpptoc\views\window_delegate_cpptoc.cc">
+      <Filter>src\cpptoc\views</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\auth_callback_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\before_download_callback_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\binary_value_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\browser_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\browser_host_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\callback_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\command_line_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\context_menu_params_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\cookie_manager_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\dictionary_value_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\domdocument_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\domnode_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\download_item_callback_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\download_item_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\drag_data_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\extension_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\file_dialog_callback_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\frame_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\get_extension_resource_callback_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\image_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\jsdialog_callback_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\list_value_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\menu_model_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\navigation_entry_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\post_data_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\post_data_element_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\print_dialog_callback_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\print_job_callback_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\print_settings_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\process_message_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\request_callback_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\request_context_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\request_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\resource_bundle_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\resource_read_callback_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\resource_skip_callback_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\response_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\run_context_menu_callback_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\scheme_registrar_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\select_client_certificate_callback_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\server_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\sslinfo_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\sslstatus_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\stream_reader_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\stream_writer_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\task_runner_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\thread_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\urlrequest_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\v8context_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\v8exception_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\v8stack_frame_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\v8stack_trace_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\v8value_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\value_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\waitable_event_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\web_plugin_info_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\x509cert_principal_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\x509certificate_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\xml_reader_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\ctocpp\zip_reader_ctocpp.cc">
+      <Filter>src\ctocpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\cef_byte_read_handler.cc">
+      <Filter>src\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\cef_closure_task.cc">
+      <Filter>src\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\cef_message_router.cc">
+      <Filter>src\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\cef_resource_manager.cc">
+      <Filter>src\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\cef_scoped_temp_dir.cc">
+      <Filter>src\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\cef_stream_resource_handler.cc">
+      <Filter>src\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\cef_xml_object.cc">
+      <Filter>src\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\cef_zip_archive.cc">
+      <Filter>src\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\libcef_dll_wrapper.cc">
+      <Filter>src\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\external\src\libcef\libcef_dll\wrapper\libcef_dll_wrapper2.cc">
+      <Filter>src\wrapper</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
