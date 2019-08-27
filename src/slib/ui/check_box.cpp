@@ -151,19 +151,21 @@ namespace slib
 	{
 		Ptr<ICheckBoxInstance> instance = getCheckBoxInstance();
 		if (instance.isNotNull()) {
-			instance->getChecked(m_flagChecked);
+			instance->getChecked(this, m_flagChecked);
 		}
 		return m_flagChecked;
 	}
 
 	void CheckBox::setChecked(sl_bool flag, UIUpdateMode mode)
 	{
-		m_flagChecked = flag;
 		Ptr<ICheckBoxInstance> instance = getCheckBoxInstance();
 		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&CheckBox::setChecked, flag, mode)
+			m_flagChecked = flag;
 			setCurrentCategory(flag ? 1 : 0, UIUpdateMode::None);
-			instance->setChecked(flag);
+			instance->setChecked(this, flag);
 		} else {
+			m_flagChecked = flag;
 			setCurrentCategory(flag ? 1 : 0, mode);
 		}
 	}

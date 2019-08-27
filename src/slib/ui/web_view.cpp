@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,9 @@
 
 #include "slib/core/definition.h"
 
-#ifndef SLIB_UI_IS_GTK
-
 #include "slib/ui/web_view.h"
+
+#include "slib/ui/core.h"
 
 namespace slib
 {
@@ -37,7 +37,6 @@ namespace slib
 		setFocusable(sl_true);
 		
 		m_flagOfflineContent = sl_false;
-		m_flagClearCacheOnAttach = sl_false;
 	}
 	
 	WebView::~WebView()
@@ -46,21 +45,29 @@ namespace slib
 
 	void WebView::loadURL(const String& url)
 	{
+		Ptr<IWebViewInstance> instance = getWebViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&WebView::loadURL, url)
+		}
 		m_flagOfflineContent = sl_false;
 		m_offlineContentHTML.setNull();
 		m_urlOrigin = url;
-		if (isNativeWidget()) {
-			_load_NW();
+		if (instance.isNotNull()) {
+			instance->load(this);
 		}
 	}
 	
 	void WebView::loadHTML(const String& html, const String& baseURL)
 	{
+		Ptr<IWebViewInstance> instance = getWebViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&WebView::loadHTML, html, baseURL)
+		}
 		m_flagOfflineContent = sl_true;
 		m_offlineContentHTML = html;
 		m_urlOrigin = baseURL;
-		if (isNativeWidget()) {
-			_load_NW();
+		if (instance.isNotNull()) {
+			instance->load(this);
 		}
 	}
 	
@@ -76,66 +83,63 @@ namespace slib
 	
 	String WebView::getURL()
 	{
-		if (isNativeWidget()) {
-			return _getURL_NW();
+		Ptr<IWebViewInstance> instance = getWebViewInstance();
+		if (instance.isNotNull()) {
+			String url;
+			if (instance->getURL(this, url)) {
+				return url;
+			}
 		}
-		return sl_null;
+		return m_urlOrigin;
 	}
 	
 	String WebView::getPageTitle()
 	{
-		if (isNativeWidget()) {
-			return _getPageTitle_NW();
+		Ptr<IWebViewInstance> instance = getWebViewInstance();
+		if (instance.isNotNull()) {
+			String title;
+			if (instance->getPageTitle(this, title)) {
+				return title;
+			}
 		}
 		return sl_null;
 	}
 	
 	void WebView::goBack()
 	{
-		if (isNativeWidget()) {
-			_goBack_NW();
+		Ptr<IWebViewInstance> instance = getWebViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&WebView::goBack)
+			instance->goBack(this);
 		}
 	}
 	
 	void WebView::goForward()
 	{
-		if (isNativeWidget()) {
-			_goForward_NW();
+		Ptr<IWebViewInstance> instance = getWebViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&WebView::goForward)
+			instance->goForward(this);
 		}
 	}
 	
 	void WebView::reload()
 	{
-		if (isNativeWidget()) {
-			_reload_NW();
+		Ptr<IWebViewInstance> instance = getWebViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&WebView::reload)
+			instance->reload(this);
 		}
 	}
 	
 	void WebView::runJavaScript(const String& script)
 	{
-		if (isNativeWidget()) {
-			_runJavaScript_NW(script);
+		Ptr<IWebViewInstance> instance = getWebViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&WebView::runJavaScript, script)
+			instance->runJavaScript(this, script);
 		}
 	}
-	
-	void WebView::clearCache()
-	{
-#if defined(SLIB_PLATFORM_IS_APPLE) || defined(SLIB_PLATFORM_IS_WIN32)
-		_clearCache_NW();
-#else
-		if (isNativeWidget()) {
-			_clearCache_NW();
-		} else {
-			m_flagClearCacheOnAttach = sl_true;
-		}
-#endif
-	}
-
-	void WebView::clearCookie()
-	{
-		_clearCookie_NW();
-	}
-	
 	
 	String WebView::getErrorMessage()
 	{
@@ -149,8 +153,14 @@ namespace slib
 	
 	void WebView::setCustomUserAgent(const String& userAgent)
 	{
-		m_customUserAgent = userAgent;
-		_setCustomUserAgent_NW();
+		Ptr<IWebViewInstance> instance = getWebViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&WebView::setCustomUserAgent, userAgent)
+			m_customUserAgent = userAgent;
+			instance->setCustomUserAgent(this, userAgent);
+		} else {
+			m_customUserAgent = userAgent;
+		}
 	}
 	
 	void WebView::queryUserAgent(const Function<void(WebView*, String)>& callbackQueryCompletion)
@@ -196,75 +206,33 @@ namespace slib
 		SLIB_INVOKE_EVENT_HANDLER(MessageFromJavaScript, msg, param)
 	}
 	
-	void WebView::dispatchAttach()
-	{
-		View::dispatchAttach();
-		if (m_flagClearCacheOnAttach) {
-			m_flagClearCacheOnAttach = sl_false;
-			clearCache();
-		}
-	}
-	
 	void WebView::dispatchResize(sl_ui_len width, sl_ui_len height)
 	{
 		View::dispatchResize(width, height);
-		if (isNativeWidget()) {
-			_refreshSize_NW();
+		Ptr<IWebViewInstance> instance = getWebViewInstance();
+		if (instance.isNotNull()) {
+			instance->refreshSize(this);
 		}
 	}
 	
-	
 #if !defined(SLIB_UI)
-	
 	Ref<ViewInstance> WebView::createNativeWidget(ViewInstance* parent)
 	{
 		return sl_null;
 	}
 	
-	void WebView::_refreshSize_NW()
-	{
-	}
-	
-	void WebView::_load_NW()
-	{
-	}
-	
-	String WebView::_getURL_NW()
+	Ptr<IWebViewInstance> WebView::getWebViewInstance()
 	{
 		return sl_null;
 	}
 	
-	String WebView::_getPageTitle_NW()
-	{
-		return sl_null;
-	}
-	
-	void WebView::_goBack_NW()
+	void DefaultWebViewProvider::clearCache()
 	{
 	}
 	
-	void WebView::_goForward_NW()
+	void DefaultWebViewProvider::clearCookie()
 	{
 	}
-	
-	void WebView::_reload_NW()
-	{
-	}
-	
-	void WebView::_runJavaScript_NW(const String& script)
-	{
-	}
-	
-	void WebView::_clearCache_NW()
-	{
-	}
-	
-	void WebView::_setCustomUserAgent_NW()
-	{
-	}
-	
 #endif
 
 }
-
-#endif

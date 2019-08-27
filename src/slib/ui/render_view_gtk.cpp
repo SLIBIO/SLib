@@ -25,6 +25,7 @@
 #if defined(SLIB_UI_IS_GTK)
 
 #include "slib/ui/render_view.h"
+
 #include "slib/render/opengl.h"
 
 #include "view_gtk.h"
@@ -39,8 +40,14 @@ namespace slib
 		namespace render_view
 		{
 
-			class RenderViewInstance : public GTK_ViewInstance
+			class RenderViewHelper : public RenderView
 			{
+			};
+
+			class RenderViewInstance : public GTK_ViewInstance, public IRenderViewInstance
+			{
+				SLIB_DECLARE_OBJECT
+
 			public:
 				AtomicRef<Renderer> m_renderer;
 				RenderEngine* m_pLastEngine;
@@ -60,6 +67,22 @@ namespace slib
 				}
 
 			public:
+				void setRedrawMode(RenderView* view, RedrawMode mode) override
+				{
+					Ref<Renderer> renderer = m_renderer;
+					if (renderer.isNotNull()) {
+						renderer->setRenderingContinuously(mode == RedrawMode::Continuously);
+					}
+				}
+
+				void requestRender(RenderView* view) override
+				{
+					Ref<Renderer> renderer = m_renderer;
+					if (renderer.isNotNull()) {
+						renderer->requestRender();
+					}
+				}
+
 				void setRenderer(const Ref<Renderer>& renderer, RedrawMode redrawMode)
 				{
 					m_renderer = renderer;
@@ -80,16 +103,19 @@ namespace slib
 
 				void onFrame(RenderEngine* engine)
 				{
-					Ref<View> _view = getView();
-					if (RenderView* view = CastInstance<RenderView>(_view.get())) {
+					Ref<RenderViewHelper> helper = CastRef<RenderViewHelper>(getView());
+					if (helper.isNotNull()) {
 						if (m_pLastEngine != engine) {
-							view->dispatchCreateEngine(engine);
+							helper->dispatchCreateEngine(engine);
 						}
-						view->dispatchFrame(engine);
+						helper->dispatchFrame(engine);
 						m_pLastEngine = engine;
 					}
 				}
+
 			};
+
+			SLIB_DEFINE_OBJECT(RenderViewInstance, GTK_ViewInstance)
 
 		}
 	}
@@ -132,28 +158,11 @@ namespace slib
 		return sl_null;
 	}
 
-	void RenderView::_setRedrawMode_NW(RedrawMode mode)
+	Ptr<IRenderViewInstance> RenderView::getRenderViewInstance()
 	{
-		Ref<RenderViewInstance> instance = Ref<RenderViewInstance>::from(getViewInstance());
-		if (instance.isNotNull()) {
-			Ref<Renderer> renderer = instance->m_renderer;
-			if (renderer.isNotNull()) {
-				renderer->setRenderingContinuously(mode == RedrawMode::Continuously);
-			}
-		}
+		return CastRef<RenderViewInstance>(getViewInstance());
 	}
-
-	void RenderView::_requestRender_NW()
-	{
-		Ref<RenderViewInstance> instance = Ref<RenderViewInstance>::from(getViewInstance());
-		if (instance.isNotNull()) {
-			Ref<Renderer> renderer = instance->m_renderer;
-			if (renderer.isNotNull()) {
-				renderer->requestRender();
-			}
-		}
-	}
-
+	
 }
 
 #endif

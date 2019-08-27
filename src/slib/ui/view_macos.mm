@@ -26,39 +26,12 @@
 
 #include "view_macos.h"
 
-#include "slib/ui/core.h"
 #include "slib/ui/view.h"
 
 #include "slib/math/transform2d.h"
 
 namespace slib
 {
-	
-	namespace priv
-	{
-		namespace view
-		{
-			NSRect GetViewFrameAndTransform(const UIRect& frame, const Matrix3& transform, sl_real& rotation)
-			{
-				rotation = Transform2::getRotationAngleFromMatrix(transform);
-				Vector2 translation = Transform2::getTranslationFromMatrix(transform);
-				NSRect ret;
-				ret.origin.x = frame.left + translation.x;
-				ret.origin.y = frame.top + translation.y;
-				ret.size.width = frame.getWidth();
-				ret.size.height = frame.getHeight();
-				if (!(Math::isAlmostZero(rotation))) {
-					sl_real ax = frame.getWidth() / 2;
-					sl_real ay = frame.getHeight() / 2;
-					sl_real cr = Math::cos(rotation);
-					sl_real sr = Math::sin(rotation);
-					ret.origin.x += (- ax * cr + ay * sr) + ax;
-					ret.origin.y += (- ax * sr - ay * cr) + ay;
-				}
-				return ret;
-			}
-		}
-	}
 	
 	SLIB_DEFINE_OBJECT(macOS_ViewInstance, ViewInstance)
 
@@ -111,41 +84,29 @@ namespace slib
 		return m_handle;
 	}
 
-	sl_bool macOS_ViewInstance::isValid()
+	sl_bool macOS_ViewInstance::isValid(View* view)
 	{
 		return sl_true;
 	}
 
-	void macOS_ViewInstance::setFocus(sl_bool flagFocus)
+	void macOS_ViewInstance::setFocus(View* view, sl_bool flagFocus)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
 			NSWindow* window = [handle window];
 			if (window != nil) {
-				if ([NSThread isMainThread]) {
-					if (flagFocus) {
-						[window makeFirstResponder:handle];
-					} else {
-						if (window.firstResponder == handle) {
-							[window makeFirstResponder:nil];
-						}
-					}
+				if (flagFocus) {
+					[window makeFirstResponder:handle];
 				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						if (flagFocus) {
-							[window makeFirstResponder:handle];
-						} else {
-							if (window.firstResponder == handle) {
-								[window makeFirstResponder:nil];
-							}
-						}
-					});
+					if (window.firstResponder == handle) {
+						[window makeFirstResponder:nil];
+					}
 				}
 			}
 		}
 	}
 
-	void macOS_ViewInstance::invalidate()
+	void macOS_ViewInstance::invalidate(View* view)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -163,7 +124,7 @@ namespace slib
 		}
 	}
 
-	void macOS_ViewInstance::invalidate(const UIRect& rect)
+	void macOS_ViewInstance::invalidate(View* view, const UIRect& rect)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -186,92 +147,38 @@ namespace slib
 		}
 	}
 
-	UIRect macOS_ViewInstance::getFrame()
+	void macOS_ViewInstance::setFrame(View* view, const UIRect& frame)
+	{
+		m_frame = frame;
+		updateFrameAndTransform();
+	}
+
+	void macOS_ViewInstance::setTransform(View* view, const Matrix3& transform)
+	{
+		m_transform = transform;
+		updateFrameAndTransform();
+	}
+
+	void macOS_ViewInstance::setVisible(View* view, sl_bool flag)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
-			NSRect frame = handle.frame;
-			UIRect ret;
-			ret.left = (sl_ui_pos)(frame.origin.x);
-			ret.top = (sl_ui_pos)(frame.origin.y);
-			ret.right = ret.left + (sl_ui_pos)(frame.size.width);
-			ret.bottom = ret.top + (sl_ui_pos)(frame.size.height);
-			ret.fixSizeError();
-			return ret;
-		}
-		return UIRect::zero();
-	}
-
-	void macOS_ViewInstance::setFrame(const UIRect& frame)
-	{
-		if ([NSThread isMainThread]) {
-			m_frame = frame;
-			updateFrameAndTransform();
-		} else {
-			UIRect _frame = frame;
-			WeakRef<macOS_ViewInstance> weak(this);
-			dispatch_async(dispatch_get_main_queue(), ^{
-				Ref<macOS_ViewInstance> ref(weak);
-				if (ref.isNull()) {
-					return;
-				}
-				m_frame = _frame;
-				updateFrameAndTransform();
-			});
+			[handle setHidden:(flag ? NO : YES)];
 		}
 	}
 
-	void macOS_ViewInstance::setTransform(const Matrix3& transform)
-	{
-		if ([NSThread isMainThread]) {
-			m_transform = transform;
-			updateFrameAndTransform();
-		} else {
-			Matrix3 _transform = transform;
-			WeakRef<macOS_ViewInstance> weak(this);
-			dispatch_async(dispatch_get_main_queue(), ^{
-				Ref<macOS_ViewInstance> ref(weak);
-				if (ref.isNull()) {
-					return;
-				}
-				m_transform = _transform;
-				updateFrameAndTransform();
-			});
-		}
-	}
-
-	void macOS_ViewInstance::setVisible(sl_bool flag)
-	{
-		NSView* handle = m_handle;
-		if (handle != nil) {
-			if ([NSThread isMainThread]) {
-				[handle setHidden:(flag ? NO : YES)];
-			} else {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[handle setHidden:(flag ? NO : YES)];
-				});
-			}
-		}
-	}
-
-	void macOS_ViewInstance::setEnabled(sl_bool flag)
+	void macOS_ViewInstance::setEnabled(View* view, sl_bool flag)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
 			if ([handle isKindOfClass:[NSControl class]]) {
 				NSControl* control = (NSControl*)handle;
-				if ([NSThread isMainThread]) {
-					[control setEnabled:(flag ? YES : NO)];
-				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[control setEnabled:(flag ? YES : NO)];
-					});
-				}
+				[control setEnabled:(flag ? YES : NO)];
 			}
 		}
 	}
 
-	void macOS_ViewInstance::setOpaque(sl_bool flag)
+	void macOS_ViewInstance::setOpaque(View* view, sl_bool flag)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -282,21 +189,15 @@ namespace slib
 		}
 	}
 
-	void macOS_ViewInstance::setAlpha(sl_real alpha)
+	void macOS_ViewInstance::setAlpha(View* view, sl_real alpha)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
-			if ([NSThread isMainThread]) {
-				[handle setNeedsDisplay: TRUE];
-			} else {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[handle setNeedsDisplay: TRUE];
-				});
-			}
+			[handle setNeedsDisplay: TRUE];
 		}
 	}
 	
-	void macOS_ViewInstance::setClipping(sl_bool flag)
+	void macOS_ViewInstance::setClipping(View* view, sl_bool flag)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -307,7 +208,7 @@ namespace slib
 		}
 	}
 	
-	void macOS_ViewInstance::setDrawing(sl_bool flag)
+	void macOS_ViewInstance::setDrawing(View* view, sl_bool flag)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -318,7 +219,7 @@ namespace slib
 		}
 	}
 	
-	UIPointf macOS_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& ptScreen)
+	UIPointf macOS_ViewInstance::convertCoordinateFromScreenToView(View* view, const UIPointf& ptScreen)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -344,7 +245,7 @@ namespace slib
 		return ptScreen;
 	}
 
-	UIPointf macOS_ViewInstance::convertCoordinateFromViewToScreen(const UIPointf& ptView)
+	UIPointf macOS_ViewInstance::convertCoordinateFromViewToScreen(View* view, const UIPointf& ptView)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
@@ -370,9 +271,9 @@ namespace slib
 		return ptView;
 	}
 
-	void macOS_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
+	void macOS_ViewInstance::addChildInstance(View* view, const Ref<ViewInstance>& _child)
 	{
-		NSView* handle = UIPlatform::getViewHandle(this);
+		NSView* handle = m_handle;
 		if (handle != nil) {
 			macOS_ViewInstance* child = (macOS_ViewInstance*)(_child.get());
 			if (child) {
@@ -384,7 +285,7 @@ namespace slib
 		}
 	}
 
-	void macOS_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
+	void macOS_ViewInstance::removeChildInstance(View* view, const Ref<ViewInstance>& _child)
 	{
 		macOS_ViewInstance* child = (macOS_ViewInstance*)(_child.get());
 		if (child) {
@@ -395,25 +296,38 @@ namespace slib
 		}
 	}
 
-	void macOS_ViewInstance::bringToFront()
+	void macOS_ViewInstance::bringToFront(View* view)
 	{
 		NSView* handle = m_handle;
 		if (handle != nil) {
 			NSView* parent = handle.superview;
 			if (parent != nil) {
-				if ([NSThread isMainThread]) {
-					[handle removeFromSuperviewWithoutNeedingDisplay];
-					[parent addSubview:handle];
-				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[handle removeFromSuperviewWithoutNeedingDisplay];
-						[parent addSubview:handle];
-					});
-				}
+				[handle removeFromSuperviewWithoutNeedingDisplay];
+				[parent addSubview:handle];
 			}
 		}
 	}
-
+	
+	NSRect macOS_ViewInstance::getViewFrameAndTransform(const UIRect& frame, const Matrix3& transform, sl_real& rotation)
+	{
+		rotation = Transform2::getRotationAngleFromMatrix(transform);
+		Vector2 translation = Transform2::getTranslationFromMatrix(transform);
+		NSRect ret;
+		ret.origin.x = frame.left + translation.x;
+		ret.origin.y = frame.top + translation.y;
+		ret.size.width = frame.getWidth();
+		ret.size.height = frame.getHeight();
+		if (!(Math::isAlmostZero(rotation))) {
+			sl_real ax = frame.getWidth() / 2;
+			sl_real ay = frame.getHeight() / 2;
+			sl_real cr = Math::cos(rotation);
+			sl_real sr = Math::sin(rotation);
+			ret.origin.x += (- ax * cr + ay * sr) + ax;
+			ret.origin.y += (- ax * sr - ay * cr) + ay;
+		}
+		return ret;
+	}
+	
 	void macOS_ViewInstance::onDraw(NSRect rcDirty)
 	{
 		NSView* handle = m_handle;
@@ -579,7 +493,7 @@ namespace slib
 		NSView* handle = m_handle;
 		if (handle != nil) {
 			sl_real rotation = 0;
-			handle.frame = priv::view::GetViewFrameAndTransform(m_frame, m_transform, rotation);
+			handle.frame = getViewFrameAndTransform(m_frame, m_transform, rotation);
 			handle.frameRotation = Math::getDegreesFromRadian(rotation);
 			[handle setNeedsDisplay:YES];
 		}

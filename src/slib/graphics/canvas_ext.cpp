@@ -71,7 +71,7 @@ namespace slib
 		return Size::zero();
 	}
 	
-	void CanvasExt::drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& _font, const Color& color, Alignment align, sl_bool flagMultiLine)
+	void CanvasExt::drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& _font, const Color& color, const Alignment& align, sl_bool flagMultiLine)
 	{
 		if (flagMultiLine) {
 			drawText16(text, rcDst, _font, color, align, sl_true);
@@ -89,7 +89,7 @@ namespace slib
 		((Canvas*)this)->drawText(text, pt.x, pt.y, font, color);
 	}
 	
-	void CanvasExt::drawText16(const String16& text, const Rectangle& rcDst, const Ref<Font>& _font, const Color& color, Alignment align, sl_bool flagMultiLine)
+	void CanvasExt::drawText16(const String16& text, const Rectangle& rcDst, const Ref<Font>& _font, const Color& color, const Alignment& align, sl_bool flagMultiLine)
 	{
 		Ref<Font> font = _font;
 		if (font.isNull()) {
@@ -241,7 +241,7 @@ namespace slib
 		onDrawAll(rectDst, src, param);
 	}
 	
-	void CanvasExt::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleMode scaleMode, Alignment alignment, const DrawParam& param)
+	void CanvasExt::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleMode scaleMode, const Alignment& alignment, const DrawParam& param)
 	{
 		if (source.isNull()) {
 			return;

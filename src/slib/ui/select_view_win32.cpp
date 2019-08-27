@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -39,10 +39,10 @@ namespace slib
 			class SelectViewHelper : public SelectView
 			{
 			public:
-				void _applyItemsCount(HWND hWnd)
+				void applyItemsCount(HWND hWnd)
 				{
 					ObjectLocker lock(this);
-					sl_uint32 nOrig = (sl_uint32)(::SendMessageW(hWnd, CB_GETCOUNT, 0, 0));
+					sl_uint32 nOrig = (sl_uint32)(SendMessageW(hWnd, CB_GETCOUNT, 0, 0));
 					sl_uint32 nNew = (sl_uint32)(m_titles.getCount());
 					if (nOrig == nNew) {
 						return;
@@ -50,66 +50,89 @@ namespace slib
 					if (nOrig > nNew) {
 						if (nNew > 0) {
 							for (sl_uint32 i = nOrig; i > nNew; i--) {
-								::SendMessageW(hWnd, CB_DELETESTRING, (WPARAM)(i - 1), 0);
+								SendMessageW(hWnd, CB_DELETESTRING, (WPARAM)(i - 1), 0);
 							}
 						} else {
-							::SendMessageW(hWnd, CB_RESETCONTENT, 0, 0);
+							SendMessageW(hWnd, CB_RESETCONTENT, 0, 0);
 						}
 					} else {
 						for (sl_uint32 i = nOrig; i < nNew; i++) {
 							String16 s = m_titles.getValueAt(i);
-							::SendMessageW(hWnd, CB_ADDSTRING, 0, (LPARAM)(s.getData()));
+							SendMessageW(hWnd, CB_ADDSTRING, 0, (LPARAM)(s.getData()));
 						}
 					}
 				}
 
-				void _copyItems(HWND hWnd)
+				void copyItems(HWND hWnd)
 				{
-					::SendMessageW(hWnd, CB_RESETCONTENT, 0, 0);
-					_applyItemsCount(hWnd);
+					SendMessageW(hWnd, CB_RESETCONTENT, 0, 0);
+					applyItemsCount(hWnd);
 					sl_uint32 n = (sl_uint32)(m_titles.getCount());
 					if (m_indexSelected >= n) {
 						m_indexSelected = 0;
 					}
 					if (n > 0) {
-						::SendMessageW(hWnd, CB_SETCURSEL, (WPARAM)m_indexSelected, 0);
+						SendMessageW(hWnd, CB_SETCURSEL, (WPARAM)m_indexSelected, 0);
 					}
-				}
-
-				void _setItemTitle(HWND hWnd, sl_uint32 index, const String& title)
-				{
-					String16 s = title;
-					::SendMessageW(hWnd, CB_DELETESTRING, (WPARAM)index, 0);
-					::SendMessageW(hWnd, CB_INSERTSTRING, (WPARAM)index, (LPARAM)(s.getData()));
-				}
-
-				sl_uint32 _getSelectedIndex(HWND hWnd)
-				{
-					return (sl_uint32)(::SendMessageW(hWnd, CB_GETCURSEL, 0, 0));
-				}
-
-				void _onSelectItem(HWND hWnd)
-				{
-					dispatchSelectItem(_getSelectedIndex(hWnd));
 				}
 
 			};
 
-			class SelectViewInstance : public Win32_ViewInstance
+			class SelectViewInstance : public Win32_ViewInstance, public ISelectViewInstance
 			{
+				SLIB_DECLARE_OBJECT
+
 			public:
+				void select(SelectView* view, sl_uint32 index) override
+				{
+					HWND handle = m_handle;
+					if (handle) {
+						SendMessageW(handle, CB_SETCURSEL, (WPARAM)index, 0);
+					}
+				}
+
+				void refreshItemsCount(SelectView* view) override
+				{
+					HWND handle = m_handle;
+					if (handle) {
+						(static_cast<SelectViewHelper*>(view))->applyItemsCount(handle);
+					}
+				}
+
+				void refreshItemsContent(SelectView* view) override
+				{
+					HWND handle = m_handle;
+					if (handle) {
+						(static_cast<SelectViewHelper*>(view))->copyItems(handle);
+					}
+				}
+
+				void setItemTitle(SelectView* view, sl_uint32 index, const String& title) override
+				{
+					HWND handle = m_handle;
+					if (handle) {
+						String16 s = title;
+						SendMessageW(handle, CB_DELETESTRING, (WPARAM)index, 0);
+						SendMessageW(handle, CB_INSERTSTRING, (WPARAM)index, (LPARAM)(s.getData()));
+					}
+				}
+
 				sl_bool processCommand(SHORT code, LRESULT& result) override
 				{
 					if (code == CBN_SELCHANGE) {
-						Ref<View> view = getView();
-						if (SelectViewHelper* _view = CastInstance<SelectViewHelper>(view.get())) {
-							_view->_onSelectItem(m_handle);
+						Ref<SelectViewHelper> helper = CastRef<SelectViewHelper>(getView());
+						if (helper.isNotNull()) {
+							sl_uint32 index = (sl_uint32)(SendMessageW(m_handle, CB_GETCURSEL, 0, 0));
+							helper->dispatchSelectItem(index);							
 						}
 						return sl_true;
 					}
 					return sl_false;
 				}
+
 			};
+
+			SLIB_DEFINE_OBJECT(SelectViewInstance, Win32_ViewInstance)
 
 		}
 	}
@@ -118,70 +141,19 @@ namespace slib
 
 	Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* parent)
 	{
-		Win32_UI_Shared* shared = Win32_UI_Shared::get();
-		if (!shared) {
-			return sl_null;
-		}
-
 		UINT style = CBS_DROPDOWNLIST | WS_TABSTOP;
-		Ref<SelectViewInstance> ret = Win32_ViewInstance::create<SelectViewInstance>(this, parent, L"COMBOBOX", sl_null, style, 0);
-		
+		Ref<SelectViewInstance> ret = Win32_ViewInstance::create<SelectViewInstance>(this, parent, L"COMBOBOX", sl_null, style, 0);		
 		if (ret.isNotNull()) {
-
 			HWND handle = ret->getHandle();
-
-			Ref<Font> font = getFont();
-			HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
-			if (hFont) {
-				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
-			}
-
-			((SelectViewHelper*)this)->_copyItems(handle);
+			(static_cast<SelectViewHelper*>(this))->copyItems(handle);
+			return ret;
 		}
-		return ret;
-	}
-	
-	void SelectView::_select_NW(sl_uint32 index)
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			::SendMessageW(handle, CB_SETCURSEL, (WPARAM)index, 0);
-		}
+		return sl_null;
 	}
 
-	void SelectView::_refreshItemsCount_NW()
+	Ptr<ISelectViewInstance> SelectView::getSelectViewInstance()
 	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			((SelectViewHelper*)this)->_applyItemsCount(handle);
-		}
-	}
-
-	void SelectView::_refreshItemsContent_NW()
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			((SelectViewHelper*)this)->_copyItems(handle);
-		}
-	}
-
-	void SelectView::_setItemTitle_NW(sl_uint32 index, const String& title)
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			((SelectViewHelper*)this)->_setItemTitle(handle, index, title);
-		}
-	}
-
-	void SelectView::_setFont_NW(const Ref<Font>& font)
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
-			if (hFont) {
-				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
-			}
-		}
+		return CastRef<SelectViewInstance>(getViewInstance());
 	}
 
 }

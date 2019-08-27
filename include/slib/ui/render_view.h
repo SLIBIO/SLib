@@ -31,6 +31,8 @@
 
 namespace slib
 {
+	
+	class IRenderViewInstance;
 
 	class SLIB_EXPORT RenderView : public ViewGroup
 	{
@@ -94,9 +96,12 @@ namespace slib
 		
 		void onDrawBackground(Canvas* canvas) override;
 		
-	public:
+	protected:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* _parent) override;
 		
+		virtual Ptr<IRenderViewInstance> getRenderViewInstance();
+		
+	public:
 		void dispatchMouseEvent(UIEvent* ev) override;
 		
 		void dispatchTouchEvent(UIEvent* ev) override;
@@ -122,10 +127,6 @@ namespace slib
 		
 		void _dispatchSwipe(const Ref<GestureEvent>& ev);
 		
-		void _setRedrawMode_NW(RedrawMode mode);
-
-		void _requestRender_NW();
-		
 	protected:
 		RedrawMode m_redrawMode;
 		sl_bool m_flagDispatchEventsToRenderingThread;
@@ -136,6 +137,15 @@ namespace slib
 
 		sl_bool m_flagDebugTextVisible;
 		sl_bool m_flagDebugTextVisibleOnRelease;
+		
+	};
+	
+	class SLIB_EXPORT IRenderViewInstance
+	{
+	public:
+		virtual void setRedrawMode(RenderView* view, RedrawMode mode) = 0;
+		
+		virtual void requestRender(RenderView* view) = 0;
 		
 	};
 

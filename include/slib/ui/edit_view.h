@@ -30,6 +30,8 @@
 namespace slib
 {
 	
+	class IEditViewInstance;
+	
 	class SLIB_EXPORT EditView : public View
 	{
 		SLIB_DECLARE_OBJECT
@@ -46,7 +48,7 @@ namespace slib
 		
 		Alignment getGravity();
 		
-		virtual void setGravity(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setGravity(const Alignment& gravity, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		Color getTextColor();
 		
@@ -58,7 +60,7 @@ namespace slib
 		
 		Alignment getHintGravity();
 		
-		virtual void setHintGravity(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setHintGravity(const Alignment& gravity, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		Color getHintTextColor();
 		
@@ -99,66 +101,26 @@ namespace slib
 		void setFocusNextOnReturnKey();
 		
 	public:
-		SLIB_DECLARE_EVENT_HANDLER(EditView, Change, String* pValue);
+		SLIB_DECLARE_EVENT_HANDLER(EditView, Change, String* pValue)
+		
 		SLIB_DECLARE_EVENT_HANDLER(EditView, ReturnKey)
 		
 	protected:
 		void onUpdateLayout() override;
 		
-		void onChangePadding() override;
-		
 		void onDraw(Canvas* canvas) override;
 
 		void onClickEvent(UIEvent* ev) override;
 		
-	public:
+	protected:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
+		virtual Ptr<IEditViewInstance> getEditViewInstance();
+		
+	public:
 		void dispatchKeyEvent(UIEvent* ev) override;
 		
 	private:
-		void _getText_NW();
-		
-		void _setText_NW(const String& text);
-		
-		void _setTextAlignment_NW(Alignment align);
-		
-		void _setTextColor_NW(const Color& color);
-		
-		void _setHintText_NW(const String& str);
-		
-		void _setHintTextAlignment_NW(Alignment align);
-		
-		void _setHintTextColor_NW(const Color& color);
-		
-		void _setHintFont_NW(const Ref<Font>& font);
-
-		void _setReadOnly_NW(sl_bool flag);
-		
-		void _setPassword_NW(sl_bool flag);
-
-		void _setMultiLine_NW(MultiLineMode mode);
-		
-		void _setReturnKeyType_NW(UIReturnKeyType type);
-		
-		void _setKeyboardType_NW(UIKeyboardType type);
-		
-		void _setAutoCapitalizationType_NW(UIAutoCapitalizationType type);
-		
-		sl_ui_len _measureHeight_NW();
-		
-		void _onChangePadding_NW();
-
-		
-		void _setFont_NW(const Ref<Font>& font) override;
-		
-		void _setBorder_NW(sl_bool flag) override;
-		
-		void _setBackgroundColor_NW(const Color& color) override;
-		
-		void _setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical) override;
-		
-
 		void _onChangeEditViewNative(EditView* ev, String* text);
 		
 		void _onReturnKeyEditViewNative(EditView* ev);
@@ -169,10 +131,10 @@ namespace slib
 
 	protected:
 		AtomicString m_text;
-		Alignment m_textAlignment;
+		Alignment m_gravity;
 		Color m_textColor;
 		AtomicString m_hintText;
-		Alignment m_hintTextAlignment;
+		Alignment m_hintGravity;
 		Color m_hintTextColor;
 		AtomicRef<Font> m_hintFont;
 		sl_bool m_flagReadOnly;
@@ -204,11 +166,48 @@ namespace slib
 		
 		~TextArea();
 
-	public:
+	protected:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
+		
+		Ptr<IEditViewInstance> getEditViewInstance() override;
 		
 	};
 
+	class SLIB_EXPORT IEditViewInstance
+	{
+	public:
+		virtual sl_bool getText(EditView* view, String& _out) = 0;
+		
+		virtual void setText(EditView* view, const String& text) = 0;
+		
+		virtual void setGravity(EditView* view, const Alignment& gravity) = 0;
+		
+		virtual void setTextColor(EditView* view, const Color& color) = 0;
+		
+		virtual void setHintText(EditView* view, const String& text) = 0;
+		
+		virtual void setHintGravity(EditView* view, const Alignment& gravity) = 0;
+		
+		virtual void setHintTextColor(EditView* view, const Color& color) = 0;
+		
+		virtual void setHintFont(EditView* view, const Ref<Font>& font) = 0;
+		
+		virtual void setReadOnly(EditView* view, sl_bool flag) = 0;
+		
+		virtual void setPassword(EditView* view, sl_bool flag) = 0;
+		
+		virtual void setMultiLine(EditView* view, MultiLineMode mode) = 0;
+		
+		virtual void setReturnKeyType(EditView* view, UIReturnKeyType type);
+		
+		virtual void setKeyboardType(EditView* view, UIKeyboardType type);
+		
+		virtual void setAutoCapitalizationType(EditView* view, UIAutoCapitalizationType type);
+		
+		virtual sl_ui_len measureHeight(EditView* view) = 0;
+		
+	};
+	
 }
 
 #endif

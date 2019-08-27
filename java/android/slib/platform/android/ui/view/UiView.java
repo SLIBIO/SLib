@@ -96,20 +96,12 @@ public class UiView {
 
 	public static void setFocus(final View view, final boolean flag) {
 		try {
-			if (!(UiThread.isUiThread())) {
-				view.post(new Runnable() {
-					public void run() {
-						setFocus(view, flag);
-					}
-				});
+			view.setFocusable(true);
+			view.setFocusableInTouchMode(true);
+			if (flag) {
+				view.requestFocus();
 			} else {
-				view.setFocusable(true);
-				view.setFocusableInTouchMode(true);
-				if (flag) {
-					view.requestFocus();
-				} else {
-					view.clearFocus();
-				}
+				view.clearFocus();
 			}
 		} catch (Exception e) {
 			Logger.exception(e);
@@ -139,37 +131,10 @@ public class UiView {
 			}
 		}
 	}
-	
-	public static Rect getFrame(View view)
-	{
-		if (view instanceof IView) {
-			return ((IView)view).getUIFrame();
-		} else {
-			Rect ret = new Rect();
-			ret.left = view.getLeft();
-			ret.top = view.getTop();
-			ret.right = view.getRight();
-			ret.bottom = view.getBottom();
-			return ret;
-		}
-	}
 
 	public static boolean setFrame(final View view, int left, int top, int right, int bottom) {
 
 		if (view instanceof UiWindow) {
-			return true;
-		}
-
-		if (!(UiThread.isUiThread())) {
-			final int l = left;
-			final int r = right;
-			final int t = top;
-			final int b = bottom;
-			view.post(new Runnable() {
-				public void run() {
-					setFrame(view, l, t, r, b);
-				}
-			});
 			return true;
 		}
 
@@ -214,8 +179,8 @@ public class UiView {
 
 	private static final float EPSILON = 0.000001f;
 	public static void setTransform(final View view, final float _tx, final float _ty, final float rotate, final float sx, final float sy, final float ax, final float ay) {
-		if (UiThread.isUiThread()) {
-			float r = (float)(rotate * 180 / Math.PI);
+		try {
+			float r = (float) (rotate * 180 / Math.PI);
 			if (Math.abs(r - view.getRotation()) > EPSILON) {
 				view.setRotation(r);
 			}
@@ -230,8 +195,8 @@ public class UiView {
 			if (Math.abs(ax) > EPSILON || Math.abs(ay) > EPSILON) {
 				double cr = Math.cos(rotate);
 				double sr = Math.sin(rotate);
-				tx = (float)((- ax * cr + ay * sr) * sx + tx + ax);
-				ty = (float)((- ax * sr - ay * cr) * sy + ty + ay);
+				tx = (float) ((-ax * cr + ay * sr) * sx + tx + ax);
+				ty = (float) ((-ax * sr - ay * cr) * sy + ty + ay);
 			}
 			if (Math.abs(tx - view.getTranslationX()) > EPSILON) {
 				view.setTranslationX(tx);
@@ -239,12 +204,8 @@ public class UiView {
 			if (Math.abs(ty - view.getTranslationY()) > EPSILON) {
 				view.setTranslationY(ty);
 			}
-		} else {
-			view.post(new Runnable() {
-				public void run() {
-					setTransform(view, _tx, _ty, rotate, sx, sy, ax, ay);
-				}
-			});
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 	}
 	
@@ -253,18 +214,14 @@ public class UiView {
 	}
 	
 	public static void setVisible(final View view, final boolean flag) {
-		if (UiThread.isUiThread()) {
+		try {
 			if (flag) {
 				view.setVisibility(View.VISIBLE);
 			} else {
 				view.setVisibility(View.INVISIBLE);
 			}
-		} else {
-			view.post(new Runnable() {
-				public void run() {
-					setVisible(view, flag);
-				}
-			});
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 	}
 	
@@ -273,26 +230,18 @@ public class UiView {
 	}
 	
 	public static void setEnabled(final View view, final boolean flag) {
-		if (UiThread.isUiThread()) {
+		try {
 			view.setEnabled(flag);
-		} else {
-			view.post(new Runnable() {
-				public void run() {
-					view.setEnabled(flag);
-				}
-			});
-		}		
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
 	}
 
 	public static void setAlpha(final View view, final float alpha) {
-		if (UiThread.isUiThread()) {
+		try {
 			view.setAlpha(alpha);
-		} else {
-			view.post(new Runnable() {
-				public void run() {
-					view.setAlpha(alpha);
-				}
-			});
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 	}
 
@@ -300,15 +249,11 @@ public class UiView {
 	}
 
 	public static void setDrawing(final View view, final boolean flag) {
-		if (UiThread.isUiThread()) {
+		try {
 			view.setWillNotDraw(!flag);
-		} else {
-			view.post(new Runnable() {
-				public void run() {
-					view.setWillNotDraw(!flag);
-				}
-			});
-		}			
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
 	}
 	
 	public static void setLayered(final View view) {
@@ -393,14 +338,6 @@ public class UiView {
 	}
 	
 	public static void bringToFront(final View view) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					bringToFront(view);
-				}
-			});
-			return;
-		}
 		try {
 			ViewParent parent = view.getParent();
 			parent.bringChildToFront(view);

@@ -22,10 +22,11 @@
 
 #include "slib/ui/list_report_view.h"
 
+#include "slib/ui/core.h"
+
 #if defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_WIN32)
 #	define HAS_NATIVE_WIDGET_IMPL
 #endif
-
 
 namespace slib
 {
@@ -72,10 +73,14 @@ namespace slib
 	
 	void ListReportView::setColumnsCount(sl_uint32 nCount, UIUpdateMode mode)
 	{
+		Ptr<IListReportViewInstance> instance = getListReportViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&ListReportView::setColumnsCount, nCount, mode)
+		}
 		ObjectLocker lock(this);
 		m_columns.setCount(nCount);
-		if (isNativeWidget()) {
-			_refreshColumnsCount_NW();
+		if (instance.isNotNull()) {
+			instance->refreshColumnsCount(this);
 		} else {
 			invalidate(mode);
 		}
@@ -88,13 +93,17 @@ namespace slib
 	
 	void ListReportView::setRowsCount(sl_uint32 nCount, UIUpdateMode mode)
 	{
+		Ptr<IListReportViewInstance> instance = getListReportViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&ListReportView::setRowsCount, nCount, mode)
+		}
 		ObjectLocker lock(this);
 		if (nCount < m_cells.getCount()) {
 			m_cells.setCount(nCount);
 		}
 		m_nRows = nCount;
-		if (isNativeWidget()) {
-			_refreshRowsCount_NW();
+		if (instance.isNotNull()) {
+			instance->refreshRowsCount(this);
 		} else {
 			invalidate(mode);
 		}
@@ -115,6 +124,10 @@ namespace slib
 	
 	void ListReportView::setItemText(sl_uint32 iRow, sl_uint32 iCol, const String& text, UIUpdateMode mode)
 	{
+		Ptr<IListReportViewInstance> instance = getListReportViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&ListReportView::setItemText, iRow, iCol, text, mode)
+		}
 		ObjectLocker lock(this);
 		if (iRow < m_nRows) {
 			if (iRow >= m_cells.getCount()) {
@@ -138,8 +151,8 @@ namespace slib
 				cell->text = text;
 			}
 			if (SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
-				if (isNativeWidget()) {
-					_refreshRowsCount_NW();
+				if (instance.isNotNull()) {
+					instance->refreshRowsCount(this);
 				} else {
 					invalidate();
 				}
@@ -159,12 +172,16 @@ namespace slib
 	
 	void ListReportView::setHeaderText(sl_uint32 iCol, const String& text, UIUpdateMode mode)
 	{
+		Ptr<IListReportViewInstance> instance = getListReportViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&ListReportView::setHeaderText, iCol, text, mode)
+		}
 		MutexLocker lock(m_columns.getLocker());
 		if (iCol < m_columns.getCount()) {
 			ListReportViewColumn* col = m_columns.getPointerAt(iCol);
 			col->title = text;
-			if (isNativeWidget()) {
-				_setHeaderText_NW(iCol, text);
+			if (instance.isNotNull()) {
+				instance->setHeaderText(this, iCol, text);
 			} else {
 				invalidate(mode);
 			}
@@ -183,12 +200,16 @@ namespace slib
 	
 	void ListReportView::setColumnWidth(sl_uint32 iCol, sl_ui_len width, UIUpdateMode mode)
 	{
+		Ptr<IListReportViewInstance> instance = getListReportViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&ListReportView::setColumnWidth, iCol, width, mode)
+		}
 		MutexLocker lock(m_columns.getLocker());
 		if (iCol < m_columns.getCount()) {
 			ListReportViewColumn* col = m_columns.getPointerAt(iCol);
 			col->width = width;
-			if (isNativeWidget()) {
-				_setColumnWidth_NW(iCol, width);
+			if (instance.isNotNull()) {
+				instance->setColumnWidth(this, iCol, width);
 			} else {
 				invalidate(mode);
 			}
@@ -205,14 +226,18 @@ namespace slib
 		return Alignment::Center;
 	}
 	
-	void ListReportView::setHeaderAlignment(sl_uint32 iCol, Alignment align, UIUpdateMode mode)
+	void ListReportView::setHeaderAlignment(sl_uint32 iCol, const Alignment& align, UIUpdateMode mode)
 	{
+		Ptr<IListReportViewInstance> instance = getListReportViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&ListReportView::setHeaderAlignment, iCol, align, mode)
+		}
 		MutexLocker lock(m_columns.getLocker());
 		if (iCol < m_columns.getCount()) {
 			ListReportViewColumn* col = m_columns.getPointerAt(iCol);
 			col->headerAlign = align;
-			if (isNativeWidget()) {
-				_setHeaderAlignment_NW(iCol, align);
+			if (instance.isNotNull()) {
+				instance->setHeaderAlignment(this, iCol, align);
 			} else {
 				invalidate(mode);
 			}
@@ -229,14 +254,18 @@ namespace slib
 		return Alignment::Center;
 	}
 	
-	void ListReportView::setColumnAlignment(sl_uint32 iCol, Alignment align, UIUpdateMode mode)
+	void ListReportView::setColumnAlignment(sl_uint32 iCol, const Alignment& align, UIUpdateMode mode)
 	{
+		Ptr<IListReportViewInstance> instance = getListReportViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&ListReportView::setColumnAlignment, iCol, align, mode)
+		}
 		MutexLocker lock(m_columns.getLocker());
 		if (iCol < m_columns.getCount()) {
 			ListReportViewColumn* col = m_columns.getPointerAt(iCol);
 			col->align = align;
-			if (isNativeWidget()) {
-				_setColumnAlignment_NW(iCol, align);
+			if (instance.isNotNull()) {
+				instance->setColumnAlignment(this, iCol, align);
 			} else {
 				invalidate(mode);
 			}
@@ -245,8 +274,9 @@ namespace slib
 	
 	sl_int32 ListReportView::getSelectedRow()
 	{
-		if (isNativeWidget()) {
-			_getSelectedRow_NW();
+		Ptr<IListReportViewInstance> instance = getListReportViewInstance();
+		if (instance.isNotNull()) {
+			instance->getSelectedRow(this, m_selectedRow);
 		}
 		return m_selectedRow;
 	}
@@ -286,6 +316,7 @@ namespace slib
 
 	void ListReportView::dispatchSelectRow(sl_uint32 row)
 	{
+		m_selectedRow = row;
 		SLIB_INVOKE_EVENT_HANDLER(SelectRow, row)
 	}
 	
@@ -297,7 +328,6 @@ namespace slib
 		if (ev.isNotNull()) {
 			dispatchClickEvent(ev.get());
 		}
-		
 		SLIB_INVOKE_EVENT_HANDLER(ClickRow, row, pt)
 	}
 	
@@ -316,7 +346,6 @@ namespace slib
 		if (ev.isNotNull()) {
 			dispatchMouseEvent(ev.get());
 		}
-
 		SLIB_INVOKE_EVENT_HANDLER(DoubleClickRow, row, pt)
 	}
 	
@@ -327,36 +356,9 @@ namespace slib
 		return sl_null;
 	}
 	
-	void ListReportView::_refreshColumnsCount_NW()
+	Ptr<IListReportViewInstance> ListReportView::getListReportViewInstance()
 	{
-	}
-	
-	void ListReportView::_refreshRowsCount_NW()
-	{
-	}
-	
-	void ListReportView::_setHeaderText_NW(sl_uint32 col, const String& text)
-	{
-	}
-	
-	void ListReportView::_setColumnWidth_NW(sl_uint32 col, sl_ui_len width)
-	{
-	}
-	
-	void ListReportView::_setHeaderAlignment_NW(sl_uint32 col, Alignment align)
-	{
-	}
-	
-	void ListReportView::_setColumnAlignment_NW(sl_uint32 col, Alignment align)
-	{
-	}
-	
-	void ListReportView::_getSelectedRow_NW()
-	{
-	}
-	
-	void ListReportView::_setFont_NW(const Ref<Font>& font)
-	{
+		return sl_null;
 	}
 #endif
 

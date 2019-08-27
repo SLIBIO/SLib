@@ -29,6 +29,8 @@
 
 namespace slib
 {
+	
+	class IScrollViewInstance;
 
 	class SLIB_EXPORT ScrollView : public ViewGroup
 	{
@@ -54,9 +56,12 @@ namespace slib
 		
 		UIRect getBounds() override;
 		
-	public:
+	protected:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
+		virtual Ptr<IScrollViewInstance> getScrollViewInstance();
+		
+	public:
 		void dispatchScroll(sl_scroll_pos x, sl_scroll_pos y) override;
 		
 	protected:
@@ -64,36 +69,15 @@ namespace slib
 		
 		void onResizeChild(View* child, sl_ui_len width, sl_ui_len height) override;
 		
-		void onUpdatePaging() override;
-		
-	private:
-		void _refreshContentSize_NW();
-		
-		void _setContentView_NW(const Ref<View>& view);
-		
-		ScrollPoint _getScrollPosition_NW();
-		
-		ScrollPoint _getScrollRange_NW();
-		
-		UIRect _getBounds_NW();
-		
-		void _setBorder_NW(sl_bool flag) override;
-		
-		void _setBackgroundColor_NW(const Color& color) override;
-		
-		void _setPaging_NW(sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight);
-		
 	protected:
-		void _setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical) override;
-		
-		void _scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate) override;
+		void _refreshSize();
 		
 	protected:
 		AtomicRef<View> m_viewContent;
 		
 	};
 	
-	class HorizontalScrollView : public ScrollView
+	class SLIB_EXPORT HorizontalScrollView : public ScrollView
 	{
 	public:
 		HorizontalScrollView();
@@ -102,7 +86,7 @@ namespace slib
 
 	};
 	
-	class VerticalScrollView : public ScrollView
+	class SLIB_EXPORT VerticalScrollView : public ScrollView
 	{
 	public:
 		VerticalScrollView();
@@ -111,6 +95,21 @@ namespace slib
 
 	};
 
+	class SLIB_EXPORT IScrollViewInstance
+	{
+	public:
+		virtual void refreshContentSize(ScrollView* view) = 0;
+		
+		virtual void setContentView(ScrollView* view, const Ref<View>& content) = 0;
+		
+		virtual sl_bool getScrollPosition(ScrollView* view, ScrollPoint& _out) = 0;
+		
+		virtual sl_bool getScrollRange(ScrollView* view, ScrollPoint& _out) = 0;
+		
+		virtual sl_bool getBounds(ScrollView* view, UIRect& _out);
+		
+	};
+	
 }
 
 #endif

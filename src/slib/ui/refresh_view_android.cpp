@@ -51,11 +51,7 @@ namespace slib
 			class RefreshViewHelper : public RefreshView
 			{
 			public:
-				void _applyProperties(jobject handle, ViewInstance* viewInstance)
-				{
-				}
-
-				void _onRefresh()
+				void onRefresh()
 				{
 					_onRefresh_NW();
 				}
@@ -63,9 +59,9 @@ namespace slib
 
 			void JNICALL OnRefresh(JNIEnv* env, jobject _this, jlong instance)
 			{
-				Ref<View> _view = Android_ViewInstance::findView(instance);
-				if (RefreshViewHelper* view = CastInstance<RefreshViewHelper>(_view.get())) {
-					view->_onRefresh();
+				Ref<RefreshViewHelper> helper = CastRef<RefreshViewHelper>(Android_ViewInstance::findView(instance));
+				if (helper.isNotNull()) {
+					helper->onRefresh();
 				}
 			}
 			
@@ -76,17 +72,12 @@ namespace slib
 
 	Ref<ViewInstance> RefreshView::createNativeWidget(ViewInstance* _parent)
 	{
-		Ref<Android_ViewInstance> ret;
 		Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 		if (parent) {
 			JniLocal<jobject> handle = JRefreshView::create.callObject(sl_null, parent->getContext());
-			ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
-			if (ret.isNotNull()) {
-				jobject handle = ret->getHandle();
-				((RefreshViewHelper*)this)->_applyProperties(handle, ret.get());
-			}
+			return Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 		}
-		return ret;
+		return sl_null;
 	}
 
 	void RefreshView::_setRefreshing_NW(sl_bool flag)

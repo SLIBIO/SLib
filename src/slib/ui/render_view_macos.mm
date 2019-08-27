@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@
 #if defined(SLIB_UI_IS_MACOS)
 
 #include "slib/ui/render_view.h"
+
 #include "slib/render/opengl.h"
 #include "slib/core/thread.h"
 
@@ -44,46 +45,68 @@
 	slib::AtomicRef<slib::Thread> m_thread;
 }
 
--(void)_setRenderContinuously:(BOOL)flag;
--(void)_requestRender;
--(void)_queryViewStatus;
+-(void)queryViewStatus;
 
 @end
 
-
 namespace slib
 {
-
-	Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* _parent)
+	
+	namespace priv
 	{
-		MACOS_VIEW_CREATE_INSTANCE_BEGIN
-		SLIBGLViewHandle* handle = [[SLIBGLViewHandle alloc] initWithFrame:frame];
-		if (handle != nil) {
-			[handle _setRenderContinuously:(m_redrawMode == RedrawMode::Continuously)];
-		}
-		MACOS_VIEW_CREATE_INSTANCE_END
-		return ret;
-	}
-
-	void RenderView::_setRedrawMode_NW(RedrawMode mode)
-	{
-		ObjectLocker lock(this);
-		NSView* view = UIPlatform::getViewHandle(this);
-		if (view != nil && [view isKindOfClass:[SLIBGLViewHandle class]]) {
-			SLIBGLViewHandle* v = (SLIBGLViewHandle*)view;
-			[v _setRenderContinuously:(mode == RedrawMode::Continuously)];
-		}
-	}
-
-	void RenderView::_requestRender_NW()
-	{
-		NSView* view = UIPlatform::getViewHandle(this);
-		if (view != nil && [view isKindOfClass:[SLIBGLViewHandle class]]) {
-			SLIBGLViewHandle* v = (SLIBGLViewHandle*)view;
-			[v _requestRender];
+		namespace render_view
+		{
+			
+			class RenderViewInstance : public macOS_ViewInstance, public IRenderViewInstance
+			{
+				SLIB_DECLARE_OBJECT
+				
+			public:
+				SLIBGLViewHandle* getHandle()
+				{
+					return (SLIBGLViewHandle*)m_handle;
+				}
+				
+				void setRedrawMode(RenderView* view, RedrawMode mode) override
+				{
+					SLIBGLViewHandle* handle = getHandle();
+					if (handle != nil) {
+						handle->m_flagRenderingContinuously = mode == RedrawMode::Continuously;
+					}
+				}
+				
+				void requestRender(RenderView* view) override
+				{
+					SLIBGLViewHandle* handle = getHandle();
+					if (handle != nil) {
+						handle->m_flagRequestRender = sl_true;
+					}
+				}
+				
+			};
+			
+			SLIB_DEFINE_OBJECT(RenderViewInstance, ViewInstance)
+			
 		}
 	}
 	
+	using namespace priv::render_view;
+
+	Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* parent)
+	{
+		Ref<RenderViewInstance> ret = macOS_ViewInstance::create<RenderViewInstance, SLIBGLViewHandle>(this, parent);
+		if (ret.isNotNull()) {
+			ret->setRedrawMode(this, getRedrawMode());
+			return ret;
+		}
+		return sl_null;
+	}
+	
+	Ptr<IRenderViewInstance> RenderView::getRenderViewInstance()
+	{
+		return CastRef<RenderViewInstance>(getViewInstance());
+	}
+
 	namespace priv
 	{
 		namespace gl_view
@@ -133,7 +156,7 @@ namespace slib
 						
 						if (frameNumber % 10 == 0) {
 							dispatch_async(dispatch_get_main_queue(), ^{
-								[handle _queryViewStatus];
+								[handle queryViewStatus];
 							});
 						}
 						
@@ -238,7 +261,7 @@ namespace slib
 		m_flagViewVisible = sl_false;
 		m_viewportWidth = 1;
 		m_viewportHeight = 1;
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_surfaceNeedsUpdate:) name:NSViewGlobalFrameDidChangeNotification object:self];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(surfaceNeedsUpdate:) name:NSViewGlobalFrameDidChangeNotification object:self];
 		__weak SLIBGLViewHandle* weak = self;
 		m_thread = slib::Thread::start(slib::Function<void()>::bind(&(slib::priv::gl_view::RenderThreadProc), weak));
 	}
@@ -275,25 +298,12 @@ namespace slib
 	}
 }
 
--(void) _surfaceNeedsUpdate:(NSNotification*)notification
+-(void)surfaceNeedsUpdate:(NSNotification*)notification
 {
 	m_flagUpdate = sl_true;
 }
 
--(void)_setRenderContinuously:(BOOL)flag
-{
-	if (flag == m_flagRenderingContinuously) {
-		return;
-	}
-	m_flagRenderingContinuously = flag;
-}
-
--(void)_requestRender
-{
-	m_flagRequestRender = sl_true;
-}
-
--(void)_queryViewStatus
+-(void)queryViewStatus
 {
 	sl_bool flagVisible = sl_true;
 	if ([self isHidden]) {

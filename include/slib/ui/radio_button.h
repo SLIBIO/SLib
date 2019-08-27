@@ -52,7 +52,7 @@ namespace slib
 		
 		void setChecked(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw) override;
 
-	public:
+	protected:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
 		void dispatchClickEvent(UIEvent* ev) override;

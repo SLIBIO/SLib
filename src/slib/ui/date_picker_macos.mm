@@ -28,57 +28,108 @@
 
 #include "view_macos.h"
 
+namespace slib
+{
+	namespace priv
+	{
+		namespace date_picker
+		{
+			class DatePickerInstance;
+		}
+	}
+}
+
 @interface SLIBDatePickerHandle : NSDatePicker<NSDatePickerCellDelegate>
 {
-	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
+	@public slib::WeakRef<slib::priv::date_picker::DatePickerInstance> m_viewInstance;
 }
 @end
 
 namespace slib
 {
-
-	Ref<ViewInstance> DatePicker::createNativeWidget(ViewInstance* _parent)
+	
+	namespace priv
 	{
-		MACOS_VIEW_CREATE_INSTANCE_BEGIN
-		SLIBDatePickerHandle* handle = [[SLIBDatePickerHandle alloc] initWithFrame:frame];
-		if (handle != nil) {
+		namespace date_picker
+		{
+			
+			class DatePickerInstance : public macOS_ViewInstance, public IDatePickerInstance
+			{
+				SLIB_DECLARE_OBJECT
+				
+			public:
+				NSDatePicker* getHandle()
+				{
+					return (NSDatePicker*)m_handle;
+				}
+				
+				sl_bool getDate(DatePicker* view, Time& _out) override
+				{
+					NSDatePicker* handle = getHandle();
+					if (handle != nil) {
+						_out = Apple::getTimeFromNSDate(handle.dateValue);
+						return sl_true;
+					}
+					return sl_false;
+				}
+				
+				void setDate(DatePicker* view, const Time& date) override
+				{
+					NSDatePicker* handle = getHandle();
+					if (handle != nil) {
+						handle.dateValue = Apple::getNSDateFromTime(date);
+					}
+				}
+				
+				sl_bool measureSize(DatePicker* view, UISize& _out) override
+				{
+					return UIPlatform::measureNativeWidgetFittingSize(this, _out);
+				}
+				
+				void onChange(SLIBDatePickerHandle* handle, NSDate** pValue)
+				{
+					Ref<DatePicker> view = CastRef<DatePicker>(getView());
+					if (view.isNotNull()) {
+						NSDate* date = *pValue;
+						Time time = Apple::getTimeFromNSDate(date);
+						Time old = time;
+						view->dispatchChange(time);
+						if (old != time) {
+							*pValue = Apple::getNSDateFromTime(time);
+						}
+					}
+				}
+				
+			};
+			
+			SLIB_DEFINE_OBJECT(DatePickerInstance, macOS_ViewInstance)
+			
+		}
+	}
+	
+	using namespace priv::date_picker;
+
+	Ref<ViewInstance> DatePicker::createNativeWidget(ViewInstance* parent)
+	{
+		Ref<DatePickerInstance> ret = macOS_ViewInstance::create<DatePickerInstance, SLIBDatePickerHandle>(this, parent);
+		if (ret.isNotNull()) {
+			NSDatePicker* handle = ret->getHandle();
 			handle.dateValue = Apple::getNSDateFromTime(m_date);
 			handle.datePickerElements = NSDatePickerElementFlagYearMonthDay;
+			return ret;
 		}
-		MACOS_VIEW_CREATE_INSTANCE_END
-		return ret;
+		return sl_null;
 	}
-
-	void DatePicker::_getDate_NW()
+	
+	Ptr<IDatePickerInstance> DatePicker::getDatePickerInstance()
 	{
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[NSDatePicker class]]) {
-			NSDatePicker* v = (NSDatePicker*)handle;
-			m_date = Apple::getTimeFromNSDate(v.dateValue);
-		}
+		return CastRef<DatePickerInstance>(getViewInstance());
 	}
-
-	void DatePicker::_setDate_NW(const Time& date)
-	{
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[NSDatePicker class]]) {
-			NSDatePicker* v = (NSDatePicker*)handle;
-			v.dateValue = Apple::getNSDateFromTime(date);
-		}
-	}
-
-	sl_bool DatePicker::_measureSize_NW(UISize& _out)
-	{
-		return UIPlatform::measureNativeWidgetFittingSize(this, _out);
-	}
-
-	void DatePicker::_setFont_NW(const Ref<Font>& font)
-	{
-	}
-
+	
 }
 
 using namespace slib;
+using namespace slib::priv::date_picker;
 
 @implementation SLIBDatePickerHandle
 
@@ -97,15 +148,9 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 validateProposedDateValue:(NSDate * _Nonnull *)proposedDateValue
 		  timeInterval:(NSTimeInterval *)proposedTimeInterval
 {
-	Ref<DatePicker> view = GetViewFromInstance<DatePicker, macOS_ViewInstance>(m_viewInstance);
-	if (view.isNotNull()) {
-		NSDate* date = *proposedDateValue;
-		Time time = Apple::getTimeFromNSDate(date);
-		Time old = time;
-		view->dispatchChange(time);
-		if (old != time) {
-			*proposedDateValue = Apple::getNSDateFromTime(time);
-		}
+	Ref<DatePickerInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		instance->onChange(self, proposedDateValue);
 	}
 }
 

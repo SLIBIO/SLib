@@ -50,15 +50,17 @@ namespace slib
 				~ButtonInstance();
 				
 			public:
-				void setText(const String& text) override;
+				NSButton* getHandle();
 				
-				void setDefaultButton(sl_bool flag) override;
+				void setText(Button* view, const String& text) override;
 				
-				sl_bool measureSize(UISize& _out) override;
+				void setDefaultButton(Button* view, sl_bool flag) override;
 				
-				void getChecked(sl_bool& flag) override;
+				sl_bool measureSize(Button* view, UISize& _out) override;
 				
-				void setChecked(sl_bool flag) override;
+				sl_bool getChecked(CheckBox* view, sl_bool& flag) override;
+				
+				void setChecked(CheckBox* view, sl_bool flag) override;
 				
 			};
 			

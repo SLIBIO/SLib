@@ -121,7 +121,7 @@ namespace slib
 		return m_gravity;
 	}
 	
-	void ImageView::setGravity(Alignment align, UIUpdateMode mode)
+	void ImageView::setGravity(const Alignment& align, UIUpdateMode mode)
 	{
 		m_gravity = align;
 		invalidate(mode);

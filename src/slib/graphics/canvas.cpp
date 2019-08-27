@@ -439,7 +439,7 @@ namespace slib
 		draw(xDst, yDst, src, priv::canvas::g_defaultDrawParam);
 	}
 
-	void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleMode scaleMode, Alignment alignment)
+	void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleMode scaleMode, const Alignment& alignment)
 	{
 		draw(rectDst, source, scaleMode, alignment, priv::canvas::g_defaultDrawParam);
 	}

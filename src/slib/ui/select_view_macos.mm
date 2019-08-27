@@ -28,9 +28,20 @@
 
 #include "view_macos.h"
 
+namespace slib
+{
+	namespace priv
+	{
+		namespace select_view
+		{
+			class SelectViewInstance;
+		}
+	}
+}
+
 @interface SLIBSelectViewHandle : NSPopUpButton
 {	
-	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
+	@public slib::WeakRef<slib::priv::select_view::SelectViewInstance> m_viewInstance;
 }
 @end
 
@@ -45,7 +56,7 @@ namespace slib
 			class SelectViewHelper : public SelectView
 			{
 			public:
-				void _applyItemsCount(NSPopUpButton* v)
+				void applyItemsCount(NSPopUpButton* v)
 				{
 					ObjectLocker lock(this);
 					sl_uint32 nOrig = (sl_uint32)([v numberOfItems]);
@@ -66,20 +77,16 @@ namespace slib
 							[v addItemWithTitle:[NSString stringWithFormat:@"%d",i]];
 							NSMenuItem* item = [v lastItem];
 							if (item != nil) {
-								NSString* s = Apple::getNSStringFromString(m_titles.getValueAt(i));
-								if (s == nil) {
-									s = @"";
-								}
-								[item setTitle:s];
+								[item setTitle:Apple::getNSStringFromString(m_titles.getValueAt(i), @"")];
 							}
 						}
 					}
 				}
 				
-				void _copyItems(NSPopUpButton* v)
+				void copyItems(NSPopUpButton* v)
 				{
 					[v removeAllItems];
-					_applyItemsCount(v);
+					applyItemsCount(v);
 					if (m_indexSelected >= m_titles.getCount()) {
 						m_indexSelected = 0;
 					}
@@ -88,89 +95,89 @@ namespace slib
 					}
 				}
 				
-				void _setItemTitle(NSPopUpButton* v, sl_uint32 index, const String& title)
+			};
+			
+			class SelectViewInstance : public macOS_ViewInstance, public ISelectViewInstance
+			{
+				SLIB_DECLARE_OBJECT
+				
+			public:
+				NSPopUpButton* getHandle()
 				{
-					NSString* s = Apple::getNSStringFromString(title);
-					if (s == nil) {
-						s = @"";
-					}
-					NSMenuItem* item = [v itemAtIndex:index];
-					if (item != nil) {
-						[item setTitle:s];
+					return (NSPopUpButton*)m_handle;
+				}
+				
+				void select(SelectView* view, sl_uint32 index) override
+				{
+					NSPopUpButton* handle = getHandle();
+					if (handle != nil) {
+						[handle selectItemAtIndex:index];
 					}
 				}
 				
-				sl_uint32 _getSelectedIndex(NSPopUpButton* v)
+				void refreshItemsCount(SelectView* view) override
 				{
-					return (sl_uint32)([v indexOfSelectedItem]);
+					NSPopUpButton* handle = getHandle();
+					if (handle != nil) {
+						static_cast<SelectViewHelper*>(view)->applyItemsCount(handle);
+					}
 				}
 				
-				void _onSelectItem(NSPopUpButton* v)
+				void refreshItemsContent(SelectView* view) override
 				{
-					dispatchSelectItem(_getSelectedIndex(v));
+					NSPopUpButton* handle = getHandle();
+					if (handle != nil) {
+						static_cast<SelectViewHelper*>(view)->copyItems(handle);
+					}
+				}
+				
+				void setItemTitle(SelectView* view, sl_uint32 index, const String& title) override
+				{
+					NSPopUpButton* handle = getHandle();
+					if (handle != nil) {
+						NSMenuItem* item = [handle itemAtIndex:index];
+						if (item != nil) {
+							[item setTitle:Apple::getNSStringFromString(title, @"")];
+						}
+					}
+				}
+				
+				sl_bool measureSize(SelectView* view, UISize& _out) override
+				{
+					return UIPlatform::measureNativeWidgetFittingSize(this, _out);
+				}
+				
+				void onSelectItem(NSPopUpButton* handle)
+				{
+					Ref<SelectView> view = CastRef<SelectView>(getView());
+					if (view.isNotNull()) {
+						view->dispatchSelectItem((sl_uint32)([handle indexOfSelectedItem]));
+					}
 				}
 			};
 
+			SLIB_DEFINE_OBJECT(SelectViewInstance, macOS_ViewInstance)
+			
 		}
 	}
 
 	using namespace priv::select_view;
 
-	Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* _parent)
+	Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* parent)
 	{
-		MACOS_VIEW_CREATE_INSTANCE_BEGIN
-		SLIBSelectViewHandle* handle = [[SLIBSelectViewHandle alloc] initWithFrame:frame];
-		if (handle != nil) {
+		Ref<SelectViewInstance> ret = macOS_ViewInstance::create<SelectViewInstance, SLIBSelectViewHandle>(this, parent);
+		if (ret.isNotNull()) {
+			NSPopUpButton* handle = ret->getHandle();
 			[handle setPullsDown:NO];
-			((SelectViewHelper*)this)->_copyItems(handle);
+			static_cast<SelectViewHelper*>(this)->copyItems(handle);
+			return ret;
 		}
-		MACOS_VIEW_CREATE_INSTANCE_END
-		return ret;
+		return sl_null;
 	}
-
-	void SelectView::_select_NW(sl_uint32 index)
+	
+	Ptr<ISelectViewInstance> SelectView::getSelectViewInstance()
 	{
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
-			NSPopUpButton* v = (NSPopUpButton*)handle;
-			[v selectItemAtIndex:index];
-		}
-	}
-
-	void SelectView::_refreshItemsCount_NW()
-	{
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
-			NSPopUpButton* v = (NSPopUpButton*)handle;
-			((SelectViewHelper*)this)->_applyItemsCount(v);
-		}
-	}
-
-	void SelectView::_refreshItemsContent_NW()
-	{
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
-			NSPopUpButton* v = (NSPopUpButton*)handle;
-			((SelectViewHelper*)this)->_copyItems(v);
-		}
-	}
-
-	void SelectView::_setItemTitle_NW(sl_uint32 index, const String& title)
-	{
-		NSView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
-			NSPopUpButton* v = (NSPopUpButton*)handle;
-			((SelectViewHelper*)this)->_setItemTitle(v, index, title);
-		}
-	}
-
-	sl_bool SelectView::_measureSize_NW(UISize& _out)
-	{
-		return UIPlatform::measureNativeWidgetFittingSize(this, _out);
-	}
-
-	void SelectView::_setFont_NW(const Ref<Font>& font)
-	{
+		return CastRef<SelectViewInstance>(getViewInstance());
 	}
 
 }
@@ -195,9 +202,9 @@ MACOS_VIEW_DEFINE_ON_KEY
 
 -(void)onSelect
 {
-	Ref<SelectViewHelper> view = GetViewFromInstance<SelectViewHelper, macOS_ViewInstance>(m_viewInstance);
-	if (view.isNotNull()) {
-		view->_onSelectItem(self);
+	Ref<SelectViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		instance->onSelectItem(self);
 	}
 }
 

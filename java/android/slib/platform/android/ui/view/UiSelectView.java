@@ -37,7 +37,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import slib.platform.android.Logger;
 import slib.platform.android.ui.UiFont;
-import slib.platform.android.ui.UiThread;
 import slib.platform.android.ui.Util;
 
 public class UiSelectView extends Spinner implements IView {
@@ -61,133 +60,117 @@ public class UiSelectView extends Spinner implements IView {
 	}
 	
 	public static void _applyList(final View view, final String[] items) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_applyList(view, items);
-				}
-			});
-			return;
-		}
-		if (view instanceof UiSelectView) {
-			UiSelectView sv = (UiSelectView)view;
-			MyAdapter adapter = sv.new MyAdapter(items);
-			sv.setAdapter(adapter);
+		try {
+			if (view instanceof UiSelectView) {
+				UiSelectView sv = (UiSelectView) view;
+				MyAdapter adapter = sv.new MyAdapter(items);
+				sv.setAdapter(adapter);
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 	}
 	
 	public static int _getSelectedIndex(View view) {
-		if (view instanceof UiSelectView) {
-			UiSelectView sv = (UiSelectView)view;
-			int n = sv.getSelectedItemPosition();
-			if (n < 0) {
-				n = 0;
+		try {
+			if (view instanceof UiSelectView) {
+				UiSelectView sv = (UiSelectView) view;
+				int n = sv.getSelectedItemPosition();
+				if (n < 0) {
+					n = 0;
+				}
+				return n;
 			}
-			return n;
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return 0;
 	}
 	
 	public static void _select(final View view, final int n) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_select(view, n);
-				}
-			});
-			return;
-		}
-		if (view instanceof UiSelectView) {
-			UiSelectView sv = (UiSelectView)view;
-			sv.setSelection(n);
+		try {
+			if (view instanceof UiSelectView) {
+				UiSelectView sv = (UiSelectView) view;
+				sv.setSelection(n);
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 	}
 
 	public static boolean _setAlignment(final View view, final int align) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setAlignment(view, align);
+		try {
+			if (view instanceof UiSelectView) {
+				UiSelectView sv = (UiSelectView) view;
+				sv.textAlignment = Util.getAndroidAlignment(align);
+				View child = sv.getChildAt(0);
+				if (child instanceof TextView) {
+					((TextView) child).setGravity(sv.textAlignment);
 				}
-			});
-			return true;
-		}
-		if (view instanceof UiSelectView) {
-			UiSelectView sv = (UiSelectView)view;
-			sv.textAlignment = Util.getAndroidAlignment(align);
-			View child = sv.getChildAt(0);
-			if (child instanceof TextView) {
-				((TextView)child).setGravity(sv.textAlignment);
+				return true;
 			}
-			return true;
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}
 
 	public static boolean _setTextColor(final View view, final int color) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setTextColor(view, color);
+		try {
+			if (view instanceof UiSelectView) {
+				UiSelectView sv = (UiSelectView) view;
+				sv.textColor = color;
+				View child = sv.getChildAt(0);
+				if (child instanceof TextView) {
+					((TextView) child).setTextColor(color);
 				}
-			});
-			return true;
-		}
-		if (view instanceof UiSelectView) {
-			UiSelectView sv = (UiSelectView)view;
-			sv.textColor = color;
-			View child = sv.getChildAt(0);
-			if (child instanceof TextView) {
-				((TextView)child).setTextColor(color);
+				return true;
 			}
-			return true;
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}
 
 	public static boolean _setBorder(final View view, final boolean flag) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setBorder(view, flag);
-				}
-			});
-			return true;
-		}
-		if (view instanceof UiSelectView) {
-			UiSelectView sv = (UiSelectView)view;
-			sv.border = flag;
-			sv.applyBackground();
-			return true;
+		try {
+			if (view instanceof UiSelectView) {
+				UiSelectView sv = (UiSelectView) view;
+				sv.border = flag;
+				sv.applyBackground();
+				return true;
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}
 
 	public static boolean _setBackgroundColor(final View view, final int color) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setBackgroundColor(view, color);
-				}
-			});
-			return true;
-		}
-		if (view instanceof UiSelectView) {
-			UiSelectView sv = (UiSelectView)view;
-			sv.backgroundColor = color;
-			sv.applyBackground();
-			return true;
+		try {
+			if (view instanceof UiSelectView) {
+				UiSelectView sv = (UiSelectView) view;
+				sv.backgroundColor = color;
+				sv.applyBackground();
+				return true;
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}
 
 	public static boolean _setFont(View view, UiFont font) {
-		if (view instanceof UiSelectView) {
-			UiSelectView sv = (UiSelectView)view;
-			if (font != null) {
-				sv.font = font;
-				return true;				
+		try {
+			if (view instanceof UiSelectView) {
+				UiSelectView sv = (UiSelectView) view;
+				if (font != null) {
+					sv.font = font;
+					return true;
+				}
 			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}

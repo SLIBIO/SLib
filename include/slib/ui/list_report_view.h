@@ -57,6 +57,8 @@ namespace slib
 
 	};
 	
+	class IListReportViewInstance;
+	
 	class SLIB_EXPORT ListReportView : public View
 	{
 		SLIB_DECLARE_OBJECT
@@ -89,11 +91,11 @@ namespace slib
 		
 		Alignment getHeaderAlignment(sl_uint32 col);
 		
-		virtual void setHeaderAlignment(sl_uint32 col, Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setHeaderAlignment(sl_uint32 col, const Alignment& align, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		Alignment getColumnAlignment(sl_uint32 col);
 		
-		virtual void setColumnAlignment(sl_uint32 col, Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setColumnAlignment(sl_uint32 col, const Alignment& align, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		sl_int32 getSelectedRow();
 		
@@ -111,33 +113,38 @@ namespace slib
 		SLIB_DECLARE_EVENT_HANDLER(ListReportView, RightButtonClickRow, sl_uint32 row, const UIPoint& pt)
 		SLIB_DECLARE_EVENT_HANDLER(ListReportView, DoubleClickRow, sl_uint32 row, const UIPoint& pt)
 		
-	public:
+	protected:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
-	protected:
-		void _refreshColumnsCount_NW();
-		
-		void _refreshRowsCount_NW();
-		
-		void _setHeaderText_NW(sl_uint32 col, const String& text);
-		
-		void _setColumnWidth_NW(sl_uint32 col, sl_ui_len width);
-		
-		void _setHeaderAlignment_NW(sl_uint32 col, Alignment align);
-		
-		void _setColumnAlignment_NW(sl_uint32 col, Alignment align);
-		
-		void _getSelectedRow_NW();
-		
-		void _setFont_NW(const Ref<Font>& font) override;
-		
+		virtual Ptr<IListReportViewInstance> getListReportViewInstance();
+
 	protected:
 		CList<ListReportViewColumn> m_columns;
 		sl_uint32 m_nRows;
 		CList< List<ListReportViewCell> > m_cells;
 		sl_int32 m_selectedRow;
 		
-	};	
+	};
+	
+	class IListReportViewInstance
+	{
+	public:
+		virtual void refreshColumnsCount(ListReportView* view) = 0;
+		
+		virtual void refreshRowsCount(ListReportView* view) = 0;
+		
+		virtual void setHeaderText(ListReportView* view, sl_uint32 col, const String& text) = 0;
+		
+		virtual void setColumnWidth(ListReportView* view, sl_uint32 col, sl_ui_len width) = 0;
+		
+		virtual void setHeaderAlignment(ListReportView* view, sl_uint32 col, const Alignment& align) = 0;
+		
+		virtual void setColumnAlignment(ListReportView* view, sl_uint32 col, const Alignment& align) = 0;
+		
+		virtual sl_bool getSelectedRow(ListReportView* view, sl_int32& row) = 0;
+
+	};
+	
 }
 
 #endif

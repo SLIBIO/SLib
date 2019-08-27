@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
 
 #include "slib/ui/select_view.h"
 
+#include "slib/ui/core.h"
 #include "slib/core/safe_static.h"
 
 #if defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_IOS) || defined(SLIB_UI_IS_WIN32) || defined(SLIB_UI_IS_ANDROID)
@@ -138,7 +139,7 @@ namespace slib
 		m_iconSize.x = 0;
 		m_iconSize.y = 0;
 		
-		m_textAlignment = Alignment::MiddleLeft;
+		m_gravity = Alignment::MiddleLeft;
 		m_textColor = Color::Black;
 		
 		DefaultResources* def = GetDefaultResources();
@@ -161,10 +162,14 @@ namespace slib
 	
 	void SelectView::setItemsCount(sl_uint32 n, UIUpdateMode mode)
 	{
+		Ptr<ISelectViewInstance> instance = getSelectViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&SelectView::setItemsCount, n, mode)
+		}
 		m_values.setCount(n);
 		m_titles.setCount(n);
-		if (isNativeWidget()) {
-			_refreshItemsCount_NW();
+		if (instance.isNotNull()) {
+			instance->refreshItemsCount(this);
 			if (m_indexSelected >= n) {
 				selectIndex(0, UIUpdateMode::None);
 			}
@@ -208,10 +213,14 @@ namespace slib
 	
 	void SelectView::setItemTitle(sl_uint32 index, const String& title, UIUpdateMode mode)
 	{
+		Ptr<ISelectViewInstance> instance = getSelectViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&SelectView::setItemTitle, index, title, mode)
+		}
 		if (index < m_titles.getCount()) {
 			m_titles.setAt(index, title);
-			if (isNativeWidget()) {
-				_setItemTitle_NW(index, title);
+			if (instance.isNotNull()) {
+				instance->setItemTitle(this, index, title);
 			} else {
 				invalidate(mode);
 			}
@@ -225,14 +234,17 @@ namespace slib
 	
 	void SelectView::setTitles(const List<String>& list, UIUpdateMode mode)
 	{
-		m_titles = list;
-		if (isNativeWidget()) {
-			_refreshItemsContent_NW();
+		Ptr<ISelectViewInstance> instance = getSelectViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&SelectView::setTitles, list, mode)
+			m_titles = list;
+			instance->refreshItemsContent(this);
 			sl_uint32 n = (sl_uint32)(m_titles.getCount());
 			if (m_indexSelected >= n) {
 				selectIndex(0, UIUpdateMode::None);
 			}
 		} else {
+			m_titles = list;
 			sl_uint32 n = (sl_uint32)(m_titles.getCount());
 			if (m_indexSelected >= n) {
 				selectIndex(0, UIUpdateMode::None);
@@ -243,13 +255,17 @@ namespace slib
 	
 	void SelectView::addItem(const String& value, const String& title, UIUpdateMode mode)
 	{
+		Ptr<ISelectViewInstance> instance = getSelectViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&SelectView::addItem, value, title, mode)
+		}
 		sl_size n = m_values.getCount();
 		m_values.setCount(n + 1);
 		m_titles.setCount(n + 1);
 		m_values.setAt(n, value);
 		m_titles.setAt(n, title);
-		if (isNativeWidget()) {
-			_refreshItemsCount_NW();
+		if (instance.isNotNull()) {
+			instance->refreshItemsCount(this);
 			if (m_indexSelected >= n) {
 				selectIndex(0, UIUpdateMode::None);
 			}
@@ -263,10 +279,14 @@ namespace slib
 	
 	void SelectView::selectIndex(sl_uint32 index, UIUpdateMode mode)
 	{
+		Ptr<ISelectViewInstance> instance = getSelectViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&SelectView::selectIndex, index, mode)
+		}
 		if (index < m_titles.getCount()) {
 			m_indexSelected = index;
-			if (isNativeWidget()) {
-				_select_NW(index);
+			if (instance.isNotNull()) {
+				instance->select(this, index);
 			} else {
 				invalidate(mode);
 			}
@@ -365,15 +385,18 @@ namespace slib
 	
 	Alignment SelectView::getGravity()
 	{
-		return m_textAlignment;
+		return m_gravity;
 	}
 	
-	void SelectView::setGravity(Alignment align, UIUpdateMode mode)
+	void SelectView::setGravity(const Alignment& gravity, UIUpdateMode mode)
 	{
-		m_textAlignment = align;
-		if (isNativeWidget()) {
-			_setTextAlignment_NW(align);
+		Ptr<ISelectViewInstance> instance = getSelectViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&SelectView::setGravity, gravity, mode)
+			m_gravity = gravity;
+			instance->setGravity(this, gravity);
 		} else {
+			m_gravity = gravity;
 			invalidate(mode);
 		}
 	}
@@ -385,10 +408,13 @@ namespace slib
 	
 	void SelectView::setTextColor(const Color& color, UIUpdateMode mode)
 	{
-		m_textColor = color;
-		if (isNativeWidget()) {
-			_setTextColor_NW(color);
+		Ptr<ISelectViewInstance> instance = getSelectViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&SelectView::setTextColor, color, mode)
+			m_textColor = color;
+			instance->setTextColor(this, color);
 		} else {
+			m_textColor = color;
 			invalidate(mode);
 		}
 	}
@@ -449,9 +475,10 @@ namespace slib
 			return;
 		}
 		
-		if (isNativeWidget()) {
+		Ptr<ISelectViewInstance> instance = getSelectViewInstance();
+		if (instance.isNotNull()) {
 			UISize size;
-			if (_measureSize_NW(size)) {
+			if (instance->measureSize(this, size)) {
 				if (flagHorizontal) {
 					setLayoutWidth(size.x);
 				}
@@ -561,50 +588,23 @@ namespace slib
 		return sl_null;
 	}
 	
-	void SelectView::_select_NW(sl_uint32 index)
+	Ptr<ISelectViewInstance> SelectView::getSelectViewInstance()
 	{
-	}
-	
-	void SelectView::_refreshItemsCount_NW()
-	{
-	}
-	
-	void SelectView::_refreshItemsContent_NW()
-	{
-	}
-	
-	void SelectView::_setItemTitle_NW(sl_uint32 index, const String& title)
-	{
-	}
-	
-	void SelectView::_setFont_NW(const Ref<Font>& font)
-	{
+		return sl_null;
 	}
 #endif
 	
-#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
-	void SelectView::_setTextAlignment_NW(Alignment align)
+	void ISelectViewInstance::setGravity(SelectView* view, const Alignment& gravity)
 	{
 	}
 	
-	void SelectView::_setTextColor_NW(const Color& color)
+	void ISelectViewInstance::setTextColor(SelectView* view, const Color& color)
 	{
 	}
 	
-	void SelectView::_setBorder_NW(sl_bool flag)
-	{
-	}
-	
-	void SelectView::_setBackgroundColor_NW(const Color& color)
-	{
-	}
-#endif
-
-#if !defined(SLIB_UI_IS_MACOS)
-	sl_bool SelectView::_measureSize_NW(UISize& _out)
+	sl_bool ISelectViewInstance::measureSize(SelectView* view, UISize& _out)
 	{
 		return sl_false;
 	}
-#endif
-
+	
 }

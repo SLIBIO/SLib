@@ -25,6 +25,7 @@
 #if defined(SLIB_UI_IS_WIN32)
 
 #include "slib/ui/web_view.h"
+
 #include "slib/core/win32_com.h"
 
 #include "view_win32.h"
@@ -48,10 +49,239 @@ namespace slib
 		namespace web_view
 		{
 
+			class WebViewHelper : public WebView
+			{
+				friend class WebViewInstance;
+			};
+
 			class OleClient;
 
-			class WebViewInstance : public Win32_ViewInstance
+			class DocumentMoniker : public IMoniker
 			{
+			public:
+				IStream* m_stream;
+				String16 m_displayName;
+
+				sl_int32 m_nRef;
+
+			public:
+				DocumentMoniker()
+				{
+					m_stream = NULL;
+					m_nRef = 1;
+				}
+
+				~DocumentMoniker()
+				{
+					SLIB_WIN32_COM_SAFE_RELEASE(m_stream);
+				}
+
+			public:
+				HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, void** ppvObject)
+				{
+					*ppvObject = NULL;
+					if (Base::equalsMemory(&iid, &IID_IUnknown, sizeof(IID))) {
+						*ppvObject = (IUnknown*)(IMoniker*)this;
+						AddRef();
+						return S_OK;
+					}
+					if (Base::equalsMemory(&iid, &IID_IMoniker, sizeof(IID))) {
+						*ppvObject = (IMoniker*)this;
+						AddRef();
+						return S_OK;
+					}
+					return E_NOINTERFACE;
+				}
+
+				ULONG STDMETHODCALLTYPE AddRef()
+				{
+					sl_int32 nRef = Base::interlockedIncrement32(&m_nRef);
+					return nRef;
+				}
+
+				ULONG STDMETHODCALLTYPE Release()
+				{
+					sl_int32 nRef = Base::interlockedDecrement32(&m_nRef);
+					if (nRef == 0) {
+						delete this;
+					}
+					return nRef;
+				}
+
+				// IPersist
+				HRESULT STDMETHODCALLTYPE GetClassID(CLSID *pClassID)
+				{
+					return E_NOTIMPL;
+				}
+
+				// IPersistStream
+				HRESULT STDMETHODCALLTYPE IsDirty()
+				{
+					return E_NOTIMPL;
+				}
+
+				HRESULT STDMETHODCALLTYPE Load(IStream *pStm)
+				{
+					return E_NOTIMPL;
+				}
+
+				HRESULT STDMETHODCALLTYPE Save(IStream *pStm, BOOL fClearDirty)
+				{
+					return E_NOTIMPL;
+				}
+
+				HRESULT STDMETHODCALLTYPE GetSizeMax(ULARGE_INTEGER *pcbSize)
+				{
+					return E_NOTIMPL;
+				}
+
+				// IMoniker
+				HRESULT STDMETHODCALLTYPE BindToObject(IBindCtx *pbc, IMoniker *pmkToLeft, REFIID riidResult, void **ppvResult)
+				{
+					return E_NOTIMPL;
+				}
+
+				HRESULT STDMETHODCALLTYPE BindToStorage(IBindCtx *pbc, IMoniker *pmkToLeft, REFIID riid, void **ppvObj)
+				{
+					*ppvObj = NULL;
+					if (Base::equalsMemory(&riid, &IID_IStream, sizeof(IID))) {
+						*ppvObj = m_stream;
+						m_stream->AddRef();
+					} else {
+						*ppvObj = NULL;
+					}
+					return S_OK;
+				}
+
+				HRESULT STDMETHODCALLTYPE Reduce(IBindCtx *pbc, DWORD dwReduceHowFar, IMoniker **ppmkToLeft, IMoniker **ppmkReduced)
+				{
+					return E_NOTIMPL;
+				}
+
+				HRESULT STDMETHODCALLTYPE ComposeWith(IMoniker *pmkRight, BOOL fOnlyIfNotGeneric, IMoniker **ppmkComposite)
+				{
+					return E_NOTIMPL;
+				}
+
+				HRESULT STDMETHODCALLTYPE Enum(BOOL fForward, IEnumMoniker **ppenumMoniker)
+				{
+					return E_NOTIMPL;
+				}
+
+				HRESULT STDMETHODCALLTYPE IsEqual(IMoniker *pmkOtherMoniker)
+				{
+					return E_NOTIMPL;
+				}
+
+				HRESULT STDMETHODCALLTYPE Hash(DWORD *pdwHash)
+				{
+					return E_NOTIMPL;
+				}
+
+				HRESULT STDMETHODCALLTYPE IsRunning(IBindCtx *pbc, IMoniker *pmkToLeft, IMoniker *pmkNewlyRunning)
+				{
+					return E_NOTIMPL;
+				}
+
+				HRESULT STDMETHODCALLTYPE GetTimeOfLastChange(IBindCtx *pbc, IMoniker *pmkToLeft, FILETIME *pFileTime)
+				{
+					return E_NOTIMPL;
+				}
+
+				HRESULT STDMETHODCALLTYPE Inverse(IMoniker **ppmk)
+				{
+					return E_NOTIMPL;
+				}
+
+				HRESULT STDMETHODCALLTYPE CommonPrefixWith(IMoniker *pmkOther, IMoniker **ppmkPrefix)
+				{
+					return E_NOTIMPL;
+				}
+
+				HRESULT STDMETHODCALLTYPE RelativePathTo(IMoniker *pmkOther, IMoniker **ppmkRelPath)
+				{
+					return E_NOTIMPL;
+				}
+
+				HRESULT STDMETHODCALLTYPE GetDisplayName(IBindCtx *pbc, IMoniker *pmkToLeft, LPOLESTR *ppszDisplayName)
+				{
+					String16 name = m_displayName;
+					DWORD size = (DWORD)(name.getLength()) * 2 + 2;
+					OLECHAR* buf = (OLECHAR*)(::CoTaskMemAlloc(size));
+					if (buf) {
+						Base::copyMemory(buf, name.getData(), size);
+						*ppszDisplayName = buf;
+						return S_OK;
+					} else {
+						*ppszDisplayName = NULL;
+						return E_OUTOFMEMORY;
+					}
+				}
+
+				HRESULT STDMETHODCALLTYPE ParseDisplayName(IBindCtx *pbc, IMoniker *pmkToLeft, LPOLESTR pszDisplayName, ULONG *pchEaten, IMoniker **ppmkOut)
+				{
+					return E_NOTIMPL;
+				}
+
+				HRESULT STDMETHODCALLTYPE IsSystemMoniker(DWORD *pdwMksys)
+				{
+					return E_NOTIMPL;
+				}
+			};
+
+			static void WriteHTML(IHTMLDocument2* doc, String16 content, String16 baseURL)
+			{
+				if (baseURL.isNotEmpty()) {
+					HRESULT hr;
+					IStream* stream = ::SHCreateMemStream((BYTE*)(content.getData()), (sl_uint32)(content.getLength() * 2));
+					if (stream) {
+						IPersistMoniker* persistMoniker = NULL;
+						hr = doc->QueryInterface(IID_IPersistMoniker, (void**)(&persistMoniker));
+						if (hr == S_OK) {
+							IBindCtx* ctx = NULL;
+							hr = ::CreateBindCtx(0, &ctx);
+							if (hr == S_OK) {
+								DocumentMoniker* moniker = new DocumentMoniker;
+								if (moniker) {
+									moniker->m_stream = stream;
+									if (stream) {
+										moniker->m_displayName = baseURL;
+										persistMoniker->Load(TRUE, moniker, ctx, STGM_READ);
+									}
+									moniker->Release();
+									stream = NULL;
+								}
+								ctx->Release();
+							}
+							persistMoniker->Release();
+						}
+						if (stream) {
+							stream->Release();
+						}
+					}
+				} else {
+					SAFEARRAYBOUND bound;
+					bound.cElements = 1;
+					bound.lLbound = 0;
+					SAFEARRAY* sa = ::SafeArrayCreate(VT_VARIANT, 1, &bound);
+					if (sa) {
+						VARIANT* varArr;
+						HRESULT hr = ::SafeArrayAccessData(sa, (void**)(&varArr));
+						if (hr == S_OK) {
+							varArr[0].vt = VT_BSTR;
+							varArr[0].bstrVal = ::SysAllocString((BSTR)(content.getData()));
+							doc->write(sa);
+							doc->close();
+						}
+						::SafeArrayDestroy(sa);
+					}
+				}
+			}
+
+			class WebViewInstance : public Win32_ViewInstance, public IWebViewInstance
+			{
+				SLIB_DECLARE_OBJECT
+
 			public:
 				OleClient* m_oleClient;
 
@@ -62,23 +292,155 @@ namespace slib
 
 			public:
 				WebViewInstance();
+
 				~WebViewInstance();
 
 			public:
-				sl_bool _initialize();
+				void installExternal();
 
-				void _resize()
+			public:
+				sl_bool prepare();
+
+				void refreshSize(WebView* view) override
+				{
+					HWND handle = getHandle();
+					if (handle) {
+						IWebBrowser2* browser = m_browser;
+						if (browser) {
+							RECT rc;
+							GetClientRect(handle, &rc);
+							browser->put_Left(0);
+							browser->put_Top(0);
+							browser->put_Width(rc.right);
+							browser->put_Width(rc.bottom);
+						}
+					}
+				}
+
+				void load(WebView* view) override
+				{
+					WebViewHelper* helper = static_cast<WebViewHelper*>(view);
+					IWebBrowser2* browser = m_browser;
+					if (browser) {
+						if (helper->m_flagOfflineContent) {
+							IHTMLDocument2* doc2 = getDoc();
+							if (doc2) {
+								WriteHTML(doc2, helper->m_offlineContentHTML, helper->m_urlOrigin);
+								doc2->Release();
+							}
+						} else {
+							String16 url = helper->m_urlOrigin;
+							if (url.isNotEmpty()) {
+								VARIANT varURL;
+								VariantInit(&varURL);
+								varURL.vt = VT_BSTR;
+								varURL.bstrVal = (BSTR)(url.getData());
+								if (helper->m_customUserAgent.isNotEmpty()) {
+									String16 headers = "User-Agent: " + helper->m_customUserAgent;
+									VARIANT varHeaders;
+									varHeaders.vt = VT_BSTR;
+									varHeaders.bstrVal = (BSTR)(headers.getData());
+									browser->Navigate2(&varURL, NULL, NULL, NULL, &varHeaders);
+								} else {
+									browser->Navigate2(&varURL, NULL, NULL, NULL, NULL);
+								}
+							}
+						}
+					}
+				}
+
+				sl_bool getURL(WebView* view, String& _out) override
+				{
+					IHTMLDocument2* doc2 = getDoc();
+					if (doc2) {
+						sl_bool bRet = sl_false;
+						BSTR url = NULL;
+						HRESULT hr = doc2->get_URL(&url);
+						if (hr == S_OK) {
+							_out = (sl_char16*)url;
+							bRet = sl_true;
+						}
+						if (url) {
+							SysFreeString(url);
+						}
+						doc2->Release();
+						return bRet;
+					}
+					return sl_false;
+				}
+
+				sl_bool getPageTitle(WebView* view, String& _out) override
+				{
+					IHTMLDocument2* doc2 = getDoc();
+					if (doc2) {
+						sl_bool bRet = sl_false;
+						BSTR title = NULL;
+						HRESULT hr = doc2->get_title(&title);
+						if (hr == S_OK) {
+							_out = (sl_char16*)title;
+							bRet = sl_true;
+						}
+						if (title) {
+							::SysFreeString(title);
+						}
+						doc2->Release();
+						return bRet;
+					}
+					return sl_null;
+				}
+
+				void goBack(WebView* view) override
 				{
 					IWebBrowser2* browser = m_browser;
 					if (browser) {
-						HWND hWnd = getHandle();
-						RECT rc;
-						::GetClientRect(hWnd, &rc);
-						browser->put_Left(0);
-						browser->put_Top(0);
-						browser->put_Width(rc.right);
-						browser->put_Width(rc.bottom);
+						browser->GoBack();
 					}
+				}
+
+				void goForward(WebView* view) override
+				{
+					IWebBrowser2* browser = m_browser;
+					if (browser) {
+						browser->GoBack();
+					}
+				}
+
+				void reload(WebView* view) override
+				{
+					IWebBrowser2* browser = m_browser;
+					if (browser) {
+						browser->Refresh();
+					}
+				}
+
+				void runJavaScript(WebView* view, const String& _script) override
+				{
+					String16 script = _script;
+					if (script.isNotEmpty()) {
+						IHTMLDocument2* doc2 = getDoc();
+						if (doc2) {
+							HRESULT hr;
+							IHTMLWindow2* win = NULL;
+							hr = doc2->get_parentWindow(&win);
+							if (hr == S_OK) {
+								BSTR s = (BSTR)(SysAllocString((OLECHAR*)(script.getData())));
+								if (s) {
+									VARIANT var;
+									VariantInit(&var);
+									// execScript always returns empty
+									win->execScript(s, L"JScript", &var);
+									VariantClear(&var);
+									SysFreeString(s);
+								}
+								win->Release();
+							}
+							doc2->Release();
+						}
+					}
+				}
+
+				void setCustomUserAgent(WebView* view, const String& agent) override
+				{
 				}
 
 				IHTMLDocument2* getDoc()
@@ -97,31 +459,61 @@ namespace slib
 					return ret;
 				}
 
-				void _installExternal();
-
-				void _onBeforeNavigate2(BSTR szURL, VARIANT_BOOL* pFlagCancel)
+				Ref<WebViewHelper> getHelper()
 				{
-					Ref<View> _view = getView();
-					if (WebView* view = CastInstance<WebView>(_view.get())) {
-						view->dispatchStartLoad(szURL);
+					return CastRef<WebViewHelper>(getView());
+				}
+
+				void onBeforeNavigate2(BSTR szURL, VARIANT_BOOL* pFlagCancel)
+				{
+					Ref<WebViewHelper> helper = getHelper();
+					if (helper.isNotNull()) {
+						helper->dispatchStartLoad(szURL);
 						*pFlagCancel = 0;
 					}
 				}
 
-				void _onNavigateComplete(BSTR szURL)
+				void onNavigateComplete(BSTR szURL)
 				{
-					Ref<View> _view = getView();
-					if (WebView* view = CastInstance<WebView>(_view.get())) {
-						_installExternal();
-						view->runJavaScript("window.slib = {send: slib_send};");
+					installExternal();
+					runJavaScript(sl_null, "window.slib = {send: slib_send};");
+				}
+
+				void onDocumentComplete(BSTR szURL)
+				{
+					Ref<WebViewHelper> helper = getHelper();
+					if (helper.isNotNull()) {
+						helper->dispatchFinishLoad(szURL, sl_false);
 					}
 				}
 
-				void _onDocumentComplete(BSTR szURL)
+				void onExternalCall(DISPPARAMS* pDispParams)
 				{
-					Ref<View> _view = getView();
-					if (WebView* view = CastInstance<WebView>(_view.get())) {
-						view->dispatchFinishLoad(szURL, sl_false);
+					Ref<WebViewHelper> helper = CastRef<WebViewHelper>(getView());
+					if (helper.isNotNull()) {
+						List<String> params;
+						sl_uint32 n = (sl_uint32)(pDispParams->cArgs);
+						for (sl_uint32 i = 0; i < n; i++) {
+							VARIANT& var = pDispParams->rgvarg[n - 1 - i];
+							String s;
+							if (var.vt == VT_BSTR) {
+								s = String((sl_char16*)(var.bstrVal));
+							} else {
+								VARIANT varStr;
+								VariantInit(&varStr);
+								VariantChangeType(&varStr, &var, 0, VT_BSTR);
+								if (varStr.vt == VT_BSTR) {
+									s = String((sl_char16*)(varStr.bstrVal));
+								}
+								VariantClear(&varStr);
+							}
+							params.add(s);
+						}
+						String msg = params.getValueAt(0);
+						if (msg.isNotEmpty()) {
+							String param = params.getValueAt(1);
+							helper->dispatchMessageFromJavaScript(msg, param);
+						}
 					}
 				}
 
@@ -132,10 +524,7 @@ namespace slib
 			public:
 				WebViewInstance* m_viewInstance;
 
-				OleClient()
-				{
-				}
-
+			public:
 				// IUnknown
 				HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, void** ppvObject)
 				{
@@ -255,8 +644,8 @@ namespace slib
 					lpFrameInfo->haccel = 0;
 					lpFrameInfo->cAccelEntries = 0;
 
-					::GetClientRect(lpFrameInfo->hwndFrame, lprcPosRect);
-					::GetClientRect(lpFrameInfo->hwndFrame, lprcClipRect);
+					GetClientRect(lpFrameInfo->hwndFrame, lprcPosRect);
+					GetClientRect(lpFrameInfo->hwndFrame, lprcClipRect);
 					return S_OK;
 				}
 
@@ -461,44 +850,16 @@ namespace slib
 				{
 					switch (dispIdMember) {
 					case DISPID_VALUE:
-						// external call
-						{
-							sl_uint32 n = (sl_uint32)(pDispParams->cArgs);
-							Ref<View> _view = m_viewInstance->getView();
-							if (WebView* view = CastInstance<WebView>(_view.get())) {
-								List<String> params;
-								for (sl_uint32 i = 0; i < n; i++) {
-									VARIANT& var = pDispParams->rgvarg[n - 1 - i];
-									String s;
-									if (var.vt == VT_BSTR) {
-										s = String((sl_char16*)(var.bstrVal));
-									} else {
-										VARIANT varStr;
-										::VariantInit(&varStr);
-										::VariantChangeType(&varStr, &var, 0, VT_BSTR);
-										if (varStr.vt == VT_BSTR) {
-											s = String((sl_char16*)(varStr.bstrVal));
-										}
-										::VariantClear(&varStr);
-									}
-									params.add(s);
-								}
-								String msg = params.getValueAt(0);
-								if (msg.isNotEmpty()) {
-									String param = params.getValueAt(1);
-									view->dispatchMessageFromJavaScript(msg, param);
-								}
-							}
-						}
+						m_viewInstance->onExternalCall(pDispParams);
 						break;
 					case DISPID_BEFORENAVIGATE2:
-						m_viewInstance->_onBeforeNavigate2(pDispParams->rgvarg[5].pvarVal->bstrVal, pDispParams->rgvarg[0].pboolVal);
+						m_viewInstance->onBeforeNavigate2(pDispParams->rgvarg[5].pvarVal->bstrVal, pDispParams->rgvarg[0].pboolVal);
 						break;
 					case DISPID_NAVIGATECOMPLETE2:
-						m_viewInstance->_onNavigateComplete(pDispParams->rgvarg[0].pvarVal->bstrVal);
+						m_viewInstance->onNavigateComplete(pDispParams->rgvarg[0].pvarVal->bstrVal);
 						break;
 					case DISPID_DOCUMENTCOMPLETE:
-						m_viewInstance->_onDocumentComplete(pDispParams->rgvarg[0].pvarVal->bstrVal);
+						m_viewInstance->onDocumentComplete(pDispParams->rgvarg[0].pvarVal->bstrVal);
 						break;
 					default:
 						return DISP_E_MEMBERNOTFOUND;
@@ -506,6 +867,8 @@ namespace slib
 					return S_OK;
 				}
 			};
+
+			SLIB_DEFINE_OBJECT(WebViewInstance, Win32_ViewInstance)
 
 			WebViewInstance::WebViewInstance()
 			{
@@ -526,62 +889,72 @@ namespace slib
 					m_control->Close(OLECLOSE_NOSAVE);
 					SLIB_WIN32_COM_SAFE_RELEASE(m_control);
 				}
-
 				delete m_oleClient;
 			}
 
-			sl_bool WebViewInstance::_initialize()
+			sl_bool WebViewInstance::prepare()
 			{
+				HWND hWnd = m_handle;
+				if (!hWnd) {
+					return sl_false;
+				}
+
 				HRESULT hr;
 				IOleObject* control;
-				hr = ::CoCreateInstance(CLSID_WebBrowser, NULL, CLSCTX_INPROC_SERVER, IID_IOleObject, (void**)(&control));
-				if (hr != S_OK) {
-					return sl_false;
-				}
-				control->SetClientSite((IOleClientSite*)m_oleClient);
-				hr = ::OleSetContainedObject((IUnknown*)(control), TRUE);
-				if (hr != S_OK) {
-					control->Release();
-					return sl_false;
-				}
 
-				control->SetHostNames(L"SLIB_WebBrowser", NULL);
-
-				HWND hWnd = getHandle();
-				RECT rect;
-				::GetClientRect(hWnd, &rect);
-				
-				hr = control->DoVerb(OLEIVERB_SHOW, NULL, (IOleClientSite*)m_oleClient, -1, hWnd, &rect);
-				if (hr != S_OK) {
-					control->Release();
-					return sl_false;
-				}
-				IWebBrowser2* browser = NULL;
-				hr = control->QueryInterface(IID_IWebBrowser2, (void**)(&browser));
-				if (hr != S_OK) {
-					control->Release();
-					return sl_false;
-				}
-				m_control = control;
-				m_browser = browser;
-				_resize();
-
-				IConnectionPointContainer *cpc = NULL;
-				hr = control->QueryInterface(IID_IConnectionPointContainer, (void**)&cpc);
+				hr = CoCreateInstance(CLSID_WebBrowser, NULL, CLSCTX_INPROC_SERVER, IID_IOleObject, (void**)(&control));
 				if (hr == S_OK) {
-					IConnectionPoint *cp = NULL;
-					hr = cpc->FindConnectionPoint(DIID_DWebBrowserEvents2, &cp);
-					if (hr == S_OK) {
-						cp->Advise((IDispatch*)m_oleClient, &m_eventCookie);
-						cp->Release();
-					}
-					cpc->Release();
-				}
 
-				return sl_true;
+					control->SetClientSite((IOleClientSite*)m_oleClient);
+
+					hr = OleSetContainedObject((IUnknown*)(control), TRUE);
+					if (hr == S_OK) {
+
+						control->SetHostNames(L"SLIB_WebBrowser", NULL);
+
+						RECT rect;
+						GetClientRect(hWnd, &rect);
+
+						hr = control->DoVerb(OLEIVERB_SHOW, NULL, (IOleClientSite*)m_oleClient, -1, hWnd, &rect);
+						if (hr == S_OK) {
+
+							IWebBrowser2* browser = NULL;
+							hr = control->QueryInterface(IID_IWebBrowser2, (void**)(&browser));
+							if (hr == S_OK) {
+
+								m_control = control;
+								m_browser = browser;
+
+								IConnectionPointContainer *cpc = NULL;
+								hr = control->QueryInterface(IID_IConnectionPointContainer, (void**)&cpc);
+								if (hr == S_OK) {
+									IConnectionPoint *cp = NULL;
+									hr = cpc->FindConnectionPoint(DIID_DWebBrowserEvents2, &cp);
+									if (hr == S_OK) {
+										cp->Advise((IDispatch*)m_oleClient, &m_eventCookie);
+										cp->Release();
+									}
+									cpc->Release();
+								}
+
+								refreshSize(sl_null);
+
+								VARIANT varURL;
+								VariantInit(&varURL);
+								varURL.vt = VT_BSTR;
+								varURL.bstrVal = L"about:blank";
+								browser->Navigate2(&varURL, NULL, NULL, NULL, NULL);
+
+								return sl_true;
+							}
+						}
+					}
+					control->Release();
+				}
+				return sl_false;
 			}
 
-			void WebViewInstance::_installExternal()
+			void WebViewInstance::installExternal()
 			{
 				HRESULT hr;
 				IHTMLDocument2* doc = getDoc();
@@ -615,274 +988,6 @@ namespace slib
 				}
 			}
 
-			class DocumentMoniker : public IMoniker
-			{
-			public:
-				IStream* m_stream;
-				String16 m_displayName;
-
-				sl_int32 m_nRef;
-
-				DocumentMoniker()
-				{
-					m_stream = NULL;
-					m_nRef = 1;
-				}
-
-				~DocumentMoniker()
-				{
-					SLIB_WIN32_COM_SAFE_RELEASE(m_stream);
-				}
-
-				HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, void** ppvObject)
-				{
-					*ppvObject = NULL;
-					if (Base::equalsMemory(&iid, &IID_IUnknown, sizeof(IID))) {
-						*ppvObject = (IUnknown*)(IMoniker*)this;
-						AddRef();
-						return S_OK;
-					}
-					if (Base::equalsMemory(&iid, &IID_IMoniker, sizeof(IID))) {
-						*ppvObject = (IMoniker*)this;
-						AddRef();
-						return S_OK;
-					}
-					return E_NOINTERFACE;
-				}
-
-				ULONG STDMETHODCALLTYPE AddRef()
-				{
-					sl_int32 nRef = Base::interlockedIncrement32(&m_nRef);
-					return nRef;
-				}
-
-				ULONG STDMETHODCALLTYPE Release()
-				{
-					sl_int32 nRef = Base::interlockedDecrement32(&m_nRef);
-					if (nRef == 0) {
-						delete this;
-					}
-					return nRef;
-				}
-
-				// IPersist
-				HRESULT STDMETHODCALLTYPE GetClassID(CLSID *pClassID)
-				{
-					return E_NOTIMPL;
-				}
-
-				// IPersistStream
-				HRESULT STDMETHODCALLTYPE IsDirty()
-				{		
-					return E_NOTIMPL;
-				}
-
-				HRESULT STDMETHODCALLTYPE Load(IStream *pStm)
-				{
-					return E_NOTIMPL;
-				}
-
-				HRESULT STDMETHODCALLTYPE Save(IStream *pStm, BOOL fClearDirty)
-				{
-					return E_NOTIMPL;
-				}
-
-				HRESULT STDMETHODCALLTYPE GetSizeMax(ULARGE_INTEGER *pcbSize)
-				{
-					return E_NOTIMPL;
-				}
-
-				// IMoniker
-				HRESULT STDMETHODCALLTYPE BindToObject(IBindCtx *pbc, IMoniker *pmkToLeft, REFIID riidResult, void **ppvResult)
-				{
-					return E_NOTIMPL;
-				}
-
-				HRESULT STDMETHODCALLTYPE BindToStorage(IBindCtx *pbc, IMoniker *pmkToLeft, REFIID riid, void **ppvObj)
-				{
-					*ppvObj = NULL;
-					if (Base::equalsMemory(&riid, &IID_IStream, sizeof(IID))) {
-						*ppvObj = m_stream;
-						m_stream->AddRef();
-					} else {
-						*ppvObj = NULL;
-					}
-					return S_OK;
-				}
-
-				HRESULT STDMETHODCALLTYPE Reduce(IBindCtx *pbc, DWORD dwReduceHowFar, IMoniker **ppmkToLeft, IMoniker **ppmkReduced)
-				{
-					return E_NOTIMPL;
-				}
-
-				HRESULT STDMETHODCALLTYPE ComposeWith(IMoniker *pmkRight, BOOL fOnlyIfNotGeneric, IMoniker **ppmkComposite)
-				{
-					return E_NOTIMPL;
-				}
-
-				HRESULT STDMETHODCALLTYPE Enum(BOOL fForward, IEnumMoniker **ppenumMoniker)
-				{
-					return E_NOTIMPL;
-				}
-
-				HRESULT STDMETHODCALLTYPE IsEqual(IMoniker *pmkOtherMoniker)
-				{
-					return E_NOTIMPL;
-				}
-
-				HRESULT STDMETHODCALLTYPE Hash(DWORD *pdwHash)
-				{
-					return E_NOTIMPL;
-				}
-
-				HRESULT STDMETHODCALLTYPE IsRunning(IBindCtx *pbc, IMoniker *pmkToLeft, IMoniker *pmkNewlyRunning)
-				{
-					return E_NOTIMPL;
-				}
-
-				HRESULT STDMETHODCALLTYPE GetTimeOfLastChange(IBindCtx *pbc, IMoniker *pmkToLeft, FILETIME *pFileTime)
-				{
-					return E_NOTIMPL;
-				}
-
-				HRESULT STDMETHODCALLTYPE Inverse(IMoniker **ppmk)
-				{
-					return E_NOTIMPL;
-				}
-
-				HRESULT STDMETHODCALLTYPE CommonPrefixWith(IMoniker *pmkOther, IMoniker **ppmkPrefix)
-				{
-					return E_NOTIMPL;
-				}
-
-				HRESULT STDMETHODCALLTYPE RelativePathTo(IMoniker *pmkOther, IMoniker **ppmkRelPath)
-				{
-					return E_NOTIMPL;
-				}
-
-				HRESULT STDMETHODCALLTYPE GetDisplayName(IBindCtx *pbc, IMoniker *pmkToLeft, LPOLESTR *ppszDisplayName)
-				{
-					String16 name = m_displayName;
-					DWORD size = (DWORD)(name.getLength()) * 2 + 2;
-					OLECHAR* buf = (OLECHAR*)(::CoTaskMemAlloc(size));
-					if (buf) {
-						Base::copyMemory(buf, name.getData(), size);
-						*ppszDisplayName = buf;
-						return S_OK;
-					} else {
-						*ppszDisplayName = NULL;
-						return E_OUTOFMEMORY;
-					}
-				}
-
-				HRESULT STDMETHODCALLTYPE ParseDisplayName(IBindCtx *pbc, IMoniker *pmkToLeft, LPOLESTR pszDisplayName, ULONG *pchEaten, IMoniker **ppmkOut)
-				{
-					return E_NOTIMPL;
-				}
-
-				HRESULT STDMETHODCALLTYPE IsSystemMoniker(DWORD *pdwMksys)
-				{
-					return E_NOTIMPL;
-				}
-			};
-
-			void WriteHTML(IHTMLDocument2* doc, String16 content, String16 baseURL)
-			{
-				if (baseURL.isNotEmpty()) {
-					HRESULT hr;
-					IStream* stream = ::SHCreateMemStream((BYTE*)(content.getData()), (sl_uint32)(content.getLength() * 2));
-					if (stream) {
-						IPersistMoniker* persistMoniker = NULL;
-						hr = doc->QueryInterface(IID_IPersistMoniker, (void**)(&persistMoniker));
-						if (hr == S_OK) {
-							IBindCtx* ctx = NULL;
-							hr = ::CreateBindCtx(0, &ctx);
-							if (hr == S_OK) {
-								DocumentMoniker* moniker = new DocumentMoniker;
-								if (moniker) {
-									moniker->m_stream = stream;
-									if (stream) {
-										moniker->m_displayName = baseURL;
-										persistMoniker->Load(TRUE, moniker, ctx, STGM_READ);
-									}
-									moniker->Release();
-									stream = NULL;
-								}
-								ctx->Release();
-							}
-							persistMoniker->Release();
-						}
-						if (stream) {
-							stream->Release();
-						}
-					}
-				} else {
-					SAFEARRAYBOUND bound;
-					bound.cElements = 1;
-					bound.lLbound = 0;
-					SAFEARRAY* sa = ::SafeArrayCreate(VT_VARIANT, 1, &bound);
-					if (sa) {
-						VARIANT* varArr;
-						HRESULT hr = ::SafeArrayAccessData(sa, (void**)(&varArr));
-						if (hr == S_OK) {
-							varArr[0].vt = VT_BSTR;
-							varArr[0].bstrVal = ::SysAllocString((BSTR)(content.getData()));
-							doc->write(sa);
-							doc->close();
-						}
-						::SafeArrayDestroy(sa);
-					}
-				}
-			}
-
-			class WebViewHelper : public WebView
-			{
-			public:
-				void _init(WebViewInstance* instance)
-				{
-					IWebBrowser2* browser = instance->m_browser;
-					if (browser) {
-						VARIANT varURL;
-						::VariantInit(&varURL);
-						varURL.vt = VT_BSTR;
-						varURL.bstrVal = L"about:blank";
-						browser->Navigate2(&varURL, NULL, NULL, NULL, NULL);
-					}
-				}
-
-				void _load(WebViewInstance* instance)
-				{
-					IWebBrowser2* browser = instance->m_browser;
-					if (browser) {
-						if (m_flagOfflineContent) {
-							IHTMLDocument2* doc2 = instance->getDoc();
-							if (doc2) {
-								WriteHTML(doc2, m_offlineContentHTML, m_urlOrigin);
-								doc2->Release();
-							}
-						} else {
-							String16 url = m_urlOrigin;
-							if (url.isNotEmpty()) {
-								VARIANT varURL;
-								::VariantInit(&varURL);
-								varURL.vt = VT_BSTR;
-								varURL.bstrVal = (BSTR)(url.getData());
-								if (m_customUserAgent.isNotEmpty()) {
-									String16 headers = "User-Agent: " + m_customUserAgent;
-									VARIANT varHeaders;
-									varHeaders.vt = VT_BSTR;
-									varHeaders.bstrVal = (BSTR)(headers.getData());
-									browser->Navigate2(&varURL, NULL, NULL, NULL, &varHeaders);
-								} else {
-									browser->Navigate2(&varURL, NULL, NULL, NULL, NULL);
-								}
-							}
-						}
-					}
-				}
-
-			};
-
 		}
 	}
 
@@ -894,141 +999,22 @@ namespace slib
 		if (!shared) {
 			return sl_null;
 		}
-
-		DWORD style = 0;
-		DWORD styleEx = 0;
-		Ref<WebViewInstance> ret = Win32_ViewInstance::create<WebViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), sl_null, style, styleEx);
+		Ref<WebViewInstance> ret = Win32_ViewInstance::create<WebViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), sl_null, 0, 0);
 		if (ret.isNotNull()) {
-			ret->_initialize();
-			((WebViewHelper*)this)->_init(ret.get());
-			((WebViewHelper*)this)->_load(ret.get());
-		}
-		return ret;
-	}
-
-	void WebView::_refreshSize_NW()
-	{
-		Ref<ViewInstance> _instance = getViewInstance();
-		if (WebViewInstance* instance = CastInstance<WebViewInstance>(_instance.get())) {
-			instance->_resize();
-		}
-	}
-
-	void WebView::_load_NW()
-	{
-		Ref<ViewInstance> _instance = getViewInstance();
-		if (WebViewInstance* instance = CastInstance<WebViewInstance>(_instance.get())) {
-			((WebViewHelper*)this)->_load(instance);
-		}
-	}
-
-	String WebView::_getURL_NW()
-	{
-		Ref<ViewInstance> _instance = getViewInstance();
-		if (WebViewInstance* instance = CastInstance<WebViewInstance>(_instance.get())) {
-			IHTMLDocument2* doc2 = instance->getDoc();
-			if (doc2) {
-				String ret;
-				BSTR url = NULL;
-				HRESULT hr = doc2->get_URL(&url);
-				if (hr == S_OK) {
-					ret = (sl_char16*)url;
-				}
-				if (url) {
-					::SysFreeString(url);
-				}
-				doc2->Release();
-				return ret;
-			}
-		}
-		return m_urlOrigin;
-	}
-
-	String WebView::_getPageTitle_NW()
-	{
-		Ref<ViewInstance> _instance = getViewInstance();
-		if (WebViewInstance* instance = CastInstance<WebViewInstance>(_instance.get())) {
-			IHTMLDocument2* doc2 = instance->getDoc();
-			if (doc2) {
-				String ret;
-				BSTR title = NULL;
-				HRESULT hr = doc2->get_title(&title);
-				if (hr == S_OK) {
-					ret = (sl_char16*)title;
-				}
-				if (title) {
-					::SysFreeString(title);
-				}
-				doc2->Release();
-				return ret;
-			}
+			ret->prepare();
+			ret->load(this);
+			return ret;
 		}
 		return sl_null;
 	}
 
-	void WebView::_goBack_NW()
+	Ptr<IWebViewInstance> WebView::getWebViewInstance()
 	{
-		Ref<ViewInstance> _instance = getViewInstance();
-		if (WebViewInstance* instance = CastInstance<WebViewInstance>(_instance.get())) {
-			IWebBrowser2* browser = instance->m_browser;
-			if (browser) {
-				browser->GoBack();
-			}
-		}
+		return CastRef<WebViewInstance>(getViewInstance());
 	}
 
-	void WebView::_goForward_NW()
-	{
-		Ref<ViewInstance> _instance = getViewInstance();
-		if (WebViewInstance* instance = CastInstance<WebViewInstance>(_instance.get())) {
-			IWebBrowser2* browser = instance->m_browser;
-			if (browser) {
-				browser->GoForward();
-			}
-		}
-	}
 
-	void WebView::_reload_NW()
-	{
-		Ref<ViewInstance> _instance = getViewInstance();
-		if (WebViewInstance* instance = CastInstance<WebViewInstance>(_instance.get())) {
-			IWebBrowser2* browser = instance->m_browser;
-			if (browser) {
-				browser->Refresh();
-			}
-		}
-	}
-
-	void WebView::_runJavaScript_NW(const String& _script)
-	{
-		String16 script = _script;
-		if (script.isNotEmpty()) {
-			Ref<ViewInstance> _instance = getViewInstance();
-			if (WebViewInstance* instance = CastInstance<WebViewInstance>(_instance.get())) {
-				IHTMLDocument2* doc2 = instance->getDoc();
-				if (doc2) {
-					HRESULT hr;
-					IHTMLWindow2* win = NULL;
-					hr = doc2->get_parentWindow(&win);
-					if (hr == S_OK) {
-						BSTR s = (BSTR)(::SysAllocString((OLECHAR*)(script.getData())));
-						if (s) {
-							VARIANT var;
-							::VariantInit(&var);
-							// execScript always returns empty
-							win->execScript(s, L"JScript", &var);
-							::VariantClear(&var);
-							::SysFreeString(s);
-						}
-						win->Release();
-					}
-					doc2->Release();
-				}
-			}
-		}
-	}
-
-	void WebView::_clearCache_NW()
+	void DefaultWebViewProvider::clearCache()
 	{
 		GROUPID groupId;
 		HANDLE handle = ::FindFirstUrlCacheGroup(0, CACHEGROUP_SEARCH_ALL, NULL, 0, &groupId, NULL);
@@ -1047,11 +1033,7 @@ namespace slib
 		}
 	}
 
-	void WebView::_clearCookie_NW()
-	{
-	}
-
-	void WebView::_setCustomUserAgent_NW()
+	void DefaultWebViewProvider::clearCookie()
 	{
 	}
 

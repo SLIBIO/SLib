@@ -27,8 +27,6 @@
 
 #include "view.h"
 
-#include "../core/ptr.h"
-
 namespace slib
 {
 
@@ -61,17 +59,8 @@ namespace slib
 		
 	};
 	
-	class SLIB_EXPORT IButtonInstance
-	{
-	public:
-		virtual void setText(const String& text) = 0;
-		
-		virtual void setDefaultButton(sl_bool flag) = 0;
-		
-		virtual sl_bool measureSize(UISize& _out) = 0;
-		
-	};
-
+	class IButtonInstance;
+	
 	class SLIB_EXPORT Button : public View
 	{
 		SLIB_DECLARE_OBJECT
@@ -127,15 +116,15 @@ namespace slib
 		
 		Alignment getGravity();
 		
-		virtual void setGravity(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setGravity(const Alignment& align, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		Alignment getIconAlignment();
 		
-		virtual void setIconAlignment(Alignment align, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		virtual void setIconAlignment(const Alignment& align, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		Alignment getTextAlignment();
 		
-		virtual void setTextAlignment(Alignment align, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
+		virtual void setTextAlignment(const Alignment& align, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isTextBeforeIcon();
 		
@@ -245,10 +234,10 @@ namespace slib
 		
 		void setUsingDefaultColorFilter(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-	public:
+	protected:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
-		Ptr<IButtonInstance> getButtonInstance();
+		virtual Ptr<IButtonInstance> getButtonInstance();
 		
 	public:
 		void setEnabled(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::Redraw) override;
@@ -311,6 +300,17 @@ namespace slib
 
 		ButtonCategory* m_categories;
 		sl_uint32 m_nCategories;
+		
+	};
+
+	class SLIB_EXPORT IButtonInstance
+	{
+	public:
+		virtual void setText(Button* view, const String& text) = 0;
+		
+		virtual void setDefaultButton(Button* view, sl_bool flag) = 0;
+		
+		virtual sl_bool measureSize(Button* view, UISize& _out) = 0;
 		
 	};
 

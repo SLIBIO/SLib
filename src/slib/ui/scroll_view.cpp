@@ -54,6 +54,10 @@ namespace slib
 	
 	void ScrollView::setContentView(const Ref<slib::View>& view, UIUpdateMode mode)
 	{
+		Ptr<IScrollViewInstance> instance = getScrollViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&ScrollView::setContentView, view, mode);
+		}
 		ObjectLocker lock(this);
 		Ref<View> viewOld = m_viewContent;
 		if (viewOld == view) {
@@ -81,12 +85,8 @@ namespace slib
 		if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
 			return;
 		}
-		if (isNativeWidget()) {
-			if (UI::isUiThread()) {
-				_setContentView_NW(view);
-			} else {
-				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ScrollView, _setContentView_NW, this, view));
-			}
+		if (instance.isNotNull()) {
+			instance->setContentView(this, view);
 		} else {
 			invalidate(mode);
 		}
@@ -94,6 +94,11 @@ namespace slib
 	
 	void ScrollView::setContentSize(sl_scroll_pos _width, sl_scroll_pos _height, UIUpdateMode mode)
 	{
+		Ptr<IScrollViewInstance> instance = getScrollViewInstance();
+		if (instance.isNotNull()) {
+			void (ScrollView::*func)(sl_scroll_pos, sl_scroll_pos, UIUpdateMode) = &ScrollView::setContentSize;
+			SLIB_VIEW_RUN_ON_UI_THREAD(func, _width, _height, mode)
+		}
 		_initializeScrollAttributes();
 		Ref<ScrollAttributes>& attrs = m_scrollAttrs;
 		if (attrs.isNull()) {
@@ -118,31 +123,43 @@ namespace slib
 			viewContent->setSize(width, height, SLIB_UI_UPDATE_MODE_IS_REDRAW(mode) ? UIUpdateMode::UpdateLayout : mode);
 		}
 		ViewGroup::setContentSize(_width, _height, mode);
-		if (isNativeWidget()) {
-			_refreshContentSize_NW();
+		if (instance.isNotNull()) {
+			instance->refreshContentSize(this);
 		}
 	}
 	
 	ScrollPoint ScrollView::getScrollPosition()
 	{
-		if (isNativeWidget()) {
-			return _getScrollPosition_NW();
+		Ptr<IScrollViewInstance> instance = getScrollViewInstance();
+		if (instance.isNotNull()) {
+			ScrollPoint pt;
+			if (instance->getScrollPosition(this, pt)) {
+				return pt;
+			}
 		}
 		return ViewGroup::getScrollPosition();
 	}
 	
 	ScrollPoint ScrollView::getScrollRange()
 	{
-		if (isNativeWidget()) {
-			return _getScrollRange_NW();
+		Ptr<IScrollViewInstance> instance = getScrollViewInstance();
+		if (instance.isNotNull()) {
+			ScrollPoint pt;
+			if (instance->getScrollRange(this, pt)) {
+				return pt;
+			}
 		}
 		return ViewGroup::getScrollRange();
 	}
 	
 	UIRect ScrollView::getBounds()
 	{
-		if (isNativeWidget()) {
-			return _getBounds_NW();
+		Ptr<IScrollViewInstance> instance = getScrollViewInstance();
+		if (instance.isNotNull()) {
+			UIRect ret;
+			if (instance->getBounds(this, ret)) {
+				return ret;
+			}
 		}
 		return ViewGroup::getBounds();
 	}
@@ -160,25 +177,23 @@ namespace slib
 	
 	void ScrollView::onResize(sl_ui_len width, sl_ui_len height)
 	{
-		if (isNativeWidget()) {
-			_refreshContentSize_NW();
-		}
+		_refreshSize();
 	}
 	
 	void ScrollView::onResizeChild(View* child, sl_ui_len width, sl_ui_len height)
 	{
 		if (child == m_viewContent) {
 			ViewGroup::setContentSize(width, height);
-			if (isNativeWidget()) {
-				_refreshContentSize_NW();
-			}
+			_refreshSize();
 		}
 	}
 	
-	void ScrollView::onUpdatePaging()
+	void ScrollView::_refreshSize()
 	{
-		if (isNativeWidget()) {
-			_setPaging_NW(isPaging(), getPageWidth(), getPageHeight());
+		Ptr<IScrollViewInstance> instance = getScrollViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&ScrollView::_refreshSize)
+			instance->refreshContentSize(this);
 		}
 	}
 	
@@ -188,51 +203,9 @@ namespace slib
 		return sl_null;
 	}
 	
-	void ScrollView::_refreshContentSize_NW()
+	Ptr<IScrollViewInstance> ScrollView::getScrollViewInstance()
 	{
-	}
-	
-	void ScrollView::_setContentView_NW(const Ref<View>& view)
-	{
-	}
-	
-	void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate)
-	{
-	}
-	
-	ScrollPoint ScrollView::_getScrollPosition_NW()
-	{
-		return ScrollPoint::zero();
-	}
-	
-	ScrollPoint ScrollView::_getScrollRange_NW()
-	{
-		return ScrollPoint::zero();
-	}
-	
-	void ScrollView::_setBorder_NW(sl_bool flag)
-	{
-	}
-	
-	void ScrollView::_setBackgroundColor_NW(const Color& color)
-	{
-	}
-	
-	void ScrollView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
-	{
-	}
-#endif
-	
-#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
-	void ScrollView::_setPaging_NW(sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight)
-	{
-	}
-#endif
-
-#if !defined(SLIB_UI_IS_WIN32)
-	UIRect ScrollView::_getBounds_NW()
-	{
-		return ViewGroup::getBounds();
+		return sl_null;
 	}
 #endif
 	
@@ -244,15 +217,21 @@ namespace slib
 	HorizontalScrollView::~HorizontalScrollView()
 	{
 	}
-
-
+	
+	
 	VerticalScrollView::VerticalScrollView()
 	{
 		setScrolling(sl_false, sl_true, UIUpdateMode::Init);
 	}
-
+	
 	VerticalScrollView::~VerticalScrollView()
 	{
 	}
 
+	
+	sl_bool IScrollViewInstance::getBounds(ScrollView* view, UIRect& _out)
+	{
+		return sl_false;
+	}
+	
 }

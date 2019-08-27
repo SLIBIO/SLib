@@ -29,7 +29,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ScrollView;
 import slib.platform.android.Logger;
-import slib.platform.android.ui.UiThread;
 import slib.platform.android.ui.window.UiWindow;
 
 public class UiScrollView extends ScrollView implements IView {
@@ -62,38 +61,32 @@ public class UiScrollView extends ScrollView implements IView {
 	}
 
 	public static void _setBackgroundColor(final View view, final int color) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setBackgroundColor(view, color);
-				}
-			});
+		try {
+			view.setBackgroundColor(color);
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
-		view.setBackgroundColor(color);
 	}
 	
 	public static void _scrollTo(final View view, final int x, final int y, final boolean flagAnimate) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_scrollTo(view, x, y, flagAnimate);
+		try {
+			if (view instanceof UiScrollView) {
+				if (flagAnimate) {
+					((UiScrollView) view).smoothScrollTo(x, y);
+				} else {
+					((UiScrollView) view)._scrollTo(x, y);
 				}
-			});
-		}
-		if (view instanceof UiScrollView) {
-			if (flagAnimate) {
-				((UiScrollView)view).smoothScrollTo(x, y);
+			} else if (view instanceof UiHorizontalScrollView) {
+				if (flagAnimate) {
+					((UiHorizontalScrollView) view).smoothScrollTo(x, y);
+				} else {
+					((UiHorizontalScrollView) view)._scrollTo(x, y);
+				}
 			} else {
-				((UiScrollView)view)._scrollTo(x, y);
+				view.scrollTo(x, y);
 			}
-		} else if (view instanceof UiHorizontalScrollView) {
-			if (flagAnimate) {
-				((UiHorizontalScrollView)view).smoothScrollTo(x, y);
-			} else {
-				((UiHorizontalScrollView)view)._scrollTo(x, y);
-			}
-		} else {
-			view.scrollTo(x, y);
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 	}
 	
@@ -106,16 +99,24 @@ public class UiScrollView extends ScrollView implements IView {
 	}
 
 	public static void _setPaging(View view, boolean flagPaging, int pageWidth, int pageHeight) {
-		if (view instanceof UiScrollView) {
-			((UiScrollView)view).setPaging(flagPaging, pageWidth, pageHeight);
-		} else if (view instanceof UiHorizontalScrollView) {
-			((UiHorizontalScrollView)view).setPaging(flagPaging, pageWidth, pageHeight);
+		try {
+			if (view instanceof UiScrollView) {
+				((UiScrollView) view).setPaging(flagPaging, pageWidth, pageHeight);
+			} else if (view instanceof UiHorizontalScrollView) {
+				((UiHorizontalScrollView) view).setPaging(flagPaging, pageWidth, pageHeight);
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 	}
 
 	public static void _setScrollBarsVisible(View view, boolean flagHorz, boolean flagVert) {
-		view.setHorizontalScrollBarEnabled(flagHorz);
-		view.setVerticalScrollBarEnabled(flagVert);
+		try {
+			view.setHorizontalScrollBarEnabled(flagHorz);
+			view.setVerticalScrollBarEnabled(flagVert);
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
 	}
 
 	private static native void nativeOnScroll(long instance, int x, int y);
@@ -125,7 +126,6 @@ public class UiScrollView extends ScrollView implements IView {
 			nativeOnScroll(instance, x, y);
 		}
 	}
-
 
 	boolean mPaging = false;
 	int mPageHeight = 0;

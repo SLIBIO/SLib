@@ -125,8 +125,9 @@ namespace slib
 	void RenderView::setRedrawMode(RedrawMode mode)
 	{
 		m_redrawMode = mode;
-		if (isNativeWidget()) {
-			_setRedrawMode_NW(mode);
+		Ptr<IRenderViewInstance> instance = getRenderViewInstance();
+		if (instance.isNotNull()) {
+			instance->setRedrawMode(this, mode);
 		}
 	}
 
@@ -142,8 +143,9 @@ namespace slib
 
 	void RenderView::requestRender()
 	{
-		if (isNativeWidget()) {
-			_requestRender_NW();
+		Ptr<IRenderViewInstance> instance = getRenderViewInstance();
+		if (instance.isNotNull()) {
+			instance->requestRender(this);
 		}
 	}
 
@@ -451,13 +453,10 @@ namespace slib
 	{
 		return sl_null;
 	}
-
-	void RenderView::_setRedrawMode_NW(RedrawMode mode)
+	
+	Ptr<IRenderViewInstance> RenderView::getRenderViewInstance()
 	{
-	}
-
-	void RenderView::_requestRender_NW()
-	{
+		return sl_null;
 	}
 #endif
 

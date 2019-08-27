@@ -186,6 +186,9 @@ namespace slib
 					
 					if (window != nil) {
 						
+						[window setDelegate: window];
+						window.animationBehavior = NSWindowAnimationBehaviorDocumentWindow;
+
 						window->m_flagStateResizingWidth = sl_false;
 						[window setReleasedWhenClosed:NO];
 						[window setContentView:[[SLIBViewHandle alloc] init]];
@@ -212,14 +215,7 @@ namespace slib
 										w->m_flagSheet = sl_false;
 									}
 								}];
-							} else {
-								if (parent != nil) {
-									[parent addChildWindow:window ordered:NSWindowAbove];
-								}
-								[window makeKeyAndOrderFront:NSApp];
-								[window setDelegate: window];
 							}
-							
 							return ret;
 						}
 					}
@@ -261,7 +257,7 @@ namespace slib
 					return m_window == nil;
 				}
 				
-				sl_bool setParent(const Ref<WindowInstance>& windowInst) override
+				void setParent(const Ref<WindowInstance>& windowInst) override
 				{
 					NSWindow* window = m_window;
 					if (window != nil) {
@@ -269,20 +265,17 @@ namespace slib
 							macOS_WindowInstance* w = static_cast<macOS_WindowInstance*>(windowInst.get());
 							NSWindow* p = w->m_window;
 							m_parent = p;
-							if (p != nil) {
+							if (p != nil && window.parentWindow == nil) {
 								[p addChildWindow:window ordered:NSWindowAbove];
-								return sl_true;
 							}
 						} else {
-							NSWindow* p = [window parentWindow];
+							NSWindow* p = window.parentWindow;
 							if (p != nil) {
 								[p removeChildWindow:window];
 							}
 							m_parent = nil;
-							return sl_true;
 						}
 					}
-					return sl_false;
 				}
 				
 				Ref<ViewInstance> getContentView() override
@@ -300,22 +293,13 @@ namespace slib
 					return sl_false;
 				}
 				
-				sl_bool activate() override
+				void activate() override
 				{
 					NSWindow* window = m_window;
 					if (window != nil) {
-						if ([NSThread isMainThread]) {
-							[window makeKeyAndOrderFront:NSApp];
-							[NSApp activateIgnoringOtherApps:YES];
-						} else {
-							dispatch_async(dispatch_get_main_queue(), ^{
-								[window makeKeyAndOrderFront:NSApp];
-								[NSApp activateIgnoringOtherApps:YES];
-							});
-						}
-						return sl_true;
+						[window makeKeyAndOrderFront:NSApp];
+						[NSApp activateIgnoringOtherApps:YES];
 					}
-					return sl_false;
 				}
 				
 				UIRect getFrame() override
@@ -331,22 +315,14 @@ namespace slib
 					}
 				}
 				
-				sl_bool setFrame(const UIRect& frame) override
+				void setFrame(const UIRect& frame) override
 				{
 					NSWindow* window = m_window;
 					if (window != nil) {
 						NSRect rect;
 						_getNSRect(rect, frame, m_heightScreen);
-						if ([NSThread isMainThread]) {
-							[window setFrame:rect display:TRUE];
-						} else {
-							dispatch_async(dispatch_get_main_queue(), ^{
-								[window setFrame:rect display:TRUE];
-							});
-						}
-						return sl_true;
+						[window setFrame:rect display:TRUE];
 					}
-					return sl_false;
 				}
 				
 				UIRect getClientFrame() override
@@ -374,38 +350,28 @@ namespace slib
 					}
 				}
 				
-				sl_bool setClientSize(const UISize& _size) override
+				sl_bool setClientSize(const UISize& size) override
 				{
-					UISize size = _size;
 					NSWindow* window = m_window;
 					if (window != nil) {
 						NSSize s;
 						s.width = (CGFloat)(size.x);
 						s.height = (CGFloat)(size.y);
-						if ([NSThread isMainThread]) {
-							[window setContentSize:s];
-						} else {
-							dispatch_async(dispatch_get_main_queue(), ^{
-								[window setContentSize:s];
-							});
-						}
+						[window setContentSize:s];
 						return sl_true;
 					}
 					return sl_false;
 				}
 				
-				sl_bool setTitle(const String& title) override
+				void setTitle(const String& title) override
 				{
 					NSWindow* window = m_window;
 					if (window != nil) {
-						NSString* ntitle = Apple::getNSStringFromString(title);
-						[window setTitle: ntitle];
-						return sl_true;
+						[window setTitle: Apple::getNSStringFromString(title)];
 					}
-					return sl_false;
 				}
 				
-				sl_bool setBackgroundColor(const Color& _color) override
+				void setBackgroundColor(const Color& _color) override
 				{
 					NSWindow* window = m_window;
 					if (window != nil) {
@@ -415,16 +381,8 @@ namespace slib
 						} else {
 							color = GraphicsPlatform::getNSColorFromColor(_color);
 						}
-						if ([NSThread isMainThread]) {
-							[window setBackgroundColor:color];
-						} else {
-							dispatch_async(dispatch_get_main_queue(), ^{
-								[window setBackgroundColor:color];
-							});
-						}
-						return sl_true;
+						[window setBackgroundColor:color];
 					}
-					return sl_false;
 				}
 				
 				sl_bool isMinimized() override
@@ -442,36 +400,20 @@ namespace slib
 					}
 				}
 				
-				sl_bool setMinimized(sl_bool flag) override
+				void setMinimized(sl_bool flag) override
 				{
 					NSWindow* window = m_window;
 					if (window != nil) {
-						if ([NSThread isMainThread]) {
-							sl_bool f1 = [window isMiniaturized] ? sl_true : sl_false;
-							sl_bool f2 = flag ? sl_true : sl_false;
-							if (f1 != f2) {
-								if (f2) {
-									[window miniaturize:nil];
-								} else {
-									[window deminiaturize:nil];
-								}
+						sl_bool f1 = [window isMiniaturized] ? sl_true : sl_false;
+						sl_bool f2 = flag ? sl_true : sl_false;
+						if (f1 != f2) {
+							if (f2) {
+								[window miniaturize:nil];
+							} else {
+								[window deminiaturize:nil];
 							}
-						} else {
-							dispatch_async(dispatch_get_main_queue(), ^{
-								sl_bool f1 = [window isMiniaturized] ? sl_true : sl_false;
-								sl_bool f2 = flag ? sl_true : sl_false;
-								if (f1 != f2) {
-									if (f2) {
-										[window miniaturize:nil];
-									} else {
-										[window deminiaturize:nil];
-									}
-								}
-							});
 						}
-						return sl_true;
 					}
-					return sl_false;
 				}
 				
 				sl_bool isMaximized() override
@@ -489,97 +431,59 @@ namespace slib
 					}
 				}
 				
-				sl_bool setMaximized(sl_bool flag) override
+				void setMaximized(sl_bool flag) override
 				{
 					NSWindow* window = m_window;
 					if (window != nil) {
-						if ([NSThread isMainThread]) {
-							sl_bool f1 = [window isZoomed] ? sl_true : sl_false;
-							sl_bool f2 = flag ? sl_true : sl_false;
-							if (f1 != f2) {
-								[window zoom:nil];
-							}
-						} else {
-							dispatch_async(dispatch_get_main_queue(), ^{
-								sl_bool f1 = [window isZoomed] ? sl_true : sl_false;
-								sl_bool f2 = flag ? sl_true : sl_false;
-								if (f1 != f2) {
-									[window zoom:nil];
-								}
-							});
+						sl_bool f1 = [window isZoomed] ? sl_true : sl_false;
+						sl_bool f2 = flag ? sl_true : sl_false;
+						if (f1 != f2) {
+							[window zoom:nil];
 						}
-						return sl_true;
 					}
-					return sl_false;
 				}
 				
-				sl_bool setVisible(sl_bool flag) override
+				void setVisible(sl_bool flag) override
 				{
 					NSWindow* window = m_window;
 					if (window != nil) {
-						if ([NSThread isMainThread]) {
-							if (flag) {
-								NSWindow* parent = m_parent;
-								if (parent != nil) {
+						if (flag) {
+							NSWindow* parent = m_parent;
+							if (parent != nil) {
+								if (window.parentWindow == nil) {
 									[parent addChildWindow:window ordered:NSWindowAbove];
-								} else {
-									[window orderFrontRegardless];
 								}
 							} else {
-								[window orderOut:nil];
+								[window orderFrontRegardless];
 							}
 						} else {
-							dispatch_async(dispatch_get_main_queue(), ^{
-								if (flag) {
-									NSWindow* parent = m_parent;
-									if (parent != nil) {
-										[parent addChildWindow:window ordered:NSWindowAbove];
-									} else {
-										[window orderFrontRegardless];
-									}
-								} else {
-									[window orderOut:nil];
-								}
-							});
+							[window orderOut:nil];
 						}
-						return sl_true;
 					}
-					return sl_false;
 				}
 				
-				sl_bool setAlwaysOnTop(sl_bool flag) override
+				void setAlwaysOnTop(sl_bool flag) override
 				{
 					NSWindow* window = m_window;
 					if (window != nil) {
-						if ([NSThread isMainThread]) {
-							if (flag) {
-								[window setLevel:NSFloatingWindowLevel];
-							} else {
-								[window setLevel:NSNormalWindowLevel];
-							}
+						if (flag) {
+							[window setLevel:NSFloatingWindowLevel];
 						} else {
-							dispatch_async(dispatch_get_main_queue(), ^{
-								if (flag) {
-									[window setLevel:NSFloatingWindowLevel];
-								} else {
-									[window setLevel:NSNormalWindowLevel];
-								}
-							});
+							[window setLevel:NSNormalWindowLevel];
 						}
 					}
-					return sl_false;
 				}
 				
-				sl_bool setCloseButtonEnabled(sl_bool flag) override
+				void setCloseButtonEnabled(sl_bool flag) override
 				{
 					NSWindow* window = m_window;
 					if (window != nil) {
 						NSUInteger style = [window styleMask];
 						if (style & NSBorderlessWindowMask) {
-							return sl_false;
+							return;
 						}
 						if (!(style & NSTitledWindowMask)) {
-							return sl_false;
+							return;
 						}
 						sl_bool f1 = (style & NSClosableWindowMask) ? sl_true : sl_false;
 						sl_bool f2 = flag ? sl_true : sl_false;
@@ -589,29 +493,21 @@ namespace slib
 							} else {
 								style = style & (~NSClosableWindowMask);
 							}
-							if ([NSThread isMainThread]) {
-								[window setStyleMask:style];
-							} else {
-								dispatch_async(dispatch_get_main_queue(), ^{
-									[window setStyleMask:style];
-								});
-							}
+							[window setStyleMask:style];
 						}
-						return sl_true;
 					}
-					return sl_false;
 				}
 				
-				sl_bool setMinimizeButtonEnabled(sl_bool flag) override
+				void setMinimizeButtonEnabled(sl_bool flag) override
 				{
 					NSWindow* window = m_window;
 					if (window != nil) {
 						NSUInteger style = [window styleMask];
 						if (style & NSBorderlessWindowMask) {
-							return sl_false;
+							return;
 						}
 						if (!(style & NSTitledWindowMask)) {
-							return sl_false;
+							return;
 						}
 						sl_bool f1 = (style & NSMiniaturizableWindowMask) ? sl_true : sl_false;
 						sl_bool f2 = flag ? sl_true : sl_false;
@@ -621,51 +517,35 @@ namespace slib
 							} else {
 								style = style & (~NSMiniaturizableWindowMask);
 							}
-							if ([NSThread isMainThread]) {
-								[window setStyleMask:style];
-							} else {
-								dispatch_async(dispatch_get_main_queue(), ^{
-									[window setStyleMask:style];
-								});
-							}
+							[window setStyleMask:style];
 						}
-						return sl_true;
 					}
-					return sl_false;
 				}
 				
-				sl_bool setMaximizeButtonEnabled(sl_bool flag) override
+				void setMaximizeButtonEnabled(sl_bool flag) override
 				{
 					NSWindow* window = m_window;
 					if (window != nil) {
 						NSUInteger style = [window styleMask];
 						if (style & NSBorderlessWindowMask) {
-							return sl_false;
+							return;
 						}
 						NSButton* buttonZoom = [window standardWindowButton:NSWindowZoomButton];
 						sl_bool f1 = [buttonZoom isEnabled] ? sl_true : sl_false;
 						sl_bool f2 = flag ? sl_true : sl_false;
 						if (f1 != f2) {
-							if ([NSThread isMainThread]) {
-								[buttonZoom setEnabled:flag];
-							} else {
-								dispatch_async(dispatch_get_main_queue(), ^{
-									[buttonZoom setEnabled:flag];
-								});
-							}
+							[buttonZoom setEnabled:flag];
 						}
-						return sl_true;
 					}
-					return sl_false;
 				}
 				
-				sl_bool setResizable(sl_bool flag) override
+				void setResizable(sl_bool flag) override
 				{
 					NSWindow* window = m_window;
 					if (window != nil) {
 						NSUInteger style = [window styleMask];
 						if (style & NSBorderlessWindowMask) {
-							return sl_false;
+							return;
 						}
 						sl_bool f1 = (style & NSResizableWindowMask) ? sl_true : sl_false;
 						sl_bool f2 = flag ? sl_true : sl_false;
@@ -678,20 +558,12 @@ namespace slib
 									style = NSClosableWindowMask;
 								}
 							}
-							if ([NSThread isMainThread]) {
-								[window setStyleMask:style];
-							} else {
-								dispatch_async(dispatch_get_main_queue(), ^{
-									[window setStyleMask:style];
-								});
-							}
+							[window setStyleMask:style];
 						}
-						return sl_true;
 					}
-					return sl_false;
 				}
 				
-				sl_bool setAlpha(sl_real _alpha) override
+				void setAlpha(sl_real _alpha) override
 				{
 					NSWindow* window = m_window;
 					if (window != nil) {
@@ -702,26 +574,16 @@ namespace slib
 						if (alpha > 1) {
 							alpha = 1;
 						}
-						if ([NSThread isMainThread]) {
-							[window setAlphaValue:alpha];
-						} else {
-							dispatch_async(dispatch_get_main_queue(), ^{
-								[window setAlphaValue:alpha];
-							});
-						}
-						return sl_true;
+						[window setAlphaValue:alpha];
 					}
-					return sl_false;
 				}
 				
-				sl_bool setTransparent(sl_bool flag) override
+				void setTransparent(sl_bool flag) override
 				{
 					NSWindow* window = m_window;
 					if (window != nil) {
 						[window setIgnoresMouseEvents:(flag?TRUE:FALSE)];
-						return sl_true;
 					}
-					return sl_false;
 				}
 				
 				

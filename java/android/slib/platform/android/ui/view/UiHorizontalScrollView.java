@@ -29,6 +29,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.HorizontalScrollView;
 
+import slib.platform.android.Logger;
 import slib.platform.android.ui.window.UiWindow;
 
 public class UiHorizontalScrollView extends HorizontalScrollView implements IView {
@@ -52,11 +53,15 @@ public class UiHorizontalScrollView extends HorizontalScrollView implements IVie
 	int initScrollY = 0;
 
 	public void _scrollTo(int x, int y) {
-		if (flagInitedContent) {
-			scrollTo(x, y);
-		} else {
-			initScrollX = x;
-			initScrollY = y;
+		try {
+			if (flagInitedContent) {
+				scrollTo(x, y);
+			} else {
+				initScrollX = x;
+				initScrollY = y;
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 	}
 

@@ -37,9 +37,57 @@ namespace slib
 	{
 		namespace date_picker
 		{
-			class DatePickerInstance : public Win32_ViewInstance
+
+			class DatePickerInstance : public Win32_ViewInstance, public IDatePickerInstance
 			{
+				SLIB_DECLARE_OBJECT
+
 			public:
+				sl_bool getDate(DatePicker* view, Time& _out) override
+				{
+					HWND handle = m_handle;
+					if (handle) {
+						SYSTEMTIME st;
+						if (GDT_VALID == SendMessageW(handle, DTM_GETSYSTEMTIME, 0, (LPARAM)&st)) {
+							_out = Windows::getTime(&st, sl_false);
+							return sl_true;
+						}
+					}
+					return sl_false;
+				}
+
+				void setDate(DatePicker* view, const Time& time) override
+				{
+					HWND handle = m_handle;
+					if (handle) {
+						SYSTEMTIME st;
+						Windows::getSYSTEMTIME(time, sl_false, &st);
+						SendMessageW(handle, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&st);
+					}
+				}
+
+				sl_bool measureSize(DatePicker* view, UISize& _out) override
+				{
+					HWND handle = m_handle;
+					if (handle) {
+						SIZE size = { 0, 0 };
+						SendMessageW(handle, (DTM_FIRST + 15) /*DTM_GETIDEALSIZE*/, 0, (LPARAM)&size);
+						if (size.cx > 0 && size.cy > 0) {
+							_out.x = (sl_ui_len)(size.cx);
+							_out.y = (sl_ui_len)(size.cy);
+							return sl_true;
+						} else {
+							if (m_font.isNotNull()) {
+								Size size = m_font->measureText("0000-00-00");
+								_out.x = (sl_ui_len)(size.x + size.y * 2);
+								_out.y = (sl_ui_len)(size.y * 1.5f);
+								return sl_true;
+							}
+						}
+					}
+					return sl_false;
+				}
+
 				sl_bool processCommand(SHORT code, LRESULT& result) override
 				{
 					if (code == BN_CLICKED) {
@@ -48,7 +96,11 @@ namespace slib
 					}
 					return sl_false;
 				}
+
 			};
+
+			SLIB_DEFINE_OBJECT(DatePickerInstance, Win32_ViewInstance)
+
 		}
 	}
 
@@ -56,80 +108,18 @@ namespace slib
 
 	Ref<ViewInstance> DatePicker::createNativeWidget(ViewInstance* parent)
 	{
-		Win32_UI_Shared* shared = Win32_UI_Shared::get();
-		if (!shared) {
-			return sl_null;
-		}
-		DWORD style = 0;
 		SLIB_STATIC_STRING16(text, "DateTime")
-		Ref<DatePickerInstance> ret = Win32_ViewInstance::create<DatePickerInstance>(this, parent, L"SysDateTimePick32", text, style, 0);
+		Ref<DatePickerInstance> ret = Win32_ViewInstance::create<DatePickerInstance>(this, parent, L"SysDateTimePick32", text, 0, 0);
 		if (ret.isNotNull()) {
 			HWND handle = ret->getHandle();
-			Ref<Font> font = getFont();
-			HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
-			if (hFont) {
-				SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
-			}
-			SYSTEMTIME st;
-			Windows::getSYSTEMTIME(m_date, sl_false, &st);
-			SendMessageW(handle, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&st);
+			ret->setDate(this, m_date);
 		}
 		return ret;
 	}
 
-	void DatePicker::_getDate_NW()
+	Ptr<IDatePickerInstance> DatePicker::getDatePickerInstance()
 	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			SYSTEMTIME st;
-			if (GDT_VALID == SendMessageW(handle, DTM_GETSYSTEMTIME, 0, (LPARAM)&st)) {
-				m_date = Windows::getTime(&st, sl_false);
-			}
-		}
-	}
-
-	void DatePicker::_setDate_NW(const Time& time)
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			SYSTEMTIME st;
-			Windows::getSYSTEMTIME(time, sl_false, &st);
-			SendMessageW(handle, DTM_SETSYSTEMTIME, GDT_VALID, (LPARAM)&st);
-		}
-	}
-
-	sl_bool DatePicker::_measureSize_NW(UISize& _out)
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			SIZE size = { 0, 0 };
-			SendMessageW(handle, (DTM_FIRST + 15) /*DTM_GETIDEALSIZE*/, 0, (LPARAM)&size);
-			if (size.cx > 0 && size.cy > 0) {
-				_out.x = (sl_ui_len)(size.cx);
-				_out.y = (sl_ui_len)(size.cy);
-				return sl_true;
-			} else {
-				Ref<Font> font = getFont();
-				if (font.isNotNull()) {
-					Size size = font->measureText("0000-00-00");
-					_out.x = (sl_ui_len)(size.x + size.y * 2);
-					_out.y = (sl_ui_len)(size.y * 1.5f);
-					return sl_true;
-				}
-			}
-		}
-		return sl_false;
-	}
-
-	void DatePicker::_setFont_NW(const Ref<Font>& font)
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
-			if (hFont) {
-				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
-			}
-		}
+		return CastRef<DatePickerInstance>(getViewInstance());
 	}
 
 }

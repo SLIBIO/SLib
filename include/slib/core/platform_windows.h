@@ -143,6 +143,14 @@ namespace slib
 
 		static void setWindowText(HWND hWnd, const String16& text);
 
+		static void setWindowStyle(HWND hWnd, LONG flags, sl_bool flagAddOrRemove);
+
+		static void removeAndAddWindowStyle(HWND hWnd, LONG flagsRemove, LONG flagsAdd);
+
+		static void setWindowExStyle(HWND hWnd, LONG flags, sl_bool flagAddOrRemove);
+
+		static void removeAndAddWindowExStyle(HWND hWnd, LONG flagsRemove, LONG flagsAdd);
+
 
 		static sl_bool processWindowHorizontalScrollEvents(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, sl_uint32 nLine, sl_uint32 nWheel);
 

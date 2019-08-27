@@ -64,6 +64,8 @@ namespace slib
 	public:
 		Ref<ViewInstance> getViewInstance();
 		
+		Ref<ViewInstance> getNativeWidget();
+		
 		sl_bool isInstance();
 
 		sl_bool isValidInstance();
@@ -98,12 +100,6 @@ namespace slib
 		// set before attaching
 		void setAttachMode(UIAttachMode mode);
 
-		virtual Ref<ViewInstance> createGenericInstance(ViewInstance* parent);
-		
-		virtual Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
-		
-		Ref<ViewInstance> createInstance(ViewInstance* parent);
-		
 		sl_bool isNativeWidget();
 		
 		sl_bool isHardwareLayer();
@@ -116,20 +112,11 @@ namespace slib
 		
 		void setWindow(const Ref<Window>& window);
 		
-		
 		Ref<View> getParent();
-		
+
 		void setParent(const Ref<View>& parent);
 		
-		void removeParent(View* parent = sl_null);
-		
-		void attach(const Ref<ViewInstance>& instance);
-		
-		void detach();
-		
-		void detachAll();
-		
-		Ref<ViewInstance> attachToNewInstance(const Ref<ViewInstance>& parent);
+		Ref<ViewInstance> attachToNewInstance(ViewInstance* parent);
 		
 		
 		String getId();
@@ -176,10 +163,6 @@ namespace slib
 		
 		void removeFromParent();
 		
-		void removeAllViewInstances();
-		
-		void attachChild(const Ref<View>& child);
-		
 		void bringToFront(UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 
 		
@@ -192,8 +175,6 @@ namespace slib
 		
 		void updateAndInvalidateBoundsInParent(UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		void updateInstanceFrames();
-
 		
 		// parent coordinate
 		const UIRect& getFrame();
@@ -266,8 +247,6 @@ namespace slib
 		sl_bool isVisibleInInstance();
 		
 		void setVisible(sl_bool flagVisible, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
-		
-		void setInstanceVisible(sl_bool flagVisible);
 		
 		sl_bool isEnabled();
 		
@@ -701,8 +680,6 @@ namespace slib
 		
 		void setAnchorOffset(const Vector2& pt, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
-		void updateInstanceTransforms();
-		
 		// Call in UI Thread
 		UIPointf convertCoordinateFromScreen(const UIPointf& ptScreen);
 		
@@ -752,7 +729,7 @@ namespace slib
 		
 		Alignment getBackgroundAlignment();
 		
-		virtual void setBackgroundAlignment(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setBackgroundAlignment(const Alignment& align, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		Ref<Pen> getBorder();
 		
@@ -1239,6 +1216,11 @@ namespace slib
 		Ref<Timer> startTimer(const Function<void(Timer*)>& task, sl_uint32 interval_ms);
 		
 	protected:
+		virtual Ref<ViewInstance> createGenericInstance(ViewInstance* parent);
+		
+		virtual Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+		
+	protected:
 		virtual void onChangeParent(View* oldParent, View* newParent);
 		
 		virtual void onAddChild(View* child);
@@ -1315,14 +1297,32 @@ namespace slib
 		void dispatchCancel();
 
 	private:
-		void _processAttachOnUiThread();
+		void _removeParent(View* parent = sl_null);
+
+		void _attach(const Ref<ViewInstance>& instance);
 		
-		void _addChild(View* child, UIUpdateMode mode);
+		void _detach();
+		
+		void _detachAll();
+		
+		void _doAttach();
+		
+		Ref<ViewInstance> _createInstance(ViewInstance* parent);
+		
+		void _addChild(View* child, View* viewCreatingChildInstances, UIUpdateMode mode);
 
 		void _removeChild(View* child);
 		
 		void _removeChildInstances(View* child);
-				
+		
+		void _removeAllViewInstances();
+		
+		void _attachChild(const Ref<View>& child);
+		
+		void _setInstanceVisible(sl_bool flagVisible);
+		
+		void _updateInstanceFrames();
+		
 		void _setFocus(sl_bool flagFocused, sl_bool flagApplyInstance, UIUpdateMode mode);
 		
 		void _setFocusedFlag(sl_bool flagFocused, sl_bool flagApplyInstance);
@@ -1353,6 +1353,8 @@ namespace slib
 		
 		sl_ui_len _measureLayoutWrappingSize_Vert(View* view, Pair<sl_ui_len, sl_ui_len>& insets, HashMap< View*, Pair<sl_ui_len, sl_ui_len> >& map, sl_ui_pos paddingTop, sl_ui_pos paddingBottom);
 
+		void _updateInstanceTransforms();
+		
 		void _applyCalcTransform(UIUpdateMode mode);
 		
 		void _applyFinalTransform(UIUpdateMode mode);
@@ -1360,6 +1362,10 @@ namespace slib
 		void _refreshBorderPen(UIUpdateMode mode);
 		
 		void _setFontInvalidateChildren();
+		
+		void _setInstanceFont();
+		
+		void _setInstancePadding();
 		
 		
 		void _attachNativeAnimations();
@@ -1387,19 +1393,7 @@ namespace slib
 		
 		void _processContentScrollingFlow(Timer* timer);
 		
-		
-	protected:
-		virtual void _setBorder_NW(sl_bool flag);
-
-		virtual void _setBackgroundColor_NW(const Color& color);
-
-		virtual void _setFont_NW(const Ref<Font>& font);
-		
-		virtual void _setPadding_NW(const UIEdgeInsets& padding);
-
-		virtual void _setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical);
-		
-		virtual void _scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate);
+		void _setInstancePaging();
 		
 	protected:
 		virtual void _onScroll_NW(sl_scroll_pos x, sl_scroll_pos y);
@@ -1770,6 +1764,7 @@ namespace slib
 		void _initializeEventAttributes();
 
 		friend class ViewInstance;
+		friend class Window;
 		friend class ListView;
 		friend class LinearView;
 
@@ -1798,54 +1793,54 @@ namespace slib
 		void setWindowContent(sl_bool flag);
 
 	public:
-		virtual sl_bool isValid() = 0;
+		virtual sl_bool isValid(View* view) = 0;
 		
-		virtual void setFocus(sl_bool flagFocus) = 0;
+		virtual void setFocus(View* view, sl_bool flagFocus) = 0;
 		
-		virtual void invalidate() = 0;
+		virtual void invalidate(View* view) = 0;
 
-		virtual void invalidate(const UIRect& rect) = 0;
+		virtual void invalidate(View* view, const UIRect& rect) = 0;
 		
-		virtual UIRect getFrame() = 0;
+		virtual void setFrame(View* view, const UIRect& frame) = 0;
 		
-		virtual void setFrame(const UIRect& frame) = 0;
+		virtual void setTransform(View* view, const Matrix3& transform) = 0;
 		
-		virtual void setTransform(const Matrix3& transform) = 0;
+		virtual void setVisible(View* view, sl_bool flag) = 0;
 		
-		virtual void setVisible(sl_bool flag) = 0;
+		virtual void setEnabled(View* view, sl_bool flag) = 0;
 		
-		virtual void setEnabled(sl_bool flag) = 0;
+		virtual void setOpaque(View* view, sl_bool flag) = 0;
 		
-		virtual void setOpaque(sl_bool flag) = 0;
+		virtual void setAlpha(View* view, sl_real alpha) = 0;
 		
-		virtual void setAlpha(sl_real alpha) = 0;
+		virtual void setClipping(View* view, sl_bool flag) = 0;
 		
-		virtual void setClipping(sl_bool flag) = 0;
-		
-		virtual void setDrawing(sl_bool flag) = 0;
+		virtual void setDrawing(View* view, sl_bool flag) = 0;
 
-		virtual UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen) = 0;
+		virtual UIPointf convertCoordinateFromScreenToView(View* view, const UIPointf& ptScreen) = 0;
 		
-		virtual UIPointf convertCoordinateFromViewToScreen(const UIPointf& ptView) = 0;
+		virtual UIPointf convertCoordinateFromViewToScreen(View* view, const UIPointf& ptView) = 0;
 		
-		virtual void addChildInstance(const Ref<ViewInstance>& instance) = 0;
+		virtual void addChildInstance(View* view, const Ref<ViewInstance>& instance) = 0;
 		
-		virtual void removeChildInstance(const Ref<ViewInstance>& instance) = 0;
+		virtual void removeChildInstance(View* view, const Ref<ViewInstance>& instance) = 0;
 		
-		virtual void bringToFront() = 0;
+		virtual void bringToFront(View* view) = 0;
 		
 		// extended functions for native widgets
-		virtual void setBorder(sl_bool flag);
+		virtual void setBorder(View* view, sl_bool flag);
 		
-		virtual void setBackgroundColor(const Color& color);
+		virtual void setBackgroundColor(View* view, const Color& color);
 		
-		virtual void setFont(const Ref<Font>& font);
+		virtual void setFont(View* view, const Ref<Font>& font);
 
-		virtual void setPadding(const UIEdgeInsets& padding);
+		virtual void setPadding(View* view, const UIEdgeInsets& padding);
 
-		virtual void setScrollBarsVisible(sl_bool flagHorizontal, sl_bool flagVertical);
+		virtual void setScrollBarsVisible(View* view, sl_bool flagHorizontal, sl_bool flagVertical);
 
-		virtual void scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate);
+		virtual void scrollTo(View* view, sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate);
+		
+		virtual void setPaging(View* view, sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight);
 
 	public:
 		void onDraw(Canvas* canvas);
@@ -1882,18 +1877,6 @@ namespace slib
 		~ViewGroup();
 		
 	};
-	
-	template <class T, class O>
-	SLIB_INLINE Ref<T> GetViewFromInstance(const Ref<O>& instance)
-	{
-		if (instance.isNotNull()) {
-			Ref<View> view = instance->getView();
-			if (view.isNotNull()) {
-				return CastInstance<T>(view.get());
-			}
-		}
-		return sl_null;
-	}
 
 }
 

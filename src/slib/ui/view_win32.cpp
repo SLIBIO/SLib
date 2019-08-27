@@ -210,8 +210,9 @@ namespace slib
 
 	HWND Win32_ViewInstance::createHandle(
 		View* view, ViewInstance* parent,
-		LPCWSTR wndClass, LPCWSTR text, int style, int styleEx,
-		const UIRect& frame, const Matrix3& transform)
+		LPCWSTR wndClass, LPCWSTR text,
+		const UIRect& frame, const Matrix3& transform,
+		int style, int styleEx, int styleRemove)
 	{
 
 		HWND hWndParent = UIPlatform::getViewHandle(parent);
@@ -223,6 +224,16 @@ namespace slib
 			if (view->isVisible()) {
 				style |= WS_VISIBLE;
 			}
+			if (view->isBorder()) {
+				style |= WS_BORDER;
+			}
+			if (view->isHorizontalScrollBarVisible()) {
+				style |= WS_HSCROLL;
+			}
+			if (view->isVerticalScrollBarVisible()) {
+				style |= WS_VSCROLL;
+			}
+			style &= (~styleRemove);
 
 			sl_ui_pos x = frame.left;
 			sl_ui_pos y = frame.top;
@@ -270,6 +281,9 @@ namespace slib
 		m_text = text;
 		m_frame = frame;
 		m_translation = Transform2::getTranslationFromMatrix(transform);
+		if (view->isUsingFont()) {
+			setFont(view, view->getFont());
+		}
 	}
 
 	HWND Win32_ViewInstance::getHandle()
@@ -277,7 +291,7 @@ namespace slib
 		return m_handle;
 	}
 
-	sl_bool Win32_ViewInstance::isValid()
+	sl_bool Win32_ViewInstance::isValid(View* view)
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
@@ -288,12 +302,8 @@ namespace slib
 		return sl_false;
 	}
 
-	void Win32_ViewInstance::setFocus(sl_bool flag)
+	void Win32_ViewInstance::setFocus(View* view, sl_bool flag)
 	{
-		if (!(UI::isUiThread())) {
-			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), Win32_ViewInstance, setFocus, this, flag));
-			return;
-		}
 		HWND hWnd = m_handle;
 		if (hWnd) {
 			if (flag) {
@@ -306,11 +316,11 @@ namespace slib
 		}
 	}
 
-	void Win32_ViewInstance::invalidate()
+	void Win32_ViewInstance::invalidate(View* view)
 	{
 		if (!(UI::isUiThread()) || g_flagDuringPaint) {
-			void (ViewInstance::*func)() = &ViewInstance::invalidate;
-			UI::dispatchToUiThreadUrgently(Function<void()>::fromWeakRef(WeakRef<ViewInstance>(this), func));
+			void (Win32_ViewInstance::*func)(View*) = &ViewInstance::invalidate;
+			UI::dispatchToUiThreadUrgently(Function<void()>::bindWeakRef(this, func, sl_null));
 			return;
 		}
 		HWND hWnd = m_handle;
@@ -319,11 +329,11 @@ namespace slib
 		}
 	}
 
-	void Win32_ViewInstance::invalidate(const UIRect& rect)
+	void Win32_ViewInstance::invalidate(View* view, const UIRect& rect)
 	{
 		if (!(UI::isUiThread()) || g_flagDuringPaint) {
-			void (ViewInstance::*func)(const UIRect&) = &ViewInstance::invalidate;
-			UI::dispatchToUiThreadUrgently(Function<void()>::bindWeakRef(WeakRef<ViewInstance>(this), func, rect));
+			void (ViewInstance::*func)(View*, const UIRect&) = &ViewInstance::invalidate;
+			UI::dispatchToUiThreadUrgently(Function<void()>::bindWeakRef(this, func, sl_null, rect));
 			return;
 		}
 		HWND hWnd = m_handle;
@@ -337,23 +347,7 @@ namespace slib
 		}
 	}
 
-	UIRect Win32_ViewInstance::getFrame()
-	{
-		HWND hWnd = m_handle;
-		if (hWnd) {
-			RECT rc;
-			Windows::getWindowFrame(hWnd, rc);
-			UIRect ret;
-			ret.left = (sl_ui_pos)(rc.left);
-			ret.top = (sl_ui_pos)(rc.top);
-			ret.right = (sl_ui_pos)(rc.right);
-			ret.bottom = (sl_ui_pos)(rc.bottom);
-			return ret;
-		}
-		return UIRect::zero();
-	}
-
-	void Win32_ViewInstance::setFrame(const UIRect& frame)
+	void Win32_ViewInstance::setFrame(View* view, const UIRect& frame)
 	{
 		if (isWindowContent()) {
 			return;
@@ -363,8 +357,7 @@ namespace slib
 		if (hWnd) {
 			UINT uFlags = SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE
 				| SWP_NOCOPYBITS
-				| SWP_ASYNCWINDOWPOS
-				;
+				| SWP_ASYNCWINDOWPOS;
 			SetWindowPos(hWnd, NULL
 				, (int)(frame.left + m_translation.x), (int)(frame.top + m_translation.y)
 				, (int)(frame.getWidth()), (int)(frame.getHeight())
@@ -373,7 +366,7 @@ namespace slib
 		}
 	}
 
-	void Win32_ViewInstance::setTransform(const Matrix3 &transform)
+	void Win32_ViewInstance::setTransform(View* view, const Matrix3 &transform)
 	{
 		if (isWindowContent()) {
 			return;
@@ -393,7 +386,7 @@ namespace slib
 		}
 	}
 
-	void Win32_ViewInstance::setVisible(sl_bool flag)
+	void Win32_ViewInstance::setVisible(View* view, sl_bool flag)
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
@@ -411,7 +404,7 @@ namespace slib
 		}
 	}
 
-	void Win32_ViewInstance::setEnabled(sl_bool flag)
+	void Win32_ViewInstance::setEnabled(View* view, sl_bool flag)
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
@@ -423,23 +416,23 @@ namespace slib
 		}
 	}
 
-	void Win32_ViewInstance::setOpaque(sl_bool flag)
+	void Win32_ViewInstance::setOpaque(View* view, sl_bool flag)
 	{
 	}
 
-	void Win32_ViewInstance::setAlpha(sl_real alpha)
+	void Win32_ViewInstance::setAlpha(View* view, sl_real alpha)
 	{
 	}
 
-	void Win32_ViewInstance::setClipping(sl_bool flag)
+	void Win32_ViewInstance::setClipping(View* view, sl_bool flag)
 	{
 	}
 
-	void Win32_ViewInstance::setDrawing(sl_bool flag)
+	void Win32_ViewInstance::setDrawing(View* view, sl_bool flag)
 	{
 	}
 
-	UIPointf Win32_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& ptScreen)
+	UIPointf Win32_ViewInstance::convertCoordinateFromScreenToView(View* view, const UIPointf& ptScreen)
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
@@ -452,7 +445,7 @@ namespace slib
 		return ptScreen;
 	}
 
-	UIPointf Win32_ViewInstance::convertCoordinateFromViewToScreen(const UIPointf& ptView)
+	UIPointf Win32_ViewInstance::convertCoordinateFromViewToScreen(View* view, const UIPointf& ptView)
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
@@ -465,7 +458,7 @@ namespace slib
 		return ptView;
 	}
 
-	void Win32_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
+	void Win32_ViewInstance::addChildInstance(View* view, const Ref<ViewInstance>& _child)
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
@@ -479,7 +472,7 @@ namespace slib
 		}
 	}
 
-	void Win32_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
+	void Win32_ViewInstance::removeChildInstance(View* view, const Ref<ViewInstance>& _child)
 	{
 		Win32_ViewInstance* child = (Win32_ViewInstance*)(_child.get());
 		HWND hWnd = child->getHandle();
@@ -488,12 +481,8 @@ namespace slib
 		}
 	}
 
-	void Win32_ViewInstance::bringToFront()
+	void Win32_ViewInstance::bringToFront(View* view)
 	{
-		if (!(UI::isUiThread())) {
-			UI::dispatchToUiThreadUrgently(SLIB_FUNCTION_WEAKREF(Win32_ViewInstance, bringToFront, this));
-			return;
-		}
 		HWND hWnd = m_handle;
 		if (hWnd) {
 			BringWindowToTop(hWnd);
@@ -504,32 +493,41 @@ namespace slib
 		}
 	}
 
-	void Win32_ViewInstance::setText(const String16& text)
+	void Win32_ViewInstance::setFont(View* view, const Ref<Font>& font)
 	{
-		if (!(UI::isUiThread())) {
-			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), Win32_ViewInstance, setText, this, text));
-			return;
-		}
-		HWND handle = getHandle();
-		if (handle) {
-			Windows::setWindowText(handle, text);
-			m_text = text;
-		}
-	}
-
-	void Win32_ViewInstance::setFont(const Ref<Font>& font)
-	{
-		if (!(UI::isUiThread())) {
-			UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), Win32_ViewInstance, setFont, this, font));
-			return;
-		}
-		HWND handle = getHandle();
+		HWND handle = m_handle;
 		if (handle) {
 			HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
 			if (hFont) {
 				SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 				m_font = font;
 			}
+		}
+	}
+
+	void Win32_ViewInstance::setBorder(View* view, sl_bool flag)
+	{
+		Windows::setWindowStyle(m_handle, WS_BORDER, flag);
+	}
+
+	void Win32_ViewInstance::setScrollBarsVisible(View* view, sl_bool flagHorizontal, sl_bool flagVertical)
+	{
+		HWND handle = m_handle;
+		if (handle) {
+			WINAPI_ShowScrollBar func = Windows::getAPI_ShowScrollBar();
+			if (func) {
+				func(handle, SB_HORZ, flagHorizontal);
+				func(handle, SB_VERT, flagVertical);
+			}
+		}
+	}
+
+	void Win32_ViewInstance::setText(const String16& text)
+	{
+		HWND handle = m_handle;
+		if (handle) {
+			Windows::setWindowText(handle, text);
+			m_text = text;
 		}
 	}
 

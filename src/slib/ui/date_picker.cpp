@@ -22,6 +22,8 @@
 
 #include "slib/ui/date_picker.h"
 
+#include "slib/ui/core.h"
+
 namespace slib
 {
 
@@ -42,17 +44,23 @@ namespace slib
 
 	Time DatePicker::getDate()
 	{
-		if (isNativeWidget()) {
-			_getDate_NW();
+		Ptr<IDatePickerInstance> instance = getDatePickerInstance();
+		if (instance.isNotNull()) {
+			instance->getDate(this, m_date);
 		}
 		return m_date;
 	}
 	
-	void DatePicker::setDate(const Time& date)
+	void DatePicker::setDate(const Time& date, UIUpdateMode mode)
 	{
-		m_date = date;
-		if (isNativeWidget()) {
-			_setDate_NW(date);
+		Ptr<IDatePickerInstance> instance = getDatePickerInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&DatePicker::setDate, date, mode)
+			m_date = date;
+			instance->setDate(this, date);
+		} else {
+			m_date = date;
+			invalidate(mode);
 		}
 	}
 	
@@ -73,9 +81,10 @@ namespace slib
 			return;
 		}
 		
-		if (isNativeWidget()) {
+		Ptr<IDatePickerInstance> instance = getDatePickerInstance();
+		if (instance.isNotNull()) {
 			UISize size;
-			if (_measureSize_NW(size)) {
+			if (instance->measureSize(this, size)) {
 				if (flagHorizontal) {
 					setLayoutWidth(size.x);
 				}
@@ -122,21 +131,9 @@ namespace slib
 		return sl_null;
 	}
 
-	void DatePicker::_getDate_NW()
+	Ptr<IDatePickerInstance> DatePicker::getDatePickerInstance()
 	{
-	}
-
-	void DatePicker::_setDate_NW(const Time& date)
-	{
-	}
-
-	sl_bool DatePicker::_measureSize_NW(UISize& _out)
-	{
-		return sl_false;
-	}
-
-	void DatePicker::_setFont_NW(const Ref<Font>& font)
-	{
+		return sl_null;
 	}
 #endif
 

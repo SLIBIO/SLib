@@ -382,10 +382,6 @@ namespace slib
 	public:
 		Ref<WindowInstance> getWindowInstance();
 		
-		void attach(const Ref<WindowInstance>& instance, sl_bool flagAttachContent = sl_true);
-
-		void detach();
-
 		void create();
 		
 		void createAndKeep();
@@ -432,9 +428,14 @@ namespace slib
 		
 		void dispatchCancel();
 		
-	private:
+	protected:
 		Ref<WindowInstance> createWindowInstance(const WindowInstanceParam& param);
 
+		void attach(const Ref<WindowInstance>& instance, sl_bool flagAttachContent = sl_true);
+		
+		void detach();
+
+	private:
 		void _create(sl_bool flagKeepReference);
 		
 		void _attachContent();
@@ -527,7 +528,7 @@ namespace slib
 		virtual sl_bool isClosed() = 0;
 		
 
-		virtual sl_bool setParent(const Ref<WindowInstance>& parent) = 0;
+		virtual void setParent(const Ref<WindowInstance>& parent) = 0;
 		
 		virtual Ref<ViewInstance> getContentView() = 0;
 		
@@ -536,12 +537,12 @@ namespace slib
 		
 		virtual sl_bool isActive() = 0;
 
-		virtual sl_bool activate() = 0;
+		virtual void activate() = 0;
 
 		
 		virtual UIRect getFrame() = 0;
 		
-		virtual sl_bool setFrame(const UIRect& frame) = 0;
+		virtual void setFrame(const UIRect& frame) = 0;
 		
 		virtual UIRect getClientFrame() = 0;
 		
@@ -550,36 +551,36 @@ namespace slib
 		virtual sl_bool setClientSize(const UISize& size) = 0;
 		
 
-		virtual sl_bool setTitle(const String& title) = 0;
+		virtual void setTitle(const String& title) = 0;
 		
-		virtual sl_bool setBackgroundColor(const Color& color) = 0;
+		virtual void setBackgroundColor(const Color& color) = 0;
 
 		
 		virtual sl_bool isMinimized() = 0;
 		
-		virtual sl_bool setMinimized(sl_bool flag) = 0;
+		virtual void setMinimized(sl_bool flag) = 0;
 		
 		
 		virtual sl_bool isMaximized() = 0;
 		
-		virtual sl_bool setMaximized(sl_bool flag) = 0;
+		virtual void setMaximized(sl_bool flag) = 0;
 		
 		
-		virtual sl_bool setVisible(sl_bool flag) = 0;
+		virtual void setVisible(sl_bool flag) = 0;
 
-		virtual sl_bool setAlwaysOnTop(sl_bool flag) = 0;
+		virtual void setAlwaysOnTop(sl_bool flag) = 0;
 		
-		virtual sl_bool setCloseButtonEnabled(sl_bool flag) = 0;
+		virtual void setCloseButtonEnabled(sl_bool flag) = 0;
 		
-		virtual sl_bool setMinimizeButtonEnabled(sl_bool flag) = 0;
+		virtual void setMinimizeButtonEnabled(sl_bool flag) = 0;
 		
-		virtual sl_bool setMaximizeButtonEnabled(sl_bool flag) = 0;
+		virtual void setMaximizeButtonEnabled(sl_bool flag) = 0;
 		
-		virtual sl_bool setResizable(sl_bool flag) = 0;
+		virtual void setResizable(sl_bool flag) = 0;
 		
-		virtual sl_bool setAlpha(sl_real alpha) = 0;
+		virtual void setAlpha(sl_real alpha) = 0;
 		
-		virtual sl_bool setTransparent(sl_bool flag) = 0;
+		virtual void setTransparent(sl_bool flag) = 0;
 
 		
 		virtual UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen) = 0;

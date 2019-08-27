@@ -56,7 +56,7 @@ namespace slib
 		
 		Alignment getGravity();
 		
-		virtual void setGravity(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setGravity(const Alignment& align, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		MultiLineMode getMultiLine();
 		

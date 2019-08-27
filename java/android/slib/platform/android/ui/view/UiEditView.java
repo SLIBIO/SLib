@@ -26,14 +26,12 @@ import io.slib.R;
 import slib.platform.android.Android;
 import slib.platform.android.Logger;
 import slib.platform.android.ui.UiFont;
-import slib.platform.android.ui.UiThread;
 import slib.platform.android.ui.Util;
 
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.text.Editable;
 import android.text.InputType;
@@ -95,334 +93,286 @@ public class UiEditView extends EditText implements IView {
 	}
 	
 	public static boolean _setText(final View view, String text) {
-		if (!(UiThread.isUiThread())) {
-			final String t = text;
-			view.post(new Runnable() {
-				public void run() {
-					_setText(view, t);
+		try {
+			if (view instanceof TextView) {
+				if (text == null) {
+					text = "";
 				}
-			});
-			return true;
-		}
-		if (view instanceof TextView) {
-			if (text == null) {
-				text = "";
+				TextView tv = (TextView) view;
+				String old = tv.getText().toString();
+				if (old == null) {
+					old = "";
+				}
+				if (!(old.equals(text))) {
+					tv.setText(text);
+				}
+				return true;
 			}
-			TextView tv = (TextView)view;
-			String old = tv.getText().toString();
-			if (old == null) {
-				old = "";
-			}
-			if (!(old.equals(text))) {
-				tv.setText(text);				
-			}
-			return true;
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}
 
 	public static boolean _setAlignment(final View view, final int align) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setAlignment(view, align);
-				}
-			});
-			return true;
-		}
-		if (view instanceof TextView) {
-			TextView tv = (TextView)view;
-			tv.setGravity(Util.getAndroidAlignment(align));
-			return true;
+		try {
+			if (view instanceof TextView) {
+				TextView tv = (TextView) view;
+				tv.setGravity(Util.getAndroidAlignment(align));
+				return true;
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}
 
 	public static boolean _setTextColor(final View view, final int color) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setTextColor(view, color);
-				}
-			});
-			return true;
-		}
-		if (view instanceof TextView) {
-			TextView tv = (TextView)view;
-			tv.setTextColor(color);
-			return true;
+		try {
+			if (view instanceof TextView) {
+				TextView tv = (TextView) view;
+				tv.setTextColor(color);
+				return true;
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}
 
 	public static boolean _setHintText(final View view, String text) {
-		if (!(UiThread.isUiThread())) {
-			final String t = text;
-			view.post(new Runnable() {
-				public void run() {
-					_setHintText(view, t);
+		try {
+			if (view instanceof UiEditView) {
+				UiEditView tv = (UiEditView) view;
+				tv.mHintText = text;
+				tv.applyHint();
+				return true;
+			} else if (view instanceof TextView) {
+				if (text == null) {
+					text = "";
 				}
-			});
-			return true;
-		}
-		if (view instanceof UiEditView) {
-			UiEditView tv = (UiEditView)view;
-			tv.mHintText = text;
-			tv.applyHint();
-			return true;
-		} else if (view instanceof TextView) {
-			if (text == null) {
-				text = "";
+				((TextView) view).setHint(text);
+				return true;
 			}
-			((TextView)view).setHint(text);
-			return true;
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}
 
 	public static boolean _setHintAlignment(final View view, final int align) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setHintAlignment(view, align);
-				}
-			});
-			return true;
-		}
-		if (view instanceof UiEditView) {
-			UiEditView tv = (UiEditView)view;
-			tv.mHintAlign = Util.getAndroidAlignment(align);
-			tv.applyHint();
-			return true;
+		try {
+			if (view instanceof UiEditView) {
+				UiEditView tv = (UiEditView) view;
+				tv.mHintAlign = Util.getAndroidAlignment(align);
+				tv.applyHint();
+				return true;
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}
 
 	public static boolean _setHintTextColor(final View view, final int color) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setHintTextColor(view, color);
-				}
-			});
-			return true;
-		}
-		if (view instanceof UiEditView) {
-			UiEditView tv = (UiEditView)view;
-			tv.mHintColor = color;
-			tv.applyHint();
-			return true;
-		} else if (view instanceof TextView) {
-			TextView tv = (TextView)view;
-			tv.setHintTextColor(color);
-			return true;
+		try {
+			if (view instanceof UiEditView) {
+				UiEditView tv = (UiEditView) view;
+				tv.mHintColor = color;
+				tv.applyHint();
+				return true;
+			} else if (view instanceof TextView) {
+				TextView tv = (TextView) view;
+				tv.setHintTextColor(color);
+				return true;
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}
 
 	public static boolean _setHintFont(final View view, final UiFont font) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setHintFont(view, font);
-				}
-			});
-			return true;
-		}
-		if (view instanceof UiEditView) {
-			UiEditView tv = (UiEditView)view;
-			tv.mHintFont = font;
-			tv.applyHint();
-			return true;
+		try {
+			if (view instanceof UiEditView) {
+				UiEditView tv = (UiEditView) view;
+				tv.mHintFont = font;
+				tv.applyHint();
+				return true;
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}
 
 	public static boolean _setReadOnly(final View view, final boolean flag) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setReadOnly(view, flag);
-				}
-			});
-			return true;
-		}
-		if (view instanceof TextView) {
-			((TextView)view).setEnabled(!flag);
-			return true;
+		try {
+			if (view instanceof TextView) {
+				((TextView) view).setEnabled(!flag);
+				return true;
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}
 
 	public static boolean _setMultiLine(final View view, final boolean flag) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setMultiLine(view, flag);
+		try {
+			if (view instanceof TextView) {
+				TextView tv = (TextView) view;
+				int type = tv.getInputType();
+				if (flag) {
+					type |= EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE;
+				} else {
+					type &= ~(EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE);
 				}
-			});
-			return true;
-		}
-		if (view instanceof TextView) {
-			TextView tv = (TextView)view;
-			int type = tv.getInputType();
-			if (flag) {
-				type |= EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE;
-			} else {
-				type &= ~(EditorInfo.TYPE_TEXT_FLAG_MULTI_LINE);
+				tv.setInputType(type);
+				return true;
 			}
-			tv.setInputType(type);
-			return true;
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}
 
 	public static boolean _setReturnKeyType(final View view, final int type) {
-		if (view instanceof UiTextArea) {
-			return false;
-		}
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setReturnKeyType(view, type);
-				}
-			});
-			return true;
-		}
-		if (view instanceof TextView) {
-			TextView tv = (TextView)view;
-			int defaultOption = EditorInfo.IME_FLAG_NO_FULLSCREEN;
-			switch (type) {
-				case 0:
-					tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_DONE);
-					break;
-				case 1:
-					tv.setImeActionLabel("Return", KeyEvent.KEYCODE_ENTER);
-					break;
-				case 2:
-					tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_DONE);
-					break;
-				case 3:
-					tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_SEARCH);
-					break;
-				case 4:
-					tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_NEXT);
-					break;
-				case 5:
-					tv.setImeActionLabel("Continue", KeyEvent.KEYCODE_ENTER);
-					break;
-				case 6:
-					tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_GO);
-					break;
-				case 7:
-					tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_SEND);
-					break;
-				case 8:
-					tv.setImeActionLabel("Join", KeyEvent.KEYCODE_ENTER);
-					break;
-				case 9:
-					tv.setImeActionLabel("Route", KeyEvent.KEYCODE_ENTER);
-					break;
-				case 10:
-					tv.setImeActionLabel("EmergencyCall", KeyEvent.KEYCODE_ENTER);
-					break;
-				case 11:
-					tv.setImeActionLabel("Google", KeyEvent.KEYCODE_ENTER);
-					break;
-				case 12:
-					tv.setImeActionLabel("Yahoo", KeyEvent.KEYCODE_ENTER);
-					break;
-				default:
-					tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_NONE);
-					break;
+		try {
+			if (view instanceof UiTextArea) {
+				return false;
 			}
-			return true;
+			if (view instanceof TextView) {
+				TextView tv = (TextView) view;
+				int defaultOption = EditorInfo.IME_FLAG_NO_FULLSCREEN;
+				switch (type) {
+					case 0:
+						tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_DONE);
+						break;
+					case 1:
+						tv.setImeActionLabel("Return", KeyEvent.KEYCODE_ENTER);
+						break;
+					case 2:
+						tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_DONE);
+						break;
+					case 3:
+						tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_SEARCH);
+						break;
+					case 4:
+						tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_NEXT);
+						break;
+					case 5:
+						tv.setImeActionLabel("Continue", KeyEvent.KEYCODE_ENTER);
+						break;
+					case 6:
+						tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_GO);
+						break;
+					case 7:
+						tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_SEND);
+						break;
+					case 8:
+						tv.setImeActionLabel("Join", KeyEvent.KEYCODE_ENTER);
+						break;
+					case 9:
+						tv.setImeActionLabel("Route", KeyEvent.KEYCODE_ENTER);
+						break;
+					case 10:
+						tv.setImeActionLabel("EmergencyCall", KeyEvent.KEYCODE_ENTER);
+						break;
+					case 11:
+						tv.setImeActionLabel("Google", KeyEvent.KEYCODE_ENTER);
+						break;
+					case 12:
+						tv.setImeActionLabel("Yahoo", KeyEvent.KEYCODE_ENTER);
+						break;
+					default:
+						tv.setImeOptions(defaultOption | EditorInfo.IME_ACTION_NONE);
+						break;
+				}
+				return true;
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}
 
 	public static boolean _setInputType(final View view, final int keyboardType, final int autoCapType, final boolean flagPassword) {
-
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setInputType(view, keyboardType, autoCapType, flagPassword);
-				}
-			});
-			return true;
-		}
-
-		if (view instanceof TextView) {
-			TextView tv = (TextView)view;
-			int type;
-			if (flagPassword) {
-				type = InputType.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_PASSWORD;
-			} else {
-				if (view instanceof UiTextArea) {
-					type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+		try {
+			if (view instanceof TextView) {
+				TextView tv = (TextView) view;
+				int type;
+				if (flagPassword) {
+					type = InputType.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_PASSWORD;
 				} else {
-					switch (keyboardType) {
-						case 0:
-							type = InputType.TYPE_CLASS_TEXT;
-							break;
-						case 1:
-							type = InputType.TYPE_CLASS_NUMBER;
-							break;
-						case 2:
-							type = InputType.TYPE_CLASS_PHONE;
-							break;
-						case 3:
-							type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
-							break;
-						case 4:
-							type = InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL;
-							break;
-						case 5:
-							type = InputType.TYPE_CLASS_TEXT;
-							break;
-						case 6:
-							type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI;
-							break;
-						case 7:
-							type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT;
-							break;
-						case 8:
-							type = InputType.TYPE_CLASS_TEXT;
-							break;
-						case 9:
-							type = InputType.TYPE_CLASS_TEXT;
-							break;
-						case 10:
-							type = InputType.TYPE_CLASS_TEXT;
-							break;
-						case 11:
-							type = InputType.TYPE_CLASS_TEXT;
-							break;
-						case 12:
-							type = InputType.TYPE_CLASS_TEXT;
-							break;
-						default:
-							type = InputType.TYPE_CLASS_TEXT;
-							break;
+					if (view instanceof UiTextArea) {
+						type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+					} else {
+						switch (keyboardType) {
+							case 0:
+								type = InputType.TYPE_CLASS_TEXT;
+								break;
+							case 1:
+								type = InputType.TYPE_CLASS_NUMBER;
+								break;
+							case 2:
+								type = InputType.TYPE_CLASS_PHONE;
+								break;
+							case 3:
+								type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
+								break;
+							case 4:
+								type = InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL;
+								break;
+							case 5:
+								type = InputType.TYPE_CLASS_TEXT;
+								break;
+							case 6:
+								type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI;
+								break;
+							case 7:
+								type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT;
+								break;
+							case 8:
+								type = InputType.TYPE_CLASS_TEXT;
+								break;
+							case 9:
+								type = InputType.TYPE_CLASS_TEXT;
+								break;
+							case 10:
+								type = InputType.TYPE_CLASS_TEXT;
+								break;
+							case 11:
+								type = InputType.TYPE_CLASS_TEXT;
+								break;
+							case 12:
+								type = InputType.TYPE_CLASS_TEXT;
+								break;
+							default:
+								type = InputType.TYPE_CLASS_TEXT;
+								break;
+						}
+					}
+					if ((type & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_TEXT) {
+						switch (autoCapType) {
+							case 1:
+								type = type | InputType.TYPE_TEXT_FLAG_CAP_WORDS;
+								break;
+							case 2:
+								type = type | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES;
+								break;
+							case 3:
+								type = type | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS;
+								break;
+							default:
+								break;
+						}
 					}
 				}
-				if ((type & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_TEXT) {
-					switch (autoCapType) {
-						case 1:
-							type = type | InputType.TYPE_TEXT_FLAG_CAP_WORDS;
-							break;
-						case 2:
-							type = type | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES;
-							break;
-						case 3:
-							type = type | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS;
-							break;
-						default:
-							break;
-					}
-				}
+				tv.setInputType(type);
 			}
-			tv.setInputType(type);
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}
@@ -440,60 +390,48 @@ public class UiEditView extends EditText implements IView {
 	}
 
 	public static boolean _setFont(final View view, final UiFont font) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setFont(view, font);
+		try {
+			if (view instanceof TextView) {
+				if (font != null) {
+					TextView tv = (TextView) view;
+					tv.setTypeface(font.getTypeface());
+					tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, font.getSize());
+					return true;
 				}
-			});
-			return true;
-		}
-		if (view instanceof TextView) {
-			if (font != null) {
-				TextView tv = (TextView)view;
-				tv.setTypeface(font.getTypeface());
-				tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, font.getSize());
-				return true;
 			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}
 
 	public static boolean _setBorder(final View view, final boolean flag) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setBorder(view, flag);
-				}
-			});
-			return true;
-		}
-		if (view instanceof UiEditView) {
-			UiEditView tv = (UiEditView)view;
-			tv.mFlagBorder = flag;
-			tv.applyBackground();
-			return true;
+		try {
+			if (view instanceof UiEditView) {
+				UiEditView tv = (UiEditView) view;
+				tv.mFlagBorder = flag;
+				tv.applyBackground();
+				return true;
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}
 
 	public static boolean _setBackgroundColor(final View view, final int color) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setBackgroundColor(view, color);
-				}
-			});
-			return true;
-		}
-		if (view instanceof UiEditView) {
-			UiEditView tv = (UiEditView) view;
-			tv.mBackgroundColor = color;
-			tv.applyBackground();
-		} else if (view instanceof TextView) {
-			TextView tv = (TextView)view;
-			tv.setBackgroundColor(color);				
-			return true;
+		try {
+			if (view instanceof UiEditView) {
+				UiEditView tv = (UiEditView) view;
+				tv.mBackgroundColor = color;
+				tv.applyBackground();
+			} else if (view instanceof TextView) {
+				TextView tv = (TextView) view;
+				tv.setBackgroundColor(color);
+				return true;
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}
@@ -610,7 +548,7 @@ public class UiEditView extends EditText implements IView {
 		prepareHint();
 		if (mHintLayout != null) {
 			canvas.save();
-			int paddingLeft = getCompoundPaddingLeft();
+			int paddingLeft = getCompoundPaddingLeft() + getScrollX();
 			int paddingTop = getCompoundPaddingTop();
 			int paddingBottom = getCompoundPaddingBottom();
 			if ((mHintAlign & Gravity.TOP) == Gravity.TOP) {

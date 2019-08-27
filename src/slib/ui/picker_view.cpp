@@ -22,10 +22,11 @@
 
 #include "slib/ui/picker_view.h"
 
+#include "slib/ui/resource.h"
+#include "slib/ui/core.h"
 #include "slib/core/safe_static.h"
 #include "slib/core/math.h"
 #include "slib/core/timer.h"
-#include "slib/ui/resource.h"
 
 #define ANIMATE_FRAME_MS 15
 
@@ -69,10 +70,14 @@ namespace slib
 	
 	void PickerView::setItemsCount(sl_uint32 n, UIUpdateMode mode)
 	{
+		Ptr<IPickerViewInstance> instance = getPickerViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&PickerView::setItemsCount, n, mode)
+		}
 		m_values.setCount(n);
 		m_titles.setCount(n);
-		if (isNativeWidget()) {
-			_refreshItemsCount_NW();
+		if (instance.isNotNull()) {
+			instance->refreshItemsCount(this);
 			if (m_indexSelected >= n) {
 				selectIndex(0, UIUpdateMode::None);
 			}
@@ -116,10 +121,14 @@ namespace slib
 	
 	void PickerView::setItemTitle(sl_uint32 index, const String& title, UIUpdateMode mode)
 	{
+		Ptr<IPickerViewInstance> instance = getPickerViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&PickerView::setItemTitle, index, title, mode)
+		}
 		if (index < m_titles.getCount()) {
 			m_titles.setAt(index, title);
-			if (isNativeWidget()) {
-				_setItemTitle_NW(index, title);
+			if (instance.isNotNull()) {
+				instance->setItemTitle(this, index, title);
 			} else {
 				invalidate(mode);
 			}
@@ -133,9 +142,13 @@ namespace slib
 	
 	void PickerView::setTitles(const List<String>& list, UIUpdateMode mode)
 	{
+		Ptr<IPickerViewInstance> instance = getPickerViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&PickerView::setTitles, list, mode)
+		}
 		m_titles = list;
-		if (isNativeWidget()) {
-			_refreshItemsContent_NW();
+		if (instance.isNotNull()) {
+			instance->refreshItemsContent(this);
 			sl_uint32 n = (sl_uint32)(m_titles.getCount());
 			if (m_indexSelected >= n) {
 				selectIndex(0, UIUpdateMode::None);
@@ -151,10 +164,14 @@ namespace slib
 	
 	void PickerView::selectIndex(sl_uint32 index, UIUpdateMode mode)
 	{
+		Ptr<IPickerViewInstance> instance = getPickerViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&PickerView::selectIndex, index, mode)
+		}
 		if (index < m_titles.getCount()) {
 			m_indexSelected = index;
-			if (isNativeWidget()) {
-				_select_NW(index);
+			if (instance.isNotNull()) {
+				instance->select(this, index);
 			} else {
 				invalidate(mode);
 			}
@@ -457,36 +474,18 @@ namespace slib
 		
 		m_speedFlow *= 0.97f;
 		
-		
 	}
 	
 #if !defined(HAS_NATIVE_WIDGET_IMPL)
-	
 	Ref<ViewInstance> PickerView::createNativeWidget(ViewInstance* parent)
 	{
 		return sl_null;
 	}
 	
-	void PickerView::_select_NW(sl_uint32 index)
+	Ptr<IPickerViewInstance> PickerView::getPickerViewInstance()
 	{
+		return sl_null;
 	}
-	
-	void PickerView::_refreshItemsCount_NW()
-	{
-	}
-	
-	void PickerView::_refreshItemsContent_NW()
-	{
-	}
-	
-	void PickerView::_setItemTitle_NW(sl_uint32 index, const String& title)
-	{
-	}
-	
-	void PickerView::_setFont_NW(const Ref<Font>& font)
-	{
-	}
-	
 #endif
 
 }

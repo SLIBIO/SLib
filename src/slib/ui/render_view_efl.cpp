@@ -24,8 +24,9 @@
 
 #if defined(SLIB_UI_IS_EFL)
 
-#include "slib/ui/core.h"
 #include "slib/ui/render_view.h"
+
+#include "slib/ui/core.h"
 #include "slib/render/opengl.h"
 #include "slib/ui/mobile_app.h"
 
@@ -45,8 +46,14 @@ namespace slib
 		namespace render_view
 		{
 
+			class RenderViewHelper : public RenderView
+			{				
+			};
+
 			class RenderViewInstance : public EFL_ViewInstance
 			{
+				SLIB_DECLARE_OBJECT
+
 			public:
 				Ref<RenderEngine> m_renderEngine;
 				sl_bool m_flagContinuously;
@@ -64,43 +71,83 @@ namespace slib
 				~RenderViewInstance()
 				{
 					if (m_timer) {
-						::ecore_animator_del(m_timer);
+						ecore_animator_del(m_timer);
 					}
 				}
 
+			public:
+				Ref<RenderViewHelper> getHelper()
+				{
+					return CastRef<RenderViewHelper>(getView());
+				}
+
+				void setRedrawMode(RenderView* view, RedrawMode mode) override
+				{
+					m_flagContinuously = (mode == RedrawMode::Continuously);
+				}
+				
+				void requestRender(RenderView* view) override
+				{
+					m_flagRequestRender = sl_true;
+				}
+
+				void onInit(Evas_Object* handle)
+				{
+					m_renderEngine = GLES::createEngine();
+					Ref<RenderViewHelper> helper = getHelper();
+					if (helper.isNotNull()) {
+						helper->dispatchCreateEngine(m_renderEngine.get());
+					}
+				}
+
+				void onResize(Evas_Object* handle)
+				{
+					int w = 0;
+					int h = 0;
+					elm_glview_size_get(handle, &w, &h);
+					if (w > 0 && h > 0) {
+						m_renderEngine->setViewport(0, 0, w, h);
+					}
+				}
+
+				void onRender(Evas_Object* handle)
+				{
+					Ref<RenderViewHelper> helper = getHelper();
+					if (helper.isNotNull()) {
+						helper->dispatchFrame(m_renderEngine.get());
+						glFlush();
+					}
+				}
+
+				void onTimer(Evas_Object* handle)
+				{
+					if (m_flagContinuously || m_flagRequestRender) {
+						m_flagRequestRender = sl_false;
+						elm_glview_changed_set(handle);
+					}
+				}
+				
 				static void glInit(Evas_Object* handle)
 				{
-					Ref<RenderViewInstance> instance = Ref<RenderViewInstance>::from(UIPlatform::getViewInstance(handle));
+					Ref<RenderViewInstance> instance = CastRef<RenderViewInstance>(UIPlatform::getViewInstance(handle));
 					if (instance.isNotNull()) {
-						instance->m_renderEngine = GLES::createEngine();
-						if (RenderView* view = CastInstance<RenderView>(_view.get())) {
-							view->dispatchCreateEngine(instance->m_renderEngine.get());
-						}
+						instance->onInit(handle);
 					}
 				}
 
 				static void glResize(Evas_Object* handle)
 				{
-					Ref<RenderViewInstance> instance = Ref<RenderViewInstance>::from(UIPlatform::getViewInstance(handle));
+					Ref<RenderViewInstance> instance = CastRef<RenderViewInstance>(UIPlatform::getViewInstance(handle));
 					if (instance.isNotNull()) {
-						int w = 0;
-						int h = 0;
-						elm_glview_size_get(handle, &w, &h);
-						if (w > 0 && h > 0) {
-							instance->m_renderEngine->setViewport(0, 0, w, h);
-						}
+						instance->onResize(handle);
 					}
 				}
 
 				static void glRender(Evas_Object* handle)
 				{
-					Ref<RenderViewInstance> instance = Ref<RenderViewInstance>::from(UIPlatform::getViewInstance(handle));
+					Ref<RenderViewInstance> instance = CastRef<RenderViewInstance>(UIPlatform::getViewInstance(handle));
 					if (instance.isNotNull()) {
-						Ref<View> _view = instance->getView();
-						if (RenderView* view = CastInstance<RenderView>(_view.get())) {
-							view->dispatchFrame(instance->m_renderEngine.get());
-							glFlush();
-						}
+						instance->onRender(handle);
 					}
 				}
 
@@ -111,17 +158,16 @@ namespace slib
 				static Eina_Bool timer(void* data)
 				{
 					Evas_Object* handle = (Evas_Object*)data;
-					Ref<RenderViewInstance> instance = Ref<RenderViewInstance>::from(UIPlatform::getViewInstance(handle));
+					Ref<RenderViewInstance> instance = CastRef<RenderViewInstance>(UIPlatform::getViewInstance(handle));
 					if (instance.isNotNull()) {
-						if (instance->m_flagContinuously || instance->m_flagRequestRender) {
-							instance->m_flagRequestRender = sl_false;
-							::elm_glview_changed_set(handle);
-						}
+						instance->onTimer(handle);
 					}
 					return EINA_TRUE;
 				}
 
 			};
+
+			SLIB_DEFINE_OBJECT(RenderViewInstance, EFL_ViewInstance)
 
 		}
 	}
@@ -134,7 +180,7 @@ namespace slib
 
 		if (handleParent) {
 
-			Evas_Object* handle = ::elm_glview_version_add(handleParent, EVAS_GL_GLES_2_X);
+			Evas_Object* handle = elm_glview_version_add(handleParent, EVAS_GL_GLES_2_X);
 
 			if (handle) {
 
@@ -144,16 +190,16 @@ namespace slib
 
 				if (ret.isNotNull()) {
 
-					::elm_glview_mode_set(handle, (Elm_GLView_Mode)(ELM_GLVIEW_ALPHA | ELM_GLVIEW_DEPTH));
-					::elm_glview_resize_policy_set(handle, ELM_GLVIEW_RESIZE_POLICY_RECREATE);
-					::elm_glview_render_policy_set(handle, ELM_GLVIEW_RENDER_POLICY_ON_DEMAND);
-					::elm_glview_init_func_set(handle, RenderViewInstance::glInit);
-					::elm_glview_resize_func_set(handle, RenderViewInstance::glResize);
-					::elm_glview_render_func_set(handle, RenderViewInstance::glRender);
-					::elm_glview_del_func_set(handle, RenderViewInstance::glDelete);
+					elm_glview_mode_set(handle, (Elm_GLView_Mode)(ELM_GLVIEW_ALPHA | ELM_GLVIEW_DEPTH));
+					elm_glview_resize_policy_set(handle, ELM_GLVIEW_RESIZE_POLICY_RECREATE);
+					elm_glview_render_policy_set(handle, ELM_GLVIEW_RENDER_POLICY_ON_DEMAND);
+					elm_glview_init_func_set(handle, RenderViewInstance::glInit);
+					elm_glview_resize_func_set(handle, RenderViewInstance::glResize);
+					elm_glview_render_func_set(handle, RenderViewInstance::glRender);
+					elm_glview_del_func_set(handle, RenderViewInstance::glDelete);
 
 					ret->m_flagContinuously = (m_redrawMode == RedrawMode::Continuously);
-					ret->m_timer = ::ecore_animator_add(RenderViewInstance::timer, handle);
+					ret->m_timer = ecore_animator_add(RenderViewInstance::timer, handle);
 
 					ret->installTouchEvents();
 
@@ -163,21 +209,10 @@ namespace slib
 		}
 		return sl_null;
 	}
-	
-	void RenderView::_setRedrawMode_NW(RedrawMode mode)
+
+	Ptr<IRenderViewInstance> RenderView::getRenderViewInstance()
 	{
-		Ref<RenderViewInstance> instance = Ref<RenderViewInstance>::from(getViewInstance());
-		if (instance.isNotNull()) {
-			instance->m_flagContinuously = (mode == RedrawMode::Continuously);
-		}
-	}
-	
-	void RenderView::_requestRender_NW()
-	{
-		Ref<RenderViewInstance> instance = Ref<RenderViewInstance>::from(getViewInstance());
-		if (instance.isNotNull()) {
-			instance->m_flagRequestRender = sl_true;
-		}
+		return CastRef<RenderViewInstance>(getViewInstance());
 	}
 	
 }

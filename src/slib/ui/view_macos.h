@@ -20,168 +20,14 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_UI_VIEW_MACOS
-#define CHECKHEADER_SLIB_UI_VIEW_MACOS
+#ifndef CHECKHEADER_SLIB_SRC_UI_VIEW_MACOS
+#define CHECKHEADER_SLIB_SRC_UI_VIEW_MACOS
 
 #include "slib/core/definition.h"
 
 #if defined(SLIB_UI_IS_MACOS)
 
-#include "slib/ui/view.h"
-#include "slib/ui/platform.h"
-
-namespace slib
-{
-
-	namespace priv
-	{
-		namespace view
-		{
-			NSRect GetViewFrameAndTransform(const UIRect& frame, const Matrix3& transform, sl_real& rotation);
-		}
-	}
-
-	class macOS_ViewInstance : public ViewInstance
-	{
-		SLIB_DECLARE_OBJECT
-		
-	public:
-		macOS_ViewInstance();
-		
-		~macOS_ViewInstance();
-		
-	public:
-		template <class T>
-		static Ref<T> create(NSView* handle)
-		{
-			if (handle != nil) {
-				Ref<T> ret = new T;
-				if (ret.isNotNull()) {
-					ret->initialize(handle);
-					return ret;
-				}
-			}
-			return sl_null;
-		}
-
-		template <class T>
-		static Ref<T> create(NSView* handle, NSView* parent, View* view)
-		{
-			if (handle != nil) {
-				Ref<T> ret = new T;
-				if (ret.isNotNull()) {
-					ret->initialize(handle, parent, view);
-					return ret;
-				}
-			}
-			return sl_null;
-		}
-		
-		template <class INSTANCE, class HANDLE>
-		static Ref<INSTANCE> create(View* view, ViewInstance* _parent)
-		{
-			NSView* parent = UIPlatform::getViewHandle(_parent);
-			UIRect frameView = view->getFrameInInstance();
-			Matrix3 transformView = view->getFinalTransformInInstance();
-			sl_real rotation;
-			NSRect frame = priv::view::GetViewFrameAndTransform(frameView, transformView, rotation);
-			HANDLE* handle = [[HANDLE alloc] initWithFrame:frame];
-			if (handle != nil) {
-				if (!(Math::isAlmostZero(rotation))) {
-					handle.frameRotation = Math::getDegreesFromRadian(rotation);
-				}
-				Ref<INSTANCE> ret = create<INSTANCE>(handle, parent, view);
-				if (ret.isNotNull()) {
-					ret->m_frame = frameView;
-					ret->m_transform = transformView;
-					handle->m_viewInstance = ret;
-					return ret;
-				}
-			}
-			return sl_null;
-		}
-		
-	public:
-		void initialize(NSView* handle);
-		
-		void initialize(NSView* handle, NSView* parent, View* view);
-		
-		NSView* getHandle();
-		
-		template <class HANDLE>
-		HANDLE* getHandleOf()
-		{
-			NSView* handle = m_handle;
-			if (handle != nil && [handle isKindOfClass:[HANDLE class]]) {
-				return (HANDLE*)handle;
-			}
-			return nil;
-		}
-		
-		sl_bool isValid() override;
-		
-		void setFocus(sl_bool flagFocus) override;
-		
-		void invalidate() override;
-		
-		void invalidate(const UIRect& rect) override;
-		
-		UIRect getFrame() override;
-		
-		void setFrame(const UIRect& frame) override;
-		
-		void setTransform(const Matrix3& transform) override;
-
-		void setVisible(sl_bool flag) override;
-		
-		void setEnabled(sl_bool flag) override;
-		
-		void setOpaque(sl_bool flag) override;
-		
-		void setAlpha(sl_real alpha) override;
-		
-		void setClipping(sl_bool flag) override;
-		
-		void setDrawing(sl_bool flag) override;
-		
-		UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen) override;
-		
-		UIPointf convertCoordinateFromViewToScreen(const UIPointf& ptView) override;
-		
-		void addChildInstance(const Ref<ViewInstance>& instance) override;
-		
-		void removeChildInstance(const Ref<ViewInstance>& instance) override;
-		
-		void bringToFront() override;
-		
-	public:
-		void onDraw(NSRect rectDirty);
-		
-		UIEventFlags onEventKey(sl_bool flagDown, NSEvent* event);
-		
-		UIEventFlags onEventMouse(UIAction action, NSEvent* event);
-		
-		UIEventFlags onEventMouse(UIAction action, const NSPoint& point);
-
-		UIEventFlags onEventMouseWheel(NSEvent* event);
-		
-		UIEventFlags onEventUpdateCursor(NSEvent* event);
-				
-		void updateFrameAndTransform();
-		
-	private:
-		void _release();
-		
-	protected:
-		NSView* m_handle;
-		
-	public:
-		UIRect m_frame;
-		Matrix3 m_transform;
-		
-	};
-
-}
+#include "slib/ui/view_macos.h"
 
 @interface SLIBViewBaseHandle : NSView
 {
@@ -196,27 +42,6 @@ namespace slib
 	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 }
 @end
-
-#define MACOS_VIEW_CREATE_INSTANCE_BEGIN \
-	Ref<macOS_ViewInstance> ret; \
-	NSView* parent = UIPlatform::getViewHandle(_parent); \
-	UIRect frameView = getFrameInInstance(); \
-	Matrix3 transformView = getFinalTransformInInstance(); \
-	sl_real rotation; \
-	NSRect frame = priv::view::GetViewFrameAndTransform(frameView, transformView, rotation); \
-
-#define MACOS_VIEW_CREATE_INSTANCE_END \
-	if (handle != nil) { \
-		if (!(Math::isAlmostZero(rotation))) { \
-			handle.frameRotation = Math::getDegreesFromRadian(rotation); \
-		} \
-		ret = macOS_ViewInstance::create<macOS_ViewInstance>(handle, parent, this); \
-		if (ret.isNotNull()) { \
-			ret->m_frame = frameView; \
-			ret->m_transform = transformView; \
-			handle->m_viewInstance = ret; \
-		} \
-	}
 
 #define MACOS_VIEW_DEFINE_ON_FOCUS \
 	- (BOOL)becomeFirstResponder \
@@ -251,7 +76,6 @@ namespace slib
 		} \
 		[super keyUp:theEvent]; \
 	}
-
 
 #endif
 

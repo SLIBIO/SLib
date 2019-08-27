@@ -47,7 +47,7 @@ namespace slib
 	public:
 		SLIB_DECLARE_EVENT_HANDLER(RefreshView, Refresh)
 		
-	public:
+	protected:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
 	protected:

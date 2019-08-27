@@ -127,9 +127,9 @@ namespace slib
 
 		virtual void drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color);
 
-		virtual void drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment, sl_bool flagMultiLine = sl_false) = 0;
+		virtual void drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, const Alignment& alignment, sl_bool flagMultiLine = sl_false) = 0;
 
-		virtual void drawText16(const String16& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment, sl_bool flagMultiLine = sl_false) = 0;
+		virtual void drawText16(const String16& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, const Alignment& alignment, sl_bool flagMultiLine = sl_false) = 0;
 
 
 		virtual void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& pen) = 0;
@@ -283,9 +283,9 @@ namespace slib
 
 		void draw(sl_real xDst, sl_real yDst, const Ref<Drawable>& drawable);
 
-		virtual void draw(const Rectangle& rectDst, const Ref<Drawable>& src, ScaleMode scaleMode, Alignment alignment, const DrawParam& param) = 0;
+		virtual void draw(const Rectangle& rectDst, const Ref<Drawable>& src, ScaleMode scaleMode, const Alignment& alignment, const DrawParam& param) = 0;
 
-		void draw(const Rectangle& rectDst, const Ref<Drawable>& src, ScaleMode scaleMode, Alignment alignment);
+		void draw(const Rectangle& rectDst, const Ref<Drawable>& src, ScaleMode scaleMode, const Alignment& alignment);
 		
 		
 		virtual sl_bool isSupportedDrawable(const Ref<Drawable>& drawable) = 0;
@@ -336,10 +336,10 @@ namespace slib
 		Size measureText16(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine = sl_false) override;
 		
 		using Canvas::drawText;
-		void drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment, sl_bool flagMultiLine = sl_false) override;
+		void drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, const Alignment& alignment, sl_bool flagMultiLine = sl_false) override;
 		
 		using Canvas::drawText16;
-		void drawText16(const String16& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment, sl_bool flagMultiLine = sl_false) override;
+		void drawText16(const String16& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, const Alignment& alignment, sl_bool flagMultiLine = sl_false) override;
 
 		using Canvas::drawRectangle;
 		void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Color& fillColor) override;
@@ -366,7 +366,7 @@ namespace slib
 
 		void draw(sl_real xDst, sl_real yDst, const Ref<Drawable>& drawable, const DrawParam& param) override;
 		
-		void draw(const Rectangle& rectDst, const Ref<Drawable>& src, ScaleMode scaleMode, Alignment alignment, const DrawParam& param) override;
+		void draw(const Rectangle& rectDst, const Ref<Drawable>& src, ScaleMode scaleMode, const Alignment& alignment, const DrawParam& param) override;
 		
 		sl_bool isSupportedDrawable(const Ref<Drawable>& drawable) override;
 		

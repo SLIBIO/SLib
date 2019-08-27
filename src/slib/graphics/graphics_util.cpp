@@ -94,7 +94,7 @@ namespace slib
 		return 4 * (x * x * ry2 + y * y * rx2) <= rx2 * ry2;
 	}
 
-	sl_real GraphicsUtil::calculateAlignX(sl_real leftDst, sl_real rightDst, sl_real widthSrc, Alignment align)
+	sl_real GraphicsUtil::calculateAlignX(sl_real leftDst, sl_real rightDst, sl_real widthSrc, const Alignment& align)
 	{
 		Alignment hAlign = align & Alignment::HorizontalMask;
 		switch (hAlign) {
@@ -110,7 +110,7 @@ namespace slib
 		return leftDst;
 	}
 
-	sl_real GraphicsUtil::calculateAlignY(sl_real topDst, sl_real bottomDst, sl_real heightSrc, Alignment align)
+	sl_real GraphicsUtil::calculateAlignY(sl_real topDst, sl_real bottomDst, sl_real heightSrc, const Alignment& align)
 	{
 		Alignment vAlign = align & Alignment::VerticalMask;
 		switch (vAlign) {
@@ -126,7 +126,7 @@ namespace slib
 		return topDst;
 	}
 
-	Point GraphicsUtil::calculateAlignPosition(const Rectangle& rcDst, sl_real widthSrc, sl_real heightSrc, Alignment align)
+	Point GraphicsUtil::calculateAlignPosition(const Rectangle& rcDst, sl_real widthSrc, sl_real heightSrc, const Alignment& align)
 	{
 		Point ret;
 		ret.x = calculateAlignX(rcDst.left, rcDst.right, widthSrc, align);
@@ -134,7 +134,7 @@ namespace slib
 		return ret;
 	}
 	
-	sl_bool GraphicsUtil::calculateAlignRectangle(Rectangle& rectOutput, const Rectangle& rectDst, sl_real sw, sl_real sh, ScaleMode scaleMode, Alignment alignment)
+	sl_bool GraphicsUtil::calculateAlignRectangle(Rectangle& rectOutput, const Rectangle& rectDst, sl_real sw, sl_real sh, ScaleMode scaleMode, const Alignment& alignment)
 	{
 		if (sw < SLIB_EPSILON) {
 			return sl_false;

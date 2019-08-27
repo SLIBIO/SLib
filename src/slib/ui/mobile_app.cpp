@@ -57,7 +57,7 @@ namespace slib
 		m_navigationController->setVisibility(Visibility::Hidden, UIUpdateMode::Init);
 		m_contentView->addChild(m_navigationController, UIUpdateMode::Init);
 
-		m_callbackOnChangeLocale = SLIB_FUNCTION_CLASS(MobileApp, dispatchChangeCurrentLocale, this);
+		m_callbackOnChangeLocale = SLIB_FUNCTION_MEMBER(MobileApp, dispatchChangeCurrentLocale, this);
 		Locale::addOnChangeCurrentLocale(m_callbackOnChangeLocale);
 	}
 	

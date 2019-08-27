@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@
 #if defined(SLIB_UI_IS_WIN32)
 
 #include "slib/ui/render_view.h"
+
 #include "slib/render/opengl.h"
 
 #include "view_win32.h"
@@ -37,8 +38,10 @@ namespace slib
 		namespace render_view
 		{
 
-			class RenderViewInstance : public Win32_ViewInstance
+			class RenderViewInstance : public Win32_ViewInstance, public IRenderViewInstance
 			{
+				SLIB_DECLARE_OBJECT
+
 			public:
 				AtomicRef<Renderer> m_renderer;
 				RenderEngine* m_pLastEngine;
@@ -58,6 +61,22 @@ namespace slib
 				}
 
 			public:
+				void setRedrawMode(RenderView* view, RedrawMode mode) override
+				{
+					Ref<Renderer> renderer = m_renderer;
+					if (renderer.isNotNull()) {
+						renderer->setRenderingContinuously(mode == RedrawMode::Continuously);
+					}
+				}
+
+				void requestRender(RenderView* view) override
+				{
+					Ref<Renderer> renderer = m_renderer;
+					if (renderer.isNotNull()) {
+						renderer->requestRender();
+					}
+				}
+
 				void setRenderer(const Ref<Renderer>& renderer, RedrawMode redrawMode)
 				{
 					m_renderer = renderer;
@@ -96,6 +115,8 @@ namespace slib
 				}
 			};
 
+			SLIB_DEFINE_OBJECT(RenderViewInstance, Win32_ViewInstance)
+
 		}
 	}
 
@@ -107,10 +128,7 @@ namespace slib
 		if (!shared) {
 			return sl_null;
 		}
-
-		DWORD styleEx = 0;
-		DWORD style = 0;
-		Ref<RenderViewInstance> ret = Win32_ViewInstance::create<RenderViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), sl_null, style, styleEx);
+		Ref<RenderViewInstance> ret = Win32_ViewInstance::create<RenderViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), sl_null, 0, 0);
 		if (ret.isNotNull()) {
 			RenderEngineType engineType = getPreferredEngineType();
 			if (engineType == RenderEngineType::OpenGL_ES) {
@@ -144,26 +162,9 @@ namespace slib
 		return sl_null;
 	}
 
-	void RenderView::_setRedrawMode_NW(RedrawMode mode)
+	Ptr<IRenderViewInstance> RenderView::getRenderViewInstance()
 	{
-		Ref<RenderViewInstance> instance = Ref<RenderViewInstance>::from(getViewInstance());
-		if (instance.isNotNull()) {
-			Ref<Renderer> renderer = instance->m_renderer;
-			if (renderer.isNotNull()) {
-				renderer->setRenderingContinuously(mode == RedrawMode::Continuously);
-			}
-		}
-	}
-
-	void RenderView::_requestRender_NW()
-	{
-		Ref<RenderViewInstance> instance = Ref<RenderViewInstance>::from(getViewInstance());
-		if (instance.isNotNull()) {
-			Ref<Renderer> renderer = instance->m_renderer;
-			if (renderer.isNotNull()) {
-				renderer->requestRender();
-			}
-		}
+		return CastRef<RenderViewInstance>(getViewInstance());
 	}
 
 }

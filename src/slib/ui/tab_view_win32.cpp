@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -38,14 +38,14 @@ namespace slib
 	{
 		namespace tab_view
 		{
-			
+
 			class TabViewHelper : public TabView
 			{
 			public:
-				void _applyTabsCount(HWND hWnd)
+				void applyTabsCount(HWND hWnd)
 				{
 					ObjectLocker lock(this);
-					sl_uint32 nOrig = (sl_uint32)(::SendMessageW(hWnd, TCM_GETITEMCOUNT, 0, 0));
+					sl_uint32 nOrig = (sl_uint32)(SendMessageW(hWnd, TCM_GETITEMCOUNT, 0, 0));
 					sl_uint32 nNew = (sl_uint32)(m_items.getCount());
 					if (nOrig == nNew) {
 						return;
@@ -53,23 +53,23 @@ namespace slib
 					if (nOrig > nNew) {
 						if (nNew > 0) {
 							for (sl_uint32 i = nOrig; i > nNew; i--) {
-								::SendMessageW(hWnd, TCM_GETITEMCOUNT, (WPARAM)(i - 1), 0);
+								SendMessageW(hWnd, TCM_GETITEMCOUNT, (WPARAM)(i - 1), 0);
 							}
 						} else {
-							::SendMessageW(hWnd, TCM_DELETEALLITEMS, 0, 0);
+							SendMessageW(hWnd, TCM_DELETEALLITEMS, 0, 0);
 						}
 					} else {
 						for (sl_uint32 i = nOrig; i < nNew; i++) {
 							TCITEMW tci;
 							Base::zeroMemory(&tci, sizeof(tci));
-							::SendMessageW(hWnd, TCM_INSERTITEM, (WPARAM)i, (LPARAM)(&tci));
+							SendMessageW(hWnd, TCM_INSERTITEM, (WPARAM)i, (LPARAM)(&tci));
 						}
 					}
 				}
 
-				void _copyTabs(HWND hWnd, ViewInstance* viewInstance)
+				void copyTabs(ViewInstance* instance, HWND hWnd)
 				{
-					_applyTabsCount(hWnd);
+					applyTabsCount(hWnd);
 					ListLocker<TabViewItem> items(m_items);
 					for (sl_size i = 0; i < items.count; i++) {
 						TCITEMW tci;
@@ -77,46 +77,24 @@ namespace slib
 						tci.mask = TCIF_TEXT;
 						String16 label = items[i].label;
 						tci.pszText = (LPWSTR)(label.getData());
-						::SendMessageW(hWnd, TCM_SETITEMW, (WPARAM)i, (LPARAM)&tci);
+						SendMessageW(hWnd, TCM_SETITEMW, (WPARAM)i, (LPARAM)&tci);
 					}
-					_selectTab(hWnd, viewInstance, m_indexSelected);
+					selectTab(instance, hWnd, m_indexSelected);
 				}
 
-				void _setTabLabel(HWND hWnd, sl_uint32 index, const String& _label)
-				{
-					TCITEMW tci;
-					Base::zeroMemory(&tci, sizeof(tci));
-					tci.mask = TCIF_TEXT;
-					String16 label = _label;
-					tci.pszText = (LPWSTR)(label.getData());
-					::SendMessageW(hWnd, TCM_SETITEMW, (WPARAM)index, (LPARAM)(&tci));
-				}
-
-				void _selectTab(HWND hWnd, ViewInstance* viewInstance, sl_uint32 index)
+				void selectTab(ViewInstance* instance, HWND hWnd, sl_uint32 index)
 				{
 					sl_uint32 n = (sl_uint32)(m_items.getCount());
 					if (index >= n) {
 						index = 0;
 					}
-					::SendMessageW(hWnd, TCM_SETCURSEL, (WPARAM)m_indexSelected, 0);
-					_applyTabContents(hWnd, viewInstance);
+					SendMessageW(hWnd, TCM_SETCURSEL, (WPARAM)index, 0);
+					applyTabContents(instance, hWnd);
 				}
 
-				sl_uint32 _getSelectedIndex(HWND hWnd)
+				void applyTabContents(ViewInstance* viewInstance, HWND hWnd)
 				{
-					return (sl_uint32)(::SendMessageW(hWnd, TCM_GETCURSEL, 0, 0));
-				}
-
-				void _onSelectTab(HWND hWnd, ViewInstance* viewInstance)
-				{
-					sl_uint32 index = _getSelectedIndex(hWnd);
-					dispatchSelectTab(index);
-					_applyTabContents(hWnd, viewInstance);
-				}
-
-				void _applyTabContents(HWND hWnd, ViewInstance* viewInstance)
-				{
-					UIRect rc = _getClientBounds(hWnd);
+					UIRect rc = getClientBounds(hWnd);
 					sl_size sel = m_indexSelected;
 					ListLocker<TabViewItem> items(m_items);
 					for (sl_size i = 0; i < items.count; i++) {
@@ -124,9 +102,11 @@ namespace slib
 						if (view.isNotNull()) {
 							view->setFrame(rc);
 							if (i == sel) {
-								view->setVisible(sl_true);
-								if (view->getViewInstance().isNull()) {
+								if (!(view->isInstance())) {
+									view->setVisible(sl_true, UIUpdateMode::None);
 									view->attachToNewInstance(viewInstance);
+								} else {
+									view->setVisible(sl_true);
 								}
 							} else {
 								view->setVisible(sl_false);
@@ -135,9 +115,9 @@ namespace slib
 					}
 				}
 
-				void _applyClientBounds(HWND hWnd)
+				void applyClientBounds(HWND hWnd)
 				{
-					UIRect rc = _getClientBounds(hWnd);
+					UIRect rc = getClientBounds(hWnd);
 					ListLocker<TabViewItem> items(m_items);
 					for (sl_size i = 0; i < items.count; i++) {
 						Ref<View> view = items[i].contentView;
@@ -147,30 +127,90 @@ namespace slib
 					}
 				}
 
-				UIRect _getClientBounds(HWND hWnd)
+				UIRect getClientBounds(HWND hWnd)
 				{
 					RECT rc;
 					rc.left = -2;
 					rc.top = 0;
 					rc.right = (int)(getWidth());
 					rc.bottom = (int)(getHeight()) + 1;
-					::SendMessageW(hWnd, TCM_ADJUSTRECT, FALSE, (LPARAM)(&rc));
+					SendMessageW(hWnd, TCM_ADJUSTRECT, FALSE, (LPARAM)(&rc));
 					return UIRect((sl_ui_pos)(rc.left), (sl_ui_pos)(rc.top), (sl_ui_pos)(rc.right), (sl_ui_pos)(rc.bottom));
 				}
+
 			};
 
-			class TabViewInstance : public Win32_ViewInstance
+			class TabViewInstance : public Win32_ViewInstance, public ITabViewInstance
 			{
+				SLIB_DECLARE_OBJECT
+
 			public:
+				void refreshTabsCount(TabView* view) override
+				{
+					HWND handle = m_handle;
+					if (handle) {
+						(static_cast<TabViewHelper*>(view))->applyTabsCount(handle);
+					}
+				}
+
+				void refreshSize(TabView* view) override
+				{
+					HWND handle = m_handle;
+					if (handle) {
+						(static_cast<TabViewHelper*>(view))->applyClientBounds(handle);
+					}
+				}
+
+				void setTabLabel(TabView* view, sl_uint32 index, const String& _text) override
+				{
+					HWND handle = m_handle;
+					if (handle) {
+						TCITEMW tci;
+						Base::zeroMemory(&tci, sizeof(tci));
+						tci.mask = TCIF_TEXT;
+						String16 text = _text;
+						tci.pszText = (LPWSTR)(text.getData());
+						SendMessageW(handle, TCM_SETITEMW, (WPARAM)index, (LPARAM)(&tci));
+					}
+				}
+
+				void setTabContentView(TabView* view, sl_uint32 index, const Ref<View>& content) override
+				{
+					HWND handle = m_handle;
+					if (handle) {
+						(static_cast<TabViewHelper*>(view))->applyTabContents(this, handle);
+					}
+				}
+
+				void selectTab(TabView* view, sl_uint32 index) override
+				{
+					HWND handle = m_handle;
+					if (handle) {
+						(static_cast<TabViewHelper*>(view))->selectTab(this, handle, index);
+					}
+				}
+
+				sl_bool getContentViewSize(TabView* view, UISize& _out) override
+				{
+					HWND handle = m_handle;
+					if (handle) {
+						_out = (static_cast<TabViewHelper*>(view))->getClientBounds(handle).getSize();
+						return sl_true;
+					}
+					return sl_false;
+				}
+
 				sl_bool processNotify(NMHDR* nmhdr, LRESULT& result) override
 				{
 					HWND handle = getHandle();
 					if (handle) {
-						Ref<View> _view = getView();
-						if (TabViewHelper* view = CastInstance<TabViewHelper>(_view.get())) {
+						Ref<TabViewHelper> helper = CastRef<TabViewHelper>(getView());
+						if (helper.isNotNull()) {
 							UINT code = nmhdr->code;
 							if (code == TCN_SELCHANGE) {
-								view->_onSelectTab(handle, this);
+								sl_uint32 index = (sl_uint32)(SendMessageW(handle, TCM_GETCURSEL, 0, 0));
+								helper->dispatchSelectTab(index);
+								helper->applyTabContents(this, handle);
 								return sl_true;
 							}
 						}
@@ -179,6 +219,8 @@ namespace slib
 				}
 			};
 
+			SLIB_DEFINE_OBJECT(TabViewInstance, Win32_ViewInstance)
+
 		}
 	}
 
@@ -186,91 +228,20 @@ namespace slib
 
 	Ref<ViewInstance> TabView::createNativeWidget(ViewInstance* parent)
 	{
-		Win32_UI_Shared* shared = Win32_UI_Shared::get();
-		if (!shared) {
-			return sl_null;
-		}
-
 		DWORD style = WS_CLIPCHILDREN;
 		DWORD styleEx = WS_EX_CONTROLPARENT;
-
 		Ref<TabViewInstance> ret = Win32_ViewInstance::create<TabViewInstance>(this, parent, L"SysTabControl32", sl_null, style, styleEx);
-		
 		if (ret.isNotNull()) {
-
 			HWND handle = ret->getHandle();
-
-			Ref<Font> font = getFont();
-			HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
-			if (hFont) {
-				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
-			}
-
-			((TabViewHelper*)this)->_copyTabs(handle, ret.get());
+			(static_cast<TabViewHelper*>(this))->copyTabs(ret.get(), handle);
+			return ret;
 		}
-		return ret;
+		return sl_null;
 	}
 
-	void TabView::_refreshTabsCount_NW()
+	Ptr<ITabViewInstance> TabView::getTabViewInstance()
 	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			((TabViewHelper*)this)->_applyTabsCount(handle);
-		}
-	}
-
-	void TabView::_refreshSize_NW()
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			((TabViewHelper*)this)->_applyClientBounds(handle);
-		}
-	}
-
-	void TabView::_setTabLabel_NW(sl_uint32 index, const String& text)
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			((TabViewHelper*)this)->_setTabLabel(handle, index, text);
-		}
-	}
-
-	void TabView::_setTabContentView_NW(sl_uint32 index, const Ref<View>& view)
-	{
-		Ref<ViewInstance> viewInstance = getViewInstance();
-		if (viewInstance.isNotNull()) {
-			HWND handle = UIPlatform::getViewHandle(viewInstance.get());
-			((TabViewHelper*)this)->_applyTabContents(handle, viewInstance.get());
-		}
-	}
-
-	void TabView::_selectTab_NW(sl_uint32 index)
-	{
-		Ref<ViewInstance> viewInstance = getViewInstance();
-		if (viewInstance.isNotNull()) {
-			HWND handle = UIPlatform::getViewHandle(viewInstance.get());
-			((TabViewHelper*)this)->_selectTab(handle, viewInstance.get(), index);
-		}
-	}
-
-	UISize TabView::_getContentViewSize_NW()
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			return ((TabViewHelper*)this)->_getClientBounds(handle).getSize();
-		}
-		return UISize::zero();
-	}
-
-	void TabView::_setFont_NW(const Ref<Font>& font)
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
-			if (hFont) {
-				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
-			}
-		}
+		return CastRef<TabViewInstance>(getViewInstance());
 	}
 
 }

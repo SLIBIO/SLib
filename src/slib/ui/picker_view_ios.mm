@@ -28,16 +28,27 @@
 
 #include "view_ios.h"
 
+namespace slib
+{
+	namespace priv
+	{
+		namespace picker_view
+		{
+			class PickerViewInstance;
+		}
+	}
+}
+
 @interface SLIBPickerViewHandle : UIPickerView<UIPickerViewDelegate, UIPickerViewDataSource>
 {
 	@public sl_uint32 m_selectionBefore;
+	@public slib::WeakRef<slib::priv::picker_view::PickerViewInstance> m_viewInstance;
 	
-	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
-	@public slib::WeakRef<slib::PickerView> m_view;
-	
-	@public UIFont* m_font;
-	
+	UIFont* m_font;
 }
+
+- (void)setFont: (UIFont*)font;
+
 @end
 
 namespace slib
@@ -51,122 +62,112 @@ namespace slib
 			class PickerViewHelper : public PickerView
 			{
 			public:
-				sl_uint32 _getItemsCount()
+				sl_uint32 getItemsCount()
 				{
 					return (sl_uint32)(m_titles.getCount());
 				}
 				
-				NSString* _getItemTitle(sl_uint32 row)
+				NSString* getItemTitle(sl_uint32 row)
 				{
 					String s = m_titles.getValueAt(row);
 					return Apple::getNSStringFromString(s);
 				}
 				
-				void _onSelectItem(SLIBPickerViewHandle* v, sl_uint32 row)
+			};
+			
+			class PickerViewInstance : public iOS_ViewInstance, public IPickerViewInstance
+			{
+				SLIB_DECLARE_OBJECT
+				
+			public:
+				SLIBPickerViewHandle* getHandle()
 				{
-					dispatchSelectItem(row);
+					return (SLIBPickerViewHandle*)m_handle;
 				}
 				
-				void _selectItem(SLIBPickerViewHandle* v, sl_uint32 row)
+				Ref<PickerViewHelper> getHelper()
 				{
-					[v selectRow:row inComponent:0 animated:NO];
+					return CastRef<PickerViewHelper>(getView());
 				}
+				
+				static void _select(SLIBPickerViewHandle* handle, sl_uint32 index)
+				{
+					[handle selectRow:index inComponent:0 animated:NO];
+				}
+				
+				void select(PickerView* view, sl_uint32 index) override
+				{
+					SLIBPickerViewHandle* handle = getHandle();
+					if (handle != nil) {
+						_select(handle, index);
+					}
+				}
+				
+				void refreshItemsCount(PickerView* view) override
+				{
+					refreshItemsContent(view);
+				}
+				
+				void refreshItemsContent(PickerView* view) override
+				{
+					SLIBPickerViewHandle* handle = getHandle();
+					if (handle != nil) {
+						[handle reloadAllComponents];
+						_select(handle, view->getSelectedIndex());
+					}
+				}
+				
+				void setItemTitle(PickerView* view, sl_uint32 index, const String& title) override
+				{
+					SLIBPickerViewHandle* handle = getHandle();
+					if (handle != nil) {
+						[handle reloadAllComponents];
+					}
+				}
+				
+				void setFont(View* view, const Ref<Font>& font) override
+				{
+					SLIBPickerViewHandle* handle = getHandle();
+					if (handle != nil) {
+						setHandleFont(handle, font);
+						[handle reloadAllComponents];
+					}
+				}
+				
+				void onSelectItem(SLIBPickerViewHandle* handle, sl_uint32 row)
+				{
+					Ref<PickerViewHelper> helper = getHelper();
+					if (helper.isNotNull()) {
+						helper->dispatchSelectItem(row);
+					}
+				}
+				
 			};
+			
+			SLIB_DEFINE_OBJECT(PickerViewInstance, iOS_ViewInstance)
 
 		}
 	}
 
 	using namespace priv::picker_view;
 	
-	Ref<ViewInstance> PickerView::createNativeWidget(ViewInstance* _parent)
+	Ref<ViewInstance> PickerView::createNativeWidget(ViewInstance* parent)
 	{
-		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		SLIBPickerViewHandle* handle = [[SLIBPickerViewHandle alloc] initWithFrame:frame];
-		if (handle != nil) {
-			Ref<Font> font = getFont();
-			UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
-			if (hFont != nil) {
-				handle->m_font = hFont;
-			}
-			handle->m_view = this;
+		Ref<PickerViewInstance> ret = iOS_ViewInstance::create<PickerViewInstance, SLIBPickerViewHandle>(this, parent);
+		if (ret.isNotNull()) {
+			SLIBPickerViewHandle* handle = ret->getHandle();
+			iOS_ViewInstance::setHandleFont(handle, getFont());
+			PickerViewInstance::_select(handle, m_indexSelected);
+			return ret;
 		}
-		IOS_VIEW_CREATE_INSTANCE_END
-		if (handle != nil) {
-			((PickerViewHelper*)this)->_selectItem(handle, m_indexSelected);
-		}
-		return ret;
+		return sl_null;
 	}
 	
-	void PickerView::_select_NW(sl_uint32 index)
+	Ptr<IPickerViewInstance> PickerView::getPickerViewInstance()
 	{
-		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), PickerView, _select_NW, this, index));
-			return;
-		}
-		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[SLIBPickerViewHandle class]]) {
-			SLIBPickerViewHandle* v = (SLIBPickerViewHandle*)handle;
-			((PickerViewHelper*)this)->_selectItem(v, index);
-		}
+		return CastRef<PickerViewInstance>(getViewInstance());
 	}
 	
-	void PickerView::_refreshItemsCount_NW()
-	{
-		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_FUNCTION_WEAKREF(PickerView, _refreshItemsCount_NW, this));
-			return;
-		}
-		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[SLIBPickerViewHandle class]]) {
-			SLIBPickerViewHandle* v = (SLIBPickerViewHandle*)handle;
-			[v reloadAllComponents];
-			((PickerViewHelper*)this)->_selectItem(v, m_indexSelected);
-		}
-	}
-	
-	void PickerView::_refreshItemsContent_NW()
-	{
-		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_FUNCTION_WEAKREF(PickerView, _refreshItemsContent_NW, this));
-			return;
-		}
-		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[SLIBPickerViewHandle class]]) {
-			SLIBPickerViewHandle* v = (SLIBPickerViewHandle*)handle;
-			[v reloadAllComponents];
-			((PickerViewHelper*)this)->_selectItem(v, m_indexSelected);
-		}
-	}
-	
-	void PickerView::_setItemTitle_NW(sl_uint32 index, const String& title)
-	{
-		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), PickerView, _setItemTitle_NW, this, index, title));
-			return;
-		}
-		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[SLIBPickerViewHandle class]]) {
-			SLIBPickerViewHandle* v = (SLIBPickerViewHandle*)handle;
-			[v reloadAllComponents];
-		}
-	}
-	
-	void PickerView::_setFont_NW(const Ref<Font>& font)
-	{
-		if (!(isUiThread())) {
-			dispatchToUiThread(SLIB_BIND_WEAKREF(void(), PickerView, _setFont_NW, this, font));
-			return;
-		}
-		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[SLIBPickerViewHandle class]]) {
-			SLIBPickerViewHandle* v = (SLIBPickerViewHandle*)handle;
-			UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
-			if (hFont != nil) {
-				v->m_font = hFont;
-				[v reloadAllComponents];
-			}
-		}
-	}	
 }
 
 using namespace slib;
@@ -179,17 +180,27 @@ IOS_VIEW_DEFINE_ON_FOCUS
 -(id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];
-	
 	if (self != nil) {
-	
 		self->m_selectionBefore = 0;
-		
 		self.showsSelectionIndicator = YES;
 		self.dataSource = self;
 		self.delegate = self;
-
 	}
 	return self;
+}
+
+- (void)setFont:(UIFont *)font
+{
+	m_font = font;
+}
+
+- (Ref<PickerViewHelper>)helper
+{
+	Ref<PickerViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		return instance->getHelper();
+	}
+	return sl_null;
 }
 
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView;
@@ -199,17 +210,17 @@ IOS_VIEW_DEFINE_ON_FOCUS
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
 {
-	Ref<PickerView> view = m_view;
-	if (view.isNotNull()) {
-		((PickerViewHelper*)(view.get()))->_onSelectItem(self, (sl_uint32)row);
+	Ref<PickerViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		instance->onSelectItem(self, (sl_uint32)row);
 	}
 }
 
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component;
 {
-	Ref<PickerView> view = m_view;
-	if (view.isNotNull()) {
-		return (NSInteger)(((PickerViewHelper*)(view.get()))->_getItemsCount());
+	Ref<PickerViewHelper> helper = [self helper];
+	if (helper.isNotNull()) {
+		return (NSInteger)(helper->getItemsCount());
 	}
 	return 0;
 }
@@ -221,9 +232,9 @@ IOS_VIEW_DEFINE_ON_FOCUS
 		label.font = m_font;
 		label.textAlignment = NSTextAlignmentCenter;
 	}
-	Ref<PickerView> picker = m_view;
-	if (picker.isNotNull()) {
-		label.text = ((PickerViewHelper*)(picker.get()))->_getItemTitle((sl_uint32)row);
+	Ref<PickerViewHelper> helper = [self helper];
+	if (helper.isNotNull()) {
+		label.text = helper->getItemTitle((sl_uint32)row);
 	}
 	return label;
 }

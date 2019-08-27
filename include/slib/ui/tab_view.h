@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -43,6 +43,8 @@ namespace slib
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TabViewItem)
 		
 	};
+	
+	class ITabViewInstance;
 	
 	class SLIB_EXPORT TabView : public ViewGroup
 	{
@@ -132,7 +134,7 @@ namespace slib
 		
 		Alignment getTabAlignment();
 		
-		virtual void setTabAlignment(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setTabAlignment(const Alignment& align, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		virtual void setTabPadding(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
@@ -185,8 +187,10 @@ namespace slib
 	public:
 		SLIB_DECLARE_EVENT_HANDLER(TabView, SelectTab, sl_uint32 index)
 		
-	public:
+	protected:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
+		
+		virtual Ptr<ITabViewInstance> getTabViewInstance();
 		
 	protected:
 		void onClickEvent(UIEvent* ev) override;
@@ -204,20 +208,7 @@ namespace slib
 		
 		void _relayout(UIUpdateMode mode);
 		
-	private:
-		void _refreshTabsCount_NW();
-		
-		void _refreshSize_NW();
-		
-		void _setTabLabel_NW(sl_uint32 index, const String& text);
-		
-		void _setTabContentView_NW(sl_uint32 index, const Ref<View>& view);
-				
-		UISize _getContentViewSize_NW();
-		
-		void _selectTab_NW(sl_uint32 index);
-		
-		void _setFont_NW(const Ref<Font>& font) override;
+		void _refreshSize();
 		
 	protected:
 		CList<TabViewItem> m_items;
@@ -244,6 +235,23 @@ namespace slib
 		sl_ui_pos m_tabSpaceSize;
 		sl_ui_len m_iconWidth;
 		sl_ui_len m_iconHeight;
+		
+	};
+	
+	class SLIB_EXPORT ITabViewInstance
+	{
+	public:
+		virtual void refreshTabsCount(TabView* view) = 0;
+		
+		virtual void refreshSize(TabView* view) = 0;
+		
+		virtual void setTabLabel(TabView* view, sl_uint32 index, const String& text) = 0;
+		
+		virtual void setTabContentView(TabView* view, sl_uint32 index, const Ref<View>& content) = 0;
+		
+		virtual sl_bool getContentViewSize(TabView* view, UISize& _out) = 0;
+		
+		virtual void selectTab(TabView* view, sl_uint32 index) = 0;
 		
 	};
 

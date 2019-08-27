@@ -120,8 +120,6 @@ namespace slib
 		}
 	}
 	
-#define CHECK_INSTANCE(instance) (instance.isNotNull() && !(instance->isClosed()))
-
 	SLIB_DEFINE_OBJECT(Window, Object)
 
 	Window::Window()
@@ -198,20 +196,21 @@ namespace slib
 
 	void Window::close()
 	{
+		Ref<WindowInstance> instance = m_instance;
+		if (instance.isNull()) {
+			return;
+		}
+		
+		void (Window::*func)() = &Window::close;
+		SLIB_VIEW_RUN_ON_UI_THREAD(func)
+		
 		Ref<Window> window = this;
-		{
-			ObjectLocker lock(this);
-			Ref<WindowInstance> instance = m_instance;
-			if (instance.isNotNull()) {
-				instance->close();
-				detach();
-				lock.unlock();
-				dispatchDestroy();
-			}
-			if (m_flagStateDoModal) {
-				m_flagStateDoModal = sl_false;
-				UI::quitLoop();
-			}
+		instance->close();
+		detach();
+		dispatchDestroy();
+		if (m_flagStateDoModal) {
+			m_flagStateDoModal = sl_false;
+			UI::quitLoop();
 		}
 	}
 
@@ -240,14 +239,17 @@ namespace slib
 
 	void Window::setParent(const Ref<Window>& parent)
 	{
-		m_parent = parent;
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setParent, parent)
+			m_parent = parent;
 			if (parent.isNotNull()) {
 				instance->setParent(parent->m_instance);
 			} else {
 				instance->setParent(Ref<WindowInstance>::null());
 			}
+		} else {
+			m_parent = parent;
 		}
 	}
 
@@ -273,17 +275,20 @@ namespace slib
 
 	void Window::setMenu(const Ref<Menu>& menu)
 	{
-		m_menu = menu;
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setMenu, menu)
+			m_menu = menu;
 			instance->setMenu(menu);
+		} else {
+			m_menu = menu;
 		}
 	}
 
 	sl_bool Window::isActive()
 	{
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
 			return instance->isActive();
 		}
 		return sl_false;
@@ -292,7 +297,8 @@ namespace slib
 	void Window::activate()
 	{
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::activate)
 			instance->activate();
 		}
 	}
@@ -300,7 +306,7 @@ namespace slib
 	UIRect Window::getFrame()
 	{
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
 			m_frame = instance->getFrame();
 		}
 		return m_frame;
@@ -308,11 +314,14 @@ namespace slib
 
 	void Window::setFrame(const UIRect& _frame)
 	{
+		Ref<WindowInstance> instance = m_instance;
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::activate)
+		}
 		UIRect frame = _frame;
 		_constrainSize(frame, frame.getWidth() > 0);
 		m_frame = frame;
-		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
 			instance->setFrame(frame);
 		}
 		m_flagUseClientSizeRequested = sl_false;
@@ -438,7 +447,7 @@ namespace slib
 	UIRect Window::getClientFrame()
 	{
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
 			return instance->getClientFrame();
 		}
 		return UIRect::zero();
@@ -447,7 +456,7 @@ namespace slib
 	UISize Window::getClientSize()
 	{
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
 			return instance->getClientSize();
 		} else {
 			if (m_flagUseClientSizeRequested) {
@@ -461,7 +470,10 @@ namespace slib
 	void Window::setClientSize(const UISize& size)
 	{
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
+			void (Window::*func)(const UISize&) = &Window::setClientSize;
+			SLIB_VIEW_RUN_ON_UI_THREAD(func, size)
+
 			m_flagUseClientSizeRequested = sl_false;
 			if (!(instance->setClientSize(size))) {
 				setSize(size);
@@ -486,7 +498,8 @@ namespace slib
 	void Window::setClientWidth(sl_ui_len width)
 	{
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setClientWidth, width)
 			m_flagUseClientSizeRequested = sl_false;
 			if (!(instance->setClientSize(UISize(width, m_clientSizeRequested.y)))) {
 				setWidth(width);
@@ -506,7 +519,8 @@ namespace slib
 	void Window::setClientHeight(sl_ui_len height)
 	{
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setClientHeight, height)
 			m_flagUseClientSizeRequested = sl_false;
 			if (!(instance->setClientSize(UISize(m_clientSizeRequested.x, height)))) {
 				setHeight(height);
@@ -531,10 +545,13 @@ namespace slib
 
 	void Window::setTitle(const String& title)
 	{
-		m_title = title;
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setTitle, title)
+			m_title = title;
 			instance->setTitle(title);
+		} else {
+			m_title = title;
 		}
 	}
 
@@ -545,17 +562,20 @@ namespace slib
 
 	void Window::setBackgroundColor(const Color& color)
 	{
-		m_backgroundColor = color;
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setBackgroundColor, color)
+			m_backgroundColor = color;
 			instance->setBackgroundColor(color);
+		} else {
+			m_backgroundColor = color;
 		}
 	}
 
 	sl_bool Window::isMinimized()
 	{
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
 			m_flagMinimized = instance->isMinimized();
 		}
 		return m_flagMinimized;
@@ -563,17 +583,20 @@ namespace slib
 
 	void Window::setMinimized(sl_bool flag)
 	{
-		m_flagMinimized = flag;
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setMinimized, flag)
+			m_flagMinimized = flag;
 			instance->setMinimized(flag);
+		} else {
+			m_flagMinimized = flag;
 		}
 	}
 
 	sl_bool Window::isMaximized()
 	{
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
 			m_flagMaximized = instance->isMaximized();
 		}
 		return m_flagMaximized;
@@ -581,10 +604,13 @@ namespace slib
 
 	void Window::setMaximized(sl_bool flag)
 	{
-		m_flagMaximized = flag;
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setMaximized, flag)
+			m_flagMaximized = flag;
 			instance->setMaximized(flag);
+		} else {
+			m_flagMaximized = flag;
 		}
 	}
 
@@ -595,10 +621,13 @@ namespace slib
 
 	void Window::setVisible(sl_bool flag)
 	{
-		m_flagVisible = flag;
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setVisible, flag)
+			m_flagVisible = flag;
 			instance->setVisible(flag);
+		} else {
+			m_flagVisible = flag;
 		}
 	}
 
@@ -609,10 +638,13 @@ namespace slib
 
 	void Window::setAlwaysOnTop(sl_bool flag)
 	{
-		m_flagAlwaysOnTop = flag;
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setAlwaysOnTop, flag)
+			m_flagAlwaysOnTop = flag;
 			instance->setAlwaysOnTop(flag);
+		} else {
+			m_flagAlwaysOnTop = flag;
 		}
 	}
 
@@ -623,10 +655,13 @@ namespace slib
 
 	void Window::setCloseButtonEnabled(sl_bool flag)
 	{
-		m_flagCloseButtonEnabled = flag;
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setCloseButtonEnabled, flag)
+			m_flagCloseButtonEnabled = flag;
 			instance->setCloseButtonEnabled(flag);
+		} else {
+			m_flagCloseButtonEnabled = flag;
 		}
 	}
 
@@ -637,10 +672,13 @@ namespace slib
 
 	void Window::setMinimizeButtonEnabled(sl_bool flag)
 	{
-		m_flagMinimizeButtonEnabled = flag;
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setMinimizeButtonEnabled, flag)
+			m_flagMinimizeButtonEnabled = flag;
 			instance->setMinimizeButtonEnabled(flag);
+		} else {
+			m_flagMinimizeButtonEnabled = flag;
 		}
 	}
 
@@ -651,10 +689,13 @@ namespace slib
 
 	void Window::setMaximizeButtonEnabled(sl_bool flag)
 	{
-		m_flagMaximizeButtonEnabled = flag;
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setMaximizeButtonEnabled, flag)
+			m_flagMaximizeButtonEnabled = flag;
 			instance->setMaximizeButtonEnabled(flag);
+		} else {
+			m_flagMaximizeButtonEnabled = flag;
 		}
 	}
 
@@ -665,10 +706,13 @@ namespace slib
 
 	void Window::setResizable(sl_bool flag)
 	{
-		m_flagResizable = flag;
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setResizable, flag)
+			m_flagResizable = flag;
 			instance->setResizable(flag);
+		} else {
+			m_flagResizable = flag;
 		}
 	}
 
@@ -679,10 +723,13 @@ namespace slib
 
 	void Window::setAlpha(sl_real alpha)
 	{
-		m_alpha = alpha;
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setAlpha, alpha)
+			m_alpha = alpha;
 			instance->setAlpha(alpha);
+		} else {
+			m_alpha = alpha;
 		}
 	}
 
@@ -693,10 +740,13 @@ namespace slib
 
 	void Window::setTransparent(sl_bool flag)
 	{
-		m_flagTransparent = flag;
 		Ref<WindowInstance> instance = m_instance;
-		if (CHECK_INSTANCE(instance)) {
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setTransparent, flag)
+			m_flagTransparent = flag;
 			instance->setTransparent(flag);
+		} else {
+			m_flagTransparent = flag;
 		}
 	}
 
@@ -830,6 +880,11 @@ namespace slib
 	
 	void Window::setSizeRange(const UISize& _sizeMinimum, const UISize& _sizeMaximum, float aspectRatioMinimum, float aspectRatioMaximum)
 	{
+		Ref<WindowInstance> instance = m_instance;
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setSizeRange, _sizeMinimum, _sizeMaximum, aspectRatioMinimum, aspectRatioMaximum)
+		}
+
 		UISize sizeMinimum = _sizeMinimum;
 		if (sizeMinimum.x < 0) {
 			sizeMinimum.x = 0;
@@ -855,7 +910,6 @@ namespace slib
 		}
 		m_aspectRatioMaximum = aspectRatioMaximum;
 		
-		Ref<WindowInstance> instance = m_instance;
 		if (instance.isNotNull()) {
 			instance->setSizeRange(sizeMinimum, sizeMaximum, aspectRatioMinimum, m_aspectRatioMaximum);
 		}
@@ -1086,17 +1140,37 @@ namespace slib
 		return m_instance;
 	}
 
+	void Window::create()
+	{
+		_create(sl_false);
+	}
+
+	void Window::createAndKeep()
+	{
+		_create(sl_true);
+	}
+
+	void Window::forceCreate()
+	{
+		SLIB_VIEW_RUN_ON_UI_THREAD(&Window::forceCreate)
+		detach();
+		create();
+	}
+
+	void Window::forceCreateAndKeep()
+	{
+		SLIB_VIEW_RUN_ON_UI_THREAD(&Window::forceCreateAndKeep)
+		detach();
+		createAndKeep();
+	}
+
 	void Window::attach(const Ref<WindowInstance>& instance, sl_bool flagAttachContent)
 	{
-		ObjectLocker lock(this);
-
 		detach();
-		
 		if (instance.isNotNull()) {
 			instance->setWindow(this);
 			m_instance = instance;
 			if (flagAttachContent) {
-				lock.unlock();
 				_attachContent();
 			}
 		}
@@ -1104,17 +1178,15 @@ namespace slib
 	
 	void Window::detach()
 	{
-		ObjectLocker lock(this);
-		
 		// save current window's properties
 		getFrame();
 		isMaximized();
 		isMinimized();
-
+		
 		Ref<View> view = m_viewContent;
 		if (view.isNotNull()) {
-			view->removeParent();
-			view->detachAll();
+			view->_removeParent();
+			view->_detachAll();
 		}
 		Ref<WindowInstance> instance = m_instance;
 		if (instance.isNotNull()) {
@@ -1123,38 +1195,10 @@ namespace slib
 		m_instance.setNull();
 	}
 
-	void Window::create()
-	{
-		if (UI::isUiThread()) {
-			_create(sl_false);
-		} else {
-			UI::dispatchToUiThread(SLIB_BIND_REF(void(), Window, _create, this, sl_false));
-		}
-	}
-
-	void Window::createAndKeep()
-	{
-		if (UI::isUiThread()) {
-			_create(sl_true);
-		} else {
-			UI::dispatchToUiThread(SLIB_BIND_REF(void(), Window, _create, this, sl_true));
-		}
-	}
-
-	void Window::forceCreate()
-	{
-		detach();
-		create();
-	}
-
-	void Window::forceCreateAndKeep()
-	{
-		detach();
-		createAndKeep();
-	}
-
 	void Window::_create(sl_bool flagKeepReference)
 	{
+		SLIB_VIEW_RUN_ON_UI_THREAD(&Window::_create, flagKeepReference)
+
 		if (m_instance.isNotNull()) {
 			return;
 		}
@@ -1215,7 +1259,6 @@ namespace slib
 			
 			window->setBackgroundColor(m_backgroundColor);
 			
-			window->setVisible(m_flagVisible);
 			window->setMinimized(m_flagMinimized);
 			window->setMaximized(m_flagMaximized);
 			
@@ -1238,8 +1281,6 @@ namespace slib
 			}
 #endif
 
-			window->setVisible(sl_true);
-
 			attach(window, sl_false);
 			
 #if defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_EFL)
@@ -1252,6 +1293,10 @@ namespace slib
 				dispatchResize(sizeClient.x, sizeClient.y);
 			}
 #endif
+			
+			if (m_flagVisible) {
+				window->setVisible(sl_true);
+			}
 
 			dispatchCreate();
 			
@@ -1263,22 +1308,19 @@ namespace slib
 	
 	void Window::_attachContent()
 	{
-		if (!(UI::isUiThread())) {
-			UI::dispatchToUiThread(SLIB_FUNCTION_REF(Window, _attachContent, this));
-			return;
-		}
+		SLIB_VIEW_RUN_ON_UI_THREAD(&Window::_attachContent)
 		Ref<WindowInstance> instance = m_instance;
 		if (instance.isNotNull()) {
 			Ref<ViewInstance> contentViewInstance = instance->getContentView();
 			if (contentViewInstance.isNotNull()) {
 				Ref<View> view = m_viewContent;
 				if (view.isNotNull()) {
-					view->removeParent();
-					view->removeAllViewInstances();
-					contentViewInstance->setEnabled(view->isEnabled());
-					contentViewInstance->setOpaque(view->isOpaque());
-					contentViewInstance->setDrawing(view->isDrawing());
-					view->attach(contentViewInstance);
+					view->_removeParent();
+					view->_removeAllViewInstances();
+					contentViewInstance->setEnabled(view.get(), view->isEnabled());
+					contentViewInstance->setOpaque(view.get(), view->isOpaque());
+					contentViewInstance->setDrawing(view.get(), view->isDrawing());
+					view->_attach(contentViewInstance);
 				}
 			}
 		}

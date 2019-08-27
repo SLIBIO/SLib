@@ -192,7 +192,7 @@ namespace slib
 		return m_gravity;
 	}
 	
-	void VideoView::setGravity(Alignment align, UIUpdateMode mode)
+	void VideoView::setGravity(const Alignment& align, UIUpdateMode mode)
 	{
 		m_gravity = align;
 		invalidate(mode);

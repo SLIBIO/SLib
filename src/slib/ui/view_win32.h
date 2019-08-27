@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -20,156 +20,19 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_UI_VIEW_WIN32
-#define CHECKHEADER_SLIB_UI_VIEW_WIN32
+#ifndef CHECKHEADER_SLIB_SRC_UI_VIEW_WIN32
+#define CHECKHEADER_SLIB_SRC_UI_VIEW_WIN32
 
 #include "slib/core/definition.h"
 
 #if defined(SLIB_UI_IS_WIN32)
 
-#include "slib/ui/view.h"
+#include "slib/ui/view_win32.h"
 
 #include "ui_core_win32.h"
 
 namespace slib
 {
-
-	class Win32_ViewInstance : public ViewInstance
-	{
-		SLIB_DECLARE_OBJECT
-
-	public:
-		Win32_ViewInstance();
-		
-		~Win32_ViewInstance();
-
-	public:
-		template <class T>
-		static Ref<T> create(HWND hWnd, sl_bool flagDestroyOnRelease)
-		{
-			if (hWnd) {
-				Ref<T> ret = new T;
-				if (ret.isNotNull()) {
-					ret->initialize(hWnd, flagDestroyOnRelease);
-					return ret;
-				} else {
-					if (flagDestroyOnRelease) {
-						PostMessageW(hWnd, SLIB_UI_MESSAGE_CLOSE, 0, 0);
-					}
-				}
-			}
-			return sl_null;
-		}
-
-		template <class T>
-		static Ref<T> create(
-			View* view, ViewInstance* parent,
-			LPCWSTR wndClass, const String16& text,
-			int style, int styleEx)
-		{
-			UIRect frame = view->getFrameInInstance();
-			Matrix3 transform = view->getFinalTransformInInstance();
-			HWND handle = createHandle(view, parent, wndClass, (LPCWSTR)(text.getData()), style, styleEx, frame, transform);
-			if (handle) {
-				Ref<T> ret = new T;
-				if (ret.isNotNull()) {
-					ret->initialize(handle, view, text, frame, transform);
-					return ret;
-				}
-				DestroyWindow(handle);
-			}
-			return sl_null;
-		}
-
-		static HWND createHandle(View* view, ViewInstance* parent,
-			LPCWSTR wndClass, LPCWSTR text,
-			int style, int styleEx, const UIRect& rect, const Matrix3& transform);
-
-		void initialize(HWND hWnd, sl_bool flagDestroyOnRelease);
-
-		void initialize(HWND hWnd, View* view, const String16& text, const UIRect& rect, const Matrix3& transform);
-
-		HWND getHandle();
-
-	public:
-		virtual LRESULT processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam);
-
-		virtual LRESULT processSubclassMessage(UINT msg, WPARAM wParam, LPARAM lParam);
-
-		virtual sl_bool processCommand(SHORT code, LRESULT& result);
-
-		virtual sl_bool processNotify(NMHDR* nmhdr, LRESULT& result);
-
-		virtual sl_bool processControlColor(UINT msg, HDC hDC, HBRUSH& result);
-
-		virtual void processPostControlColor(UINT msg, HDC hDC, HBRUSH& result);
-
-	public:
-		sl_bool isValid() override;
-
-		void setFocus(sl_bool flag) override;
-
-		void invalidate() override;
-
-		void invalidate(const UIRect& rect) override;
-
-		UIRect getFrame() override;
-
-		void setFrame(const UIRect& frame) override;
-
-		void setTransform(const Matrix3& transform) override;
-
-		void setVisible(sl_bool flag) override;
-
-		void setEnabled(sl_bool flag) override;
-
-		void setOpaque(sl_bool flag) override;
-
-		void setAlpha(sl_real alpha) override;
-
-		void setClipping(sl_bool flag) override;
-
-		void setDrawing(sl_bool flag) override;
-
-		UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen) override;
-
-		UIPointf convertCoordinateFromViewToScreen(const UIPointf& ptView) override;
-
-		void addChildInstance(const Ref<ViewInstance>& instance) override;
-
-		void removeChildInstance(const Ref<ViewInstance>& instance) override;
-
-		void bringToFront() override;
-
-
-		void setText(const String16& text);
-
-		void setFont(const Ref<Font>& font) override;
-
-	public:
-		sl_bool onEventKey(sl_bool flagDown, WPARAM wParam, LPARAM lParam);
-
-		sl_bool onEventMouse(UIAction action, WPARAM wParam, LPARAM lParam);
-
-		sl_bool onEventMouseWheel(sl_bool flagVertical, WPARAM wParam, LPARAM lParam);
-
-		sl_bool onEventSetCursor();
-
-		void setGenericView(sl_bool flag);
-
-	protected:
-		HWND m_handle;
-		sl_bool m_flagGenericView;
-		sl_bool m_flagDestroyOnRelease;
-		UIAction m_actionMouseCapture;
-		
-		UIRect m_frame;
-		Vector2 m_translation;
-
-		String16 m_text;
-		Ref<Font> m_font;
-
-	};
 
 	namespace priv
 	{

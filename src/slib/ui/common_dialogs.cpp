@@ -125,7 +125,7 @@ namespace slib
 			priv::alert_dialog::RunOnUiThread m;
 			m.alert = this;
 			m.event = ev;
-			UI::dispatchToUiThread(SLIB_FUNCTION_CLASS(priv::alert_dialog::RunOnUiThread, run, &m));
+			UI::dispatchToUiThread(SLIB_FUNCTION_MEMBER(priv::alert_dialog::RunOnUiThread, run, &m));
 			ev->wait();
 			return m.result;
 		}
@@ -140,7 +140,7 @@ namespace slib
 		}
 		if (UI::isUiThread()) {
 			priv::alert_dialog::RunByShowOnUiThread m;
-			alert->onComplete = SLIB_FUNCTION_CLASS(priv::alert_dialog::RunByShowOnUiThread, onComplete, &m);
+			alert->onComplete = SLIB_FUNCTION_MEMBER(priv::alert_dialog::RunByShowOnUiThread, onComplete, &m);
 #if defined(SLIB_UI_IS_IOS)
 			if (alert->_showMobilePopup()) {
 				UI::runLoop();
@@ -157,7 +157,7 @@ namespace slib
 			if (ev.isNotNull()) {
 				priv::alert_dialog::RunByShowOnWorkingThread m;
 				m.event = ev;
-				alert->onComplete = SLIB_FUNCTION_CLASS(priv::alert_dialog::RunByShowOnWorkingThread, onComplete, &m);
+				alert->onComplete = SLIB_FUNCTION_MEMBER(priv::alert_dialog::RunByShowOnWorkingThread, onComplete, &m);
 				UI::dispatchToUiThread(Function<void()>::bind(&(priv::alert_dialog::ShowOnWorkingThread), alert.get(), &m));
 				ev->wait();
 				return m.result;
@@ -477,7 +477,7 @@ namespace slib
 			priv::file_dialog::RunOnUiThread m;
 			m.dlg = this;
 			m.event = ev;
-			UI::dispatchToUiThread(SLIB_FUNCTION_CLASS(priv::file_dialog::RunOnUiThread, run, &m));
+			UI::dispatchToUiThread(SLIB_FUNCTION_MEMBER(priv::file_dialog::RunOnUiThread, run, &m));
 			ev->wait();
 			return m.result;
 		}
@@ -492,7 +492,7 @@ namespace slib
 		}
 		if (UI::isUiThread()) {
 			priv::file_dialog::RunByShowOnUiThread m;
-			dialog->onComplete = SLIB_FUNCTION_CLASS(priv::file_dialog::RunByShowOnUiThread, onComplete, &m);
+			dialog->onComplete = SLIB_FUNCTION_MEMBER(priv::file_dialog::RunByShowOnUiThread, onComplete, &m);
 			if (dialog->_show()) {
 				UI::runLoop();
 				result = m.result;
@@ -505,7 +505,7 @@ namespace slib
 			if (ev.isNotNull()) {
 				priv::file_dialog::RunByShowOnWorkingThread m;
 				m.event = ev;
-				dialog->onComplete = SLIB_FUNCTION_CLASS(priv::file_dialog::RunByShowOnWorkingThread, onComplete, &m);
+				dialog->onComplete = SLIB_FUNCTION_MEMBER(priv::file_dialog::RunByShowOnWorkingThread, onComplete, &m);
 				UI::dispatchToUiThread(Function<void()>::bind(&(priv::file_dialog::ShowOnWorkingThread), dialog.get(), &m));
 				ev->wait();
 				result = m.result;

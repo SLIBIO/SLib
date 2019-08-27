@@ -44,13 +44,13 @@ namespace slib
 		static sl_bool containsPointInEllipse(const Point& pt, const Rectangle& rect);
 	
 
-		static sl_real calculateAlignX(sl_real leftDst, sl_real rightDst, sl_real widthSrc, Alignment alignment);
+		static sl_real calculateAlignX(sl_real leftDst, sl_real rightDst, sl_real widthSrc, const Alignment& alignment);
 
-		static sl_real calculateAlignY(sl_real topDst, sl_real bottomDst, sl_real heightSrc, Alignment alignment);
+		static sl_real calculateAlignY(sl_real topDst, sl_real bottomDst, sl_real heightSrc, const Alignment& alignment);
 
-		static Point calculateAlignPosition(const Rectangle& rectDst, sl_real widthSrc, sl_real heightSrc, Alignment alignment);
+		static Point calculateAlignPosition(const Rectangle& rectDst, sl_real widthSrc, sl_real heightSrc, const Alignment& alignment);
 		
-		static sl_bool calculateAlignRectangle(Rectangle& rectOutput, const Rectangle& rectDst, sl_real widthSrc, sl_real heightSrc, ScaleMode scaleMode, Alignment alignment);
+		static sl_bool calculateAlignRectangle(Rectangle& rectOutput, const Rectangle& rectDst, sl_real widthSrc, sl_real heightSrc, ScaleMode scaleMode, const Alignment& alignment);
 
 		static Rectangle transformRectangle(const Rectangle& rectTransform, const Rectangle& rectOtherFrom, const Rectangle& rectOtherTo);
 

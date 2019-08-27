@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,8 @@
 
 namespace slib
 {
+	
+	class IWebViewInstance;
 	
 	class SLIB_EXPORT WebView : public View
 	{
@@ -60,10 +62,6 @@ namespace slib
 		
 		virtual void runJavaScript(const String& script);
 		
-		virtual void clearCache();
-		
-		virtual void clearCookie();
-
 		
 		String getErrorMessage();
 		
@@ -78,35 +76,13 @@ namespace slib
 		SLIB_DECLARE_EVENT_HANDLER(WebView, FinishLoad, const String& url, sl_bool flagFailed)
 		SLIB_DECLARE_EVENT_HANDLER(WebView, MessageFromJavaScript, const String& msg, const String& param)
 		
-	public:
+	protected:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 
-		void dispatchAttach() override;
+		virtual Ptr<IWebViewInstance> getWebViewInstance();
 		
+	public:
 		void dispatchResize(sl_ui_len width, sl_ui_len height) override;
-		
-	private:
-		void _refreshSize_NW();
-		
-		void _load_NW();
-		
-		String _getURL_NW();
-		
-		String _getPageTitle_NW();
-		
-		void _goBack_NW();
-		
-		void _goForward_NW();
-		
-		void _reload_NW();
-		
-		void _runJavaScript_NW(const String& script);
-		
-		void _clearCache_NW();
-		
-		void _clearCookie_NW();
-		
-		void _setCustomUserAgent_NW();
 		
 	protected:
 		AtomicString m_urlOrigin;
@@ -114,9 +90,40 @@ namespace slib
 		sl_bool m_flagOfflineContent;
 		AtomicString m_lastErrorMessage;
 		
-		sl_bool m_flagClearCacheOnAttach;
 		AtomicString m_customUserAgent;
 		AtomicFunction<void(WebView*, String)> m_callbackQueryUserAgentCompletion;
+
+	};
+	
+	class SLIB_EXPORT IWebViewInstance
+	{
+	public:
+		virtual void refreshSize(WebView* view) = 0;
+		
+		virtual void load(WebView* view) = 0;
+		
+		virtual sl_bool getURL(WebView* view, String& _out) = 0;
+		
+		virtual sl_bool getPageTitle(WebView* view, String& _out) = 0;
+		
+		virtual void goBack(WebView* view) = 0;
+		
+		virtual void goForward(WebView* view) = 0;
+		
+		virtual void reload(WebView* view) = 0;
+		
+		virtual void runJavaScript(WebView* view, const String& script) = 0;
+		
+		virtual void setCustomUserAgent(WebView* view, const String& agent) = 0;
+		
+	};
+	
+	class SLIB_EXPORT DefaultWebViewProvider
+	{
+	public:
+		static void clearCache();
+		
+		static void clearCookie();
 
 	};
 

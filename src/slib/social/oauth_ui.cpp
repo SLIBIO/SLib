@@ -56,10 +56,6 @@ namespace slib
 	{
 	}
 	
-	void OAuthWebRedirectDialog::clearCookie()
-	{
-	}
-	
 	namespace priv
 	{
 		namespace oauth
@@ -155,11 +151,6 @@ namespace slib
 					if (window.isNotNull()) {
 						window->decreaseReference();
 					}
-				}
-				
-				void clearCookie() override
-				{
-					m_webView->clearCookie();
 				}
 				
 			};

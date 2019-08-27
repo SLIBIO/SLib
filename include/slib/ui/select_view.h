@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,8 @@
 
 namespace slib
 {
+	
+	class ISelectViewInstance;
 
 	class SLIB_EXPORT SelectView : public View
 	{
@@ -105,10 +107,9 @@ namespace slib
 		virtual void setRightIcon(const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		
-
 		Alignment getGravity();
 		
-		virtual void setGravity(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setGravity(const Alignment& align, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 		Color getTextColor();
 		
@@ -129,29 +130,10 @@ namespace slib
 		
 		UIRect getRightIconRegion();
 		
-	public:
+	protected:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
-	private:		
-		void _select_NW(sl_uint32 index);
-		
-		void _refreshItemsCount_NW();
-		
-		void _refreshItemsContent_NW();
-		
-		void _setItemTitle_NW(sl_uint32 index, const String& title);
-		
-		void _setTextAlignment_NW(Alignment align);
-
-		void _setTextColor_NW(const Color& color);
-		
-		sl_bool _measureSize_NW(UISize& _out);
-
-		void _setBorder_NW(sl_bool flag) override;
-		
-		void _setBackgroundColor_NW(const Color& color) override;
-
-		void _setFont_NW(const Ref<Font>& font) override;
+		virtual Ptr<ISelectViewInstance> getSelectViewInstance();
 		
 	protected:
 		AtomicList<String> m_values;
@@ -163,8 +145,27 @@ namespace slib
 		AtomicRef<Drawable> m_rightIcon;
 		int m_clickedIconNo;
 		
-		Alignment m_textAlignment;
+		Alignment m_gravity;
 		Color m_textColor;
+		
+	};
+	
+	class SLIB_EXPORT ISelectViewInstance
+	{
+	public:
+		virtual void select(SelectView* view, sl_uint32 index) = 0;
+		
+		virtual void refreshItemsCount(SelectView* view) = 0;
+		
+		virtual void refreshItemsContent(SelectView* view) = 0;
+		
+		virtual void setItemTitle(SelectView* view, sl_uint32 index, const String& title) = 0;
+		
+		virtual void setGravity(SelectView* view, const Alignment& gravity);
+		
+		virtual void setTextColor(SelectView* view, const Color& color);
+		
+		virtual sl_bool measureSize(SelectView* view, UISize& _out);
 		
 	};
 

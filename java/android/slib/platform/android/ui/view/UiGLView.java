@@ -66,20 +66,28 @@ public class UiGLView extends GLSurfaceView implements IView, GLSurfaceView.Rend
 	}
 	
 	public static boolean _setRenderMode(final View view, final int mode) {
-		if (view instanceof GLSurfaceView) {
-			if (mode == 0) {
-				((GLSurfaceView)view).setRenderMode(UiGLView.RENDERMODE_CONTINUOUSLY);
-			} else {
-				((GLSurfaceView)view).setRenderMode(UiGLView.RENDERMODE_WHEN_DIRTY);				
+		try {
+			if (view instanceof GLSurfaceView) {
+				if (mode == 0) {
+					((GLSurfaceView) view).setRenderMode(UiGLView.RENDERMODE_CONTINUOUSLY);
+				} else {
+					((GLSurfaceView) view).setRenderMode(UiGLView.RENDERMODE_WHEN_DIRTY);
+				}
+				return true;
 			}
-			return true;
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 		return false;
 	}
 
 	public static void _requestRender(final View view) {
-		if (view instanceof UiGLView) {			
-			((UiGLView)view).requestRender();				
+		try {
+			if (view instanceof UiGLView) {
+				((UiGLView) view).requestRender();
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 	}
 	

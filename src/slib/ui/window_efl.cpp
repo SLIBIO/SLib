@@ -229,9 +229,8 @@ namespace slib
 					return m_window == sl_null;
 				}
 				
-				sl_bool setParent(const Ref<WindowInstance>& window) override
+				void setParent(const Ref<WindowInstance>& window) override
 				{
-					return sl_false;
 				}
 
 				Ref<ViewInstance> getContentView() override
@@ -244,17 +243,12 @@ namespace slib
 					return sl_true;
 				}
 				
-				sl_bool activate() override
+				void activate() override
 				{
 					Evas_Object* window = m_window;
 					if (window) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EFL_WindowInstance, setFocus, this));
-							return sl_true;
-						}
 						elm_win_raise(window);
 					}
-					return sl_false;
 				}
 				
 				UIRect getFrame() override
@@ -262,9 +256,8 @@ namespace slib
 					return UI::getScreenBounds();
 				}
 				
-				sl_bool setFrame(const UIRect& _frame) override
+				void setFrame(const UIRect& _frame) override
 				{
-					return sl_false;
 				}
 				
 				UIRect getClientFrame() override
@@ -282,14 +275,12 @@ namespace slib
 					return sl_false;
 				}
 				
-				sl_bool setTitle(const String& title) override
+				void setTitle(const String& title) override
 				{
-					return sl_false;
 				}
 				
-				sl_bool setBackgroundColor(const Color& _color) override
+				void setBackgroundColor(const Color& _color) override
 				{
-					return sl_false;
 				}
 				
 				sl_bool isMinimized() override
@@ -297,9 +288,8 @@ namespace slib
 					return sl_false;
 				}
 				
-				sl_bool setMinimized(sl_bool flag) override
+				void setMinimized(sl_bool flag) override
 				{
-					return sl_false;
 				}
 				
 				sl_bool isMaximized() override
@@ -307,63 +297,48 @@ namespace slib
 					return sl_false;
 				}
 				
-				sl_bool setMaximized(sl_bool flag) override
+				void setMaximized(sl_bool flag) override
 				{
-					return sl_false;
 				}
 				
-				sl_bool setVisible(sl_bool flag) override
+				void setVisible(sl_bool flag) override
 				{
 					Evas_Object* window = m_window;
 					if (window) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EFL_WindowInstance, setVisible, this, flag));
-							return sl_true;
-						}
 						if (flag) {
 							evas_object_show(window);
 						} else {
 							evas_object_hide(window);
 						}
-						return sl_true;
-					} else {
-						return sl_false;
 					}
 				}
 				
-				sl_bool setAlwaysOnTop(sl_bool flag) override
+				void setAlwaysOnTop(sl_bool flag) override
 				{
-					return sl_false;
 				}
 				
-				sl_bool setCloseButtonEnabled(sl_bool flag) override
+				void setCloseButtonEnabled(sl_bool flag) override
 				{
-					return sl_false;
 				}
 				
-				sl_bool setMinimizeButtonEnabled(sl_bool flag) override
+				void setMinimizeButtonEnabled(sl_bool flag) override
 				{
-					return sl_false;
 				}
 				
-				sl_bool setMaximizeButtonEnabled(sl_bool flag) override
+				void setMaximizeButtonEnabled(sl_bool flag) override
 				{
-					return sl_false;
 				}
 				
-				sl_bool setResizable(sl_bool flag) override
+				void setResizable(sl_bool flag) override
 				{
-					return sl_false;
 				}
 				
-				sl_bool setAlpha(sl_real _alpha) override
+				void setAlpha(sl_real _alpha) override
 				{
-					return sl_false;
 				}
 				
-				sl_bool setTransparent(sl_bool flag) override
+				void setTransparent(sl_bool flag) override
 				{
-					return sl_false;
 				}
 				
 				UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen) override

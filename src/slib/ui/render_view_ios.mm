@@ -24,8 +24,8 @@
 
 #if defined(SLIB_UI_IS_IOS)
 
-#include "slib/ui/core.h"
 #include "slib/ui/render_view.h"
+
 #include "slib/render/opengl.h"
 #include "slib/ui/mobile_app.h"
 
@@ -33,15 +33,27 @@
 
 #include <GLKit/GLKit.h>
 
+namespace slib
+{
+	namespace priv
+	{
+		namespace render_view
+		{
+			class RenderViewInstance;
+		}
+	}
+}
+
+@class SLIBGLViewRenderer;
+
 @interface SLIBGLViewHandle : GLKView
 {
-	
-	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
+	@public slib::WeakRef<slib::priv::render_view::RenderViewInstance> m_viewInstance;
 	
 	@public sl_bool m_flagRenderingContinuously;
 	@public sl_bool m_flagRequestRender;
 	
-	id m_renderer;
+	SLIBGLViewRenderer* m_renderer;
 	slib::Ref<slib::RenderEngine> m_engine;
 	CADisplayLink* m_displayLink;
 	
@@ -49,46 +61,9 @@
 	CGFloat m_viewportHeight;
 }
 
--(void)_init;
--(void)_setRenderContinuously:(BOOL)flag;
--(void)_requestRender;
+- (void)initialize;
 
 @end
-
-
-namespace slib
-{
-	Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* _parent)
-	{
-		SLIBGLViewHandle* handle = nil;
-		IOS_VIEW_CREATE_INSTANCE_BEGIN
-		handle = [[SLIBGLViewHandle alloc] initWithFrame:frame];
-		IOS_VIEW_CREATE_INSTANCE_END
-		if (handle != nil && ret.isNotNull()) {
-			[handle _init];
-			[handle _setRenderContinuously:(m_redrawMode == RedrawMode::Continuously)];
-		}
-		return ret;
-	}
-	
-	void RenderView::_setRedrawMode_NW(RedrawMode mode)
-	{
-		UIView* handle = UIPlatform::getViewHandle(this);
-		if (handle != nil && [handle isKindOfClass:[SLIBGLViewHandle class]]) {
-			SLIBGLViewHandle* v = (SLIBGLViewHandle*)handle;
-			[v _setRenderContinuously:(mode == RedrawMode::Continuously)];
-		}
-	}
-	
-	void RenderView::_requestRender_NW()
-	{
-		UIView* view = UIPlatform::getViewHandle(this);
-		if (view != nil && [view isKindOfClass:[SLIBGLViewHandle class]]) {
-			SLIBGLViewHandle* v = (SLIBGLViewHandle*)view;
-			[v _requestRender];
-		}
-	}	
-}
 
 @interface SLIBGLViewRenderer : NSObject
 {
@@ -99,11 +74,151 @@ namespace slib
 	BOOL m_flagViewVisible;
 	int m_frameNumber;
 }
+
+- (void)onRenderFrame;
+- (void)run;
+- (void)stop;
+
+@end
+
+
+namespace slib
+{
+
+	namespace priv
+	{
+		namespace render_view
+		{
+			
+			class RenderViewInstance : public iOS_ViewInstance, public IRenderViewInstance
+			{
+				SLIB_DECLARE_OBJECT
+				
+			public:
+				SLIBGLViewHandle* getHandle()
+				{
+					return (SLIBGLViewHandle*)m_handle;
+				}
+				
+				void setRedrawMode(RenderView* view, RedrawMode mode) override
+				{
+					SLIBGLViewHandle* handle = getHandle();
+					if (handle != nil) {
+						handle->m_flagRenderingContinuously = mode == RedrawMode::Continuously;
+					}
+				}
+				
+				void requestRender(RenderView* view) override
+				{
+					SLIBGLViewHandle* handle = getHandle();
+					if (handle != nil) {
+						handle->m_flagRequestRender = sl_true;
+					}
+				}
+				
+			};
+			
+			SLIB_DEFINE_OBJECT(RenderViewInstance, iOS_ViewInstance)
+			
+		}
+	}
+
+	using namespace priv::render_view;
+
+	Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* parent)
+	{
+		Ref<RenderViewInstance> ret = iOS_ViewInstance::create<RenderViewInstance, SLIBGLViewHandle>(this, parent);
+		if (ret.isNotNull()) {
+			SLIBGLViewHandle* handle = ret->getHandle();
+			[handle initialize];
+			handle->m_flagRenderingContinuously = m_redrawMode == RedrawMode::Continuously;
+			return ret;
+		}
+		return sl_null;
+	}
+	
+	Ptr<IRenderViewInstance> RenderView::getRenderViewInstance()
+	{
+		return CastRef<RenderViewInstance>(getViewInstance());
+	}
+	
+}
+
+using namespace slib;
+using namespace slib::priv::render_view;
+
+@implementation SLIBGLViewHandle
+
+-(void)initialize
+{
+	m_flagRenderingContinuously = sl_false;
+	m_flagRequestRender = sl_true;
+	m_viewportWidth = 0;
+	m_viewportHeight = 0;
+	
+	EAGLContext* context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
+	if (context == nil) {
+		context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+	}
+	if (context != nil) {
+		self.context = context;
+	}
+	
+	self.drawableColorFormat = GLKViewDrawableColorFormatRGBA8888;
+	self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
+	
+	SLIBGLViewRenderer* renderer = [[SLIBGLViewRenderer alloc] init];
+	renderer->m_view = self;
+	m_displayLink = [CADisplayLink displayLinkWithTarget:renderer selector:@selector(onRenderFrame)];
+	renderer->m_displayLink = m_displayLink;
+	[NSThread detachNewThreadSelector:@selector(run) toTarget:renderer withObject:nil];
+	m_renderer = renderer;
+}
+
+-(void)dealloc
+{
+	[m_displayLink invalidate];
+	[m_renderer stop];
+}
+
+-(void)drawRect:(CGRect)dirtyRect
+{
+	Ref<RenderViewInstance> instance = m_viewInstance;
+	if (instance.isNull()) {
+		return;
+	}
+	Ref<RenderView> view = CastRef<RenderView>(instance->getView());
+	if (view.isNotNull()) {
+		if (m_engine.isNull()) {
+			m_engine = GLES::createEngine();
+			if (m_engine.isNotNull()) {
+				view->dispatchCreateEngine(m_engine.get());
+			}
+		}
+		if (m_engine.isNotNull()) {
+			m_engine->setViewport(0, 0, m_viewportWidth, m_viewportHeight);
+			view->dispatchFrame(m_engine.get());
+		}
+	}
+	
+}
+
+- (void)setNeedsDisplay
+{
+}
+
+- (void)setFrame:(CGRect)frame
+{
+	[super setFrame:frame];
+}
+
+IOS_VIEW_EVENTS
+
 @end
 
 @implementation SLIBGLViewRenderer
 
-- (void)onGLRenderFrame
+- (void)onRenderFrame
 {
 	if (!m_flagRunning) {
 		return;
@@ -115,7 +230,7 @@ namespace slib
 				[self queryViewState];
 			});
 		}
-		if (m_flagViewVisible && !(slib::MobileApp::isPaused())) {
+		if (m_flagViewVisible && !(MobileApp::isPaused())) {
 			if (view->m_flagRenderingContinuously || view->m_flagRequestRender) {
 				view->m_flagRequestRender = sl_false;
 				[view display];
@@ -154,13 +269,13 @@ namespace slib
 	m_flagViewVisible = flagVisible;
 }
 
-- (void)onRun
+- (void)run
 {
 	m_flagRunning = YES;
 	m_flagViewVisible = NO;
 	m_frameNumber = 0;
 #if defined(SLIB_PLATFORM_IS_IOS_SIMULATOR)
-	slib::TimeCounter timer;
+	TimeCounter timer;
 	while (m_flagRunning) {
 		[self onGLRenderFrame];
 		sl_uint64 t = timer.getElapsedMilliseconds();
@@ -180,87 +295,6 @@ namespace slib
 {
 	m_flagRunning = NO;
 }
-
-@end
-
-@implementation SLIBGLViewHandle
-
--(void)_init
-{
-	m_flagRenderingContinuously = sl_false;
-	m_flagRequestRender = sl_true;
-	m_viewportWidth = 0;
-	m_viewportHeight = 0;
-	
-	EAGLContext* context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
-	if (context == nil) {
-		context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-	}
-	if (context != nil) {
-		self.context = context;
-	}
-	
-	self.drawableColorFormat = GLKViewDrawableColorFormatRGBA8888;
-	self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
-	
-	SLIBGLViewRenderer* renderer = [[SLIBGLViewRenderer alloc] init];
-	renderer->m_view = self;
-	m_displayLink = [CADisplayLink displayLinkWithTarget:renderer selector:@selector(onGLRenderFrame)];
-	renderer->m_displayLink = m_displayLink;
-	[NSThread detachNewThreadSelector:@selector(onRun) toTarget:renderer withObject:nil];
-	m_renderer = renderer;
-	
-}
-
--(void)dealloc
-{
-	[m_displayLink invalidate];
-	[m_renderer stop];
-}
-
--(void)_requestRender
-{
-	m_flagRequestRender = sl_true;
-}
-
--(void)_setRenderContinuously:(BOOL)flag
-{
-	m_flagRenderingContinuously = flag;
-}
-
-- (void)drawRect:(CGRect)dirtyRect
-{
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
-	if (instance.isNull()) {
-		return;
-	}
-	
-	slib::Ref<slib::View> _view = instance->getView();
-	if (slib::RenderView* view = slib::CastInstance<slib::RenderView>(_view.get())) {
-		if (m_engine.isNull()) {
-			m_engine = slib::GLES::createEngine();
-			if (m_engine.isNotNull()) {
-				view->dispatchCreateEngine(m_engine.get());
-			}
-		}
-		if (m_engine.isNotNull()) {
-			m_engine->setViewport(0, 0, m_viewportWidth, m_viewportHeight);
-			view->dispatchFrame(m_engine.get());
-		}
-	}
-
-}
-
-- (void)setNeedsDisplay
-{
-}
-
-- (void)setFrame:(CGRect)frame
-{
-	[super setFrame:frame];
-}
-
-IOS_VIEW_EVENTS
 
 @end
 

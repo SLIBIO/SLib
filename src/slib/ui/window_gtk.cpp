@@ -25,6 +25,7 @@
 #if defined(SLIB_UI_IS_GTK)
 
 #include "slib/ui/window.h"
+
 #include "slib/ui/screen.h"
 #include "slib/ui/core.h"
 
@@ -381,7 +382,7 @@ namespace slib
 					return m_flagClosed;
 				}
 				
-				sl_bool setParent(const Ref<WindowInstance>& windowParent) override
+				void setParent(const Ref<WindowInstance>& windowParent) override
 				{
 					GtkWindow* window = m_window;
 					if (window && !m_flagClosed) {
@@ -390,9 +391,7 @@ namespace slib
 						} else {
 							gtk_window_set_transient_for(window, sl_null);
 						}
-						return sl_true;
 					}
-					return sl_false;
 				}
 
 				sl_bool isActive() override
@@ -406,20 +405,14 @@ namespace slib
 					return sl_false;
 				}
 				
-				sl_bool activate() override
+				void activate() override
 				{
 					if (!m_flagClosed) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_WindowInstance, activate, this));
-							return sl_true;
-						}
 						GtkWindow* window = m_window;
 						if (window) {
 							gtk_window_present(window);
-							return sl_true;
 						}
 					}
-					return sl_false;
 				}
 				
 				UIRect getFrame() override
@@ -432,19 +425,15 @@ namespace slib
 					return ret;
 				}
 				
-				sl_bool setFrame(const UIRect& frame) override
+				void setFrame(const UIRect& frame) override
 				{
 					if (!m_flagClosed) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_WindowInstance, setFrame, this, frame));
-							return sl_true;
-						}
 						UIPoint location = frame.getLocation();
 						UISize size;
 						size.x = frame.getWidth() - m_origin.x;
 						size.y = frame.getHeight() - m_origin.y;
 						if (m_location.isAlmostEqual(location) && m_size.isAlmostEqual(size)) {
-							return sl_true;
+							return;
 						}
 						m_location = location;
 						m_size = size;
@@ -456,9 +445,7 @@ namespace slib
 								gtk_widget_set_size_request((GtkWidget*)window, m_size.x, m_size.y);
 							}
 						}
-						return sl_true;
 					}
-					return sl_false;
 				}
 				
 				UIRect getClientFrame() override
@@ -479,10 +466,6 @@ namespace slib
 				sl_bool setClientSize(const UISize& size) override
 				{
 					if (!m_flagClosed) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_WindowInstance, setClientSize, this, size));
-							return sl_true;
-						}
 						if (m_size.isAlmostEqual(size)) {
 							return sl_true;
 						}
@@ -496,29 +479,19 @@ namespace slib
 					return sl_false;
 				}
 				
-				sl_bool setTitle(const String& title) override
+				void setTitle(const String& title) override
 				{
 					if (!m_flagClosed) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_WindowInstance, setTitle, this, title));
-							return sl_true;
-						}
 						GtkWindow* window = m_window;
 						if (window) {
 							gtk_window_set_title(window, title.getData());
-							return sl_true;
 						}
 					}
-					return sl_false;
 				}
 				
-				sl_bool setBackgroundColor(const Color& color) override
+				void setBackgroundColor(const Color& color) override
 				{
 					if (!m_flagClosed) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_WindowInstance, setBackgroundColor, this, color));
-							return sl_true;
-						}
 						Ref<ViewInstance> viewContent = m_viewContent;
 						if (viewContent.isNotNull()) {
 							GtkWidget* content = UIPlatform::getViewHandle(viewContent.get());
@@ -532,9 +505,7 @@ namespace slib
 								}
 							}
 						}
-						return sl_true;
 					}
-					return sl_false;
 				}
 				
 				sl_bool isMinimized() override
@@ -542,13 +513,9 @@ namespace slib
 					return m_flagMinimized;
 				}
 				
-				sl_bool setMinimized(sl_bool flag) override
+				void setMinimized(sl_bool flag) override
 				{
 					if (!m_flagClosed) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_WindowInstance, setMinimized, this, flag));
-							return sl_true;
-						}
 						GtkWindow* window = m_window;
 						if (window) {
 							if (m_flagMinimized) {
@@ -562,10 +529,8 @@ namespace slib
 									gtk_window_iconify(window);
 								}
 							}
-							return sl_true;
 						}
 					}
-					return sl_false;
 				}
 				
 				sl_bool isMaximized() override
@@ -573,13 +538,9 @@ namespace slib
 					return m_flagMaximized;
 				}
 				
-				sl_bool setMaximized(sl_bool flag) override
+				void setMaximized(sl_bool flag) override
 				{
 					if (!m_flagClosed) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_WindowInstance, setMaximized, this, flag));
-							return sl_true;
-						}
 						GtkWindow* window = m_window;
 						if (window) {
 							if (m_flagMaximized) {
@@ -593,19 +554,13 @@ namespace slib
 									gtk_window_maximize(window);
 								}
 							}
-							return sl_true;
 						}
 					}
-					return sl_false;
 				}
 				
-				sl_bool setVisible(sl_bool flag) override
+				void setVisible(sl_bool flag) override
 				{
 					if (!m_flagClosed) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_WindowInstance, setVisible, this, flag));
-							return sl_true;
-						}
 						GtkWindow* window = m_window;
 						if (window) {
 							if (flag) {
@@ -617,19 +572,13 @@ namespace slib
 							} else {
 								gtk_widget_hide((GtkWidget*)window);
 							}
-							return sl_true;
 						}
 					}
-					return sl_false;
 				}
 				
-				sl_bool setAlwaysOnTop(sl_bool flag) override
+				void setAlwaysOnTop(sl_bool flag) override
 				{
 					if (!m_flagClosed) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_WindowInstance, setAlwaysOnTop, this, flag));
-							return sl_true;
-						}
 						GtkWindow* window = m_window;
 						if (window) {
 							if (flag) {
@@ -637,19 +586,13 @@ namespace slib
 							} else {
 								gtk_window_set_keep_above(window, sl_false);
 							}
-							return sl_true;
 						}
 					}
-					return sl_false;
 				}
 				
-				sl_bool setCloseButtonEnabled(sl_bool flag) override
+				void setCloseButtonEnabled(sl_bool flag) override
 				{
 					if (!m_flagClosed) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_WindowInstance, setCloseButtonEnabled, this, flag));
-							return sl_true;
-						}
 						GtkWindow* window = m_window;
 						if (window) {
 							if (flag) {
@@ -657,29 +600,21 @@ namespace slib
 							} else {
 								gtk_window_set_deletable(window, sl_false);
 							}
-							return sl_true;
 						}
 					}
-					return sl_false;
 				}
 				
-				sl_bool setMinimizeButtonEnabled(sl_bool flag) override
+				void setMinimizeButtonEnabled(sl_bool flag) override
 				{
-					return sl_false;
 				}
 				
-				sl_bool setMaximizeButtonEnabled(sl_bool flag) override
+				void setMaximizeButtonEnabled(sl_bool flag) override
 				{
-					return sl_false;
 				}
 				
-				sl_bool setResizable(sl_bool flag) override
+				void setResizable(sl_bool flag) override
 				{
 					if (!m_flagClosed) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_WindowInstance, setResizable, this, flag));
-							return sl_true;
-						}
 						GtkWindow* window = m_window;
 						if (window) {
 							if (flag) {
@@ -694,31 +629,22 @@ namespace slib
 									gtk_window_set_resizable(window, sl_false);
 								}
 							}
-							return sl_true;
 						}
 					}
-					return sl_false;
 				}
 				
-				sl_bool setAlpha(sl_real alpha) override
+				void setAlpha(sl_real alpha) override
 				{
 					if (!m_flagClosed) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_WindowInstance, setAlpha, this, alpha));
-							return sl_true;
-						}
 						GtkWindow* window = m_window;
 						if (window) {
 							gtk_window_set_opacity(window, alpha);
-							return sl_true;
 						}
 					}
-					return sl_false;
 				}
 				
-				sl_bool setTransparent(sl_bool flag) override
+				void setTransparent(sl_bool flag) override
 				{
-					return sl_false;
 				}
 				
 				UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen) override
@@ -764,10 +690,6 @@ namespace slib
 				void setSizeRange(const UISize& sizeMinimum, const UISize& sizeMaximum, float aspectRatioMinimum, float aspectRatioMaximum) override
 				{
 					if (!m_flagClosed) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_WindowInstance, setSizeRange, this, sizeMinimum, sizeMaximum, aspectRatioMinimum, aspectRatioMaximum));
-							return;
-						}
 						GtkWindow* window = m_window;
 						if (window) {
 							GdkGeometry geometry;

@@ -94,19 +94,15 @@ namespace slib
 		return m_handle;
 	}
 	
-	sl_bool iOS_ViewInstance::isValid()
+	sl_bool iOS_ViewInstance::isValid(View* view)
 	{
 		return sl_true;
 	}
 	
-	void iOS_ViewInstance::setFocus(sl_bool flag)
+	void iOS_ViewInstance::setFocus(View* view, sl_bool flag)
 	{
 		UIView* handle = m_handle;
 		if (handle != nil) {
-			if (!(UI::isUiThread())) {
-				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_ViewInstance, setFocus, this, flag));
-				return;
-			}
 			if (flag) {
 				if (handle.window != nil) {
 					[handle becomeFirstResponder];
@@ -117,11 +113,11 @@ namespace slib
 		}
 	}
 	
-	void iOS_ViewInstance::invalidate()
+	void iOS_ViewInstance::invalidate(View* view)
 	{
 		UIView* handle = m_handle;
 		if (handle != nil) {
-			if (UI::isUiThread()) {
+			if ([NSThread isMainThread]) {
 				[handle setNeedsDisplay];
 			} else {
 				dispatch_async(dispatch_get_main_queue(), ^{
@@ -131,7 +127,7 @@ namespace slib
 		}
 	}
 	
-	void iOS_ViewInstance::invalidate(const UIRect& _rect)
+	void iOS_ViewInstance::invalidate(View* view, const UIRect& _rect)
 	{
 		UIView* handle = m_handle;
 		if (handle != nil) {
@@ -141,7 +137,7 @@ namespace slib
 			rect.origin.y = (CGFloat)(_rect.top) / f;
 			rect.size.width = (CGFloat)(_rect.getWidth()) / f;
 			rect.size.height = (CGFloat)(_rect.getHeight()) / f;
-			if (UI::isUiThread()) {
+			if ([NSThread isMainThread]) {
 				[handle setNeedsDisplayInRect: rect];
 			} else {
 				dispatch_async(dispatch_get_main_queue(), ^{
@@ -151,27 +147,7 @@ namespace slib
 		}
 	}
 	
-	UIRect iOS_ViewInstance::getFrame()
-	{
-		UIView* handle = m_handle;
-		if (handle != nil) {
-			CGPoint center = handle.center;
-			CGSize size = handle.bounds.size;
-			size.width /= 2;
-			size.height /= 2;
-			UIRect ret;
-			CGFloat f = UIPlatform::getGlobalScaleFactor();
-			ret.left = (sl_ui_pos)((center.x - size.width) * f);
-			ret.top = (sl_ui_pos)((center.y - size.height) * f);
-			ret.right = (sl_ui_pos)((center.x + size.width) * f);
-			ret.bottom = (sl_ui_pos)((center.y + size.height) * f);
-			ret.fixSizeError();
-			return ret;
-		}
-		return UIRect::zero();
-	}
-	
-	void iOS_ViewInstance::setFrame(const UIRect& frame)
+	void iOS_ViewInstance::setFrame(View* view, const UIRect& frame)
 	{
 		UIView* handle = m_handle;
 		if (handle != nil) {
@@ -187,116 +163,72 @@ namespace slib
 			bounds.size.height = (CGFloat)(frame.getHeight()) / f;
 			center.x = (CGFloat)(frame.left) / f + bounds.size.width / 2;
 			center.y = (CGFloat)(frame.top) / f + bounds.size.height / 2;
-			if (UI::isUiThread()) {
-				[handle setBounds:bounds];
-				[handle setCenter:center];
-				[handle setNeedsDisplay];
-			} else {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[handle setBounds:bounds];
-					[handle setCenter:center];
-					[handle setNeedsDisplay];
-				});
-			}
+			[handle setBounds:bounds];
+			[handle setCenter:center];
+			[handle setNeedsDisplay];
 		}
 	}
 	
-	void iOS_ViewInstance::setTransform(const Matrix3& m)
+	void iOS_ViewInstance::setTransform(View* view, const Matrix3& m)
 	{
 		UIView* handle = m_handle;
 		if (handle != nil) {
 			CGAffineTransform t;
 			GraphicsPlatform::getCGAffineTransform(t, m, UIPlatform::getGlobalScaleFactor(), 0, 0);
-			if (UI::isUiThread()) {
-				[handle setTransform: t];
-			} else {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[handle setTransform: t];
-				});
-			}
+			[handle setTransform: t];
 		}
 	}
 	
-	void iOS_ViewInstance::setVisible(sl_bool flag)
+	void iOS_ViewInstance::setVisible(View* view, sl_bool flag)
 	{
 		UIView* handle = m_handle;
 		if (handle != nil) {
-			if (UI::isUiThread()) {
-				[handle setHidden:(flag ? NO : YES)];
-			} else {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[handle setHidden:(flag ? NO : YES)];
-				});
-			}
+			[handle setHidden:(flag ? NO : YES)];
 		}
 	}
 	
-	void iOS_ViewInstance::setEnabled(sl_bool flag)
+	void iOS_ViewInstance::setEnabled(View* view, sl_bool flag)
 	{
 		UIView* handle = m_handle;
 		if (handle != nil) {
 			if ([handle isKindOfClass:[UIControl class]]) {
 				UIControl* control = (UIControl*)handle;
-				if (UI::isUiThread()) {
-					[control setEnabled:(flag ? YES : NO)];
-				} else {
-					dispatch_async(dispatch_get_main_queue(), ^{
-						[control setEnabled:(flag ? YES : NO)];
-					});
-				}
+				[control setEnabled:(flag ? YES : NO)];
 			}
 		}
 	}
 	
-	void iOS_ViewInstance::setOpaque(sl_bool flag)
+	void iOS_ViewInstance::setOpaque(View* view, sl_bool flag)
 	{
 		UIView* handle = m_handle;
 		if (handle != nil) {
-			if (UI::isUiThread()) {
-				[handle setOpaque:(flag ? YES : NO)];
-			} else {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[handle setOpaque:(flag ? YES : NO)];
-				});
-			}
+			[handle setOpaque:(flag ? YES : NO)];
 		}
 	}
 	
-	void iOS_ViewInstance::setAlpha(sl_real alpha)
+	void iOS_ViewInstance::setAlpha(View* view, sl_real alpha)
 	{
 		UIView* handle = m_handle;
 		if (handle != nil) {
-			if (UI::isUiThread()) {
-				[handle setAlpha:alpha];
-			} else {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[handle setAlpha:alpha];
-				});
-			}
+			[handle setAlpha:alpha];
 		}
 	}
 	
-	void iOS_ViewInstance::setClipping(sl_bool flag)
+	void iOS_ViewInstance::setClipping(View* view, sl_bool flag)
 	{
 		UIView* handle = m_handle;
 		if (handle != nil) {
-			if (UI::isUiThread()) {
-				[handle setClipsToBounds:(flag ? YES : NO)];
-			} else {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[handle setClipsToBounds:(flag ? YES : NO)];
-				});
-			}
+			[handle setClipsToBounds:(flag ? YES : NO)];
 		}
 	}
 	
 	
-	void iOS_ViewInstance::setDrawing(sl_bool flag)
+	void iOS_ViewInstance::setDrawing(View* view, sl_bool flag)
 	{
 		m_flagDrawing = flag;
 	}
 	
-	UIPointf iOS_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& ptScreen)
+	UIPointf iOS_ViewInstance::convertCoordinateFromScreenToView(View* view, const UIPointf& ptScreen)
 	{
 		UIView* handle = m_handle;
 		if (handle != nil) {
@@ -318,7 +250,7 @@ namespace slib
 		return ptScreen;
 	}
 	
-	UIPointf iOS_ViewInstance::convertCoordinateFromViewToScreen(const UIPointf& ptView)
+	UIPointf iOS_ViewInstance::convertCoordinateFromViewToScreen(View* view, const UIPointf& ptView)
 	{
 		UIView* handle = m_handle;
 		if (handle != nil) {
@@ -340,7 +272,7 @@ namespace slib
 		return ptView;
 	}
 	
-	void iOS_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
+	void iOS_ViewInstance::addChildInstance(View* view, const Ref<ViewInstance>& _child)
 	{
 		iOS_ViewInstance* child = (iOS_ViewInstance*)(_child.get());
 		if (child) {
@@ -354,7 +286,7 @@ namespace slib
 		}
 	}
 	
-	void iOS_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
+	void iOS_ViewInstance::removeChildInstance(View* view, const Ref<ViewInstance>& _child)
 	{
 		iOS_ViewInstance* child = (iOS_ViewInstance*)(_child.get());
 		if (child) {
@@ -365,7 +297,7 @@ namespace slib
 		}
 	}
 	
-	void iOS_ViewInstance::bringToFront()
+	void iOS_ViewInstance::bringToFront(View* view)
 	{
 		UIView* handle = m_handle;
 		if (handle != nil) {

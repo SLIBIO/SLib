@@ -84,23 +84,23 @@ namespace slib
 			if (parent && parent->m_type == EFL_ViewType::Grid) {
 				Evas_Object* handleParent = parent->m_handle;
 				if (handleParent) {
-					::elm_grid_pack(handleParent, handle, frame.left, frame.top, frame.getWidth(), frame.getHeight());
+					elm_grid_pack(handleParent, handle, frame.left, frame.top, frame.getWidth(), frame.getHeight());
 				}
 			} else {
-				::evas_object_move(handle, frame.left, frame.top);
-				::evas_object_resize(handle, frame.getWidth(), frame.getHeight());
+				evas_object_move(handle, frame.left, frame.top);
+				evas_object_resize(handle, frame.getWidth(), frame.getHeight());
 			}
 			if (m_type == EFL_ViewType::Grid) {
-				::elm_grid_size_set(handle, frame.getWidth(), frame.getHeight());
+				elm_grid_size_set(handle, frame.getWidth(), frame.getHeight());
 			}
 			if (view->isVisible()) {
-				::evas_object_show(handle);
+				evas_object_show(handle);
 			}
 			sl_real alpha = view->getAlpha();
 			if (alpha < 0.005f) {
-				::evas_object_color_set(handle, 255, 255, 255, 0);
+				evas_object_color_set(handle, 255, 255, 255, 0);
 			} else if (alpha < 0.995f) {
-				::evas_object_color_set(handle, 255, 255, 255, (int)(255 * alpha));
+				evas_object_color_set(handle, 255, 255, 255, (int)(255 * alpha));
 			}
 			return sl_true;
 		}
@@ -122,7 +122,7 @@ namespace slib
 	void EFL_ViewInstance::freeHandle(Evas_Object* handle)
 	{
 		if (handle) {
-			::evas_object_del(handle);
+			evas_object_del(handle);
 		}
 	}
 
@@ -141,67 +141,52 @@ namespace slib
 		return sl_true;
 	}
 	
-	void EFL_ViewInstance::setFocus()
+	void EFL_ViewInstance::setFocus(View* view, sl_bool flag)
 	{
 		Evas_Object* handle = m_handle;
 		if (handle) {
-			if (!(UI::isUiThread())) {
-				UI::dispatchToUiThread(SLIB_FUNCTION_WEAKREF(EFL_ViewInstance, setFocus, this));
-				return;
+			if (flag) {
+				elm_object_focus_set(handle, EINA_TRUE);
 			}
-			::elm_object_focus_set(handle, EINA_TRUE);
 		}
 	}
 	
-	void EFL_ViewInstance::invalidate()
+	void EFL_ViewInstance::invalidate(View* view)
 	{
 	}
 	
-	void EFL_ViewInstance::invalidate(const UIRect& _rect)
+	void EFL_ViewInstance::invalidate(View* view, const UIRect& _rect)
 	{
 	}
 	
-	UIRect EFL_ViewInstance::getFrame()
-	{
-		return UIRect::zero();
-	}
-	
-	void EFL_ViewInstance::setFrame(const UIRect& frame)
+	void EFL_ViewInstance::setFrame(View* view, const UIRect& frame)
 	{
 		if (m_type != EFL_ViewType::Window) {
 			Evas_Object* handle = m_handle;
 			if (handle) {
-				if (!(UI::isUiThread())) {
-					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EFL_ViewInstance, setFrame, this, frame));
-					return;
-				}
-				::elm_grid_pack_set(handle, frame.left, frame.top, frame.getWidth(), frame.getHeight());
+				elm_grid_pack_set(handle, frame.left, frame.top, frame.getWidth(), frame.getHeight());
 				if (m_type == EFL_ViewType::Grid) {
-					::elm_grid_size_set(handle, frame.getWidth(), frame.getHeight());
+					elm_grid_size_set(handle, frame.getWidth(), frame.getHeight());
 				} else {
-					::evas_object_move(handle, frame.left, frame.top);
-					::evas_object_resize(handle, frame.getWidth(), frame.getHeight());
+					evas_object_move(handle, frame.left, frame.top);
+					evas_object_resize(handle, frame.getWidth(), frame.getHeight());
 				}
 			}
 		}
 	}
 	
-	void EFL_ViewInstance::setTransform(const Matrix3& m)
+	void EFL_ViewInstance::setTransform(View* view, const Matrix3& m)
 	{
 	}
 	
-	void EFL_ViewInstance::setVisible(sl_bool flag)
+	void EFL_ViewInstance::setVisible(View* view, sl_bool flag)
 	{
 		Evas_Object* handle = m_handle;
 		if (handle) {
-			if (!(UI::isUiThread())) {
-				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EFL_ViewInstance, setVisible, this, flag));
-				return;
-			}
 			if (flag) {
-				::evas_object_show(handle);
+				evas_object_show(handle);
 			} else {
-				::evas_object_hide(handle);
+				evas_object_hide(handle);
 			}
 		}
 	}
@@ -214,55 +199,51 @@ namespace slib
 	{
 	}
 	
-	void EFL_ViewInstance::setAlpha(sl_real alpha)
+	void EFL_ViewInstance::setAlpha(View* view, sl_real alpha)
 	{
 		Evas_Object* handle = m_handle;
 		if (handle) {
-			if (!(UI::isUiThread())) {
-				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), EFL_ViewInstance, setAlpha, this, alpha));
-				return;
-			}
 			if (alpha <= 0.005f) {
-				::evas_object_color_set(handle, 255, 255, 255, 0);
+				evas_object_color_set(handle, 255, 255, 255, 0);
 			} else if (alpha <= 0.995) {
-				::evas_object_color_set(handle, 255, 255, 255, (int)(alpha * 255));
+				evas_object_color_set(handle, 255, 255, 255, (int)(alpha * 255));
 			} else {
-				::evas_object_color_set(handle, 255, 255, 255, 255);
+				evas_object_color_set(handle, 255, 255, 255, 255);
 			}
 		}
 	}
 
-	void EFL_ViewInstance::setClipping(sl_bool flag)
+	void EFL_ViewInstance::setClipping(View* view, sl_bool flag)
 	{
 	}
 
-	void EFL_ViewInstance::setDrawing(sl_bool flag)
+	void EFL_ViewInstance::setDrawing(View* view, sl_bool flag)
 	{
 	}
 	
-	UIPointf EFL_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& ptScreen)
+	UIPointf EFL_ViewInstance::convertCoordinateFromScreenToView(View* view, const UIPointf& ptScreen)
 	{
 		Evas_Object* handle = m_handle;
 		if (handle) {
 			Evas_Coord x = 0, y = 0;
-			::evas_object_geometry_get(handle, &x, &y, sl_null, sl_null);
+			evas_object_geometry_get(handle, &x, &y, sl_null, sl_null);
 			return UIPointf((sl_ui_posf)(ptScreen.x - x), (sl_ui_posf)(ptScreen.y - y));
 		}
 		return ptScreen;
 	}
 	
-	UIPointf EFL_ViewInstance::convertCoordinateFromViewToScreen(const UIPointf& ptView)
+	UIPointf EFL_ViewInstance::convertCoordinateFromViewToScreen(View* view, const UIPointf& ptView)
 	{
 		Evas_Object* handle = m_handle;
 		if (handle) {
 			Evas_Coord x = 0, y = 0;
-			::evas_object_geometry_get(handle, &x, &y, sl_null, sl_null);
+			evas_object_geometry_get(handle, &x, &y, sl_null, sl_null);
 			return UIPointf((sl_ui_posf)(ptView.x + x), (sl_ui_posf)(ptView.y + y));
 		}
 		return ptView;
 	}
 	
-	void EFL_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
+	void EFL_ViewInstance::addChildInstance(View* view, const Ref<ViewInstance>& _child)
 	{
 		EFL_ViewInstance* child = static_cast<EFL_ViewInstance*>(_child.get());
 		if (child) {
@@ -278,14 +259,14 @@ namespace slib
 						} else {
 							frame = UIRect::zero();
 						}
-						::elm_grid_pack(handle, handleChild, frame.left, frame.top, frame.getWidth(), frame.getHeight());
+						elm_grid_pack(handle, handleChild, frame.left, frame.top, frame.getWidth(), frame.getHeight());
 					}
 				}
 			}
 		}
 	}
 	
-	void EFL_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
+	void EFL_ViewInstance::removeChildInstance(View* view, const Ref<ViewInstance>& _child)
 	{
 		EFL_ViewInstance* child = static_cast<EFL_ViewInstance*>(_child.get());
 		if (child) {
@@ -294,18 +275,18 @@ namespace slib
 				Evas_Object* handleChild = child->m_handle;
 				if (handleChild) {
 					if (m_type == EFL_ViewType::Grid) {
-						::elm_grid_unpack(handle, handleChild);
+						elm_grid_unpack(handle, handleChild);
 					}
 				}
 			}
 		}
 	}
 	
-	void EFL_ViewInstance::bringToFront()
+	void EFL_ViewInstance::bringToFront(View* view)
 	{
 		Evas_Object* handle = m_handle;
 		if (handle) {
-			::evas_object_raise(handle);
+			evas_object_raise(handle);
 		}
 	}
 
@@ -400,7 +381,7 @@ namespace slib
 		}
 
 		Evas_Coord x, y;
-		::evas_object_geometry_get(handle, &x, &y, sl_null, sl_null);
+		evas_object_geometry_get(handle, &x, &y, sl_null, sl_null);
 
 		UIAction action;
 		unsigned int timestamp;
@@ -465,12 +446,12 @@ namespace slib
 	{
 		Evas_Object* handle = m_handle;
 		if (handle) {
-			::evas_object_event_callback_add(handle, EVAS_CALLBACK_MOUSE_DOWN, &(EFL_ViewInstance::_onTouch), g_strEventTouchBegin);
-			::evas_object_event_callback_add(handle, EVAS_CALLBACK_MOUSE_UP, &(EFL_ViewInstance::_onTouch), g_strEventTouchEnd);
-			::evas_object_event_callback_add(handle, EVAS_CALLBACK_MOUSE_MOVE, &(EFL_ViewInstance::_onTouch), g_strEventTouchMove);
-			::evas_object_event_callback_add(handle, EVAS_CALLBACK_MULTI_DOWN, &(EFL_ViewInstance::_onTouch), g_strEventMultiTouchBegin);
-			::evas_object_event_callback_add(handle, EVAS_CALLBACK_MULTI_UP, &(EFL_ViewInstance::_onTouch), g_strEventMultiTouchEnd);
-			::evas_object_event_callback_add(handle, EVAS_CALLBACK_MULTI_MOVE, &(EFL_ViewInstance::_onTouch), g_strEventMultiTouchMove);
+			evas_object_event_callback_add(handle, EVAS_CALLBACK_MOUSE_DOWN, &(EFL_ViewInstance::_onTouch), g_strEventTouchBegin);
+			evas_object_event_callback_add(handle, EVAS_CALLBACK_MOUSE_UP, &(EFL_ViewInstance::_onTouch), g_strEventTouchEnd);
+			evas_object_event_callback_add(handle, EVAS_CALLBACK_MOUSE_MOVE, &(EFL_ViewInstance::_onTouch), g_strEventTouchMove);
+			evas_object_event_callback_add(handle, EVAS_CALLBACK_MULTI_DOWN, &(EFL_ViewInstance::_onTouch), g_strEventMultiTouchBegin);
+			evas_object_event_callback_add(handle, EVAS_CALLBACK_MULTI_UP, &(EFL_ViewInstance::_onTouch), g_strEventMultiTouchEnd);
+			evas_object_event_callback_add(handle, EVAS_CALLBACK_MULTI_MOVE, &(EFL_ViewInstance::_onTouch), g_strEventMultiTouchMove);
 		}
 	}
 

@@ -103,7 +103,7 @@ namespace slib
 		UIView* handle = UIPlatform::getViewHandle(child);
 		if ([handle isKindOfClass:[UIScrollView class]]) {
 			UIScrollView* scrollView = (UIScrollView*)handle;
-			UIRefreshControl* control = ((RefreshViewHelper*)this)->createControl();
+			UIRefreshControl* control = static_cast<RefreshViewHelper*>(this)->createControl();
 			if (control != nil) {
 				if (@available(iOS 10.0, *)) {
 					scrollView.refreshControl = control;
@@ -116,11 +116,8 @@ namespace slib
 	
 	void RefreshView::_setRefreshing_NW(sl_bool flag)
 	{
-		if (!(UI::isUiThread())) {
-			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), RefreshView, _setRefreshing_NW, this, flag));
-			return;
-		}
-		UIRefreshControl* control = ((RefreshViewHelper*)this)->getControl();
+		SLIB_VIEW_RUN_ON_UI_THREAD(&RefreshView::_setRefreshing_NW, flag)
+		UIRefreshControl* control = static_cast<RefreshViewHelper*>(this)->getControl();
 		if (control != nil) {
 			if (flag) {
 				if (!(control.refreshing)) {
@@ -145,7 +142,7 @@ using namespace slib::priv::refresh_view;
 {
 	Ref<RefreshView> view(m_view);
 	if (view.isNotNull()) {
-		((RefreshViewHelper*)(view.get()))->_onRefresh();
+		static_cast<RefreshViewHelper*>((view.get()))->_onRefresh();
 	}
 }
 

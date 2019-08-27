@@ -25,6 +25,7 @@
 #if defined(SLIB_UI_IS_IOS)
 
 #include "slib/ui/window.h"
+
 #include "slib/ui/view.h"
 #include "slib/ui/screen.h"
 #include "slib/ui/core.h"
@@ -216,9 +217,8 @@ namespace slib
 					return m_window == nil;
 				}
 				
-				sl_bool setParent(const Ref<WindowInstance>& window) override
+				void setParent(const Ref<WindowInstance>& window) override
 				{
-					return sl_false;
 				}
 				
 				Ref<ViewInstance> getContentView() override
@@ -240,23 +240,17 @@ namespace slib
 					return sl_false;
 				}
 				
-				sl_bool activate() override
+				void activate() override
 				{
 					UIView* view = m_window;
 					if (view != nil) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_WindowInstance, activate, this));
-							return sl_true;
-						}
 						if ([view isKindOfClass:[UIWindow class]]) {
 							UIWindow* window = (UIWindow*)view;
 							[window makeKeyAndVisible];
 						} else {
 							[view becomeFirstResponder];
 						}
-						return sl_true;
 					}
-					return sl_false;
 				}
 				
 				UIRect getFrame() override
@@ -276,14 +270,10 @@ namespace slib
 					}
 				}
 				
-				sl_bool setFrame(const UIRect& frame) override
+				void setFrame(const UIRect& frame) override
 				{
 					UIView* window = m_window;
 					if (window != nil) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_WindowInstance, setFrame, this, frame));
-							return sl_true;
-						}
 						CGFloat f = UIPlatform::getGlobalScaleFactor();
 						CGRect rect;
 						rect.origin.x = (CGFloat)(frame.left) / f;
@@ -299,9 +289,7 @@ namespace slib
 								((SLIBWindowRootViewController*)controller)->m_sizeClientResizedByKeyboard = size;
 							}
 						}
-						return sl_true;
 					}
-					return sl_false;
 				}
 				
 				UIRect getClientFrame() override
@@ -334,10 +322,6 @@ namespace slib
 				{
 					UIView* window = m_window;
 					if (window != nil) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_WindowInstance, setClientSize, this, size));
-							return sl_true;
-						}
 						CGFloat f = UIPlatform::getGlobalScaleFactor();
 						CGRect frame = [window frame];
 						frame.size.width = (CGFloat)(size.x) / f;
@@ -355,19 +339,14 @@ namespace slib
 					return sl_false;
 				}
 				
-				sl_bool setTitle(const String& title) override
+				void setTitle(const String& title) override
 				{
-					return sl_false;
 				}
 				
-				sl_bool setBackgroundColor(const Color& _color) override
+				void setBackgroundColor(const Color& _color) override
 				{
 					UIView* window = m_window;
 					if (window != nil) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_WindowInstance, setBackgroundColor, this, _color));
-							return sl_true;
-						}
 						UIColor* color;
 						if (_color.isZero()) {
 							color = nil;
@@ -375,9 +354,7 @@ namespace slib
 							color = GraphicsPlatform::getUIColorFromColor(_color);
 						}
 						[window setBackgroundColor:color];
-						return sl_true;
 					}
-					return sl_false;
 				}
 				
 				sl_bool isMinimized() override
@@ -385,9 +362,8 @@ namespace slib
 					return sl_false;
 				}
 				
-				sl_bool setMinimized(sl_bool flag) override
+				void setMinimized(sl_bool flag) override
 				{
-					return sl_false;
 				}
 				
 				sl_bool isMaximized() override
@@ -395,75 +371,53 @@ namespace slib
 					return sl_false;
 				}
 				
-				sl_bool setMaximized(sl_bool flag) override
+				void setMaximized(sl_bool flag) override
 				{
-					return sl_false;
 				}
 				
-				sl_bool setVisible(sl_bool flag) override
+				void setVisible(sl_bool flag) override
 				{
 					UIView* window = m_window;
 					if (window != nil) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_WindowInstance, setVisible, this, flag));
-							return sl_true;
-						}
 						[window setHidden:(flag ? NO : YES)];
-						return sl_true;
-					} else {
-						return sl_false;
 					}
 				}
 				
-				sl_bool setAlwaysOnTop(sl_bool flag) override
+				void setAlwaysOnTop(sl_bool flag) override
 				{
 					UIView* view = m_window;
 					if (view != nil) {
 						if ([view isKindOfClass:[UIWindow class]]) {
-							if (!(UI::isUiThread())) {
-								UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_WindowInstance, setAlwaysOnTop, this, flag));
-								return sl_true;
-							}
 							UIWindow* window = (UIWindow*)view;
 							if (flag) {
 								window.windowLevel = UIWindowLevelAlert + 1;
 							} else {
 								window.windowLevel = UIWindowLevelNormal + 1;
 							}
-							return sl_true;
 						}
 					}
-					return sl_false;
 				}
 				
-				sl_bool setCloseButtonEnabled(sl_bool flag) override
+				void setCloseButtonEnabled(sl_bool flag) override
 				{
-					return sl_false;
 				}
 				
-				sl_bool setMinimizeButtonEnabled(sl_bool flag) override
+				void setMinimizeButtonEnabled(sl_bool flag) override
 				{
-					return sl_false;
 				}
 				
-				sl_bool setMaximizeButtonEnabled(sl_bool flag) override
+				void setMaximizeButtonEnabled(sl_bool flag) override
 				{
-					return sl_false;
 				}
 				
-				sl_bool setResizable(sl_bool flag) override
+				void setResizable(sl_bool flag) override
 				{
-					return sl_false;
 				}
 				
-				sl_bool setAlpha(sl_real _alpha) override
+				void setAlpha(sl_real _alpha) override
 				{
 					UIView* window = m_window;
 					if (window != nil) {
-						if (!(UI::isUiThread())) {
-							UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), iOS_WindowInstance, setAlpha, this, _alpha));
-							return sl_true;
-						}
 						sl_real alpha = _alpha;
 						if (alpha < 0) {
 							alpha = 0;
@@ -472,15 +426,11 @@ namespace slib
 							alpha = 1;
 						}
 						window.alpha = alpha;
-						return sl_true;
-					} else {
-						return sl_false;
 					}
 				}
 				
-				sl_bool setTransparent(sl_bool flag) override
+				void setTransparent(sl_bool flag) override
 				{
-					return sl_false;
 				}
 				
 				UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen) override
@@ -581,12 +531,12 @@ namespace slib
 				
 			};
 			
-			void resetOrientation()
+			void ResetOrientation()
 			{
 				g_screenOrientation = [[UIApplication sharedApplication] statusBarOrientation];
 			}
 			
-			ScreenOrientation convertScreenOrientation(UIInterfaceOrientation orientation)
+			ScreenOrientation ConvertScreenOrientation(UIInterfaceOrientation orientation)
 			{
 				switch (orientation) {
 					case UIInterfaceOrientationPortraitUpsideDown:
@@ -600,7 +550,7 @@ namespace slib
 				}
 			}
 			
-			UIInterfaceOrientation convertScreenOrientation(ScreenOrientation orientation)
+			UIInterfaceOrientation ConvertScreenOrientation(ScreenOrientation orientation)
 			{
 				switch (orientation) {
 					case ScreenOrientation::PortraitUpsideDown:
@@ -652,7 +602,7 @@ namespace slib
 			default:
 				break;
 		}
-		return convertScreenOrientation(g_screenOrientation);
+		return ConvertScreenOrientation(g_screenOrientation);
 	}
 	
 	void UI::attemptRotateScreenOrientation()
@@ -662,12 +612,12 @@ namespace slib
 		if (orientations.isEmpty()) {
 			return;
 		}
-		if (orientations.contains(convertScreenOrientation([[UIApplication sharedApplication] statusBarOrientation]))) {
+		if (orientations.contains(ConvertScreenOrientation([[UIApplication sharedApplication] statusBarOrientation]))) {
 			return;
 		}
 		ScreenOrientation orientation = orientations.getValueAt(0, ScreenOrientation::Portrait);
 		@try {
-			[[UIDevice currentDevice] setValue:[NSNumber numberWithInteger:convertScreenOrientation(orientation)] forKey:@"orientation"];
+			[[UIDevice currentDevice] setValue:[NSNumber numberWithInteger:ConvertScreenOrientation(orientation)] forKey:@"orientation"];
 		} @catch (NSError* error) {
 			NSLog(@"[Error] %@", error.localizedDescription);
 		}
@@ -805,7 +755,7 @@ using namespace slib::priv::window;
 	[super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 	
 	dispatch_async(dispatch_get_main_queue(), ^{
-		resetOrientation();
+		ResetOrientation();
 		UIWindow* handle = self.view.window;
 		if (handle != nil) {
 			CGRect r = handle.frame;

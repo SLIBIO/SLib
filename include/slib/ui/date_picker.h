@@ -31,7 +31,9 @@
 
 namespace slib
 {
-
+	
+	class IDatePickerInstance;
+	
 	class SLIB_EXPORT DatePicker : public View
 	{
 		SLIB_DECLARE_OBJECT
@@ -44,7 +46,7 @@ namespace slib
 	public:
 		Time getDate();
 		
-		virtual void setDate(const Time& date);
+		virtual void setDate(const Time& date, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 	public:		
 		SLIB_DECLARE_EVENT_HANDLER(DatePicker, Change, Time& date)
@@ -52,20 +54,24 @@ namespace slib
 	protected:
 		void onUpdateLayout() override;
 		
-	public:
+	protected:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		
-	private:
-		void _getDate_NW();
-		
-		void _setDate_NW(const Time& date);
-		
-		sl_bool _measureSize_NW(UISize& _out);
-		
-		void _setFont_NW(const Ref<Font>& font) override;
+		virtual Ptr<IDatePickerInstance> getDatePickerInstance();
 		
 	protected:
 		Time m_date;
+		
+	};
+
+	class SLIB_EXPORT IDatePickerInstance
+	{
+	public:
+		virtual sl_bool getDate(DatePicker* view, Time& _out) = 0;
+		
+		virtual void setDate(DatePicker* view, const Time& date) = 0;
+		
+		virtual sl_bool measureSize(DatePicker* view, UISize& _out) = 0;
 		
 	};
 

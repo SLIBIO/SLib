@@ -65,65 +65,246 @@ namespace slib
 
 			SLIB_JNI_END_CLASS
 
-			class EditViewHelper : public EditView
+			class EditViewInstance;
+
+			class EditViewHelper : public TextArea
 			{
 			public:
-				void applyParameters(jobject handle)
+				void apply(jobject handle, EditViewInstance* instance);
+
+			};
+
+			class EditViewInstance : public Android_ViewInstance, public IEditViewInstance
+			{
+				SLIB_DECLARE_OBJECT
+
+			public:
+				Ref<EditViewHelper> getHelper()
 				{
-					JniLocal<jstring> jtext = Jni::getJniString(m_text);
-					JEditView::setText.callBoolean(sl_null, handle, jtext.get());
-					JEditView::setBorder.callBoolean(sl_null, handle, isBorder());
-					JEditView::setAlignment.callBoolean(sl_null, handle, m_textAlignment.value);
-					JEditView::setTextColor.callBoolean(sl_null, handle, m_textColor.getARGB());
-					JniLocal<jstring> jhintText = Jni::getJniString(m_hintText);
-					JEditView::setHintText.callBoolean(sl_null, handle, jhintText.get());
-					JEditView::setHintAlignment.callBoolean(sl_null, handle, m_hintTextAlignment.value);
-					JEditView::setHintTextColor.callBoolean(sl_null, handle, m_hintTextColor.getARGB());
-					{
-						Ref<Font> font = getHintFont();
+					return CastRef<EditViewHelper>(getView());
+				}
+
+				sl_bool getText(EditView* view, String& _out) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						_out = JEditView::getText.callString(sl_null, handle);
+						return sl_true;
+					}
+					return sl_false;
+				}
+
+				void setText(EditView* view, const String& text) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						JniLocal<jstring> jstr = Jni::getJniString(text);
+						JEditView::setText.callBoolean(sl_null, handle, jstr.get());
+					}
+				}
+
+				void setGravity(EditView* view, const Alignment& align) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						JEditView::setAlignment.callBoolean(sl_null, handle, align.value);
+					}
+				}
+
+				void setTextColor(EditView* view, const Color& color) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						JEditView::setTextColor.callBoolean(sl_null, handle, color.getARGB());
+					}
+				}
+
+				void setHintText(EditView* view, const String& text) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						JniLocal<jstring> jstr = Jni::getJniString(text);
+						JEditView::setHintText.callBoolean(sl_null, handle, jstr.get());
+					}
+				}
+
+				void setHintGravity(EditView* view, const Alignment& align) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						JEditView::setHintAlignment.callBoolean(sl_null, handle, align.value);
+					}
+				}
+
+				void setHintTextColor(EditView* view, const Color& color) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						JEditView::setHintTextColor.callBoolean(sl_null, handle, color.getARGB());
+					}
+				}
+
+				void setHintFont(EditView* view, const Ref<Font>& font) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
 						jobject jfont = GraphicsPlatform::getNativeFont(font.get());
 						if (jfont) {
 							JEditView::setHintFont.callBoolean(sl_null, handle, jfont);
 						}
 					}
-					JEditView::setReadOnly.callBoolean(sl_null, handle, m_flagReadOnly);
-					JEditView::setMultiLine.callBoolean(sl_null, handle, m_multiLine != MultiLineMode::Single);
-					JEditView::setBackgroundColor.callBoolean(sl_null, handle, getBackgroundColor().getARGB());
-					{
-						Ref<Font> font = getFont();
+				}
+
+				void setReadOnly(EditView* view, sl_bool flag) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						JEditView::setReadOnly.callBoolean(sl_null, handle, flag);
+					}
+				}
+
+				void setPassword(EditView* view, sl_bool flag) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						JEditView::setInputType.callBoolean(sl_null, handle, (int)(view->getKeyboardType()), (int)(view->getAutoCaptializationType()), flag ? 1 : 0);
+					}
+				}
+
+				void setMultiLine(EditView* view, MultiLineMode mode) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						JEditView::setMultiLine.callBoolean(sl_null, handle, mode != MultiLineMode::Single);
+					}
+				}
+
+				void setReturnKeyType(EditView* view, UIReturnKeyType type) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						JEditView::setReturnKeyType.callBoolean(sl_null, handle, (int)type);
+					}
+				}
+
+				void setKeyboardType(EditView* view, UIKeyboardType type) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						JEditView::setInputType.callBoolean(sl_null, handle, (int)type, (int)(view->getAutoCaptializationType()), view->isPassword() ? 1 : 0);
+					}
+				}
+
+				void setAutoCapitalizationType(EditView* view, UIAutoCapitalizationType type) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						JEditView::setInputType.callBoolean(sl_null, handle, (int)(view->getKeyboardType()), (int) type, view->isPassword() ? 1 : 0);
+					}
+				}
+
+				sl_ui_len measureHeight(EditView* view) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						return JEditView::measureHeight.callInt(sl_null, handle);
+					}
+					return 0;
+				}
+
+				void setFont(View* view, const Ref<Font>& font) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
 						jobject jfont = GraphicsPlatform::getNativeFont(font.get());
 						if (jfont) {
 							JEditView::setFont.callBoolean(sl_null, handle, jfont);
 						}
 					}
-					JEditView::setReturnKeyType.callBoolean(sl_null, handle, (int)m_returnKeyType);
-					JEditView::setInputType.callBoolean(sl_null, handle, (int)m_keyboardType, (int)m_autoCapitalizationType, m_flagPassword ? 1 : 0);
 				}
+
+				void setBorder(View* view, sl_bool flag) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						JEditView::setBorder.callBoolean(sl_null, handle, flag);
+					}
+				}
+
+				void setBackgroundColor(View* view, const Color& color) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						JEditView::setBackgroundColor.callBoolean(sl_null, handle, color.getARGB());
+					}
+				}
+
+				void setScrollBarsVisible(View* view, sl_bool flagHorizontal, sl_bool flagVertical) override
+				{
+				}
+
+				void onChange()
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						Ref<EditViewHelper> helper = getHelper();
+						if (helper.isNotNull()) {
+							String text = JEditView::getText.callString(sl_null, handle);
+							String textNew = text;
+							helper->dispatchChange(&textNew);
+							if (text != textNew) {
+								JniLocal<jstring> jstr = Jni::getJniString(textNew);
+								JEditView::setText.callBoolean(sl_null, handle, jstr.get());
+							}
+						}
+					}
+				}
+
+				void onReturn()
+				{
+					Ref<EditViewHelper> helper = getHelper();
+					if (helper.isNotNull()) {
+						helper->dispatchReturnKey();
+					}
+				}
+
 			};
+
+			SLIB_DEFINE_OBJECT(EditViewInstance, Android_ViewInstance)
+
+			void EditViewHelper::apply(jobject handle, EditViewInstance* instance)
+			{
+				JniLocal<jstring> jtext = Jni::getJniString(m_text);
+				JEditView::setText.callBoolean(sl_null, handle, jtext.get());
+				JEditView::setBorder.callBoolean(sl_null, handle, isBorder());
+				JEditView::setAlignment.callBoolean(sl_null, handle, m_gravity.value);
+				JEditView::setTextColor.callBoolean(sl_null, handle, m_textColor.getARGB());
+				JniLocal<jstring> jhintText = Jni::getJniString(m_hintText);
+				JEditView::setHintText.callBoolean(sl_null, handle, jhintText.get());
+				JEditView::setHintAlignment.callBoolean(sl_null, handle, m_hintGravity.value);
+				JEditView::setHintTextColor.callBoolean(sl_null, handle, m_hintTextColor.getARGB());
+				instance->setHintFont(this, getHintFont());
+				JEditView::setReadOnly.callBoolean(sl_null, handle, m_flagReadOnly);
+				JEditView::setMultiLine.callBoolean(sl_null, handle, m_multiLine != MultiLineMode::Single);
+				JEditView::setBackgroundColor.callBoolean(sl_null, handle, getBackgroundColor().getARGB());
+				instance->setFont(this, getFont());
+				JEditView::setReturnKeyType.callBoolean(sl_null, handle, (int)m_returnKeyType);
+				JEditView::setInputType.callBoolean(sl_null, handle, (int)m_keyboardType, (int)m_autoCapitalizationType, m_flagPassword ? 1 : 0);
+			}
 
 			void JNICALL OnChange(JNIEnv* env, jobject _this, jlong _instance)
 			{
-				Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(_instance);
-				if (instance.isNull()) {
-					return;
-				}
-				Ref<View> _view = instance->getView();
-				if (EditView* view = CastInstance<EditView>(_view.get())) {
-					String text = JEditView::getText.callString(sl_null, instance->getHandle());
-					String textNew = text;
-					view->dispatchChange(&textNew);
-					if (text != textNew) {
-						JniLocal<jstring> jstr = Jni::getJniString(textNew);
-						JEditView::setText.callBoolean(sl_null, instance->getHandle(), jstr.get());
-					}
+				Ref<EditViewInstance> instance = CastRef<EditViewInstance>(Android_ViewInstance::findInstance(_instance));
+				if (instance.isNotNull()) {
+					instance->onChange();
 				}
 			}
 
-			void JNICALL OnReturn(JNIEnv* env, jobject _this, jlong instance)
+			void JNICALL OnReturn(JNIEnv* env, jobject _this, jlong _instance)
 			{
-				Ref<View> _view = Android_ViewInstance::findView(instance);
-				if (EditView* view = CastInstance<EditView>(_view.get())) {
-					view->dispatchReturnKey();
+				Ref<EditViewInstance> instance = CastRef<EditViewInstance>(Android_ViewInstance::findInstance(_instance));
+				if (instance.isNotNull()) {
+					instance->onReturn();
 				}
 			}
 
@@ -134,189 +315,42 @@ namespace slib
 
 	Ref<ViewInstance> EditView::createNativeWidget(ViewInstance* _parent)
 	{
-		Ref<Android_ViewInstance> ret;
 		Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 		if (parent) {
 			JniLocal<jobject> handle = JEditView::create.callObject(sl_null, parent->getContext(), 0);
-			ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
+			Ref<EditViewInstance> ret = Android_ViewInstance::create<EditViewInstance>(this, parent, handle.get());
 			if (ret.isNotNull()) {
-				jobject handle = ret->getHandle();
-				((EditViewHelper*)this)->applyParameters(handle);
+				jobject jhandle = ret->getHandle();
+				(static_cast<EditViewHelper*>(this))->apply(jhandle, ret.get());
+				return ret;
 			}
 		}
-		return ret;
+		return sl_null;
+	}
+
+	Ptr<IEditViewInstance> EditView::getEditViewInstance()
+	{
+		return CastRef<EditViewInstance>(getViewInstance());
 	}
 
 	Ref<ViewInstance> TextArea::createNativeWidget(ViewInstance* _parent)
 	{
-		Ref<Android_ViewInstance> ret;
 		Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 		if (parent) {
 			JniLocal<jobject> handle = JEditView::create.callObject(sl_null, parent->getContext(), 2);
-			ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
+			Ref<EditViewInstance> ret = Android_ViewInstance::create<EditViewInstance>(this, parent, handle.get());
 			if (ret.isNotNull()) {
-				jobject handle = ret->getHandle();
-				((EditViewHelper*)this)->applyParameters(handle);
+				jobject jhandle = ret->getHandle();
+				(static_cast<EditViewHelper*>(this))->apply(jhandle, ret.get());
+				return ret;
 			}
 		}
-		return ret;
+		return sl_null;
 	}
 
-	void EditView::_getText_NW()
+	Ptr<IEditViewInstance> TextArea::getEditViewInstance()
 	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			m_text = JEditView::getText.callString(sl_null, handle);
-		}
-	}
-
-	void EditView::_setText_NW(const String& text)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JniLocal<jstring> jstr = Jni::getJniString(text);
-			JEditView::setText.callBoolean(sl_null, handle, jstr.get());
-		}
-	}
-
-	void EditView::_setTextAlignment_NW(Alignment align)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JEditView::setAlignment.callBoolean(sl_null, handle, align.value);
-		}
-	}
-
-	void EditView::_setTextColor_NW(const Color& color)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JEditView::setTextColor.callBoolean(sl_null, handle, color.getARGB());
-		}
-	}
-
-	void EditView::_setHintText_NW(const String& text)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JniLocal<jstring> jstr = Jni::getJniString(text);
-			JEditView::setHintText.callBoolean(sl_null, handle, jstr.get());
-		}
-	}
-
-	void EditView::_setHintTextAlignment_NW(Alignment align)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JEditView::setHintAlignment.callBoolean(sl_null, handle, align.value);
-		}
-	}
-
-	void EditView::_setHintTextColor_NW(const Color& color)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JEditView::setHintTextColor.callBoolean(sl_null, handle, color.getARGB());
-		}
-	}
-
-	void EditView::_setHintFont_NW(const Ref<Font>& font)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			jobject jfont = GraphicsPlatform::getNativeFont(font.get());
-			if (jfont) {
-				JEditView::setHintFont.callBoolean(sl_null, handle, jfont);
-			}
-		}
-	}
-
-	void EditView::_setReadOnly_NW(sl_bool flag)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JEditView::setReadOnly.callBoolean(sl_null, handle, flag);
-		}
-	}
-
-	void EditView::_setPassword_NW(sl_bool flag)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JEditView::setInputType.callBoolean(sl_null, handle, (int)m_keyboardType, (int)m_autoCapitalizationType, flag ? 1 : 0);
-		}
-	}
-
-	void EditView::_setMultiLine_NW(MultiLineMode mode)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JEditView::setMultiLine.callBoolean(sl_null, handle, mode != MultiLineMode::Single);
-		}
-	}
-
-	void EditView::_setReturnKeyType_NW(UIReturnKeyType type)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JEditView::setReturnKeyType.callBoolean(sl_null, handle, (int)type);
-		}
-	}
-
-	void EditView::_setKeyboardType_NW(UIKeyboardType type)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JEditView::setInputType.callBoolean(sl_null, handle, (int)type, (int)m_autoCapitalizationType, m_flagPassword ? 1 : 0);
-		}
-	}
-
-	void EditView::_setAutoCapitalizationType_NW(UIAutoCapitalizationType type)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JEditView::setInputType.callBoolean(sl_null, handle, (int) m_keyboardType, (int) type, m_flagPassword ? 1 : 0);
-		}
-	}
-
-	sl_ui_len EditView::_measureHeight_NW()
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			return JEditView::measureHeight.callInt(sl_null, handle);
-		}
-		return 0;
-	}
-
-	void EditView::_setFont_NW(const Ref<Font>& font)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			jobject jfont = GraphicsPlatform::getNativeFont(font.get());
-			if (jfont) {
-				JEditView::setFont.callBoolean(sl_null, handle, jfont);
-			}
-		}
-	}
-
-	void EditView::_setBorder_NW(sl_bool flag)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JEditView::setBorder.callBoolean(sl_null, handle, flag);
-		}
-	}
-
-	void EditView::_setBackgroundColor_NW(const Color& color)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JEditView::setBackgroundColor.callBoolean(sl_null, handle, color.getARGB());
-		}
-	}
-
-	void EditView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
-	{
+		return CastRef<EditViewInstance>(getViewInstance());
 	}
 
 }

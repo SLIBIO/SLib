@@ -22,6 +22,7 @@
 
 #include "slib/ui/button.h"
 
+#include "slib/ui/core.h"
 #include "slib/graphics/util.h"
 #include "slib/core/safe_static.h"
 #include "slib/core/new_helper.h"
@@ -181,13 +182,16 @@ namespace slib
 
 	void Button::setText(const String& text, UIUpdateMode mode)
 	{
-		m_text = text;
 		Ptr<IButtonInstance> instance = getButtonInstance();
 		if (instance.isNotNull()) {
-			instance->setText(text);
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Button::setText, text, mode)
+			m_text = text;
+			instance->setText(this, text);
 			if (!SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
 				return;
 			}
+		} else {
+			m_text = text;
 		}
 		invalidateLayoutOfWrappingControl(mode);
 	}
@@ -199,15 +203,18 @@ namespace slib
 
 	void Button::setDefaultButton(sl_bool flag, UIUpdateMode mode)
 	{
+		Ptr<IButtonInstance> instance = getButtonInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Button::setDefaultButton, flag, mode)
+		}
 		m_flagDefaultButton = flag;
 		if (flag) {
 			setCurrentCategory(1, UIUpdateMode::None);
 		} else {
 			setCurrentCategory(0, UIUpdateMode::None);
 		}
-		Ptr<IButtonInstance> instance = getButtonInstance();
 		if (instance.isNotNull()) {
-			instance->setDefaultButton(flag);
+			instance->setDefaultButton(this, flag);
 		} else {
 			invalidate(mode);
 		}
@@ -293,7 +300,7 @@ namespace slib
 		return m_gravity;
 	}
 
-	void Button::setGravity(Alignment align, UIUpdateMode mode)
+	void Button::setGravity(const Alignment& align, UIUpdateMode mode)
 	{
 		m_gravity = align;
 		invalidate(mode);
@@ -304,7 +311,7 @@ namespace slib
 		return m_iconAlignment;
 	}
 
-	void Button::setIconAlignment(Alignment align, UIUpdateMode mode)
+	void Button::setIconAlignment(const Alignment& align, UIUpdateMode mode)
 	{
 		m_iconAlignment = align;
 		invalidateLayoutOfWrappingControl(mode);
@@ -315,7 +322,7 @@ namespace slib
 		return m_textAlignment;
 	}
 
-	void Button::setTextAlignment(Alignment align, UIUpdateMode mode)
+	void Button::setTextAlignment(const Alignment& align, UIUpdateMode mode)
 	{
 		m_textAlignment = align;
 		invalidateLayoutOfWrappingControl(mode);
@@ -782,7 +789,7 @@ namespace slib
 		Ptr<IButtonInstance> instance = getButtonInstance();
 		if (instance.isNotNull()) {
 			UISize size;
-			if (instance->measureSize(size)) {
+			if (instance->measureSize(this, size)) {
 				if (flagHorizontal) {
 					setLayoutWidth(size.x);
 				}

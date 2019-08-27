@@ -26,8 +26,6 @@
 
 #include "slib/ui/button.h"
 
-#include "slib/ui/core.h"
-
 #include "button_macos.h"
 
 namespace slib
@@ -48,25 +46,22 @@ namespace slib
 			{
 			}
 			
-			void ButtonInstance::setText(const String& text)
+			NSButton* ButtonInstance::getHandle()
 			{
-				if (!(UI::isUiThread())) {
-					UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), ButtonInstance, setText, this, text));
-					return;
-				}
-				NSButton* handle = getHandleOf<NSButton>();
+				return (NSButton*)m_handle;
+			}
+			
+			void ButtonInstance::setText(Button* view, const String& text)
+			{
+				NSButton* handle = getHandle();
 				if (handle != nil) {
 					handle.title = Apple::getNSStringFromString(text);
 				}
 			}
 			
-			void ButtonInstance::setDefaultButton(sl_bool flag)
+			void ButtonInstance::setDefaultButton(Button* view, sl_bool flag)
 			{
-				if (!(UI::isUiThread())) {
-					UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), ButtonInstance, setDefaultButton, this, flag));
-					return;
-				}
-				NSButton* handle = getHandleOf<NSButton>();
+				NSButton* handle = getHandle();
 				if (handle != nil) {
 					if (flag) {
 						[handle setKeyEquivalent:@"\r"];
@@ -76,26 +71,24 @@ namespace slib
 				}
 			}
 			
-			sl_bool ButtonInstance::measureSize(UISize& _out)
+			sl_bool ButtonInstance::measureSize(Button* view, UISize& _out)
 			{
 				return UIPlatform::measureNativeWidgetFittingSize(this, _out);
 			}
 			
-			void ButtonInstance::getChecked(sl_bool& _out)
+			sl_bool ButtonInstance::getChecked(CheckBox* view, sl_bool& _out)
 			{
-				NSButton* handle = getHandleOf<NSButton>();
+				NSButton* handle = getHandle();
 				if (handle != nil) {
 					_out = (handle.state == NSOnState ? sl_true : sl_false);
+					return sl_true;
 				}
+				return sl_false;
 			}
 			
-			void ButtonInstance::setChecked(sl_bool flag)
+			void ButtonInstance::setChecked(CheckBox* view, sl_bool flag)
 			{
-				if (!(UI::isUiThread())) {
-					UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), ButtonInstance, setChecked, this, flag));
-					return;
-				}
-				NSButton* handle = getHandleOf<NSButton>();
+				NSButton* handle = getHandle();
 				if (handle != nil) {
 					[handle setState: (flag ? NSOnState : NSOffState)];
 				}
@@ -110,7 +103,7 @@ namespace slib
 	{
 		Ref<ButtonInstance> ret = macOS_ViewInstance::create<ButtonInstance, SLIBButtonHandle>(this, parent);
 		if (ret.isNotNull()) {
-			SLIBButtonHandle* handle = (SLIBButtonHandle*)(ret->getHandle());
+			NSButton* handle = ret->getHandle();
 			handle.title = Apple::getNSStringFromString(m_text);
 			if (m_flagDefaultButton) {
 				[handle setKeyEquivalent:@"\r"];

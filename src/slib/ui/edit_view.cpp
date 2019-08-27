@@ -32,10 +32,6 @@
 namespace slib
 {
 
-	/**********************
-		EditView
-	 ***********************/
-
 	SLIB_DEFINE_OBJECT(EditView, View)
 
 	EditView::EditView()
@@ -44,10 +40,10 @@ namespace slib
 		setUsingFont(sl_true);
 		setFocusable(sl_true);
 		
-		m_textAlignment = Alignment::MiddleCenter;
+		m_gravity = Alignment::MiddleCenter;
 		m_textColor = Color::Black;
-		m_hintTextAlignment = Alignment::MiddleCenter;
-		m_hintTextColor = Color(180, 180, 180);
+		m_hintGravity = Alignment::MiddleCenter;
+		m_hintTextColor = Color(150, 150, 150);
 		m_flagReadOnly = sl_false;
 		m_flagPassword = sl_false;
 		m_multiLine = MultiLineMode::Single;
@@ -66,21 +62,28 @@ namespace slib
 
 	String EditView::getText()
 	{
-		if (isNativeWidget()) {
-			_getText_NW();
+		Ptr<IEditViewInstance> instance = getEditViewInstance();
+		if (instance.isNotNull()) {
+			String text;
+			if (instance->getText(this, text)) {
+				m_text = Move(text);
+			}
 		}
 		return m_text;
 	}
 
 	void EditView::setText(const String& text, UIUpdateMode mode)
 	{
-		m_text = text;
-		if (isNativeWidget()) {
-			_setText_NW(text);
+		Ptr<IEditViewInstance> instance = getEditViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&EditView::setText, text, mode)
+			m_text = text;
+			instance->setText(this, text);
 			if (isHeightWrapping()) {
 				invalidateLayoutOfWrappingControl(mode);
 			}
 		} else {
+			m_text = text;
 			if (isHeightWrapping()) {
 				invalidateLayoutOfWrappingControl(mode);
 			} else {
@@ -91,15 +94,18 @@ namespace slib
 
 	Alignment EditView::getGravity()
 	{
-		return m_textAlignment;
+		return m_gravity;
 	}
 
-	void EditView::setGravity(Alignment align, UIUpdateMode mode)
+	void EditView::setGravity(const Alignment& gravity, UIUpdateMode mode)
 	{
-		m_textAlignment = align;
-		if (isNativeWidget()) {
-			_setTextAlignment_NW(align);
+		Ptr<IEditViewInstance> instance = getEditViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&EditView::setGravity, gravity, mode)
+			m_gravity = gravity;
+			instance->setGravity(this, gravity);
 		} else {
+			m_gravity = gravity;
 			invalidate(mode);
 		}
 	}
@@ -111,10 +117,13 @@ namespace slib
 	
 	void EditView::setTextColor(const Color& color, UIUpdateMode mode)
 	{
-		m_textColor = color;
-		if (isNativeWidget()) {
-			_setTextColor_NW(color);
+		Ptr<IEditViewInstance> instance = getEditViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&EditView::setTextColor, color, mode)
+			m_textColor = color;
+			instance->setTextColor(this, color);
 		} else {
+			m_textColor = color;
 			invalidate(mode);
 		}
 	}
@@ -126,25 +135,31 @@ namespace slib
 
 	void EditView::setHintText(const String& str, UIUpdateMode mode)
 	{
-		m_hintText = str;
-		if (isNativeWidget()) {
-			_setHintText_NW(str);
+		Ptr<IEditViewInstance> instance = getEditViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&EditView::setHintText, str, mode)
+			m_hintText = str;
+			instance->setHintText(this, str);
 		} else {
+			m_hintText = str;
 			invalidate(mode);
 		}
 	}
 
 	Alignment EditView::getHintGravity()
 	{
-		return m_hintTextAlignment;
+		return m_hintGravity;
 	}
 	
-	void EditView::setHintGravity(Alignment align, UIUpdateMode mode)
+	void EditView::setHintGravity(const Alignment& gravity, UIUpdateMode mode)
 	{
-		m_hintTextAlignment = align;
-		if (isNativeWidget()) {
-			_setHintTextAlignment_NW(align);
+		Ptr<IEditViewInstance> instance = getEditViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&EditView::setHintGravity, gravity, mode)
+			m_hintGravity = gravity;
+			instance->setHintGravity(this, gravity);
 		} else {
+			m_hintGravity = gravity;
 			invalidate(mode);
 		}
 	}
@@ -156,10 +171,13 @@ namespace slib
 	
 	void EditView::setHintTextColor(const Color& color, UIUpdateMode mode)
 	{
-		m_hintTextColor = color;
-		if (isNativeWidget()) {
-			_setHintTextColor_NW(color);
+		Ptr<IEditViewInstance> instance = getEditViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&EditView::setHintTextColor, color, mode)
+			m_hintTextColor = color;
+			instance->setHintTextColor(this, color);
 		} else {
+			m_hintTextColor = color;
 			invalidate(mode);
 		}
 	}
@@ -175,10 +193,13 @@ namespace slib
 	
 	void EditView::setHintFont(const Ref<Font>& font, UIUpdateMode mode)
 	{
-		m_hintFont = font;
-		if (isNativeWidget()) {
-			_setHintFont_NW(getHintFont());
+		Ptr<IEditViewInstance> instance = getEditViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&EditView::setHintFont, font, mode)
+			m_hintFont = font;
+			instance->setHintFont(this, getHintFont());
 		} else {
+			m_hintFont = font;
 			invalidate(mode);
 		}
 	}
@@ -190,10 +211,13 @@ namespace slib
 
 	void EditView::setReadOnly(sl_bool flag, UIUpdateMode mode)
 	{
-		m_flagReadOnly = flag;
-		if (isNativeWidget()) {
-			_setReadOnly_NW(flag);
+		Ptr<IEditViewInstance> instance = getEditViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&EditView::setReadOnly, flag, mode)
+			m_flagReadOnly = flag;
+			instance->setReadOnly(this, flag);
 		} else {
+			m_flagReadOnly = flag;
 			invalidate(mode);
 		}
 	}
@@ -205,10 +229,13 @@ namespace slib
 	
 	void EditView::setPassword(sl_bool flag, UIUpdateMode mode)
 	{
-		m_flagPassword = flag;
-		if (isNativeWidget()) {
-			_setPassword_NW(flag);
+		Ptr<IEditViewInstance> instance = getEditViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&EditView::setPassword, flag, mode)
+			m_flagPassword = flag;
+			instance->setPassword(this, flag);
 		} else {
+			m_flagPassword = flag;
 			invalidate(mode);
 		}
 	}
@@ -221,10 +248,13 @@ namespace slib
 	
 	void EditView::setMultiLine(MultiLineMode multiLineMode, UIUpdateMode updateMode)
 	{
-		m_multiLine = multiLineMode;
-		if (isNativeWidget()) {
-			_setMultiLine_NW(multiLineMode);
+		Ptr<IEditViewInstance> instance = getEditViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&EditView::setMultiLine, multiLineMode, updateMode)
+			m_multiLine = multiLineMode;
+			instance->setMultiLine(this, multiLineMode);
 		} else {
+			m_multiLine = multiLineMode;
 			invalidate(updateMode);
 		}
 	}
@@ -236,9 +266,13 @@ namespace slib
 
 	void EditView::setReturnKeyType(UIReturnKeyType type)
 	{
-		m_returnKeyType = type;
-		if (isNativeWidget()) {
-			_setReturnKeyType_NW(type);
+		Ptr<IEditViewInstance> instance = getEditViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&EditView::setReturnKeyType, type)
+			m_returnKeyType = type;
+			instance->setReturnKeyType(this, type);
+		} else {
+			m_returnKeyType = type;
 		}
 	}
 
@@ -249,17 +283,30 @@ namespace slib
 
 	void EditView::setKeyboardType(UIKeyboardType type)
 	{
-		m_keyboardType = type;
-		if (isNativeWidget()) {
-			_setKeyboardType_NW(type);
+		Ptr<IEditViewInstance> instance = getEditViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&EditView::setKeyboardType, type)
+			m_keyboardType = type;
+			instance->setKeyboardType(this, type);
+		} else {
+			m_keyboardType = type;
 		}
+	}
+	
+	UIAutoCapitalizationType EditView::getAutoCaptializationType()
+	{
+		return m_autoCapitalizationType;
 	}
 
 	void EditView::setAutoCapitalizationType(UIAutoCapitalizationType type)
 	{
-		m_autoCapitalizationType = type;
-		if (isNativeWidget()) {
-			_setAutoCapitalizationType_NW(type);
+		Ptr<IEditViewInstance> instance = getEditViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&EditView::setAutoCapitalizationType, type)
+			m_autoCapitalizationType = type;
+			instance->setAutoCapitalizationType(this, type);
+		} else {
+			m_autoCapitalizationType = type;
 		}
 	}
 
@@ -309,8 +356,9 @@ namespace slib
 		if (flagVertical) {
 			sl_ui_pos height = 0;
 			do {
-				if (isNativeWidget()) {
-					height = _measureHeight_NW();
+				Ptr<IEditViewInstance> instance = getEditViewInstance();
+				if (instance.isNotNull()) {
+					height = instance->measureHeight(this);
 					if (height > 0) {
 						break;
 					}
@@ -330,22 +378,15 @@ namespace slib
 		}
 	}
 	
-	void EditView::onChangePadding()
-	{
-		if (isNativeWidget()) {
-			_onChangePadding_NW();
-		}
-	}
-	
 	void EditView::onDraw(Canvas* canvas)
 	{
 		if (m_text.isEmpty()) {
-			canvas->drawText(m_hintText, getBoundsInnerPadding(), getFont(), m_hintTextColor, m_textAlignment);
+			canvas->drawText(m_hintText, getBoundsInnerPadding(), getHintFont(), m_hintTextColor, m_hintGravity);
 		} else {
 			if (m_flagPassword) {
-				canvas->drawText(String('*', m_text.getLength()), getBoundsInnerPadding(), getFont(), m_textColor, m_textAlignment);
+				canvas->drawText(String('*', m_text.getLength()), getBoundsInnerPadding(), getFont(), m_textColor, m_gravity);
 			} else {
-				canvas->drawText(m_text, getBoundsInnerPadding(), getFont(), m_textColor, m_textAlignment);
+				canvas->drawText(m_text, getBoundsInnerPadding(), getFont(), m_textColor, m_gravity);
 			}
 		}
 	}
@@ -354,38 +395,45 @@ namespace slib
 	{
 #if defined(SLIB_PLATFORM_IS_MOBILE)
 		if (!m_flagReadOnly) {
-			m_windowEdit = new Window;
-			m_windowEdit->setBackgroundColor(Color::White);
+			Ref<Window> window = new Window;
+			if (window.isNull()) {
+				return;
+			}
+			window->setBackgroundColor(Color::White);
+			Ref<EditView> edit;
 			if (IsInstanceOf<PasswordView>(this)) {
-				m_editViewNative = new PasswordView;
+				edit = new PasswordView;
 			} else {
 #if defined(SLIB_UI_IS_IOS)
-				m_editViewNative = new TextArea;
+				edit = new TextArea;
 #else
-				m_editViewNative = new EditView;
+				edit = new EditView;
 #endif
 			}
-			m_editViewNative->setText(m_text, UIUpdateMode::Init);
-			m_editViewNative->setWidthFilling(1, UIUpdateMode::Init);
-			m_editViewNative->setHeightFilling(1, UIUpdateMode::Init);
-			m_editViewNative->setMargin(UIResource::getScreenMinimum()/20);
-			m_editViewNative->setBorder(sl_false, UIUpdateMode::Init);
-			m_editViewNative->setGravity(Alignment::TopLeft, UIUpdateMode::Init);
-			m_editViewNative->setMultiLine(getMultiLine(), UIUpdateMode::Init);
-			m_editViewNative->setOnChange(SLIB_FUNCTION_WEAKREF(EditView, _onChangeEditViewNative, this));
-			m_editViewNative->setOnReturnKey(SLIB_FUNCTION_WEAKREF(EditView, _onReturnKeyEditViewNative, this));
-			if (m_returnKeyType == UIReturnKeyType::Default && m_multiLine == MultiLineMode::Single) {
-				m_editViewNative->setReturnKeyType(UIReturnKeyType::Done);
-			} else {
-				m_editViewNative->setReturnKeyType(m_returnKeyType);
+			if (edit.isNull()) {
+				return;
 			}
-			m_editViewNative->setKeyboardType(m_keyboardType);
-			m_editViewNative->setAutoCapitalizationType(m_autoCapitalizationType);
-			m_editViewNative->setFont(Font::create(getFontFamily(), UIResource::getScreenMinimum()/20));
-			m_windowEdit->addView(m_editViewNative);
-			m_windowEdit->create();
-			m_windowEdit->setOnClose(SLIB_FUNCTION_WEAKREF(EditView, _onCloseWindowEditViewNative, this));
-			m_editViewNative->setFocus();
+			edit->setText(m_text, UIUpdateMode::Init);
+			edit->setWidthFilling(1, UIUpdateMode::Init);
+			edit->setHeightFilling(1, UIUpdateMode::Init);
+			edit->setMargin(UIResource::getScreenMinimum()/20);
+			edit->setBorder(sl_false, UIUpdateMode::Init);
+			edit->setGravity(Alignment::TopLeft, UIUpdateMode::Init);
+			edit->setMultiLine(getMultiLine(), UIUpdateMode::Init);
+			edit->setOnChange(SLIB_FUNCTION_WEAKREF(EditView, _onChangeEditViewNative, this));
+			edit->setOnReturnKey(SLIB_FUNCTION_WEAKREF(EditView, _onReturnKeyEditViewNative, this));
+			if (m_returnKeyType == UIReturnKeyType::Default && m_multiLine == MultiLineMode::Single) {
+				edit->setReturnKeyType(UIReturnKeyType::Done);
+			} else {
+				edit->setReturnKeyType(m_returnKeyType);
+			}
+			edit->setKeyboardType(m_keyboardType);
+			edit->setAutoCapitalizationType(m_autoCapitalizationType);
+			edit->setFont(Font::create(getFontFamily(), UIResource::getScreenMinimum()/20));
+			window->addView(edit);
+			window->create();
+			window->setOnClose(SLIB_FUNCTION_WEAKREF(EditView, _onCloseWindowEditViewNative, this));
+			edit->setFocus();
 
 			sl_bool flagDoneButton = m_multiLine != MultiLineMode::Single;
 #if defined(SLIB_UI_IS_ANDROID)
@@ -396,9 +444,11 @@ namespace slib
 #endif
 			if (flagDoneButton) {
 				sl_ui_pos sw = UIResource::getScreenMinimum();
-				m_editViewNative->setMarginRight(sw / 5 - sw / 20);
+				edit->setMarginRight(sw / 5 - sw / 20);
 				Ref<Button> btnDone = new Button;
-				btnDone = new Button;
+				if (btnDone.isNull()) {
+					return;
+				}
 				btnDone->setText("Done");
 				btnDone->setWidth(sw / 5);
 				btnDone->setMargin(sw / 20);
@@ -407,7 +457,10 @@ namespace slib
 				btnDone->setFont(Font::create(getFontFamily(), sw/20));
 				btnDone->setAlignParentRight();
 				btnDone->setOnClick(SLIB_FUNCTION_WEAKREF(EditView, _onDoneEditViewNativeButton, this));
-				m_windowEdit->addView(btnDone);
+				window->addView(btnDone);
+				
+				m_windowEdit = window;
+				m_editViewNative = edit;
 			}
 		}
 #endif
@@ -504,7 +557,7 @@ namespace slib
 	{
 		m_multiLine = MultiLineMode::Multiple;
 		m_flagAutoDismissKeyboard = sl_false;
-		m_textAlignment = Alignment::TopLeft;
+		m_gravity = Alignment::TopLeft;
 		setReturnKeyType(UIReturnKeyType::Return);
 		setScrolling(sl_true, sl_true, UIUpdateMode::Init);
 	}
@@ -518,71 +571,12 @@ namespace slib
 	{
 		return sl_null;
 	}
-
-	void EditView::_getText_NW()
+	
+	Ptr<IEditViewInstance> EditView::getEditViewInstance()
 	{
-	}
-
-	void EditView::_setText_NW(const String& text)
-	{
-	}
-
-	void EditView::_setTextAlignment_NW(Alignment align)
-	{
-	}
-
-	void EditView::_setTextColor_NW(const Color& color)
-	{
+		return sl_null;
 	}
 	
-	void EditView::_setHintText_NW(const String& str)
-	{
-	}
-
-	void EditView::_setHintTextAlignment_NW(Alignment align)
-	{
-	}
-
-	void EditView::_setHintTextColor_NW(const Color& color)
-	{
-	}
-	
-	void EditView::_setHintFont_NW(const Ref<Font>& font)
-	{
-	}
-
-	void EditView::_setReadOnly_NW(sl_bool flag)
-	{
-	}
-
-	void EditView::_setPassword_NW(sl_bool flag)
-	{
-	}
-	
-	void EditView::_setMultiLine_NW(MultiLineMode mode)
-	{
-	}
-
-	sl_ui_len EditView::_measureHeight_NW()
-	{
-		return 0;
-	}
-
-	void EditView::_setFont_NW(const Ref<Font>& font)
-	{
-	}
-
-	void EditView::_setBorder_NW(sl_bool flag)
-	{
-	}
-
-	void EditView::_setBackgroundColor_NW(const Color& color)
-	{
-	}
-
-	void EditView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
-	{
-	}
 
 	Ref<ViewInstance> TextArea::createNativeWidget(ViewInstance* parent)
 	{
@@ -590,24 +584,16 @@ namespace slib
 	}
 #endif
 	
-#if !defined(SLIB_UI_IS_WIN32)
-	void EditView::_onChangePadding_NW()
+	void IEditViewInstance::setReturnKeyType(EditView* view, UIReturnKeyType type)
 	{
 	}
-#endif
-
-#if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID) && !defined(SLIB_UI_IS_EFL)
-	void EditView::_setReturnKeyType_NW(UIReturnKeyType type)
+	
+	void IEditViewInstance::setKeyboardType(EditView* view, UIKeyboardType type)
 	{
 	}
-
-	void EditView::_setKeyboardType_NW(UIKeyboardType type)
+	
+	void IEditViewInstance::setAutoCapitalizationType(EditView* view, UIAutoCapitalizationType type)
 	{
 	}
-
-	void EditView::_setAutoCapitalizationType_NW(UIAutoCapitalizationType type)
-	{
-	}
-#endif
-
+	
 }

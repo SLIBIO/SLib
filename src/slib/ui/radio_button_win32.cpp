@@ -35,17 +35,11 @@ namespace slib
 
 	Ref<ViewInstance> RadioButton::createNativeWidget(ViewInstance* parent)
 	{
-		Win32_UI_Shared* shared = Win32_UI_Shared::get();
-		if (!shared) {
-			return sl_null;
-		}
-
 		UINT style = BS_RADIOBUTTON | WS_TABSTOP;
 		Ref<CheckBoxInstance> ret = Win32_ViewInstance::create<CheckBoxInstance>(this, parent, L"BUTTON", getText(), style, 0);
 		if (ret.isNotNull()) {
-			ret->setFont(getFont());
-			ret->setPadding(getPadding());
-			ret->setChecked(m_flagChecked);
+			ret->setPadding(this, getPadding());
+			ret->setChecked(this, m_flagChecked);
 			return ret;
 		}
 		return sl_null;

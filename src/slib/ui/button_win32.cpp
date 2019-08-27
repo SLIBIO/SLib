@@ -57,13 +57,9 @@ namespace slib
 				return sl_false;
 			}
 
-			void ButtonInstance::setPadding(const UIEdgeInsets& padding)
+			void ButtonInstance::setPadding(View* view, const UIEdgeInsets& padding)
 			{
-				if (!(UI::isUiThread())) {
-					UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), ButtonInstance, setPadding, this, padding));
-					return;
-				}
-				HWND handle = getHandle();
+				HWND handle = m_handle;
 				if (handle) {
 					RECT rc;
 					rc.left = (LONG)(padding.left);
@@ -74,33 +70,19 @@ namespace slib
 				}
 			}
 
-			void ButtonInstance::setText(const String& text)
+			void ButtonInstance::setText(Button* view, const String& text)
 			{
 				Win32_ViewInstance::setText(text);
 			}
 
-			void ButtonInstance::setDefaultButton(sl_bool flag)
+			void ButtonInstance::setDefaultButton(Button* view, sl_bool flag)
 			{
-				if (!(UI::isUiThread())) {
-					UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), ButtonInstance, setDefaultButton, this, flag));
-					return;
-				}
-				HWND handle = getHandle();
-				if (handle) {
-					LONG old = ::GetWindowLongW(handle, GWL_STYLE);
-					if (flag) {
-						SetWindowLongW(handle, GWL_STYLE, old | BS_DEFPUSHBUTTON);
-					} else {
-						SetWindowLongW(handle, GWL_STYLE, old & (~(BS_DEFPUSHBUTTON)));
-					}
-					SetWindowPos(handle, NULL, 0, 0, 0, 0
-						, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
-				}
+				Windows::setWindowStyle(m_handle, BS_DEFPUSHBUTTON, flag);
 			}
 
-			sl_bool ButtonInstance::measureSize(UISize& _out)
+			sl_bool ButtonInstance::measureSize(Button* view, UISize& _out)
 			{
-				HWND handle = getHandle();
+				HWND handle = m_handle;
 				if (handle) {
 					SIZE size = { 0, 0 };
 					SendMessageW(handle, BCM_GETIDEALSIZE, 0, (LPARAM)&size);
@@ -118,18 +100,13 @@ namespace slib
 
 	Ref<ViewInstance> Button::createNativeWidget(ViewInstance* parent)
 	{
-		Win32_UI_Shared* shared = Win32_UI_Shared::get();
-		if (!shared) {
-			return sl_null;
-		}
 		DWORD style = WS_TABSTOP;
 		if (m_flagDefaultButton) {
 			style |= BS_DEFPUSHBUTTON;
 		}
 		Ref<ButtonInstance> ret = Win32_ViewInstance::create<ButtonInstance>(this, parent, L"BUTTON", getText(), style, 0);
 		if (ret.isNotNull()) {
-			ret->setFont(getFont());
-			ret->setPadding(getPadding());
+			ret->setPadding(this, getPadding());
 			return ret;
 		}
 		return sl_null;

@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -37,20 +37,31 @@ namespace slib
 	{
 		namespace list_report_view
 		{
-			
+
+			static int TranslateAlignment(Alignment _align)
+			{
+				Alignment align = _align & Alignment::HorizontalMask;
+				if (align == Alignment::Center) {
+					return LVCFMT_CENTER;
+				} else if (align == Alignment::Right) {
+					return LVCFMT_RIGHT;
+				}
+				return LVCFMT_LEFT;
+			}
+
 			class ListReportViewHelper : public ListReportView
 			{
 			public:
 				static sl_uint32 getColumnsCountFromListView(HWND hWnd)
 				{
-					HWND hWndHeader = (HWND)(::SendMessageW(hWnd, LVM_GETHEADER, 0, 0));
+					HWND hWndHeader = (HWND)(SendMessageW(hWnd, LVM_GETHEADER, 0, 0));
 					if (hWndHeader) {
-						return (sl_uint32)(::SendMessageW(hWndHeader, HDM_GETITEMCOUNT, 0, 0));
+						return (sl_uint32)(SendMessageW(hWndHeader, HDM_GETITEMCOUNT, 0, 0));
 					}
 					return 0;
 				}
 
-				void _applyColumnsCount(HWND hWnd)
+				void applyColumnsCount(HWND hWnd)
 				{
 					ObjectLocker lock(this);
 					sl_uint32 nNew = (sl_uint32)(m_columns.getCount());
@@ -60,7 +71,7 @@ namespace slib
 					}
 					if (nOrig > nNew) {
 						for (sl_uint32 i = nOrig; i > nNew; i--) {
-							::SendMessageW(hWnd, LVM_DELETECOLUMN, (WPARAM)(i - 1), 0);
+							SendMessageW(hWnd, LVM_DELETECOLUMN, (WPARAM)(i - 1), 0);
 						}
 					} else {
 						LVCOLUMNW lvc;
@@ -68,14 +79,14 @@ namespace slib
 						lvc.mask = LVCF_SUBITEM;
 						for (sl_uint32 i = nOrig; i < nNew; i++) {
 							lvc.iSubItem = i;
-							::SendMessageW(hWnd, LVM_INSERTCOLUMNW, (WPARAM)i, (LPARAM)&lvc);
+							SendMessageW(hWnd, LVM_INSERTCOLUMNW, (WPARAM)i, (LPARAM)&lvc);
 						}
 					}
 				}
 
-				void _copyColumns(HWND hWnd)
+				void copyColumns(HWND hWnd)
 				{
-					_applyColumnsCount(hWnd);
+					applyColumnsCount(hWnd);
 					LVCOLUMNW lvc;
 					Base::zeroMemory(&lvc, sizeof(lvc));
 					lvc.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_FMT;
@@ -89,42 +100,100 @@ namespace slib
 							width = 0;
 						}
 						lvc.cx = width;
-						lvc.fmt = translateAlignment(column.align);
-						::SendMessageW(hWnd, LVM_SETCOLUMNW, (WPARAM)i, (LPARAM)(&lvc));
+						lvc.fmt = TranslateAlignment(column.align);
+						SendMessageW(hWnd, LVM_SETCOLUMNW, (WPARAM)i, (LPARAM)(&lvc));
 					}
 				}
 
-				void _applyRowsCount(HWND hWnd)
+				void applyRowsCount(HWND hWnd)
 				{
 					sl_uint32 nNew = m_nRows;
-					::SendMessageW(hWnd, LVM_SETITEMCOUNT, (WPARAM)nNew, LVSICF_NOINVALIDATEALL | LVSICF_NOSCROLL);
-				}
-
-				static int translateAlignment(Alignment _align)
-				{
-					Alignment align = _align & Alignment::HorizontalMask;
-					if (align == Alignment::Center) {
-						return LVCFMT_CENTER;
-					} else if (align == Alignment::Right) {
-						return LVCFMT_RIGHT;
-					}
-					return LVCFMT_LEFT;
+					SendMessageW(hWnd, LVM_SETITEMCOUNT, (WPARAM)nNew, LVSICF_NOINVALIDATEALL | LVSICF_NOSCROLL);
 				}
 
 			};
 
-			class ListReportViewInstance : public Win32_ViewInstance
+			class ListReportViewInstance : public Win32_ViewInstance, public IListReportViewInstance
 			{
+				SLIB_DECLARE_OBJECT
+
 			public:
+				void refreshColumnsCount(ListReportView* view) override
+				{
+					HWND handle = m_handle;
+					if (handle) {
+						(static_cast<ListReportViewHelper*>(view))->applyColumnsCount(handle);
+					}
+				}
+
+				void refreshRowsCount(ListReportView* view) override
+				{
+					HWND handle = m_handle;
+					if (handle) {
+						(static_cast<ListReportViewHelper*>(view))->applyRowsCount(handle);
+						InvalidateRect(handle, NULL, TRUE);
+					}
+				}
+
+				void setHeaderText(ListReportView* view, sl_uint32 iCol, const String& _text) override
+				{
+					HWND handle = m_handle;
+					if (handle) {
+						LVCOLUMNW lvc;
+						Base::zeroMemory(&lvc, sizeof(lvc));
+						lvc.mask = LVCF_TEXT;
+						String16 text = _text;
+						lvc.pszText = (LPWSTR)(text.getData());
+						SendMessageW(handle, LVM_SETCOLUMNW, (WPARAM)iCol, (LPARAM)(&lvc));
+					}
+				}
+
+				void setColumnWidth(ListReportView* view, sl_uint32 iCol, sl_ui_len width) override
+				{
+					HWND handle = m_handle;
+					if (handle) {
+						if (width < 0) {
+							width = 0;
+						}
+						SendMessageW(handle, LVM_SETCOLUMNWIDTH, (WPARAM)iCol, (LPARAM)(width));
+					}
+				}
+
+				void setHeaderAlignment(ListReportView* view, sl_uint32 iCol, const Alignment& align) override
+				{
+				}
+
+				void setColumnAlignment(ListReportView* view, sl_uint32 iCol, const Alignment& align) override
+				{
+					HWND handle = m_handle;
+					if (handle) {
+						LVCOLUMNW lvc;
+						Base::zeroMemory(&lvc, sizeof(lvc));
+						lvc.mask = LVCF_FMT;
+						lvc.fmt = TranslateAlignment(align);
+						SendMessageW(handle, LVM_SETCOLUMNW, (WPARAM)iCol, (LPARAM)(&lvc));
+					}
+				}
+
+				sl_bool getSelectedRow(ListReportView* view, sl_int32& _out) override
+				{
+					HWND handle = m_handle;
+					if (handle) {
+						_out = (sl_int32)(::SendMessageW(handle, LVM_GETNEXTITEM, (WPARAM)(-1), LVNI_SELECTED));
+						return sl_true;
+					}
+					return sl_false;
+				}
+
 				sl_bool processNotify(NMHDR* nmhdr, LRESULT& result) override
 				{
-					Ref<View> _view = getView();
-					if (ListReportView* view = CastInstance<ListReportView>(_view.get())) {
+					Ref<ListReportViewHelper> helper = CastRef<ListReportViewHelper>(getView());
+					if (helper.isNotNull()) {
 						NMITEMACTIVATE* nm = (NMITEMACTIVATE*)nmhdr;
 						UINT code = nmhdr->code;
 						if (code == LVN_GETDISPINFOW) {
 							NMLVDISPINFOW* disp = (NMLVDISPINFOW*)nmhdr;
-							String16 s = view->getItemText(disp->item.iItem, disp->item.iSubItem);
+							String16 s = helper->getItemText(disp->item.iItem, disp->item.iSubItem);
 							sl_uint32 n = (sl_uint32)(s.getLength());
 							if (n > 0) {
 								sl_uint32 m = (sl_uint32)(disp->item.cchTextMax);
@@ -141,7 +210,7 @@ namespace slib
 							NMLISTVIEW* v = (NMLISTVIEW*)(nm);
 							if (v->hdr.hwndFrom == getHandle()) {
 								if (!(v->uOldState & LVIS_SELECTED) && (v->uNewState & LVIS_SELECTED)) {
-									view->dispatchSelectRow(v->iItem);
+									helper->dispatchSelectRow(v->iItem);
 								}
 							}
 							return sl_true;
@@ -154,11 +223,11 @@ namespace slib
 							sl_int32 n = (sl_int32)(::SendMessageW(getHandle(), LVM_HITTEST, 0, (LPARAM)(&lvhi)));
 							if (n >= 0) {
 								if (code == NM_CLICK) {
-									view->dispatchClickRow(n, pt);
+									helper->dispatchClickRow(n, pt);
 								} else if (code == NM_RCLICK) {
-									view->dispatchRightButtonClickRow(n, pt);
+									helper->dispatchRightButtonClickRow(n, pt);
 								} else if (code == NM_DBLCLK) {
-									view->dispatchDoubleClickRow(n, pt);
+									helper->dispatchDoubleClickRow(n, pt);
 								}
 							}
 							return sl_true;
@@ -168,6 +237,8 @@ namespace slib
 				}
 			};
 
+			SLIB_DEFINE_OBJECT(ListReportViewInstance, Win32_ViewInstance)
+
 		}
 	}
 
@@ -175,109 +246,23 @@ namespace slib
 
 	Ref<ViewInstance> ListReportView::createNativeWidget(ViewInstance* parent)
 	{
-		Win32_UI_Shared* shared = Win32_UI_Shared::get();
-		if (!shared) {
-			return sl_null;
-		}
-
 		DWORD style = LVS_REPORT | LVS_SINGLESEL | LVS_OWNERDATA | WS_TABSTOP | WS_BORDER;
-		DWORD styleEx = 0;
-		Ref<ListReportViewInstance> ret = Win32_ViewInstance::create<ListReportViewInstance>(this, parent, L"SysListView32", sl_null, style, styleEx);
-		
+		Ref<ListReportViewInstance> ret = Win32_ViewInstance::create<ListReportViewInstance>(this, parent, L"SysListView32", sl_null, style, 0);
 		if (ret.isNotNull()) {
-
 			HWND handle = ret->getHandle();
-
-			Ref<Font> font = getFont();
-			HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
-			if (hFont) {
-				// You should send this message before inserting any items
-				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
-			}
-
+			ListReportViewHelper* helper = static_cast<ListReportViewHelper*>(this);
 			UINT exStyle = LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVS_EX_ONECLICKACTIVATE | LVS_EX_DOUBLEBUFFER;
 			::SendMessageW(handle, LVM_SETEXTENDEDLISTVIEWSTYLE, exStyle, exStyle);
-
-			((ListReportViewHelper*)this)->_copyColumns(handle);
-			((ListReportViewHelper*)this)->_applyRowsCount(handle);
+			helper->copyColumns(handle);
+			helper->applyRowsCount(handle);
+			return ret;
 		}
-		return ret;
+		return sl_null;
 	}
 
-	void ListReportView::_refreshColumnsCount_NW()
+	Ptr<IListReportViewInstance> ListReportView::getListReportViewInstance()
 	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			((ListReportViewHelper*)this)->_applyColumnsCount(handle);
-		}
-	}
-
-	void ListReportView::_refreshRowsCount_NW()
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			((ListReportViewHelper*)this)->_applyRowsCount(handle);
-			::InvalidateRect(handle, NULL, TRUE);
-		}
-	}
-
-	void ListReportView::_setHeaderText_NW(sl_uint32 iCol, const String& _text)
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			LVCOLUMNW lvc;
-			Base::zeroMemory(&lvc, sizeof(lvc));
-			lvc.mask = LVCF_TEXT;
-			String16 text = _text;
-			lvc.pszText = (LPWSTR)(text.getData());
-			::SendMessageW(handle, LVM_SETCOLUMNW, (WPARAM)iCol, (LPARAM)(&lvc));
-		}
-	}
-
-	void ListReportView::_setColumnWidth_NW(sl_uint32 iCol, sl_ui_len width)
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			if (width < 0) {
-				width = 0;
-			}
-			::SendMessageW(handle, LVM_SETCOLUMNWIDTH, (WPARAM)iCol, (LPARAM)(width));
-		}
-	}
-
-	void ListReportView::_setHeaderAlignment_NW(sl_uint32 iCol, Alignment align)
-	{
-	}
-
-	void ListReportView::_setColumnAlignment_NW(sl_uint32 iCol, Alignment align)
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			LVCOLUMNW lvc;
-			Base::zeroMemory(&lvc, sizeof(lvc));
-			lvc.mask = LVCF_FMT;
-			lvc.fmt = ListReportViewHelper::translateAlignment(align);
-			::SendMessageW(handle, LVM_SETCOLUMNW, (WPARAM)iCol, (LPARAM)(&lvc));
-		}
-	}
-
-	void ListReportView::_getSelectedRow_NW()
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			m_selectedRow = (sl_int32)(::SendMessageW(handle, LVM_GETNEXTITEM, (WPARAM)(-1), LVNI_SELECTED));
-		}
-	}
-
-	void ListReportView::_setFont_NW(const Ref<Font>& font)
-	{
-		HWND handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
-			if (hFont) {
-				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
-			}
-		}
+		return CastRef<ListReportViewInstance>(getViewInstance());
 	}
 
 }

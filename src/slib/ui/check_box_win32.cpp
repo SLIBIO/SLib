@@ -46,25 +46,20 @@ namespace slib
 			{
 			}
 
-			void CheckBoxInstance::getChecked(sl_bool& _out)
+			sl_bool CheckBoxInstance::getChecked(CheckBox* view, sl_bool& _out)
 			{
-				if (!(UI::isUiThread())) {
-					return;
-				}
-				HWND handle = getHandle();
+				HWND handle = m_handle;
 				if (handle) {
 					LRESULT lr = SendMessageW(handle, BM_GETCHECK, 0, 0);
 					_out = (lr == BST_CHECKED);
+					return sl_true;
 				}
+				return sl_false;
 			}
 
-			void CheckBoxInstance::setChecked(sl_bool flag)
+			void CheckBoxInstance::setChecked(CheckBox* view, sl_bool flag)
 			{
-				if (!(UI::isUiThread())) {
-					UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), CheckBoxInstance, setChecked, this, flag));
-					return;
-				}
-				HWND handle = UIPlatform::getViewHandle(this);
+				HWND handle = m_handle;
 				if (handle) {
 					if (flag) {
 						SendMessageW(handle, BM_SETCHECK, BST_CHECKED, 0);
@@ -74,7 +69,7 @@ namespace slib
 				}
 			}
 
-			sl_bool CheckBoxInstance::measureSize(UISize& _out)
+			sl_bool CheckBoxInstance::measureSize(Button* view, UISize& _out)
 			{
 				if (m_font.isNotNull()) {
 					sl_ui_len cx = (sl_ui_len)(GetSystemMetrics(SM_CXMENUCHECK));
@@ -99,16 +94,11 @@ namespace slib
 
 	Ref<ViewInstance> CheckBox::createNativeWidget(ViewInstance* parent)
 	{
-		Win32_UI_Shared* shared = Win32_UI_Shared::get();
-		if (!shared) {
-			return sl_null;
-		}
 		UINT style = BS_AUTOCHECKBOX | WS_TABSTOP;
 		Ref<CheckBoxInstance> ret = Win32_ViewInstance::create<CheckBoxInstance>(this, parent, L"BUTTON", getText(), style, 0);
 		if (ret.isNotNull()) {
-			ret->setFont(getFont());
-			ret->setPadding(getPadding());
-			ret->setChecked(m_flagChecked);
+			ret->setPadding(this, getPadding());
+			ret->setChecked(this, m_flagChecked);
 			return ret;
 		}
 		return sl_null;

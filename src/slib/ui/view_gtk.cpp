@@ -111,77 +111,60 @@ namespace slib
 		m_handleChildrenContainer = widget;
 	}
 
-	sl_bool GTK_ViewInstance::isValid()
+	sl_bool GTK_ViewInstance::isValid(View* view)
 	{
 		return sl_true;
 	}
 	
-	void GTK_ViewInstance::setFocus(sl_bool flag)
+	void GTK_ViewInstance::setFocus(View* view, sl_bool flag)
 	{
 		GtkWidget* handle = m_handle;
 		if (handle) {
-			if (!(UI::isUiThread())) {
-				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_ViewInstance, setFocus, this, flag));
-				return;
-			}
 			if (flag) {
 				gtk_widget_grab_focus(handle);
 			}
 		}
 	}
 	
-	void GTK_ViewInstance::invalidate()
+	void GTK_ViewInstance::invalidate(View* view)
 	{
 		GtkWidget* handle = m_handle;
 		if (handle) {
 			if (!(UI::isUiThread())) {
-				void(GTK_ViewInstance::*func)() = &GTK_ViewInstance::invalidate;
-				UI::dispatchToUiThread(CreateFunctionFromWeakRef(WeakRef<GTK_ViewInstance>(this), func));
+				void(GTK_ViewInstance::*func)(View*) = &GTK_ViewInstance::invalidate;
+				UI::dispatchToUiThread(Function<void()>::bindWeakRef(this, func, sl_null));
 				return;
 			}
 			gtk_widget_queue_draw(handle);
 		}
 	}
 	
-	void GTK_ViewInstance::invalidate(const UIRect& rect)
+	void GTK_ViewInstance::invalidate(View* view, const UIRect& rect)
 	{
 		GtkWidget* handle = m_handle;
 		if (handle) {
 			if (!(UI::isUiThread())) {
-				void(GTK_ViewInstance::*func)(const UIRect&) = &GTK_ViewInstance::invalidate;
-				UI::dispatchToUiThread(Function<void()>::bindWeakRef(WeakRef<GTK_ViewInstance>(this), func, rect));
+				void(GTK_ViewInstance::*func)(View*, const UIRect&) = &GTK_ViewInstance::invalidate;
+				UI::dispatchToUiThread(Function<void()>::bindWeakRef(this, func, sl_null, rect));
 				return;
 			}
 			gtk_widget_queue_draw_area(handle, rect.left, rect.top, rect.getWidth(), rect.getHeight());
 		}
 	}
 	
-	UIRect GTK_ViewInstance::getFrame()
-	{
-		return UIRect::zero();
-	}
-	
-	void GTK_ViewInstance::setFrame(const UIRect& frame)
+	void GTK_ViewInstance::setFrame(View* view, const UIRect& frame)
 	{
 		GtkWidget* handle = m_handle;
 		if (handle) {
-			if (!(UI::isUiThread())) {
-				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_ViewInstance, setFrame, this, frame));
-				return;
-			}
 			m_frame = frame;
 			_updateFrameAndTransform();
 		}
 	}
 	
-	void GTK_ViewInstance::setTransform(const Matrix3& m)
+	void GTK_ViewInstance::setTransform(View* view, const Matrix3& m)
 	{
 		GtkWidget* handle = m_handle;
 		if (handle) {
-			if (!(UI::isUiThread())) {
-				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_ViewInstance, setTransform, this, m));
-				return;
-			}
 			m_translation = Transform2::getTranslationFromMatrix(m);
 			_updateFrameAndTransform();
 		}
@@ -199,14 +182,10 @@ namespace slib
 		}
 	}
 	
-	void GTK_ViewInstance::setVisible(sl_bool flag)
+	void GTK_ViewInstance::setVisible(View* view, sl_bool flag)
 	{
 		GtkWidget* handle = m_handle;
 		if (handle) {
-			if (!(UI::isUiThread())) {
-				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_ViewInstance, setVisible, this, flag));
-				return;
-			}
 			if (flag) {
 				gtk_widget_show(handle);
 			} else {
@@ -215,14 +194,10 @@ namespace slib
 		}
 	}
 	
-	void GTK_ViewInstance::setEnabled(sl_bool flag)
+	void GTK_ViewInstance::setEnabled(View* view, sl_bool flag)
 	{
 		GtkWidget* handle = m_handle;
 		if (handle) {
-			if (!(UI::isUiThread())) {
-				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_ViewInstance, setEnabled, this, flag));
-				return;
-			}
 			if (flag) {
 				gtk_widget_set_sensitive(handle, sl_true);
 			} else {
@@ -231,26 +206,22 @@ namespace slib
 		}
 	}
 	
-	void GTK_ViewInstance::setOpaque(sl_bool flag)
+	void GTK_ViewInstance::setOpaque(View* view, sl_bool flag)
 	{
 	}
 	
-	void GTK_ViewInstance::setAlpha(sl_real alpha)
+	void GTK_ViewInstance::setAlpha(View* view, sl_real alpha)
 	{
 	}
 
-	void GTK_ViewInstance::setClipping(sl_bool flag)
+	void GTK_ViewInstance::setClipping(View* view, sl_bool flag)
 	{
 	}
 
-	void GTK_ViewInstance::setDrawing(sl_bool flag)
+	void GTK_ViewInstance::setDrawing(View* view, sl_bool flag)
 	{
 		GtkWidget* handle = m_handle;
 		if (handle) {
-			if (!(UI::isUiThread())) {
-				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), GTK_ViewInstance, setDrawing, this, flag));
-				return;
-			}
 			if (GTK_IS_FIXED(handle)) {
 				if (flag) {
 					gtk_widget_set_app_paintable(handle, sl_true);
@@ -261,7 +232,7 @@ namespace slib
 		}
 	}
 	
-	UIPointf GTK_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& ptScreen)
+	UIPointf GTK_ViewInstance::convertCoordinateFromScreenToView(View* view, const UIPointf& ptScreen)
 	{
 		GtkWidget* handle = m_handle;
 		if (handle) {
@@ -272,7 +243,7 @@ namespace slib
 		return ptScreen;
 	}
 	
-	UIPointf GTK_ViewInstance::convertCoordinateFromViewToScreen(const UIPointf& ptView)
+	UIPointf GTK_ViewInstance::convertCoordinateFromViewToScreen(View* view, const UIPointf& ptView)
 	{
 		GtkWidget* handle = m_handle;
 		if (handle) {
@@ -283,7 +254,7 @@ namespace slib
 		return ptView;
 	}
 	
-	void GTK_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
+	void GTK_ViewInstance::addChildInstance(View* view, const Ref<ViewInstance>& _child)
 	{
 		GTK_ViewInstance* child = static_cast<GTK_ViewInstance*>(_child.get());
 		if (child) {
@@ -309,7 +280,7 @@ namespace slib
 		}
 	}
 	
-	void GTK_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
+	void GTK_ViewInstance::removeChildInstance(View* view, const Ref<ViewInstance>& _child)
 	{
 		GTK_ViewInstance* child = static_cast<GTK_ViewInstance*>(_child.get());
 		if (child) {
@@ -325,14 +296,10 @@ namespace slib
 		}
 	}
 	
-	void GTK_ViewInstance::bringToFront()
+	void GTK_ViewInstance::bringToFront(View* view)
 	{
 		GtkWidget* handle = m_handle;
 		if (handle) {
-			if (!(UI::isUiThread())) {
-				UI::dispatchToUiThread(SLIB_FUNCTION_WEAKREF(GTK_ViewInstance, bringToFront, this));
-				return;
-			}
 			GdkWindow* window = handle->window;
 			if (window) {
 				gdk_window_raise(window);

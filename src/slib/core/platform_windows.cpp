@@ -153,6 +153,58 @@ namespace slib
 		}
 	}
 
+	void Windows::setWindowStyle(HWND hWnd, LONG flags, sl_bool flagAdd)
+	{
+		if (!hWnd) {
+			return;
+		}
+		LONG old = GetWindowLongW(hWnd, GWL_STYLE);
+		if (flagAdd) {
+			SetWindowLongW(hWnd, GWL_STYLE, old | flags);
+		} else {
+			SetWindowLongW(hWnd, GWL_STYLE, old & (~flags));
+		}
+		SetWindowPos(hWnd, NULL, 0, 0, 0, 0,
+			SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+	}
+
+	void Windows::removeAndAddWindowStyle(HWND hWnd, LONG flagsRemove, LONG flagsAdd)
+	{
+		if (!hWnd) {
+			return;
+		}
+		LONG old = GetWindowLongW(hWnd, GWL_STYLE);
+		SetWindowLongW(hWnd, GWL_STYLE, (old & (~flagsRemove)) | flagsAdd);
+		SetWindowPos(hWnd, NULL, 0, 0, 0, 0,
+			SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+	}
+
+	void Windows::setWindowExStyle(HWND hWnd, LONG flags, sl_bool flagAdd)
+	{
+		if (!hWnd) {
+			return;
+		}
+		LONG old = GetWindowLongW(hWnd, GWL_EXSTYLE);
+		if (flagAdd) {
+			SetWindowLongW(hWnd, GWL_EXSTYLE, old | flags);
+		} else {
+			SetWindowLongW(hWnd, GWL_EXSTYLE, old & (~flags));
+		}
+		SetWindowPos(hWnd, NULL, 0, 0, 0, 0,
+			SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+	}
+
+	void Windows::removeAndAddWindowExStyle(HWND hWnd, LONG flagsRemove, LONG flagsAdd)
+	{
+		if (!hWnd) {
+			return;
+		}
+		LONG old = GetWindowLongW(hWnd, GWL_EXSTYLE);
+		SetWindowLongW(hWnd, GWL_EXSTYLE, (old & (~flagsRemove)) | flagsAdd);
+		SetWindowPos(hWnd, NULL, 0, 0, 0, 0,
+			SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+	}
+
 	sl_bool Windows::processWindowHorizontalScrollEvents(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, sl_uint32 nLine, sl_uint32 nWheel)
 	{
 		int nSBCode = LOWORD(wParam);

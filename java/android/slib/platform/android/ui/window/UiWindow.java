@@ -25,7 +25,6 @@ package slib.platform.android.ui.window;
 import slib.platform.android.Android;
 import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
-import slib.platform.android.ui.UiThread;
 import slib.platform.android.ui.Util;
 import slib.platform.android.ui.view.IView;
 import slib.platform.android.ui.view.UiGestureDetector;
@@ -82,9 +81,9 @@ public class UiWindow extends FrameLayout implements IView, ViewTreeObserver.OnG
 		setFocusableInTouchMode(true);
 	}
 
-	static UiWindow create(Activity activity
-			, boolean flagFullScreen, boolean flagCenterScreen
-			, int x, int y, int width, int height) {
+	static UiWindow create(Activity activity,
+	                       boolean flagFullScreen, boolean flagCenterScreen,
+	                       int x, int y, int width, int height) {
 		try {
 			final UiWindow ret = new UiWindow(activity);
 			ret.flagFullScreen = flagFullScreen;
@@ -180,15 +179,7 @@ public class UiWindow extends FrameLayout implements IView, ViewTreeObserver.OnG
 			final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(right - left, bottom - top);
 			params.leftMargin = left;
 			params.topMargin = top;
-			if (UiThread.isUiThread()) {
-				setLayoutParams(params);
-			} else {
-				activity.runOnUiThread(new Runnable() {
-					public void run() {
-						setLayoutParams(params);
-					}
-				});
-			}
+			setLayoutParams(params);
 		} catch (Exception e) {
 			Logger.exception(e);
 		}
@@ -220,15 +211,7 @@ public class UiWindow extends FrameLayout implements IView, ViewTreeObserver.OnG
 				params.width = width;
 				params.height = height;
 			}
-			if (UiThread.isUiThread()) {
-				setLayoutParams(params);
-			} else {
-				activity.runOnUiThread(new Runnable() {
-					public void run() {
-						setLayoutParams(params);
-					}
-				});
-			}
+			setLayoutParams(params);
 		} catch (Exception e) {
 			Logger.exception(e);
 		}

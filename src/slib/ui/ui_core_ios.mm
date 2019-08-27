@@ -48,7 +48,7 @@ namespace slib
 
 		namespace window
 		{
-			void resetOrientation();
+			void ResetOrientation();
 		}
 
 		using namespace window;
@@ -381,7 +381,7 @@ using namespace slib::priv::window;
 	
 	slib::Log("App", "Finished Launching");
 	
-	resetOrientation();
+	ResetOrientation();
 	
 	slib::UIApp::dispatchStartToApp();
 	
@@ -414,7 +414,7 @@ using namespace slib::priv::window;
 	
 	slib::Log("App", "Enter Foreground");
 
-	resetOrientation();
+	ResetOrientation();
 
 }
 
@@ -423,7 +423,7 @@ using namespace slib::priv::window;
 
 	slib::Log("App", "Become Active");
 
-	resetOrientation();
+	ResetOrientation();
 	
 	slib::MobileApp::dispatchResumeToApp();
 }

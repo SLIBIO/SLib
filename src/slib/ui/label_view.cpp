@@ -88,7 +88,7 @@ namespace slib
 		return m_textAlignment;
 	}
 	
-	void LabelView::setGravity(Alignment align, UIUpdateMode mode)
+	void LabelView::setGravity(const Alignment& align, UIUpdateMode mode)
 	{
 		m_textAlignment = align;
 		invalidate(mode);

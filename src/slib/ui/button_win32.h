@@ -52,14 +52,13 @@ namespace slib
 			public:
 				sl_bool processCommand(SHORT code, LRESULT& result) override;
 
-				void setPadding(const UIEdgeInsets& padding) override;
+				void setPadding(View* view, const UIEdgeInsets& padding) override;
 
-
-				void setText(const String& text) override;
+				void setText(Button* view, const String& text) override;
 				
-				void setDefaultButton(sl_bool flag) override;
+				void setDefaultButton(Button* view, sl_bool flag) override;
 				
-				sl_bool measureSize(UISize& _out) override;
+				sl_bool measureSize(Button* view, UISize& _out) override;
 
 			};
 
@@ -73,11 +72,11 @@ namespace slib
 				~CheckBoxInstance();
 
 			public:
-				void getChecked(sl_bool& flag) override;
+				sl_bool getChecked(CheckBox* view, sl_bool& flag) override;
 
-				void setChecked(sl_bool flag) override;
+				void setChecked(CheckBox* view, sl_bool flag) override;
 
-				sl_bool measureSize(UISize& _out) override;
+				sl_bool measureSize(Button* view, UISize& _out) override;
 
 			};
 			

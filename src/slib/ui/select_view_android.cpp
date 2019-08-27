@@ -36,13 +36,7 @@ namespace slib
 		namespace select_view
 		{
 
-			void JNICALL OnSelect(JNIEnv* env, jobject _this, jlong instance, jint n)
-			{
-				Ref<View> _view = Android_ViewInstance::findView(instance);
-				if (SelectView* view = CastInstance<SelectView>(_view.get())) {
-					view->dispatchSelectItem(n);
-				}
-			}
+			void JNICALL OnSelect(JNIEnv* env, jobject _this, jlong instance, jint n);
 
 			SLIB_JNI_BEGIN_CLASS(JSelectView, "slib/platform/android/ui/view/UiSelectView")
 
@@ -60,10 +54,15 @@ namespace slib
 
 			SLIB_JNI_END_CLASS
 
+			static void Select(jobject jview, sl_uint32 n)
+			{
+				JSelectView::select.call(sl_null, jview, n);
+			}
+
 			class SelectViewHelper : public SelectView
 			{
 			public:
-				void _copyItems(jobject jview)
+				void copyItems(jobject jview)
 				{
 					ListLocker<String> titles(m_titles);
 					sl_uint32 n = (sl_uint32)(titles.count);
@@ -74,16 +73,97 @@ namespace slib
 						}
 						titles.unlock();
 						JSelectView::applyList.call(sl_null, jview, arr.get());
-						_select(jview, m_indexSelected);
+						Select(jview, m_indexSelected);
 					}
 				}
 
-				void _select(jobject jview, sl_uint32 n)
+			};
+
+			class SelectViewInstance : public Android_ViewInstance, public ISelectViewInstance
+			{
+				SLIB_DECLARE_OBJECT
+
+			public:
+				void select(SelectView* view, sl_uint32 index) override
 				{
-					JSelectView::select.call(sl_null, jview, n);
+					jobject handle = m_handle.get();
+					if (handle) {
+						Select(handle, index);
+					}
+				}
+
+				void refreshItemsCount(SelectView* view) override
+				{
+					refreshItemsContent(view);
+				}
+
+				void refreshItemsContent(SelectView* view) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						(static_cast<SelectViewHelper*>(view))->copyItems(handle);
+					}
+				}
+
+				void setItemTitle(SelectView* view, sl_uint32 index, const String& title) override
+				{
+					refreshItemsContent(view);
+				}
+
+				void setGravity(SelectView* view, const Alignment& align) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						JSelectView::setAlignment.callBoolean(sl_null, handle, align.value);
+					}
+				}
+
+				void setTextColor(SelectView* view, const Color& color) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						JSelectView::setTextColor.callBoolean(sl_null, handle, color.getARGB());
+					}
+				}
+
+				void setBorder(View* view, sl_bool flag) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						JSelectView::setBorder.callBoolean(sl_null, handle, flag);
+					}
+				}
+
+				void setBackgroundColor(View* view, const Color& color) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						JSelectView::setBackgroundColor.callBoolean(sl_null, handle, color.getARGB());
+					}
+				}
+
+				void setFont(View* view, const Ref<Font>& font) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						jobject jfont = GraphicsPlatform::getNativeFont(font.get());
+						if (jfont) {
+							JSelectView::setFont.callBoolean(sl_null, handle, jfont);
+						}
+					}
 				}
 
 			};
+
+			SLIB_DEFINE_OBJECT(SelectViewInstance, Android_ViewInstance)
+
+			void JNICALL OnSelect(JNIEnv* env, jobject _this, jlong instance, jint n)
+			{
+				Ref<SelectViewHelper> helper = CastRef<SelectViewHelper>(Android_ViewInstance::findView(instance));
+				if (helper.isNotNull()) {
+					helper->dispatchSelectItem(n);
+				}
+			}
 
 		}
 	}
@@ -92,104 +172,27 @@ namespace slib
 
 	Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* _parent)
 	{
-		Ref<Android_ViewInstance> ret;
 		Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 		if (parent) {
 			JniLocal<jobject> handle = JSelectView::create.callObject(sl_null, parent->getContext());
-			ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
+			Ref<SelectViewInstance> ret = Android_ViewInstance::create<SelectViewInstance>(this, parent, handle.get());
 			if (ret.isNotNull()) {
-				jobject handle = ret->getHandle();
-
-				JSelectView::setAlignment.callBoolean(sl_null, handle, m_textAlignment.value);
-				JSelectView::setTextColor.callBoolean(sl_null, handle, m_textColor.getARGB());
-				JSelectView::setBorder.callBoolean(sl_null, handle, isBorder());
-				JSelectView::setBackgroundColor.callBoolean(sl_null, handle, getBackgroundColor().getARGB());
-
-				Ref<Font> font = getFont();
-				jobject jfont = GraphicsPlatform::getNativeFont(font.get());
-				if (jfont) {
-					JSelectView::setFont.callBoolean(sl_null, handle, jfont);
-				}
-
-				((SelectViewHelper*)this)->_copyItems(handle);
+				jobject jhandle = ret->getHandle();
+				JSelectView::setAlignment.callBoolean(sl_null, jhandle, m_gravity.value);
+				JSelectView::setTextColor.callBoolean(sl_null, jhandle, m_textColor.getARGB());
+				JSelectView::setBorder.callBoolean(sl_null, jhandle, isBorder());
+				JSelectView::setBackgroundColor.callBoolean(sl_null, jhandle, getBackgroundColor().getARGB());
+				ret->setFont(this, getFont());
+				ret->refreshItemsContent(this);
+				return ret;
 			}
 		}
-		return ret;
+		return sl_null;
 	}
 
-	void SelectView::_select_NW(sl_uint32 index)
+	Ptr<ISelectViewInstance> SelectView::getSelectViewInstance()
 	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			((SelectViewHelper*)this)->_select(handle, index);
-		}
-	}
-
-	void SelectView::_refreshItemsCount_NW()
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			((SelectViewHelper*)this)->_copyItems(handle);
-		}
-	}
-
-	void SelectView::_refreshItemsContent_NW()
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			((SelectViewHelper*)this)->_copyItems(handle);
-		}
-	}
-
-	void SelectView::_setItemTitle_NW(sl_uint32 index, const String& title)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			((SelectViewHelper*)this)->_copyItems(handle);
-		}
-	}
-
-	void SelectView::_setTextAlignment_NW(Alignment align)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JSelectView::setAlignment.callBoolean(sl_null, handle, align.value);
-		}
-	}
-
-	void SelectView::_setTextColor_NW(const Color& color)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JSelectView::setTextColor.callBoolean(sl_null, handle, color.getARGB());
-		}
-	}
-
-	void SelectView::_setBorder_NW(sl_bool flag)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JSelectView::setBorder.callBoolean(sl_null, handle, flag);
-		}
-	}
-
-	void SelectView::_setBackgroundColor_NW(const Color& color)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			JSelectView::setBackgroundColor.callBoolean(sl_null, handle, color.getARGB());
-		}
-	}
-
-	void SelectView::_setFont_NW(const Ref<Font>& font)
-	{
-		jobject handle = UIPlatform::getViewHandle(this);
-		if (handle) {
-			jobject jfont = GraphicsPlatform::getNativeFont(font.get());
-			if (jfont) {
-				JSelectView::setFont.callBoolean(sl_null, handle, jfont);
-			}
-		}
+		return CastRef<SelectViewInstance>(getViewInstance());
 	}
 
 }

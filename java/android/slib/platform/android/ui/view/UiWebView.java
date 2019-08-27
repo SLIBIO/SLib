@@ -47,7 +47,6 @@ import android.widget.EditText;
 
 import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
-import slib.platform.android.ui.UiThread;
 import slib.platform.android.ui.helper.WebViewFileChooser;
 
 public class UiWebView extends WebView implements IView {
@@ -70,14 +69,6 @@ public class UiWebView extends WebView implements IView {
 	}
 	
 	public static void _load(final View view, final String url) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_load(view, url);
-				}
-			});
-			return;
-		}
 		if (url == null || url.length() == 0) {
 			return;
 		}
@@ -92,14 +83,6 @@ public class UiWebView extends WebView implements IView {
 	}
 	
 	public static void _loadHTML(final View view, final String html, final String url) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_loadHTML(view, html, url);
-				}
-			});
-			return;
-		}
 		if (view instanceof WebView) {
 			final WebView wv = (WebView)view;
 			try {
@@ -139,14 +122,6 @@ public class UiWebView extends WebView implements IView {
 	}
 	
 	public static void _goBack(final View view) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_goBack(view);
-				}
-			});
-			return;
-		}
 		if (view instanceof WebView) {
 			final WebView wv = (WebView)view;
 			try {
@@ -158,14 +133,6 @@ public class UiWebView extends WebView implements IView {
 	}
 
 	public static void _goForward(final View view) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_goForward(view);
-				}
-			});
-			return;
-		}
 		if (view instanceof WebView) {
 			final WebView wv = (WebView)view;
 			try {
@@ -177,14 +144,6 @@ public class UiWebView extends WebView implements IView {
 	}
 
 	public static void _reload(final View view) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_reload(view);
-				}
-			});
-			return;
-		}
 		if (view instanceof WebView) {
 			final WebView wv = (WebView)view;
 			try {
@@ -196,14 +155,6 @@ public class UiWebView extends WebView implements IView {
 	}
 
 	public static void _runJavaScript(final View view, final String script) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_runJavaScript(view, script);
-				}
-			});
-			return;
-		}
 		if (script != null && script.length() > 0) {
 			if (view instanceof WebView) {
 				final WebView wv = (WebView)view;
@@ -216,39 +167,27 @@ public class UiWebView extends WebView implements IView {
 		}
 	}
 
-	public static void _clearCache(final View view) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_clearCache(view);
-				}
-			});
-			return;
-		}
+	public static void _setCustomUserAgent(final View view, final String userAgent) {
 		if (view instanceof WebView) {
-			final WebView wv = (WebView)view;
+			final WebView wv = (WebView) view;
 			try {
-				Logger.info("WebView: Clear Cache");
-				wv.clearHistory();
-				wv.clearCache(true);
-				wv.clearFormData();
-				wv.clearMatches();
-				wv.clearSslPreferences();
+				wv.getSettings().setUserAgentString(userAgent);
 			} catch (Exception e) {
 				Logger.exception(e);
 			}
 		}
 	}
 
-	public static void _clearCookie(final View view) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_clearCookie(view);
-				}
-			});
-			return;
+	public static void _clearCache(Activity activity) {
+		try {
+			WebView wv = new WebView(activity);
+			wv.clearCache(true);
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
+	}
+
+	public static void _clearCookie(Activity activity) {
 		try {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				CookieManager manager = CookieManager.getInstance();
@@ -258,7 +197,7 @@ public class UiWebView extends WebView implements IView {
 					manager.flush();
 				}
 			} else {
-				CookieSyncManager sync = CookieSyncManager.createInstance(view.getContext());
+				CookieSyncManager sync = CookieSyncManager.createInstance(activity);
 				if (sync != null) {
 					sync.startSync();
 					CookieManager manager = CookieManager.getInstance();
@@ -272,25 +211,6 @@ public class UiWebView extends WebView implements IView {
 			}
 		} catch (Exception e) {
 			Logger.exception(e);
-		}
-	}
-
-	public static void _setCustomUserAgent(final View view, final String userAgent) {
-		if (!(UiThread.isUiThread())) {
-			view.post(new Runnable() {
-				public void run() {
-					_setCustomUserAgent(view, userAgent);
-				}
-			});
-			return;
-		}
-		if (view instanceof WebView) {
-			final WebView wv = (WebView) view;
-			try {
-				wv.getSettings().setUserAgentString(userAgent);
-			} catch (Exception e) {
-				Logger.exception(e);
-			}
 		}
 	}
 

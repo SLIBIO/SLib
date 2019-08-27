@@ -224,12 +224,18 @@ namespace slib
 		static void setBadgeNumber(sl_uint32 number);
 
 	};
-
+	
 }
 
 #define SLIB_UI_CALLBACK(...) slib::UI::getCallbackOnUiThread(SLIB_BIND(void(), __VA_ARGS__))
 #define SLIB_UI_CALLBACK_CLASS(...) slib::UI::getCallbackOnUiThread(SLIB_BIND_CLASS(void(), __VA_ARGS__))
 #define SLIB_UI_CALLBACK_REF(...) slib::UI::getCallbackOnUiThread(SLIB_BIND_REF(void(), __VA_ARGS__))
 #define SLIB_UI_CALLBACK_WEAKREF(...) slib::UI::getCallbackOnUiThread(SLIB_BIND_WEAKREF(void(), __VA_ARGS__))
+
+#define SLIB_VIEW_RUN_ON_UI_THREAD(FUNC, ...) \
+	if (!(UI::isUiThread())) { \
+		UI::dispatchToUiThreadUrgently(Function<void()>::bindWeakRef(this, FUNC, ##__VA_ARGS__)); \
+		return; \
+	}
 
 #endif

@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -89,6 +89,10 @@ namespace slib
 	
 	void TabView::setTabsCount(sl_uint32 nNew, UIUpdateMode mode)
 	{
+		Ptr<ITabViewInstance> instance = getTabViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&TabView::setTabsCount, nNew, mode)
+		}
 		ObjectLocker lock(this);
 		ListLocker<TabViewItem> items(m_items);
 		if (nNew < 1) {
@@ -108,8 +112,8 @@ namespace slib
 			}
 		}
 		m_items.setCount(nNew);
-		if (isNativeWidget()) {
-			_refreshTabsCount_NW();
+		if (instance.isNotNull()) {
+			instance->refreshTabsCount(this);
 		}
 		selectTab(m_indexSelected, UIUpdateMode::None);
 		invalidate(mode);
@@ -127,12 +131,16 @@ namespace slib
 	
 	void TabView::setTabLabel(sl_uint32 index, const String& text, UIUpdateMode mode)
 	{
+		Ptr<ITabViewInstance> instance = getTabViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&TabView::setTabLabel, index, text, mode)
+		}
 		ObjectLocker lock(this);
 		if (index < m_items.getCount()) {
 			TabViewItem* item = m_items.getPointerAt(index);
 			item->label = text;
-			if (isNativeWidget()) {
-				_setTabLabel_NW(index, text);
+			if (instance.isNotNull()) {
+				instance->setTabLabel(this, index, text);
 			} else {
 				_invalidateTabBar(mode);
 			}
@@ -173,6 +181,10 @@ namespace slib
 	
 	void TabView::setTabContentView(sl_uint32 index, const Ref<View>& view, UIUpdateMode mode)
 	{
+		Ptr<ITabViewInstance> instance = getTabViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&TabView::setTabContentView, index, view, mode)
+		}
 		MutexLocker lock(m_items.getLocker());
 		if (index < m_items.getCount()) {
 			TabViewItem* item = m_items.getPointerAt(index);
@@ -184,12 +196,8 @@ namespace slib
 					addChild(view, SLIB_UI_UPDATE_MODE_IS_INIT(mode) ? UIUpdateMode::Init : UIUpdateMode::UpdateLayout);
 				}
 				item->contentView = view;
-				if (isNativeWidget()) {
-					if (UI::isUiThread()) {
-						_setTabContentView_NW(index, view);
-					} else {
-						UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), TabView, _setTabContentView_NW, this, index, view));
-					}
+				if (instance.isNotNull()) {
+					instance->setTabContentView(this, index, view);
 				} else {
 					selectTab(m_indexSelected, UIUpdateMode::None);
 					invalidate(mode);
@@ -205,15 +213,19 @@ namespace slib
 	
 	void TabView::selectTab(sl_uint32 index, UIUpdateMode mode)
 	{
+		Ptr<ITabViewInstance> instance = getTabViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&TabView::selectTab, index, mode)
+		}
 		ObjectLocker lock(this);
 		ListLocker<TabViewItem> items(m_items);
 		if (index >= items.count) {
 			index = 0;
 		}
 		m_indexSelected = index;
-		if (isNativeWidget()) {
+		if (instance.isNotNull()) {
 			if (index < items.count) {
-				_selectTab_NW(index);
+				instance->selectTab(this, index);
 			}
 		} else {
 			for (sl_size i = 0; i < items.count; i++) {
@@ -232,15 +244,18 @@ namespace slib
 	
 	UISize TabView::getContentViewSize()
 	{
-		if (isNativeWidget()) {
-			UISize size = _getContentViewSize_NW();
-			if (size.x < 0) {
-				size.x = 0;
+		Ptr<ITabViewInstance> instance = getTabViewInstance();
+		if (instance.isNotNull()) {
+			UISize size;
+			if (instance->getContentViewSize(this, size)) {
+				if (size.x < 0) {
+					size.x = 0;
+				}
+				if (size.y < 0) {
+					size.y = 0;
+				}
+				return size;
 			}
-			if (size.y < 0) {
-				size.y = 0;
-			}
-			return size;
 		}
 		return getTabContentRegion().getSize();
 	}
@@ -428,7 +443,7 @@ namespace slib
 		return m_tabAlignment;
 	}
 	
-	void TabView::setTabAlignment(Alignment align, UIUpdateMode mode)
+	void TabView::setTabAlignment(const Alignment& align, UIUpdateMode mode)
 	{
 		m_tabAlignment = align;
 		invalidate(mode);
@@ -615,6 +630,17 @@ namespace slib
 		}
 	}
 	
+	void TabView::_refreshSize()
+	{
+		Ptr<ITabViewInstance> instance = getTabViewInstance();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&TabView::_refreshSize)
+			instance->refreshSize(this);
+		} else {
+			_relayout(UIUpdateMode::Redraw);
+		}
+	}
+	
 	void TabView::_relayout(UIUpdateMode mode)
 	{
 		ObjectLocker lock(this);
@@ -788,11 +814,7 @@ namespace slib
 	
 	void TabView::onResize(sl_ui_len width, sl_ui_len height)
 	{
-		if (isNativeWidget()) {
-			_refreshSize_NW();
-		} else {
-			_relayout(UIUpdateMode::Redraw);
-		}
+		_refreshSize();
 	}
 	
 	
@@ -802,33 +824,9 @@ namespace slib
 		return sl_null;
 	}
 	
-	void TabView::_refreshTabsCount_NW()
+	Ptr<ITabViewInstance> TabView::getTabViewInstance()
 	{
-	}
-	
-	void TabView::_refreshSize_NW()
-	{
-	}
-	
-	void TabView::_setTabLabel_NW(sl_uint32 index, const String& text)
-	{
-	}
-	
-	void TabView::_setTabContentView_NW(sl_uint32 index, const Ref<View>& view)
-	{
-	}
-	
-	UISize TabView::_getContentViewSize_NW()
-	{
-		return UISize::zero();
-	}
-	
-	void TabView::_selectTab_NW(sl_uint32 index)
-	{
-	}
-	
-	void TabView::_setFont_NW(const Ref<Font>& font)
-	{
+		return sl_null;
 	}
 #endif
 

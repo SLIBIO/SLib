@@ -30,6 +30,8 @@
 
 namespace slib
 {
+	
+	class IPickerViewInstance;
 
 	class SLIB_EXPORT PickerView : public View
 	{
@@ -90,9 +92,11 @@ namespace slib
 		
 		void onMouseEvent(UIEvent* ev) override;
 		
-	public:
+	protected:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
-				
+		
+		virtual Ptr<IPickerViewInstance> getPickerViewInstance();
+		
 	private:
 		void _selectIndexInner(sl_int32 index);
 		
@@ -107,17 +111,6 @@ namespace slib
 		void _stopFlow();
 		
 		void _animationCallback(Timer* timer);
-		
-				
-		void _select_NW(sl_uint32 index);
-		
-		void _refreshItemsCount_NW();
-		
-		void _refreshItemsContent_NW();
-		
-		void _setItemTitle_NW(sl_uint32 index, const String& title);
-		
-		void _setFont_NW(const Ref<Font>& font) override;
 		
 	protected:
 		AtomicList<String> m_values;
@@ -134,6 +127,19 @@ namespace slib
 		Ref<Timer> m_timerFlow;
 		sl_real m_speedFlow;
 		Time m_timeFlowFrameBefore;
+		
+	};
+	
+	class SLIB_EXPORT IPickerViewInstance
+	{
+	public:
+		virtual void select(PickerView* view, sl_uint32 index) = 0;
+		
+		virtual void refreshItemsCount(PickerView* view) = 0;
+		
+		virtual void refreshItemsContent(PickerView* view) = 0;
+		
+		virtual void setItemTitle(PickerView* view, sl_uint32 index, const String& title) = 0;
 		
 	};
 
