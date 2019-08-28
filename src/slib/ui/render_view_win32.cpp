@@ -89,8 +89,8 @@ namespace slib
 				{
 					if (msg == WM_PAINT) {
 						PAINTSTRUCT ps;
-						::BeginPaint(m_handle, &ps);
-						::EndPaint(m_handle, &ps);
+						BeginPaint(m_handle, &ps);
+						EndPaint(m_handle, &ps);
 						Ref<Renderer> renderer = m_renderer;
 						if (renderer.isNotNull()) {
 							renderer->requestRender();

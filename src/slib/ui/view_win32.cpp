@@ -980,8 +980,9 @@ namespace slib
 		Ref<Win32_ViewInstance> ret = Win32_ViewInstance::create<Win32_ViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), sl_null, style, styleEx);
 		if (ret.isNotNull()) {
 			ret->setGenericView(sl_true);
+			return ret;
 		}
-		return ret;
+		return sl_null;
 	}
 
 	HWND UIPlatform::getViewHandle(View* view)
