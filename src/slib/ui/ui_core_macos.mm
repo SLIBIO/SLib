@@ -102,6 +102,8 @@ namespace slib
 			{
 			public:
 				NSEvent* dispatchEvent;
+				Function<void()> customMessageLoop;
+				Function<void()> customQuitApp;
 				
 			public:
 				StaticContext()
@@ -113,6 +115,40 @@ namespace slib
 			
 			SLIB_SAFE_STATIC_GETTER(StaticContext, GetStaticContext)
 
+			static Function<void()> GetCustomMessageLoop()
+			{
+				StaticContext* context = GetStaticContext();
+				if (context) {
+					return context->customMessageLoop;
+				}
+				return sl_null;
+			}
+			
+			void SetCustomMessageLoop(const Function<void()>& func)
+			{
+				StaticContext* context = GetStaticContext();
+				if (context) {
+					context->customMessageLoop = func;
+				}
+			}
+			
+			static Function<void()> GetCustomQuitApp()
+			{
+				StaticContext* context = GetStaticContext();
+				if (context) {
+					return context->customQuitApp;
+				}
+				return sl_null;
+			}
+			
+			void SetCustomQuitApp(const Function<void()>& func)
+			{
+				StaticContext* context = GetStaticContext();
+				if (context) {
+					context->customQuitApp = func;
+				}
+			}
+			
 		}
 	}
 
@@ -268,7 +304,7 @@ namespace slib
 		
 		SLIBAppDelegate * delegate = [[SLIBAppDelegate alloc] init];
 		[NSApp setDelegate:delegate];
-		
+
 		[NSEvent addLocalMonitorForEventsMatchingMask:(NSApplicationDefinedMask | NSKeyDownMask) handler:^(NSEvent* event){
 			NSEventType type = [event type];
 			if (type == NSKeyDown) {
@@ -315,8 +351,13 @@ namespace slib
 			return event;
 		}];
 		
-		@autoreleasepool {
-			[NSApp run];
+		Function<void()> customMessageLoop = GetCustomMessageLoop();
+		if (customMessageLoop.isNotNull()) {
+			customMessageLoop();
+		} else {
+			@autoreleasepool {
+				[NSApp run];
+			}
 		}
 	}
 
@@ -327,7 +368,12 @@ namespace slib
 			app->dispatchQuitApp();
 		}
 		dispatch_async(dispatch_get_main_queue(), ^{
-			[NSApp terminate:nil];
+			Function<void()> customQuitApp = GetCustomQuitApp();
+			if (customQuitApp.isNotNull()) {
+				customQuitApp();
+			} else {
+				[NSApp terminate:nil];
+			}
 		});
 	}
 
