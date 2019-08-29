@@ -309,6 +309,7 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/ui/clipboard.cpp"
  "${SLIB_PATH}/src/slib/ui/chat_view.cpp"
  "${SLIB_PATH}/src/slib/ui/check_box.cpp"
+ "${SLIB_PATH}/src/slib/ui/chromium.cpp"
  "${SLIB_PATH}/src/slib/ui/common_dialogs.cpp"
  "${SLIB_PATH}/src/slib/ui/cursor.cpp"
  "${SLIB_PATH}/src/slib/ui/date_picker.cpp"

@@ -679,6 +679,7 @@
 		26635CA1226706FD005E4BA6 /* ui_photo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26635CA0226706FD005E4BA6 /* ui_photo.cpp */; };
 		266E66EC21D9566300D92386 /* locale_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266E66EB21D9566300D92386 /* locale_apple.mm */; };
 		2671F99121E07F7400B39842 /* drawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2671F99021E07F7300B39842 /* drawer.cpp */; };
+		267466702318556800DE8715 /* chromium.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2674666F2318556700DE8715 /* chromium.cpp */; };
 		267B9D65225D11450057DF2A /* instagram_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 267B9D64225D11450057DF2A /* instagram_ios.mm */; };
 		267B9D67225D11760057DF2A /* instagram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 267B9D66225D11760057DF2A /* instagram.cpp */; };
 		2698A54A226A1C4300662528 /* refresh_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2698A549226A1C4300662528 /* refresh_view.cpp */; };
@@ -2165,6 +2166,7 @@
 		266F926D1D51CD5D0040166C /* render_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_resource.cpp; sourceTree = "<group>"; };
 		266F926F1D51CD7A0040166C /* graphics_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graphics_resource.cpp; sourceTree = "<group>"; };
 		2671F99021E07F7300B39842 /* drawer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = drawer.cpp; sourceTree = "<group>"; };
+		2674666F2318556700DE8715 /* chromium.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chromium.cpp; sourceTree = "<group>"; };
 		267B9D64225D11450057DF2A /* instagram_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = instagram_ios.mm; sourceTree = "<group>"; };
 		267B9D66225D11760057DF2A /* instagram.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = instagram.cpp; sourceTree = "<group>"; };
 		267D00891E32AA3B002CC949 /* render_drawable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_drawable.cpp; sourceTree = "<group>"; };
@@ -4165,6 +4167,7 @@
 				26A9B7611C172BCC004C9B0E /* camera_view.cpp */,
 				264DF0ED22455E3B007DB734 /* chat_view.cpp */,
 				266DD4351C11901A00D47AB0 /* check_box.cpp */,
+				2674666F2318556700DE8715 /* chromium.cpp */,
 				26C7959B221538D90053C5A1 /* clipboard.cpp */,
 				26C7959A221538D90053C5A1 /* clipboard_ios.mm */,
 				2649C23A1CBBD7BF003E7561 /* common_dialogs.cpp */,
@@ -5432,6 +5435,7 @@
 				26D9D83B1E9628E0005F7BD3 /* file_unix.cpp in Sources */,
 				26E1B8F9222ABCDD007C222E /* jquant2.c in Sources */,
 				26B92D5821D3E4FC003F6F82 /* web_controller.cpp in Sources */,
+				267466702318556800DE8715 /* chromium.cpp in Sources */,
 				26D9D8CA1E962976005F7BD3 /* picker_view.cpp in Sources */,
 				26D9D85D1E962937005F7BD3 /* geo_location.cpp in Sources */,
 				26BAE02822239EA80085B5AB /* linkedin_ui.cpp in Sources */,

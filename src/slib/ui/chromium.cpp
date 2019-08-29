@@ -892,7 +892,7 @@ namespace slib
 	
 	Ref<ViewInstance> ChromiumView::createNativeWidget(ViewInstance* parent)
 	{
-		return WebView::createNativeWidget(ViewInstance* parent);
+		return WebView::createNativeWidget(parent);
 	}
 	
 	Ptr<IWebViewInstance> ChromiumView::getWebViewInstance()
@@ -900,11 +900,11 @@ namespace slib
 		return WebView::getWebViewInstance();
 	}
 	
-	void Chromium::startup(int argc, const char* argv[])
+	void Chromium::startup(int argc, const void* argv)
 	{
 	}
 	
-	void Chromium::startup(int argc, const char* argv[], const ChromiumSettings& settings)
+	void Chromium::startup(int argc, const void* argv, const ChromiumSettings& settings)
 	{
 	}
 	
