@@ -157,7 +157,7 @@ class CefPoint : public CefStructBase<CefPointTraits> {
   CefPoint(int x, int y) : parent() { Set(x, y); }
 
   bool IsEmpty() const { return x <= 0 && y <= 0; }
-  void Set(int x_val, int y_val) { x = x_val, y = y_val; }
+	void Set(int x_val, int y_val) { x = x_val; y = y_val; }
 };
 
 inline bool operator==(const CefPoint& a, const CefPoint& b) {
@@ -197,7 +197,7 @@ class CefRect : public CefStructBase<CefRectTraits> {
 
   bool IsEmpty() const { return width <= 0 || height <= 0; }
   void Set(int x_val, int y_val, int width_val, int height_val) {
-    x = x_val, y = y_val, width = width_val, height = height_val;
+	  x = x_val; y = y_val; width = width_val; height = height_val;
   }
 
   // Returns true if the point identified by point_x and point_y falls inside
@@ -247,7 +247,7 @@ class CefSize : public CefStructBase<CefSizeTraits> {
 
   bool IsEmpty() const { return width <= 0 || height <= 0; }
   void Set(int width_val, int height_val) {
-    width = width_val, height = height_val;
+	  width = width_val; height = height_val;
   }
 };
 
@@ -284,7 +284,7 @@ class CefRange : public CefStructBase<CefRangeTraits> {
   CefRange(const CefRange& r) : parent(r) {}
   CefRange(int from, int to) : parent() { Set(from, to); }
 
-  void Set(int from_val, int to_val) { from = from_val, to = to_val; }
+	void Set(int from_val, int to_val) { from = from_val; to = to_val; }
 };
 
 inline bool operator==(const CefRange& a, const CefRange& b) {
@@ -323,7 +323,7 @@ class CefInsets : public CefStructBase<CefInsetsTraits> {
   }
 
   void Set(int top_val, int left_val, int bottom_val, int right_val) {
-    top = top_val, left = left_val, bottom = bottom_val, right = right_val;
+	  top = top_val; left = left_val; bottom = bottom_val; right = right_val;
   }
 };
 
@@ -364,7 +364,7 @@ class CefDraggableRegion : public CefStructBase<CefDraggableRegionTraits> {
   }
 
   void Set(const CefRect& bounds_val, bool draggable_val) {
-    bounds = bounds_val, draggable = draggable_val;
+	  bounds = bounds_val; draggable = draggable_val;
   }
 };
 
