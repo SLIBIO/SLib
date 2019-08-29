@@ -98,6 +98,20 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "267464A723171F2500DE8715"
+               BuildableName = "libcef_dll_wrapper.a"
+               BlueprintName = "cef_dll_wrapper"
+               ReferencedContainer = "container:SLib.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "2639191921CD2389008B335B"
                BuildableName = "libhiredis.a"
                BlueprintName = "hiredis"

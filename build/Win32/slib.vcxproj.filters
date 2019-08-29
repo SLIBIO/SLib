@@ -1274,5 +1274,8 @@
     <ClCompile Include="..\..\src\slib\ui\global_event_monitor_win32.cpp">
       <Filter>src\ui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\ui\chromium.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

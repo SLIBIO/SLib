@@ -43,6 +43,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "slib-sapp", "slib-sapp.vcxp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zxing", "external\zxing.vcxproj", "{8CC7CC4E-0993-40EE-AC09-6FBBBE5414DE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcef_dll_wrapper", "external\libcef_dll_wrapper.vcxproj", "{78039D5C-C2B0-463B-AA81-27BAA602185F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -139,6 +141,14 @@ Global
 		{8CC7CC4E-0993-40EE-AC09-6FBBBE5414DE}.Release|x64.Build.0 = Release|x64
 		{8CC7CC4E-0993-40EE-AC09-6FBBBE5414DE}.Release|x86.ActiveCfg = Release|Win32
 		{8CC7CC4E-0993-40EE-AC09-6FBBBE5414DE}.Release|x86.Build.0 = Release|Win32
+		{78039D5C-C2B0-463B-AA81-27BAA602185F}.Debug|x64.ActiveCfg = Debug|x64
+		{78039D5C-C2B0-463B-AA81-27BAA602185F}.Debug|x64.Build.0 = Debug|x64
+		{78039D5C-C2B0-463B-AA81-27BAA602185F}.Debug|x86.ActiveCfg = Debug|Win32
+		{78039D5C-C2B0-463B-AA81-27BAA602185F}.Debug|x86.Build.0 = Debug|Win32
+		{78039D5C-C2B0-463B-AA81-27BAA602185F}.Release|x64.ActiveCfg = Release|x64
+		{78039D5C-C2B0-463B-AA81-27BAA602185F}.Release|x64.Build.0 = Release|x64
+		{78039D5C-C2B0-463B-AA81-27BAA602185F}.Release|x86.ActiveCfg = Release|Win32
+		{78039D5C-C2B0-463B-AA81-27BAA602185F}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -153,5 +163,6 @@ Global
 		{D1153F23-72DA-4CFF-B753-6FA6C5F95292} = {3AE9B313-400D-4A60-8250-0EF0BE9B58FA}
 		{6AB2A19A-CCF1-4EA2-9CB1-7175B7F85EB2} = {3AE9B313-400D-4A60-8250-0EF0BE9B58FA}
 		{8CC7CC4E-0993-40EE-AC09-6FBBBE5414DE} = {FAEFDD39-4E16-4DB6-9E35-45566C83C04E}
+		{78039D5C-C2B0-463B-AA81-27BAA602185F} = {FAEFDD39-4E16-4DB6-9E35-45566C83C04E}
 	EndGlobalSection
 EndGlobal

@@ -86,4 +86,6 @@
 #include "ui/screen_capture.h"
 #include "ui/global_event_monitor.h"
 
+#include "ui/chromium.h"
+
 #endif

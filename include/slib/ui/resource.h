@@ -338,6 +338,7 @@ namespace slib
 	class TabView;
 	class TreeView;
 	class WebView;
+	class ChromiumView;
 	class SplitView;
 	class ProgressBar;
 	class Slider;
