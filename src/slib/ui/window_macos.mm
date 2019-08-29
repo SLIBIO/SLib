@@ -1053,7 +1053,6 @@ using namespace slib::priv::window;
 		NSView* hit = nil;
 		NSView* content = [self contentView];
 		if (content != nil) {
-			pt = [content convertPoint:pt fromView:nil];
 			hit = [content hitTest:pt];
 		}
 		if (m_handleLastHitMouse != hit) {

@@ -38,6 +38,7 @@ namespace slib
 	macOS_ViewInstance::macOS_ViewInstance()
 	{
 		m_handle = nil;
+		m_frame.setZero();
 		m_transform = Matrix3::identity();
 	}
 
@@ -392,12 +393,13 @@ namespace slib
 						case UIAction::RightButtonDoubleClick:
 						case UIAction::MiddleButtonDoubleClick:
 							{
-								NSView* content = [window contentView];
-								if (content != nil) {
-									NSPoint pc = [content convertPoint:pw fromView:nil];
-									NSView* hit = [content hitTest:pc];
-									if (hit != handle) {
-										ev->addFlag(UIEventFlags::NotDispatchToChildren);
+								for (NSView* subview in [handle subviews]) {
+									if (!(subview.isHidden)) {
+										NSRect frame = subview.frame;
+										if (NSPointInRect(pt, frame)) {
+											ev->addFlag(UIEventFlags::NotDispatchToChildren);
+											break;
+										}
 									}
 								}
 							}
@@ -820,6 +822,7 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 
 - (NSView *)hitTest:(NSPoint)aPoint
 {
+	NSPoint pt = [self convertPoint:aPoint fromView:[self superview]];
 	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		Ref<View> view = instance->getView();
@@ -829,13 +832,26 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 			}
 			Function<sl_bool(const UIPoint&)> hitTestCapture(view->getCapturingChildInstanceEvents());
 			if (hitTestCapture.isNotNull()) {
-				if (hitTestCapture(UIPoint((sl_ui_pos)(aPoint.x), (sl_ui_pos)(aPoint.y)))) {
+				if (hitTestCapture(UIPoint((sl_ui_pos)(pt.x), (sl_ui_pos)(pt.y)))) {
 					return self;
 				}
 			}
 		}
 	}
-	return [super hitTest:aPoint];
+	for (NSView* subview in [self subviews]) {
+		if (!(subview.isHidden)) {
+			if (NSPointInRect(pt, subview.frame)) {
+				NSView* view = [subview hitTest:pt];
+				if (view != nil) {
+					return view;
+				}
+			}
+		}
+	}
+	if (NSPointInRect(aPoint, self.frame)) {
+		return self;
+	}
+	return nil;
 }
 
 @end
