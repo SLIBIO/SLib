@@ -11,3 +11,6 @@
 [submodule "external/bin/libmysqlclient"]
 	path = external/bin/libmysqlclient
 	url = https://github.com/SLIBIO/SLibExternalBin_libmysqlclient.git
+[submodule "external/bin/libcef"]
+	path = external/bin/libcef
+	url = https://github.com/SLIBIO/SLibExternalBin_libcef
