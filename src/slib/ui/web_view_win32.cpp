@@ -299,7 +299,7 @@ namespace slib
 				void installExternal();
 
 			public:
-				sl_bool prepare();
+				sl_bool prepare(WebView* view);
 
 				void refreshSize(WebView* view) override
 				{
@@ -307,12 +307,10 @@ namespace slib
 					if (handle) {
 						IWebBrowser2* browser = m_browser;
 						if (browser) {
-							RECT rc;
-							GetClientRect(handle, &rc);
 							browser->put_Left(0);
 							browser->put_Top(0);
-							browser->put_Width(rc.right);
-							browser->put_Width(rc.bottom);
+							browser->put_Width(view->getWidth());
+							browser->put_Height(view->getHeight());
 						}
 					}
 				}
@@ -517,6 +515,26 @@ namespace slib
 					}
 				}
 
+				LRESULT processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam) override
+				{
+					HWND handle = getHandle();
+					if (handle) {
+						switch (msg) {
+						case WM_PAINT:
+							if (m_browser) {
+								PAINTSTRUCT ps;
+								BeginPaint(m_handle, &ps);
+								EndPaint(m_handle, &ps);
+								return 0;
+							}
+							break;
+						case WM_ERASEBKGND:
+							return TRUE;
+						}
+					}
+					return Win32_ViewInstance::processWindowMessage(msg, wParam, lParam);
+				}
+
 			};
 
 			class OleClient : public IOleClientSite, public IOleInPlaceSite, public IOleInPlaceFrame, public IDocHostUIHandler, public IDispatch
@@ -681,7 +699,7 @@ namespace slib
 						IOleInPlaceObject* place = NULL;
 						HRESULT hr = control->QueryInterface(IID_IOleInPlaceObject, (void**)(&place));
 						if (hr == S_OK) {
-							//place->SetObjectRects(lprcPosRect, lprcPosRect);
+							place->SetObjectRects(lprcPosRect, lprcPosRect);
 							place->Release();
 						}
 					}
@@ -892,7 +910,7 @@ namespace slib
 				delete m_oleClient;
 			}
 
-			sl_bool WebViewInstance::prepare()
+			sl_bool WebViewInstance::prepare(WebView* view)
 			{
 				HWND hWnd = m_handle;
 				if (!hWnd) {
@@ -937,7 +955,7 @@ namespace slib
 									cpc->Release();
 								}
 
-								refreshSize(sl_null);
+								refreshSize(view);
 
 								VARIANT varURL;
 								VariantInit(&varURL);
@@ -1001,7 +1019,7 @@ namespace slib
 		}
 		Ref<WebViewInstance> ret = Win32_ViewInstance::create<WebViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), sl_null, 0, 0);
 		if (ret.isNotNull()) {
-			ret->prepare();
+			ret->prepare(this);
 			ret->load(this);
 			return ret;
 		}
