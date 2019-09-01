@@ -310,6 +310,9 @@ namespace slib
 
 	void ChaCha20_Poly1305::encrypt(const void* src, void* dst, sl_size len)
 	{
+		if (!len) {
+			return;
+		}
 		m_cipher.encrypt(src, dst, len);
 		m_auth.update(dst, len);
 		m_lenInput += len;
@@ -317,6 +320,9 @@ namespace slib
 	
 	void ChaCha20_Poly1305::decrypt(const void* src, void* dst, sl_size len)
 	{
+		if (!len) {
+			return;
+		}
 		m_auth.update(src, len);
 		m_cipher.encrypt(src, dst, len);
 		m_lenInput += len;
