@@ -54,7 +54,7 @@
 		260504EA20CF137800032B2C /* emms.asm in Sources */ = {isa = PBXBuildFile; fileRef = 260504E920CF137800032B2C /* emms.asm */; };
 		26072FFC20D8F535004EB272 /* font_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26072FFB20D8F535004EB272 /* font_quartz.mm */; };
 		2607300020D98466004EB272 /* url_request_curl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26072FFF20D98466004EB272 /* url_request_curl.cpp */; };
-		2607300520DA853B004EB272 /* sad4d_avx512.c in Sources */ = {isa = PBXBuildFile; fileRef = 2607300420DA853B004EB272 /* sad4d_avx512.c */; settings = {COMPILER_FLAGS = "-mavx512f -mavx512bw"; }; };
+		2607300520DA853B004EB272 /* sad4d_avx512.c in Sources */ = {isa = PBXBuildFile; fileRef = 2607300420DA853B004EB272 /* sad4d_avx512.c */; settings = {COMPILER_FLAGS = "-mavx512f -mavx512bw -mavx512dq"; }; };
 		2607301120DD22C9004EB272 /* rw_lock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2607301020DD22C8004EB272 /* rw_lock.cpp */; };
 		260B73EF220CAD1C00858EEA /* oauth.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260B73EE220CAD1C00858EEA /* oauth.cpp */; };
 		260B73F8220D872600858EEA /* twitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260B73F7220D872600858EEA /* twitter.cpp */; };

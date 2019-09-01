@@ -277,7 +277,7 @@ IOS_VIEW_EVENTS
 #if defined(SLIB_PLATFORM_IS_IOS_SIMULATOR)
 	TimeCounter timer;
 	while (m_flagRunning) {
-		[self onGLRenderFrame];
+		[self onRenderFrame];
 		sl_uint64 t = timer.getElapsedMilliseconds();
 		if (t < 15) {
 			[NSThread sleepForTimeInterval:(15 - (sl_uint32)(t)) / 1000.0];
