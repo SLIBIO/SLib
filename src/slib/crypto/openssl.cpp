@@ -1096,6 +1096,9 @@ namespace slib
 	
 	void OpenSSL_ChaCha20::encrypt(const void* _src, void* _dst, sl_size len)
 	{
+		if (!len) {
+			return;
+		}
 		sl_uint8* lastBlock = m_lastBlock;
 		const sl_uint8* src = (const sl_uint8*)_src;
 		sl_uint8* dst = (sl_uint8*)_dst;
