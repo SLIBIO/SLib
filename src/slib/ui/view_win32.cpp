@@ -224,14 +224,16 @@ namespace slib
 			if (view->isVisible()) {
 				style |= WS_VISIBLE;
 			}
-			if (view->isBorder()) {
-				style |= WS_BORDER;
-			}
-			if (view->isHorizontalScrollBarVisible()) {
-				style |= WS_HSCROLL;
-			}
-			if (view->isVerticalScrollBarVisible()) {
-				style |= WS_VSCROLL;
+			if (view->isCreatingNativeWidget()) {
+				if (view->isBorder()) {
+					style |= WS_BORDER;
+				}
+				if (view->isHorizontalScrollBarVisible()) {
+					style |= WS_HSCROLL;
+				}
+				if (view->isVerticalScrollBarVisible()) {
+					style |= WS_VSCROLL;
+				}
 			}
 			style &= (~styleRemove);
 
