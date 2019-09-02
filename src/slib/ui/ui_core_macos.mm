@@ -215,7 +215,11 @@ namespace slib
 	
 	void UI::setBadgeNumber(sl_uint32 number)
 	{
-		[[NSApp dockTile] setBadgeLabel:[NSString stringWithFormat:@"%d", number]];
+		if (number) {
+			[[NSApp dockTile] setBadgeLabel:[NSString stringWithFormat:@"%d", number]];
+		} else {
+			[[NSApp dockTile] setBadgeLabel:nil];
+		}
 	}
 	
 	sl_bool UI::isUiThread()
