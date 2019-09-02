@@ -203,6 +203,7 @@ if(ANDROID)
  )
 else ()
  set (SLIB_CORE_PLATFORM_FILES
+  "${SLIB_PATH}/src/slib/core/preference_linux.cpp"
   "${SLIB_PATH}/src/slib/core/wrap_memcpy.cpp"
  )
 endif()
