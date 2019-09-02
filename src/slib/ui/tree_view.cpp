@@ -795,10 +795,12 @@ namespace slib
 		_redrawContent(mode);
 	}
 	
-	void TreeView::onDraw(Canvas* canvas)
+	void TreeView::setFont(const Ref<Font>& font, UIUpdateMode mode)
 	{
-		_calcTextHeight(canvas);
-		_makeLayoutContent();
+		ScrollView::setFont(font, mode);
+		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
+			_relayoutContent(UIUpdateMode::None);
+		}
 	}
 	
 	void TreeView::onResize(sl_ui_len width, sl_ui_len height)
@@ -850,7 +852,9 @@ namespace slib
 		Ref<TreeContentViewImpl> content = m_content;
 		if (content.isNotNull()) {
 			m_flagInvalidTreeLayout = sl_true;
-			content->invalidate(mode);
+			if (SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
+				dispatchToDrawingThread(SLIB_FUNCTION_WEAKREF(TreeView, _makeLayoutContent, this));
+			}
 		}
 	}
 	
@@ -864,6 +868,9 @@ namespace slib
 	
 	void TreeView::_drawContent(Canvas* canvas)
 	{
+		if (m_flagInvalidTreeLayout) {
+			_relayoutContent(UIUpdateMode::Redraw);
+		}
 		Ref<TreeViewItem> root = m_root;
 		if (root.isNotNull()) {
 			_drawItem(canvas, root.get(), sl_true);
@@ -876,6 +883,18 @@ namespace slib
 			return;
 		}
 		m_flagInvalidTreeLayout = sl_false;
+		
+		Ref<Font> font = getFont();
+		sl_ui_pos height;
+		if (font.isNotNull()) {
+			height = (sl_ui_pos)(font->getFontHeight());
+			if (height < 0) {
+				height = 0;
+			}
+		} else {
+			height = 0;
+		}
+		m_layoutTextHeight = height;
 		
 		Ref<TreeViewItem> root = m_root;
 		if (root.isNotNull()) {
@@ -892,7 +911,9 @@ namespace slib
 			}
 			Ref<TreeContentViewImpl> content = m_content;
 			if (content.isNotNull()) {
-				content->setHeight(top, UIUpdateMode::None);
+				if (content->getHeight() != top) {
+					content->setHeight(top, UIUpdateMode::Redraw);
+				}
 			}
 		}
 		
@@ -963,21 +984,6 @@ namespace slib
 			}
 		}
 		item->m_bottomChildren = top;
-	}
-	
-	void TreeView::_calcTextHeight(Canvas* canvas)
-	{
-		Ref<Font> font = getFont();
-		sl_ui_pos height;
-		if (font.isNotNull()) {
-			height = (sl_ui_pos)(font->getFontHeight());
-			if (height < 0) {
-				height = 0;
-			}
-		} else {
-			height = 0;
-		}
-		m_layoutTextHeight = height;
 	}
 	
 	void TreeView::_drawItem(Canvas* canvas, TreeViewItem* item, sl_bool flagRoot)
@@ -1057,6 +1063,7 @@ namespace slib
 		UIAction action = ev->getAction();
 		if (action == UIAction::MouseLeave) {
 			m_itemHover.setNull();
+			_redrawContent(UIUpdateMode::Redraw);
 			return;
 		}
 		if (action == UIAction::LeftButtonDown || action == UIAction::TouchBegin) {
@@ -1102,6 +1109,7 @@ namespace slib
 				if (flagClick) {
 					m_itemSelected = item;
 					_processClickItem(item);
+					_redrawContent(UIUpdateMode::Redraw);
 				} else {
 					if (action == UIAction::MouseMove) {
 						if (m_itemHover != item) {

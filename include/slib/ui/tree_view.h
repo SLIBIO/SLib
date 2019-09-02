@@ -272,12 +272,12 @@ namespace slib
 		
 		void setTextIndent(sl_ui_pos indent, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
+		void setFont(const Ref<Font>& font, UIUpdateMode mode = UIUpdateMode::UpdateLayout) override;
+		
 	public:
 		SLIB_DECLARE_EVENT_HANDLER(TreeView, SelectItem, TreeViewItem* item)
 		
-	protected:
-		void onDraw(Canvas* canvas) override;
-		
+	protected:		
 		void onResize(sl_ui_len width, sl_ui_len height) override;
 		
 		void onChangePadding() override;
@@ -296,8 +296,6 @@ namespace slib
 		void _makeLayoutContent();
 		
 		void _makeLayoutItem(TreeViewItem* item, sl_ui_pos& top, sl_ui_pos left, sl_ui_pos right, sl_bool flagRoot);
-		
-		void _calcTextHeight(Canvas* canvas);
 		
 		void _drawItem(Canvas* canvas, TreeViewItem* item, sl_bool flagRoot);
 		
