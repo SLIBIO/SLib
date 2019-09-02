@@ -524,15 +524,32 @@ namespace slib
 				return sl_false;
 			}
 			if (size == 0) {
-				mem->setNull();
+				if (mem) {
+					mem->setNull();
+				}
 				return sl_true;
 			}
-			Memory ret = Memory::create(size);
-			if (ret.isNotNull()) {
-				if (readFully(ret.getData(), size) == (sl_reg)size) {
-					*mem = ret;
-					return sl_true;
+			if (mem) {
+				Memory ret = Memory::create(size);
+				if (ret.isNotNull()) {
+					if (readFully(ret.getData(), size) == (sl_reg)size) {
+						*mem = ret;
+						return sl_true;
+					}
 				}
+			} else {
+				char buf[512];
+				while (size) {
+					sl_size n = size;
+					if (n > sizeof(buf)) {
+						n = sizeof(buf);
+					}
+					if (readFully(buf, n) != n) {
+						return sl_false;
+					}
+					size -= n;
+				}
+				return sl_true;
 			}
 		}
 		return sl_false;
@@ -558,18 +575,22 @@ namespace slib
 
 	sl_bool IReader::readStringSection(String* str, sl_size maxLen)
 	{
-		Memory mem;
-		if (readSection(&mem, maxLen)) {
-			if (mem.isNull()) {
-				str->setNull();
-				return sl_true;
+		if (str) {
+			Memory mem;
+			if (readSection(&mem, maxLen)) {
+				if (mem.isNull()) {
+					str->setNull();
+					return sl_true;
+				}
+				sl_size len = mem.getSize();
+				String ret((char*)(mem.getData()), len);
+				if (ret.isNotNull()) {
+					*str = ret;
+					return sl_true;
+				}
 			}
-			sl_size len = mem.getSize();
-			String ret((char*)(mem.getData()), len);
-			if (ret.isNotNull()) {
-				*str = ret;
-				return sl_true;
-			}
+		} else {
+			return readSection(sl_null, maxLen);
 		}
 		return sl_false;
 	}
