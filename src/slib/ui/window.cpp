@@ -1259,10 +1259,6 @@ namespace slib
 			
 			window->setBackgroundColor(m_backgroundColor);
 			
-			window->setMinimized(m_flagMinimized);
-			window->setMaximized(m_flagMaximized);
-			
-			window->setAlwaysOnTop(m_flagAlwaysOnTop);
 			window->setCloseButtonEnabled(m_flagCloseButtonEnabled);
 			window->setMinimizeButtonEnabled(m_flagMinimizeButtonEnabled);
 			window->setMaximizeButtonEnabled(m_flagMaximizeButtonEnabled);
@@ -1281,6 +1277,20 @@ namespace slib
 			}
 #endif
 
+			if (m_flagMinimized) {
+				window->setMinimized(sl_true);
+			}
+			if (m_flagMaximized) {
+#ifdef SLIB_UI_IS_MACOS
+				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), Window, setMaximized, this, sl_true));
+#else
+				window->setMaximized(sl_true);
+#endif
+			}
+			if (m_flagAlwaysOnTop) {
+				window->setAlwaysOnTop(sl_true);
+			}
+			
 			attach(window, sl_false);
 			
 #if defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_EFL)
