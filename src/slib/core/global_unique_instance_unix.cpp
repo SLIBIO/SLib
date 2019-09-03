@@ -27,8 +27,11 @@
 #include "slib/core/global_unique_instance.h"
 
 #include "slib/core/file.h"
-#include "slib/core/list.h"
-#include "slib/core/safe_static.h"
+
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <errno.h>
 
 namespace slib
 {
@@ -38,16 +41,11 @@ namespace slib
 		namespace global_unique_instance
 		{
 			
-			typedef CList<String> GlobalUniqueInstanceList;
-			
-			SLIB_SAFE_STATIC_GETTER(GlobalUniqueInstanceList, GetGlobalUniqueInstanceList)
-			
 			class GlobalUniqueInstanceImpl : public GlobalUniqueInstance
 			{
 			public:
-				String m_name;
-				Ref<File> m_file;
-				String m_filePath;
+				int handle;
+				String path;
 				
 			public:
 				GlobalUniqueInstanceImpl()
@@ -56,13 +54,15 @@ namespace slib
 				
 				~GlobalUniqueInstanceImpl()
 				{
-					m_file->unlock();
-					m_file->close();
-					File::deleteFile(m_filePath);
-					GlobalUniqueInstanceList* list = GetGlobalUniqueInstanceList();
-					if (list) {
-						list->remove(m_name);
-					}
+					struct flock fl;
+					Base::resetMemory(&fl, 0, sizeof(fl));
+					fl.l_start = 0;
+					fl.l_len = 0;
+					fl.l_type = F_UNLCK;
+					fl.l_whence = SEEK_SET;
+					fcntl(handle, F_SETLK, &fl);
+					close(handle);
+					//remove(path.getData());
 				}
 				
 			};
@@ -77,64 +77,43 @@ namespace slib
 		if (_name.isEmpty()) {
 			return sl_null;
 		}
-		
 		String name = File::makeSafeFileName(_name);
-		GlobalUniqueInstanceList* list = GetGlobalUniqueInstanceList();
-		if (!list) {
-			return sl_null;
-		}
-		if (list->indexOf(name) >= 0) {
-			return sl_null;
-		}
+		String path = "/tmp/.slib_global_lock_" + name;
 		
-		Ref<GlobalUniqueInstanceImpl> instance = new GlobalUniqueInstanceImpl;
-		if (instance.isNotNull()) {
-			String filePath = "/tmp/.slib_global_lock_" + name;
-			Ref<File> file = File::openForWrite(filePath);
-			if (file.isNotNull()) {
-				if (file->lock()) {
-					instance->m_name = name;
-					instance->m_file = file;
-					instance->m_filePath = filePath;
-					list->add(name);
+		int handle = open(path.getData(), O_RDWR | O_CREAT | O_EXCL, 0644);
+		if (handle == -1) {
+			handle = open(path.getData(), O_RDWR);
+			if (handle == -1) {
+				return sl_null;
+			}
+		}
+		if (handle != -1) {
+			struct flock fl;
+			Base::resetMemory(&fl, 0, sizeof(fl));
+			fl.l_start = 0;
+			fl.l_len = 0;
+			fl.l_type = F_WRLCK;
+			fl.l_whence = SEEK_SET;
+			int ret = fcntl(handle, F_SETLK, &fl);
+			int err = errno;
+			err = EAGAIN;
+			if (ret >= 0) {
+				Ref<GlobalUniqueInstanceImpl> instance = new GlobalUniqueInstanceImpl;
+				if (instance.isNotNull()) {
+					instance->handle = handle;
+					instance->path = path;
 					return instance;
 				}
-				file->close();
-				File::deleteFile(filePath);
 			}
+			close(handle);
+			//remove(path.getData());
 		}
 		return sl_null;
 	}
 	
-	sl_bool GlobalUniqueInstance::exists(const String& _name)
+	sl_bool GlobalUniqueInstance::exists(const String& name)
 	{
-		if (_name.isEmpty()) {
-			return sl_false;
-		}
-		String name = File::makeSafeFileName(_name);
-		GlobalUniqueInstanceList* list = GetGlobalUniqueInstanceList();
-		if (!list) {
-			return sl_false;
-		}
-		if (list->indexOf(name) >= 0) {
-			return sl_true;
-		}
-		String fileName = "/tmp/.slib_global_lock_" + name;
-		if (File::exists(fileName)) {
-			Ref<File> file = File::openForWrite(fileName);
-			if (file.isNull()) {
-				return sl_true;
-			} else {
-				if (file->lock()) {
-					file->unlock();
-				} else {
-					return sl_true;
-				}
-				file->close();
-				File::deleteFile(fileName);
-			}
-		}
-		return sl_false;
+		return GlobalUniqueInstance::create(name).isNull();
 	}
 
 }
