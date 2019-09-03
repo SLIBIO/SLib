@@ -129,4 +129,20 @@ namespace slib
 			app->dispatchExit();
 		}
 	}
+	
+	SLIB_DEFINE_EVENT_HANDLER(UIApp, Reopen, sl_bool flagHasVisibleWindows, sl_bool& outFlagPerformNormalTasks)
+	
+	void UIApp::dispatchReopen(sl_bool flagHasVisibleWindows, sl_bool& outFlagPerformNormalTasks)
+	{
+		SLIB_INVOKE_EVENT_HANDLER(Reopen, flagHasVisibleWindows, outFlagPerformNormalTasks)
+	}
+	
+	void UIApp::dispatchReopenToApp(sl_bool flagHasVisibleWindows, sl_bool& outFlagPerformNormalTasks)
+	{
+		Ref<UIApp> app = getApp();
+		if (app.isNotNull()) {
+			app->dispatchReopen(flagHasVisibleWindows, outFlagPerformNormalTasks);
+		}
+	}
+
 }

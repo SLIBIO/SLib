@@ -398,6 +398,13 @@ using namespace slib::priv::ui_core;
 	UIApp::dispatchExitToApp();
 }
 
+- (BOOL)applicationShouldHandleReopen:(NSApplication *)sender hasVisibleWindows:(BOOL)flag
+{
+	sl_bool flagRet = sl_true;
+	UIApp::dispatchReopenToApp(flag ? sl_true : sl_false, flagRet);
+	return flagRet ? YES : NO;
+}
+
 @end
 
 #endif
