@@ -1306,6 +1306,7 @@ namespace slib
 			
 			if (m_flagVisible) {
 				window->setVisible(sl_true);
+				window->activate();
 			}
 
 			dispatchCreate();
