@@ -463,7 +463,7 @@ namespace slib
 		GET_API(bcrypt, BCryptCloseAlgorithmProvider)
 		GET_API(bcrypt, BCryptGenRandom)
 
-		sl_bool Windows::getRegistryValue(HKEY hKeyParent, const String16& path, const String16& name, Variant* out)
+	sl_bool Windows::getRegistryValue(HKEY hKeyParent, const String16& path, const String16& name, Variant* out)
 	{
 		if (!hKeyParent) {
 			return sl_false;
@@ -615,6 +615,48 @@ namespace slib
 			RegCloseKey(hKey);
 		}
 		return flagSuccess;
+	}
+
+	void Windows::setApplicationRunAtStartup(const String16& appName, const String16& path, sl_bool flagRegister)
+	{
+		List<String16> listDelete;
+		HKEY hKey = NULL;
+		RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_QUERY_VALUE | KEY_SET_VALUE, &hKey);
+		if (hKey) {
+			DWORD dwIndex = 0;
+			sl_char16 name[513] = { 0 };
+			sl_char16 data[1025] = { 0 };
+			for (;;) {
+				DWORD dwType = 0;
+				DWORD dwLenName = 512;
+				DWORD nData = 1024;
+				LSTATUS lRet = RegEnumValueW(hKey, dwIndex, (LPWSTR)name, &dwLenName, NULL, &dwType, (LPBYTE)data, &nData);
+				if (lRet == ERROR_SUCCESS) {
+					if (dwType == REG_SZ) {
+						if (path == data) {
+							if (flagRegister) {
+								// already registered
+								return;
+							} else {
+								listDelete.add_NoLock(name);
+							}
+						}
+					}
+				} else {
+					break;
+				}
+				dwIndex++;
+			}
+			if (flagRegister) {
+				RegSetValueExW(hKey, (LPCWSTR)(appName.getData()), NULL, REG_SZ, (BYTE*)(path.getData()), (DWORD)(path.getLength() + 1) * 2);
+			} else {
+				ListElements<String16> names(listDelete);
+				for (sl_size i = 0; i < names.count; i++) {
+					RegDeleteValueW(hKey, (LPCWSTR)(names[i].getData()));
+				}
+			}
+			RegCloseKey(hKey);
+		}
 	}
 
 	namespace priv

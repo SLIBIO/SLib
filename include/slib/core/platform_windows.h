@@ -198,6 +198,8 @@ namespace slib
 	
 		static sl_bool setRegistryValue(HKEY hKey, const String16& subPath, const String16& name, const Variant& value);
 	
+		static void setApplicationRunAtStartup(const String16& name, const String16& path, sl_bool flagRegister);
+
 
 		static WindowsVersion getVersion();
 

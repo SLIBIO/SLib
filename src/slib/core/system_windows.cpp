@@ -303,6 +303,27 @@ namespace slib
 		}
 	}
 
+	void System::registerApplicationRunAtStartup(const String& path)
+	{
+		String name = File::getFileNameOnly(path) + "_" + Time::now().toInt();
+		Windows::setApplicationRunAtStartup(name, path, sl_true);
+	}
+
+	void System::registerApplicationRunAtStartup()
+	{
+		registerApplicationRunAtStartup(System::getApplicationPath());
+	}
+
+	void System::unregisterApplicationRunAtStartup(const String& path)
+	{
+		Windows::setApplicationRunAtStartup(sl_null, path, sl_false);
+	}
+
+	void System::unregisterApplicationRunAtStartup()
+	{
+		unregisterApplicationRunAtStartup(System::getApplicationPath());
+	}
+
 }
 
 #endif
