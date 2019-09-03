@@ -3081,12 +3081,10 @@ namespace slib
 	void View::invalidateLayoutOfWrappingControl(UIUpdateMode mode)
 	{
 		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
-		if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
-			if (layoutAttrs.isNotNull()) {
-				if (layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping) {
-					invalidateLayout();
-					return;
-				}
+		if (layoutAttrs.isNotNull()) {
+			if (layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping) {
+				invalidateLayout(mode);
+				return;
 			}
 		}
 		invalidate(mode);
@@ -4887,7 +4885,7 @@ namespace slib
 	
 	void View::setHoverBackgroundColor(const Color& color, UIUpdateMode mode)
 	{
-		setPressedBackground(ColorDrawable::createColorDrawable(color), mode);
+		setHoverBackground(ColorDrawable::createColorDrawable(color), mode);
 	}
 
 	ScaleMode View::getBackgroundScaleMode()
