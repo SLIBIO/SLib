@@ -229,11 +229,11 @@ namespace slib
 				}
 			};
 
-			static void WriteHTML(IHTMLDocument2* doc, String16 content, String16 baseURL)
+			static void WriteHTML(IHTMLDocument2* doc, String content, String16 baseURL)
 			{
 				if (baseURL.isNotEmpty()) {
 					HRESULT hr;
-					IStream* stream = ::SHCreateMemStream((BYTE*)(content.getData()), (sl_uint32)(content.getLength() * 2));
+					IStream* stream = ::SHCreateMemStream((BYTE*)(content.getData()), (sl_uint32)(content.getLength()));
 					if (stream) {
 						IPersistMoniker* persistMoniker = NULL;
 						hr = doc->QueryInterface(IID_IPersistMoniker, (void**)(&persistMoniker));
