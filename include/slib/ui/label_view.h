@@ -66,6 +66,10 @@ namespace slib
 		
 		virtual void setEllipsize(EllipsizeMode ellipsizeMode, UIUpdateMode updateMode = UIUpdateMode::UpdateLayout);
 		
+		sl_uint32 getLinesCount();
+		
+		virtual void setLinesCount(sl_uint32 nLines, UIUpdateMode updateMode = UIUpdateMode::UpdateLayout);
+		
 		UISize measureSize();
 		
 	public:
@@ -90,6 +94,7 @@ namespace slib
 		Alignment m_textAlignment;
 		MultiLineMode m_multiLineMode;
 		EllipsizeMode m_ellipsizeMode;
+		sl_uint32 m_linesCount;
 		
 		SimpleTextBox m_textBox;
 		

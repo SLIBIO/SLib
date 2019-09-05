@@ -324,6 +324,7 @@ namespace slib
 		tabMargin = 1;
 		align = Alignment::Left;
 		multiLineMode = MultiLineMode::Single;
+		linesCount = 0;
 	}
 
 	TextParagraphLayoutParam::~TextParagraphLayoutParam() noexcept
@@ -911,6 +912,7 @@ namespace slib
 				Alignment m_align;
 				MultiLineMode m_multiLineMode;
 				EllipsizeMode m_ellipsizeMode;
+				sl_uint32 m_linesCount;
 				sl_real m_tabMargin;
 				sl_real m_tabWidth;
 				
@@ -921,6 +923,7 @@ namespace slib
 				CList< Ref<TextItem> > m_lineItems;
 				sl_real m_lineWidth;
 				sl_real m_lineHeight;
+				sl_uint32 m_lineNo;
 				
 				sl_real m_maxWidth;
 				
@@ -932,6 +935,7 @@ namespace slib
 					m_align = param.align & Alignment::HorizontalMask;
 					m_multiLineMode = param.multiLineMode;
 					m_ellipsizeMode = param.ellipsisMode;
+					m_linesCount = param.linesCount;
 					m_tabWidth = param.tabWidth;
 					m_tabMargin = param.tabMargin;
 					
@@ -941,13 +945,14 @@ namespace slib
 
 					m_lineWidth = 0;
 					m_lineHeight = 0;
+					m_lineNo = 0;
 					m_maxWidth = 0;
 				}
 				
 				void endLine() noexcept
 				{
 					sl_size n = m_lineItems.getCount();
-					if (n == 0) {
+					if (!n) {
 						return;
 					}
 					sl_real x;
@@ -964,24 +969,33 @@ namespace slib
 						}
 					}
 					sl_real bottom = m_y + m_lineHeight;
+					
 					Ref<TextItem>* p = m_lineItems.getData();
 					for (sl_size i = 0; i < n; i++) {
 						TextItem* item = p[i].get();
 						Size size = item->getLayoutSize();
 						Point pt(x, m_y + (m_lineHeight - size.y) / 2);
 						item->setLayoutPosition(pt);
+						x += size.x;
+						TextItemType type = item->getType();
+						if (type == TextItemType::Attach) {
+							(static_cast<TextAttachItem*>(item))->setPosition(pt);
+						}
+					}
+					
+					m_lineNo++;
+					if (m_ellipsizeMode != EllipsizeMode::None) {
+						if ((m_lineWidth > m_layoutWidth && m_multiLineMode == MultiLineMode::Single) || (m_linesCount > 0 && m_lineNo >= m_linesCount)) {
+							endEllipsize();
+						}
+					}
+					
+					n = m_lineItems.getCount();
+					for (sl_size i = 0; i < n; i++) {
+						TextItem* item = p[i].get();
 						TextItemType type = item->getType();
 						if (type == TextItemType::Word || type == TextItemType::Space || type == TextItemType::Tab) {
 							m_layoutItems->add_NoLock(item);
-						} else if (type == TextItemType::Attach) {
-							(static_cast<TextAttachItem*>(item))->setPosition(pt);
-						}
-						x += size.x;
-					}
-					
-					if (m_ellipsizeMode != EllipsizeMode::None) {
-						if (m_lineWidth > m_layoutWidth) {
-							endEllipsize();
 						}
 					}
 					
@@ -994,13 +1008,23 @@ namespace slib
 					m_y = bottom;
 					m_lineHeight = 0;
 					
+					if (m_multiLineMode == MultiLineMode::Single) {
+						m_flagEnd = sl_true;
+					} else {
+						if (m_linesCount > 0) {
+							if (m_lineNo >= m_linesCount) {
+								m_flagEnd = sl_true;
+							}
+						}
+					}
 				}
 				
 				void endEllipsize() noexcept
 				{
 					SLIB_STATIC_STRING16_BY_ARRAY(strEllipsis, '.', '.', '.')
-					sl_size nItems = m_layoutItems->getCount();
-					Ref<TextItem>* items = m_layoutItems->getData();
+					CList< Ref<TextItem> >* listItems = &m_lineItems;
+					sl_size nItems = listItems->getCount();
+					Ref<TextItem>* items = listItems->getData();
 					if (nItems < 1) {
 						return;
 					}
@@ -1034,21 +1058,21 @@ namespace slib
 												break;
 											}
 										}
-										m_layoutItems->setCount_NoLock(i);
+										listItems->setCount_NoLock(i);
 										if (k > 0) {
 											word->setLayoutPosition(item->getLayoutPosition());
 											word->setLayoutSize(word->getSize());
-											m_layoutItems->add_NoLock(word);
+											listItems->add_NoLock(word);
 											pos.x += word->getSize().x;
 											itemEllipsis->setLayoutPosition(pos);
 										}
 									} else {
-										m_layoutItems->setCount_NoLock(i);
+										listItems->setCount_NoLock(i);
 									}
 								} else {
-									m_layoutItems->setCount_NoLock(i);
+									listItems->setCount_NoLock(i);
 								}
-								m_layoutItems->add_NoLock(itemEllipsis);
+								listItems->add_NoLock(itemEllipsis);
 								m_flagEnd = sl_true;
 								return;
 							}
@@ -1080,22 +1104,22 @@ namespace slib
 												break;
 											}
 										}
-										m_layoutItems->removeRange_NoLock(0, nItems - i);
+										listItems->removeRange_NoLock(0, nItems - i);
 										if (k > 0) {
 											pos.x = pos.x + widthWord - word->getSize().x;
 											word->setLayoutPosition(pos);
 											word->setLayoutSize(word->getSize());
-											m_layoutItems->add_NoLock(word);
+											listItems->add_NoLock(word);
 											pos.x -= sizeEllipsis.x;
 											itemEllipsis->setLayoutPosition(pos);
 										}
 									} else {
-										m_layoutItems->removeRange_NoLock(0, nItems - i);
+										listItems->removeRange_NoLock(0, nItems - i);
 									}
 								} else {
-									m_layoutItems->removeRange_NoLock(0, nItems - i);
+									listItems->removeRange_NoLock(0, nItems - i);
 								}
-								m_layoutItems->insert_NoLock(0, itemEllipsis);
+								listItems->insert_NoLock(0, itemEllipsis);
 								m_flagEnd = sl_true;
 								return;
 							}
@@ -1134,22 +1158,22 @@ namespace slib
 												break;
 											}
 										}
-										m_layoutItems->removeRange(indexMid, nItems - indexMid - i);
+										listItems->removeRange(indexMid, nItems - indexMid - i);
 										if (k > 0) {
 											pos.x = pos.x + widthWord - word->getSize().x;
 											word->setLayoutPosition(pos);
 											word->setLayoutSize(word->getSize());
-											m_layoutItems->insert_NoLock(indexMid, word);
+											listItems->insert_NoLock(indexMid, word);
 											pos.x -= sizeEllipsis.x + sizeEllipsis.x * 0.2f;
 											itemEllipsis->setLayoutPosition(pos);
 										}
 									} else {
-										m_layoutItems->removeRange_NoLock(indexMid, nItems - indexMid - i);
+										listItems->removeRange_NoLock(indexMid, nItems - indexMid - i);
 									}
 								} else {
-									m_layoutItems->removeRange_NoLock(indexMid, nItems - indexMid - i);
+									listItems->removeRange_NoLock(indexMid, nItems - indexMid - i);
 								}
-								m_layoutItems->insert_NoLock(indexMid, itemEllipsis);
+								listItems->insert_NoLock(indexMid, itemEllipsis);
 								m_flagEnd = sl_true;
 								return;
 							}
@@ -1195,6 +1219,9 @@ namespace slib
 					if (size.x > widthRemaining && m_x > 0) {
 						endLine();
 						widthRemaining = m_layoutWidth;
+						if (m_flagEnd) {
+							return;
+						}
 					}
 
 					while (pos < len) {
@@ -1213,6 +1240,9 @@ namespace slib
 							x = 0;
 							height = 0;
 							widthRemaining = m_layoutWidth;
+							if (m_flagEnd) {
+								return;
+							}
 						}
 						x += size.x;
 						if (size.y > height) {
@@ -1267,6 +1297,9 @@ namespace slib
 								}
 								if (x > m_layoutWidth) {
 									flagBreakWord = sl_true;
+								}
+								if (m_flagEnd) {
+									return nWords - 1;
 								}
 							}
 						} else if (m_multiLineMode == MultiLineMode::BreakWord) {
@@ -1327,9 +1360,6 @@ namespace slib
 					m_lineWidth = m_x;
 					endLine();
 					item->setLayoutPosition(Point(m_x, m_y));
-					if (m_multiLineMode == MultiLineMode::Single) {
-						m_flagEnd = sl_true;
-					}
 				}
 				
 				void processAttach(TextAttachItem* item) noexcept
@@ -1536,6 +1566,7 @@ namespace slib
 		width(0),
 		multiLineMode(MultiLineMode::WordWrap),
 		ellipsizeMode(EllipsizeMode::None),
+		linesCount(0),
 		align(Alignment::TopLeft)
 	{
 	}
@@ -1587,8 +1618,16 @@ namespace slib
 		}
 		MultiLineMode multiLineMode = param.multiLineMode;
 		EllipsizeMode ellipsizeMode = param.ellipsizeMode;
+		sl_uint32 linesCount = param.linesCount;
+		
 		if (multiLineMode != MultiLineMode::Single) {
-			ellipsizeMode = EllipsizeMode::None;
+			if (linesCount == 0) {
+				ellipsizeMode = EllipsizeMode::None;
+			} else {
+				if (ellipsizeMode != EllipsizeMode::End) {
+					ellipsizeMode = EllipsizeMode::None;
+				}
+			}
 		}
 		
 		m_alignVertical = param.align & Alignment::VerticalMask;
@@ -1628,7 +1667,7 @@ namespace slib
 			return;
 		}
 		if (m_paragraph.isNotNull()) {
-			if (m_font != param.font || !(Math::isAlmostZero(m_width - width)) || m_multiLineMode != multiLineMode || m_ellipsisMode != ellipsizeMode || m_alignHorizontal != alignHorizontal) {
+			if (m_font != param.font || !(Math::isAlmostZero(m_width - width)) || m_multiLineMode != multiLineMode || m_ellipsisMode != ellipsizeMode || m_linesCount != linesCount || m_alignHorizontal != alignHorizontal) {
 				flagReLayout = sl_true;
 			}
 			if (flagReLayout) {
@@ -1638,6 +1677,7 @@ namespace slib
 				paramParagraph.tabMargin = paramParagraph.tabWidth / 4;
 				paramParagraph.multiLineMode = multiLineMode;
 				paramParagraph.ellipsisMode = ellipsizeMode;
+				paramParagraph.linesCount = linesCount;
 				paramParagraph.align = alignHorizontal;
 				m_paragraph->layout(paramParagraph);
 				
@@ -1646,6 +1686,7 @@ namespace slib
 				m_multiLineMode = multiLineMode;
 				m_ellipsisMode = ellipsizeMode;
 				m_alignHorizontal = alignHorizontal;
+				m_linesCount = linesCount;
 				
 				m_contentWidth = m_paragraph->getMaximumWidth();
 				m_contentHeight = m_paragraph->getTotalHeight();

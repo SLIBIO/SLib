@@ -394,6 +394,7 @@ namespace slib
 		SAppAlignmentValue gravity;
 		SAppMultiLineModeValue multiLine;
 		SAppEllipsizeModeValue ellipsize;
+		SAppUint32Value lines;
 
 	};
 

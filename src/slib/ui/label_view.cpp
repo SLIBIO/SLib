@@ -40,6 +40,7 @@ namespace slib
 		m_textColor = Color::Black;
 		m_multiLineMode = MultiLineMode::Single;
 		m_ellipsizeMode = EllipsizeMode::None;
+		m_linesCount = 0;
 		
 		setPadding(1, 1, 1, 1, UIUpdateMode::Init);
 	}
@@ -116,6 +117,17 @@ namespace slib
 		invalidate(updateMode);
 	}
 	
+	sl_uint32 LabelView::getLinesCount()
+	{
+		return m_linesCount;
+	}
+	
+	void LabelView::setLinesCount(sl_uint32 nLines, UIUpdateMode updateMode)
+	{
+		m_linesCount = nLines;
+		invalidateLayoutOfWrappingControl(updateMode);
+	}
+	
 	UISize LabelView::measureSize()
 	{
 		_updateTextBox(getWidth());
@@ -160,6 +172,7 @@ namespace slib
 		param.width = (sl_real)widthText;
 		param.multiLineMode = m_multiLineMode;
 		param.ellipsizeMode = m_ellipsizeMode;
+		param.linesCount = m_linesCount;
 		param.align = m_textAlignment;
 		m_textBox.update(param);
 	}
