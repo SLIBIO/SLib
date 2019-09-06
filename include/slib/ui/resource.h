@@ -354,6 +354,7 @@ namespace slib
 	class Drawer;
 	class ChatView;
 	class RefreshView;
+	class CollectionView;
 
 }
 

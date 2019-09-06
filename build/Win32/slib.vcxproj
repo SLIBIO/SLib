@@ -358,6 +358,7 @@
     </ClCompile>
     <ClCompile Include="..\..\src\slib\ui\clipboard.cpp" />
     <ClCompile Include="..\..\src\slib\ui\clipboard_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\collection_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\common_dialogs.cpp" />
     <ClCompile Include="..\..\src\slib\ui\common_dialogs_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\cursor.cpp" />

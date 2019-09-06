@@ -914,6 +914,7 @@ namespace slib
 			PROCESS_CONTROL_SWITCH(Scroll)
 			PROCESS_CONTROL_SWITCH(Linear)
 			PROCESS_CONTROL_SWITCH(List)
+			PROCESS_CONTROL_SWITCH(Collection)
 			PROCESS_CONTROL_SWITCH(ListReport)
 			PROCESS_CONTROL_SWITCH(Render)
 			PROCESS_CONTROL_SWITCH(Tab)
@@ -3217,7 +3218,7 @@ namespace slib
 		} else if (op == OP_SIMULATE) {
 			_openLayoutResource(resource, attr->itemLayout);
 			
-			if (attr->itemLayout.isNotEmpty()) {
+			if (attr->itemLayout.isNotEmpty() && !(view->getProperty("setAdapter").getBoolean())) {
 				
 				Ref<SAppLayoutResource> layoutItem;
 				m_layouts.get(attr->itemLayout, &layoutItem);
@@ -3236,7 +3237,7 @@ namespace slib
 				adapter->layout = layoutItem;
 				
 				view->setAdapter(adapter);
-				
+				view->setProperty("setAdapter", sl_true);
 			}
 		}
 		
@@ -3245,6 +3246,42 @@ namespace slib
 	}
 	END_PROCESS_LAYOUT_CONTROL
 
+	BEGIN_PROCESS_LAYOUT_CONTROL(Collection, CollectionView)
+	{
+		LAYOUT_CONTROL_PROCESS_SUPER(View)
+		
+		if (op == OP_PARSE) {
+			attr->itemLayout = resourceItem->getXmlAttribute("item");
+		} else if (op == OP_SIMULATE) {
+			_openLayoutResource(resource, attr->itemLayout);
+			
+			if (attr->itemLayout.isNotEmpty() && !(view->getProperty("setAdapter").getBoolean())) {
+				
+				Ref<SAppLayoutResource> layoutItem;
+				m_layouts.get(attr->itemLayout, &layoutItem);
+				if (layoutItem.isNull()) {
+					_logError(element, g_str_error_layout_not_found.arg(attr->itemLayout));
+					return sl_false;
+				}
+				if (layoutItem->layoutType != SAppLayoutType::View) {
+					_logError(element, g_str_error_layout_is_not_view.arg(attr->itemLayout));
+					return sl_false;
+				}
+				
+				Ref<_SAppDocument_SimuationListViewAdapter> adapter = new _SAppDocument_SimuationListViewAdapter;
+				adapter->refer = params->simulator->getReferable();
+				adapter->simulator = params->simulator;
+				adapter->layout = layoutItem;
+				
+				view->setAdapter(adapter);
+				view->setProperty("setAdapter", sl_true);
+			}
+		}
+		
+		LAYOUT_CONTROL_ADD_STATEMENT
+		
+	}
+	END_PROCESS_LAYOUT_CONTROL
 
 	BEGIN_PROCESS_LAYOUT_CONTROL(ListReport, ListReportView)
 	{

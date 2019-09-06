@@ -230,6 +230,7 @@ namespace slib
 		sl_bool _processLayoutResourceControl_Scroll(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_Linear(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_List(LayoutControlProcessParams* params);
+		sl_bool _processLayoutResourceControl_Collection(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_ListReport(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_Render(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_Tab(LayoutControlProcessParams* params);

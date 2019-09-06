@@ -37,6 +37,11 @@ namespace slib
 	{
 	}
 	
+	sl_object_type ViewAdapter::getViewType(sl_uint64 index, View* parent)
+	{
+		return sl_null;
+	}
+	
 	sl_ui_len ViewAdapter::getAverageItemHeight(View* parent)
 	{
 		return 0;

@@ -8,7 +8,7 @@
 			style='button_back'
 			/>
 		<refresh name='refreshControl' width='fill' height='fill' below='btnBack'>
-			<list name='listView' item='ListViewItem' />
+			<collection name='listView' item='ListViewItem' />
 		</refresh>
  	</layout>
 </sapp>

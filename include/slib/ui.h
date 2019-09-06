@@ -57,6 +57,7 @@
 #include "ui/scroll_view.h"
 #include "ui/linear_view.h"
 #include "ui/list_view.h"
+#include "ui/collection_view.h"
 #include "ui/list_report_view.h"
 #include "ui/split_view.h"
 #include "ui/tab_view.h"

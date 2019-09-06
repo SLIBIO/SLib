@@ -1277,5 +1277,8 @@
     <ClCompile Include="..\..\src\slib\ui\chromium.cpp">
       <Filter>src\ui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\ui\collection_view.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

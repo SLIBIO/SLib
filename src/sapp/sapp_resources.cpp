@@ -407,6 +407,10 @@ namespace slib
 				prefix = "list";
 				pN = &nAutoIncreaseNameList;
 				break;
+			case SAppLayoutItemType::Collection:
+				prefix = "collection";
+				pN = &nAutoIncreaseNameCollection;
+				break;
 			case SAppLayoutItemType::ListReport:
 				prefix = "listReport";
 				pN = &nAutoIncreaseNameListReport;
@@ -533,6 +537,8 @@ namespace slib
 			type = SAppLayoutItemType::Linear;
 		} else if (strType == "list") {
 			type = SAppLayoutItemType::List;
+		} else if (strType == "collection") {
+			type = SAppLayoutItemType::Collection;
 		} else if (strType == "listreport" || strType == "list-report") {
 			type = SAppLayoutItemType::ListReport;
 		} else if (strType == "render") {

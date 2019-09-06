@@ -44,6 +44,8 @@ namespace slib
 		
 		virtual Ref<View> getView(sl_uint64 index, View* original, View* parent) = 0;
 		
+		virtual sl_object_type getViewType(sl_uint64 index, View* parent);
+		
 		virtual sl_ui_len getAverageItemHeight(View* parent);
 		
 		virtual sl_ui_len getItemHeight(sl_uint64 index, View* parent);

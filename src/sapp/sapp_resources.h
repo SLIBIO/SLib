@@ -504,6 +504,13 @@ namespace slib
 		
 	};
 
+	class SAppLayoutCollectionAttributes : public Referable
+	{
+	public:
+		String itemLayout;
+		
+	};
+
 	struct SAppLayoutListReportColumn
 	{
 		SAppStringValue title;
@@ -849,12 +856,13 @@ namespace slib
 		Scroll = 0x0230,
 		Linear = 0x0231,
 		List = 0x0232,
-		ListReport = 0x0233,
-		Render = 0x0234,
-		Tab = 0x0235,
-		Tree = 0x0236,
-		Web = 0x0237,
-		Split = 0x0238,
+		Collection = 0x0233,
+		ListReport = 0x0234,
+		Render = 0x0235,
+		Tab = 0x0236,
+		Tree = 0x0237,
+		Web = 0x0238,
+		Split = 0x0239,
 		
 		Progress = 0x0240,
 		Slider = 0x0241,
@@ -900,6 +908,7 @@ namespace slib
 		Ref<SAppLayoutScrollAttributes> attrsScroll;
 		Ref<SAppLayoutLinearAttributes> attrsLinear;
 		Ref<SAppLayoutListAttributes> attrsList;
+		Ref<SAppLayoutCollectionAttributes> attrsCollection;
 		Ref<SAppLayoutListReportAttributes> attrsListReport;
 		Ref<SAppLayoutRenderAttributes> attrsRender;
 		Ref<SAppLayoutTabAttributes> attrsTab;
@@ -966,6 +975,7 @@ namespace slib
 		sl_uint32 nAutoIncreaseNameScroll = 0;
 		sl_uint32 nAutoIncreaseNameLinear = 0;
 		sl_uint32 nAutoIncreaseNameList = 0;
+		sl_uint32 nAutoIncreaseNameCollection = 0;
 		sl_uint32 nAutoIncreaseNameListReport = 0;
 		sl_uint32 nAutoIncreaseNameRender = 0;
 		sl_uint32 nAutoIncreaseNameTab = 0;

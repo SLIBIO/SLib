@@ -1045,6 +1045,7 @@
 		26E1B8F8222ABCDD007C222E /* jquant1.c in Sources */ = {isa = PBXBuildFile; fileRef = 260D83E520C838F90013B34E /* jquant1.c */; };
 		26E1B8F9222ABCDD007C222E /* jquant2.c in Sources */ = {isa = PBXBuildFile; fileRef = 260D83E420C838F90013B34E /* jquant2.c */; };
 		26E1B8FA222ABCDD007C222E /* jutils.c in Sources */ = {isa = PBXBuildFile; fileRef = 260D83E320C838F90013B34E /* jutils.c */; };
+		26E44AEB2322F39D00A88D93 /* collection_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E44AEA2322F39C00A88D93 /* collection_view.cpp */; };
 		26F53F9E22E1EBD50031D485 /* date_picker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F53F9D22E1EBD50031D485 /* date_picker.cpp */; };
 		26F53FA222E2E6D70031D485 /* line_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F53FA122E2E6D60031D485 /* line_view.cpp */; };
 		26F5EA6422D6810A00CD1595 /* toast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5EA6322D6810900CD1595 /* toast.cpp */; };
@@ -2288,6 +2289,7 @@
 		26DA4B4F223C22DE00706393 /* media_player_ffmpeg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = media_player_ffmpeg.cpp; path = media/media_player_ffmpeg.cpp; sourceTree = "<group>"; };
 		26E1B85522283BD3007C222E /* pinterest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pinterest.cpp; sourceTree = "<group>"; };
 		26E1B85922290380007C222E /* ebay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ebay.cpp; sourceTree = "<group>"; };
+		26E44AEA2322F39C00A88D93 /* collection_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = collection_view.cpp; sourceTree = "<group>"; };
 		26E49B1E1D79AD0A0052D89F /* select_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = select_view.cpp; sourceTree = "<group>"; };
 		26E49B201D79AD440052D89F /* select_view_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = select_view_ios.mm; sourceTree = "<group>"; };
 		26E5E6EC1E4CDD5500020156 /* network_async.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = network_async.h; sourceTree = "<group>"; };
@@ -4170,6 +4172,7 @@
 				2674666F2318556700DE8715 /* chromium.cpp */,
 				26C7959B221538D90053C5A1 /* clipboard.cpp */,
 				26C7959A221538D90053C5A1 /* clipboard_ios.mm */,
+				26E44AEA2322F39C00A88D93 /* collection_view.cpp */,
 				2649C23A1CBBD7BF003E7561 /* common_dialogs.cpp */,
 				2649C23C1CBBD7D4003E7561 /* common_dialogs_ios.mm */,
 				266DD41A1C118E4A00D47AB0 /* cursor.cpp */,
@@ -5182,6 +5185,7 @@
 				26D9D8051E9628E0005F7BD3 /* matrix2.cpp in Sources */,
 				26B92D5021D357AD003F6F82 /* des.cpp in Sources */,
 				26D9D8601E962937005F7BD3 /* latlon.cpp in Sources */,
+				26E44AEB2322F39D00A88D93 /* collection_view.cpp in Sources */,
 				26E1B8C4222ABBE7007C222E /* pngtrans.c in Sources */,
 				26D9D8DB1E962976005F7BD3 /* ui_animation.cpp in Sources */,
 				26D9D8611E96294F005F7BD3 /* bitmap.cpp in Sources */,
