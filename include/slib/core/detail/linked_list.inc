@@ -36,7 +36,30 @@ namespace slib
 	{
 		removeAll_NoLock();
 	}
-	
+
+	template <class T>
+	CLinkedList<T>::CLinkedList(CLinkedList<T>&& other) noexcept
+	{
+		m_front = other.m_front;
+		m_back = other.m_back;
+		m_count = other.m_count;
+		other.m_front = sl_null;
+		other.m_back = sl_null;
+		other.m_count = 0;
+	}
+
+	template <class T>
+	CLinkedList<T>& CLinkedList<T>::operator=(CLinkedList<T>&& other) noexcept
+	{
+		m_front = other.m_front;
+		m_back = other.m_back;
+		m_count = other.m_count;
+		other.m_front = sl_null;
+		other.m_back = sl_null;
+		other.m_count = 0;
+		return *this;
+	}
+
 	template <class T>
 	SLIB_INLINE void CLinkedList<T>::initialize() noexcept
 	{

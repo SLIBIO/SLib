@@ -96,9 +96,14 @@ namespace slib
 
 	public:
 		CLinkedList() noexcept;
-
+		
 		~CLinkedList() noexcept;
 
+	public:
+		CLinkedList(CLinkedList&& other) noexcept;
+
+		CLinkedList& operator=(CLinkedList&& other) noexcept;
+		
 	public:
 		// not-free existing links
 		void initialize() noexcept;
