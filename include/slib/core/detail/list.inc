@@ -243,6 +243,25 @@ namespace slib
 	}
 	
 	template <class T>
+	template <class VALUE>
+	CList<T>* CList<T>::createFromElement(VALUE&& value) noexcept
+	{
+		CList<T>* ret = new CList<T>();
+		if (ret) {
+			T* data = (T*)(Base::createMemory(sizeof(T)));
+			if (data) {
+				new (data) T(Forward<VALUE>(value));
+				ret->m_data = data;
+				ret->m_count = 1;
+				ret->m_capacity = 1;
+				return ret;
+			}
+			delete ret;
+		}
+		return sl_null;
+	}
+	
+	template <class T>
 	CList<T>* CList<T>::createFromElement(const T& value, sl_size count) noexcept
 	{
 		return create(count, count, value);
@@ -1421,6 +1440,13 @@ namespace slib
 	}
 	
 	template <class T>
+	template <class VALUE>
+	SLIB_INLINE List<T> List<T>::createFromElement(VALUE&& e) noexcept
+	{
+		return CList<T>::createFromElement(Forward<VALUE>(e));
+	}
+	
+	template <class T>
 	SLIB_INLINE List<T> List<T>::createFromElement(const T& e, sl_size count) noexcept
 	{
 		return CList<T>::createFromElement(e, count);
@@ -2206,7 +2232,7 @@ namespace slib
 		if (obj) {
 			return obj->addIfNotExist_NoLock(Forward<VALUE>(value), equals);
 		} else {
-			obj = CList<T>::createFromElement(value);
+			obj = CList<T>::createFromElement(Forward<VALUE>(value));
 			if (obj) {
 				ref = obj;
 				return sl_true;

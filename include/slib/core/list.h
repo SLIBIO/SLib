@@ -105,7 +105,10 @@ namespace slib
 		static CList<T>* create(const std::initializer_list<T>& l) noexcept;
 #endif
 		
-		static CList<T>* createFromElement(const T& value, sl_size count = 1) noexcept;
+		template <class VALUE>
+		static CList<T>* createFromElement(VALUE&& value) noexcept;
+		
+		static CList<T>* createFromElement(const T& value, sl_size count) noexcept;
 		
 		template <class... ARGS>
 		static CList<T>* createFromElements(ARGS&&... values) noexcept;
@@ -413,7 +416,10 @@ namespace slib
 		static List<T> create(const std::initializer_list<T>& l) noexcept;
 #endif
 
-		static List<T> createFromElement(const T& e, sl_size count = 1) noexcept;
+		template <class VALUE>
+		static List<T> createFromElement(VALUE&& e) noexcept;
+		
+		static List<T> createFromElement(const T& e, sl_size count) noexcept;
 		
 		template <class... ARGS>
 		static List<T> createFromElements(ARGS&&... args) noexcept;
