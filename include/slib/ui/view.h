@@ -1066,13 +1066,13 @@ namespace slib
 		
 		ScrollPoint getContentSize();
 		
-		virtual void setContentSize(sl_scroll_pos width, sl_scroll_pos height, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setContentSize(sl_scroll_pos width, sl_scroll_pos height, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setContentSize(const ScrollPoint& size, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setContentSize(const ScrollPoint& size, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setContentWidth(sl_scroll_pos width, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setContentWidth(sl_scroll_pos width, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
-		void setContentHeight(sl_scroll_pos height, UIUpdateMode mode = UIUpdateMode::Redraw);
+		void setContentHeight(sl_scroll_pos height, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		virtual ScrollPoint getScrollRange();
 		
@@ -1765,8 +1765,9 @@ namespace slib
 
 		friend class ViewInstance;
 		friend class Window;
-		friend class ListView;
 		friend class LinearView;
+		friend class ListView;
+		friend class CollectionView;
 
 	};
 

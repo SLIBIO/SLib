@@ -120,7 +120,7 @@ namespace slib
 		ObjectLocker lock(this);
 		Ref<View> viewContent = m_viewContent;
 		if (viewContent.isNotNull()) {
-			viewContent->setSize(width, height, SLIB_UI_UPDATE_MODE_IS_REDRAW(mode) ? UIUpdateMode::UpdateLayout : mode);
+			viewContent->setSize(width, height, mode);
 		}
 		ViewGroup::setContentSize(_width, _height, mode);
 		if (instance.isNotNull()) {

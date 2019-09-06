@@ -48,7 +48,7 @@ namespace slib
 		
 		using ViewGroup::setContentSize;
 		
-		void setContentSize(sl_scroll_pos width, sl_scroll_pos height, UIUpdateMode mode = UIUpdateMode::Redraw) override;
+		void setContentSize(sl_scroll_pos width, sl_scroll_pos height, UIUpdateMode mode = UIUpdateMode::UpdateLayout) override;
 		
 		ScrollPoint getScrollPosition() override;
 		

@@ -894,12 +894,18 @@ namespace slib
 		if (isInstance()) {
 			SLIB_VIEW_RUN_ON_UI_THREAD(&View::removeAllChildren, mode)
 			ListLocker< Ref<View> > children(attrs->children);
+			if (!(children.count)) {
+				return;
+			}
 			for (sl_size i = 0; i < children.count; i++) {
 				Ref<View>& child = children[i];
 				_removeChild(child.get());
 			}
 		} else {
 			ListLocker< Ref<View> > children(attrs->children);
+			if (!(children.count)) {
+				return;
+			}
 			for (sl_size i = 0; i < children.count; i++) {
 				children[i]->_removeParent(this);
 			}
