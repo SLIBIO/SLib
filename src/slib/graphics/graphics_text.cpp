@@ -990,6 +990,7 @@ namespace slib
 						}
 					}
 					
+					p = m_lineItems.getData();
 					n = m_lineItems.getCount();
 					for (sl_size i = 0; i < n; i++) {
 						TextItem* item = p[i].get();
