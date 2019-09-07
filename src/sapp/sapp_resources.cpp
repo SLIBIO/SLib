@@ -309,6 +309,7 @@ namespace slib
 		arrayIndex = -1;
 		itemType = SAppLayoutItemType::Unknown;
 		flagGeneratedName = sl_false;
+		flagNoChildren = sl_false;
 	}
 
 	String SAppLayoutResourceItem::getXmlAttribute(const String& name)

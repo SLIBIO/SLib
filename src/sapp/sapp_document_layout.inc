@@ -153,7 +153,7 @@ namespace slib
 		return sl_true;
 	}
 	
-	sl_bool SAppDocument::_parseLayoutResource(const String& filePath, const String& localNamespace, const Ref<XmlElement>& element)
+	sl_bool SAppDocument::_parseLayoutResource(const String& filePath, const String& localNamespace, const Ref<XmlElement>& element, const String16& source)
 	{
 		if (element.isNull()) {
 			return sl_false;
@@ -190,7 +190,7 @@ namespace slib
 		
 		layout->baseClassName = layout->getXmlAttribute("base");
 
-		if (!(_parseLayoutResourceItem(layout.get(), layout.get(), sl_null))) {
+		if (!(_parseLayoutResourceItem(layout.get(), layout.get(), sl_null, source))) {
 			return sl_false;
 		}
 		
@@ -221,7 +221,7 @@ namespace slib
 		}
 	}
 
-	sl_bool SAppDocument::_parseLayoutResourceItem(SAppLayoutResource* layout, SAppLayoutResourceItem* item, SAppLayoutResourceItem* parent)
+	sl_bool SAppDocument::_parseLayoutResourceItem(SAppLayoutResource* layout, SAppLayoutResourceItem* item, SAppLayoutResourceItem* parent, const String16& source)
 	{
 		Ref<XmlElement> element = item->element;
 		if (element.isNull()) {
@@ -287,6 +287,7 @@ namespace slib
 		
 		LayoutControlProcessParams pp;
 		pp.op = OP_PARSE;
+		pp.source = source;
 		pp.resource = layout;
 		pp.resourceItem = item;
 		pp.parentResourceItem = parent;
@@ -344,7 +345,7 @@ namespace slib
 		return sl_true;
 	}
 
-	Ref<SAppLayoutResourceItem> SAppDocument::_parseLayoutResourceItemChild(SAppLayoutResource* layout, SAppLayoutResourceItem* parentItem, const Ref<XmlElement>& element)
+	Ref<SAppLayoutResourceItem> SAppDocument::_parseLayoutResourceItemChild(SAppLayoutResource* layout, SAppLayoutResourceItem* parentItem, const Ref<XmlElement>& element, const String16& source)
 	{
 		String strType = element->getName();
 		SAppLayoutItemType type = SAppLayoutResource::getTypeFromName(strType);
@@ -362,7 +363,7 @@ namespace slib
 		childItem->itemType = type;
 		childItem->element = element;
 		
-		if (!(_parseLayoutResourceItem(layout, childItem.get(), parentItem))) {
+		if (!(_parseLayoutResourceItem(layout, childItem.get(), parentItem, source))) {
 			return Ref<SAppLayoutResourceItem>::null();
 		}
 		
@@ -869,7 +870,7 @@ namespace slib
 		} \
 		break;
 
-	sl_bool SAppDocument::_processLayoutResourceControl(LayoutControlProcessParams *params)
+	sl_bool SAppDocument::_processLayoutResourceControl(LayoutControlProcessParams* params)
 	{
 		m_currentLocalNamespace = params->resource->name;
 		SAppLayoutResourceItem* resourceItem = params->resourceItem;
@@ -944,40 +945,45 @@ namespace slib
 				break;
 			default:
 				if (op == OP_PARSE) {
-					ListLocker< Ref<XmlElement> > children(_getLayoutItemChildElements(resourceItem, params->resource->name, String::null()));
-					for (sl_size i = 0; i < children.count; i++) {
-						const Ref<XmlElement>& child = children[i];
-						if (child.isNotNull()) {
-							String tagName = child->getName();
-							if (tagName == "item" || tagName == "column") {
-								continue;
-							}
-							Ref<SAppLayoutResourceItem> childItem = _parseLayoutResourceItemChild(params->resource, resourceItem, child);
-							if (childItem.isNull()) {
-								return sl_false;
-							}
-							if (resourceItem->itemType == SAppLayoutItemType::Linear) {
-								if (!(resourceItem->attrsLinear->orientation.flagDefined) || resourceItem->attrsLinear->orientation.value == LayoutOrientation::Vertical) {
-									childItem->attrsView->topMode = PositionMode::Free;
-									childItem->attrsView->bottomMode = PositionMode::Free;
-								} else {
-									childItem->attrsView->leftMode = PositionMode::Free;
-									childItem->attrsView->rightMode = PositionMode::Free;
+					do {
+						if (params->resourceItem->flagNoChildren) {
+							break;
+						}
+						ListLocker< Ref<XmlElement> > children(_getLayoutItemChildElements(resourceItem, params->resource->name, String::null()));
+						for (sl_size i = 0; i < children.count; i++) {
+							const Ref<XmlElement>& child = children[i];
+							if (child.isNotNull()) {
+								String tagName = child->getName();
+								if (tagName == "item" || tagName == "column") {
+									continue;
 								}
-							} else if (resourceItem->itemType == SAppLayoutItemType::Refresh) {
-								childItem->attrsView->width.flagDefined = sl_true;
-								childItem->attrsView->width.amount = 1;
-								childItem->attrsView->width.unit = SAppDimensionValue::FILL;
-								childItem->attrsView->height.flagDefined = sl_true;
-								childItem->attrsView->height.amount = 1;
-								childItem->attrsView->height.unit = SAppDimensionValue::FILL;
-							}
-							if (!(resourceItem->children.add(childItem))) {
-								_logError(resourceItem->element, g_str_error_out_of_memory);
-								return sl_false;
+								Ref<SAppLayoutResourceItem> childItem = _parseLayoutResourceItemChild(params->resource, resourceItem, child, params->source);
+								if (childItem.isNull()) {
+									return sl_false;
+								}
+								if (resourceItem->itemType == SAppLayoutItemType::Linear) {
+									if (!(resourceItem->attrsLinear->orientation.flagDefined) || resourceItem->attrsLinear->orientation.value == LayoutOrientation::Vertical) {
+										childItem->attrsView->topMode = PositionMode::Free;
+										childItem->attrsView->bottomMode = PositionMode::Free;
+									} else {
+										childItem->attrsView->leftMode = PositionMode::Free;
+										childItem->attrsView->rightMode = PositionMode::Free;
+									}
+								} else if (resourceItem->itemType == SAppLayoutItemType::Refresh) {
+									childItem->attrsView->width.flagDefined = sl_true;
+									childItem->attrsView->width.amount = 1;
+									childItem->attrsView->width.unit = SAppDimensionValue::FILL;
+									childItem->attrsView->height.flagDefined = sl_true;
+									childItem->attrsView->height.amount = 1;
+									childItem->attrsView->height.unit = SAppDimensionValue::FILL;
+								}
+								if (!(resourceItem->children.add(childItem))) {
+									_logError(resourceItem->element, g_str_error_out_of_memory);
+									return sl_false;
+								}
 							}
 						}
-					}
+					} while (0);
 					return sl_true;
 				} else if (op == OP_GENERATE_CPP) {
 					String name;
@@ -2767,6 +2773,18 @@ namespace slib
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(ellipsize, setEllipsize)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(lines, setLinesCount)
 
+		if (op == OP_PARSE) {
+			if (!(attr->text.flagDefined) && !(attr->hyperText.flagDefined)) {
+				resourceItem->flagNoChildren = sl_true;
+				String value = params->source.substring(element->getStartContentPositionInSource(), element->getEndContentPositionInSource());
+				if (value.isNotEmpty()) {
+					attr->hyperText.flagDefined = sl_true;
+					attr->hyperText.flagReferResource = sl_false;
+					attr->hyperText.valueOrName = value;
+				}
+			}
+		}
+		
 		LAYOUT_CONTROL_ADD_STATEMENT
 
 	}
@@ -3116,7 +3134,7 @@ namespace slib
 				}
 				Ref<XmlElement> xmlChild = element->getFirstChildElement();
 				if (xmlChild.isNotNull()) {
-					Ref<SAppLayoutResourceItem> contentItem = _parseLayoutResourceItemChild(params->resource, resourceItem, xmlChild);
+					Ref<SAppLayoutResourceItem> contentItem = _parseLayoutResourceItemChild(params->resource, resourceItem, xmlChild, params->source);
 					if (contentItem.isNull()) {
 						return sl_false;
 					}
@@ -3471,7 +3489,7 @@ namespace slib
 						}
 						Ref<XmlElement> xmlView= itemXml->getFirstChildElement();
 						if (xmlView.isNotNull()) {
-							Ref<SAppLayoutResourceItem> subItemView = _parseLayoutResourceItemChild(params->resource, resourceItem, xmlView);
+							Ref<SAppLayoutResourceItem> subItemView = _parseLayoutResourceItemChild(params->resource, resourceItem, xmlView, params->source);
 							if (subItemView.isNull()) {
 								return sl_false;
 							}
@@ -3676,7 +3694,7 @@ namespace slib
 						}
 						Ref<XmlElement> xmlView= itemXml->getFirstChildElement();
 						if (xmlView.isNotNull()) {
-							Ref<SAppLayoutResourceItem> subItemView = _parseLayoutResourceItemChild(params->resource, resourceItem, xmlView);
+							Ref<SAppLayoutResourceItem> subItemView = _parseLayoutResourceItemChild(params->resource, resourceItem, xmlView, params->source);
 							if (subItemView.isNull()) {
 								return sl_false;
 							}
@@ -4162,7 +4180,7 @@ namespace slib
 						}
 						Ref<XmlElement> xmlView= itemXml->getFirstChildElement();
 						if (xmlView.isNotNull()) {
-							Ref<SAppLayoutResourceItem> subItemView = _parseLayoutResourceItemChild(params->resource, resourceItem, xmlView);
+							Ref<SAppLayoutResourceItem> subItemView = _parseLayoutResourceItemChild(params->resource, resourceItem, xmlView, params->source);
 							if (subItemView.isNull()) {
 								return sl_false;
 							}

@@ -177,10 +177,10 @@ namespace slib
 		sl_bool _parseLayoutStyle(const String& localNamespace, const Ref<XmlElement>& element);
 		sl_bool _parseLayoutInclude(const String& localNamespace, const Ref<XmlElement>& element);
 		sl_bool _parseLayoutUnit(const String& localNamespace, const Ref<XmlElement>& element);
-		sl_bool _parseLayoutResource(const String& filePath, const String& localNamespace, const Ref<XmlElement>& element);
+		sl_bool _parseLayoutResource(const String& filePath, const String& localNamespace, const Ref<XmlElement>& element, const String16& source);
 		void _openLayoutResource(SAppLayoutResource* layout, const String& fileName);
-		sl_bool _parseLayoutResourceItem(SAppLayoutResource* layout, SAppLayoutResourceItem* item, SAppLayoutResourceItem* parent);
-		Ref<SAppLayoutResourceItem> _parseLayoutResourceItemChild(SAppLayoutResource* layout, SAppLayoutResourceItem* parentItem, const Ref<XmlElement>& element);
+		sl_bool _parseLayoutResourceItem(SAppLayoutResource* layout, SAppLayoutResourceItem* item, SAppLayoutResourceItem* parent, const String16& source);
+		Ref<SAppLayoutResourceItem> _parseLayoutResourceItemChild(SAppLayoutResource* layout, SAppLayoutResourceItem* parentItem, const Ref<XmlElement>& element, const String16& source);
 		sl_bool _generateLayoutsCpp(const String& targetPath);
 		sl_bool _generateLayoutsCpp_Layout(const String& targetPath, SAppLayoutResource* layout);
 		sl_bool _generateLayoutsCpp_Item(SAppLayoutResource* layout, SAppLayoutResourceItem* item, SAppLayoutResourceItem* parent, StringBuffer& sbDeclare, StringBuffer& sbDefineInit, StringBuffer& sbDefineLayout, const String& addStatement);
@@ -197,6 +197,7 @@ namespace slib
 		struct LayoutControlProcessParams
 		{
 			int op;
+			String16 source;
 			SAppLayoutResource* resource;
 			SAppLayoutResourceItem* resourceItem;
 			SAppLayoutResourceItem* parentResourceItem;

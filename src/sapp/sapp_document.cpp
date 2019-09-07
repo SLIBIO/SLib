@@ -777,7 +777,7 @@ namespace slib
 			Ref<XmlElement>& child = children[i];
 			if (child.isNotNull()) {
 				if (child->getName() == "layout") {
-					if (!_parseLayoutResource(filePath, localNamespace, child)) {
+					if (!_parseLayoutResource(filePath, localNamespace, child, textXML)) {
 						return sl_false;
 					}
 				}

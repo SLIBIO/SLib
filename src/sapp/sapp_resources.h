@@ -891,6 +891,7 @@ namespace slib
 		sl_bool flagGeneratedName;
 		String arrayName;
 		sl_int32 arrayIndex;
+		sl_bool flagNoChildren;
 
 		String className;
 		
