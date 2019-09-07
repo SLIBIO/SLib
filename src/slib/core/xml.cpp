@@ -1361,6 +1361,7 @@ namespace slib
 		
 		flagProcessNamespaces = sl_true;
 		flagCheckWellFormed = sl_true;
+		flagSupportCpp11String = sl_false;
 		
 		flagLogError = sl_true;
 		
@@ -1988,6 +1989,44 @@ namespace slib
 					if (!flagEnded) {
 						REPORT_ERROR(g_strError_element_attr_not_end)
 					}
+				} else if (ch == 'R' && param.flagSupportCpp11String) {
+					pos++;
+					escapeWhiteSpaces();
+					if (pos >= len) {
+						REPORT_ERROR(g_strError_element_attr_required_quot)
+					}
+					if (buf[pos] != '\"') {
+						REPORT_ERROR(g_strError_element_attr_required_quot)
+					}
+					pos++;
+					sl_size posDelimiterBegin = pos;
+					sl_size posDelimiterEnd = 0;
+					while (pos < len) {
+						if (buf[pos] == '(') {
+							posDelimiterEnd = pos;
+							pos++;
+							break;
+						}
+						pos++;
+					}
+					if (pos >= len || !posDelimiterEnd) {
+						REPORT_ERROR(g_strError_element_attr_not_end)
+					}
+					sl_size lenDelimiter = posDelimiterEnd - posDelimiterBegin;
+					sl_size posValueBegin = pos;
+					sl_size posValueEnd = 0;
+					while (pos + lenDelimiter + 2 <= len) {
+						if (buf[pos] == ')' && buf[pos + lenDelimiter + 1] == '\"' && Base::equalsMemory(buf + pos + 1, buf + posDelimiterBegin, lenDelimiter * sizeof(CT))) {
+							posValueEnd = pos;
+							pos += lenDelimiter + 2;
+							break;
+						}
+						pos++;
+					}
+					if (!posValueEnd) {
+						REPORT_ERROR(g_strError_element_attr_not_end)
+					}
+					value = XmlString(buf + posValueBegin, posValueEnd - posValueBegin);
 				} else {
 					REPORT_ERROR(g_strError_element_attr_required_quot)
 				}

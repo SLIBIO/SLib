@@ -511,6 +511,8 @@ namespace slib
 		sl_bool flagProcessNamespaces;
 		// in
 		sl_bool flagCheckWellFormed;
+		// in
+		sl_bool flagSupportCpp11String;
 
 		// in, callbacks
 		Function<void(XmlParseControl*, XmlDocument*)> onStartDocument;
