@@ -223,6 +223,8 @@
     <ClCompile Include="..\..\src\slib\graphics\drawable.cpp" />
     <ClCompile Include="..\..\src\slib\graphics\drawable_ext.cpp" />
     <ClCompile Include="..\..\src\slib\graphics\drawable_gdi.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\emoji.cpp" />
+    <ClCompile Include="..\..\src\slib\graphics\emoji_png.cpp" />
     <ClCompile Include="..\..\src\slib\graphics\font.cpp" />
     <ClCompile Include="..\..\src\slib\graphics\font_atlas.cpp" />
     <ClCompile Include="..\..\src\slib\graphics\font_freetype.cpp" />

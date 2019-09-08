@@ -532,6 +532,8 @@
 		2628EAE021C410C100D8CD00 /* base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2628EADF21C410C000D8CD00 /* base64.cpp */; };
 		2628EAE321C410CF00D8CD00 /* jwt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2628EAE221C410CF00D8CD00 /* jwt.cpp */; };
 		262B6A3320D03B430094927F /* loopfilter_sse2.c in Sources */ = {isa = PBXBuildFile; fileRef = 260D89D720C917500013B34E /* loopfilter_sse2.c */; };
+		262D59A323250E6D00F85780 /* emoji.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 262D59A223250E6D00F85780 /* emoji.cpp */; };
+		262D59A523250E7300F85780 /* emoji_png.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 262D59A423250E7300F85780 /* emoji_png.cpp */; };
 		262ED4EA228DEBEE0029F409 /* ecc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 262ED4E9228DEBEE0029F409 /* ecc.cpp */; };
 		263051CF225CA20B00A6609E /* pinterest_ui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263051CE225CA20B00A6609E /* pinterest_ui.cpp */; };
 		263916F621C930DD008B335B /* qr_code_scanner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263916F521C930DD008B335B /* qr_code_scanner.cpp */; };
@@ -1758,6 +1760,8 @@
 		2628EADF21C410C000D8CD00 /* base64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = base64.cpp; sourceTree = "<group>"; };
 		2628EAE221C410CF00D8CD00 /* jwt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jwt.cpp; sourceTree = "<group>"; };
 		2629F8731DFAF4AE005CF43D /* ref.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ref.cpp; sourceTree = "<group>"; };
+		262D59A223250E6D00F85780 /* emoji.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = emoji.cpp; sourceTree = "<group>"; };
+		262D59A423250E7300F85780 /* emoji_png.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = emoji_png.cpp; sourceTree = "<group>"; };
 		262ED4E9228DEBEE0029F409 /* ecc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ecc.cpp; sourceTree = "<group>"; };
 		263051CE225CA20B00A6609E /* pinterest_ui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pinterest_ui.cpp; sourceTree = "<group>"; };
 		2631B77D1DDB14E600729A87 /* url.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = url.cpp; sourceTree = "<group>"; };
@@ -2442,6 +2446,8 @@
 				266DD3901C117AE300D47AB0 /* drawable.cpp */,
 				26C1B64520D51D3D00E36539 /* drawable_ext.cpp */,
 				2601078B1DACE8CF00C40723 /* drawable_quartz.mm */,
+				262D59A223250E6D00F85780 /* emoji.cpp */,
+				262D59A423250E7300F85780 /* emoji_png.cpp */,
 				266DD3921C117AE300D47AB0 /* font.cpp */,
 				26072FFB20D8F535004EB272 /* font_quartz.mm */,
 				2640CB6D1DC27BC7006376AC /* font_atlas.cpp */,
@@ -5374,6 +5380,7 @@
 				26ACB3F6220985EE0093FF3F /* device_audio_ios.mm in Sources */,
 				26D9D8871E96295A005F7BD3 /* camera.cpp in Sources */,
 				26E1B8C2222ABBE7007C222E /* pngrutil.c in Sources */,
+				262D59A323250E6D00F85780 /* emoji.cpp in Sources */,
 				26A39D8C20EFE16D004707C9 /* calculator.cpp in Sources */,
 				26BAE008221BEE530085B5AB /* etsy.cpp in Sources */,
 				26E1B8AF222ABBDC007C222E /* gzclose.c in Sources */,
@@ -5512,6 +5519,7 @@
 				26D9D8721E96294F005F7BD3 /* graphics_resource.cpp in Sources */,
 				269E31AB2255F4F2005CD0ED /* paypal_ui.cpp in Sources */,
 				26635CA1226706FD005E4BA6 /* ui_photo.cpp in Sources */,
+				262D59A523250E7300F85780 /* emoji_png.cpp in Sources */,
 				26E1B8AD222ABBDC007C222E /* crc32.c in Sources */,
 				26AFC60522B198340034C634 /* asm_x64.cpp in Sources */,
 				26D9D8E71E962976005F7BD3 /* video_view.cpp in Sources */,

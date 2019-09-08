@@ -20,34 +20,57 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_GRAPHICS_HEADER
-#define CHECKHEADER_SLIB_GRAPHICS_HEADER
+#include "slib/graphics/emoji.h"
 
-#include "graphics/constants.h"
+#include "slib/core/hash_map.h"
+#include "slib/core/safe_static.h"
 
-#include "graphics/color.h"
-#include "graphics/yuv.h"
-#include "graphics/bitmap_format.h"
-#include "graphics/bitmap_data.h"
+namespace slib
+{
+	
+	namespace priv
+	{
+		namespace emoji
+		{
+			
+			#include "emoji.inc"
+			
+			class StaticContext
+			{
+			public:
+				CHashMap<sl_char32, sl_bool> emojis;
+				
+			public:
+				StaticContext()
+				{
+					sl_uint32 index = 0;
+					for (;;) {
+						sl_char32 ch = (sl_char32)(list[index]);
+						if (ch) {
+							emojis.add_NoLock(ch, sl_true);
+						} else {
+							break;
+						}
+						index++;
+					}
+				}
+				
+			};
+			
+			SLIB_SAFE_STATIC_GETTER(StaticContext, GetStaticContext)
+			
+		}
+	}
+	
+	using namespace priv::emoji;
+	
+	sl_bool Emoji::isEmoji(sl_char32 ch)
+	{
+		StaticContext* context = GetStaticContext();
+		if (context) {
+			return context->emojis.getValue_NoLock(ch);
+		}
+		return sl_false;
+	}
 
-#include "graphics/pen.h"
-#include "graphics/brush.h"
-#include "graphics/font.h"
-#include "graphics/path.h"
-
-#include "graphics/drawable.h"
-#include "graphics/bitmap.h"
-#include "graphics/image.h"
-
-#include "graphics/canvas.h"
-
-#include "graphics/freetype.h"
-
-#include "graphics/font_atlas.h"
-#include "graphics/text.h"
-#include "graphics/emoji.h"
-#include "graphics/util.h"
-
-#include "graphics/zxing.h"
-
-#endif
+}

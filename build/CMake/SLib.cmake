@@ -219,6 +219,8 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/graphics/color.cpp"
  "${SLIB_PATH}/src/slib/graphics/drawable.cpp"
  "${SLIB_PATH}/src/slib/graphics/drawable_ext.cpp"
+ "${SLIB_PATH}/src/slib/graphics/emoji.cpp"
+ "${SLIB_PATH}/src/slib/graphics/emoji_png.cpp"
  "${SLIB_PATH}/src/slib/graphics/font.cpp"
  "${SLIB_PATH}/src/slib/graphics/font_atlas.cpp"
  "${SLIB_PATH}/src/slib/graphics/font_freetype.cpp"

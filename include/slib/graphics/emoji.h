@@ -20,34 +20,27 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_GRAPHICS_HEADER
-#define CHECKHEADER_SLIB_GRAPHICS_HEADER
+#ifndef CHECKHEADER_SLIB_GRAPHICS_EMOJI
+#define CHECKHEADER_SLIB_GRAPHICS_EMOJI
 
-#include "graphics/constants.h"
+#include "definition.h"
 
-#include "graphics/color.h"
-#include "graphics/yuv.h"
-#include "graphics/bitmap_format.h"
-#include "graphics/bitmap_data.h"
+#include "image.h"
 
-#include "graphics/pen.h"
-#include "graphics/brush.h"
-#include "graphics/font.h"
-#include "graphics/path.h"
+namespace slib
+{
+	
+	class SLIB_EXPORT Emoji
+	{
+	public:
+		static sl_bool isEmoji(sl_char32 ch);
+		
+		static Memory getPng(sl_char32 ch);
+		
+		static Ref<Image> getImage(sl_char32 ch);
 
-#include "graphics/drawable.h"
-#include "graphics/bitmap.h"
-#include "graphics/image.h"
+	};
 
-#include "graphics/canvas.h"
-
-#include "graphics/freetype.h"
-
-#include "graphics/font_atlas.h"
-#include "graphics/text.h"
-#include "graphics/emoji.h"
-#include "graphics/util.h"
-
-#include "graphics/zxing.h"
+}
 
 #endif
