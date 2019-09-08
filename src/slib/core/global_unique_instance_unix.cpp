@@ -27,6 +27,7 @@
 #include "slib/core/global_unique_instance.h"
 
 #include "slib/core/file.h"
+#include "slib/core/system.h"
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -78,7 +79,11 @@ namespace slib
 			return sl_null;
 		}
 		String name = File::makeSafeFileName(_name);
-		String path = "/tmp/.slib_global_lock_" + name;
+		String pathRoot = System::getHomeDirectory() + "/.SLib.io";
+		if (!(File::exists(pathRoot))) {
+			File::createDirectory(pathRoot);
+		}
+		String path = pathRoot + "/.global_lock_" + name;
 		
 		int handle = open(path.getData(), O_RDWR | O_CREAT | O_EXCL, 0644);
 		if (handle == -1) {
@@ -95,8 +100,6 @@ namespace slib
 			fl.l_type = F_WRLCK;
 			fl.l_whence = SEEK_SET;
 			int ret = fcntl(handle, F_SETLK, &fl);
-			int err = errno;
-			err = EAGAIN;
 			if (ret >= 0) {
 				Ref<GlobalUniqueInstanceImpl> instance = new GlobalUniqueInstanceImpl;
 				if (instance.isNotNull()) {
