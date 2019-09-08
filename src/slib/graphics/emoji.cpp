@@ -30,29 +30,77 @@ namespace slib
 	
 	namespace priv
 	{
+		
+		namespace noto_emoji
+		{
+			extern const char32_t* emojis[];
+		}
+		
+		using namespace noto_emoji;
+		
 		namespace emoji
 		{
-			
-			#include "emoji.inc"
 			
 			class StaticContext
 			{
 			public:
-				CHashMap<sl_char32, sl_bool> emojis;
+				CMap<String16, sl_bool> mapEmojis;
+				CHashMap<sl_char32, sl_bool> mapEmojiFirstChars;
+				sl_size maxLength;
 				
 			public:
 				StaticContext()
 				{
-					sl_uint32 index = 0;
-					for (;;) {
-						sl_char32 ch = (sl_char32)(list[index]);
-						if (ch) {
-							emojis.add_NoLock(ch, sl_true);
+					maxLength = 0;
+					for (sl_uint32 index = 0; ; index++) {
+						const sl_char32* sz = emojis[index];
+						if (sz) {
+							String16 str(sz);
+							sl_size len = str.getLength();
+							if (len) {
+								if (len > maxLength) {
+									maxLength = len;
+								}
+								mapEmojis.add_NoLock(Move(str), sl_true);
+								mapEmojiFirstChars.emplace_NoLock(sz[0], sl_true);
+							}
 						} else {
 							break;
 						}
-						index++;
 					}
+				}
+				
+			public:
+				sl_size getEmojiLength(const sl_char16* sz, sl_size len)
+				{
+					sl_char32 ch = sz[0];
+					if (ch >= 0xD800 && ch < 0xE000) {
+						if (len >= 2) {
+							sl_uint32 ch1 = (sl_uint32)((sl_uint16)sz[1]);
+							if (ch < 0xDC00 && ch1 >= 0xDC00 && ch1 < 0xE000) {
+								ch = (sl_char32)(((ch - 0xD800) << 10) | (ch1 - 0xDC00)) + 0x10000;
+							} else {
+								return 0;
+							}
+						} else {
+							return 0;
+						}
+					}
+					if (mapEmojiFirstChars.getValue(ch)) {
+						if (len > maxLength) {
+							len = maxLength;
+						}
+						len = Base::getStringLength2(sz, len);
+						MapNode<String16, sl_bool>* node = sl_null;
+						mapEmojis.getNearest(String16(sz, len), &node);
+						if (node) {
+							sl_size lenKey = node->key.getLength();
+							if (lenKey <= len && Base::equalsMemory2((sl_uint16*)sz, (sl_uint16*)(node->key.getData()), lenKey)) {
+								return node->key.getLength();
+							}
+						}
+					}
+					return 0;
 				}
 				
 			};
@@ -60,15 +108,34 @@ namespace slib
 			SLIB_SAFE_STATIC_GETTER(StaticContext, GetStaticContext)
 			
 		}
+		
 	}
 	
 	using namespace priv::emoji;
+	
+	sl_bool Emoji::isEmoji(const String16& str)
+	{
+		StaticContext* context = GetStaticContext();
+		if (context) {
+			return context->mapEmojis.getValue_NoLock(str);
+		}
+		return sl_false;
+	}
 	
 	sl_bool Emoji::isEmoji(sl_char32 ch)
 	{
 		StaticContext* context = GetStaticContext();
 		if (context) {
-			return context->emojis.getValue_NoLock(ch);
+			return context->mapEmojiFirstChars.getValue_NoLock(ch);
+		}
+		return sl_false;
+	}
+
+	sl_size Emoji::getEmojiLength(const sl_char16* sz, sl_size len)
+	{
+		StaticContext* context = GetStaticContext();
+		if (context) {
+			return context->getEmojiLength(sz, len);
 		}
 		return sl_false;
 	}

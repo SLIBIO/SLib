@@ -23,7 +23,9 @@
 #include "slib/graphics/text.h"
 
 #include "slib/graphics/font_atlas.h"
+#include "slib/graphics/emoji.h"
 #include "slib/graphics/util.h"
+#include "slib/core/charset.h"
 #include "slib/core/xml.h"
 #include "slib/core/string_buffer.h"
 #include "slib/math/calculator.h"
@@ -215,6 +217,59 @@ namespace slib
 	}
 	
 	
+	SLIB_DEFINE_OBJECT(TextEmojiItem, TextItem)
+	
+	TextEmojiItem::TextEmojiItem() noexcept
+	: TextItem(TextItemType::Emoji)
+	{
+	}
+	
+	TextEmojiItem::~TextEmojiItem() noexcept
+	{
+	}
+	
+	Ref<TextEmojiItem> TextEmojiItem::create(const String16& text, const Ref<TextStyle>& style) noexcept
+	{
+		if (style.isNotNull()) {
+			Ref<TextEmojiItem> ret = new TextEmojiItem;
+			if (ret.isNotNull()) {
+				ret->m_text = text;
+				ret->m_style = style;
+				return ret;
+			}
+		}
+		return sl_null;
+	}
+	
+	Size TextEmojiItem::getSize() noexcept
+	{
+		ObjectLocker lock(this);
+		
+		Ref<Font> font = getFont();
+		if (m_fontCached == font) {
+			return Size(m_widthCached, m_heightCached);
+		}
+		if (font.isNotNull()) {
+			Size size = font->measureText(m_text, sl_false);
+			m_fontCached = font;
+			m_widthCached = size.x;
+			m_heightCached = size.y;
+			return size;
+		}
+		m_widthCached = 0;
+		m_heightCached = 0;
+		return Size::zero();
+	}
+	
+	void TextEmojiItem::draw(Canvas* canvas, sl_real x, sl_real y, const Color& color)
+	{
+		Ref<Font> font = getFont();
+		if (font.isNotNull()) {
+			canvas->drawText16(m_text, x, y, font, color);
+		}
+	}
+	
+	
 	SLIB_DEFINE_OBJECT(TextSpaceItem, TextItem)
 
 	TextSpaceItem::TextSpaceItem() noexcept
@@ -374,8 +429,26 @@ namespace slib
 		sl_size startWord = 0;
 		sl_size pos = 0;
 		while (pos < len) {
-			sl_char16 ch = sz[pos];
-			if (SLIB_CHAR_IS_WHITE_SPACE(ch)) {
+			sl_char32 ch = sz[pos];
+			sl_bool flagUtf32 = sl_false;
+			if (ch >= 0xD800 && ch < 0xE000) {
+				flagUtf32 = sl_true;
+				if (pos + 1 < len) {
+					sl_uint32 ch1 = (sl_uint32)((sl_uint16)sz[pos + 1]);
+					if (ch < 0xDC00 && ch1 >= 0xDC00 && ch1 < 0xE000) {
+						ch = (sl_char32)(((ch - 0xD800) << 10) | (ch1 - 0xDC00)) + 0x10000;
+					} else {
+						ch = '?';
+					}
+				} else {
+					ch = '?';
+				}
+			}
+			sl_bool flagEmoji = sl_false;
+			if (ch >= 0x80 && Emoji::isEmoji(ch)) {
+				flagEmoji = sl_true;
+			}
+			if (SLIB_CHAR_IS_WHITE_SPACE(ch) || flagEmoji) {
 				if (startWord < pos) {
 					Ref<TextWordItem> item = TextWordItem::create(String16(sz + startWord, pos - startWord), style);
 					if (item.isNotNull()) {
@@ -406,8 +479,22 @@ namespace slib
 							pos++;
 						}
 					}
+				} else if (flagEmoji) {
+					sl_size lenEmoji = Emoji::getEmojiLength(sz + pos, len - pos);
+					if (lenEmoji) {
+						Ref<TextEmojiItem> item = TextEmojiItem::create(String16(sz + pos, lenEmoji), style);
+						if (item.isNotNull()) {
+							m_items.add_NoLock(item);
+							m_positionLength++;
+							pos = pos + lenEmoji - 1;
+						}
+					}
 				}
 				startWord = pos + 1;
+			} else {
+				if (flagUtf32) {
+					pos++;
+				}
 			}
 			pos++;
 		}
@@ -1008,7 +1095,7 @@ namespace slib
 					for (sl_size i = 0; i < n; i++) {
 						TextItem* item = p[i].get();
 						TextItemType type = item->getType();
-						if (type == TextItemType::Word || type == TextItemType::Space || type == TextItemType::Tab) {
+						if (type == TextItemType::Word || type == TextItemType::Emoji || type == TextItemType::Space || type == TextItemType::Tab) {
 							m_layoutItems->add_NoLock(item);
 						}
 					}
@@ -1343,6 +1430,16 @@ namespace slib
 					return nWords - 1;
 				}
 				
+				void processEmoji(TextEmojiItem* item) noexcept
+				{
+					Size size = item->getSize();
+					applyLineHeight(item, size.y);
+					item->setLayoutPosition(Point(m_x, m_y));
+					item->setLayoutSize(size);
+					m_lineItems.add_NoLock(item);
+					m_x += size.x;
+				}
+				
 				void processSpace(TextSpaceItem* item) noexcept
 				{
 					Size size = item->getSize();
@@ -1415,6 +1512,10 @@ namespace slib
 								
 							case TextItemType::Word:
 								i += processWords(items + i, n - i);
+								break;
+								
+							case TextItemType::Emoji:
+								processEmoji(static_cast<TextEmojiItem*>(item));
 								break;
 								
 							case TextItemType::Space:
@@ -1502,6 +1603,21 @@ namespace slib
 								canvas->fillRectangle(Rectangle(x + frame.left, y + frame.top, x + frame.right, y + frame.bottom), backColor);
 							}
 							wordItem->draw(canvas, x + frame.left, y + frame.top, color);
+						}
+					}
+				} else if (type == TextItemType::Emoji) {
+					TextEmojiItem* emojiItem = static_cast<TextEmojiItem*>(item);
+					Rectangle frame = emojiItem->getLayoutFrame();
+					frame.top += style->yOffset;
+					frame.bottom += style->yOffset;
+					if (rc.intersectRectangle(frame)) {
+						Ref<Font> font = style->font;
+						if (font.isNotNull()) {
+							Color backColor = style->backgroundColor;
+							if (backColor.a > 0) {
+								canvas->fillRectangle(Rectangle(x + frame.left, y + frame.top, x + frame.right, y + frame.bottom), backColor);
+							}
+							emojiItem->draw(canvas, x + frame.left, y + frame.top, color);
 						}
 					}
 				}

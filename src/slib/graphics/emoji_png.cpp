@@ -30,72 +30,63 @@ namespace slib
 	
 	namespace priv
 	{
+		
+		namespace noto_emoji
+		{
+			extern const char32_t* emojis[];
+			extern const void* png[];
+			extern unsigned int png_size[];
+		}
+		
+		using namespace noto_emoji;
+		
 		namespace emoji
 		{
-			extern unsigned long list[];
-			
-			#include "emoji_png_data0.inc"
-			#include "emoji_png_data1.inc"
-			#include "emoji_png_data2.inc"
-			#include "emoji_png_data3.inc"
-			#include "emoji_png_data4.inc"
-			#include "emoji_png_data5.inc"
-			#include "emoji_png_data6.inc"
-			#include "emoji_png_data7.inc"
-			#include "emoji_png_data8.inc"
-			#include "emoji_png_data9.inc"
-			#include "emoji_png_data10.inc"
-			#include "emoji_png_data11.inc"
-			#include "emoji_png_data12.inc"
-			#include "emoji_png_data13.inc"
-			#include "emoji_png_data14.inc"
-			#include "emoji_png_data15.inc"
-			#include "emoji_png_data16.inc"
-			#include "emoji_png_data17.inc"
-			#include "emoji_png_data18.inc"
-			#include "emoji_png_data19.inc"
-			#include "emoji_png.inc"
-			
+
 			class StaticPngContext
 			{
 			public:
-				CHashMap<sl_char32, Memory> mapPNG;
-				CHashMap< sl_char32, Ref<Image> > mapImage;
+				CHashMap<String16, Memory> mapPNG;
+				CHashMap< String16, Ref<Image> > mapImage;
 				Mutex lockImage;
 				
 			public:
 				StaticPngContext()
 				{
-					sl_uint32 index = 0;
-					for (;;) {
-						sl_char32 ch = (sl_char32)(list[index]);
-						const void* data = png[index];
-						unsigned long size = png_size[index];
-						if (ch && data && size) {
-							Memory mem = Memory::createStatic(data, size);
-							if (mem.isNotNull()) {
-								mapPNG.add_NoLock(ch, Move(mem));
+					for (sl_uint32 index = 0; ; index++) {
+						const char32_t* sz = emojis[index];
+						if (sz) {
+							String16 str(sz);
+							sl_size len = str.getLength();
+							if (len) {
+								const void* data = png[index];
+								sl_size size = (sl_size)(png_size[index]);
+								if (data && size) {
+									Memory mem = Memory::createStatic(data, size);
+									if (mem.isNotNull()) {
+										mapPNG.add_NoLock(str, Move(mem));
+									}
+								}
 							}
 						} else {
 							break;
 						}
-						index++;
 					}
 				}
 				
 			public:
-				Ref<Image> getImage(sl_char32 ch)
+				Ref<Image> getImage(const String16& str)
 				{
 					MutexLocker lock(&lockImage);
 					Ref<Image> image;
-					if (mapImage.get_NoLock(ch, &image)) {
+					if (mapImage.get_NoLock(str, &image)) {
 						return image;
 					}
-					Memory mem = mapPNG.getValue_NoLock(ch);
+					Memory mem = mapPNG.getValue_NoLock(str);
 					if (mem.isNotNull()) {
 						image = Image::loadFromMemory(mem);
 						if (image.isNotNull()) {
-							mapImage.put_NoLock(ch, image);
+							mapImage.put_NoLock(str, image);
 							return image;
 						}
 					}
@@ -111,20 +102,20 @@ namespace slib
 	
 	using namespace priv::emoji;
 	
-	Memory Emoji::getPng(sl_char32 ch)
+	Memory Emoji::getPng(const String16& str)
 	{
 		StaticPngContext* context = GetStaticPngContext();
 		if (context) {
-			return context->mapPNG.getValue_NoLock(ch);
+			return context->mapPNG.getValue_NoLock(str);
 		}
 		return sl_null;
 	}
 
-	Ref<Image> Emoji::getImage(sl_char32 ch)
+	Ref<Image> Emoji::getImage(const String16& str)
 	{
 		StaticPngContext* context = GetStaticPngContext();
 		if (context) {
-			return context->getImage(ch);
+			return context->getImage(str);
 		}
 		return sl_null;
 	}

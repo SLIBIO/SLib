@@ -818,6 +818,8 @@
 		262D599D2324E44500F85780 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 262D59922324E3A900F85780 /* main.cpp */; };
 		262D599F2324E9A500F85780 /* emoji.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 262D599E2324E9A400F85780 /* emoji.cpp */; };
 		262D59A12324EB3D00F85780 /* emoji_png.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 262D59A02324EB3D00F85780 /* emoji_png.cpp */; };
+		262D59A9232587AF00F85780 /* noto_emoji.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 262D59A7232587AF00F85780 /* noto_emoji.cpp */; };
+		262D59AA232587AF00F85780 /* noto_emoji_png.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 262D59A8232587AF00F85780 /* noto_emoji_png.cpp */; };
 		262ED4DF228DD35B0029F409 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 262ED4DE228DD35B0029F409 /* main.cpp */; };
 		262ED4E2228DD6ED0029F409 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF11B21AEE6BE004E58CB /* Cocoa.framework */; };
 		263051D1225CA21700A6609E /* pinterest_ui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263051D0225CA21700A6609E /* pinterest_ui.cpp */; };
@@ -2386,6 +2388,8 @@
 		262D599C2324E3D000F85780 /* GenerateEmojiList */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = GenerateEmojiList; sourceTree = BUILT_PRODUCTS_DIR; };
 		262D599E2324E9A400F85780 /* emoji.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = emoji.cpp; sourceTree = "<group>"; };
 		262D59A02324EB3D00F85780 /* emoji_png.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = emoji_png.cpp; sourceTree = "<group>"; };
+		262D59A7232587AF00F85780 /* noto_emoji.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = noto_emoji.cpp; path = ../../external/src/noto_emoji/noto_emoji.cpp; sourceTree = "<group>"; };
+		262D59A8232587AF00F85780 /* noto_emoji_png.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = noto_emoji_png.cpp; path = ../../external/src/noto_emoji/noto_emoji_png.cpp; sourceTree = "<group>"; };
 		262ED4D6228DD3340029F409 /* GenerateEllipticCurvePow2G */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = GenerateEllipticCurvePow2G; sourceTree = BUILT_PRODUCTS_DIR; };
 		262ED4DE228DD35B0029F409 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../../tool/src/GenerateEllipticCurvePow2G/main.cpp; sourceTree = "<group>"; };
 		262ED4E0228DD6D70029F409 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -4207,6 +4211,7 @@
 				2605064E20CF87F100032B2C /* libvpx */,
 				2628F11721C429FD00D8CD00 /* zxing */,
 				267464B023171F9900DE8715 /* libcef */,
+				262D59A62325878500F85780 /* noto_emoji */,
 				2639193021CD23BB008B335B /* hiredis */,
 				2605032320CBDD3900032B2C /* yasm */,
 			);
@@ -4573,6 +4578,15 @@
 			);
 			name = GenerateEmojiList;
 			path = ../../tool/src/GenerateEmojiList;
+			sourceTree = "<group>";
+		};
+		262D59A62325878500F85780 /* noto_emoji */ = {
+			isa = PBXGroup;
+			children = (
+				262D59A8232587AF00F85780 /* noto_emoji_png.cpp */,
+				262D59A7232587AF00F85780 /* noto_emoji.cpp */,
+			);
+			name = noto_emoji;
 			sourceTree = "<group>";
 		};
 		262ED4DD228DD34C0029F409 /* GenerateEllipticCurvePow2 */ = {
@@ -6969,6 +6983,7 @@
 				265A936A2304832300B155A2 /* console.cpp in Sources */,
 				26D9D9741E96466A005F7BD3 /* graphics_util.cpp in Sources */,
 				26D9D90F1E9645CE005F7BD3 /* mutex.cpp in Sources */,
+				262D59AA232587AF00F85780 /* noto_emoji_png.cpp in Sources */,
 				26D9D9E41E96468D005F7BD3 /* ui_event_macos.mm in Sources */,
 				26D9D98D1E964675005F7BD3 /* media_player.cpp in Sources */,
 				26E1B877222ABA51007C222E /* pngwio.c in Sources */,
@@ -7203,6 +7218,7 @@
 				26E1B89F222ABAB2007C222E /* jerror.c in Sources */,
 				26D9D95C1E964662005F7BD3 /* geo_line.cpp in Sources */,
 				26D9D9C61E96468D005F7BD3 /* list_view.cpp in Sources */,
+				262D59A9232587AF00F85780 /* noto_emoji.cpp in Sources */,
 				26D9D9F11E964693005F7BD3 /* web_controller.cpp in Sources */,
 				26C1B63520D4FF5200E36539 /* canvas.cpp in Sources */,
 				26D9D9411E9645CE005F7BD3 /* plane.cpp in Sources */,

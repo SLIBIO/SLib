@@ -41,6 +41,7 @@ namespace slib
 		Space = 10,
 		Tab = 11,
 		LineBreak = 20,
+		Emoji = 50,
 		Attach = 100
 	};
 	
@@ -167,6 +168,32 @@ namespace slib
 
 		Ref<Font> m_fontCached;
 		String16 m_textCached;
+		sl_real m_widthCached;
+		sl_real m_heightCached;
+
+	};
+	
+	class SLIB_EXPORT TextEmojiItem : public TextItem
+	{
+		SLIB_DECLARE_OBJECT
+		
+	private:
+		TextEmojiItem() noexcept;
+		
+		~TextEmojiItem() noexcept;
+		
+	public:
+		static Ref<TextEmojiItem> create(const String16& text, const Ref<TextStyle>& style) noexcept;
+		
+	public:
+		Size getSize() noexcept;
+		
+		void draw(Canvas* canvas, sl_real x, sl_real y, const Color& color);
+		
+	private:
+		String16 m_text;
+		
+		Ref<Font> m_fontCached;
 		sl_real m_widthCached;
 		sl_real m_heightCached;
 

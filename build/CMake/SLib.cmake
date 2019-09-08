@@ -548,6 +548,13 @@ set (
  "${LIBJPEG_ROOT_DIR}/jutils.c"
 )
 
+set (NOTO_EMOJI_ROOT_DIR "${SLIB_PATH}/external/src/noto_emoji")
+set (
+ NOTO_EMOJI_FILES
+ "${NOTO_EMOJI_ROOT_DIR}/noto_emoji.cpp"
+ "${NOTO_EMOJI_ROOT_DIR}/noto_emoji_png.cpp"
+)
+
 add_library (
  slib STATIC
  ${SLIB_CORE_FILES}
@@ -557,6 +564,7 @@ add_library (
  ${ZLIB_FILES}
  ${LIBPNG_FILES}
  ${LIBJPEG_FILES}
+ ${NOTO_EMOJI_FILES}
 )
 set_target_properties (
  slib

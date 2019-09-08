@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -20,31 +20,35 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_GRAPHICS_EMOJI
-#define CHECKHEADER_SLIB_GRAPHICS_EMOJI
-
-#include "definition.h"
-
-#include "image.h"
-
 namespace slib
 {
-	
-	class SLIB_EXPORT Emoji
+	namespace priv
 	{
-	public:
-		static sl_bool isEmoji(const String16& str);
-		
-		static sl_bool isEmoji(sl_char32 ch);
-
-		static sl_size getEmojiLength(const sl_char16* sz, sl_size len = SLIB_SIZE_MAX);
-		
-		static Memory getPng(const String16& str);
-		
-		static Ref<Image> getImage(const String16& str);
-
-	};
-
+		namespace noto_emoji
+		{
+			
+			#include "emoji_png_data0.inc"
+			#include "emoji_png_data1.inc"
+			#include "emoji_png_data2.inc"
+			#include "emoji_png_data3.inc"
+			#include "emoji_png_data4.inc"
+			#include "emoji_png_data5.inc"
+			#include "emoji_png_data6.inc"
+			#include "emoji_png_data7.inc"
+			#include "emoji_png_data8.inc"
+			#include "emoji_png_data9.inc"
+			#include "emoji_png_data10.inc"
+			#include "emoji_png_data11.inc"
+			#include "emoji_png_data12.inc"
+			#include "emoji_png_data13.inc"
+			#include "emoji_png_data14.inc"
+			#include "emoji_png_data15.inc"
+			#include "emoji_png_data16.inc"
+			#include "emoji_png_data17.inc"
+			#include "emoji_png_data18.inc"
+			#include "emoji_png_data19.inc"
+			#include "emoji_png.inc"
+			
+		}
+	}
 }
-
-#endif

@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -20,31 +20,15 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_GRAPHICS_EMOJI
-#define CHECKHEADER_SLIB_GRAPHICS_EMOJI
-
-#include "definition.h"
-
-#include "image.h"
-
 namespace slib
 {
-	
-	class SLIB_EXPORT Emoji
+	namespace priv
 	{
-	public:
-		static sl_bool isEmoji(const String16& str);
-		
-		static sl_bool isEmoji(sl_char32 ch);
-
-		static sl_size getEmojiLength(const sl_char16* sz, sl_size len = SLIB_SIZE_MAX);
-		
-		static Memory getPng(const String16& str);
-		
-		static Ref<Image> getImage(const String16& str);
-
-	};
-
+		namespace noto_emoji
+		{
+			
+			#include "emoji.inc"
+			
+		}
+	}
 }
-
-#endif

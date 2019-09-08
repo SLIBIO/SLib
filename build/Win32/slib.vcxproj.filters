@@ -58,6 +58,9 @@
     <Filter Include="external\libjpeg">
       <UniqueIdentifier>{c2cc6705-3a2b-4638-a9f2-fca0fb708924}</UniqueIdentifier>
     </Filter>
+    <Filter Include="external\noto_emoji">
+      <UniqueIdentifier>{b6db5c2e-9294-4493-b587-14d01c80b04e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\slib\core\async_config.h">
@@ -1285,6 +1288,12 @@
     </ClCompile>
     <ClCompile Include="..\..\src\slib\graphics\emoji_png.cpp">
       <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\noto_emoji\noto_emoji.cpp">
+      <Filter>external\noto_emoji</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\external\src\noto_emoji\noto_emoji_png.cpp">
+      <Filter>external\noto_emoji</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

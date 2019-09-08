@@ -94,6 +94,8 @@
     <ClCompile Include="..\..\external\src\libpng\pngwrite.c" />
     <ClCompile Include="..\..\external\src\libpng\pngwtran.c" />
     <ClCompile Include="..\..\external\src\libpng\pngwutil.c" />
+    <ClCompile Include="..\..\external\src\noto_emoji\noto_emoji.cpp" />
+    <ClCompile Include="..\..\external\src\noto_emoji\noto_emoji_png.cpp" />
     <ClCompile Include="..\..\external\src\zlib\adler32.c" />
     <ClCompile Include="..\..\external\src\zlib\compress.c" />
     <ClCompile Include="..\..\external\src\zlib\crc32.c" />

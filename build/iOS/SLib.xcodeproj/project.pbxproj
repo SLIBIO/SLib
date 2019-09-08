@@ -534,6 +534,8 @@
 		262B6A3320D03B430094927F /* loopfilter_sse2.c in Sources */ = {isa = PBXBuildFile; fileRef = 260D89D720C917500013B34E /* loopfilter_sse2.c */; };
 		262D59A323250E6D00F85780 /* emoji.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 262D59A223250E6D00F85780 /* emoji.cpp */; };
 		262D59A523250E7300F85780 /* emoji_png.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 262D59A423250E7300F85780 /* emoji_png.cpp */; };
+		262D59AF2325996700F85780 /* noto_emoji_png.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 262D59AD2325996700F85780 /* noto_emoji_png.cpp */; };
+		262D59B02325996700F85780 /* noto_emoji.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 262D59AE2325996700F85780 /* noto_emoji.cpp */; };
 		262ED4EA228DEBEE0029F409 /* ecc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 262ED4E9228DEBEE0029F409 /* ecc.cpp */; };
 		263051CF225CA20B00A6609E /* pinterest_ui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263051CE225CA20B00A6609E /* pinterest_ui.cpp */; };
 		263916F621C930DD008B335B /* qr_code_scanner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263916F521C930DD008B335B /* qr_code_scanner.cpp */; };
@@ -1762,6 +1764,8 @@
 		2629F8731DFAF4AE005CF43D /* ref.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ref.cpp; sourceTree = "<group>"; };
 		262D59A223250E6D00F85780 /* emoji.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = emoji.cpp; sourceTree = "<group>"; };
 		262D59A423250E7300F85780 /* emoji_png.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = emoji_png.cpp; sourceTree = "<group>"; };
+		262D59AD2325996700F85780 /* noto_emoji_png.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = noto_emoji_png.cpp; path = ../../external/src/noto_emoji/noto_emoji_png.cpp; sourceTree = "<group>"; };
+		262D59AE2325996700F85780 /* noto_emoji.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = noto_emoji.cpp; path = ../../external/src/noto_emoji/noto_emoji.cpp; sourceTree = "<group>"; };
 		262ED4E9228DEBEE0029F409 /* ecc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ecc.cpp; sourceTree = "<group>"; };
 		263051CE225CA20B00A6609E /* pinterest_ui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pinterest_ui.cpp; sourceTree = "<group>"; };
 		2631B77D1DDB14E600729A87 /* url.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = url.cpp; sourceTree = "<group>"; };
@@ -3444,6 +3448,15 @@
 			name = arm;
 			sourceTree = "<group>";
 		};
+		262D59AC2325995100F85780 /* noto_emoji */ = {
+			isa = PBXGroup;
+			children = (
+				262D59AD2325996700F85780 /* noto_emoji_png.cpp */,
+				262D59AE2325996700F85780 /* noto_emoji.cpp */,
+			);
+			name = noto_emoji;
+			sourceTree = "<group>";
+		};
 		2639171B21C94568008B335B /* zxing */ = {
 			isa = PBXGroup;
 			children = (
@@ -3850,6 +3863,7 @@
 				260D876720C858F20013B34E /* sqlite */,
 				260D876A20C85CD80013B34E /* opus */,
 				260D88E620C912D30013B34E /* libvpx */,
+				262D59AC2325995100F85780 /* noto_emoji */,
 				2639171B21C94568008B335B /* zxing */,
 				2639195F21CD45E1008B335B /* hiredis */,
 			);
@@ -5165,6 +5179,7 @@
 				26D9D8991E962962005F7BD3 /* ip_address.cpp in Sources */,
 				26D9D8651E96294F005F7BD3 /* brush.cpp in Sources */,
 				26E1B8F0222ABCDD007C222E /* jfdctflt.c in Sources */,
+				262D59AF2325996700F85780 /* noto_emoji_png.cpp in Sources */,
 				26A3DA94228B43EA0031CBDA /* poly1305.cpp in Sources */,
 				26E1B8E0222ABCDD007C222E /* jdarith.c in Sources */,
 				26CF4DF01ED69AD000954B7A /* ui_text.cpp in Sources */,
@@ -5490,6 +5505,7 @@
 				26D9D8441E9628E0005F7BD3 /* vector3.cpp in Sources */,
 				26D9D86D1E96294F005F7BD3 /* font_freetype.cpp in Sources */,
 				26D9D8451E9628E0005F7BD3 /* line_segment.cpp in Sources */,
+				262D59B02325996700F85780 /* noto_emoji.cpp in Sources */,
 				2671F99121E07F7400B39842 /* drawer.cpp in Sources */,
 				26D9D8DC1E962976005F7BD3 /* ui_animation_apple.mm in Sources */,
 				26BAE020222157F40085B5AB /* linkedin.cpp in Sources */,
