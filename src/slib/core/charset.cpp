@@ -65,6 +65,39 @@ namespace slib
 						}
 					}
 				}
+			} else if (ch < 0xF8) {
+				if (i + 3 < lenUtf8 && (lenUtf16Buffer < 0 || n + 1 < lenUtf16Buffer)) {
+					sl_uint32 ch1 = (sl_uint32)((sl_uint8)utf8[++i]);
+					sl_uint32 ch2 = (sl_uint32)((sl_uint8)utf8[++i]);
+					sl_uint32 ch3 = (sl_uint32)((sl_uint8)utf8[++i]);
+					if (((ch1 & 0xC0) == 0x80) && ((ch2 & 0xC0) == 0x80) && ((ch3 & 0xC0) == 0x80)) {
+						if (utf16) {
+							sl_char32 u32 = (sl_char32)(((ch & 0x07) << 18) | ((ch1 & 0x3F) << 12) | ((ch2 & 0x3F) << 6) | (ch3 & 0x3F));
+							u32 -= 0x10000;
+							utf16[n++] = (sl_char16)(0xD800 + (u32 >> 10));
+							utf16[n++] = (sl_char16)(0xDC00 + (u32 & 0x3FF));
+						} else {
+							n += 2;
+						}
+					}
+				}
+			} else if (ch < 0xFC) {
+				if (i + 4 < lenUtf8 && (lenUtf16Buffer < 0 || n + 1 < lenUtf16Buffer)) {
+					sl_uint32 ch1 = (sl_uint32)((sl_uint8)utf8[++i]);
+					sl_uint32 ch2 = (sl_uint32)((sl_uint8)utf8[++i]);
+					sl_uint32 ch3 = (sl_uint32)((sl_uint8)utf8[++i]);
+					sl_uint32 ch4 = (sl_uint32)((sl_uint8)utf8[++i]);
+					if (((ch1 & 0xC0) == 0x80) && ((ch2 & 0xC0) == 0x80) && ((ch3 & 0xC0) == 0x80) && ((ch4 & 0xC0) == 0x80)) {
+						if (utf16) {
+							sl_char32 u32 = (sl_char32)(((ch & 0x03) << 24) | ((ch1 & 0x3F) << 18) | ((ch2 & 0x3F) << 12) | ((ch3 & 0x3F) << 6) | (ch4 & 0x3F));
+							u32 -= 0x10000;
+							utf16[n++] = (sl_char16)(0xD800 + (u32 >> 10));
+							utf16[n++] = (sl_char16)(0xDC00 + (u32 & 0x3FF));
+						} else {
+							n += 2;
+						}
+					}
+				}
 			}
 		}
 		return n;
@@ -180,13 +213,32 @@ namespace slib
 					}
 				}
 			} else {
-				if (lenUtf8Buffer < 0 || n + 2 < lenUtf8Buffer) {
-					if (utf8) {
-						utf8[n++] = (sl_char8)((ch >> 12) | 0xE0);
-						utf8[n++] = (sl_char8)(((ch >> 6) & 0x3F) | 0x80);
-						utf8[n++] = (sl_char8)((ch & 0x3F) | 0x80);
-					} else {
-						n += 3;
+				if (ch < 0xD800 || ch >= 0xE000) {
+					if (lenUtf8Buffer < 0 || n + 2 < lenUtf8Buffer) {
+						if (utf8) {
+							utf8[n++] = (sl_char8)((ch >> 12) | 0xE0);
+							utf8[n++] = (sl_char8)(((ch >> 6) & 0x3F) | 0x80);
+							utf8[n++] = (sl_char8)((ch & 0x3F) | 0x80);
+						} else {
+							n += 3;
+						}
+					}
+				} else {
+					if (i + 1 < lenUtf16) {
+						sl_uint32 ch1 = (sl_uint32)((sl_uint16)utf16[++i]);
+						if (ch < 0xDC00 && ch1 >= 0xDC00 && ch1 < 0xE000) {
+							sl_char32 u32 = (sl_char32)(((ch - 0xD800) << 10) | (ch1 - 0xDC00)) + 0x10000;
+							if (lenUtf8Buffer < 0 || n + 3 < lenUtf8Buffer) {
+								if (utf8) {
+									utf8[n++] = (sl_char8)((u32 >> 18) | 0xF0);
+									utf8[n++] = (sl_char8)(((u32 >> 12) & 0x3F) | 0x80);
+									utf8[n++] = (sl_char8)(((u32 >> 6) & 0x3F) | 0x80);
+									utf8[n++] = (sl_char8)((u32 & 0x3F) | 0x80);
+								} else {
+									n += 4;
+								}
+							}
+						}
 					}
 				}
 			}
@@ -284,10 +336,10 @@ namespace slib
 				}
 			} else {
 				if (i + 1 < lenUtf16) {
-					sl_uint32 ch1 = (sl_uint32)((sl_uint8)utf16[++i]);
+					sl_uint32 ch1 = (sl_uint32)((sl_uint16)utf16[++i]);
 					if (ch < 0xDC00 && ch1 >= 0xDC00 && ch1 < 0xE000) {
 						if (utf32) {
-							utf32[n++] = (sl_char32)(((ch - 0xD800) << 10) | (ch1 - 0xDC00));
+							utf32[n++] = (sl_char32)(((ch - 0xD800) << 10) | (ch1 - 0xDC00)) + 0x10000;
 						} else {
 							n++;
 						}
