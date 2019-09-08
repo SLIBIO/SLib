@@ -191,10 +191,23 @@ namespace slib
 		sl_char16* t = s.getData();
 		for (sl_size i = 0; i < len; i++) {
 			sl_char16 ch = sz[i];
-			Size size = atlas->getFontSize(ch);
-			t[0] = ch;
-			canvas->drawText16(s, x, y, font, color);
-			x += size.x;
+			if (ch >= 0xD800 && ch < 0xE000) {
+				if (i + 1 < len) {
+					sl_uint32 ch1 = (sl_uint32)((sl_uint16)sz[++i]);
+					if (ch < 0xDC00 && ch1 >= 0xDC00 && ch1 < 0xE000) {
+						sl_char32 c32 = (sl_char32)(((ch - 0xD800) << 10) | (ch1 - 0xDC00)) + 0x10000;
+						Size size = atlas->getFontSize(c32);
+						String16 s32(&c32, 1);
+						canvas->drawText16(s32, x, y, font, color);
+						x += size.x;
+					}
+				}
+			} else {
+				Size size = atlas->getFontSize(ch);
+				t[0] = ch;
+				canvas->drawText16(s, x, y, font, color);
+				x += size.x;
+			}
 		}
 #else
 		canvas->drawText16(m_text, x, y, getFont(), color);

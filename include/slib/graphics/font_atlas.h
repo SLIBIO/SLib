@@ -81,18 +81,18 @@ namespace slib
 		static void removeAllShared();
 
 	public:
-		sl_bool getChar(sl_char16 ch, FontAtlasChar& _out);
+		sl_bool getChar(sl_char32 ch, FontAtlasChar& _out);
 
-		Size getFontSize(sl_char16 ch);
+		Size getFontSize(sl_char32 ch);
 
-		Size getFontSize_NoLock(sl_char16 ch);
+		Size getFontSize_NoLock(sl_char32 ch);
 
 		Size measureText(const String16& text, sl_bool flagMultiLine = sl_false);
 	
 		void removeAll();
 
 	protected:
-		sl_bool _getChar(sl_char16 ch, sl_bool flagSizeOnly, FontAtlasChar& _out);
+		sl_bool _getChar(sl_char32 ch, sl_bool flagSizeOnly, FontAtlasChar& _out);
 
 	protected:
 		Ref<Font> m_fontSource;
@@ -102,7 +102,7 @@ namespace slib
 		sl_uint32 m_maxPlanes;
 		sl_real m_fontSourceHeight;
 
-		CHashMap<sl_char16, FontAtlasChar> m_map;
+		CHashMap<sl_char32, FontAtlasChar> m_map;
 		sl_uint32 m_countPlanes;
 		Ref<Bitmap> m_currentPlane;
 		Ref<Canvas> m_currentCanvas;

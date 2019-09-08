@@ -190,13 +190,13 @@ namespace slib
 		}
 	}
 
-	sl_bool FontAtlas::getChar(sl_char16 ch, FontAtlasChar& _out)
+	sl_bool FontAtlas::getChar(sl_char32 ch, FontAtlasChar& _out)
 	{
 		ObjectLocker lock(this);
 		return _getChar(ch, sl_false, _out);
 	}
 
-	Size FontAtlas::getFontSize(sl_char16 ch)
+	Size FontAtlas::getFontSize(sl_char32 ch)
 	{
 		ObjectLocker lock(this);
 		FontAtlasChar fac;
@@ -206,7 +206,7 @@ namespace slib
 		return Size::zero();
 	}
 
-	Size FontAtlas::getFontSize_NoLock(sl_char16 ch)
+	Size FontAtlas::getFontSize_NoLock(sl_char32 ch)
 	{
 		FontAtlasChar fac;
 		if (_getChar(ch, sl_true, fac)) {
@@ -229,7 +229,7 @@ namespace slib
 		sl_real totalHeight = 0;
 		FontAtlasChar fac;
 		for (sl_size i = 0; i < len; i++) {
-			sl_char16 ch = sz[i];
+			sl_uint32 ch = (sl_uint32)(sz[i]);
 			if (ch == '\r' || ch == '\n') {
 				if (!flagMultiLine) {
 					return Size(lineWidth, lineHeight);
@@ -249,10 +249,24 @@ namespace slib
 					}
 				}
 			} else {
-				if (_getChar(sz[i], sl_true, fac)) {
-					lineWidth += fac.fontWidth;
-					if (lineHeight < fac.fontHeight) {
-						lineHeight = fac.fontHeight;
+				if (ch >= 0xD800 && ch < 0xE000) {
+					if (i + 1 < len) {
+						sl_uint32 ch1 = (sl_uint32)((sl_uint16)sz[++i]);
+						if (ch < 0xDC00 && ch1 >= 0xDC00 && ch1 < 0xE000) {
+							ch = (sl_char32)(((ch - 0xD800) << 10) | (ch1 - 0xDC00)) + 0x10000;
+						} else {
+							ch = 0;
+						}
+					} else {
+						ch = 0;
+					}
+				}
+				if (ch) {
+					if (_getChar((sl_char32)ch, sl_true, fac)) {
+						lineWidth += fac.fontWidth;
+						if (lineHeight < fac.fontHeight) {
+							lineHeight = fac.fontHeight;
+						}
 					}
 				}
 			}
@@ -264,7 +278,7 @@ namespace slib
 		return Size(maxWidth, totalHeight);
 	}
 
-	sl_bool FontAtlas::_getChar(sl_char16 ch, sl_bool flagSizeOnly, FontAtlasChar& _out)
+	sl_bool FontAtlas::_getChar(sl_char32 ch, sl_bool flagSizeOnly, FontAtlasChar& _out)
 	{
 		if (ch == ' ' || ch == '\r' || ch == '\n') {
 			_out.fontWidth = m_fontSourceHeight * 0.3f;
