@@ -13,7 +13,7 @@
 				centerHorizontal='true'/>
 			
 			<label
-				text='👩‍👩‍👧‍👧Tes👋🏾t'
+				text='@string/hello_world'
 				marginTop='2%sh'
 				fontSize='5%sw'
 				textColor='white'
