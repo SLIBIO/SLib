@@ -51,17 +51,15 @@ namespace slib
 			class RefreshViewHelper : public RefreshView
 			{
 			public:
-				void onRefresh()
-				{
-					_onRefresh_NW();
-				}
+				using RefreshView::_onRefresh_NW;
+
 			};
 
 			void JNICALL OnRefresh(JNIEnv* env, jobject _this, jlong instance)
 			{
 				Ref<RefreshViewHelper> helper = CastRef<RefreshViewHelper>(Android_ViewInstance::findView(instance));
 				if (helper.isNotNull()) {
-					helper->onRefresh();
+					helper->_onRefresh_NW();
 				}
 			}
 			
