@@ -64,6 +64,8 @@ namespace slib
 		
 		void setAdapter(const Ref<ViewAdapter>& adapter);
 		
+		void setAdapter(const Ref<ViewAdapter>& adapter, sl_uint32 nColumns);
+		
 		void refreshItems();
 		
 	protected:

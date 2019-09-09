@@ -95,6 +95,46 @@ namespace slib
 				
 			};
 			
+			class ColumnAdapter : public ViewAdapter
+			{
+			public:
+				Ref<ViewAdapter> adapterTotal;
+				sl_uint32 indexColumn;
+				sl_uint32 nColumns;
+				
+			public:
+				sl_uint64 getItemsCount() override
+				{
+					sl_uint64 m = adapterTotal->getItemsCount() ;
+					sl_uint64 n = m / nColumns;
+					if (indexColumn < (m % nColumns)) {
+						n++;
+					}
+					return n;
+				}
+				
+				Ref<View> getView(sl_uint64 index, View* original, View* parent) override
+				{
+					return adapterTotal->getView(index * nColumns + indexColumn, original, parent);
+				}
+				
+				sl_object_type getViewType(sl_uint64 index, View* parent) override
+				{
+					return adapterTotal->getViewType(index * nColumns + indexColumn, parent);
+				}
+				
+				sl_ui_len getAverageItemHeight(View* parent) override
+				{
+					return adapterTotal->getAverageItemHeight(parent);
+				}
+				
+				sl_ui_len getItemHeight(sl_uint64 index, View* parent) override
+				{
+					return adapterTotal->getItemHeight(index * nColumns + indexColumn, parent);
+				}
+				
+			};
+			
 		}
 	}
 	
@@ -168,7 +208,31 @@ namespace slib
 	
 	void CollectionView::setAdapter(const Ref<ViewAdapter>& adapter)
 	{
+		if (adapter.isNull()) {
+			setAdapters(sl_null, sl_null);
+			return;
+		}
 		setAdapters(List< Ref<ViewAdapter> >::createFromElement(adapter), sl_null);
+	}
+	
+	void CollectionView::setAdapter(const Ref<ViewAdapter>& adapterTotal, sl_uint32 nColumns)
+	{
+		if (adapterTotal.isNull() || !nColumns) {
+			setAdapters(sl_null, sl_null);
+			return;
+		}
+		List< Ref<ViewAdapter> > adapters;
+		for (sl_uint32 i = 0; i < nColumns; i++) {
+			Ref<ColumnAdapter> adapter = new ColumnAdapter;
+			if (adapter.isNull()) {
+				return;
+			}
+			adapter->adapterTotal = adapterTotal;
+			adapter->nColumns = nColumns;
+			adapter->indexColumn = i;
+			adapters.add_NoLock(Move(adapter));
+		}
+		setAdapters(adapters);
 	}
 
 	void CollectionView::refreshItems()
