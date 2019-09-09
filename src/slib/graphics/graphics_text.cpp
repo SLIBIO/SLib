@@ -69,6 +69,7 @@ namespace slib
 	void TextItem::setStyle(const Ref<TextStyle>& style) noexcept
 	{
 		m_style = style;
+		m_emojiFont.setNull();
 	}
 	
 	Ref<Font> TextItem::getFont() noexcept
@@ -80,6 +81,43 @@ namespace slib
 		return sl_null;
 	}
 
+	Ref<Font> TextItem::getEmojiFont() noexcept
+	{
+		Ref<TextStyle> style = m_style;
+		if (style.isNotNull()) {
+			Ref<Font> font = m_emojiFont;
+			if (font.isNotNull()) {
+				if (m_emojiFontBase == style->font) {
+					return font;
+				}
+			}
+			font = style->font;
+			if (font.isNotNull()) {
+				String name = style->emojiFamilyName;
+#ifdef SLIB_PLATFORM_IS_WINDOWS
+				if (name.isEmpty()) {
+					name = "Segoe UI Emoji";
+				}
+#endif
+				if (name.isNotEmpty()) {
+					FontDesc desc;
+					font->getDesc(desc);
+					if (desc.familyName != name) {
+						desc.familyName = name;
+						Ref<Font> fontNew = Font::create(desc);
+						m_emojiFont = fontNew;
+						m_emojiFontBase = font;
+						return fontNew;
+					}
+				}
+				m_emojiFont = font;
+				m_emojiFontBase = font;
+				return font;
+			}
+		}
+		return sl_null;
+	}
+	
 	Point TextItem::getLayoutPosition() noexcept
 	{
 		return m_layoutPosition;
@@ -245,7 +283,7 @@ namespace slib
 	{
 		ObjectLocker lock(this);
 		
-		Ref<Font> font = getFont();
+		Ref<Font> font = getEmojiFont();
 		if (m_fontCached == font) {
 			return Size(m_widthCached, m_heightCached);
 		}
@@ -263,7 +301,7 @@ namespace slib
 	
 	void TextEmojiItem::draw(Canvas* canvas, sl_real x, sl_real y, const Color& color)
 	{
-		Ref<Font> font = getFont();
+		Ref<Font> font = getEmojiFont();
 		if (font.isNotNull()) {
 			canvas->drawText16(m_text, x, y, font, color);
 		}
@@ -650,6 +688,8 @@ namespace slib
 		Color attrBackColor;
 		sl_bool flagDefineFamilyName = sl_false;
 		XmlString attrFamilyName;
+		sl_bool flagDefineEmojiFamilyName = sl_false;
+		XmlString attrEmojiFamilyName;
 		sl_bool flagDefineFontSize = sl_false;
 		XmlString attrFontSize;
 		sl_real attrFontSizeParsed = 0;
@@ -717,6 +757,13 @@ namespace slib
 			}
 		}
 		{
+			XmlString value = element->getAttribute(SLIB_UNICODE("emojiFace"));
+			if (value.isNotNull()) {
+				flagDefineEmojiFamilyName = sl_true;
+				attrEmojiFamilyName = value;
+			}
+		}
+		{
 			XmlString value = element->getAttributeIgnoreCase(SLIB_UNICODE("size"));
 			if (value.isNotNull()) {
 				flagDefineFontSize = sl_true;
@@ -774,6 +821,9 @@ namespace slib
 					} else if (name == SLIB_UNICODE("font-family")) {
 						flagDefineFamilyName = sl_true;
 						attrFamilyName = value;
+					} else if (name == SLIB_UNICODE("emoji-family")) {
+						flagDefineEmojiFamilyName = sl_true;
+						attrEmojiFamilyName = value;
 					} else if (name == SLIB_UNICODE("font-size")) {
 						flagDefineFontSize = sl_true;
 						attrFontSize = value;
@@ -885,6 +935,12 @@ namespace slib
 		sl_bool flagNewStyle = flagNewFont;
 		if (!flagNewStyle) {
 			do {
+				if (flagDefineEmojiFamilyName) {
+					if (style->emojiFamilyName != attrEmojiFamilyName) {
+						flagNewStyle = sl_true;
+						break;
+					}
+				}
 				if (flagDefineTextColor) {
 					if (style->textColor != attrTextColor) {
 						flagNewStyle = sl_true;
@@ -938,6 +994,9 @@ namespace slib
 		
 		if (flagNewStyle) {
 			styleNew = style->duplicate();
+			if (styleNew.isNull()) {
+				return;
+			}
 			if (flagNewFont) {
 				if (flagDefineFamilyName) {
 					fontDesc.familyName = attrFamilyName;
@@ -953,6 +1012,9 @@ namespace slib
 				}
 				font = Font::create(fontDesc);
 				styleNew->font = font;
+			}
+			if (flagDefineEmojiFamilyName) {
+				styleNew->emojiFamilyName = attrEmojiFamilyName;
 			}
 			if (flagDefineUnderline) {
 				styleNew->flagUnderline = attrUnderline;

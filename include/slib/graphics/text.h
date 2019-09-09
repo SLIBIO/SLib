@@ -87,6 +87,7 @@ namespace slib
 	{
 	public:
 		AtomicRef<Font> font;
+		AtomicString emojiFamilyName;
 		sl_bool flagUnderline;
 		sl_bool flagOverline;
 		sl_bool flagLineThrough;
@@ -124,6 +125,8 @@ namespace slib
 		
 		Ref<Font> getFont() noexcept;
 	
+		Ref<Font> getEmojiFont() noexcept;
+		
 		Point getLayoutPosition() noexcept;
 
 		void setLayoutPosition(const Point& pt) noexcept;
@@ -139,6 +142,8 @@ namespace slib
 		AtomicRef<TextStyle> m_style;
 		Point m_layoutPosition;
 		Size m_layoutSize;
+		AtomicRef<Font> m_emojiFont;
+		AtomicRef<Font> m_emojiFontBase;
 
 	};
 	
