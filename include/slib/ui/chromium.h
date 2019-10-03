@@ -58,6 +58,8 @@ namespace slib
 
 	};
 	
+	class HttpCookie;
+	
 	class SLIB_EXPORT Chromium
 	{
 	public:
@@ -73,7 +75,11 @@ namespace slib
 
 		static void clearCache();
 		
-		static void clearCookie();
+		static void getAllCookies(const Function<void(const List<HttpCookie>& cookies)>& callback);
+		static void getAllCookies(const String& url, const Function<void(const List<HttpCookie>& cookies)>& callback);
+		static void setCookie(const String& url, const HttpCookie& cookie, const Function<void(sl_bool flagSuccess)>& callback);
+		static void deleteCookies(const String& url, const String& name, const Function<void(sl_uint32 countDeleted)>& callback);
+		static void clearCookies();
 		
 	};
 

@@ -34,6 +34,7 @@
 #include "slib/core/file.h"
 #include "slib/core/thread.h"
 #include "slib/core/safe_static.h"
+#include "slib/network/http_common.h"
 
 #ifdef SLIB_UI_IS_WIN32
 #	pragma comment(lib, "libcef_dll_wrapper.lib")
@@ -190,7 +191,10 @@ namespace slib
 			
 			static String GetString(const CefString& str)
 			{
-				return (sl_char16*)(str.c_str());
+				if (str.length()) {
+					return (sl_char16*)(str.c_str());
+				}
+				return sl_null;
 			}
 			
 			static CefString GetCefString(const String16& str)
@@ -796,6 +800,67 @@ namespace slib
 				CefShutdown();
 			}
 			
+			class CookieVisitor : public CefCookieVisitor
+			{
+			public:
+				List<HttpCookie> cookies;
+				Function<void(const List<HttpCookie>& cookies)> callback;
+				
+			public:
+				bool Visit(const CefCookie& cookie, int count, int total, bool& deleteCookie) override
+				{
+					HttpCookie h;
+					h.name = GetString(CefString(&(cookie.name)));
+					h.value = GetString(CefString(&(cookie.value)));
+					h.domain = GetString(CefString(&(cookie.domain)));
+					h.path = GetString(CefString(&(cookie.path)));
+					h.secure = cookie.secure != 0;
+					h.http_only = cookie.httponly != 0;
+					if (cookie.has_expires) {
+						cef_time_t const& t = cookie.expires;
+						h.expires = Time(t.year, t.month, t.day_of_month, t.hour, t.minute, t.second, t.millisecond);
+					}
+					cookies.add_NoLock(h);
+					if (count + 1 == total) {
+						callback(cookies);
+					}
+					return sl_true;
+				}
+				
+			private:
+				IMPLEMENT_REFCOUNTING(CookieVisitor);
+			};
+			
+			class SetCookieCallback : public CefSetCookieCallback
+			{
+			public:
+				Function<void(sl_bool)> callback;
+				
+			public:
+				void OnComplete(bool success) override
+				{
+					callback(success);
+				}
+				
+			private:
+				IMPLEMENT_REFCOUNTING(SetCookieCallback);
+			};
+			
+			class DeleteCookiesCallback : public CefDeleteCookiesCallback
+			{
+			public:
+				Function<void(sl_uint32)> callback;
+				
+			public:
+				void OnComplete(int num_deleted) override
+				{
+					callback(num_deleted);
+				}
+				
+			private:
+				IMPLEMENT_REFCOUNTING(DeleteCookiesCallback);
+			};
+			
 		}
 	}
 	
@@ -884,8 +949,98 @@ namespace slib
 	{
 	}
 	
-	void Chromium::clearCookie()
+	void Chromium::getAllCookies(const Function<void(const List<HttpCookie>& cookies)>& callback)
 	{
+		CefRefPtr<CefCookieManager> refManager = CefCookieManager::GetGlobalManager(nullptr);
+		CefCookieManager* manager = refManager.get();
+		if (manager) {
+			CefRefPtr<CookieVisitor> refVisitor = new CookieVisitor;
+			CookieVisitor* visitor = refVisitor.get();
+			if (visitor) {
+				visitor->callback = callback;
+				manager->VisitAllCookies(refVisitor);
+				return;
+			}
+		}
+		callback(sl_null);
+	}
+	
+	void Chromium::getAllCookies(const String& url, const Function<void(const List<HttpCookie>& cookies)>& callback)
+	{
+		CefRefPtr<CefCookieManager> refManager = CefCookieManager::GetGlobalManager(nullptr);
+		CefCookieManager* manager = refManager.get();
+		if (manager) {
+			CefRefPtr<CookieVisitor> refVisitor = new CookieVisitor;
+			CookieVisitor* visitor = refVisitor.get();
+			if (visitor) {
+				visitor->callback = callback;
+				manager->VisitUrlCookies(GetCefString(url), sl_true, refVisitor);
+				return;
+			}
+		}
+		callback(sl_null);
+	}
+	
+	void Chromium::setCookie(const String& url, const HttpCookie& h, const Function<void(sl_bool flagSuccess)>& callback)
+	{
+		CefRefPtr<CefCookieManager> refManager = CefCookieManager::GetGlobalManager(nullptr);
+		CefCookieManager* manager = refManager.get();
+		if (manager) {
+			CefRefPtr<SetCookieCallback> refWrapperCallback = new SetCookieCallback;
+			SetCookieCallback* wrapperCallback = refWrapperCallback.get();
+			if (wrapperCallback) {
+				wrapperCallback->callback = callback;
+				CefCookie cookie;
+				CefString(&(cookie.name)) = GetCefString(h.name);
+				CefString(&(cookie.value)) = GetCefString(h.value);
+				CefString(&(cookie.domain)) = GetCefString(h.domain);
+				CefString(&(cookie.path)) = GetCefString(h.path);
+				cookie.secure = h.secure ? 1 : 0;
+				cookie.httponly = h.http_only ? 1 : 0;
+				if (h.expires.isNotZero()) {
+					cookie.has_expires = true;
+					Time const& t = h.expires;
+					cookie.expires.year = t.getYear();
+					cookie.expires.month = t.getMonth();
+					cookie.expires.day_of_month = t.getDay();
+					cookie.expires.day_of_week = t.getDayOfWeek();
+					cookie.expires.hour = t.getHour();
+					cookie.expires.minute = t.getMinute();
+					cookie.expires.second = t.getSecond();
+					cookie.expires.millisecond = t.getMillisecond();
+				} else {
+					cookie.has_expires = false;
+				}
+				manager->SetCookie(GetCefString(url), cookie, refWrapperCallback);
+				return;
+			}
+		}
+		callback(sl_false);
+	}
+	
+	void Chromium::deleteCookies(const String& url, const String& name, const Function<void(sl_uint32 countDeleted)>& callback)
+	{
+		CefRefPtr<CefCookieManager> refManager = CefCookieManager::GetGlobalManager(nullptr);
+		CefCookieManager* manager = refManager.get();
+		if (manager) {
+			CefRefPtr<DeleteCookiesCallback> refWrapperCallback = new DeleteCookiesCallback;
+			DeleteCookiesCallback* wrapperCallback = refWrapperCallback.get();
+			if (wrapperCallback) {
+				wrapperCallback->callback = callback;				
+				manager->DeleteCookies(GetCefString(url), GetCefString(name), refWrapperCallback);
+				return;
+			}
+		}
+		callback(0);
+	}
+	
+	void Chromium::clearCookies()
+	{
+		CefRefPtr<CefCookieManager> refManager = CefCookieManager::GetGlobalManager(nullptr);
+		CefCookieManager* manager = refManager.get();
+		if (manager) {
+			manager->FlushStore(nullptr);
+		}
 	}
 	
 #else
@@ -916,7 +1071,27 @@ namespace slib
 	{
 	}
 	
-	void Chromium::clearCookie()
+	void Chromium::getAllCookies(const Function<void(const List<HttpCookie>& cookies)>& callback)
+	{
+		callback(sl_null);
+	}
+	
+	void Chromium::getAllCookies(const String& url, const Function<void(const List<HttpCookie>& cookies)>& callback)
+	{
+		callback(sl_null);
+	}
+	
+	void Chromium::setCookie(const String& url, const HttpCookie& cookie, const Function<void(sl_bool flagSuccess)>& callback)
+	{
+		callback(sl_false);
+	}
+	
+	void Chromium::deleteCookies(const String& url, const String& name, const Function<void(sl_uint32 countDeleted)>& callback)
+	{
+		callback(0);
+	}
+	
+	void Chromium::clearCookies()
 	{
 	}
 	
