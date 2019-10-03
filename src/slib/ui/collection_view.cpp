@@ -254,6 +254,11 @@ namespace slib
 		runOnDrawingThread(SLIB_BIND_WEAKREF(void(), CollectionView, _layout, this, sl_null, sl_false));
 	}
 	
+	void CollectionView::onAttach()
+	{
+		dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), CollectionView, _layout, this, sl_null, sl_false));
+	}
+	
 	Ref<View> CollectionView::_getView(ViewAdapter* adapter, sl_uint64 index, View* original)
 	{
 		Ref<View> view = adapter->getView(index, original, this);

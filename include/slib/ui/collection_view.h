@@ -73,6 +73,8 @@ namespace slib
 		
 		void onResize(sl_ui_len x, sl_ui_len y) override;
 		
+		void onAttach() override;
+		
 	protected:
 		Ref<View> _getView(ViewAdapter* adapter, sl_uint64 index, View* original);
 		
