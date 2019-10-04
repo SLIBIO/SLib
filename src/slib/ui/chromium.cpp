@@ -274,6 +274,9 @@ namespace slib
 				sl_bool m_flagLoadOffline;
 				AtomicString m_title;
 				
+				sl_bool m_flagResizeAfterCreate;
+				sl_bool m_flagReloadAfterCreate;
+				
 			public:
 				ChromiumViewInstance();
 				
@@ -297,6 +300,8 @@ namespace slib
 						NSView* handle = (__bridge NSView*)(host->GetWindowHandle());
 						[handle setFrame:NSMakeRect(0, 0, (CGFloat)(view->getWidth()), (CGFloat)(view->getHeight()))];
 #endif
+					} else {
+						m_flagResizeAfterCreate = sl_true;
 					}
 				}
 				
@@ -307,6 +312,8 @@ namespace slib
 					if (browser) {
 						m_flagLoadOffline = helper->m_flagOfflineContent;
 						browser->GetMainFrame()->LoadURL(GetCefString(helper->m_urlOrigin));
+					} else {
+						m_flagReloadAfterCreate = sl_true;
 					}
 				}
 				
@@ -403,6 +410,15 @@ namespace slib
 				{
 					m_browser = browser;
 					m_host = browser->GetHost();
+					Ref<ChromiumViewHelper> helper = getHelper();
+					if (helper.isNotNull()) {
+						if (m_flagResizeAfterCreate) {
+							refreshSize(helper.get());
+						}
+						if (m_flagReloadAfterCreate) {
+							load(helper.get());
+						}
+					}
 				}
 				
 				CefRefPtr<CefResourceRequestHandler> onInterceptNavigationRequest(CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request)
@@ -629,6 +645,9 @@ namespace slib
 			ChromiumViewInstance::ChromiumViewInstance()
 			{
 				m_flagLoadOffline = sl_false;
+
+				m_flagResizeAfterCreate = sl_false;
+				m_flagReloadAfterCreate = sl_false;
 			}
 			
 			ChromiumViewInstance::~ChromiumViewInstance()
