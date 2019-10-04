@@ -111,7 +111,7 @@
       <AdditionalDependencies>slib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>$(SLIB_PATH)/tool/bin/sapp gen $(ProjectDir)../src/sapp</Command>
+      <Command>"$(SLIB_PATH)/tool/bin/sapp" gen "$(ProjectDir)../src/sapp"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -128,7 +128,7 @@
       <AdditionalDependencies>slib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>$(SLIB_PATH)/tool/bin/sapp gen $(ProjectDir)../src/sapp</Command>
+      <Command>"$(SLIB_PATH)/tool/bin/sapp" gen "$(ProjectDir)../src/sapp"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -149,7 +149,7 @@
       <AdditionalDependencies>slib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>$(SLIB_PATH)/tool/bin/sapp gen $(ProjectDir)../src/sapp</Command>
+      <Command>"$(SLIB_PATH)/tool/bin/sapp" gen "$(ProjectDir)../src/sapp"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -170,7 +170,7 @@
       <AdditionalDependencies>slib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>$(SLIB_PATH)/tool/bin/sapp gen $(ProjectDir)../src/sapp</Command>
+      <Command>"$(SLIB_PATH)/tool/bin/sapp" gen "$(ProjectDir)../src/sapp"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

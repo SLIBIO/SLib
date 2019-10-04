@@ -242,7 +242,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "${SLIB_PATH}/tool/bin/sapp gen ${PROJECT_DIR}/../src/sapp\n";
+			shellScript = "\"${SLIB_PATH}/tool/bin/sapp\" gen \"${PROJECT_DIR}/../src/sapp\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
