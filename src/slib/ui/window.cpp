@@ -1292,7 +1292,9 @@ namespace slib
 			}
 			
 			attach(window, sl_false);
-			
+
+			dispatchCreate();
+
 #if defined(SLIB_UI_IS_MACOS) || defined(SLIB_UI_IS_EFL)
 			UISize sizeClient = getClientSize();
 			dispatchResize(sizeClient.x, sizeClient.y);
@@ -1308,9 +1310,6 @@ namespace slib
 				window->setVisible(sl_true);
 				window->activate();
 			}
-
-			dispatchCreate();
-			
 		} else {
 			dispatchCreateFailed();
 		}
