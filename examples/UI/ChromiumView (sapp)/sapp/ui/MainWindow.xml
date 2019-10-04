@@ -1,0 +1,25 @@
+<sapp>
+	<layout
+		type='window'
+		title='ChromiumView Example'
+		width='1800dp'
+		height='1200dp'
+		minWidth='600dp'
+		minHeight='400dp'
+		resizable='true'
+		minimizeButton='true'
+		maximizeButton='true'
+		centerScreen='true'
+		background='white'
+		>
+
+		<web
+			name='chromium'
+			class='slib::ChromiumView'
+			width='fill'
+			height='fill'
+			url='https://www.bing.com'
+			/>
+
+ 	</layout>
+</sapp>
