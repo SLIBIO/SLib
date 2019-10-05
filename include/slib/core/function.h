@@ -247,7 +247,7 @@ namespace slib
 	
 }
 
-#define SLIB_BIND_CLASS(TYPE, CLASS, CALLBACK, OBJECT, ...) slib::Function<TYPE>::bindMember(OBJECT, &CLASS::CALLBACK, ##__VA_ARGS__)
+#define SLIB_BIND_MEMBER(TYPE, CLASS, CALLBACK, OBJECT, ...) slib::Function<TYPE>::bindMember(OBJECT, &CLASS::CALLBACK, ##__VA_ARGS__)
 #define SLIB_BIND_REF(TYPE, CLASS, CALLBACK, OBJECT, ...) slib::Function<TYPE>::bindRef(slib::Ref<CLASS>(OBJECT), &CLASS::CALLBACK, ##__VA_ARGS__)
 #define SLIB_BIND_WEAKREF(TYPE, CLASS, CALLBACK, OBJECT, ...) slib::Function<TYPE>::bindWeakRef(slib::WeakRef<CLASS>(OBJECT), &CLASS::CALLBACK, ##__VA_ARGS__)
 
