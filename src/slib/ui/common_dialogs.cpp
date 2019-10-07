@@ -428,7 +428,7 @@ namespace slib
 		FileDialog dlg;
 		dlg.type = FileDialogType::OpenFiles;
 		dlg.parent = parent;
-		if (dlg.run()) {
+		if (dlg.run() == DialogResult::Ok) {
 			return dlg.selectedPaths;
 		}
 		return sl_null;
@@ -439,7 +439,7 @@ namespace slib
 		FileDialog dlg;
 		dlg.type = FileDialogType::OpenFile;
 		dlg.parent = parent;
-		if (dlg.run()) {
+		if (dlg.run() == DialogResult::Ok) {
 			return dlg.selectedPath;
 		}
 		return sl_null;
@@ -450,7 +450,7 @@ namespace slib
 		FileDialog dlg;
 		dlg.type = FileDialogType::SaveFile;
 		dlg.parent = parent;
-		if (dlg.run()) {
+		if (dlg.run() == DialogResult::Ok) {
 			return dlg.selectedPath;
 		}
 		return sl_null;
@@ -461,7 +461,7 @@ namespace slib
 		FileDialog dlg;
 		dlg.type = FileDialogType::SelectDirectory;
 		dlg.parent = parent;
-		if (dlg.run()) {
+		if (dlg.run() == DialogResult::Ok) {
 			return dlg.selectedPath;
 		}
 		return sl_null;
