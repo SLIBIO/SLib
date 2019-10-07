@@ -37,7 +37,12 @@
 }
 @end
 
-@interface SLIBScrollContentViewHandle : SLIBViewHandle
+@interface SLIBLargeContentViewHandle : SLIBViewHandle
+{
+}
+@end
+
+@interface SLIBEmptyContentViewHandle : SLIBViewHandle
 {
 }
 @end

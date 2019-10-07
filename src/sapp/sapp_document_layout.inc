@@ -2314,6 +2314,12 @@ namespace slib
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(opaque, setOpaque)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(layer, setLayer)
 		
+		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(shadowOpacity, setShadowOpacity)
+		LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(shadowRadius, setShadowRadius, checkScalarSize)
+		LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(shadowOffsetX, setShadowOffsetX, checkScalarSize)
+		LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(shadowOffsetY, setShadowOffsetY, checkScalarSize)
+		LAYOUT_CONTROL_COLOR_ATTR(shadowColor, setShadowColor)
+
 		if (op == OP_PARSE) {
 			LAYOUT_CONTROL_PARSE_ATTR(attr->, scrolling)
 			if (!(attr->scrolling.flagDefined)) {
@@ -2387,9 +2393,9 @@ namespace slib
 		if (flagView) {
 			LAYOUT_CONTROL_GENERIC_ATTR(instance, setCreatingInstance)
 			LAYOUT_CONTROL_GENERIC_ATTR(nativeWidget, setCreatingNativeWidget)
+			LAYOUT_CONTROL_GENERIC_ATTR(nativeLayer, setCreatingNativeLayer)
 			LAYOUT_CONTROL_GENERIC_ATTR(largeContent, setCreatingLargeContent)
 			LAYOUT_CONTROL_GENERIC_ATTR(emptyContent, setCreatingEmptyContent)
-			LAYOUT_CONTROL_GENERIC_ATTR(hardwareLayer, setHardwareLayer)
 		}
 		LAYOUT_CONTROL_GENERIC_ATTR(childInstances, setCreatingChildInstances)
 		

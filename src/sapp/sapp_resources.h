@@ -295,6 +295,12 @@ namespace slib
 		SAppFloatValue alpha;
 		SAppBooleanValue layer;
 		
+		SAppFloatValue shadowOpacity;
+		SAppDimensionFloatValue shadowRadius;
+		SAppDimensionFloatValue shadowOffsetX;
+		SAppDimensionFloatValue shadowOffsetY;
+		SAppColorValue shadowColor;
+		
 		SAppScrollingValue scrolling;
 		SAppScrollBarsValue scrollBars;
 		SAppBooleanValue paging;
@@ -315,7 +321,7 @@ namespace slib
 		SAppBooleanValue nativeWidget;
 		SAppBooleanValue largeContent;
 		SAppBooleanValue emptyContent;
-		SAppBooleanValue hardwareLayer;
+		SAppBooleanValue nativeLayer;
 		
 		SAppBooleanValue okCancelEnabled;
 		SAppBooleanValue ok;

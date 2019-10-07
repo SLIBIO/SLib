@@ -27,7 +27,6 @@
 #include "view_ios.h"
 
 #include "slib/ui/core.h"
-#include "slib/ui/scroll_view.h"
 
 namespace slib
 {
@@ -60,6 +59,22 @@ namespace slib
 	void iOS_ViewInstance::initialize(UIView* handle, UIView* parent, View* view)
 	{
 		initialize(handle);
+		
+		float shadowOpacity = view->getShadowOpacity();
+		if (shadowOpacity > SLIB_EPSILON) {
+			CALayer* layer = handle.layer;
+			if (layer != nil) {
+				layer.shadowOpacity = shadowOpacity;
+				layer.shadowRadius = (CGFloat)(view->getShadowRadius());
+				UIPointf offset = view->getShadowOffset();
+				layer.shadowOffset = CGSizeMake((CGFloat)(offset.x), (CGFloat)(offset.y));
+				CGColorRef color = GraphicsPlatform::getCGColorFromColor(view->getShadowColor());
+				if (color) {
+					layer.shadowColor = color;
+					CFRelease(color);
+				}
+			}
+		}
 		
 		m_flagDrawing = view->isDrawing();
 
@@ -316,6 +331,54 @@ namespace slib
 		}
 	}
 	
+	void iOS_ViewInstance::setShadowOpacity(View* view, float opacity)
+	{
+		UIView* handle = m_handle;
+		if (handle != nil) {
+			CALayer* layer = handle.layer;
+			if (layer != nil) {
+				layer.shadowOpacity = opacity;
+			}
+		}
+	}
+	
+	void iOS_ViewInstance::setShadowRadius(View* view, sl_ui_posf radius)
+	{
+		UIView* handle = m_handle;
+		if (handle != nil) {
+			CALayer* layer = handle.layer;
+			if (layer != nil) {
+				layer.shadowRadius = (CGFloat)radius;
+			}
+		}
+	}
+	
+	void iOS_ViewInstance::setShadowOffset(View* view, sl_ui_posf x, sl_ui_posf y)
+	{
+		UIView* handle = m_handle;
+		if (handle != nil) {
+			CALayer* layer = handle.layer;
+			if (layer != nil) {
+				layer.shadowOffset = CGSizeMake((CGFloat)x, (CGFloat)y);
+			}
+		}
+	}
+	
+	void iOS_ViewInstance::setShadowColor(View* view, const Color& _color)
+	{
+		UIView* handle = m_handle;
+		if (handle != nil) {
+			CALayer* layer = handle.layer;
+			if (layer != nil) {
+				CGColorRef color = GraphicsPlatform::getCGColorFromColor(_color);
+				if (color) {
+					layer.shadowColor = color;
+					CFRelease(color);
+				}
+			}
+		}
+	}
+	
 	void iOS_ViewInstance::onDraw(CGRect rectDirty)
 	{
 		if (!m_flagDrawing) {
@@ -483,11 +546,13 @@ namespace slib
 	
 	Ref<ViewInstance> View::createGenericInstance(ViewInstance* parent)
 	{
-		if (IsInstanceOf<ScrollView>(getParent())) {
-			return iOS_ViewInstance::create<iOS_ViewInstance, SLIBScrollContentViewHandle>(this, parent);
-		} else {
-			return iOS_ViewInstance::create<iOS_ViewInstance, SLIBViewHandle>(this, parent);
+		if (m_flagCreatingEmptyContent) {
+			return iOS_ViewInstance::create<iOS_ViewInstance, SLIBEmptyContentViewHandle>(this, parent);
 		}
+		if (m_flagCreatingLargeContent) {
+			return iOS_ViewInstance::create<iOS_ViewInstance, SLIBLargeContentViewHandle>(this, parent);
+		}
+		return iOS_ViewInstance::create<iOS_ViewInstance, SLIBViewHandle>(this, parent);
 	}
 	
 	
@@ -622,13 +687,13 @@ IOS_VIEW_EVENTS
 
 @end
 
-@interface SLIBViewTiledLayer : CATiledLayer
+@interface SLIBViewLargeContentLayer : CATiledLayer
 {
 	@public sl_int32 m_updateId;
 }
 @end
 
-@implementation SLIBViewTiledLayer
+@implementation SLIBViewLargeContentLayer
 
 +(CFTimeInterval)fadeDuration
 {
@@ -672,11 +737,33 @@ IOS_VIEW_EVENTS
 
 @end
 
-@implementation SLIBScrollContentViewHandle
+@implementation SLIBLargeContentViewHandle
 
 +(Class)layerClass
 {
-	return SLIBViewTiledLayer.class;
+	return SLIBViewLargeContentLayer.class;
+}
+
+@end
+
+@interface SLIBViewEmptyContentLayer : CALayer
+{
+}
+@end
+
+@implementation SLIBViewEmptyContentLayer
+
+- (void)display
+{
+}
+
+@end
+
+@implementation SLIBEmptyContentViewHandle
+
++(Class)layerClass
+{
+	return SLIBViewEmptyContentLayer.class;
 }
 
 @end

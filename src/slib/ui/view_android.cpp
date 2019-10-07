@@ -275,7 +275,7 @@ namespace slib
 			if (alpha < 0.995f) {
 				JView::setAlpha.call(sl_null, jhandle, alpha);
 			}
-			if (view->isHardwareLayer()) {
+			if (view->isCreatingNativeLayer()) {
 				JView::setLayered.call(sl_null, jhandle);
 			}
 

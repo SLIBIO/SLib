@@ -133,6 +133,14 @@ namespace slib
 		
 		void bringToFront(View* view) override;
 		
+		void setShadowOpacity(View* view, float opacity) override;
+		
+		void setShadowRadius(View* view, sl_ui_posf radius) override;
+		
+		void setShadowOffset(View* view, sl_ui_posf x, sl_ui_posf y) override;
+		
+		void setShadowColor(View* view, const Color& color) override;
+		
 	public:
 		template <class HANDLE>
 		static void setHandleFont(HANDLE* handle, const Ref<Font>& font)

@@ -63,6 +63,24 @@ namespace slib
 	{
 		initialize(handle);
 
+		if (view->isCreatingNativeLayer()) {
+			[handle setWantsLayer:YES];
+			float shadowOpacity = view->getShadowOpacity();
+			if (shadowOpacity > SLIB_EPSILON) {
+				CALayer* layer = handle.layer;
+				if (layer != nil) {
+					layer.shadowOpacity = shadowOpacity;
+					layer.shadowRadius = (CGFloat)(view->getShadowRadius());
+					UIPointf offset = view->getShadowOffset();
+					layer.shadowOffset = CGSizeMake((CGFloat)(offset.x), (CGFloat)(offset.y));
+					CGColorRef color = GraphicsPlatform::getCGColorFromColor(view->getShadowColor());
+					if (color) {
+						layer.shadowColor = color;
+						CFRelease(color);
+					}
+				}
+			}
+		}
 		[handle setHidden:(view->isVisibleInInstance() ? NO : YES)];
 		if (!(view->isEnabled())) {
 			if ([handle isKindOfClass:[NSControl class]]) {
@@ -305,6 +323,54 @@ namespace slib
 			if (parent != nil) {
 				[handle removeFromSuperviewWithoutNeedingDisplay];
 				[parent addSubview:handle];
+			}
+		}
+	}
+	
+	void macOS_ViewInstance::setShadowOpacity(View* view, float opacity)
+	{
+		NSView* handle = m_handle;
+		if (handle != nil) {
+			CALayer* layer = handle.layer;
+			if (layer != nil) {
+				layer.shadowOpacity = opacity;
+			}
+		}
+	}
+	
+	void macOS_ViewInstance::setShadowRadius(View* view, sl_ui_posf radius)
+	{
+		NSView* handle = m_handle;
+		if (handle != nil) {
+			CALayer* layer = handle.layer;
+			if (layer != nil) {
+				layer.shadowRadius = (CGFloat)radius;
+			}
+		}
+	}
+	
+	void macOS_ViewInstance::setShadowOffset(View* view, sl_ui_posf x, sl_ui_posf y)
+	{
+		NSView* handle = m_handle;
+		if (handle != nil) {
+			CALayer* layer = handle.layer;
+			if (layer != nil) {
+				layer.shadowOffset = CGSizeMake((CGFloat)x, (CGFloat)y);
+			}
+		}
+	}
+	
+	void macOS_ViewInstance::setShadowColor(View* view, const Color& _color)
+	{
+		NSView* handle = m_handle;
+		if (handle != nil) {
+			CALayer* layer = handle.layer;
+			if (layer != nil) {
+				CGColorRef color = GraphicsPlatform::getCGColorFromColor(_color);
+				if (color) {
+					layer.shadowColor = color;
+					CFRelease(color);
+				}
 			}
 		}
 	}

@@ -85,6 +85,11 @@ namespace slib
 		// set before attaching
 		void setCreatingNativeWidget(sl_bool flag);
 		
+		sl_bool isCreatingNativeLayer();
+		
+		// set before attaching
+		void setCreatingNativeLayer(sl_bool flag);
+
 		sl_bool isCreatingLargeContent();
 		
 		// set before attaching
@@ -101,11 +106,6 @@ namespace slib
 		void setAttachMode(UIAttachMode mode);
 
 		sl_bool isNativeWidget();
-		
-		sl_bool isHardwareLayer();
-		
-		// set before attaching
-		void setHardwareLayer(sl_bool flagLayered);
 		
 		
 		Ref<Window> getWindow();
@@ -811,11 +811,11 @@ namespace slib
 		
 		sl_bool isOpaque();
 		
-		void setOpaque(sl_bool flagOpaque, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setOpaque(sl_bool flagOpaque, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 		sl_real getAlpha();
 		
-		void setAlpha(sl_real alpha, UIUpdateMode mode = UIUpdateMode::Redraw);
+		virtual void setAlpha(sl_real alpha, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 		sl_bool isLayer();
 		
@@ -829,6 +829,29 @@ namespace slib
 		
 		void forceDraw(sl_bool flagInvalidate = sl_true);
 		
+				
+		float getShadowOpacity();
+		
+		virtual void setShadowOpacity(float alpha, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		sl_ui_posf getShadowRadius();
+		
+		virtual void setShadowRadius(sl_ui_posf radius, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		const UIPointf& getShadowOffset();
+		
+		virtual void setShadowOffset(const UIPointf& offset, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void setShadowOffset(sl_ui_posf x, sl_ui_posf y, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void setShadowOffsetX(sl_ui_posf x, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		void setShadowOffsetY(sl_ui_posf y, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
+		Color getShadowColor();
+		
+		virtual void setShadowColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
+
 		
 		virtual Ref<AnimationLoop> getAnimationLoop();
 		
@@ -1406,13 +1429,13 @@ namespace slib
 		sl_bool m_flagCreatingInstance : 1;
 		sl_bool m_flagCreatingChildInstances : 1;
 		sl_bool m_flagCreatingNativeWidget : 1;
+		sl_bool m_flagCreatingNativeLayer : 1;
 		sl_bool m_flagCreatingLargeContent: 1;
 		sl_bool m_flagCreatingEmptyContent: 1;
 		sl_bool m_flagUsingChildLayouts : 1;
 		sl_bool m_flagEnabled : 1;
 		sl_bool m_flagHitTestable : 1;
 		sl_bool m_flagFocusable : 1;
-		sl_bool m_flagInstanceLayer : 1;
 		sl_bool m_flagClipping : 1;
 		sl_bool m_flagDrawing : 1;
 		sl_bool m_flagSavingCanvasState : 1;
@@ -1611,6 +1634,11 @@ namespace slib
 			AtomicRef<Bitmap> bitmapLayer;
 			AtomicRef<Canvas> canvasLayer;
 			UIRect rectInvalidatedLayer;
+			
+			float shadowOpacity;
+			sl_ui_posf shadowRadius;
+			UIPointf shadowOffset;
+			Color shadowColor;
 			
 			LinkedList< Function<void()> > runAfterDrawCallbacks;
 			
@@ -1827,6 +1855,15 @@ namespace slib
 		virtual void removeChildInstance(View* view, const Ref<ViewInstance>& instance) = 0;
 		
 		virtual void bringToFront(View* view) = 0;
+		
+		// extended functions for view instances
+		virtual void setShadowOpacity(View* view, float alpha);
+		
+		virtual void setShadowRadius(View* view, float radius);
+		
+		virtual void setShadowOffset(View* view, float x, float y);
+
+		virtual void setShadowColor(View* view, const Color& color);
 		
 		// extended functions for native widgets
 		virtual void setBorder(View* view, sl_bool flag);

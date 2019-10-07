@@ -134,7 +134,15 @@ namespace slib
 		void removeChildInstance(View* view, const Ref<ViewInstance>& instance) override;
 		
 		void bringToFront(View* view) override;
+		
+		void setShadowOpacity(View* view, float opacity) override;
 
+		void setShadowRadius(View* view, sl_ui_posf radius) override;
+		
+		void setShadowOffset(View* view, sl_ui_posf x, sl_ui_posf y) override;
+		
+		void setShadowColor(View* view, const Color& color) override;
+		
 	public:
 		static NSRect getViewFrameAndTransform(const UIRect& frame, const Matrix3& transform, sl_real& rotation);
 		

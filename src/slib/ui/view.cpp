@@ -52,13 +52,13 @@ namespace slib
 		m_flagCreatingInstance(sl_false),
 		m_flagCreatingChildInstances(sl_false),
 		m_flagCreatingNativeWidget(sl_false),
+		m_flagCreatingNativeLayer(sl_false),
 		m_flagCreatingLargeContent(sl_false),
 		m_flagCreatingEmptyContent(sl_false),
 		m_flagUsingChildLayouts(sl_true),
 		m_flagEnabled(sl_true),
 		m_flagHitTestable(sl_true),
 		m_flagFocusable(sl_false),
-		m_flagInstanceLayer(sl_false),
 		m_flagClipping(sl_false),
 		m_flagDrawing(sl_true),
 		m_flagSavingCanvasState(sl_true),
@@ -290,11 +290,16 @@ namespace slib
 		borderStyle(PenStyle::Solid),
 		borderWidth(0),
 	
-		alpha(1)
+		alpha(1),
+
+		shadowOpacity(0),
+		shadowRadius(0),
+		shadowOffset(0, 0),
+		shadowColor(Color::Black)
 	{}
 
 	View::DrawAttributes::~DrawAttributes()
-	{
+	{		
 	}
 
 	void View::_initializeDrawAttributes()
@@ -482,6 +487,19 @@ namespace slib
 		}
 	}
 	
+	sl_bool View::isCreatingNativeLayer()
+	{
+		return m_flagCreatingNativeLayer;
+	}
+	
+	void View::setCreatingNativeLayer(sl_bool flag)
+	{
+		m_flagCreatingNativeLayer = flag;
+		if (flag) {
+			m_flagCreatingInstance = sl_true;
+		}
+	}
+
 	sl_bool View::isCreatingLargeContent()
 	{
 		return m_flagCreatingLargeContent;
@@ -521,16 +539,6 @@ namespace slib
 			}
 		}
 		return sl_false;
-	}
-
-	sl_bool View::isHardwareLayer()
-	{
-		return m_flagInstanceLayer;
-	}
-
-	void View::setHardwareLayer(sl_bool flagLayered)
-	{
-		m_flagInstanceLayer = flagLayered;
 	}
 
 	Ref<Window> View::getWindow()
@@ -5492,6 +5500,130 @@ namespace slib
 			invalidate();
 		}
 	}
+	
+	float View::getShadowOpacity()
+	{
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->shadowOpacity;
+		}
+		return 0;
+	}
+	
+	void View::setShadowOpacity(float alpha, UIUpdateMode mode)
+	{
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			Ref<ViewInstance> instance = m_instance;
+			if (instance.isNotNull()) {
+				SLIB_VIEW_RUN_ON_UI_THREAD(&View::setShadowOpacity, alpha, mode)
+				attrs->shadowOpacity = alpha;
+				instance->setShadowOpacity(this, alpha);
+			} else {
+				attrs->shadowOpacity = alpha;
+				invalidateBoundsInParent(mode);
+			}
+		}
+	}
+	
+	sl_ui_posf View::getShadowRadius()
+	{
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->shadowRadius;
+		}
+		return 0;
+	}
+	
+	void View::setShadowRadius(sl_ui_posf radius, UIUpdateMode mode)
+	{
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			Ref<ViewInstance> instance = m_instance;
+			if (instance.isNotNull()) {
+				SLIB_VIEW_RUN_ON_UI_THREAD(&View::setShadowRadius, radius, mode)
+				attrs->shadowRadius = radius;
+				instance->setShadowRadius(this, radius);
+			} else {
+				attrs->shadowRadius = radius;
+				invalidateBoundsInParent(mode);
+			}
+		}
+	}
+	
+	const UIPointf& View::getShadowOffset()
+	{
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->shadowOffset;
+		}
+		return UIPointf::zero();
+	}
+	
+	void View::setShadowOffset(const UIPointf& offset, UIUpdateMode mode)
+	{
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			Ref<ViewInstance> instance = m_instance;
+			if (instance.isNotNull()) {
+				void (View::*func)(const UIPointf&, UIUpdateMode) = &View::setShadowOffset;
+				SLIB_VIEW_RUN_ON_UI_THREAD(func, offset, mode)
+				attrs->shadowOffset = offset;
+				instance->setShadowOffset(this, offset.x, offset.y);
+			} else {
+				attrs->shadowOffset = offset;
+				invalidateBoundsInParent(mode);
+			}
+		}
+	}
+	
+	void View::setShadowOffset(sl_ui_posf x, sl_ui_posf y, UIUpdateMode mode)
+	{
+		setShadowOffset(UIPointf(x, y), mode);
+	}
+	
+	void View::setShadowOffsetX(sl_ui_posf x, UIUpdateMode mode)
+	{
+		UIPointf offset = getShadowOffset();
+		offset.x = x;
+		setShadowOffset(offset);
+	}
+	
+	void View::setShadowOffsetY(sl_ui_posf y, UIUpdateMode mode)
+	{
+		UIPointf offset = getShadowOffset();
+		offset.y = y;
+		setShadowOffset(offset);
+	}
+	
+	Color View::getShadowColor()
+	{
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->shadowColor;
+		}
+		return Color::Black;
+	}
+	
+	void View::setShadowColor(const Color& color, UIUpdateMode mode)
+	{
+		_initializeDrawAttributes();
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNotNull()) {
+			Ref<ViewInstance> instance = m_instance;
+			if (instance.isNotNull()) {
+				SLIB_VIEW_RUN_ON_UI_THREAD(&View::setShadowColor, color, mode)
+				attrs->shadowColor = color;
+				instance->setShadowColor(this, color);
+			} else {
+				attrs->shadowColor = color;
+				invalidateBoundsInParent(mode);
+			}
+		}
+	}
 
 	Ref<AnimationLoop> View::getAnimationLoop()
 	{
@@ -9258,6 +9390,22 @@ namespace slib
 	void ViewInstance::setWindowContent(sl_bool flag)
 	{
 		m_flagWindowContent = flag;
+	}
+	
+	void ViewInstance::setShadowOpacity(View* view, float alpha)
+	{
+	}
+	
+	void ViewInstance::setShadowRadius(View* view, float radius)
+	{
+	}
+	
+	void ViewInstance::setShadowOffset(View* view, float x, float y)
+	{
+	}
+	
+	void ViewInstance::setShadowColor(View* view, const Color& color)
+	{
 	}
 	
 	void ViewInstance::setBorder(View* view, sl_bool flag)
