@@ -64,9 +64,11 @@ namespace slib
 	{
 		Ptr<IEditViewInstance> instance = getEditViewInstance();
 		if (instance.isNotNull()) {
-			String text;
-			if (instance->getText(this, text)) {
-				m_text = Move(text);
+			if (UI::isUiThread()) {
+				String text;
+				if (instance->getText(this, text)) {
+					m_text = Move(text);
+				}
 			}
 		}
 		return m_text;
