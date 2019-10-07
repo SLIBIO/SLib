@@ -43,6 +43,7 @@ namespace slib
 			public:
 				ContentView()
 				{
+					setCreatingEmptyContent(sl_true);
 					setSavingCanvasState(sl_false);
 					setUsingChildLayouts(sl_false);
 				}
