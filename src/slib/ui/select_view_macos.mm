@@ -74,7 +74,7 @@ namespace slib
 						}
 					} else {
 						for (sl_uint32 i = nOrig; i < nNew; i++) {
-							[v addItemWithTitle:[NSString stringWithFormat:@"%d",i]];
+							[v addItemWithTitle:@"____dummy____"];
 							NSMenuItem* item = [v lastItem];
 							if (item != nil) {
 								[item setTitle:Apple::getNSStringFromString(m_titles.getValueAt(i), @"")];
