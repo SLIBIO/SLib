@@ -164,6 +164,18 @@ namespace slib
 	}
 
 #endif
+	
+	CGColorRef GraphicsPlatform::getCGColorFromColor(const Color& color)
+	{
+		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+		if (colorSpace) {
+			CGFloat colorComponents[4] = {color.getRedF(), color.getGreenF(), color.getBlueF(), color.getAlphaF()};
+			CGColorRef colorRef = CGColorCreate(colorSpace, colorComponents);
+			CFRelease(colorSpace);
+			return colorRef;
+		}
+		return sl_null;
+	}
 
 	void GraphicsPlatform::getCATransform(CATransform3D& _out, const Matrix3& mat)
 	{

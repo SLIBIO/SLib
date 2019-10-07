@@ -161,10 +161,7 @@ namespace slib
 								SInt32 _underline = _font->isUnderline() ? kCTUnderlineStyleSingle: kCTUnderlineStyleNone;
 								CFNumberRef underline = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &_underline);
 								
-								CGFloat colorComponents[4] = {_color.getRedF(), _color.getGreenF(), _color.getBlueF(), _color.getAlphaF()};
-								CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-								CGColorRef color = CGColorCreate(colorSpace, colorComponents);
-								CFRelease(colorSpace);
+								CGColorRef color = GraphicsPlatform::getCGColorFromColor(_color);
 								CFStringRef keys[] = { kCTFontAttributeName, kCTUnderlineStyleAttributeName, kCTForegroundColorAttributeName };
 								CFTypeRef values[] = { font, underline, color };
 								CFDictionaryRef attributes = CFDictionaryCreate(
@@ -218,8 +215,12 @@ namespace slib
 									CFRelease(attributes);
 								}
 								
-								CFRelease(underline);
-								CFRelease(color);
+								if (underline) {
+									CFRelease(underline);
+								}
+								if (color) {
+									CFRelease(color);
+								}
 							}
 							
 						}

@@ -142,6 +142,7 @@ namespace slib
 #if defined(SLIB_PLATFORM_IS_APPLE)
 		static CGImageRef loadCGImageFromMemory(const void* buf, sl_size size);
 		static CGImageRef loadCGImageFromApp(const String& name);
+		static CGColorRef getCGColorFromColor(const Color& color);
 
 #	if defined(__OBJC__)
 #		if defined(SLIB_PLATFORM_IS_MACOS)
