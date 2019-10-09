@@ -84,6 +84,7 @@ namespace slib
 		{
 
 			DWORD g_threadMain = 0;
+			sl_bool g_bFlagQuit = sl_false;
 
 			class MainContext
 			{
@@ -211,6 +212,9 @@ namespace slib
 
 			void RunLoop(HWND hWndModalDialog)
 			{
+				if (g_bFlagQuit) {
+					return;
+				}
 				ReleaseCapture();
 				MSG msg;
 				while (GetMessageW(&msg, NULL, 0, 0)) {
@@ -248,6 +252,9 @@ namespace slib
 							TranslateMessage(&msg);
 							DispatchMessageW(&msg);
 						} while (0);
+					}
+					if (g_bFlagQuit) {
+						return;
 					}
 				}
 			}
@@ -369,6 +376,7 @@ namespace slib
 
 	void UIPlatform::quitApp()
 	{
+		g_bFlagQuit = sl_true;
 		PostQuitMessage(0);
 	}
 
