@@ -28,10 +28,11 @@
 #include <mswsock.h>
 #pragma comment(lib, "mswsock.lib")
 
-#include "network_async.h"
-
 #include "slib/core/platform_windows.h"
+
 #include "slib/core/log.h"
+
+#include "network_async.h"
 
 namespace slib
 {

@@ -26,7 +26,8 @@
 
 #include "slib/core/system.h"
 
-#include <windows.h>
+#include "slib/core/platform_windows.h"
+
 #include <assert.h>
 #include <signal.h>
 #include <float.h>
@@ -40,7 +41,6 @@ using namespace Platform;
 #endif
 
 #include "slib/core/file.h"
-#include "slib/core/platform_windows.h"
 
 #define PRIV_PATH_MAX 1024
 

@@ -24,13 +24,13 @@
 
 #if defined(SLIB_RENDER_SUPPORT_OPENGL_EGL)
 
+#include "slib/core/platform_windows.h"
 #include "opengl_egl_entries.h"
 
 #include "slib/render/engine.h"
 #include "slib/render/opengl.h"
 #include "slib/core/thread.h"
 #include "slib/core/log.h"
-#include "slib/core/platform_windows.h"
 
 namespace slib
 {
