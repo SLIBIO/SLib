@@ -449,19 +449,73 @@ namespace slib
 	}
 
 	LOAD_LIBRARY(kernel32, "kernel32.dll")
-		GET_API(kernel32, GetQueuedCompletionStatusEx)
-		GET_API(kernel32, GetUserDefaultLocaleName)
-		GET_API(kernel32, GetTickCount64)
+	GET_API(kernel32, GetQueuedCompletionStatusEx)
+	GET_API(kernel32, GetUserDefaultLocaleName)
+	GET_API(kernel32, GetTickCount64)
 
-		LOAD_LIBRARY(user32, "user32.dll")
-		GET_API(user32, ShowScrollBar)
+	LOAD_LIBRARY(user32, "user32.dll")
+	GET_API(user32, ShowScrollBar)
 
-		LOAD_LIBRARY(wininet, "wininet.dll")
+	LOAD_LIBRARY(wininet, "wininet.dll")
 
-		LOAD_LIBRARY(bcrypt, "bcrypt.dll")
-		GET_API(bcrypt, BCryptOpenAlgorithmProvider)
-		GET_API(bcrypt, BCryptCloseAlgorithmProvider)
-		GET_API(bcrypt, BCryptGenRandom)
+	LOAD_LIBRARY(bcrypt, "bcrypt.dll")
+	GET_API(bcrypt, BCryptOpenAlgorithmProvider)
+	GET_API(bcrypt, BCryptCloseAlgorithmProvider)
+	GET_API(bcrypt, BCryptGenRandom)
+
+	LOAD_LIBRARY(gdiplus, "gdiplus.dll")
+	GET_API(gdiplus, GdipCreateEffect)
+	GET_API(gdiplus, GdipDeleteEffect)
+	GET_API(gdiplus, GdipSetEffectParameters)
+	GET_API(gdiplus, GdipDrawImageFX)
+
+	extern "C"
+	{
+
+		Gdiplus::Status __stdcall SLIB_GdipCreateEffect(const GUID guid, Gdiplus::CGpEffect **effect)
+		{
+			WINAPI_GdipCreateEffect func = Windows::getAPI_GdipCreateEffect();
+			if (func) {
+				return func(guid, effect);
+			}
+			return Gdiplus::AccessDenied;
+		}
+
+		Gdiplus::Status __stdcall SLIB_GdipDeleteEffect(Gdiplus::CGpEffect *effect)
+		{
+			WINAPI_GdipDeleteEffect func = Windows::getAPI_GdipDeleteEffect();
+			if (func) {
+				return func(effect);
+			}
+			return Gdiplus::AccessDenied;
+		}
+
+		Gdiplus::Status __stdcall SLIB_GdipSetEffectParameters(Gdiplus::CGpEffect *effect, const VOID *params, const UINT size)
+		{
+			WINAPI_GdipSetEffectParameters func = Windows::getAPI_GdipSetEffectParameters();
+			if (func) {
+				return func(effect, params, size);
+			}
+			return Gdiplus::AccessDenied;
+		}
+
+		Gdiplus::GpStatus WINGDIPAPI SLIB_GdipDrawImageFX(
+			Gdiplus::GpGraphics *graphics,
+			Gdiplus::GpImage *image,
+			Gdiplus::GpRectF *source,
+			Gdiplus::GpMatrix *xForm,
+			Gdiplus::CGpEffect *effect,
+			Gdiplus::GpImageAttributes *imageAttributes,
+			Gdiplus::GpUnit srcUnit)
+		{
+			WINAPI_GdipDrawImageFX func = Windows::getAPI_GdipDrawImageFX();
+			if (func) {
+				return func(graphics, image, source, xForm, effect, imageAttributes, srcUnit);
+			}
+			return Gdiplus::AccessDenied;
+		}
+
+	}
 
 	sl_bool Windows::getRegistryValue(HKEY hKeyParent, const String16& path, const String16& name, Variant* out)
 	{

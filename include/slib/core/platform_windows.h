@@ -28,6 +28,16 @@
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 
 #include <windows.h>
+#define GDIPVER 0x0110
+#define GdipCreateEffect SLIB_GdipCreateEffect
+#define GdipDeleteEffect SLIB_GdipDeleteEffect
+#define GdipSetEffectParameters SLIB_GdipSetEffectParameters
+#define GdipDrawImageFX SLIB_GdipDrawImageFX
+#include <gdiplus.h>
+#undef GdipCreateEffect
+#undef GdipDeleteEffect
+#undef GdipSetEffectParameters
+#undef GdipDrawImageFX
 
 #include "string.h"
 #include "time.h"
@@ -111,8 +121,32 @@ namespace slib
 		ULONG cbBuffer,
 		ULONG dwFlags
 	);
+	
+	typedef Gdiplus::Status (__stdcall* WINAPI_GdipCreateEffect)(
+		const GUID guid,
+		Gdiplus::CGpEffect **effect
+	);
 
+	typedef Gdiplus::Status (__stdcall* WINAPI_GdipDeleteEffect)(
+		Gdiplus::CGpEffect *effect
+	);
 
+	typedef Gdiplus::Status (__stdcall* WINAPI_GdipSetEffectParameters)(
+		Gdiplus::CGpEffect *effect,
+		const VOID *params,
+		const UINT size
+	);
+
+	typedef Gdiplus::GpStatus (WINGDIPAPI* WINAPI_GdipDrawImageFX)(
+		Gdiplus::GpGraphics *graphics,
+		Gdiplus::GpImage *image,
+		Gdiplus::GpRectF *source,
+		Gdiplus::GpMatrix *xForm,
+		Gdiplus::CGpEffect *effect,
+		Gdiplus::GpImageAttributes *imageAttributes,
+		Gdiplus::GpUnit srcUnit
+	);
+	
 	class Variant;
 
 	class SLIB_EXPORT Windows
@@ -190,6 +224,16 @@ namespace slib
 
 		static WINAPI_BCryptGenRandom getAPI_BCryptGenRandom();
 
+		static HMODULE loadLibrary_gdiplus();
+
+		static WINAPI_GdipCreateEffect getAPI_GdipCreateEffect();
+
+		static WINAPI_GdipDeleteEffect getAPI_GdipDeleteEffect();
+
+		static WINAPI_GdipSetEffectParameters getAPI_GdipSetEffectParameters();
+
+		static WINAPI_GdipDrawImageFX getAPI_GdipDrawImageFX();
+
 	
 		static Ref<Event> createEvent(HANDLE hEvent, sl_bool flagCloseOnRelease = sl_true);
 	
@@ -235,7 +279,7 @@ namespace slib
 		static Time getTime(const SYSTEMTIME* st, sl_bool flagUTC);
 
 	};
-
+	
 }
 
 #endif
