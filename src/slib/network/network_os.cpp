@@ -120,6 +120,8 @@ namespace slib
 #include <iphlpapi.h>
 #include <netioapi.h>
 
+#include "slib/core/platform_windows.h"
+
 #pragma comment(lib, "iphlpapi.lib")
 #pragma comment(lib, "ws2_32.lib")
 
@@ -184,7 +186,7 @@ namespace slib
 									IPv4AddressInfo a4;
 									a4.address = sa.ip.getIPv4();
 									sl_uint32 networkPrefixLength = 0;
-									if (pip->Length == sizeof(IP_ADAPTER_UNICAST_ADDRESS_LH)) {
+									if (Windows::getVersion() >= WindowsVersion::Vista) {
 										networkPrefixLength = ((IP_ADAPTER_UNICAST_ADDRESS_LH*)pip)->OnLinkPrefixLength;
 									} else {
 										sl_size indexTable = 0;
