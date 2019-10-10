@@ -88,15 +88,6 @@ namespace slib
 					return sl_false;
 				}
 
-				sl_bool processCommand(SHORT code, LRESULT& result) override
-				{
-					if (code == BN_CLICKED) {
-						onClick();
-						return sl_true;
-					}
-					return sl_false;
-				}
-
 			};
 
 			SLIB_DEFINE_OBJECT(DatePickerInstance, Win32_ViewInstance)
