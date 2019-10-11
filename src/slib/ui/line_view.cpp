@@ -47,7 +47,7 @@ namespace slib
 					if (defaultThickness < 1) {
 						defaultThickness = 1;
 					}
-					defaultPen = Pen::createSolidPen(defaultThickness);
+					defaultPen = Pen::createSolidPen(defaultThickness, Color::Black);
 				}
 				
 			};
