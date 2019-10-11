@@ -234,46 +234,14 @@ namespace slib
 				
 				void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override
 				{
-					sl_int32 sx = (sl_int32)(rectSrc.left);
-					sl_int32 sy = (sl_int32)(rectSrc.top);
-					sl_int32 sx2 = (sl_int32)(rectSrc.right);
-					sl_int32 sy2 = (sl_int32)(rectSrc.bottom);
-					if (sx < 0) {
-						sx = 0;
-					}
-					if (sy < 0) {
-						sy = 0;
-					}
-					sl_int32 w = (sl_int32)m_width;
-					if (sx2 > w) {
-						sx2 = w;
-					}
-					sl_int32 h = (sl_int32)m_height;
-					if (sy2 > h) {
-						sy2 = h;
-					}
-					sl_int32 sw = sx2 - sx;
-					if (sw <= 0) {
-						return;
-					}
-					sl_int32 sh = sy2 - sy;
-					if (sh <= 0) {
-						return;
-					}
-
-					CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-					if (colorSpace) {
-						char* buf = (char*)m_buf + ((sx + (m_height - sy - sh) * w) << 2);
-						CGContextRef bitmap = CGBitmapContextCreate(buf, sw, sh, 8, w << 2, colorSpace, kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast);
-						if (bitmap) {
-							CGImageRef image = CGBitmapContextCreateImage(bitmap);
-							if (image) {
-								GraphicsPlatform::drawCGImage(canvas, rectDst, image, sl_true, param);
-								CFRelease(image);
-							}
-							CFRelease(bitmap);
+					CGImageRef image = CGBitmapContextCreateImage(m_bitmap);
+					if (image) {
+						CGImageRef imageCut = CGImageCreateWithImageInRect(image, CGRectMake((CGFloat)(rectSrc.left), (CGFloat)(m_height - rectSrc.bottom), (CGFloat)(rectSrc.getWidth()), (CGFloat)(rectSrc.getHeight())));
+						if (imageCut) {
+							GraphicsPlatform::drawCGImage(canvas, rectDst, imageCut, sl_true, param);
+							CFRelease(imageCut);
 						}
-						CFRelease(colorSpace);
+						CFRelease(image);
 					}
 				}
 				
