@@ -54,13 +54,12 @@ namespace slib
 				
 				~BitmapImpl()
 				{
-					CGContextRelease(m_bitmap);
+					CFRelease(m_bitmap);
 				}
 				
 			public:
 				static Ref<BitmapImpl> create(sl_uint32 width, sl_uint32 height)
 				{
-					Ref<BitmapImpl> ret;
 					
 					if (width > 0 && height > 0) {
 						
@@ -78,11 +77,11 @@ namespace slib
 								
 								CGContextRef bitmap = CGBitmapContextCreate(mem.getData(), width, height, 8, width << 2, colorSpace, kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast);
 								
-								CGColorSpaceRelease(colorSpace);
+								CFRelease(colorSpace);
 
 								if (bitmap) {
 									
-									ret = new BitmapImpl();
+									Ref<BitmapImpl> ret = new BitmapImpl();
 									
 									if (ret.isNotNull()) {
 									
@@ -95,14 +94,14 @@ namespace slib
 										return ret;
 									}
 									
-									CGContextRelease(bitmap);
+									CFRelease(bitmap);
 								}
 								
 							}
 							
 						}
 					}
-					return ret;
+					return sl_null;
 				}
 				
 				static Ref<BitmapImpl> create(CGImageRef image)
@@ -115,7 +114,6 @@ namespace slib
 					sl_uint32 height = (sl_uint32)(CGImageGetHeight(image));
 
 					Ref<BitmapImpl> ret = create(width, height);
-
 					if (ret.isNotNull()) {
 						CGRect rect;
 						rect.origin.x = 0;
@@ -129,9 +127,10 @@ namespace slib
 						CGContextDrawImage(ret->m_bitmap, rect, image);
 						CGContextRestoreGState(ret->m_bitmap);
 						
+						return ret;
 					}
 					
-					return ret;
+					return sl_null;
 				}
 				
 				static Ref<BitmapImpl> loadFromMemory(const void* mem, sl_size size)
@@ -270,28 +269,20 @@ namespace slib
 							CGImageRef image = CGBitmapContextCreateImage(bitmap);
 							if (image) {
 								GraphicsPlatform::drawCGImage(canvas, rectDst, image, sl_true, param);
-								CGImageRelease(image);
+								CFRelease(image);
 							}
-							CGContextRelease(bitmap);
+							CFRelease(bitmap);
 						}
-						CGColorSpaceRelease(colorSpace);
+						CFRelease(colorSpace);
 					}
 				}
 				
 				void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
 				{
-					CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-					if (colorSpace) {
-						CGContextRef bitmap = CGBitmapContextCreate(m_buf, m_width, m_height, 8, m_width << 2, colorSpace, kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast);
-						if (bitmap) {
-							CGImageRef image = CGBitmapContextCreateImage(bitmap);
-							if (image) {
-								GraphicsPlatform::drawCGImage(canvas, rectDst, image, sl_true, param);
-								CGImageRelease(image);
-							}
-							CGContextRelease(bitmap);
-						}
-						CGColorSpaceRelease(colorSpace);
+					CGImageRef image = CGBitmapContextCreateImage(m_bitmap);
+					if (image) {
+						GraphicsPlatform::drawCGImage(canvas, rectDst, image, sl_true, param);
+						CFRelease(image);
 					}
 				}
 				
