@@ -95,6 +95,9 @@ namespace slib
 
 #elif defined(SLIB_GRAPHICS_IS_QUARTZ)
 
+		static CGGradientRef getGradientBrushHandle(Brush* brush);
+		static CGImageRef getTextureBrushHandle(Brush* brush);
+
 		static CGPathRef getGraphicsPath(GraphicsPath* path);
 		static CTFontRef getCoreTextFont(Font* font);
 
@@ -104,7 +107,9 @@ namespace slib
 
 		static Ref<Drawable> createImageDrawable(CGImageRef image, sl_bool flagFlipped = sl_false);
 		static CGImageRef getImageDrawableHandle(Drawable* drawable);
+		
 		static Ref<Bitmap> createImageBitmap(CGImageRef image);
+		static CGContextRef getBitmapHandle(Bitmap* bitmap);
 
 #	if defined(__OBJC__)
 #		if defined(SLIB_PLATFORM_IS_MACOS)

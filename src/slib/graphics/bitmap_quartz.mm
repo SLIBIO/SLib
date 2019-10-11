@@ -277,6 +277,14 @@ namespace slib
 	{
 		return BitmapImpl::create(image);
 	}
+	
+	CGContextRef GraphicsPlatform::getBitmapHandle(Bitmap* _bitmap)
+	{
+		if (BitmapImpl* bitmap = CastInstance<BitmapImpl>(_bitmap)) {
+			return bitmap->m_bitmap;
+		}
+		return sl_null;
+	}
 
 }
 
