@@ -293,7 +293,7 @@ namespace slib
 		alpha(1),
 
 		shadowOpacity(0),
-		shadowRadius(0),
+		shadowRadius(3),
 		shadowOffset(0, 0),
 		shadowColor(Color::Black)
 	{}
