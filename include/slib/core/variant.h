@@ -24,9 +24,11 @@
 #define CHECKHEADER_SLIB_CORE_VARIANT
 
 #include "definition.h"
+
 #include "ref.h"
 #include "time.h"
 #include "string.h"
+#include "string_param.h"
 #include "nullable.h"
 #include "list.h"
 #include "map.h"
@@ -128,7 +130,9 @@ namespace slib
 		Variant(const sl_char8* sz8) noexcept;
 
 		Variant(const sl_char16* sz16) noexcept;
-		
+
+		Variant(const StringParam& str) noexcept;
+
 		Variant(const Time& value) noexcept;
 
 		Variant(const void* ptr) noexcept;
@@ -214,6 +218,8 @@ namespace slib
 		static Variant fromSz8(const sl_char8* value) noexcept;
 
 		static Variant fromSz16(const sl_char16* value) noexcept;
+
+		static Variant fromStringParam(const StringParam& value) noexcept;
 
 		static Variant fromTime(const Time& value) noexcept;
 
@@ -350,6 +356,10 @@ namespace slib
 
 		const sl_char16* getSz16(const sl_char16* def = sl_null) const noexcept;
 
+		StringParam getStringParam(const StringParam& def) const noexcept;
+		
+		StringParam getStringParam() const noexcept;
+
 		void setString(const String& value) noexcept;
 
 		void setString(const String16& value) noexcept;
@@ -375,7 +385,9 @@ namespace slib
 		
 		void setString(const std::u16string& value) noexcept;
 #endif
-
+		
+		void setString(const StringParam& value) noexcept;
+		
 
 		sl_bool isTime() const noexcept;
 
@@ -574,6 +586,9 @@ namespace slib
 		void get(std::u16string& _out, const std::u16string& def) const noexcept;
 		void set(const std::u16string& _in) noexcept;
 #endif
+		void get(StringParam& _out) const noexcept;
+		void get(StringParam& _out, const StringParam& def) const noexcept;
+		void set(const StringParam& _in) noexcept;
 		
 		void get(Time& _out) const noexcept;
 		void get(Time& _out, const Time& def) const noexcept;
@@ -742,6 +757,8 @@ namespace slib
 		Atomic(const std::u16string& value) noexcept;
 #endif
 
+		Atomic(const StringParam& value) noexcept;
+		
 		Atomic(const Time& value) noexcept;
 
 		Atomic(const void* ptr) noexcept;
@@ -918,6 +935,10 @@ namespace slib
 
 		const sl_char16* getSz16(const sl_char16* def = sl_null) const noexcept;
 
+		StringParam getStringParam(const StringParam& def) const noexcept;
+		
+		StringParam getStringParam() const noexcept;
+
 		void setString(const String& value) noexcept;
 
 		void setString(const AtomicString& value) noexcept;
@@ -944,6 +965,8 @@ namespace slib
 		void setString(const std::u16string& value) noexcept;
 #endif
 
+		void setString(const StringParam& value) noexcept;
+		
 		
 		sl_bool isObject() const noexcept;
 
@@ -1127,6 +1150,10 @@ namespace slib
 		void get(std::u16string& _out, const std::u16string& def) const noexcept;
 		void set(const std::u16string& _in) noexcept;
 #endif
+		
+		void get(StringParam& _out) const noexcept;
+		void get(StringParam& _out, const StringParam& def) const noexcept;
+		void set(const StringParam& _in) noexcept;
 		
 		void get(Time& _out) const noexcept;
 		void get(Time& _out, const Time& def) const noexcept;

@@ -528,6 +528,8 @@
 		260D8CC720CAC9800013B34E /* loopfilter_16_neon.asm.S in Sources */ = {isa = PBXBuildFile; fileRef = 260D8CBB20CAC97F0013B34E /* loopfilter_16_neon.asm.S */; };
 		260D8CC820CAC9800013B34E /* intrapred_neon_asm.asm.S in Sources */ = {isa = PBXBuildFile; fileRef = 260D8CBC20CAC9800013B34E /* intrapred_neon_asm.asm.S */; };
 		260D8CC920CAC9800013B34E /* loopfilter_4_neon.asm.S in Sources */ = {isa = PBXBuildFile; fileRef = 260D8CBD20CAC9800013B34E /* loopfilter_4_neon.asm.S */; };
+		261E7F422353AA6100ACE4E8 /* string_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 261E7F402353AA6100ACE4E8 /* string_buffer.cpp */; };
+		261E7F432353AA6100ACE4E8 /* string_param.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 261E7F412353AA6100ACE4E8 /* string_param.cpp */; };
 		2628EAD121C184D400D8CD00 /* regex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2628EAD021C184D400D8CD00 /* regex.cpp */; };
 		2628EAE021C410C100D8CD00 /* base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2628EADF21C410C000D8CD00 /* base64.cpp */; };
 		2628EAE321C410CF00D8CD00 /* jwt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2628EAE221C410CF00D8CD00 /* jwt.cpp */; };
@@ -684,6 +686,7 @@
 		266E66EC21D9566300D92386 /* locale_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266E66EB21D9566300D92386 /* locale_apple.mm */; };
 		2671F99121E07F7400B39842 /* drawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2671F99021E07F7300B39842 /* drawer.cpp */; };
 		267466702318556800DE8715 /* chromium.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2674666F2318556700DE8715 /* chromium.cpp */; };
+		26781C1F2350F6B3002FCA2F /* brush_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26781C1E2350F6B2002FCA2F /* brush_quartz.mm */; };
 		267B9D65225D11450057DF2A /* instagram_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 267B9D64225D11450057DF2A /* instagram_ios.mm */; };
 		267B9D67225D11760057DF2A /* instagram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 267B9D66225D11760057DF2A /* instagram.cpp */; };
 		2698A54A226A1C4300662528 /* refresh_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2698A549226A1C4300662528 /* refresh_view.cpp */; };
@@ -1757,6 +1760,8 @@
 		260D8CBC20CAC9800013B34E /* intrapred_neon_asm.asm.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = intrapred_neon_asm.asm.S; path = ../../external/src/libvpx/gen/asm_apple/armv7/vpx_dsp/arm/intrapred_neon_asm.asm.S; sourceTree = "<group>"; };
 		260D8CBD20CAC9800013B34E /* loopfilter_4_neon.asm.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = loopfilter_4_neon.asm.S; path = ../../external/src/libvpx/gen/asm_apple/armv7/vpx_dsp/arm/loopfilter_4_neon.asm.S; sourceTree = "<group>"; };
 		261B4C841DB10149000A385A /* transition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = transition.cpp; sourceTree = "<group>"; };
+		261E7F402353AA6100ACE4E8 /* string_buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = string_buffer.cpp; sourceTree = "<group>"; };
+		261E7F412353AA6100ACE4E8 /* string_param.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = string_param.cpp; sourceTree = "<group>"; };
 		2621F7201CCF174B00C4615C /* ui_menu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_menu.cpp; sourceTree = "<group>"; };
 		2628EAD021C184D400D8CD00 /* regex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = regex.cpp; sourceTree = "<group>"; };
 		2628EADF21C410C000D8CD00 /* base64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = base64.cpp; sourceTree = "<group>"; };
@@ -2176,6 +2181,7 @@
 		266F926F1D51CD7A0040166C /* graphics_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graphics_resource.cpp; sourceTree = "<group>"; };
 		2671F99021E07F7300B39842 /* drawer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = drawer.cpp; sourceTree = "<group>"; };
 		2674666F2318556700DE8715 /* chromium.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chromium.cpp; sourceTree = "<group>"; };
+		26781C1E2350F6B2002FCA2F /* brush_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = brush_quartz.mm; sourceTree = "<group>"; };
 		267B9D64225D11450057DF2A /* instagram_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = instagram_ios.mm; sourceTree = "<group>"; };
 		267B9D66225D11760057DF2A /* instagram.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = instagram.cpp; sourceTree = "<group>"; };
 		267D00891E32AA3B002CC949 /* render_drawable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_drawable.cpp; sourceTree = "<group>"; };
@@ -2443,6 +2449,7 @@
 				26C0A3551C131F8E005690FE /* bitmap_data.cpp */,
 				26C0A3571C133969005690FE /* bitmap_format.cpp */,
 				266DD38D1C117AE300D47AB0 /* brush.cpp */,
+				26781C1E2350F6B2002FCA2F /* brush_quartz.mm */,
 				266DD38E1C117AE300D47AB0 /* canvas.cpp */,
 				26C1B64720D51D4300E36539 /* canvas_ext.cpp */,
 				260107891DACE8C400C40723 /* canvas_quartz.mm */,
@@ -4041,6 +4048,8 @@
 				A25F2EE11B039EF600854DAF /* setting.cpp */,
 				26FBC2701DF9FB0200D76774 /* spin_lock.cpp */,
 				A25F2EE31B039EF600854DAF /* string.cpp */,
+				261E7F402353AA6100ACE4E8 /* string_buffer.cpp */,
+				261E7F412353AA6100ACE4E8 /* string_param.cpp */,
 				A25F2EE51B039EF600854DAF /* system.cpp */,
 				26CA8D701C23A61D0049A658 /* system_apple.mm */,
 				A2DE1DA51B383EA000A74698 /* system_unix.cpp */,
@@ -5325,6 +5334,7 @@
 				26D9D81C1E9628E0005F7BD3 /* preference_apple.mm in Sources */,
 				26D9D81D1E9628E0005F7BD3 /* json.cpp in Sources */,
 				26D9D8571E962932005F7BD3 /* sensor.cpp in Sources */,
+				261E7F422353AA6100ACE4E8 /* string_buffer.cpp in Sources */,
 				26D9D89F1E962962005F7BD3 /* network_async.cpp in Sources */,
 				26D9D8901E96295A005F7BD3 /* video_capture.cpp in Sources */,
 				26E1B8CF222ABCDD007C222E /* jcapistd.c in Sources */,
@@ -5392,6 +5402,7 @@
 				26D9D8AA1E962969005F7BD3 /* index_buffer.cpp in Sources */,
 				26D9D8EE1E962976005F7BD3 /* window_ios.mm in Sources */,
 				26C795C92215FC7C0053C5A1 /* drawables.cpp in Sources */,
+				261E7F432353AA6100ACE4E8 /* string_param.cpp in Sources */,
 				26ACB3F6220985EE0093FF3F /* device_audio_ios.mm in Sources */,
 				26D9D8871E96295A005F7BD3 /* camera.cpp in Sources */,
 				26E1B8C2222ABBE7007C222E /* pngrutil.c in Sources */,
@@ -5399,6 +5410,7 @@
 				26A39D8C20EFE16D004707C9 /* calculator.cpp in Sources */,
 				26BAE008221BEE530085B5AB /* etsy.cpp in Sources */,
 				26E1B8AF222ABBDC007C222E /* gzclose.c in Sources */,
+				26781C1F2350F6B3002FCA2F /* brush_quartz.mm in Sources */,
 				26B92D5D21D4CF29003F6F82 /* device_ios.mm in Sources */,
 				26D9D89E1E962962005F7BD3 /* network_async_unix.cpp in Sources */,
 				26E1B8F4222ABCDD007C222E /* jidctfst.c in Sources */,

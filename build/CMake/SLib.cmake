@@ -111,6 +111,8 @@ set (SLIB_CORE_FILES
  "${SLIB_PATH}/src/slib/core/setting.cpp"
  "${SLIB_PATH}/src/slib/core/spin_lock.cpp"
  "${SLIB_PATH}/src/slib/core/string.cpp"
+ "${SLIB_PATH}/src/slib/core/string_buffer.cpp"
+ "${SLIB_PATH}/src/slib/core/string_param.cpp"
  "${SLIB_PATH}/src/slib/core/system.cpp"
  "${SLIB_PATH}/src/slib/core/system_unix.cpp"
  "${SLIB_PATH}/src/slib/core/thread.cpp"

@@ -1295,5 +1295,11 @@
     <ClCompile Include="..\..\external\src\noto_emoji\noto_emoji_png.cpp">
       <Filter>external\noto_emoji</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\core\string_buffer.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\core\string_param.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

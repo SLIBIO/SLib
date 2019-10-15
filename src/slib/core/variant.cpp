@@ -27,7 +27,7 @@
 #include "slib/core/string_buffer.h"
 #include "slib/core/math.h"
 
-#define PTR_VAR(TYPE, x) (reinterpret_cast<TYPE*>(&(x)))
+#define PTR_VAR(TYPE, x) ((TYPE*)((void*)(&(x))))
 #define REF_VAR(TYPE, x) (*PTR_VAR(TYPE, x))
 
 namespace slib
@@ -87,6 +87,36 @@ namespace slib
 				}
 			}
 
+			SLIB_INLINE static void copy_string_param(const StringParam& param, VariantType& dst_type, sl_uint64& dst_value) noexcept
+			{
+				switch (param._type) {
+					case StringType::Null:
+						dst_type = VariantType::Null;
+						dst_value = param._value;
+						break;
+					case StringType::String8:
+						dst_type = VariantType::String8;
+						new PTR_VAR(String, dst_value) String(REF_VAR(String, param._value));
+						break;
+					case StringType::String16:
+						dst_type = VariantType::String16;
+						new PTR_VAR(String16, dst_value) String16(REF_VAR(String16, param._value));
+						break;
+					case StringType::Sz8:
+						dst_type = VariantType::Sz8;
+						dst_value = param._value;
+						break;
+					case StringType::Sz16:
+						dst_type = VariantType::Sz16;
+						dst_value = param._value;
+						break;
+					default:
+						dst_type = VariantType::Null;
+						dst_value = 1;
+						break;
+				}
+			}
+			
 		}
 	}
 	
@@ -465,6 +495,11 @@ namespace slib
 		}
 	}
 	
+	Variant::Variant(const StringParam& str) noexcept
+	{
+		priv::variant::copy_string_param(str, _type, _value);
+	}
+	
 	Variant::Variant(const std::string& value) noexcept
 	{
 		_type = VariantType::String8;
@@ -640,6 +675,11 @@ namespace slib
 	}
 
 	Variant Variant::fromSz16(const sl_char16* value) noexcept
+	{
+		return value;
+	}
+	
+	Variant Variant::fromStringParam(const StringParam& value) noexcept
 	{
 		return value;
 	}
@@ -1412,6 +1452,36 @@ namespace slib
 		return def;
 	}
 
+	StringParam Variant::getStringParam(const StringParam& def) const noexcept
+	{
+		switch (_type) {
+			case VariantType::String8:
+				return REF_VAR(String const, _value);
+			case VariantType::String16:
+				return REF_VAR(String16 const, _value);
+			case VariantType::Sz8:
+				return REF_VAR(sl_char8 const* const, _value);
+			case VariantType::Sz16:
+				return REF_VAR(sl_char16 const* const, _value);
+			case VariantType::Null:
+				break;
+			default:
+				{
+					String str = getString(String::null());
+					if (str.isNotNull()) {
+						return str;
+					}
+					break;
+				}
+		}
+		return def;
+	}
+	
+	StringParam Variant::getStringParam() const noexcept
+	{
+		return getStringParam(StringParam::null());
+	}
+
 	void Variant::setString(const String& value) noexcept
 	{
 		if (value.isNotNull()) {
@@ -1512,6 +1582,12 @@ namespace slib
 		priv::variant::free(_type, _value);
 		_type = VariantType::String16;
 		new PTR_VAR(String16, _value) String16(value);
+	}
+	
+	void Variant::setString(const StringParam& value) noexcept
+	{
+		priv::variant::free(_type, _value);
+		priv::variant::copy_string_param(value, _type, _value);
 	}
 
 	sl_bool Variant::isTime() const noexcept
@@ -2598,7 +2674,22 @@ namespace slib
 	{
 		setString(_in);
 	}
-
+	
+	void Variant::get(StringParam& _out) const noexcept
+	{
+		_out = getStringParam();
+	}
+	
+	void Variant::get(StringParam& _out, const StringParam& def) const noexcept
+	{
+		_out = getStringParam(def);
+	}
+	
+	void Variant::set(const StringParam& _in) noexcept
+	{
+		setString(_in);
+	}
+	
 	void Variant::get(Time& _out) const noexcept
 	{
 		_out = getTime();
@@ -2955,6 +3046,11 @@ namespace slib
 	{
 		_type = VariantType::String16;
 		new PTR_VAR(String16, _value) String16(value);
+	}
+	
+	Atomic<Variant>::Atomic(const StringParam& value) noexcept
+	{
+		priv::variant::copy_string_param(value, _type, _value);
 	}
 
 	Atomic<Variant>::Atomic(const Time& value) noexcept
@@ -3315,6 +3411,18 @@ namespace slib
 		return var.getSz16(def);
 	}
 
+	StringParam Atomic<Variant>::getStringParam(const StringParam& def) const noexcept
+	{
+		Variant var(*this);
+		return var.getStringParam(def);
+	}
+	
+	StringParam Atomic<Variant>::getStringParam() const noexcept
+	{
+		Variant var(*this);
+		return var.getStringParam();
+	}
+
 	void Atomic<Variant>::setString(const String& value) noexcept
 	{
 		if (value.isNotNull()) {
@@ -3421,6 +3529,14 @@ namespace slib
 		_replace(VariantType::String16, v);
 	}
 
+	void Atomic<Variant>::setString(const StringParam& value) noexcept
+	{
+		VariantType t;
+		sl_uint64 v;
+		priv::variant::copy_string_param(value, t, v);
+		_replace(t, v);
+	}
+	
 	sl_bool Atomic<Variant>::isTime() const noexcept
 	{
 		return _type == VariantType::Time;
@@ -3995,6 +4111,21 @@ namespace slib
 	}
 	
 	void Atomic<Variant>::set(const std::u16string& _in) noexcept
+	{
+		setString(_in);
+	}
+
+	void Atomic<Variant>::get(StringParam& _out) const noexcept
+	{
+		_out = getStringParam();
+	}
+	
+	void Atomic<Variant>::get(StringParam& _out, const StringParam& def) const noexcept
+	{
+		_out = getStringParam(def);
+	}
+	
+	void Atomic<Variant>::set(const StringParam& _in) noexcept
 	{
 		setString(_in);
 	}
@@ -4823,6 +4954,109 @@ namespace slib
 				return sl_false;
 			}
 
+			
+			SLIB_INLINE static sl_compare_result compare_element(const String* v1, const String* v2) noexcept
+			{
+				return v1->compare(*v2);
+			}
+			
+			SLIB_INLINE static sl_compare_result compare_element(const String* v1, const String16* v2) noexcept
+			{
+				return v1->compare(*v2);
+			}
+			
+			SLIB_INLINE static sl_compare_result compare_element(const String16* v2, const String* v1) noexcept
+			{
+				return -compare_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_compare_result compare_element(const String* v1, sl_char8 const* const* v2) noexcept
+			{
+				return v1->compare(*v2);
+			}
+			
+			SLIB_INLINE static sl_compare_result compare_element(sl_char8 const* const* v2, const String* v1) noexcept
+			{
+				return -compare_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_compare_result compare_element(const String* v1, sl_char16 const* const* v2) noexcept
+			{
+				return v1->compare(*v2);
+			}
+			
+			SLIB_INLINE static sl_compare_result compare_element(sl_char16 const* const* v2, const String* v1) noexcept
+			{
+				return -compare_element(v1, v2);
+			}
+			
+			
+			SLIB_INLINE static sl_compare_result compare_element(const String16* v1, const String16* v2) noexcept
+			{
+				return v1->compare(*v2);
+			}
+			
+			SLIB_INLINE static sl_compare_result compare_element(const String16* v1, sl_char8 const* const* v2) noexcept
+			{
+				return v1->compare(*v2);
+			}
+			
+			SLIB_INLINE static sl_compare_result compare_element(sl_char8 const* const* v2, const String16* v1) noexcept
+			{
+				return -compare_element(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_compare_result compare_element(const String16* v1, sl_char16 const* const* v2) noexcept
+			{
+				return v1->compare(*v2);
+			}
+			
+			SLIB_INLINE static sl_compare_result compare_element(sl_char16 const* const* v2, const String16* v1) noexcept
+			{
+				return -compare_element(v1, v2);
+			}
+			
+			
+			SLIB_INLINE static sl_compare_result compare_element(sl_char8 const* const* v1, sl_char8 const* const* v2) noexcept
+			{
+				return Base::compareString(*v1, *v2);
+			}
+			
+			SLIB_INLINE static sl_compare_result compare_element(sl_char8 const* const* v1, sl_char16 const* const* v2) noexcept
+			{
+				return String(*v1).compare(*v2);
+			}
+			
+			SLIB_INLINE static sl_compare_result compare_element(sl_char16 const* const* v2, sl_char8 const* const* v1) noexcept
+			{
+				return -compare_element(v1, v2);
+			}
+			
+			
+			SLIB_INLINE static sl_compare_result compare_element(sl_char16 const* const* v1, sl_char16 const* const* v2) noexcept
+			{
+				return Base::compareString2(*v1, *v2) == 0;
+			}
+			
+			
+			template <class T>
+			SLIB_INLINE static sl_compare_result compare_string(const T* v1, const Variant& v2) noexcept
+			{
+				VariantType type = v2._type;
+				switch (type) {
+					case VariantType::String8:
+						return compare_element(v1, PTR_VAR(String const, v2._value));
+					case VariantType::String16:
+						return compare_element(v1, PTR_VAR(String16 const, v2._value));
+					case VariantType::Sz8:
+						return compare_element(v1, PTR_VAR(sl_char8 const* const, v2._value));
+					case VariantType::Sz16:
+						return compare_element(v1, PTR_VAR(sl_char16 const* const, v2._value));
+					default:
+						break;
+				}
+				return -1;
+			}
 		}
 	}
 	
@@ -4860,7 +5094,18 @@ namespace slib
 					return ComparePrimitiveValues(v1._value, v2._value);
 			}
 		} else {
-			ComparePrimitiveValues((int)type, (int)(v2._type));
+			switch (type) {
+				case VariantType::String8:
+					return priv::variant::compare_string(PTR_VAR(String const, v1._value), v2);
+				case VariantType::String16:
+					return priv::variant::compare_string(PTR_VAR(String16 const, v1._value), v2);
+				case VariantType::Sz8:
+					return priv::variant::compare_string(PTR_VAR(sl_char8 const* const, v1._value), v2);
+				case VariantType::Sz16:
+					return priv::variant::compare_string(PTR_VAR(sl_char16 const* const, v1._value), v2);
+				default:
+					ComparePrimitiveValues((int)type, (int)(v2._type));
+			}
 		}
 		return 0;
 	}
