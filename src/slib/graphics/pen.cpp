@@ -78,15 +78,6 @@ namespace slib
 		return create(desc);
 	}
 
-	Ref<Pen> Pen::create(PenStyle style, sl_real width)
-	{
-		PenDesc desc;
-		desc.style = style;
-		desc.width = width;
-		desc.color = Color::Black;
-		return create(desc);
-	}
-
 	Ref<Pen> Pen::createSolidPen(sl_real width, const Color& color)
 	{
 		PenDesc desc;
@@ -95,14 +86,6 @@ namespace slib
 		return create(desc);
 	}
 
-	Ref<Pen> Pen::createSolidPen(sl_real width)
-	{
-		PenDesc desc;
-		desc.width = width;
-		desc.color = Color::Black;
-		return create(desc);
-	}
-	
 	void Pen::getDesc(PenDesc& desc)
 	{
 		desc = m_desc;
