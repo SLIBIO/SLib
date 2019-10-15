@@ -34,7 +34,6 @@ namespace slib
 		m_fillMode = FillMode::Winding;
 		m_flagBegan = sl_false;
 		m_pointBegin = Point::zero();
-		_initialize_PO();
 	}
 
 	GraphicsPath::~GraphicsPath()
@@ -44,8 +43,10 @@ namespace slib
 	Ref<GraphicsPath> GraphicsPath::create()
 	{
 		Ref<GraphicsPath> path = new GraphicsPath;
-		if (path->m_platformObject.isNotNull()) {
-			return path;
+		if (path.isNotNull()) {
+			if (path->_initialize_PO()) {
+				return path;
+			}
 		}
 		return sl_null;
 	}
@@ -257,8 +258,9 @@ namespace slib
 
 #if !(defined(SLIB_GRAPHICS_IS_GDI)) && !(defined(SLIB_GRAPHICS_IS_QUARTZ)) && !(defined(SLIB_GRAPHICS_IS_ANDROID))
 
-	void GraphicsPath::_initialize_PO()
+	sl_bool GraphicsPath::_initialize_PO()
 	{
+		return sl_true;
 	}
 
 	void GraphicsPath::_moveTo_PO(sl_real x, sl_real y)

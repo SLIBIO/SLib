@@ -94,12 +94,14 @@ namespace slib
 
 	using namespace priv::android;
 
-	void GraphicsPath::_initialize_PO()
+	sl_bool GraphicsPath::_initialize_PO()
 	{
 		Ref<GraphicsPathPlatformObject> po = new GraphicsPathPlatformObject;
 		if (po.isNotNull() && po->path) {
 			m_platformObject = po;
+			return sl_true;
 		}
+		return sl_false;
 	}
 
 	void GraphicsPath::_moveTo_PO(sl_real x, sl_real y)

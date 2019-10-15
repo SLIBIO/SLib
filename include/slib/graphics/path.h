@@ -117,7 +117,7 @@ namespace slib
 		sl_bool containsPoint(const Point& pt);
 
 	protected:
-		void _initialize_PO();
+		sl_bool _initialize_PO();
 
 		void _moveTo_PO(sl_real x, sl_real y);
 
