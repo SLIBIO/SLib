@@ -54,8 +54,7 @@ namespace slib
 				jfloat callFloat(jobject _this, ...);
 				jdouble callDouble(jobject _this, ...);
 				void call(jobject _this, ...);
-				String callString(jobject _this, ...);
-				String16 callString16(jobject _this, ...);
+				String16 callString(jobject _this, ...);
 				jobject newObject(jobject _null, ...);
 
 			public:
@@ -82,8 +81,7 @@ namespace slib
 				jfloat callFloat(jobject _null, ...);
 				jdouble callDouble(jobject _null, ...);
 				void call(jobject _null, ...);
-				String callString(jobject _null, ...);
-				String16 callString16(jobject _null, ...);
+				String16 callString(jobject _null, ...);
 
 			public:
 				JClass* gcls;
@@ -117,10 +115,8 @@ namespace slib
 				void setFloat(jobject _this, jfloat value);
 				jdouble getDouble(jobject _this);
 				void setDouble(jobject _this, jdouble value);
-				String getString(jobject _this);
-				String16 getString16(jobject _this);
-				void setString(jobject _this, const String& value);
-				void setString16(jobject _this, const String16& value);
+				String16 getString(jobject _this);
+				void setString(jobject _this, const String16& value);
 			
 			public:
 				JClass*gcls;
@@ -164,10 +160,8 @@ namespace slib
 				void setFloat(jobject _null, jfloat value);
 				jdouble getDouble(jobject _null);
 				void setDouble(jobject _null, jdouble value);
-				String getString(jobject _null);
-				String16 getString16(jobject _null);
-				void setString(jobject _null, const String& value);
-				void setString16(jobject _null, const String16& value);
+				String16 getString(jobject _null);
+				void setString(jobject _null, const String16& value);
 
 			public:
 				JClass* gcls;
@@ -211,8 +205,7 @@ namespace slib
 	PRIV_SLIB_JNI_DECLARE_FIELD_TYPE(sl_int64, Long)
 	PRIV_SLIB_JNI_DECLARE_FIELD_TYPE(float, Float)
 	PRIV_SLIB_JNI_DECLARE_FIELD_TYPE(double, Double)
-	PRIV_SLIB_JNI_DECLARE_FIELD_TYPE(String, String)
-	PRIV_SLIB_JNI_DECLARE_FIELD_TYPE(String16, String16)
+	PRIV_SLIB_JNI_DECLARE_FIELD_TYPE(String16, String)
 
 #define PRIV_SLIB_JNI_DECLARE_STATIC_FIELD_TYPE(TYPE, NAME) \
 	namespace priv { \
@@ -235,8 +228,7 @@ namespace slib
 	PRIV_SLIB_JNI_DECLARE_STATIC_FIELD_TYPE(sl_int64, Long)
 	PRIV_SLIB_JNI_DECLARE_STATIC_FIELD_TYPE(float, Float)
 	PRIV_SLIB_JNI_DECLARE_STATIC_FIELD_TYPE(double, Double)
-	PRIV_SLIB_JNI_DECLARE_STATIC_FIELD_TYPE(String, String)
-	PRIV_SLIB_JNI_DECLARE_STATIC_FIELD_TYPE(String16, String16)
+	PRIV_SLIB_JNI_DECLARE_STATIC_FIELD_TYPE(String16, String)
 
 	namespace priv
 	{

@@ -256,14 +256,10 @@ namespace slib
 		void callVoidMethod(const char* name, const char* sig, jobject _this, ...) const;
 		void callStaticVoidMethod(jmethodID method, ...) const;
 		void callStaticVoidMethod(const char* name, const char* sig, ...) const;
-		String callStringMethod(jmethodID method, jobject _this, ...) const;
-		String callStringMethod(const char* name, const char* sig, jobject _this, ...) const;
-		String16 callString16Method(jmethodID method, jobject _this, ...) const;
-		String16 callString16Method(const char* name, const char* sig, jobject _this, ...) const;
-		String callStaticStringMethod(jmethodID method, ...) const;
-		String callStaticStringMethod(const char* name, const char* sig, ...) const;
-		String16 callStaticString16Method(jmethodID method, ...) const;
-		String16 callStaticString16Method(const char* name, const char* sig, ...) const;
+		String16 callStringMethod(jmethodID method, jobject _this, ...) const;
+		String16 callStringMethod(const char* name, const char* sig, jobject _this, ...) const;
+		String16 callStaticStringMethod(jmethodID method, ...) const;
+		String16 callStaticStringMethod(const char* name, const char* sig, ...) const;
 
 		jobject getObjectField(jfieldID field, jobject _this) const;
 		jobject getObjectField(const char* name, const char* sig, jobject _this) const;
@@ -338,23 +334,15 @@ namespace slib
 		void setStaticDoubleField(jfieldID field, jdouble value) const;
 		void setStaticDoubleField(const char* name, const char* sig, jdouble value) const;
 
-		String getStringField(jfieldID field, jobject _this) const;
-		String getStringField(const char* name, const char* sig, jobject _this) const;
-		String16 getString16Field(jfieldID field, jobject _this) const;
-		String16 getString16Field(const char* name, const char* sig, jobject _this) const;
-		String getStaticStringField(jfieldID field) const;
-		String getStaticStringField(const char* name, const char* sig) const;
-		String16 getStaticString16Field(jfieldID field) const;
-		String16 getStaticString16Field(const char* name, const char* sig) const;
+		String16 getStringField(jfieldID field, jobject _this) const;
+		String16 getStringField(const char* name, const char* sig, jobject _this) const;
+		String16 getStaticStringField(jfieldID field) const;
+		String16 getStaticStringField(const char* name, const char* sig) const;
 
-		void setStringField(jfieldID field, jobject _this, const String& value) const;
-		void setStringField(const char* name, const char* sig, jobject _this, const String& value) const;
-		void setString16Field(jfieldID field, jobject _this, const String16& value) const;
-		void setString16Field(const char* name, const char* sig, jobject _this, const String16& value) const;
-		void setStaticStringField(jfieldID field, const String& value) const;
-		void setStaticStringField(const char* name, const char* sig, const String& value) const;
-		void setStaticString16Field(jfieldID field, const String16& value) const;
-		void setStaticString16Field(const char* name, const char* sig, const String16& value) const;
+		void setStringField(jfieldID field, jobject _this, const String16& value) const;
+		void setStringField(const char* name, const char* sig, jobject _this, const String16& value) const;
+		void setStaticStringField(jfieldID field, const String16& value) const;
+		void setStaticStringField(const char* name, const char* sig, const String16& value) const;
 
 		sl_bool registerNative(const char* name, const char* sig, const void* fn) const;
 
@@ -402,10 +390,8 @@ namespace slib
 		static void deleteWeakRef(jobject obj);
 
 		// string
-		static jstring getJniString(const String& str);
-		static jstring getJniString16(const String16& str);
-		static String getString(jstring str);
-		static String16 getString16(jstring str);
+		static jstring getJniString(const String16& str);
+		static String16 getString(jstring str);
 
 		/*
 		 * Array release<TYPE>ArrayElements Mode
@@ -418,10 +404,8 @@ namespace slib
 		static jobject getObjectArrayElement(jobjectArray array, sl_uint32 index);
 		static void setObjectArrayElement(jobjectArray array, sl_uint32 index, jobject value);
 		static jobjectArray newStringArray(sl_uint32 length);
-		static String getStringArrayElement(jobjectArray array, sl_uint32 index);
-		static String16 getString16ArrayElement(jobjectArray array, sl_uint32 index);
-		static void setStringArrayElement(jobjectArray array, sl_uint32 index, const String& value);
-		static void setString16ArrayElement(jobjectArray array, sl_uint32 index, const String16& value);
+		static String16 getStringArrayElement(jobjectArray array, sl_uint32 index);
+		static void setStringArrayElement(jobjectArray array, sl_uint32 index, const String16& value);
 		static jbooleanArray newBooleanArray(sl_uint32 length);
 		static jboolean* getBooleanArrayElements(jbooleanArray array, jboolean* isCopy = sl_null);
 		static void releaseBooleanArrayElements(jbooleanArray array, jboolean* buf, jint mode = 0);
@@ -514,7 +498,6 @@ namespace CLASS \
 #define SLIB_JNI_FLOAT_FIELD(VAR) static slib::priv::java::JFloatField VAR(&_gcls, (#VAR));
 #define SLIB_JNI_DOUBLE_FIELD(VAR) static slib::priv::java::JDoubleField VAR(&_gcls, (#VAR));
 #define SLIB_JNI_STRING_FIELD(VAR) static slib::priv::java::JStringField VAR(&_gcls, (#VAR));
-#define SLIB_JNI_STRING16_FIELD(VAR) static slib::priv::java::JString16Field VAR(&_gcls, (#VAR));
 
 #define SLIB_JNI_STATIC_FIELD(VAR, NAME, SIG) static slib::priv::java::JStaticField VAR(&_gcls, NAME, SIG);
 #define SLIB_JNI_STATIC_OBJECT_FIELD(VAR, SIG) static slib::priv::java::JStaticObjectField VAR(&_gcls, (#VAR), SIG);
@@ -527,7 +510,6 @@ namespace CLASS \
 #define SLIB_JNI_STATIC_FLOAT_FIELD(VAR) static slib::priv::java::JStaticFloatField VAR(&_gcls, (#VAR));
 #define SLIB_JNI_STATIC_DOUBLE_FIELD(VAR) static slib::priv::java::JStaticDoubleField VAR(&_gcls, (#VAR));
 #define SLIB_JNI_STATIC_STRING_FIELD(VAR) static slib::priv::java::JStaticStringField VAR(&_gcls, (#VAR));
-#define SLIB_JNI_STATIC_STRING16_FIELD(VAR) static slib::priv::java::JStaticString16Field VAR(&_gcls, (#VAR));
 
 #define SLIB_JNI_NATIVE(VAR, NAME, SIG, fn) static slib::priv::java::JNativeMethod VAR(&_gcls, NAME, SIG, (const void*)(fn));
 #define SLIB_JNI_NATIVE_IMPL(VAR, NAME, SIG, RET, ...) \

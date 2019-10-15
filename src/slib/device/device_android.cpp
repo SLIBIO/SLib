@@ -98,7 +98,7 @@ namespace slib
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			return JDevice::getIMEIs.callString(sl_null, jactivity).split(";");
+			return String(JDevice::getIMEIs.callString(sl_null, jactivity)).split(";");
 		}
 		return sl_null;
 	}
@@ -107,7 +107,7 @@ namespace slib
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			return JDevice::getPhoneNumbers.callString(sl_null, jactivity).split(";");
+			return String(JDevice::getPhoneNumbers.callString(sl_null, jactivity)).split(";");
 		}
 		return sl_null;
 	}

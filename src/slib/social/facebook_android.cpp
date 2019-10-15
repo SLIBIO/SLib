@@ -80,7 +80,7 @@ namespace slib
 				static void getToken(OAuthAccessToken& _out, jobject _in)
 				{
 					_out.token = JToken::token.get(_in);
-					_out.scopes = JToken::scopes.get(_in).split(",");
+					_out.scopes = String(JToken::scopes.get(_in)).split(",");
 					_out.expirationTime = Time::withMilliseconds(JToken::expirationTime.get(_in));
 					_out.refreshTime = Time::withMilliseconds(JToken::refreshTime.get(_in));
 				}
