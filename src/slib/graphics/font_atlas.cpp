@@ -307,7 +307,7 @@ namespace slib
 				return sl_true;
 			}
 		} else {
-			Size sizeFont = m_fontSource->measureSingleLineText(String(&ch, 1));
+			Size sizeFont = m_fontSource->measureText(String(&ch, 1));
 			if (sizeFont.x <= 0 || sizeFont.y <= 0) {
 				FontAtlasChar fac;
 				fac.fontWidth = 0;
@@ -325,7 +325,7 @@ namespace slib
 		
 		String s(&ch, 1);
 		
-		Sizei sizeDraw = m_fontDraw->measureSingleLineText(s);
+		Sizei sizeDraw = m_fontDraw->measureText(s);
 
 		sl_uint32 widthChar = sizeDraw.x;
 		sl_uint32 heightChar = sizeDraw.y;

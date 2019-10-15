@@ -220,8 +220,10 @@ namespace slib
 		return sl_true;
 	}
 
-	Size Font::_measureText_PO(const String& text)
+	Size Font::_measureText_PO(const StringParam& _text)
 	{
+		String text = _text.getString();
+		
 		CTFontRef handle = GraphicsPlatform::getCoreTextFont(this);
 		if (!handle) {
 			return Size::zero();

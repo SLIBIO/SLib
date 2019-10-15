@@ -27,6 +27,7 @@
 
 #include "../core/object.h"
 #include "../core/string.h"
+#include "../core/string_param.h"
 #include "../math/size.h"
 
 #define SLIB_FONT_SIZE_PRECISION_MULTIPLIER 10
@@ -104,13 +105,9 @@ namespace slib
 
 		sl_real getFontDescent();
 
-		Size measureSingleLineText(const String& text);
+		Size measureText(const StringParam& text);
 
-		Size measureMultiLineText(const String16& text);
-
-		Size measureText(const String& text, sl_bool flagMultiLine = sl_false);
-
-		Size measureText16(const String16& text, sl_bool flagMultiLine = sl_false);
+		Size measureText(const StringParam& text, sl_bool flagMultiLine);
 
 		Ref<FontAtlas> getAtlas();
 
@@ -121,7 +118,7 @@ namespace slib
 	private:
 		sl_bool _getFontMetrics_PO(FontMetrics& _out);
 
-		Size _measureText_PO(const String& text);
+		Size _measureText_PO(const StringParam& text);
 
 	protected:
 		FontDesc m_desc;

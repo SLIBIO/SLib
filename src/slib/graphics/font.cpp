@@ -185,16 +185,17 @@ namespace slib
 		return 0;
 	}
 
-	Size Font::measureSingleLineText(const String& text)
+	Size Font::measureText(const StringParam& text)
 	{
-		if (text.isEmpty()) {
-			return Size::zero();
-		}
 		return _measureText_PO(text);
 	}
 
-	Size Font::measureMultiLineText(const String16& text)
+	Size Font::measureText(const StringParam& varText, sl_bool flagMultiLine)
 	{
+		if (!flagMultiLine) {
+			return _measureText_PO(varText);
+		}
+		String16 text = varText.getString16();
 		sl_char16* sz = text.getData();
 		sl_size len = text.getLength();
 		sl_size startLine = 0;
@@ -210,7 +211,7 @@ namespace slib
 			}
 			if (ch == '\r' || ch == '\n') {
 				if (pos > startLine) {
-					Size size = _measureText_PO(String(sz + startLine, pos - startLine));
+					Size size = _measureText_PO(String16(sz + startLine, pos - startLine));
 					if (size.x > width) {
 						width = size.x;
 					}
@@ -226,24 +227,6 @@ namespace slib
 			pos++;
 		}
 		return Size(width, height);
-	}
-
-	Size Font::measureText(const String& text, sl_bool flagMultiLine)
-	{
-		if (flagMultiLine) {
-			return measureMultiLineText(text);
-		} else {
-			return measureSingleLineText(text);
-		}
-	}
-
-	Size Font::measureText16(const String16& text, sl_bool flagMultiLine)
-	{
-		if (flagMultiLine) {
-			return measureMultiLineText(text);
-		} else {
-			return measureSingleLineText(text);
-		}
 	}
 
 	Ref<FontAtlas> Font::getAtlas()

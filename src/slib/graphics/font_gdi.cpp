@@ -244,7 +244,7 @@ namespace slib
 		return sl_false;
 	}
 
-	Size Font::_measureText_PO(const String& _text)
+	Size Font::_measureText_PO(const StringParam& _text)
 	{
 		Gdiplus::Font* handle = GraphicsPlatform::getGdiplusFont(this);
 		if (!handle) {
@@ -258,7 +258,7 @@ namespace slib
 
 		Size ret(0, 0);
 		if (fs->graphics) {
-			String16 text = _text;
+			String16 text = _text.getString16();
 			Gdiplus::StringFormat format(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsNoClip | Gdiplus::StringFormatFlagsNoFitBlackBox);
 			Gdiplus::RectF bound;
 			Gdiplus::PointF origin(0, 0);
