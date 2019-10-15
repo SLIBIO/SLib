@@ -175,6 +175,25 @@ namespace slib
 		b = (sl_uint8)(_ob);
 	}
 
+	void Color::multiplyAlpha(float f) noexcept
+	{
+		a = (sl_uint8)(Math::clamp0_255((sl_int32)(a * f)));
+	}
+
+	void Color::multiplyRed(float f) noexcept
+	{
+		r = (sl_uint8)(Math::clamp0_255((sl_int32)(r * f)));
+	}
+
+	void Color::multiplyGreen(float f) noexcept
+	{
+		g = (sl_uint8)(Math::clamp0_255((sl_int32)(g * f)));
+	}
+
+	void Color::multiplyBlue(float f) noexcept
+	{
+		b = (sl_uint8)(Math::clamp0_255((sl_int32)(b * f)));
+	}
 
 	String Color::toString() const noexcept
 	{

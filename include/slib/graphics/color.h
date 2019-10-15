@@ -332,6 +332,15 @@ namespace slib
 		void convertNPAtoPA() noexcept;
 	
 		void convertPAtoNPA() noexcept;
+		
+		
+		void multiplyAlpha(float f) noexcept;
+		
+		void multiplyRed(float f) noexcept;
+		
+		void multiplyGreen(float f) noexcept;
+		
+		void multiplyBlue(float f) noexcept;
 
 
 		String toString() const noexcept;
