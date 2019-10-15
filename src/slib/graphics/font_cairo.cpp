@@ -27,6 +27,7 @@
 #include "slib/graphics/font.h"
 
 #include "slib/graphics/platform.h"
+#include "slib/core/safe_static.h"
 
 namespace slib
 {
@@ -39,26 +40,21 @@ namespace slib
 			class FontPlatformObject : public Referable
 			{
 			public:
-				cairo_scaled_font_t* m_font;
+				PangoFontDescription* m_font;
 
 			public:
 				FontPlatformObject(const FontDesc& desc)
 				{
-					cairo_scaled_font_t* font = sl_null;
-					cairo_font_slant_t slant = desc.flagItalic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL;
-					cairo_font_weight_t weight = desc.flagBold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL;
-					cairo_font_face_t* face = ::cairo_toy_font_face_create(desc.familyName.getData(), slant, weight);
-					if (face) {
-						cairo_font_options_t* options = ::cairo_font_options_create();
-						if (options) {
-							cairo_matrix_t mat;
-							::cairo_matrix_init_scale(&mat, desc.size, desc.size);
-							cairo_matrix_t identity;
-							::cairo_matrix_init_identity(&identity);
-							font = ::cairo_scaled_font_create(face, &mat, &identity, options);
-							::cairo_font_options_destroy(options);
+					PangoFontDescription* font = pango_font_description_new();
+					if (font) {
+						pango_font_description_set_family(font, desc.familyName.getData());
+						if (desc.flagBold) {
+							pango_font_description_set_weight(font, PANGO_WEIGHT_BOLD);
 						}
-						::cairo_font_face_destroy(face);
+						if (desc.flagItalic) {
+							pango_font_description_set_style(font, PANGO_STYLE_ITALIC);
+						}
+						pango_font_description_set_absolute_size (font, desc.size * PANGO_SCALE);
 					}
 					m_font = font;
 				}
@@ -66,7 +62,7 @@ namespace slib
 				~FontPlatformObject()
 				{
 					if (m_font) {
-						::cairo_scaled_font_destroy(m_font);
+						pango_font_description_free(m_font);
 					}
 				}
 
@@ -86,7 +82,7 @@ namespace slib
 					return (FontPlatformObject*)(m_platformObject.get());;
 				}
 
-				cairo_scaled_font_t* getPlatformHandle()
+				PangoFontDescription* getPlatformHandle()
 				{
 					FontPlatformObject* po = getPlatformObject();
 					if (po) {
@@ -96,6 +92,32 @@ namespace slib
 				}
 			};
 
+			class StaticContext
+			{
+			public:
+				cairo_surface_t* surface;
+				cairo_t* cairo;
+				PangoContext* pango;
+
+			public:
+				StaticContext()
+				{
+					surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 32, 32);
+					cairo = cairo_create(surface);
+					pango = pango_cairo_create_context(cairo);
+				}
+
+				~StaticContext()
+				{
+					cairo_surface_destroy(surface);
+					cairo_destroy(cairo);
+					g_object_unref(pango);
+				}
+
+			};
+
+			SLIB_SAFE_STATIC_GETTER(StaticContext, GetStaticContext)
+
 		}
 	}
 
@@ -103,30 +125,48 @@ namespace slib
 
 	sl_bool Font::_getFontMetrics_PO(FontMetrics& _out)
 	{
-		cairo_scaled_font_t* handle = GraphicsPlatform::getCairoFont(this);
-		if (handle) {
-			cairo_font_extents_t extents;
-			::cairo_scaled_font_extents(handle, &extents);
-			_out.ascent = (sl_real)(extents.ascent);
-			_out.descent = (sl_real)(extents.descent);
-			_out.leading = (sl_real)(extents.height - extents.ascent - extents.descent);
-			return sl_true;
+		StaticContext* context = GetStaticContext();
+		if (context) {
+			PangoFontDescription* handle = GraphicsPlatform::getCairoFont(this);
+			if (handle) {
+				PangoFontMetrics* metrics = pango_context_get_metrics(context->pango, handle, NULL);
+				if (metrics) {
+					_out.ascent = (sl_real)(pango_font_metrics_get_ascent(metrics));
+					_out.descent = (sl_real)(pango_font_metrics_get_descent(metrics));
+					_out.leading = 0;
+					pango_font_metrics_unref(metrics);
+					return sl_true;
+				}
+			}
 		}
 		return sl_false;
 	}
 
-	Size Font::_measureText_PO(const String& text)
+	Size Font::_measureText_PO(const StringParam& _text)
 	{
-		cairo_scaled_font_t* handle = GraphicsPlatform::getCairoFont(this);
-		if (handle) {
-			cairo_text_extents_t extents;
-			::cairo_scaled_font_text_extents(handle, text.getData(), &extents);
-			return Size((sl_real)(extents.x_advance), getFontHeight());
+		String text = _text.getString();
+		sl_size len = text.getLength();
+		if (len) {
+			StaticContext* context = GetStaticContext();
+			if (context) {
+				PangoFontDescription* handle = GraphicsPlatform::getCairoFont(this);
+				if (handle) {
+					PangoLayout* layout = pango_layout_new(context->pango);
+					if (layout) {
+						pango_layout_set_font_description(layout, handle);
+						pango_layout_set_text(layout, text.getData(), len);
+						int w = 0;
+						int h = 0;
+						pango_layout_get_pixel_size(layout, &w, &h);
+						return Size((sl_real)w, (sl_real)h);
+					}
+				}
+			}
 		}
 		return Size::zero();
 	}
 
-	cairo_scaled_font_t* GraphicsPlatform::getCairoFont(Font* font)
+	PangoFontDescription* GraphicsPlatform::getCairoFont(Font* font)
 	{
 		if (font) {
 			return ((FontHelper*)font)->getPlatformHandle();

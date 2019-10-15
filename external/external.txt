@@ -27,6 +27,7 @@ libmysqlclient 8.0
 # Headers
 gl
 cairo 1.14.2
+pango 1.28.3
 curl 7.59.0
 libmariadb-client 3.0.4
 pcap 1.8.1

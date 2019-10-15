@@ -20,6 +20,8 @@ target_link_libraries (
   gobject-2.0
   glib-2.0
   cairo
+  pango-1.0
+  pangocairo-1.0
   X11
   GL
 )
