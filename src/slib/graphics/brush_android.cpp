@@ -26,7 +26,9 @@
 
 #include "slib/graphics/brush.h"
 
+#include "slib/graphics/image.h"
 #include "slib/graphics/platform.h"
+#include "slib/core/scoped.h"
 
 namespace slib
 {
@@ -40,12 +42,21 @@ namespace slib
 				SLIB_JNI_NEW(init, "()V");
 				SLIB_JNI_INT_FIELD(style);
 				SLIB_JNI_INT_FIELD(color);
+				SLIB_JNI_FLOAT_FIELD(x)
+				SLIB_JNI_FLOAT_FIELD(y)
+				SLIB_JNI_FLOAT_FIELD(x2)
+				SLIB_JNI_FLOAT_FIELD(y2)
+				SLIB_JNI_FLOAT_FIELD(radius)
+				SLIB_JNI_OBJECT_FIELD(colors, "[I")
+				SLIB_JNI_OBJECT_FIELD(locations, "[F")
+				SLIB_JNI_OBJECT_FIELD(pattern, "Lslib/platform/android/ui/UiBitmap;")
 			SLIB_JNI_END_CLASS
 
 			class BrushPlatformObject : public Referable
 			{
 			public:
 				JniGlobal<jobject> m_brush;
+				Ref<Bitmap> m_bitmapCache;
 
 			public:
 				BrushPlatformObject(const BrushDesc& desc)
@@ -54,8 +65,63 @@ namespace slib
 					if (jbrush.isNotNull()) {
 						JniGlobal<jobject> gbrush = jbrush;
 						if (gbrush.isNotNull()) {
-							JBrush::color.set(jbrush, desc.color.getARGB());
 							JBrush::style.set(jbrush, (int)(desc.style));
+							if (desc.style == BrushStyle::Solid) {
+								JBrush::color.set(jbrush, desc.color.getARGB());
+								m_brush = gbrush;
+							} else if (desc.style == BrushStyle::LinearGradient || desc.style == BrushStyle::RadialGradient) {
+								GradientBrushDetail* detail = (GradientBrushDetail*)(desc.detail.get());
+								if (detail) {
+									ListElements<Color> _colors(detail->colors);
+									ListElements<sl_real> _locations(detail->locations);
+									sl_size n = _colors.count;
+									JniLocal<jintArray> jcolors = Jni::newIntArray(n);
+									JniLocal<jfloatArray> jlocations = Jni::newFloatArray(n);
+									if (jcolors.isNotNull() && jlocations.isNotNull()) {
+										SLIB_SCOPED_BUFFER(jint, 128, colors, n);
+										SLIB_SCOPED_BUFFER(float, 128, locations, n);
+										for (sl_size i = 0; i < n; i++) {
+											colors[i] = (jint)(_colors[i].getARGB());
+											locations[i] = (jfloat)(_locations[i]);
+										}
+										Jni::setIntArrayRegion(jcolors, 0, n, colors);
+										Jni::setFloatArrayRegion(jlocations, 0, n, locations);
+										JBrush::colors.set(jbrush, jcolors);
+										JBrush::locations.set(jbrush, jlocations);
+										JBrush::x.set(jbrush, (jfloat)(detail->point1.x));
+										JBrush::y.set(jbrush, (jfloat)(detail->point1.y));
+										if (desc.style == BrushStyle::LinearGradient) {
+											JBrush::x2.set(jbrush, (jfloat)(detail->point2.x));
+											JBrush::y2.set(jbrush, (jfloat)(detail->point2.y));
+										} else {
+											JBrush::radius.set(jbrush, (jfloat)(detail->radius));
+										}
+										m_brush = gbrush;
+									}
+								}
+							} else if (desc.style == BrushStyle::Texture) {
+								TextureBrushDetail* detail = (TextureBrushDetail*)(desc.detail.get());
+								if (detail) {
+									Bitmap* pattern = detail->pattern.get();
+									if (pattern->isImage()) {
+										Ref<Bitmap> bitmap = Bitmap::create(((Image*)pattern));
+										if (bitmap.isNotNull()) {											
+											jobject jbitmap = GraphicsPlatform::getBitmapHandle(bitmap.get());
+											if (jbitmap) {
+												JBrush::pattern.set(jbrush, jbitmap);
+												m_bitmapCache = bitmap;
+												m_brush = gbrush;
+											}
+										}
+									} else {
+										jobject jbitmap = GraphicsPlatform::getBitmapHandle(pattern);
+										if (jbitmap) {
+											JBrush::pattern.set(jbrush, jbitmap);
+											m_brush = gbrush;
+										}
+									}
+								}
+							}
 							m_brush = gbrush;
 						}
 					}

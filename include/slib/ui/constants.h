@@ -243,15 +243,6 @@ namespace slib
 		};
 	};
 	
-	enum class BoundShape
-	{
-		None = 0,
-		Rectangle = 1,
-		Ellipse = 2,
-		RoundRect = 3,
-		Path = 10
-	};
-	
 	enum class ButtonState
 	{
 		Normal = 0,

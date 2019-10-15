@@ -35,7 +35,7 @@ namespace slib
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DrawParam)
 	
 	DrawParam::DrawParam()
-	 : useAlpha(sl_false), alpha(1), tiled(sl_false), useColorMatrix(sl_false), useBlur(sl_false), blurRadius(10), time(0)
+	 : useAlpha(sl_false), alpha(1), useColorMatrix(sl_false), useBlur(sl_false), blurRadius(10), time(0)
 	{
 	}
 

@@ -265,7 +265,21 @@ public class UiView {
 			Logger.exception(e);
 		}
 	}
-	
+
+	public static void setShadow(final View view, float opacity, float radius) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			try {
+				if (opacity > 0) {
+					view.setTranslationZ(radius);
+				} else {
+					view.setTranslationZ(0);
+				}
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
+		}
+	}
+
 	public static Point convertCoordinateFromScreenToView(View view, int x, int y) {
 		Point ret = new Point();
 		int[] location = new int[2];

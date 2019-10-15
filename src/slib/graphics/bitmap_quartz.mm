@@ -104,7 +104,7 @@ namespace slib
 					return sl_null;
 				}
 				
-				static Ref<BitmapImpl> create(CGImageRef image)
+				static Ref<BitmapImpl> createFromCGImage(CGImageRef image)
 				{
 					if (!image) {
 						return sl_null;
@@ -137,7 +137,7 @@ namespace slib
 				{
 					CGImageRef image = GraphicsPlatform::loadCGImageFromMemory(mem, size);
 					if (image) {
-						Ref<BitmapImpl> ret = create(image);
+						Ref<BitmapImpl> ret = createFromCGImage(image);
 						CGImageRelease(image);
 						return ret;
 					}
@@ -273,11 +273,6 @@ namespace slib
 		return BitmapImpl::loadFromMemory(mem, size);
 	}
 
-	Ref<Bitmap> GraphicsPlatform::createImageBitmap(CGImageRef image)
-	{
-		return BitmapImpl::create(image);
-	}
-	
 	CGContextRef GraphicsPlatform::getBitmapHandle(Bitmap* _bitmap)
 	{
 		if (BitmapImpl* bitmap = CastInstance<BitmapImpl>(_bitmap)) {
@@ -286,6 +281,11 @@ namespace slib
 		return sl_null;
 	}
 
+	Ref<Bitmap> GraphicsPlatform::createBitmapFromCGImage(CGImageRef image)
+	{
+		return BitmapImpl::createFromCGImage(image);
+	}
+	
 }
 
 #endif

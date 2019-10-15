@@ -65,22 +65,8 @@ namespace slib
 
 		if (view->isCreatingNativeLayer()) {
 			[handle setWantsLayer:YES];
-			float shadowOpacity = view->getShadowOpacity();
-			if (shadowOpacity > SLIB_EPSILON) {
-				CALayer* layer = handle.layer;
-				if (layer != nil) {
-					layer.shadowOpacity = shadowOpacity;
-					layer.shadowRadius = (CGFloat)(view->getShadowRadius());
-					UIPointf offset = view->getShadowOffset();
-					layer.shadowOffset = CGSizeMake((CGFloat)(offset.x), (CGFloat)(offset.y));
-					CGColorRef color = GraphicsPlatform::getCGColorFromColor(view->getShadowColor());
-					if (color) {
-						layer.shadowColor = color;
-						CFRelease(color);
-					}
-				}
-			}
 		}
+		
 		[handle setHidden:(view->isVisibleInInstance() ? NO : YES)];
 		if (!(view->isEnabled())) {
 			if ([handle isKindOfClass:[NSControl class]]) {
@@ -95,6 +81,22 @@ namespace slib
 		}
 		if (parent != nil) {
 			[parent addSubview:handle];
+		}
+		
+		CALayer* layer = handle.layer;
+		if (layer != nil) {
+			float shadowOpacity = view->getShadowOpacity();
+			if (shadowOpacity > SLIB_EPSILON) {
+				layer.shadowOpacity = shadowOpacity;
+				layer.shadowRadius = (CGFloat)(view->getShadowRadius());
+				UIPointf offset = view->getShadowOffset();
+				layer.shadowOffset = CGSizeMake((CGFloat)(offset.x), (CGFloat)(offset.y));
+				CGColorRef color = GraphicsPlatform::getCGColorFromColor(view->getShadowColor());
+				if (color) {
+					layer.shadowColor = color;
+					CFRelease(color);
+				}
+			}
 		}
 	}
 	

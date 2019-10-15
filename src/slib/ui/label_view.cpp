@@ -187,6 +187,13 @@ namespace slib
 		SimpleTextBoxDrawParam param;
 		param.frame = bounds;
 		param.color = m_textColor;
+		sl_real shadowOpacity = getShadowOpacity();
+		if (shadowOpacity > 0 && getCurrentBackground().isNull()) {
+			param.shadowOpacity = shadowOpacity;
+			param.shadowRadius = (sl_real)(getShadowRadius());
+			param.shadowColor = getShadowColor();
+			param.shadowOffset = getShadowOffset();
+		}
 		m_textBox.draw(canvas, param);
 	}
 	

@@ -26,7 +26,9 @@
 
 #include "slib/graphics/brush.h"
 
+#include "slib/graphics/image.h"
 #include "slib/graphics/platform.h"
+#include "slib/core/scoped.h"
 
 namespace slib
 {
@@ -40,18 +42,83 @@ namespace slib
 			{
 			public:
 				Gdiplus::Brush* m_brush;
+				Ref<Drawable> m_drawableCache;
 
 			public:
 				BrushPlatformObject(const BrushDesc& desc)
 				{
+					GraphicsPlatform::startGdiplus();
 					m_brush = NULL;
-					const Color& _color = desc.color;
-					Gdiplus::Color color(_color.a, _color.r, _color.g, _color.b);
 					if (desc.style == BrushStyle::Solid) {
-						GraphicsPlatform::startGdiplus();
-						Gdiplus::Brush* brush = new Gdiplus::SolidBrush(color);
-						if (brush) {
-							m_brush = brush;
+						const Color& _color = desc.color;
+						Gdiplus::Color color(_color.a, _color.r, _color.g, _color.b);
+						m_brush = new Gdiplus::SolidBrush(color);
+					} else if (desc.style == BrushStyle::LinearGradient || desc.style == BrushStyle::RadialGradient) {
+						GradientBrushDetail* detail = (GradientBrushDetail*)(desc.detail.get());
+						if (detail) {
+							ListElements<Color> _colors(detail->colors);
+							ListElements<sl_real> _locations(detail->locations);
+							sl_size n = _colors.count;
+							SLIB_SCOPED_BUFFER(Gdiplus::Color, 128, colors, n);
+							SLIB_SCOPED_BUFFER(Gdiplus::REAL, 128, locations, n);
+							if (desc.style == BrushStyle::LinearGradient) {
+								for (sl_size i = 0; i < n; i++) {
+									colors[i] = Gdiplus::Color(_colors[i].a, _colors[i].r, _colors[i].g, _colors[i].b);
+									locations[i] = (Gdiplus::REAL)(_locations[i]);
+								}
+								Gdiplus::PointF pt1((Gdiplus::REAL)(detail->point1.x), (Gdiplus::REAL)(detail->point1.y));
+								Gdiplus::PointF pt2((Gdiplus::REAL)(detail->point2.x), (Gdiplus::REAL)(detail->point2.y));
+								Gdiplus::LinearGradientBrush* brush = new Gdiplus::LinearGradientBrush(pt1, pt2, colors[0], colors[1]);
+								if (brush) {
+									brush->SetWrapMode(Gdiplus::WrapModeTileFlipXY);
+									if (n > 2) {
+										brush->SetInterpolationColors(colors, locations, (INT)n);
+									}
+									m_brush = brush;
+								}
+							} else {
+								Gdiplus::GraphicsPath path;
+								path.AddEllipse((Gdiplus::REAL)(detail->point1.x - detail->radius), (Gdiplus::REAL)(detail->point1.y - detail->radius), (Gdiplus::REAL)(detail->radius * 2), (Gdiplus::REAL)(detail->radius * 2));
+								Gdiplus::PathGradientBrush* brush = new Gdiplus::PathGradientBrush(&path);
+								if (brush) {
+									if (n > 2) {
+										for (sl_size i = 0; i < n; i++) {
+											Color& color = _colors[n - 1 - i];
+											colors[i] = Gdiplus::Color(color.a, color.r, color.g, color.b);
+											locations[i] = (Gdiplus::REAL)(1 - _locations[n - 1 - i]);
+										}
+										brush->SetInterpolationColors(colors, locations, (INT)n);
+									} else {
+										Gdiplus::Color c0(_colors[0].a, _colors[0].r, _colors[0].g, _colors[0].b);
+										Gdiplus::Color c1(_colors[1].a, _colors[1].r, _colors[1].g, _colors[1].b);
+										brush->SetCenterColor(c0);
+										INT k = 1;
+										brush->SetSurroundColors(&c1, &k);
+									}
+									brush->SetCenterPoint(Gdiplus::PointF((Gdiplus::REAL)(detail->point1.x), (Gdiplus::REAL)(detail->point1.y)));
+									m_brush = brush;
+								}
+							}
+						}
+					} else if (desc.style == BrushStyle::Texture) {
+						TextureBrushDetail* detail = (TextureBrushDetail*)(desc.detail.get());
+						if (detail) {
+							Bitmap* pattern = detail->pattern.get();
+							if (pattern->isImage()) {
+								Ref<Drawable> drawable = PlatformDrawable::create((Image*)pattern);
+								if (drawable.isNotNull()) {
+									Gdiplus::Image* image = GraphicsPlatform::getImageDrawableHandle(drawable.get());
+									if (image) {
+										m_brush = new Gdiplus::TextureBrush(image);
+										m_drawableCache = drawable;
+									}
+								}
+							} else {
+								Gdiplus::Bitmap* bitmap = GraphicsPlatform::getBitmapHandle(pattern);
+								if (bitmap) {
+									m_brush = new Gdiplus::TextureBrush(bitmap);
+								}
+							}
 						}
 					}
 				}
@@ -74,7 +141,7 @@ namespace slib
 							m_platformObject = new BrushPlatformObject(m_desc);
 						}
 					}
-					return (BrushPlatformObject*)(m_platformObject.get());;
+					return (BrushPlatformObject*)(m_platformObject.get());
 				}
 
 				Gdiplus::Brush* getPlatformHandle()

@@ -55,91 +55,100 @@ namespace slib
 		}
 	}
 	
-	Size CanvasExt::measureText(const Ref<Font>& font, const String& text, sl_bool flagMultiLine)
+	Size CanvasExt::measureText(const Ref<Font>& font, const StringParam& text, sl_bool flagMultiLine)
 	{
+		if (text.isEmpty()) {
+			return Size::zero();
+		}
 		if (font.isNotNull()) {
 			return font->measureText(text, flagMultiLine);
+		} else {
+			Ref<Font> _font = Font::getDefault();
+			if (_font.isNotNull()) {
+				return _font->measureText(text, flagMultiLine);
+			}
 		}
 		return Size::zero();
 	}
 	
-	Size CanvasExt::measureText16(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine)
+	void CanvasExt::drawText(const DrawTextParam& param)
 	{
-		if (font.isNotNull()) {
-			return font->measureText16(text, flagMultiLine);
-		}
-		return Size::zero();
-	}
-	
-	void CanvasExt::drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& _font, const Color& color, const Alignment& align, sl_bool flagMultiLine)
-	{
-		if (flagMultiLine) {
-			drawText16(text, rcDst, _font, color, align, sl_true);
+		if (param.text.isEmpty()) {
 			return;
 		}
-		Ref<Font> font = _font;
+		Ref<Font> font = param.font;
 		if (font.isNull()) {
 			font = Font::getDefault();
 			if (font.isNull()) {
 				return;
 			}
 		}
-		Size size = measureText(font, text, sl_false);
-		Point pt = GraphicsUtil::calculateAlignPosition(rcDst, size.x, size.y, align);
-		((Canvas*)this)->drawText(text, pt.x, pt.y, font, color);
-	}
-	
-	void CanvasExt::drawText16(const String16& text, const Rectangle& rcDst, const Ref<Font>& _font, const Color& color, const Alignment& align, sl_bool flagMultiLine)
-	{
-		Ref<Font> font = _font;
-		if (font.isNull()) {
-			font = Font::getDefault();
-			if (font.isNull()) {
-				return;
+		if (!(param.flagMultiLine)) {
+			if (param.alignment == Alignment::TopLeft) {
+				onDrawText(param.text, param.x, param.y, font, param);
+			} else {
+				Size size = measureText(font, param.text, sl_false);
+				Alignment hAlign = param.alignment & Alignment::HorizontalMask;
+				Alignment vAlign = param.alignment & Alignment::VerticalMask;
+				sl_real x = param.x;
+				sl_real y = param.y;
+				if (hAlign == Alignment::Right) {
+					x += param.width - size.x;
+				} else if (hAlign == Alignment::Center) {
+					x += (param.width - size.x) / 2;
+				}
+				if (vAlign == Alignment::Bottom) {
+					y += param.height - size.y;
+				} else if (vAlign == Alignment::Middle){
+					y += (param.height - size.y) / 2;
+				}
+				onDrawText(param.text, x, y, font, param);
 			}
+			return;
 		}
-		Size size = measureText16(font, text, flagMultiLine);
-		Point pt = GraphicsUtil::calculateAlignPosition(rcDst, size.x, size.y, align);
-		if (flagMultiLine) {
-			Alignment hAlign = align & Alignment::HorizontalMask;
-			sl_char16* sz = text.getData();
-			sl_size len = text.getLength();
-			sl_size startLine = 0;
-			sl_size pos = 0;
-			sl_real y = pt.y;
-			while (pos <= len) {
-				sl_char16 ch;
-				if (pos < len) {
-					ch = sz[pos];
-				} else {
-					ch = '\n';
-				}
-				if (ch == '\r' || ch == '\n') {
-					if (pos > startLine) {
-						String16 line(sz + startLine, pos - startLine);
-						Size s = measureText16(font, line);
-						sl_real x;
-						if (hAlign == Alignment::Center) {
-							x = pt.x + (size.x - s.x) / 2;
-						} else if (hAlign == Alignment::Right) {
-							x = pt.x + size.x - s.x;
-						} else {
-							x = pt.x;
-						}
-						((Canvas*)this)->drawText16(line, x, y, font, color);
-						y += s.y;
-					}
-					if (ch == '\r' && pos + 1 < len) {
-						if (sz[pos + 1] == '\n') {
-							pos++;
-						}
-					}
-					startLine = pos + 1;
-				}
-				pos++;
+
+		Size size = measureText(font, param.text, sl_true);
+		Point pt = GraphicsUtil::calculateAlignPosition(Rectangle(param.x, param.y, param.x + param.width, param.y + param.height), size.x, size.y, param.alignment);
+		Alignment hAlign = param.alignment & Alignment::HorizontalMask;
+		String16 text = param.text.getString16();
+		sl_char16* sz = text.getData();
+		sl_size len = text.getLength();
+		if (!len) {
+			return;
+		}
+		sl_size startLine = 0;
+		sl_size pos = 0;
+		sl_real y = pt.y;
+		while (pos <= len) {
+			sl_char16 ch;
+			if (pos < len) {
+				ch = sz[pos];
+			} else {
+				ch = '\n';
 			}
-		} else {
-			((Canvas*)this)->drawText16(text, pt.x, pt.y, font, color);
+			if (ch == '\r' || ch == '\n') {
+				if (pos > startLine) {
+					String16 line(sz + startLine, pos - startLine);
+					Size s = measureText(font, line);
+					sl_real x;
+					if (hAlign == Alignment::Center) {
+						x = pt.x + (size.x - s.x) / 2;
+					} else if (hAlign == Alignment::Right) {
+						x = pt.x + size.x - s.x;
+					} else {
+						x = pt.x;
+					}
+					onDrawText(line, x, y, font, param);
+					y += s.y;
+				}
+				if (ch == '\r' && pos + 1 < len) {
+					if (sz[pos + 1] == '\n') {
+						pos++;
+					}
+				}
+				startLine = pos + 1;
+			}
+			pos++;
 		}
 	}
 	

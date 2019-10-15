@@ -47,8 +47,10 @@
 #if defined(SLIB_GRAPHICS_IS_CAIRO)
 #	if	defined(SLIB_PLATFORM_IS_TIZEN)
 #		include <cairo.h>
+#		include <pangocairo.h>
 #	else
 #		include "cairo/cairo.h"
+#		include "pango/pangocairo.h"
 #	endif
 #endif
 
@@ -90,13 +92,13 @@ namespace slib
 		static Ref<Canvas> createCanvas(CanvasType type, jobject canvas);
 		static jobject getCanvasHandle(Canvas* canvas);
 
-		static Ref<Drawable> createImageDrawable(jobject bitmap, sl_bool flagRecycleOnRelease = sl_true, Referable* ref = sl_null);
-		static jobject getImageDrawableHandle(Drawable* drawable);
+		static Ref<Bitmap> createBitmap(jobject bitmap, sl_bool flagRecycleOnRelease = sl_true, Referable* ref = sl_null);
+		static jobject getBitmapHandle(Bitmap* bitmap);
 
 #elif defined(SLIB_GRAPHICS_IS_QUARTZ)
 
 		static CGGradientRef getGradientBrushHandle(Brush* brush);
-		static CGImageRef getTextureBrushHandle(Brush* brush);
+		static CGImageRef getTextureBrushRetainedHandle(Brush* brush);
 
 		static CGPathRef getGraphicsPath(GraphicsPath* path);
 		static CTFontRef getCoreTextFont(Font* font);
@@ -108,8 +110,9 @@ namespace slib
 		static Ref<Drawable> createImageDrawable(CGImageRef image, sl_bool flagFlipped = sl_false);
 		static CGImageRef getImageDrawableHandle(Drawable* drawable);
 		
-		static Ref<Bitmap> createImageBitmap(CGImageRef image);
 		static CGContextRef getBitmapHandle(Bitmap* bitmap);
+
+		static Ref<Bitmap> createBitmapFromCGImage(CGImageRef image);
 
 #	if defined(__OBJC__)
 #		if defined(SLIB_PLATFORM_IS_MACOS)
@@ -125,10 +128,13 @@ namespace slib
 
 #elif defined(SLIB_GRAPHICS_IS_CAIRO)
 
-		static cairo_scaled_font_t* getCairoFont(Font* font);
+		static PangoFontDescription* getCairoFont(Font* font);
 
 		static Ref<Canvas> createCanvas(CanvasType type, cairo_t* graphics, sl_uint32 width, sl_uint32 height);
 		static cairo_t* getCanvasHandle(Canvas* canvas);
+
+		static Ref<Bitmap> createBitmap(cairo_surface_t* bitmap, sl_bool flagFreeOnRelease = sl_true, Referable* ref = sl_null);
+		static cairo_surface_t* getBitmapHandle(Bitmap* bitmap);
 
 		static void drawImage(Canvas* canvas, const Rectangle& rectDst, cairo_surface_t* image, const DrawParam& param);
 		static void drawImage(Canvas* canvas, const Rectangle& rectDst, cairo_surface_t* image, const Rectangle& rectSrc, const DrawParam& param);

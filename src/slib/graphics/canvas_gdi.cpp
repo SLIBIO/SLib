@@ -236,45 +236,6 @@ namespace slib
 					setMatrix(mat);
 				}
 
-				void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color) override
-				{
-					CanvasImpl::drawText16(text, x, y, font, color);
-				}
-				
-				void drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& _font, const Color& color) override
-				{
-					if (text.isNotEmpty()) {
-						Gdiplus::Graphics* graphics = m_graphics;
-						Ref<Font> font = _font;
-						if (font.isNull()) {
-							font = Font::getDefault();
-						}
-						if (font.isNotNull()) {
-							Gdiplus::Font* pf = GraphicsPlatform::getGdiplusFont(font.get());
-							if (pf) {
-								Gdiplus::StringFormat format(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsNoClip);
-								int a = color.a;
-								sl_real alpha = getAlpha();
-								if (alpha < 0.995f) {
-									a = (int)(a * alpha);
-									if (a < 0) {
-										a = 0;
-									}
-									if (a > 255) {
-										a = 255;
-									}
-								}
-								Gdiplus::SolidBrush brush(Gdiplus::Color((BYTE)a, color.r, color.g, color.b));
-								graphics->DrawString((const WCHAR*)(text.getData()), (INT)(text.getLength())
-									, pf
-									, Gdiplus::PointF(x, y + 1)
-									, Gdiplus::StringFormat::GenericTypographic()
-									, &brush);
-							}
-						}
-					}
-				}
-
 				void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& _pen) override
 				{
 					DRAW_PEN_BEGIN
@@ -409,6 +370,65 @@ namespace slib
 					}
 				}
 
+				void onDrawText(const StringParam& _text, sl_real x, sl_real y, const Ref<Font>& font, const DrawTextParam& param) override
+				{
+					String16 text = _text.getString16();
+					if (text.isNotEmpty()) {
+						Gdiplus::Graphics* graphics = m_graphics;
+						Gdiplus::Font* pf = GraphicsPlatform::getGdiplusFont(font.get());
+						if (pf) {
+							Gdiplus::StringFormat format(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsNoClip);
+							int a = param.color.a;
+							sl_real alpha = getAlpha();
+							if (alpha < 0.995f) {
+								a = (int)(a * alpha);
+								if (a < 0) {
+									a = 0;
+								}
+								if (a > 255) {
+									a = 255;
+								}
+							}
+							if (param.shadowOpacity > 0.0001f) {
+								Gdiplus::GraphicsPath path;
+								Gdiplus::FontFamily family;
+								pf->GetFamily(&family);
+								path.AddString((const WCHAR*)(text.getData()), (INT)(text.getLength()),
+									&family, pf->GetStyle(), pf->GetSize(),
+									Gdiplus::PointF((Gdiplus::REAL)(x), (Gdiplus::REAL)(y + 1)),
+									Gdiplus::StringFormat::GenericTypographic());
+								Gdiplus::GraphicsPath* pathShadow = path.Clone();
+								if (pathShadow) {
+									Gdiplus::GraphicsState state = graphics->Save();
+									Gdiplus::REAL tx = (Gdiplus::REAL)(param.shadowOffset.x);
+									Gdiplus::REAL ty = (Gdiplus::REAL)(param.shadowOffset.y);
+									graphics->TranslateTransform(tx, ty);
+									Color _shadowColor = param.shadowColor;
+									_shadowColor.multiplyAlpha((float)(param.shadowOpacity * alpha));
+									Gdiplus::Color shadowColor(_shadowColor.a, _shadowColor.r, _shadowColor.g, _shadowColor.b);
+									Gdiplus::SolidBrush brush(shadowColor);
+									Gdiplus::Pen pen(shadowColor, (Gdiplus::REAL)(param.shadowRadius * 2));
+									pen.SetLineCap(Gdiplus::LineCapRound, Gdiplus::LineCapRound, Gdiplus::DashCapRound);
+									pen.SetLineJoin(Gdiplus::LineJoinRound);
+									pathShadow->Widen(&pen);
+									graphics->FillPath(&brush, pathShadow);
+									graphics->Restore(state);
+									delete pathShadow;
+								}
+								Gdiplus::SolidBrush brushText(Gdiplus::Color((BYTE)a, param.color.r, param.color.g, param.color.b));
+								graphics->FillPath(&brushText, &path);
+							} else {
+								Gdiplus::SolidBrush brush(Gdiplus::Color((BYTE)a, param.color.r, param.color.g, param.color.b));
+								graphics->DrawString((const WCHAR*)(text.getData()), (INT)(text.getLength()),
+									pf,
+									Gdiplus::PointF((Gdiplus::REAL)(x), (Gdiplus::REAL)(y + 1)),
+									Gdiplus::StringFormat::GenericTypographic(),
+									&brush);
+							}
+						}
+					}
+				}
+
 				void _setAntiAlias(sl_bool flag) override
 				{
 					if (flag) {
@@ -490,15 +510,6 @@ namespace slib
 			pia = new Gdiplus::ImageAttributes();
 			if (pia) {
 				pia->SetColorMatrix(&cm);
-			}
-		}
-
-		if (param.tiled) {
-			if (!pia) {
-				pia = new Gdiplus::ImageAttributes();
-			}
-			if (pia) {
-				pia->SetWrapMode(Gdiplus::WrapModeTile);
 			}
 		}
 

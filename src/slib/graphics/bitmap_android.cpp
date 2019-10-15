@@ -47,8 +47,8 @@ namespace slib
 				SLIB_JNI_METHOD(read, "read", "(IIII[II)V");
 				SLIB_JNI_METHOD(write, "write", "(IIII[II)V");
 				SLIB_JNI_METHOD(getCanvas, "getCanvas", "()Lslib/platform/android/ui/Graphics;");
-				SLIB_JNI_METHOD(draw, "draw", "(Lslib/platform/android/ui/Graphics;FFFFIIIIFFI)V");
-				SLIB_JNI_METHOD(drawWithColorMatrix, "draw", "(Lslib/platform/android/ui/Graphics;FFFFIIIIFFIFFFFFFFFFFFFFFFFFFFF)V");
+				SLIB_JNI_METHOD(draw, "draw", "(Lslib/platform/android/ui/Graphics;FFFFIIIIFF)V");
+				SLIB_JNI_METHOD(drawWithColorMatrix, "draw", "(Lslib/platform/android/ui/Graphics;FFFFIIIIFFFFFFFFFFFFFFFFFFFFFF)V");
 				SLIB_JNI_STATIC_METHOD(getArrayBuffer, "getArrayBuffer", "()[I");
 				SLIB_JNI_STATIC_METHOD(returnArrayBuffer, "returnArrayBuffer", "([I)V");
 			SLIB_JNI_END_CLASS
@@ -344,10 +344,6 @@ namespace slib
 					if (param.useBlur) {
 						blur = (float)(param.blurRadius);
 					}
-					int tileMode = 0;
-					if (param.tiled) {
-						tileMode = 1;
-					}
 					if (param.useColorMatrix) {
 						const Color4f& cr = param.colorMatrix.red;
 						const Color4f& cg = param.colorMatrix.green;
@@ -357,7 +353,7 @@ namespace slib
 						JBitmap::drawWithColorMatrix.call(m_bitmap, jcanvas,
 							rectDst.left, rectDst.top, rectDst.right, rectDst.bottom,
 							(sl_int32)(rectSrc.left), (sl_int32)(rectSrc.top), (sl_int32)(rectSrc.right), (sl_int32)(rectSrc.bottom),
-							alpha, blur, tileMode,
+							alpha, blur,
 							cr.x, cr.y, cr.z, cr.w,
 							cg.x, cg.y, cg.z, cg.w,
 							cb.x, cb.y, cb.z, cb.w,
@@ -368,7 +364,7 @@ namespace slib
 						JBitmap::draw.call(m_bitmap, jcanvas,
 							rectDst.left, rectDst.top, rectDst.right, rectDst.bottom,
 							(sl_int32)(rectSrc.left), (sl_int32)(rectSrc.top), (sl_int32)(rectSrc.right), (sl_int32)(rectSrc.bottom),
-							alpha, blur, tileMode);
+							alpha, blur);
 					}
 				}
 			};
@@ -390,15 +386,15 @@ namespace slib
 		return BitmapImpl::load(mem, size);
 	}
 
-	Ref<Drawable> GraphicsPlatform::createImageDrawable(jobject bitmap, sl_bool flagFreeOnRelease, Referable* ref)
+	Ref<Bitmap> GraphicsPlatform::createBitmap(jobject bitmap, sl_bool flagFreeOnRelease, Referable* ref)
 	{
 		return BitmapImpl::create(bitmap, flagFreeOnRelease, ref);
 	}
 
-	jobject GraphicsPlatform::getImageDrawableHandle(Drawable* _drawable)
+	jobject GraphicsPlatform::getBitmapHandle(Bitmap* _bitmap)
 	{
-		if (BitmapImpl* drawable = CastInstance<BitmapImpl>(_drawable)) {
-			return drawable->m_bitmap;
+		if (BitmapImpl* bitmap = CastInstance<BitmapImpl>(_bitmap)) {
+			return bitmap->m_bitmap;
 		}
 		return 0;
 	}

@@ -77,7 +77,7 @@ namespace slib
 #if defined(SLIB_PLATFORM_IS_APPLE)
 		CGImageRef image = GraphicsPlatform::loadCGImageFromApp(path);
 		if (image) {
-			Ref<Bitmap> ret = GraphicsPlatform::createImageBitmap(image);
+			Ref<Bitmap> ret = GraphicsPlatform::createBitmapFromCGImage(image);
 			CGImageRelease(image);
 			return ret;
 		}

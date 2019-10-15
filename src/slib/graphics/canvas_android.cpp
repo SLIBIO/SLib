@@ -53,6 +53,7 @@ namespace slib
 				SLIB_JNI_METHOD(clipToPath, "clipToPath", "(Lslib/platform/android/ui/UiPath;)V");
 				SLIB_JNI_METHOD(concatMatrix, "concatMatrix", "(FFFFFFFFF)V");
 				SLIB_JNI_METHOD(drawText, "drawText", "(Ljava/lang/String;FFLslib/platform/android/ui/UiFont;I)V");
+				SLIB_JNI_METHOD(drawText2, "drawText", "(Ljava/lang/String;FFLslib/platform/android/ui/UiFont;IIFFF)V");
 				SLIB_JNI_METHOD(drawLine, "drawLine", "(FFFFLslib/platform/android/ui/UiPen;)V");
 				SLIB_JNI_METHOD(drawLines, "drawLines", "([FLslib/platform/android/ui/UiPen;)V");
 				SLIB_JNI_METHOD(drawArc, "drawArc", "(FFFFFFLslib/platform/android/ui/UiPen;)V");
@@ -133,21 +134,6 @@ namespace slib
 							(float)(matrix.m00), (float)(matrix.m10), (float)(matrix.m20),
 							(float)(matrix.m01), (float)(matrix.m11), (float)(matrix.m21),
 							(float)(matrix.m02), (float)(matrix.m12), (float)(matrix.m22));
-				}
-
-				void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& _font, const Color& color) override
-				{
-					if (text.isNotEmpty()) {
-						Ref<Font> font = _font;
-						if (font.isNull()) {
-							font = Font::getDefault();
-						}
-						jobject hFont = GraphicsPlatform::getNativeFont(font.get());
-						if (hFont) {
-							JniLocal<jstring> jtext = Jni::getJniString(text);
-							JGraphics::drawText.call(m_canvas, jtext.value, (float)x, (float)y, hFont, color.getARGB());
-						}
-					}
 				}
 
 				void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& _pen) override
@@ -293,6 +279,26 @@ namespace slib
 							JGraphics::drawPath.call(m_canvas
 									, hPath
 									, hPen, hBrush);
+						}
+					}
+				}
+
+				void onDrawText(const StringParam& _text, sl_real x, sl_real y, const Ref<Font>& font, const DrawTextParam& param) override
+				{
+					String16 text = _text.getString16();
+					if (text.isNotEmpty()) {
+						jobject hFont = GraphicsPlatform::getNativeFont(font.get());
+						if (hFont) {
+							JniLocal<jstring> jtext = Jni::getJniString(text);
+							sl_real shadowOpacity = param.shadowOpacity;
+							if (shadowOpacity > 0.0001f) {
+								Color shadowColor = param.shadowColor;
+								shadowColor.multiplyAlpha((float)shadowOpacity);
+								JGraphics::drawText2.call(m_canvas, jtext.value, (jfloat)x, (jfloat)y, hFont, (jint)(param.color.getARGB()),
+									(jint)(shadowColor.getARGB()), (jfloat)(param.shadowRadius), (jfloat)(param.shadowOffset.x), (jfloat)(param.shadowOffset.y));
+							} else {
+								JGraphics::drawText.call(m_canvas, jtext.value, (jfloat)x, (jfloat)y, hFont, (jint)(param.color.getARGB()));
+							}
 						}
 					}
 				}

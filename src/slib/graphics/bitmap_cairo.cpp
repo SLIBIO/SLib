@@ -43,31 +43,45 @@ namespace slib
 
 			public:
 				cairo_surface_t* m_bitmap;
+				sl_bool m_flagFreeOnRelease;
+				Ref<Referable> m_ref;
 
 			public:
 				BitmapImpl()
 				{
-					m_bitmap = sl_null;
 				}
 
 				~BitmapImpl()
 				{
-					if (m_bitmap) {
-						::cairo_surface_destroy(m_bitmap);
+					if (m_flagFreeOnRelease) {
+						cairo_surface_destroy(m_bitmap);
 					}
 				}
 
 			public:
+				static Ref<BitmapImpl> create(cairo_surface_t* bitmap, sl_bool flagFreeOnRelease, Referable* ref)
+				{
+					if (bitmap) {
+						Ref<BitmapImpl> ret = new BitmapImpl();
+						if (ret.isNotNull()) {
+							ret->m_bitmap = bitmap;
+							ret->m_flagFreeOnRelease = flagFreeOnRelease;
+							ret->m_ref = ref;
+							return ret;
+						}
+						if (flagFreeOnRelease) {
+							cairo_surface_destroy(bitmap);
+						}
+					}
+					return sl_null;
+				}
+
 				static Ref<BitmapImpl> create(sl_uint32 width, sl_uint32 height)
 				{
 					if (width > 0 && height > 0) {
-						cairo_surface_t* bitmap = ::cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
+						cairo_surface_t* bitmap = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
 						if (bitmap) {
-							Ref<BitmapImpl> ret = new BitmapImpl();
-							if (ret.isNotNull()) {
-								ret->m_bitmap = bitmap;
-								return ret;
-							}
+							return create(bitmap, sl_true, sl_null);
 						}
 					}
 					return sl_null;
@@ -75,12 +89,12 @@ namespace slib
 
 				sl_uint32 getBitmapWidth() override
 				{
-					return ::cairo_image_surface_get_width(m_bitmap);
+					return cairo_image_surface_get_width(m_bitmap);
 				}
 
 				sl_uint32 getBitmapHeight() override
 				{
-					return ::cairo_image_surface_get_height(m_bitmap);
+					return cairo_image_surface_get_height(m_bitmap);
 				}
 
 				sl_bool readPixels(sl_uint32 x, sl_uint32 y, BitmapData& _dst) override
@@ -108,10 +122,10 @@ namespace slib
 						return sl_true;
 					}
 
-					::cairo_surface_flush(m_bitmap);
+					cairo_surface_flush(m_bitmap);
 
-					int pitch = ::cairo_image_surface_get_stride(m_bitmap);
-					char* buf = (char*)(::cairo_image_surface_get_data(m_bitmap)) + pitch * y + (x << 2);
+					int pitch = cairo_image_surface_get_stride(m_bitmap);
+					char* buf = (char*)(cairo_image_surface_get_data(m_bitmap)) + pitch * y + (x << 2);
 
 					BitmapData src;
 					src.width = width;
@@ -150,8 +164,8 @@ namespace slib
 						return sl_true;
 					}
 
-					int pitch = ::cairo_image_surface_get_stride(m_bitmap);
-					char* buf = (char*)(::cairo_image_surface_get_data(m_bitmap)) + pitch * y + (x << 2);
+					int pitch = cairo_image_surface_get_stride(m_bitmap);
+					char* buf = (char*)(cairo_image_surface_get_data(m_bitmap)) + pitch * y + (x << 2);
 
 					BitmapData dst;
 					dst.width = width;
@@ -162,7 +176,7 @@ namespace slib
 
 					dst.copyPixelsFrom(src);
 
-					::cairo_surface_mark_dirty(m_bitmap);
+					cairo_surface_mark_dirty(m_bitmap);
 
 					return sl_true;
 
@@ -185,8 +199,8 @@ namespace slib
 						return sl_true;
 					}
 
-					int pitch = ::cairo_image_surface_get_stride(m_bitmap);
-					char* buf = (char*)(::cairo_image_surface_get_data(m_bitmap)) + pitch * y + (x << 2);
+					int pitch = cairo_image_surface_get_stride(m_bitmap);
+					char* buf = (char*)(cairo_image_surface_get_data(m_bitmap)) + pitch * y + (x << 2);
 
 					Color _color = color;
 					_color.convertNPAtoPA();
@@ -201,7 +215,7 @@ namespace slib
 						row += pitch;
 					}
 
-					::cairo_surface_mark_dirty(m_bitmap);
+					cairo_surface_mark_dirty(m_bitmap);
 
 					return sl_true;
 
@@ -209,7 +223,7 @@ namespace slib
 
 				Ref<Canvas> getCanvas() override
 				{
-					cairo_t* g = ::cairo_create(m_bitmap);
+					cairo_t* g = cairo_create(m_bitmap);
 					if (g) {
 						sl_uint32 w = getBitmapWidth();
 						sl_uint32 h = getBitmapHeight();
@@ -220,13 +234,13 @@ namespace slib
 
 				void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param) override
 				{
-					::cairo_surface_flush(m_bitmap);
+					cairo_surface_flush(m_bitmap);
 					GraphicsPlatform::drawImage(canvas, rectDst, m_bitmap, rectSrc, param);
 				}
 
 				void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param) override
 				{
-					::cairo_surface_flush(m_bitmap);
+					cairo_surface_flush(m_bitmap);
 					GraphicsPlatform::drawImage(canvas, rectDst, m_bitmap, param);
 				}
 
@@ -247,6 +261,22 @@ namespace slib
 	Ref<Bitmap> Bitmap::loadFromMemory(const void* mem, sl_size size)
 	{
 		return Bitmap::create(Image::loadFromMemory(mem, size));
+	}
+
+	Ref<Bitmap> GraphicsPlatform::createBitmap(cairo_surface_t* bitmap, sl_bool flagFreeOnRelease, Referable* ref)
+	{
+		if (!bitmap) {
+			return sl_null;
+		}
+		return Ref<Bitmap>::from(BitmapImpl::create(bitmap, flagFreeOnRelease, ref));
+	}
+	
+	cairo_surface_t* GraphicsPlatform::getBitmapHandle(Bitmap* _bitmap)
+	{
+		if (BitmapImpl* bitmap = CastInstance<BitmapImpl>(_bitmap)) {
+			return bitmap->m_bitmap;
+		}
+		return sl_null;
 	}
 
 }

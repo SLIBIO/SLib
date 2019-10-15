@@ -30,6 +30,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
@@ -175,7 +176,7 @@ public class UiBitmap {
 	void draw(Graphics graphics,
 			float dx1, float dy1, float dx2, float dy2,
 			int sx1, int sy1, int sx2, int sy2, 
-			float _alpha, float blur, int tileMode,
+			float _alpha, float blur,
 			float[] cm) 
 	{
 		try {
@@ -186,7 +187,7 @@ public class UiBitmap {
 			Canvas canvas = graphics.getCanvas();
 			RectF rd = new RectF(dx1, dy1, dx2, dy2);
 			Rect rs = new Rect(sx1, sy1, sx2, sy2);
-			if (alpha < 255 || blur > 0.5f || tileMode != 0) {
+			if (alpha < 255 || cm != null || blur > 0.5f) {
 				Paint paint = new Paint();
 				if (alpha < 255) {
 					paint.setAlpha(alpha);				
@@ -195,13 +196,10 @@ public class UiBitmap {
 					ColorMatrixColorFilter cf = new ColorMatrixColorFilter(cm);
 					paint.setColorFilter(cf);
 				}
-				if (tileMode != 0) {
-					BitmapShader bs = new BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
-					paint.setShader(bs);
-					canvas.drawRect(rd, paint);
-				} else {
-					canvas.drawBitmap(bitmap, rs, rd, paint);
+				if (blur > 0.5f) {
+					paint.setMaskFilter(new BlurMaskFilter(blur, BlurMaskFilter.Blur.SOLID));
 				}
+				canvas.drawBitmap(bitmap, rs, rd, paint);
 			} else {
 				canvas.drawBitmap(bitmap, rs, rd, null);
 			}
@@ -213,15 +211,15 @@ public class UiBitmap {
 	public void draw(Graphics graphics,
 			float dx1, float dy1, float dx2, float dy2,
 			int sx1, int sy1, int sx2, int sy2,
-			float alpha, float blur, int tileMode)
+			float alpha, float blur)
 	{
-		draw(graphics, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, alpha, blur, tileMode, null);
+		draw(graphics, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, alpha, blur, null);
 	}
 
 	public void draw(Graphics graphics,
 			float dx1, float dy1, float dx2, float dy2,
 			int sx1, int sy1, int sx2, int sy2,
-			float alpha, float blur, int tileMode,
+			float alpha, float blur,
 			float crx, float cry, float crz, float crw,
 			float cgx, float cgy, float cgz, float cgw,
 			float cbx, float cby, float cbz, float cbw,
@@ -234,13 +232,13 @@ public class UiBitmap {
 			cbx, cby, cbz, cbw, ccz * 255,
 			cax, cay, caz, caw, ccw * 255,
 		};
-		draw(graphics, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, alpha, blur, tileMode, f);
+		draw(graphics, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, alpha, blur, f);
 	}
 	
 	static void drawPixels(Graphics graphics,
 			float dx1, float dy1, float dx2, float dy2,
 			int[] pixels, int stride, int sw, int sh,
-			float _alpha, float blur, int tileMode,
+			float _alpha, float blur,
 			float[] cm) 
 	{
 		try {
@@ -254,7 +252,7 @@ public class UiBitmap {
 			Canvas canvas = graphics.getCanvas();
 			canvas.save();
 			canvas.scale((dx2 - dx1) / sw, (dy2 - dy1) / sh, dx1, dy1);
-			if (alpha < 255 || cm != null) {
+			if (alpha < 255 || cm != null || blur > 0.5f) {
 				Paint paint = new Paint();
 				if (alpha < 255) {
 					paint.setAlpha(alpha);			
@@ -262,6 +260,9 @@ public class UiBitmap {
 				if (cm != null) {
 					ColorMatrixColorFilter cf = new ColorMatrixColorFilter(cm);
 					paint.setColorFilter(cf);
+				}
+				if (blur > 0.5f) {
+					paint.setMaskFilter(new BlurMaskFilter(blur, BlurMaskFilter.Blur.SOLID));
 				}
 				canvas.drawBitmap(pixels, 0, stride, dx1, dy1, sw, sh, true, paint);
 			} else {
@@ -276,15 +277,15 @@ public class UiBitmap {
 	public static void drawPixels(Graphics graphics,
 			float dx1, float dy1, float dx2, float dy2,
 			int[] pixels, int stride, int sw, int sh,
-			float alpha, float blur, int tileMode) 
+			float alpha, float blur)
 	{
-		drawPixels(graphics, dx1, dy1, dx2, dy2, pixels, stride, sw, sh, alpha, blur, tileMode, null);
+		drawPixels(graphics, dx1, dy1, dx2, dy2, pixels, stride, sw, sh, alpha, blur, null);
 	}
 	
 	public static void drawPixels(Graphics graphics,
 			float dx1, float dy1, float dx2, float dy2,
 			int[] pixels, int stride, int sw, int sh,
-			float alpha, float blur, int tileMode,
+			float alpha, float blur,
 			float crx, float cry, float crz, float crw,
 			float cgx, float cgy, float cgz, float cgw,
 			float cbx, float cby, float cbz, float cbw,
@@ -297,7 +298,7 @@ public class UiBitmap {
 			cbx, cby, cbz, cbw, ccz * 255,
 			cax, cay, caz, caw, ccw * 255,
 		};
-		drawPixels(graphics, dx1, dy1, dx2, dy2, pixels, stride, sw, sh, alpha, blur, tileMode, f);
+		drawPixels(graphics, dx1, dy1, dx2, dy2, pixels, stride, sw, sh, alpha, blur, f);
 	}
 	
 	static int[] arrayBufferForUi;

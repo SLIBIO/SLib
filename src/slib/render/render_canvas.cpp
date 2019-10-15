@@ -581,204 +581,28 @@ namespace slib
 		}
 	}
 
-	Size RenderCanvas::measureText(const Ref<Font>& font, const String& text, sl_bool flagMultiLine)
+	Size RenderCanvas::measureText(const Ref<Font>& font, const StringParam& text, sl_bool flagMultiLine)
 	{
-		return measureRenderingText(font, text, flagMultiLine);
+		return measureRenderingText(font, text.getString16(), flagMultiLine);
 	}
 	
-	Size RenderCanvas::measureText16(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine)
-	{
-		return measureRenderingText(font, text, flagMultiLine);
-	}
-	
-	Size RenderCanvas::measureRenderingText(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine)
+	Size RenderCanvas::measureRenderingText(const Ref<Font>& _font, const String16& text, sl_bool flagMultiLine)
 	{
 		if (text.isEmpty()) {
 			return Size::zero();
 		}
-		if (font.isNull()) {
-			return Size::zero();
-		}
-		
-		Ref<FontAtlas> fa = font->getSharedAtlas();
-		if (fa.isNull()) {
-			return Size::zero();
-		}
-		
-		return fa->measureText(text, flagMultiLine);
-		
-	}
-	
-	void RenderCanvas::drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color)
-	{
-		RenderCanvas::drawText16(text, x, y, font, color);
-	}
-	
-	void RenderCanvas::drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& _font, const Color& _color)
-	{
-		if (text.isEmpty()) {
-			return;
-		}
-		
 		Ref<Font> font = _font;
 		if (font.isNull()) {
 			font = Font::getDefault();
 			if (font.isNull()) {
-				return;
+				return Size::zero();
 			}
 		}
-		
-		sl_char16* arrChar = text.getData();
-		sl_size len = text.getLength();
-		sl_real fontHeight = font->getFontHeight();
-		sl_bool fontItalic = font->isItalic();
-		
 		Ref<FontAtlas> fa = font->getSharedAtlas();
 		if (fa.isNull()) {
-			return;
+			return Size::zero();
 		}
-		
-		SharedContext* shared = GetSharedContext();
-		if (!shared) {
-			return;
-		}
-		
-		RenderCanvasState* state = m_state.get();
-		if (state->flagClipRect) {
-			if (state->clipRect.top >= y + fontHeight || state->clipRect.bottom <= y || state->clipRect.right <= x) {
-				return;
-			}
-		}
-		
-		RenderCanvasProgramParam pp;
-		pp.prepare(state, !fontItalic);
-		pp.flagUseTexture = sl_true;
-		
-		RenderProgramScope<RenderCanvasProgramState> scope;
-		sl_bool flagBeginScope = sl_false;
-		Ref<Texture> textureBefore;
-		
-		FontAtlasChar fac;
-		Color4f color = _color;
-		sl_real fx = x;
-		
-		for (sl_size i = 0; i < len; i++) {
-			
-			sl_char32 ch = arrChar[i];
-			if (ch >= 0xD800 && ch < 0xE000) {
-				if (i + 1 < len) {
-					sl_uint32 ch1 = (sl_uint32)((sl_uint16)arrChar[++i]);
-					if (ch < 0xDC00 && ch1 >= 0xDC00 && ch1 < 0xE000) {
-						ch = (sl_char32)(((ch - 0xD800) << 10) | (ch1 - 0xDC00)) + 0x10000;
-					} else {
-						ch = 0;
-					}
-				} else {
-					ch = 0;
-				}
-			}
-			
-			if (ch && fa->getChar(ch, fac)) {
-				
-				sl_real fw = fac.fontWidth;
-				sl_real fh = fac.fontHeight;
-				sl_real fxn = fx + fw;
-				
-				if (fac.bitmap.isNotNull()) {
-					
-					Rectangle rcDst;
-					rcDst.left = fx;
-					rcDst.right = fxn;
-					rcDst.top = y + (fontHeight - fh);
-					rcDst.bottom  = rcDst.top + fh;
-					
-					Rectangle rcClip;
-					
-					sl_bool flagIgnore = sl_false;
-					sl_bool flagClip = sl_false;
-					
-					if (state->flagClipRect) {
-						if (state->clipRect.right <= fx) {
-							return;
-						}
-						if (state->clipRect.intersectRectangle(rcDst, &rcClip)) {
-							if (!fontItalic) {
-								if (!(state->clipRect.containsRectangle(rcDst))) {
-									flagClip = sl_true;
-								}
-							}
-						} else {
-							flagIgnore = sl_true;
-						}
-					}
-					if (!flagIgnore) {
-						Ref<Texture> texture = Texture::getBitmapRenderingCache(fac.bitmap);
-						if (texture.isNotNull()) {
-							sl_real sw = (sl_real)(texture->getWidth());
-							sl_real sh = (sl_real)(texture->getHeight());
-							if (sw > SLIB_EPSILON && sh > SLIB_EPSILON) {
-								if (!flagBeginScope) {
-									Ref<RenderProgram> program = shared->getProgram(pp);
-									if (!(scope.begin(m_engine.get(), program))) {
-										return;
-									}
-									scope->setColor(Color4f(color.x, color.y, color.z, color.w * getAlpha()));
-									flagBeginScope = sl_true;
-								}
-								
-								Rectangle rcSrc;
-								rcSrc.left = (sl_real)(fac.region.left) / sw;
-								rcSrc.top = (sl_real)(fac.region.top) / sh;
-								rcSrc.right = (sl_real)(fac.region.right) / sw;
-								rcSrc.bottom = (sl_real)(fac.region.bottom) / sh;
-								if (flagClip) {
-									rcSrc = GraphicsUtil::transformRectangle(rcSrc, rcDst, rcClip);
-									rcDst = rcClip;
-								}
-								Matrix3 mat;
-								if (fontItalic) {
-									float ratio = 0.2f;
-									mat.m00 = fw; mat.m10 = -ratio * fh; mat.m20 = ratio * fh + rcDst.left;
-									mat.m01 = 0; mat.m11 = fh; mat.m21 = rcDst.top;
-									mat.m02 = 0; mat.m12 = 0; mat.m22 = 1;
-								} else {
-									mat.m00 = rcDst.getWidth(); mat.m10 = 0; mat.m20 = rcDst.left;
-									mat.m01 = 0; mat.m11 = rcDst.getHeight(); mat.m21 = rcDst.top;
-									mat.m02 = 0; mat.m12 = 0; mat.m22 = 1;
-								}
-								pp.applyToProgramState(scope.getState(), mat);
-								mat *= state->matrix;
-								mat *= m_matViewport;
-								scope->setTransform(mat);
-								Ref<TextureInstance> textureInstance = m_engine->linkTexture(texture);
-								if (textureBefore != texture || (textureInstance.isNotNull() && textureInstance->_isUpdated())) {
-									scope->setTexture(texture);
-									textureBefore = texture;
-								}
-								scope->setRectSrc(Vector4(rcSrc.left, rcSrc.top, rcSrc.getWidth(), rcSrc.getHeight()));
-								m_engine->drawPrimitive(4, shared->vbRectangle, PrimitiveType::TriangleStrip);
-							}
-						}
-					}
-				}
-				fx = fxn;
-			}
-		}
-		
-		if (font->isStrikeout() || font->isUnderline()) {
-			Ref<Pen> pen = Pen::createSolidPen(1, _color);
-			FontMetrics fm;
-			font->getFontMetrics(fm);
-			if (font->isUnderline()) {
-				sl_real yLine = y + fm.leading + fm.ascent;
-				drawLine(Point(x, yLine), Point(fx, yLine), pen);
-			}
-			if (font->isStrikeout()) {
-				sl_real yLine = y + fm.leading + fm.ascent / 2;
-				drawLine(Point(x, yLine), Point(fx, yLine), pen);
-			}
-		}
-		
+		return fa->measureText(text, flagMultiLine);
 	}
 	
 	void RenderCanvas::drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& pen)
@@ -1177,6 +1001,166 @@ namespace slib
 			return;
 		}
 		drawTexture(rectDst, texture, rectSrc, param, Color4f(1, 1, 1, 1));
+	}
+	
+	void RenderCanvas::onDrawText(const StringParam& _text, sl_real x, sl_real y, const Ref<Font>& font, const DrawTextParam& param)
+	{
+		String16 text = _text.getString16();
+		if (text.isEmpty()) {
+			return;
+		}
+		
+		sl_char16* arrChar = text.getData();
+		sl_size len = text.getLength();
+		sl_real fontHeight = font->getFontHeight();
+		sl_bool fontItalic = font->isItalic();
+		
+		Ref<FontAtlas> fa = font->getSharedAtlas();
+		if (fa.isNull()) {
+			return;
+		}
+		
+		SharedContext* shared = GetSharedContext();
+		if (!shared) {
+			return;
+		}
+		
+		RenderCanvasState* state = m_state.get();
+		if (state->flagClipRect) {
+			if (state->clipRect.top >= y + fontHeight || state->clipRect.bottom <= y || state->clipRect.right <= x) {
+				return;
+			}
+		}
+		
+		RenderCanvasProgramParam pp;
+		pp.prepare(state, !fontItalic);
+		pp.flagUseTexture = sl_true;
+		
+		RenderProgramScope<RenderCanvasProgramState> scope;
+		sl_bool flagBeginScope = sl_false;
+		Ref<Texture> textureBefore;
+		
+		FontAtlasChar fac;
+		Color4f color = param.color;
+		sl_real fx = x;
+		
+		for (sl_size i = 0; i < len; i++) {
+			
+			sl_char32 ch = arrChar[i];
+			if (ch >= 0xD800 && ch < 0xE000) {
+				if (i + 1 < len) {
+					sl_uint32 ch1 = (sl_uint32)((sl_uint16)arrChar[++i]);
+					if (ch < 0xDC00 && ch1 >= 0xDC00 && ch1 < 0xE000) {
+						ch = (sl_char32)(((ch - 0xD800) << 10) | (ch1 - 0xDC00)) + 0x10000;
+					} else {
+						ch = 0;
+					}
+				} else {
+					ch = 0;
+				}
+			}
+			
+			if (ch && fa->getChar(ch, fac)) {
+				
+				sl_real fw = fac.fontWidth;
+				sl_real fh = fac.fontHeight;
+				sl_real fxn = fx + fw;
+				
+				if (fac.bitmap.isNotNull()) {
+					
+					Rectangle rcDst;
+					rcDst.left = fx;
+					rcDst.right = fxn;
+					rcDst.top = y + (fontHeight - fh);
+					rcDst.bottom  = rcDst.top + fh;
+					
+					Rectangle rcClip;
+					
+					sl_bool flagIgnore = sl_false;
+					sl_bool flagClip = sl_false;
+					
+					if (state->flagClipRect) {
+						if (state->clipRect.right <= fx) {
+							return;
+						}
+						if (state->clipRect.intersectRectangle(rcDst, &rcClip)) {
+							if (!fontItalic) {
+								if (!(state->clipRect.containsRectangle(rcDst))) {
+									flagClip = sl_true;
+								}
+							}
+						} else {
+							flagIgnore = sl_true;
+						}
+					}
+					if (!flagIgnore) {
+						Ref<Texture> texture = Texture::getBitmapRenderingCache(fac.bitmap);
+						if (texture.isNotNull()) {
+							sl_real sw = (sl_real)(texture->getWidth());
+							sl_real sh = (sl_real)(texture->getHeight());
+							if (sw > SLIB_EPSILON && sh > SLIB_EPSILON) {
+								if (!flagBeginScope) {
+									Ref<RenderProgram> program = shared->getProgram(pp);
+									if (!(scope.begin(m_engine.get(), program))) {
+										return;
+									}
+									scope->setColor(Color4f(color.x, color.y, color.z, color.w * getAlpha()));
+									flagBeginScope = sl_true;
+								}
+								
+								Rectangle rcSrc;
+								rcSrc.left = (sl_real)(fac.region.left) / sw;
+								rcSrc.top = (sl_real)(fac.region.top) / sh;
+								rcSrc.right = (sl_real)(fac.region.right) / sw;
+								rcSrc.bottom = (sl_real)(fac.region.bottom) / sh;
+								if (flagClip) {
+									rcSrc = GraphicsUtil::transformRectangle(rcSrc, rcDst, rcClip);
+									rcDst = rcClip;
+								}
+								Matrix3 mat;
+								if (fontItalic) {
+									float ratio = 0.2f;
+									mat.m00 = fw; mat.m10 = -ratio * fh; mat.m20 = ratio * fh + rcDst.left;
+									mat.m01 = 0; mat.m11 = fh; mat.m21 = rcDst.top;
+									mat.m02 = 0; mat.m12 = 0; mat.m22 = 1;
+								} else {
+									mat.m00 = rcDst.getWidth(); mat.m10 = 0; mat.m20 = rcDst.left;
+									mat.m01 = 0; mat.m11 = rcDst.getHeight(); mat.m21 = rcDst.top;
+									mat.m02 = 0; mat.m12 = 0; mat.m22 = 1;
+								}
+								pp.applyToProgramState(scope.getState(), mat);
+								mat *= state->matrix;
+								mat *= m_matViewport;
+								scope->setTransform(mat);
+								Ref<TextureInstance> textureInstance = m_engine->linkTexture(texture);
+								if (textureBefore != texture || (textureInstance.isNotNull() && textureInstance->_isUpdated())) {
+									scope->setTexture(texture);
+									textureBefore = texture;
+								}
+								scope->setRectSrc(Vector4(rcSrc.left, rcSrc.top, rcSrc.getWidth(), rcSrc.getHeight()));
+								m_engine->drawPrimitive(4, shared->vbRectangle, PrimitiveType::TriangleStrip);
+							}
+						}
+					}
+				}
+				fx = fxn;
+			}
+		}
+		
+		if (font->isStrikeout() || font->isUnderline()) {
+			Ref<Pen> pen = Pen::createSolidPen(1, param.color);
+			FontMetrics fm;
+			font->getFontMetrics(fm);
+			if (font->isUnderline()) {
+				sl_real yLine = y + fm.leading + fm.ascent;
+				drawLine(Point(x, yLine), Point(fx, yLine), pen);
+			}
+			if (font->isStrikeout()) {
+				sl_real yLine = y + fm.leading + fm.ascent / 2;
+				drawLine(Point(x, yLine), Point(fx, yLine), pen);
+			}
+		}
+		
 	}
 	
 	void RenderCanvas::onDraw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param)

@@ -47,6 +47,32 @@ namespace slib
 		Render = 3
 	};
 	
+	class DrawTextParam
+	{
+	public:
+		StringParam text;
+		Ref<Font> font;
+		Color color;
+		Alignment alignment;
+		sl_bool flagMultiLine;
+		
+		sl_real x;
+		sl_real y;
+		sl_real width;
+		sl_real height;
+		
+		sl_real shadowOpacity;
+		sl_real shadowRadius;
+		Color shadowColor;
+		Point shadowOffset;
+		
+	public:
+		DrawTextParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DrawTextParam)
+		
+	};
+	
 	class Image;
 	
 	class SLIB_EXPORT Canvas : public Object
@@ -119,17 +145,15 @@ namespace slib
 		virtual void scale(sl_real sx, sl_real sy);
 
 	
-		virtual Size measureText(const Ref<Font>& font, const String& text, sl_bool flagMultiLine = sl_false) = 0;
+		virtual Size measureText(const Ref<Font>& font, const StringParam& text, sl_bool flagMultiLine = sl_false) = 0;
+		
+		virtual void drawText(const DrawTextParam& param) = 0;
 
-		virtual Size measureText16(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine = sl_false) = 0;
+		void drawText(const StringParam& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color);
 
-		virtual void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color) = 0;
+		void drawText(const StringParam& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color, const Alignment& alignment, sl_bool flagMultiLine = sl_false);
 
-		virtual void drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color);
-
-		virtual void drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, const Alignment& alignment, sl_bool flagMultiLine = sl_false) = 0;
-
-		virtual void drawText16(const String16& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, const Alignment& alignment, sl_bool flagMultiLine = sl_false) = 0;
+		void drawText(const StringParam& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, const Alignment& alignment, sl_bool flagMultiLine = sl_false);
 
 
 		virtual void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& pen) = 0;
@@ -261,7 +285,14 @@ namespace slib
 		void fillPath(const Ref<GraphicsPath>& path, const Ref<Brush>& brush);
 
 		void fillPath(const Ref<GraphicsPath>& path, const Color& color);
+		
+		
+		void drawShadowRectangle(sl_real x, sl_real y, sl_real width, sl_real height, const Color& color, sl_real shadowRadius);
 
+		void drawShadowRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real roundRadius, const Color& color, sl_real shadowRadius);
+
+		void drawShadowCircle(sl_real centerX, sl_real centerY, sl_real circleRadius, const Color& color, sl_real shadowRadius);
+		
 
 		virtual void draw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param) = 0;
 
@@ -293,6 +324,9 @@ namespace slib
 		virtual Ref<Drawable> createDrawableCacheForImage(const Ref<Image>& image) = 0;
 		
 	protected:
+		// ignores `text`, `font`, `flagMultiLine`, `alignment`, `x`, `y`, `width` and `height`
+		virtual void onDrawText(const StringParam& text, sl_real x, sl_real y, const Ref<Font>& font, const DrawTextParam& param) = 0;
+		
 		virtual void onDraw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param) = 0;
 
 		virtual void onDrawAll(const Rectangle& rectDst, const Ref<Drawable>& src, const DrawParam& param) = 0;
@@ -330,16 +364,10 @@ namespace slib
 		void clipToEllipse(const Rectangle& rect) override;
 		
 		using Canvas::measureText;
-		Size measureText(const Ref<Font>& font, const String& text, sl_bool flagMultiLine = sl_false) override;
-		
-		using Canvas::measureText16;
-		Size measureText16(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine = sl_false) override;
+		Size measureText(const Ref<Font>& font, const StringParam& text, sl_bool flagMultiLine = sl_false) override;
 		
 		using Canvas::drawText;
-		void drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, const Alignment& alignment, sl_bool flagMultiLine = sl_false) override;
-		
-		using Canvas::drawText16;
-		void drawText16(const String16& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, const Alignment& alignment, sl_bool flagMultiLine = sl_false) override;
+		void drawText(const DrawTextParam& param) override;
 
 		using Canvas::drawRectangle;
 		void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Color& fillColor) override;

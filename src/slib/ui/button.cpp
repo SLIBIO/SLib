@@ -776,6 +776,13 @@ namespace slib
 			View::onDrawBorder(canvas);
 		}
 	}
+	
+	void Button::onDrawShadow(Canvas* canvas)
+	{
+		if (getCurrentButtonBackground().isNotNull()) {
+			drawShadow(canvas);
+		}
+	}
 
 	void Button::onUpdateLayout()
 	{
@@ -800,6 +807,15 @@ namespace slib
 			}
 		}
 		UISize size = measureLayoutContentSize(flagHorizontal ? 0 : getLayoutWidth(), flagVertical ? 0 : getLayoutHeight());
+		if (getChildrenCount()) {
+			UISize sizeLayout = measureLayoutWrappingSize(flagHorizontal, flagVertical);
+			if (sizeLayout.x > size.x) {
+				size.x = sizeLayout.x;
+			}
+			if (sizeLayout.y > size.y) {
+				size.y = sizeLayout.y;
+			}
+		}
 		if (flagHorizontal) {
 			setLayoutWidth(size.x + getPaddingLeft() + getPaddingRight());
 		}
@@ -1089,15 +1105,24 @@ namespace slib
 			}
 		}
 		if (text.isNotEmpty() && rcText.getWidth() > 0 && rcText.getHeight() > 0) {
-			rcText.left += pt.x;
-			rcText.top += pt.y;
-			rcText.right += pt.x;
-			rcText.bottom += pt.y;
-			if (m_flagMultiLine) {
-				canvas->drawText(text, rcText, getFont(), textColor, m_textAlignment, sl_true);
-			} else {
-				canvas->drawText(text, (sl_real)(rcText.left), (sl_real)(rcText.top), getFont(), textColor);
+			DrawTextParam param;
+			param.text = text;
+			param.font = getFont();
+			param.x = (sl_real)(rcText.left + pt.x);
+			param.y = (sl_real)(rcText.top + pt.y);
+			param.width = (sl_real)(rcText.getWidth());
+			param.height = (sl_real)(rcText.getHeight());
+			param.color = textColor;
+			param.alignment = m_textAlignment;
+			param.flagMultiLine = m_flagMultiLine;
+			sl_real shadowOpacity = getShadowOpacity();
+			if (shadowOpacity > 0 && getCurrentButtonBackground().isNull()) {
+				param.shadowOpacity = shadowOpacity;
+				param.shadowRadius = (sl_real)(getShadowRadius());
+				param.shadowColor = getShadowColor();
+				param.shadowOffset = getShadowOffset();
 			}
+			canvas->drawText(param);
 		}
 	}
 	
@@ -1125,6 +1150,33 @@ namespace slib
 			}
 		}
 		return sl_null;
+	}
+	
+	Ref<Drawable> Button::getCurrentButtonBackground()
+	{
+		ButtonCategoryProperties& params = m_categories[m_category].properties[(int)m_state];
+		if (params.background.isNotNull()) {
+			return params.background;
+		}
+		Ref<DrawAttributes>& attrs = m_drawAttrs;
+		if (attrs.isNull()) {
+			return sl_null;
+		}
+		switch (m_state) {
+			case ButtonState::Hover:
+				if (attrs->backgroundHover.isNotNull()) {
+					return attrs->backgroundHover;
+				}
+				break;
+			case ButtonState::Pressed:
+				if (attrs->backgroundPressed.isNotNull()) {
+					return attrs->backgroundPressed;
+				}
+				break;
+			default:
+				break;
+		}
+		return attrs->background;
 	}
 
 	void Button::_invalidateButtonState()

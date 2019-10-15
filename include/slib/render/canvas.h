@@ -115,18 +115,9 @@ namespace slib
 		void translate(sl_real dx, sl_real dy) override;
 		
 		using Canvas::measureText;
-		Size measureText(const Ref<Font>& font, const String& text, sl_bool flagMultiLine = sl_false) override;
-		
-		using Canvas::measureText16;
-		Size measureText16(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine = sl_false) override;
+		Size measureText(const Ref<Font>& font, const StringParam& text, sl_bool flagMultiLine = sl_false) override;
 		
 		static Size measureRenderingText(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine = sl_false);
-		
-		using Canvas::drawText;
-		void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color) override;
-		
-		using Canvas::drawText16;
-		void drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color) override;
 		
 		using Canvas::drawLine;
 		void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& pen) override;
@@ -189,8 +180,9 @@ namespace slib
 		
 		void drawRectangle(const Rectangle& rect, RenderProgramState2D_Position* programState, const DrawParam& param);
 		
-		
 	protected:
+		void onDrawText(const StringParam& text, sl_real x, sl_real y, const Ref<Font>& font, const DrawTextParam& param) override;
+		
 		void onDraw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param) override;
 		
 		void onDrawAll(const Rectangle& rectDst, const Ref<Drawable>& src, const DrawParam& param) override;

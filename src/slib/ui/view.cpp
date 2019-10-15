@@ -1317,21 +1317,21 @@ namespace slib
 	void View::updateAndInvalidateBoundsInParent(UIUpdateMode mode)
 	{
 		if (!SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
-			m_boundsInParent = convertCoordinateToParent(getBounds());
+			m_boundsInParent = convertCoordinateToParent(getBoundsIncludingShadow());
 			return;
 		}
 		Ref<View> parent = m_parent;
 		if (parent.isNull() || isInstance()) {
-			m_boundsInParent = convertCoordinateToParent(getBounds());
+			m_boundsInParent = convertCoordinateToParent(getBoundsIncludingShadow());
 			return;
 		}
 		UIRect boundsOld = m_boundsInParent;
 		if (Math::isAlmostZero(boundsOld.getWidth()) || Math::isAlmostZero(boundsOld.getHeight())) {
-			m_boundsInParent = convertCoordinateToParent(getBounds());
+			m_boundsInParent = convertCoordinateToParent(getBoundsIncludingShadow());
 			parent->invalidate(m_boundsInParent, mode);
 			return;
 		}
-		UIRect boundsNew = convertCoordinateToParent(getBounds());
+		UIRect boundsNew = convertCoordinateToParent(getBoundsIncludingShadow());
 		boundsNew.left -= 2;
 		boundsNew.top -= 2;
 		boundsNew.right += 2;
@@ -1638,6 +1638,42 @@ namespace slib
 		ret.bottom -= padding.bottom;
 		ret.fixSizeError();
 		return ret;
+	}
+	
+	UIRect View::getBoundsIncludingShadow()
+	{
+		if (m_instance.isNull()) {
+			Ref<DrawAttributes>& drawAttrs = m_drawAttrs;
+			if (drawAttrs.isNotNull()) {
+				if (drawAttrs->shadowOpacity > 0) {
+					UIRect rect;
+					sl_ui_pos left = (sl_ui_pos)(Math::floor(-drawAttrs->shadowRadius + drawAttrs->shadowOffset.x));
+					if (left > 0) {
+						rect.left = 0;
+					} else {
+						rect.left = left;
+					}
+					sl_ui_pos top = (sl_ui_pos)(Math::floor(-drawAttrs->shadowRadius + drawAttrs->shadowOffset.y));
+					if (top > 0) {
+						rect.top = 0;
+					} else {
+						rect.top = left;
+					}
+					rect.right = m_frame.getWidth();
+					sl_ui_pos right = (sl_ui_pos)(Math::ceil(drawAttrs->shadowRadius + drawAttrs->shadowOffset.x));
+					if (right > 0) {
+						rect.right += right;
+					}
+					rect.bottom = m_frame.getHeight();
+					sl_ui_pos bottom = (sl_ui_pos)(Math::ceil(drawAttrs->shadowRadius + drawAttrs->shadowOffset.y));
+					if (bottom > 0) {
+						rect.bottom += bottom;
+					}
+					return rect;
+				}
+			}
+		}
+		return UIRect(0, 0, m_frame.getWidth(), m_frame.getHeight());
 	}
 
 	UIRect View::getBoundsInParent()
@@ -5092,12 +5128,14 @@ namespace slib
 		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->boundRadius = radius;
-			if (radius.x > SLIB_EPSILON && radius.y > SLIB_EPSILON) {
-				attrs->boundShape = BoundShape::RoundRect;
-			} else {
-				attrs->boundShape = BoundShape::Rectangle;
+			if (attrs->boundShape != BoundShape::Ellipse && attrs->boundShape != BoundShape::Path) {
+				if (radius.x > SLIB_EPSILON && radius.y > SLIB_EPSILON) {
+					attrs->boundShape = BoundShape::RoundRect;
+				} else {
+					attrs->boundShape = BoundShape::Rectangle;
+				}
+				invalidate(mode);
 			}
-			invalidate(mode);
 		}
 	}
 
@@ -5181,12 +5219,14 @@ namespace slib
 		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->contentRadius = radius;
-			if (radius.x > SLIB_EPSILON && radius.y > SLIB_EPSILON) {
-				attrs->contentShape = BoundShape::RoundRect;
-			} else {
-				attrs->contentShape = BoundShape::Rectangle;
+			if (attrs->contentShape != BoundShape::Ellipse && attrs->contentShape != BoundShape::Path) {
+				if (radius.x > SLIB_EPSILON && radius.y > SLIB_EPSILON) {
+					attrs->contentShape = BoundShape::RoundRect;
+				} else {
+					attrs->contentShape = BoundShape::Rectangle;
+				}
+				invalidate(mode);
 			}
-			invalidate(mode);
 		}
 	}
 	
@@ -7380,7 +7420,7 @@ namespace slib
 					}
 					if (flagTranslation) {
 						UIRect rcInvalidated(rcInvalidatedParent.left - offx, rcInvalidatedParent.top - offy, rcInvalidatedParent.right - offx, rcInvalidatedParent.bottom - offy);
-						if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated) || child->isForcedDraw()) {
+						if (rcInvalidated.intersectRectangle(child->getBoundsIncludingShadow(), &rcInvalidated) || child->isForcedDraw()) {
 							if (flagTransformed) {
 								*currentState = savedState;
 								flagTransformed = sl_false;
@@ -7396,7 +7436,7 @@ namespace slib
 						rcInvalidated.top -= 1;
 						rcInvalidated.right += 1;
 						rcInvalidated.bottom += 1;
-						if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated) || child->isForcedDraw()) {
+						if (rcInvalidated.intersectRectangle(child->getBoundsIncludingShadow(), &rcInvalidated) || child->isForcedDraw()) {
 							sl_real ax = (sl_real)(child->getWidth()) / 2;
 							sl_real ay = (sl_real)(child->getHeight()) / 2;
 							mat.m20 = -ax * mat.m00 - ay * mat.m10 + mat.m20 + ax + (sl_real)(offx);
@@ -7438,7 +7478,7 @@ namespace slib
 					}
 					if (flagTranslation) {
 						UIRect rcInvalidated(rcInvalidatedParent.left - offx, rcInvalidatedParent.top - offy, rcInvalidatedParent.right - offx, rcInvalidatedParent.bottom - offy);
-						if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated) || child->isForcedDraw()) {
+						if (rcInvalidated.intersectRectangle(child->getBoundsIncludingShadow(), &rcInvalidated) || child->isForcedDraw()) {
 							CanvasStateScope scope(canvas);
 							canvas->translate((sl_real)(offx), (sl_real)(offy));
 							canvas->setAlpha(alphaParent * child->getAlpha());
@@ -7451,7 +7491,7 @@ namespace slib
 						rcInvalidated.top -= 1;
 						rcInvalidated.right += 1;
 						rcInvalidated.bottom += 1;
-						if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated) || child->isForcedDraw()) {
+						if (rcInvalidated.intersectRectangle(child->getBoundsIncludingShadow(), &rcInvalidated) || child->isForcedDraw()) {
 							CanvasStateScope scope(canvas);
 							sl_real ax = (sl_real)(child->getWidth()) / 2;
 							sl_real ay = (sl_real)(child->getHeight()) / 2;
@@ -7593,6 +7633,39 @@ namespace slib
 			drawContent(canvas);
 		} else {
 			drawContent(canvas);
+		}
+	}
+	
+	void View::drawShadow(Canvas* canvas)
+	{
+		Ref<DrawAttributes>& drawAttrs = m_drawAttrs;
+		if (drawAttrs.isNull()) {
+			return;
+		}
+		BoundShape shape = drawAttrs->boundShape;
+		if (shape == BoundShape::None || shape == BoundShape::Path) {
+			return;
+		}
+		sl_real opacity = drawAttrs->shadowOpacity;
+		if (opacity < SLIB_EPSILON) {
+			return;
+		}
+		Color color = drawAttrs->shadowColor;
+		color.multiplyAlpha((float)opacity);
+		sl_real radius = (sl_real)(drawAttrs->shadowRadius);
+		Rectangle bounds = getBounds();
+		sl_real x = (sl_real)(bounds.left + drawAttrs->shadowOffset.x);
+		sl_real y = (sl_real)(bounds.top + drawAttrs->shadowOffset.y);
+		sl_real width = bounds.getWidth();
+		sl_real height = bounds.getHeight();
+		if (shape == BoundShape::Rectangle) {
+			canvas->drawShadowRectangle(x, y, width, height, color, radius);
+		} else if (shape == BoundShape::RoundRect) {
+			canvas->drawShadowRoundRect(x, y, width, height, (sl_real)(drawAttrs->boundRadius.x), color, radius);
+		} else if (shape == BoundShape::Ellipse) {
+			sl_real w2 = width / 2;
+			sl_real h2 = height / 2;
+			canvas->drawShadowCircle(x + w2, y + h2, w2, color, radius);
 		}
 	}
 	
@@ -7892,7 +7965,8 @@ namespace slib
 	DEFINE_VIEW_EVENT_HANDLER(Draw, Canvas* canvas)
 	DEFINE_VIEW_EVENT_HANDLER_WITHOUT_ON(PreDraw, Canvas* canvas)
 	DEFINE_VIEW_EVENT_HANDLER_WITHOUT_ON(PostDraw, Canvas* canvas)
-	
+	DEFINE_VIEW_EVENT_HANDLER_WITHOUT_ON(DrawShadow, Canvas* canvas)
+
 	void View::dispatchDraw(Canvas* canvas)
 	{
 		Ref<DrawAttributes>& drawAttrs = m_drawAttrs;
@@ -7911,11 +7985,15 @@ namespace slib
 				break;
 			}
 			
-			if (!(isInstance())) {
+			if (m_instance.isNull()) {
 				_updateAndApplyLayoutWithMode(UIUpdateMode::None);
 			}
 
 			if (m_flagDrawing) {
+				
+				if (m_instance.isNull() && drawAttrs.isNotNull() && drawAttrs->shadowOpacity > 0) {
+					dispatchDrawShadow(canvas);
+				}
 				
 				getOnPreDraw()(this, canvas);
 
@@ -7959,6 +8037,19 @@ namespace slib
 		
 	}
 
+	void View::dispatchDrawShadow(Canvas* canvas)
+	{
+		onDrawShadow(canvas);
+		getOnDrawShadow()(this, canvas);
+	}
+	
+	void View::onDrawShadow(Canvas* canvas)
+	{
+		if (getCurrentBackground().isNotNull()) {
+			drawShadow(canvas);
+		}
+	}
+	
 	namespace priv
 	{
 		namespace view
@@ -9396,11 +9487,11 @@ namespace slib
 	{
 	}
 	
-	void ViewInstance::setShadowRadius(View* view, float radius)
+	void ViewInstance::setShadowRadius(View* view, sl_ui_posf radius)
 	{
 	}
 	
-	void ViewInstance::setShadowOffset(View* view, float x, float y)
+	void ViewInstance::setShadowOffset(View* view, sl_ui_posf x, sl_ui_posf y)
 	{
 	}
 	

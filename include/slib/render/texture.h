@@ -38,12 +38,7 @@ namespace slib
 		Linear
 	};
 	
-	enum class TextureWrapMode
-	{
-		Repeat,
-		Mirror,
-		Clamp
-	};
+	typedef TileMode TextureWrapMode;
 	
 	class SLIB_EXPORT TextureInstance : public RenderBaseObjectInstance
 	{

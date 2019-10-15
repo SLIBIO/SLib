@@ -231,6 +231,9 @@ namespace slib
 		// local coordinate
 		UIRect getBoundsInnerPadding();
 		
+		// local coordinate
+		UIRect getBoundsIncludingShadow();
+		
 		// parent coordinate
 		UIRect getBoundsInParent();
 		
@@ -1211,6 +1214,8 @@ namespace slib
 		
 		void draw(Canvas* canvas);
 		
+		void drawShadow(Canvas* canvas);
+		
 		void clipBounds(Canvas* canvas);
 		
 		void clipContentBounds(Canvas* canvas);
@@ -1277,6 +1282,7 @@ namespace slib
 		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, Draw, Canvas* canvas)
 		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS_WITHOUT_ON(View, PreDraw, Canvas* canvas)
 		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS_WITHOUT_ON(View, PostDraw, Canvas* canvas)
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, DrawShadow, Canvas* canvas)
 
 		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, MouseEvent, UIEvent* ev)
 		sl_bool dispatchMouseEventToChildren(UIEvent* ev, const Ref<View>* children, sl_size count);
@@ -1764,6 +1770,7 @@ namespace slib
 			AtomicFunction<void(View*, Canvas*)> onDraw;
 			AtomicFunction<void(View*, Canvas*)> onPreDraw;
 			AtomicFunction<void(View*, Canvas*)> onPostDraw;
+			AtomicFunction<void(View*, Canvas*)> onDrawShadow;
 			AtomicFunction<void(View*, UIEvent*)> onMouseEvent;
 			AtomicFunction<void(View*, UIEvent*)> onTouchEvent;
 			AtomicFunction<void(View*, UIEvent*)> onKeyEvent;
@@ -1859,9 +1866,9 @@ namespace slib
 		// extended functions for view instances
 		virtual void setShadowOpacity(View* view, float alpha);
 		
-		virtual void setShadowRadius(View* view, float radius);
+		virtual void setShadowRadius(View* view, sl_ui_posf radius);
 		
-		virtual void setShadowOffset(View* view, float x, float y);
+		virtual void setShadowOffset(View* view, sl_ui_posf x, sl_ui_posf y);
 
 		virtual void setShadowColor(View* view, const Color& color);
 		

@@ -45,6 +45,16 @@ namespace slib
 		return new TextStyle(*this);
 	}
 	
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TextDrawParam)
+	
+	TextDrawParam::TextDrawParam() :
+		color(Color::Black),
+		shadowOpacity(0), shadowRadius(3), shadowColor(Color::Black), shadowOffset(0, 0)
+	{
+	}
+	
+	
 	SLIB_DEFINE_OBJECT(TextItem, Object)
 
 	TextItem::TextItem(TextItemType type) noexcept
@@ -205,18 +215,34 @@ namespace slib
 		return Size::zero();
 	}
 	
-	void TextWordItem::draw(Canvas* canvas, sl_real x, sl_real y, const Color& color)
+	void TextWordItem::draw(Canvas* canvas, sl_real x, sl_real y, const TextDrawParam& param)
 	{
-#if defined(SLIB_PLATFORM_IS_MACOS)
-		CanvasType canvasType = canvas->getType();
-		if (canvasType != CanvasType::View && canvasType != CanvasType::Bitmap) {
-			canvas->drawText16(m_text, x, y, getFont(), color);
-			return;
-		}
 		Ref<Font> font = getFont();
 		if (font.isNull()) {
 			return;
 		}
+		
+		DrawTextParam dp;
+		dp.font = font;
+		dp.color = param.color;
+		if (param.shadowOpacity > 0) {
+			dp.shadowOpacity = param.shadowOpacity;
+			dp.shadowRadius = param.shadowRadius;
+			dp.shadowColor = param.shadowColor;
+			dp.shadowOffset = param.shadowOffset;
+		}
+
+		dp.y = y;
+
+#if defined(SLIB_PLATFORM_IS_MACOS)
+		CanvasType canvasType = canvas->getType();
+		if (canvasType != CanvasType::View && canvasType != CanvasType::Bitmap) {
+			dp.text = m_text;
+			dp.x = x;
+			canvas->drawText(dp);
+			return;
+		}
+		
 		Ref<FontAtlas> atlas = font->getSharedAtlas();
 		if (atlas.isNull()) {
 			return;
@@ -238,19 +264,25 @@ namespace slib
 						sl_char32 c32 = (sl_char32)(((ch - 0xD800) << 10) | (ch1 - 0xDC00)) + 0x10000;
 						Size size = atlas->getFontSize(c32);
 						String16 s32(&c32, 1);
-						canvas->drawText16(s32, x, y, font, color);
+						dp.text = s32;
+						dp.x = x;
+						canvas->drawText(dp);
 						x += size.x;
 					}
 				}
 			} else {
 				Size size = atlas->getFontSize(ch);
 				t[0] = ch;
-				canvas->drawText16(s, x, y, font, color);
+				dp.text = s;
+				dp.x = x;
+				canvas->drawText(dp);
 				x += size.x;
 			}
 		}
 #else
-		canvas->drawText16(m_text, x, y, getFont(), color);
+		dp.text = m_text;
+		dp.x = x;
+		canvas->drawText(dp);
 #endif
 	}
 	
@@ -299,11 +331,23 @@ namespace slib
 		return Size::zero();
 	}
 	
-	void TextEmojiItem::draw(Canvas* canvas, sl_real x, sl_real y, const Color& color)
+	void TextEmojiItem::draw(Canvas* canvas, sl_real x, sl_real y, const TextDrawParam& param)
 	{
 		Ref<Font> font = getEmojiFont();
 		if (font.isNotNull()) {
-			canvas->drawText16(m_text, x, y, font, color);
+			DrawTextParam dp;
+			dp.font = font;
+			dp.color = param.color;
+			if (param.shadowOpacity > 0) {
+				dp.shadowOpacity = param.shadowOpacity;
+				dp.shadowRadius = param.shadowRadius;
+				dp.shadowColor = param.shadowColor;
+				dp.shadowOffset = param.shadowOffset;
+			}
+			dp.x = x;
+			dp.y = y;
+			dp.text = m_text;
+			canvas->drawText(dp);
 		}
 	}
 	
@@ -1632,8 +1676,9 @@ namespace slib
 		
 	}
 
-	void TextParagraph::draw(Canvas* canvas, sl_real x, sl_real y, const Color& colorDefault) noexcept
+	void TextParagraph::draw(Canvas* canvas, sl_real x, sl_real y, const TextDrawParam& _param) noexcept
 	{
+		TextDrawParam param = _param;
 		Rectangle rc = canvas->getInvalidatedRect();
 		rc.left -= x;
 		rc.right -= x;
@@ -1649,8 +1694,8 @@ namespace slib
 			Ref<TextStyle> style = item->getStyle();
 			if (style.isNotNull()) {
 				Color color = style->textColor;
-				if (color.isZero()) {
-					color = colorDefault;
+				if (color.isNotZero()) {
+					param.color = color;
 				}
 				if (type == TextItemType::Word) {
 					TextWordItem* wordItem = static_cast<TextWordItem*>(item);
@@ -1664,7 +1709,7 @@ namespace slib
 							if (backColor.a > 0) {
 								canvas->fillRectangle(Rectangle(x + frame.left, y + frame.top, x + frame.right, y + frame.bottom), backColor);
 							}
-							wordItem->draw(canvas, x + frame.left, y + frame.top, color);
+							wordItem->draw(canvas, x + frame.left, y + frame.top, param);
 						}
 					}
 				} else if (type == TextItemType::Emoji) {
@@ -1679,7 +1724,7 @@ namespace slib
 							if (backColor.a > 0) {
 								canvas->fillRectangle(Rectangle(x + frame.left, y + frame.top, x + frame.right, y + frame.bottom), backColor);
 							}
-							emojiItem->draw(canvas, x + frame.left, y + frame.top, color);
+							emojiItem->draw(canvas, x + frame.left, y + frame.top, param);
 						}
 					}
 				}
@@ -1767,7 +1812,6 @@ namespace slib
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(SimpleTextBoxDrawParam)
 	
 	SimpleTextBoxDrawParam::SimpleTextBoxDrawParam()
-	 :	color(Color::Black)
 	{
 	}
 
@@ -1910,7 +1954,7 @@ namespace slib
 			} else {
 				y = param.frame.top;
 			}
-			m_paragraph->draw(canvas, param.frame.left, y, param.color);
+			m_paragraph->draw(canvas, param.frame.left, y, param);
 		}
 	}
 

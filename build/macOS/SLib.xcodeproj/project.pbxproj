@@ -1032,7 +1032,10 @@
 		267465F62317209000DE8715 /* libcef_dll_wrapper.cc in Sources */ = {isa = PBXBuildFile; fileRef = 267465EC2317208F00DE8715 /* libcef_dll_wrapper.cc */; };
 		267465FE23172F5E00DE8715 /* libcef_dll_dylib.cc in Sources */ = {isa = PBXBuildFile; fileRef = 267465FC23172F5E00DE8715 /* libcef_dll_dylib.cc */; };
 		267465FF23172F5E00DE8715 /* cef_library_loader_mac.mm in Sources */ = {isa = PBXBuildFile; fileRef = 267465FD23172F5E00DE8715 /* cef_library_loader_mac.mm */; };
+		26781C1D2350F6A4002FCA2F /* brush_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26781C1C2350F6A4002FCA2F /* brush_quartz.mm */; };
 		267B9D69225D14640057DF2A /* instagram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 267B9D68225D14640057DF2A /* instagram.cpp */; };
+		26805B6723533D4300D8817C /* string_param.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26805B6623533D4300D8817C /* string_param.cpp */; };
+		26805B6923533D6B00D8817C /* string_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26805B6823533D6A00D8817C /* string_buffer.cpp */; };
 		2682569F21E464630079600F /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2682569E21E464630079600F /* IOKit.framework */; };
 		2698A54E226A383500662528 /* refresh_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2698A54D226A383400662528 /* refresh_view.cpp */; };
 		269E31A92255F431005CD0ED /* paypal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31A82255F430005CD0ED /* paypal.cpp */; };
@@ -2738,9 +2741,12 @@
 		267465EC2317208F00DE8715 /* libcef_dll_wrapper.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = libcef_dll_wrapper.cc; path = ../../external/src/libcef/libcef_dll/wrapper/libcef_dll_wrapper.cc; sourceTree = "<group>"; };
 		267465FC23172F5E00DE8715 /* libcef_dll_dylib.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = libcef_dll_dylib.cc; path = ../../external/src/libcef/libcef_dll/wrapper/libcef_dll_dylib.cc; sourceTree = "<group>"; };
 		267465FD23172F5E00DE8715 /* cef_library_loader_mac.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = cef_library_loader_mac.mm; path = ../../external/src/libcef/libcef_dll/wrapper/cef_library_loader_mac.mm; sourceTree = "<group>"; };
+		26781C1C2350F6A4002FCA2F /* brush_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = brush_quartz.mm; sourceTree = "<group>"; };
 		267B9D68225D14640057DF2A /* instagram.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = instagram.cpp; path = social/instagram.cpp; sourceTree = "<group>"; };
 		267C16B81CE779D8000318C2 /* scroll_bar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scroll_bar.cpp; sourceTree = "<group>"; };
 		267D008B1E32AA5A002CC949 /* render_drawable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_drawable.cpp; sourceTree = "<group>"; };
+		26805B6623533D4300D8817C /* string_param.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = string_param.cpp; sourceTree = "<group>"; };
+		26805B6823533D6A00D8817C /* string_buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = string_buffer.cpp; sourceTree = "<group>"; };
 		2682569E21E464630079600F /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		2682C3EA1E2D211600E9CB98 /* parse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = parse.cpp; sourceTree = "<group>"; };
 		2682C3F71E2D639B00E9CB98 /* ui_core_common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_core_common.cpp; sourceTree = "<group>"; };
@@ -5111,6 +5117,7 @@
 				26B0AF831C13E08600CD8673 /* bitmap_data.cpp */,
 				26B0AF841C13E08600CD8673 /* bitmap_format.cpp */,
 				266DD47F1C1193C400D47AB0 /* brush.cpp */,
+				26781C1C2350F6A4002FCA2F /* brush_quartz.mm */,
 				266DD4801C1193C400D47AB0 /* canvas.cpp */,
 				26C1B63620D513D200E36539 /* canvas_ext.cpp */,
 				26FBDE4E1DA2B3EC00FF1B55 /* canvas_quartz.mm */,
@@ -5282,6 +5289,8 @@
 				A25F2FB61B03A33700854DAF /* setting.cpp */,
 				A25F2FB71B03A33700854DAF /* spin_lock.cpp */,
 				A25F2FB81B03A33700854DAF /* string.cpp */,
+				26805B6823533D6A00D8817C /* string_buffer.cpp */,
+				26805B6623533D4300D8817C /* string_param.cpp */,
 				A25F2FBA1B03A33700854DAF /* system.cpp */,
 				26CA8D781C23B4C90049A658 /* system_apple.mm */,
 				A2DE1D8A1B383BB000A74698 /* system_unix.cpp */,
@@ -7040,6 +7049,7 @@
 				26D9D9181E9645CE005F7BD3 /* json.cpp in Sources */,
 				265A937923051C2E00B155A2 /* drawable_quartz.mm in Sources */,
 				26D9D9191E9645CE005F7BD3 /* java.cpp in Sources */,
+				26781C1D2350F6A4002FCA2F /* brush_quartz.mm in Sources */,
 				26D9D9E21E96468D005F7BD3 /* ui_core_macos.mm in Sources */,
 				2698A54E226A383500662528 /* refresh_view.cpp in Sources */,
 				26D9D97C1E964675005F7BD3 /* audio_data.cpp in Sources */,
@@ -7104,6 +7114,7 @@
 				262D59A12324EB3D00F85780 /* emoji_png.cpp in Sources */,
 				26E1B867222A8250007C222E /* inflate.c in Sources */,
 				26D9D9271E9645CE005F7BD3 /* matrix2.cpp in Sources */,
+				26805B6723533D4300D8817C /* string_param.cpp in Sources */,
 				265A937523051C1B00B155A2 /* bitmap_quartz.mm in Sources */,
 				26D9D9761E96466A005F7BD3 /* image_png.cpp in Sources */,
 				26D9D9281E9645CE005F7BD3 /* hash.cpp in Sources */,
@@ -7243,6 +7254,7 @@
 				262D599F2324E9A500F85780 /* emoji.cpp in Sources */,
 				26D9D9CB1E96468D005F7BD3 /* progress_bar.cpp in Sources */,
 				26E1B870222ABA51007C222E /* pngpread.c in Sources */,
+				26805B6923533D6B00D8817C /* string_buffer.cpp in Sources */,
 				26E1B87F222ABAB2007C222E /* jcapistd.c in Sources */,
 				26072FFE20D97B66004EB272 /* url_request_curl.cpp in Sources */,
 				26E1B863222A8250007C222E /* gzread.c in Sources */,

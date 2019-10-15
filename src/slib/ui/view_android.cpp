@@ -204,6 +204,7 @@ namespace slib
 				SLIB_JNI_STATIC_METHOD(setClipping, "setClipping", "(Landroid/view/View;Z)V");
 				SLIB_JNI_STATIC_METHOD(setDrawing, "setDrawing", "(Landroid/view/View;Z)V");
 				SLIB_JNI_STATIC_METHOD(setLayered, "setLayered", "(Landroid/view/View;)V");
+				SLIB_JNI_STATIC_METHOD(setShadow, "setShadow", "(Landroid/view/View;FF)V");
 				SLIB_JNI_STATIC_METHOD(convertCoordinateFromScreenToView, "convertCoordinateFromScreenToView", "(Landroid/view/View;II)Landroid/graphics/Point;");
 				SLIB_JNI_STATIC_METHOD(convertCoordinateFromViewToScreen, "convertCoordinateFromViewToScreen", "(Landroid/view/View;II)Landroid/graphics/Point;");
 
@@ -277,6 +278,10 @@ namespace slib
 			}
 			if (view->isCreatingNativeLayer()) {
 				JView::setLayered.call(sl_null, jhandle);
+			}
+			float opacity = view->getShadowOpacity();
+			if (opacity > SLIB_EPSILON) {
+				JView::setShadow.call(sl_null, jhandle, (jfloat)opacity, (jfloat)(view->getShadowRadius()));
 			}
 
 			Matrix3 transform = view->getFinalTransformInInstance();
@@ -468,6 +473,22 @@ namespace slib
 		}
 	}
 
+	void Android_ViewInstance::setShadowOpacity(View* view, float opacity)
+	{
+		jobject handle = m_handle.get();
+		if (handle) {
+			JView::setShadow.call(sl_null, (jfloat)opacity, (jfloat)(view->getShadowRadius()));
+		}
+	}
+	
+	void Android_ViewInstance::setShadowRadius(View* view, sl_ui_posf radius)
+	{
+		jobject handle = m_handle.get();
+		if (handle) {
+			JView::setShadow.call(sl_null, (jfloat)(view->getShadowOpacity()), (jfloat)(radius));
+		}
+	}
+	
 
 	Ref<ViewInstance> View::createGenericInstance(ViewInstance* _parent)
 	{

@@ -253,6 +253,8 @@ namespace slib
 		
 		void onDrawBorder(Canvas* canvas) override;
 		
+		void onDrawShadow(Canvas* canvas) override;
+		
 		void onUpdateLayout() override;
 				
 		void onKeyEvent(UIEvent* ev) override;
@@ -267,6 +269,8 @@ namespace slib
 		virtual void drawButtonContent(Canvas* canvas, const Ref<Drawable>& icon, const String& text, const Color& textColor);
 		
 		const ColorMatrix* getCurrentColorFilter(sl_bool flagUseDefaultFilter);
+		
+		Ref<Drawable> getCurrentButtonBackground();
 		
 	private:
 		void _invalidateButtonState();

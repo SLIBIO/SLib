@@ -118,7 +118,11 @@ namespace slib
 		void removeChildInstance(View* view, const Ref<ViewInstance>& instance) override;
 
 		void bringToFront(View* view) override;
-
+	
+		void setShadowOpacity(View* view, float opacity) override;
+		
+		void setShadowRadius(View* view, sl_ui_posf radius) override;
+		
 	protected:
 		JniGlobal<jobject> m_handle;
 		JniGlobal<jobject> m_context;

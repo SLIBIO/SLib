@@ -107,6 +107,24 @@ namespace slib
 
 	};
 	
+	class SLIB_EXPORT TextDrawParam
+	{
+	public:
+		Color color;
+		
+		sl_real shadowOpacity;
+		sl_real shadowRadius;
+		Color shadowColor;
+		Point shadowOffset;
+		
+	public:
+		TextDrawParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TextDrawParam)
+		
+	};
+	
+	
 	class SLIB_EXPORT TextItem : public Object
 	{
 		SLIB_DECLARE_OBJECT
@@ -166,7 +184,7 @@ namespace slib
 
 		Size getSize() noexcept;
 		
-		void draw(Canvas* canvas, sl_real x, sl_real y, const Color& color);
+		void draw(Canvas* canvas, sl_real x, sl_real y, const TextDrawParam& param);
 		
 	private:
 		AtomicString16 m_text;
@@ -193,7 +211,7 @@ namespace slib
 	public:
 		Size getSize() noexcept;
 		
-		void draw(Canvas* canvas, sl_real x, sl_real y, const Color& color);
+		void draw(Canvas* canvas, sl_real x, sl_real y, const TextDrawParam& param);
 		
 	private:
 		String16 m_text;
@@ -313,7 +331,7 @@ namespace slib
 
 		void layout(const TextParagraphLayoutParam& param) noexcept;
 
-		void draw(Canvas* canvas, sl_real x, sl_real y, const Color& colorDefault) noexcept;
+		void draw(Canvas* canvas, sl_real x, sl_real y, const TextDrawParam& param) noexcept;
 		
 		Ref<TextItem> getTextItemAtPosition(sl_real x, sl_real y) noexcept;
 
@@ -351,11 +369,10 @@ namespace slib
 		
 	};
 	
-	class SLIB_EXPORT SimpleTextBoxDrawParam
+	class SLIB_EXPORT SimpleTextBoxDrawParam : public TextDrawParam
 	{
 	public:
 		Rectangle frame;
-		Color color;
 		
 	public:
 		SimpleTextBoxDrawParam();

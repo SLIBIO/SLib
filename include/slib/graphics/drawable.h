@@ -41,8 +41,6 @@ namespace slib
 		sl_bool useAlpha;
 		sl_real alpha;
 
-		sl_bool tiled;
-
 		sl_bool useColorMatrix;
 		ColorMatrix colorMatrix;
 

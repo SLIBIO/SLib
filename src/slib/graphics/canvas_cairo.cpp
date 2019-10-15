@@ -22,6 +22,7 @@
 
 #include "slib/core/definition.h"
 
+#include "slib/graphics/image.h"
 #include "slib/graphics/platform.h"
 
 #if defined(SLIB_GRAPHICS_IS_CAIRO)
@@ -51,7 +52,7 @@ namespace slib
 				~CanvasImpl()
 				{
 					if (m_graphics) {
-						::cairo_destroy(m_graphics);
+						cairo_destroy(m_graphics);
 					}
 				}
 
@@ -74,7 +75,7 @@ namespace slib
 							return ret;
 						}
 
-						::cairo_destroy(graphics);
+						cairo_destroy(graphics);
 					}
 					return sl_null;
 
@@ -88,26 +89,26 @@ namespace slib
 						for (sl_size i = 0; i < n; i++) {
 							switch (data[i].type & GraphicsPathPoint::TypeMask) {
 								case GraphicsPathPoint::Begin:
-									::cairo_move_to(graphics, data[i].pt.x, data[i].pt.y);
+									cairo_move_to(graphics, data[i].pt.x, data[i].pt.y);
 									break;
 								case GraphicsPathPoint::Line:
-									::cairo_line_to(graphics, data[i].pt.x, data[i].pt.y);
+									cairo_line_to(graphics, data[i].pt.x, data[i].pt.y);
 									break;
 								case GraphicsPathPoint::BezierCubic:
 									if (i + 2 < n) {
-										::cairo_curve_to(graphics, data[i].pt.x, data[i].pt.y, data[i+1].pt.x, data[i+1].pt.y, data[i+2].pt.x, data[i+2].pt.y);
+										cairo_curve_to(graphics, data[i].pt.x, data[i].pt.y, data[i+1].pt.x, data[i+1].pt.y, data[i+2].pt.x, data[i+2].pt.y);
 										i += 2;
 									}
 									break;
 							}
 							if (data[i].type & GraphicsPathPoint::FlagClose) {
-								::cairo_close_path(graphics);
+								cairo_close_path(graphics);
 							}
 						}
 						if (path->getFillMode() == FillMode::Winding) {
-							::cairo_set_fill_rule(m_graphics, CAIRO_FILL_RULE_WINDING);
+							cairo_set_fill_rule(m_graphics, CAIRO_FILL_RULE_WINDING);
 						} else {
-							::cairo_set_fill_rule(m_graphics, CAIRO_FILL_RULE_EVEN_ODD);
+							cairo_set_fill_rule(m_graphics, CAIRO_FILL_RULE_EVEN_ODD);
 						}
 						return sl_true;
 					}
@@ -189,32 +190,108 @@ namespace slib
 							break;
 					}
 
-					::cairo_set_line_width(graphics, _width);
-					::cairo_set_line_cap(graphics, _cap);
-					::cairo_set_line_join(graphics, _join);
-					::cairo_set_miter_limit(graphics, _miterLimit);
-					::cairo_set_dash(graphics, _dash, _dashLen, 0);
+					cairo_set_line_width(graphics, _width);
+					cairo_set_line_cap(graphics, _cap);
+					cairo_set_line_join(graphics, _join);
+					cairo_set_miter_limit(graphics, _miterLimit);
+					cairo_set_dash(graphics, _dash, _dashLen, 0);
 
 					Color4f _color = pen->getColor();
-					::cairo_set_source_rgba(graphics, _color.x, _color.y, _color.z, _color.w * getAlpha());
+					cairo_set_source_rgba(graphics, _color.x, _color.y, _color.z, _color.w * getAlpha());
 				}
 
-				void _applyBrush(Brush* brush)
+				void _fill(Brush* brush, sl_bool flagPreservePath)
 				{
 					cairo_t* graphics = m_graphics;
-					Color4f _color = brush->getColor();
-					::cairo_set_source_rgba(graphics, _color.x, _color.y, _color.z, _color.w * getAlpha());
+
+					sl_real alpha = getAlpha();
+
+					BrushDesc& desc = brush->getDesc();
+					BrushStyle style = desc.style;
+
+					if (style == BrushStyle::Solid) {
+						Color4f _color = desc.color;
+						cairo_set_source_rgba(graphics, _color.x, _color.y, _color.z, _color.w * alpha);
+						if (flagPreservePath) {
+							cairo_fill_preserve(graphics);
+						} else {
+							cairo_fill(graphics);
+						}
+					} else if (desc.style == BrushStyle::LinearGradient || desc.style == BrushStyle::RadialGradient) {
+						GradientBrushDetail* detail = (GradientBrushDetail*)(desc.detail.get());
+						if (detail) {
+							cairo_pattern_t* pattern;
+							if (desc.style == BrushStyle::LinearGradient) {
+								pattern = cairo_pattern_create_linear((double)(detail->point1.x), (double)(detail->point1.y), (double)(detail->point2.x), (double)(detail->point2.y));
+							} else {
+								pattern = cairo_pattern_create_radial((double)(detail->point1.x), (double)(detail->point1.y), 0, (double)(detail->point1.x), (double)(detail->point1.y), (double)(detail->radius));
+							}
+							if (pattern) {
+								ListElements<Color> colors(detail->colors);
+								ListElements<sl_real> locations(detail->locations);
+								sl_size n = colors.count;
+								for (sl_size i = 0; i < n; i++){
+									Color& color = colors[i];
+									cairo_pattern_add_color_stop_rgba(pattern, (double)(locations[i]), color.getRedF(), color.getGreenF(), color.getBlueF(), color.getAlphaF() * alpha);
+								}
+								cairo_set_source(graphics, pattern);
+								if (flagPreservePath) {
+									cairo_fill_preserve(graphics);
+								} else {
+									cairo_fill(graphics);
+								}
+								cairo_pattern_destroy(pattern);
+							}
+						}
+					} else if (desc.style == BrushStyle::Texture) {
+						TextureBrushDetail* detail = (TextureBrushDetail*)(desc.detail.get());
+						if (detail) {
+							Bitmap* bitmap = detail->pattern.get();
+							Ref<Bitmap> refBitmap;
+							if (bitmap->isImage()) {
+								refBitmap = Bitmap::create((Image*)bitmap);
+								bitmap = refBitmap.get();
+							}
+							if (bitmap) {
+								cairo_surface_t* handle = GraphicsPlatform::getBitmapHandle(bitmap);
+								if (handle) {
+									cairo_pattern_t* pattern = cairo_pattern_create_for_surface(handle);
+									if (pattern) {
+										cairo_pattern_set_extend(pattern, CAIRO_EXTEND_REPEAT);
+										cairo_set_source(graphics, pattern);
+										if (alpha > 0.9999) {
+											if (flagPreservePath) {
+												cairo_fill_preserve(graphics);
+											} else {
+												cairo_fill(graphics);
+											}
+										} else {
+											cairo_save(graphics);
+											if (flagPreservePath) {
+												cairo_clip_preserve(graphics);
+											} else {
+												cairo_clip(graphics);
+											}
+											cairo_paint_with_alpha(graphics, (double)alpha);
+											cairo_restore(graphics);
+										}
+										cairo_pattern_destroy(pattern);
+									}
+								}
+							}
+						}
+					}
 				}
 
 			public:
 				void save() override
 				{
-					::cairo_save(m_graphics);
+					cairo_save(m_graphics);
 				}
 
 				void restore() override
 				{
-					::cairo_restore(m_graphics);
+					cairo_restore(m_graphics);
 				}
 
 				Rectangle getClipBounds() override
@@ -223,21 +300,21 @@ namespace slib
 					double y1 = 0;
 					double x2 = 0;
 					double y2 = 0;
-					::cairo_clip_extents(m_graphics, &x1, &y1, &x2, &y2);
+					cairo_clip_extents(m_graphics, &x1, &y1, &x2, &y2);
 					return Rectangle((sl_real)x1, (sl_real)y1, (sl_real)x2, (sl_real)y2);
 				}
 
 				void clipToRectangle(const Rectangle& rect) override
 				{
-					::cairo_rectangle(m_graphics, rect.left, rect.top, rect.getWidth(), rect.getHeight());
-					::cairo_clip(m_graphics);
+					cairo_rectangle(m_graphics, rect.left, rect.top, rect.getWidth(), rect.getHeight());
+					cairo_clip(m_graphics);
 				}
 
 				void clipToPath(const Ref<GraphicsPath>& path) override
 				{
 					if (path.isNotNull()) {
 						if (_applyPath(m_graphics, path.get())) {
-							::cairo_clip(m_graphics);
+							cairo_clip(m_graphics);
 						}
 					}
 				}
@@ -251,56 +328,7 @@ namespace slib
 					t.yx = other.m01;
 					t.yy = other.m11;
 					t.y0 = other.m21;
-					::cairo_transform(m_graphics, &t);
-				}
-
-				void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& in_font, const Color& _color) override
-				{
-					if (text.isNotEmpty()) {
-						Ref<Font> _font = in_font;
-						if (_font.isNull()) {
-							_font = Font::getDefault();
-						}
-						if (_font.isNotNull()) {
-
-							cairo_scaled_font_t* font = GraphicsPlatform::getCairoFont(_font.get());
-
-							if (font) {
-
-								::cairo_set_font_face(m_graphics, ::cairo_scaled_font_get_font_face(font));
-								::cairo_set_font_size(m_graphics, _font->getSize());
-
-								Color4f color = _color;
-								::cairo_set_source_rgba(m_graphics, color.x, color.y, color.z, color.w * getAlpha());
-
-								FontMetrics fm;
-								if (_font->getFontMetrics(fm)) {
-									y += (fm.leading + fm.ascent);
-								}
-								::cairo_move_to(m_graphics, x, y);
-
-								::cairo_show_text(m_graphics, text.getData());
-
-								if (_font->isStrikeout() || _font->isUnderline()) {
-									sl_real width = _font->measureText(text).x;
-									if (_font->isUnderline()) {
-										sl_real yLine = y;
-										::cairo_move_to(m_graphics, 0, yLine);
-										::cairo_line_to(m_graphics, width, yLine);
-										::cairo_stroke(m_graphics);
-									}
-									if (_font->isStrikeout()) {
-										sl_real yLine = y - fm.ascent / 2;
-										::cairo_move_to(m_graphics, 0, yLine);
-										::cairo_line_to(m_graphics, width, yLine);
-										::cairo_stroke(m_graphics);
-									}
-								}
-
-							}
-
-						}
-					}
+					cairo_transform(m_graphics, &t);
 				}
 
 				void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& _pen) override
@@ -311,9 +339,9 @@ namespace slib
 					}
 					if (pen.isNotNull()) {
 						_applyPen(pen.get());
-						::cairo_move_to(m_graphics, pt1.x, pt1.y);
-						::cairo_line_to(m_graphics, pt2.x, pt2.y);
-						::cairo_stroke(m_graphics);
+						cairo_move_to(m_graphics, pt1.x, pt1.y);
+						cairo_line_to(m_graphics, pt2.x, pt2.y);
+						cairo_stroke(m_graphics);
 					}
 				}
 
@@ -328,11 +356,11 @@ namespace slib
 					}
 					if (pen.isNotNull()) {
 						_applyPen(pen.get());
-						::cairo_move_to(m_graphics, points[0].x, points[0].y);
+						cairo_move_to(m_graphics, points[0].x, points[0].y);
 						for (sl_uint32 i = 1; i < countPoints; i++) {
-							::cairo_line_to(m_graphics, points[i].x, points[i].y);
+							cairo_line_to(m_graphics, points[i].x, points[i].y);
 						}
-						::cairo_stroke(m_graphics);
+						cairo_stroke(m_graphics);
 					}
 				}
 
@@ -347,7 +375,7 @@ namespace slib
 
 				void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush) override
 				{
-					::cairo_rectangle(m_graphics, rect.left, rect.top, rect.getWidth(), rect.getHeight());
+					cairo_rectangle(m_graphics, rect.left, rect.top, rect.getWidth(), rect.getHeight());
 					_drawPath(pen, brush);
 				}
 
@@ -411,17 +439,89 @@ namespace slib
 						pen = Pen::getDefault();
 					}
 					if (brush.isNotNull()) {
-						_applyBrush(brush.get());
 						if (pen.isNotNull()) {
-							::cairo_fill_preserve(m_graphics);
+							_fill(brush.get(), sl_true);
 						} else {
-							::cairo_fill(m_graphics);
+							_fill(brush.get(), sl_false);
 							return;
 						}
 					}
 					if (pen.isNotNull()) {
 						_applyPen(pen.get());
-						::cairo_stroke(m_graphics);
+						cairo_stroke(m_graphics);
+					}
+				}
+
+				void onDrawText(const StringParam& _text, sl_real x, sl_real y, const Ref<Font>& _font, const DrawTextParam& param) override
+				{
+
+					String text = _text.getString();
+					sl_size len = text.getLength();
+
+					if (len) {
+
+						PangoFontDescription* font = GraphicsPlatform::getCairoFont(_font.get());
+
+						if (font) {
+
+							PangoLayout* layout = pango_cairo_create_layout(m_graphics);
+
+							if (layout) {
+
+								pango_layout_set_font_description(layout, font);
+								pango_layout_set_text(layout, text.getData(), len);
+
+								cairo_move_to(m_graphics, x, y);
+
+								sl_real shadowOpacity = param.shadowOpacity;
+								if (shadowOpacity > 0.0001f) {
+									pango_cairo_layout_path(m_graphics, layout);
+									cairo_set_fill_rule(m_graphics, CAIRO_FILL_RULE_WINDING);
+									{
+										cairo_save(m_graphics);
+										Color4f color = param.shadowColor;
+										cairo_set_source_rgba(m_graphics, color.x, color.y, color.z, color.w * shadowOpacity * getAlpha());
+										cairo_translate(m_graphics, (double)(param.shadowOffset.x), (double)(param.shadowOffset.y));
+										cairo_fill_preserve(m_graphics);
+										cairo_set_line_cap(m_graphics, CAIRO_LINE_CAP_ROUND);
+										cairo_set_line_join(m_graphics, CAIRO_LINE_JOIN_ROUND);
+										cairo_set_line_width(m_graphics, (double)(2 * param.shadowRadius));
+										cairo_stroke_preserve(m_graphics);
+										cairo_restore(m_graphics);
+									}
+									Color4f color = param.color;
+									cairo_set_source_rgba(m_graphics, color.x, color.y, color.z, color.w * getAlpha());
+									cairo_fill(m_graphics);
+								} else {
+									Color4f color = param.color;
+									cairo_set_source_rgba(m_graphics, color.x, color.y, color.z, color.w * getAlpha());
+									pango_cairo_show_layout(m_graphics, layout);
+								}
+
+								g_object_unref(layout);
+							}
+							
+							if (_font->isStrikeout() || _font->isUnderline()) {
+								sl_real width = _font->measureText(text).x;
+								if (_font->isUnderline()) {
+									sl_real yLine = y;
+									cairo_move_to(m_graphics, 0, yLine);
+									cairo_line_to(m_graphics, width, yLine);
+									cairo_stroke(m_graphics);
+								}
+								if (_font->isStrikeout()) {
+									FontMetrics fm;
+									if (_font->getFontMetrics(fm)) {
+										sl_real yLine = y - fm.ascent / 2;
+										cairo_move_to(m_graphics, 0, yLine);
+										cairo_line_to(m_graphics, width, yLine);
+										cairo_stroke(m_graphics);
+									}
+								}
+							}
+
+						}
+
 					}
 				}
 
@@ -432,9 +532,9 @@ namespace slib
 				void _setAntiAlias(sl_bool flag) override
 				{
 					if (flag) {
-						::cairo_set_antialias(m_graphics, CAIRO_ANTIALIAS_GOOD);
+						cairo_set_antialias(m_graphics, CAIRO_ANTIALIAS_GOOD);
 					} else {
-						::cairo_set_antialias(m_graphics, CAIRO_ANTIALIAS_NONE);
+						cairo_set_antialias(m_graphics, CAIRO_ANTIALIAS_NONE);
 					}
 				}
 
@@ -498,7 +598,7 @@ namespace slib
 		cairo_translate(graphics, rectDst.left, rectDst.top);
 		cairo_scale(graphics, dw / sw, dh / sh);
 		cairo_set_source_surface(graphics, image, 0, 0);
-		if (alpha == 1) {
+		if (alpha > 0.999) {
 			cairo_paint(graphics);
 		} else {
 			cairo_paint_with_alpha(graphics, alpha);

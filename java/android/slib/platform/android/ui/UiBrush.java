@@ -22,18 +22,64 @@
 
 package slib.platform.android.ui;
 
+import android.graphics.BitmapShader;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
-import android.graphics.Paint.Style;
+import android.graphics.RadialGradient;
+import android.graphics.Shader;
 
 public class UiBrush {
 
 	public int style;
 	public static final int STYLE_SOLID = 0;
-	
-	public int color;
+	public static final int STYLE_LINEAR_GRADIENT = 1;
+	public static final int STYLE_RADIAL_GRADIENT = 2;
+	public static final int STYLE_TEXTURE = 3;
+
+	// Solid Brush
+	public int color = 0xFFFFFFFF;
+
+	// Gradient Brush
+	public float x;
+	public float y;
+	public float x2;
+	public float y2;
+	public float radius;
+	public int[] colors;
+	public float[] locations;
+
+	// Texture Brush
+	public UiBitmap pattern;
 	
 	public void applyPaint(Paint paint, int alpha) {
+		paint.setStyle(Paint.Style.FILL);
 		paint.setColor(Graphics.applyAlphaToColor(color, alpha));
-		paint.setStyle(Style.FILL);
+		if (style != STYLE_SOLID) {
+			if (style == STYLE_LINEAR_GRADIENT) {
+				if (alpha < 255) {
+					int[] c = new int[colors.length];
+					for (int i = 0; i < c.length; i++) {
+						c[i] = Graphics.applyAlphaToColor(colors[i], alpha);
+					}
+					paint.setShader(new LinearGradient(x, y, x2, y2, c, locations, Shader.TileMode.CLAMP));
+				} else {
+					paint.setShader(new LinearGradient(x, y, x2, y2, colors, locations, Shader.TileMode.CLAMP));
+				}
+			} else if (style == STYLE_RADIAL_GRADIENT) {
+				if (alpha < 255) {
+					int[] c = new int[colors.length];
+					for (int i = 0; i < c.length; i++) {
+						c[i] = Graphics.applyAlphaToColor(colors[i], alpha);
+					}
+					paint.setShader(new RadialGradient(x, y, radius, c, locations, Shader.TileMode.CLAMP));
+				} else {
+					paint.setShader(new RadialGradient(x, y, radius, colors, locations, Shader.TileMode.CLAMP));
+				}
+			} else if (style == STYLE_TEXTURE) {
+				if (pattern.bitmap != null) {
+					paint.setShader(new BitmapShader(pattern.bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT));
+				}
+			}
+		}
 	}
 }

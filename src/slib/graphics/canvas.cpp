@@ -26,7 +26,16 @@
 
 namespace slib
 {
-
+	
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DrawTextParam)
+	
+	DrawTextParam::DrawTextParam():
+		color(Color::Black), alignment(Alignment::TopLeft), flagMultiLine(sl_false),
+		x(0), y(0), width(0), height(0),
+		shadowOpacity(0), shadowRadius(3), shadowColor(Color::Black), shadowOffset(0, 0)
+	{
+	}
+	
 	SLIB_DEFINE_OBJECT(Canvas, Object)
 
 	Canvas::Canvas()
@@ -156,9 +165,43 @@ namespace slib
 		concatMatrix(mat);
 	}
 
-	void Canvas::drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color)
+	void Canvas::drawText(const StringParam& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color)
 	{
-		drawText(text, x, y, font, color);
+		DrawTextParam param;
+		param.text = text;
+		param.font = font;
+		param.color = color;
+		param.x = x;
+		param.y = y;
+		drawText(param);
+	}
+	
+	void Canvas::drawText(const StringParam& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color, const Alignment& alignment, sl_bool flagMultiLine)
+	{
+		DrawTextParam param;
+		param.text = text;
+		param.font = font;
+		param.color = color;
+		param.x = x;
+		param.y = y;
+		param.alignment = alignment;
+		param.flagMultiLine = flagMultiLine;
+		drawText(param);
+	}
+	
+	void Canvas::drawText(const StringParam& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, const Alignment& alignment, sl_bool flagMultiLine)
+	{
+		DrawTextParam param;
+		param.text = text;
+		param.font = font;
+		param.color = color;
+		param.x = rcDst.left;
+		param.y = rcDst.top;
+		param.width = rcDst.getWidth();
+		param.height = rcDst.getHeight();
+		param.alignment = alignment;
+		param.flagMultiLine = flagMultiLine;
+		drawText(param);
 	}
 
 	void Canvas::drawLine(sl_real x1, sl_real y1, sl_real x2, sl_real y2, const Ref<Pen>& pen)
@@ -390,6 +433,103 @@ namespace slib
 	void Canvas::fillPath(const Ref<GraphicsPath>& path, const Color& color)
 	{
 		drawPath(path, Ref<Pen>::null(), color);
+	}
+	
+	void Canvas::drawShadowRectangle(sl_real x, sl_real y, sl_real width, sl_real height, const Color& color, sl_real shadowRadius)
+	{
+		if (shadowRadius < SLIB_EPSILON) {
+			fillRectangle(x, y, width, height, color);
+			return;
+		}
+		sl_bool flagAntialias = isAntiAlias();
+		if (flagAntialias) {
+			setAntiAlias(sl_false);
+		}
+		fillRectangle(x, y, width, height, color);
+		Color color0(color.r, color.g, color.b, 0);
+		fillRectangle(x - shadowRadius, y, shadowRadius, height, Brush::createLinearGradientBrush(Point(x - shadowRadius, y), Point(x, y), color0, color));
+		fillRectangle(x + width, y, shadowRadius, height, Brush::createLinearGradientBrush(Point(x + width + shadowRadius, y), Point(x + width, y), color0, color));
+		fillRectangle(x, y - shadowRadius, width, shadowRadius, Brush::createLinearGradientBrush(Point(x, y - shadowRadius), Point(x, y), color0, color));
+		fillRectangle(x, y + height, width, shadowRadius, Brush::createLinearGradientBrush(Point(x, y + height + shadowRadius), Point(x, y + height), color0, color));
+		fillRectangle(x - shadowRadius, y - shadowRadius, shadowRadius, shadowRadius, Brush::createRadialGradientBrush(Point(x, y), shadowRadius, color, color0));
+		fillRectangle(x + width, y - shadowRadius, shadowRadius, shadowRadius, Brush::createRadialGradientBrush(Point(x + width, y), shadowRadius, color, color0));
+		fillRectangle(x - shadowRadius, y + height, shadowRadius, shadowRadius, Brush::createRadialGradientBrush(Point(x, y + height), shadowRadius, color, color0));
+		fillRectangle(x + width, y + height, shadowRadius, shadowRadius, Brush::createRadialGradientBrush(Point(x + width, y + height), shadowRadius, color, color0));
+		if (flagAntialias) {
+			setAntiAlias(sl_true);
+		}
+	}
+	
+	void Canvas::drawShadowRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real roundRadius, const Color& color, sl_real shadowRadius)
+	{
+		if (shadowRadius < SLIB_EPSILON) {
+			fillRoundRect(x, y, width, height, roundRadius, roundRadius, color);
+			return;
+		}
+		if (roundRadius < SLIB_EPSILON) {
+			drawShadowRectangle(x, y, width, height, color, shadowRadius);
+			return;
+		}
+		sl_bool flagAntialias = isAntiAlias();
+		if (flagAntialias) {
+			setAntiAlias(sl_false);
+		}
+		sl_real width_half = width / 2;
+		if (roundRadius > width_half) {
+			roundRadius = width_half;
+		}
+		sl_real height_half = height / 2;
+		if (roundRadius > height_half) {
+			roundRadius = height_half;
+		}
+		sl_real roundRadius2 = roundRadius * 2;
+		fillRectangle(x + roundRadius, y + roundRadius, width - roundRadius2, height - roundRadius2, color);
+		Color colors[3];
+		colors[0] = color;
+		colors[1] = color;
+		colors[2] = color;
+		colors[2].a = 0;
+		sl_real radius = roundRadius + shadowRadius;
+		sl_real locations[3] = {0, roundRadius / radius, 1};
+		fillRectangle(x - shadowRadius, y + roundRadius, radius, height - roundRadius2, Brush::createLinearGradientBrush(Point(x + roundRadius, y), Point(x - shadowRadius, y), 3, colors, locations));
+		fillRectangle(x + width - roundRadius, y + roundRadius, radius, height - roundRadius2, Brush::createLinearGradientBrush(Point(x + width - roundRadius, y), Point(x + width + shadowRadius, y), 3, colors, locations));
+		fillRectangle(x + roundRadius, y - shadowRadius, width - roundRadius2, radius, Brush::createLinearGradientBrush(Point(x, y + roundRadius), Point(x, y - shadowRadius), 3, colors, locations));
+		fillRectangle(x + roundRadius, y + height - roundRadius, width - roundRadius2, radius, Brush::createLinearGradientBrush(Point(x, y + height - roundRadius), Point(x, y + height + shadowRadius), 3, colors, locations));
+		fillRectangle(x - shadowRadius, y - shadowRadius, radius, radius, Brush::createRadialGradientBrush(Point(x + roundRadius, y + roundRadius), radius, 3, colors, locations));
+		fillRectangle(x + width - roundRadius, y - shadowRadius, radius, radius, Brush::createRadialGradientBrush(Point(x + width - roundRadius, y + roundRadius), radius, 3, colors, locations));
+		fillRectangle(x - shadowRadius, y + height - roundRadius, radius, radius, Brush::createRadialGradientBrush(Point(x + roundRadius, y + height - roundRadius), radius, 3, colors, locations));
+		fillRectangle(x + width - roundRadius, y + height - roundRadius, radius, radius, Brush::createRadialGradientBrush(Point(x + width - roundRadius, y + height - roundRadius), radius, 3, colors, locations));
+		if (flagAntialias) {
+			setAntiAlias(sl_true);
+		}
+	}
+	
+	void Canvas::drawShadowCircle(sl_real centerX, sl_real centerY, sl_real circleRadius, const Color& color, sl_real shadowRadius)
+	{
+		if (circleRadius < SLIB_EPSILON) {
+			return;
+		}
+		if (shadowRadius < SLIB_EPSILON) {
+			sl_real circleRadius2 = circleRadius * 2;
+			fillEllipse(centerX - circleRadius, centerY - circleRadius, circleRadius2, circleRadius2, color);
+			return;
+		}
+		sl_bool flagAntialias = isAntiAlias();
+		if (flagAntialias) {
+			setAntiAlias(sl_false);
+		}
+		Color colors[3];
+		colors[0] = color;
+		colors[1] = color;
+		colors[2] = color;
+		colors[2].a = 0;
+		sl_real radius = circleRadius + shadowRadius;
+		sl_real radius2 = radius * 2;
+		sl_real locations[3] = {0, circleRadius / radius, 1};
+		fillEllipse(centerX - radius, centerY - radius, radius2, radius2, Brush::createRadialGradientBrush(Point(centerX, centerY), radius, 3, colors, locations));
+		if (flagAntialias) {
+			setAntiAlias(sl_true);
+		}
 	}
 	
 	namespace priv

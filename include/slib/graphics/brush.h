@@ -29,15 +29,47 @@
 #include "color.h"
 
 #include "../core/object.h"
+#include "../math/point.h"
 
 namespace slib
 {
+	
+	class SLIB_EXPORT GradientBrushDetail : public Referable
+	{
+	public:
+		Point point1;
+		Point point2;
+		sl_real radius;
+		List<Color> colors;
+		List<sl_real> locations;
+		
+	public:
+		GradientBrushDetail();
+		
+		~GradientBrushDetail();
+
+	};
+	
+	class Bitmap;
+	
+	class SLIB_EXPORT TextureBrushDetail : public Referable
+	{
+	public:
+		Ref<Bitmap> pattern;
+		
+	public:
+		TextureBrushDetail();
+		
+		~TextureBrushDetail();
+		
+	};
 	
 	class SLIB_EXPORT BrushDesc
 	{
 	public:
 		BrushStyle style;
 		Color color;
+		Ref<Referable> detail;
 
 	public:
 		BrushDesc();
@@ -62,8 +94,20 @@ namespace slib
 
 		static Ref<Brush> createSolidBrush(const Color& color);
 
+		static Ref<Brush> createLinearGradientBrush(const Point& pt1, const Point& pt2, const Color& color1, const Color& color2);
+
+		static Ref<Brush> createLinearGradientBrush(const Point& pt1, const Point& pt2, sl_uint32 nColors, const Color* colors, const sl_real* locations);
+
+		static Ref<Brush> createRadialGradientBrush(const Point& ptCenter, sl_real radius, const Color& colorCenter, const Color& colorEdge);
+		
+		static Ref<Brush> createRadialGradientBrush(const Point& ptCenter, sl_real radius, sl_uint32 nColors, const Color* colors, const sl_real* locations);
+		
+		static Ref<Brush> createTextureBrush(const Ref<Bitmap>& bitmap);
+
 	public:
 		void getDesc(BrushDesc& desc);
+		
+		BrushDesc& getDesc();
 
 		BrushStyle getStyle();
 

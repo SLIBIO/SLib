@@ -40,8 +40,8 @@ namespace slib
 		{
 
 			SLIB_JNI_BEGIN_CLASS(JBitmap, "slib/platform/android/ui/UiBitmap")
-				SLIB_JNI_STATIC_METHOD(drawPixels, "drawPixels", "(Lslib/platform/android/ui/Graphics;FFFF[IIIIFFI)V");
-				SLIB_JNI_STATIC_METHOD(drawPixelsWithColorMatrix, "drawPixels", "(Lslib/platform/android/ui/Graphics;FFFF[IIIIFFIFFFFFFFFFFFFFFFFFFFF)V");
+				SLIB_JNI_STATIC_METHOD(drawPixels, "drawPixels", "(Lslib/platform/android/ui/Graphics;FFFF[IIIIFF)V");
+				SLIB_JNI_STATIC_METHOD(drawPixelsWithColorMatrix, "drawPixels", "(Lslib/platform/android/ui/Graphics;FFFF[IIIIFFFFFFFFFFFFFFFFFFFFFF)V");
 				SLIB_JNI_STATIC_METHOD(getArrayBuffer, "getArrayBuffer", "()[I");
 				SLIB_JNI_STATIC_METHOD(returnArrayBuffer, "returnArrayBuffer", "([I)V");
 			SLIB_JNI_END_CLASS
@@ -128,10 +128,6 @@ namespace slib
 					if (param.useBlur) {
 						blur = (float)(param.blurRadius);
 					}
-					int tileMode = 0;
-					if (param.tiled) {
-						tileMode = 1;
-					}
 					const Color4f& cr = param.colorMatrix.red;
 					const Color4f& cg = param.colorMatrix.green;
 					const Color4f& cb = param.colorMatrix.blue;
@@ -173,7 +169,7 @@ namespace slib
 										JBitmap::drawPixelsWithColorMatrix.call(sl_null, jcanvas,
 											rectDst.left, yCurrent, rectDst.right, yCurrent + heightSegmentDst,
 											abuf.value, width, width, heightSegment,
-											alpha, blur, tileMode,
+											alpha, blur,
 											cr.x, cr.y, cr.z, cr.w,
 											cg.x, cg.y, cg.z, cg.w,
 											cb.x, cb.y, cb.z, cb.w,
@@ -184,7 +180,7 @@ namespace slib
 										JBitmap::drawPixels.call(sl_null, jcanvas,
 											rectDst.left, yCurrent, rectDst.right, yCurrent + heightSegmentDst,
 											abuf.value, width, width, heightSegment,
-											alpha, blur, tileMode);
+											alpha, blur);
 									}
 
 									yCurrent += heightSegmentDst;

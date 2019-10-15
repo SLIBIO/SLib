@@ -55,7 +55,10 @@ namespace slib
 
 	enum class BrushStyle
 	{
-		Solid = 0
+		Solid = 0,
+		LinearGradient = 1,
+		RadialGradient = 2,
+		Texture = 3
 	};
 
 	enum class FillMode
@@ -235,6 +238,13 @@ namespace slib
 		Cover = 3
 	};
 
+	enum class TileMode
+	{
+		Repeat,
+		Mirror,
+		Clamp
+	};
+	
 	enum class ColorSpace
 	{
 		None = 0,
@@ -259,6 +269,15 @@ namespace slib
 		End = 1,
 		Start = 2,
 		Middle = 3
+	};
+	
+	enum class BoundShape
+	{
+		None = 0,
+		Rectangle = 1,
+		Ellipse = 2,
+		RoundRect = 3,
+		Path = 10
 	};
 	
 }

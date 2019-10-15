@@ -141,92 +141,6 @@ namespace slib
 					CGContextConcatCTM(m_graphics, t);
 				}
 				
-				void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& in_font, const Color& _color) override
-				{		
-					if (text.isNotEmpty()) {
-						
-						Ref<Font> _font = in_font;
-						if (_font.isNull()) {
-							_font = Font::getDefault();
-						}
-						if (_font.isNotNull()) {
-							
-							CTFontRef font = GraphicsPlatform::getCoreTextFont(_font.get());
-							
-							if (font) {
-								
-								NSString* ns_text = Apple::getNSStringFromString(text);
-								CFStringRef string = (__bridge CFStringRef)ns_text;
-								
-								SInt32 _underline = _font->isUnderline() ? kCTUnderlineStyleSingle: kCTUnderlineStyleNone;
-								CFNumberRef underline = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &_underline);
-								
-								CGColorRef color = GraphicsPlatform::getCGColorFromColor(_color);
-								CFStringRef keys[] = { kCTFontAttributeName, kCTUnderlineStyleAttributeName, kCTForegroundColorAttributeName };
-								CFTypeRef values[] = { font, underline, color };
-								CFDictionaryRef attributes = CFDictionaryCreate(
-																				kCFAllocatorDefault,
-																				(const void**)&keys, (const void**)&values,
-																				sizeof(keys) / sizeof(keys[0]),
-																				&kCFCopyStringDictionaryKeyCallBacks,
-																				&kCFTypeDictionaryValueCallBacks);
-								if (attributes) {
-									
-									CFAttributedStringRef attrString = CFAttributedStringCreate(kCFAllocatorDefault, string, attributes);
-									
-									if (attrString) {
-										
-										CTLineRef line = CTLineCreateWithAttributedString(attrString);
-										
-										if (line) {
-											CGFloat leading = CTFontGetLeading(font);
-											CGFloat ascent = CTFontGetAscent(font);
-											CGFloat descent = CTFontGetDescent(font);
-											
-											CGAffineTransform trans;
-											trans.a = 1;
-											trans.b = 0;
-											trans.c = 0;
-											trans.d = -1;
-											trans.tx = x;
-											trans.ty = y + leading + ascent;
-											
-											CGContextSaveGState(m_graphics);
-											CGContextSetTextMatrix(m_graphics, trans);
-											
-											CTLineDraw(line, m_graphics);
-											
-											if (_font->isStrikeout()) {
-												CGFloat yStrike = leading + ascent / 2 + descent;
-												CGRect rect = CTLineGetBoundsWithOptions(line, 0);
-												CGFloat widthStrike = rect.size.width;
-												CGContextBeginPath(m_graphics);
-												CGContextMoveToPoint(m_graphics, 0, yStrike);
-												CGContextAddLineToPoint(m_graphics, widthStrike, yStrike);
-												CGContextSetRGBStrokeColor(m_graphics, _color.getRedF(), _color.getGreenF(), _color.getBlueF(), _color.getAlphaF());
-												CGContextStrokePath(m_graphics);
-											}
-											
-											CGContextRestoreGState(m_graphics);
-											CFRelease(line);
-										}
-										CFRelease(attrString);
-									}
-									CFRelease(attributes);
-								}
-								
-								if (underline) {
-									CFRelease(underline);
-								}
-								if (color) {
-									CFRelease(color);
-								}
-							}
-							
-						}
-					}
-				}
-				
 				void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& _pen) override
 				{
 					Ref<Pen> pen = _pen;
@@ -279,8 +193,14 @@ namespace slib
 					rect.size.width = _rect.getWidth();
 					rect.size.height = _rect.getHeight();
 					if (brush.isNotNull()) {
-						_applyBrush(brush.get());
-						CGContextFillRect(m_graphics, rect);
+						if (_applySolidBrush(brush.get())) {
+							CGContextFillRect(m_graphics, rect);
+						} else {
+							CGContextSaveGState(m_graphics);
+							CGContextClipToRect(m_graphics, rect);
+							_drawOtherBrush(brush.get());
+							CGContextRestoreGState(m_graphics);
+						}
 					}
 					Ref<Pen> pen = _pen;
 					if (brush.isNull() && pen.isNull()) {
@@ -309,8 +229,16 @@ namespace slib
 					rect.size.width = _rect.getWidth();
 					rect.size.height = _rect.getHeight();
 					if (brush.isNotNull()) {
-						_applyBrush(brush.get());
-						CGContextFillEllipseInRect(m_graphics, rect);
+						if (_applySolidBrush(brush.get())) {
+							CGContextFillEllipseInRect(m_graphics, rect);
+						} else {
+							CGContextSaveGState(m_graphics);
+							CGContextBeginPath(m_graphics);
+							CGContextAddEllipseInRect(m_graphics, rect);
+							CGContextClip(m_graphics);
+							_drawOtherBrush(brush.get());
+							CGContextRestoreGState(m_graphics);
+						}
 					}
 					Ref<Pen> pen = _pen;
 					if (brush.isNull() && pen.isNull()) {
@@ -361,17 +289,33 @@ namespace slib
 				void _drawPath(CGPathRef path, const Ref<Pen>& _pen, const Ref<Brush>& brush, FillMode fillMode)
 				{
 					if (brush.isNotNull()) {
-						_applyBrush(brush.get());
-						CGContextBeginPath(m_graphics);
-						CGContextAddPath(m_graphics, path);
-						switch (fillMode) {
-							case FillMode::Winding:
-								CGContextFillPath(m_graphics);
-								break;
-							case FillMode::Alternate:
-							default:
-								CGContextEOFillPath(m_graphics);
-								break;
+						if (_applySolidBrush(brush.get())) {
+							CGContextBeginPath(m_graphics);
+							CGContextAddPath(m_graphics, path);
+							switch (fillMode) {
+								case FillMode::Winding:
+									CGContextFillPath(m_graphics);
+									break;
+								case FillMode::Alternate:
+								default:
+									CGContextEOFillPath(m_graphics);
+									break;
+							}
+						} else {
+							CGContextSaveGState(m_graphics);
+							CGContextBeginPath(m_graphics);
+							CGContextAddPath(m_graphics, path);
+							switch (fillMode) {
+								case FillMode::Winding:
+									CGContextClip(m_graphics);
+									break;
+								case FillMode::Alternate:
+								default:
+									CGContextEOClip(m_graphics);
+									break;
+							}
+							_drawOtherBrush(brush.get());
+							CGContextRestoreGState(m_graphics);
 						}
 					}
 					Ref<Pen> pen = _pen;
@@ -471,11 +415,143 @@ namespace slib
 					CGContextSetRGBStrokeColor(graphics, _color.getRedF(), _color.getGreenF(), _color.getBlueF(), _color.getAlphaF());
 				}
 
-				void _applyBrush(Brush* brush)
+				sl_bool _applySolidBrush(Brush* brush)
 				{
-					CGContextRef graphics = m_graphics;
-					Color _color = brush->getColor();
-					CGContextSetRGBFillColor(graphics, _color.getRedF(), _color.getGreenF(), _color.getBlueF(), _color.getAlphaF());
+					BrushDesc& desc = brush->getDesc();
+					if (desc.style == BrushStyle::Solid) {
+						Color& color = desc.color;
+						CGContextSetRGBFillColor(m_graphics, color.getRedF(), color.getGreenF(), color.getBlueF(), color.getAlphaF());
+						return sl_true;
+					}
+					return sl_false;
+				}
+				
+				void _drawOtherBrush(Brush* brush)
+				{
+					BrushDesc& desc = brush->getDesc();
+					if (desc.style == BrushStyle::LinearGradient || desc.style == BrushStyle::RadialGradient) {
+						GradientBrushDetail* detail = (GradientBrushDetail*)(desc.detail.get());
+						if (detail) {
+							CGGradientRef gradient = GraphicsPlatform::getGradientBrushHandle(brush);
+							if (gradient) {
+								if (desc.style == BrushStyle::LinearGradient) {
+									CGContextDrawLinearGradient(m_graphics, gradient, CGPointMake(detail->point1.x, detail->point1.y), CGPointMake(detail->point2.x, detail->point2.y), 0);
+								} else {
+									CGContextDrawRadialGradient(m_graphics, gradient, CGPointMake(detail->point1.x, detail->point1.y), 0, CGPointMake(detail->point1.x, detail->point1.y), detail->radius, 0);
+								}
+							}
+						}
+					} else if (desc.style == BrushStyle::Texture) {
+						TextureBrushDetail* detail = (TextureBrushDetail*)(desc.detail.get());
+						if (detail) {
+							CGImageRef pattern = GraphicsPlatform::getTextureBrushRetainedHandle(brush);
+							if (pattern) {
+								CGFloat w = (CGFloat)(CGImageGetWidth(pattern));
+								CGFloat h = (CGFloat)(CGImageGetHeight(pattern));
+								CGContextTranslateCTM(m_graphics, 0, h);
+								CGContextScaleCTM(m_graphics, 1, -1);
+								CGContextTranslateCTM(m_graphics, 0, -h);
+								CGContextDrawTiledImage(m_graphics, CGRectMake(0, 0, w, h), pattern);
+								CFRelease(pattern);
+							}
+						}
+					}
+				}
+				
+				void onDrawText(const StringParam& _text, sl_real x, sl_real y, const Ref<Font>& _font, const DrawTextParam& param) override
+				{
+					String text = _text.getString();
+					CTFontRef font = GraphicsPlatform::getCoreTextFont(_font.get());
+					
+					if (text.isNotEmpty() && font) {
+						
+						NSString* ns_text = Apple::getNSStringFromString(text);
+						CFStringRef string = (__bridge CFStringRef)ns_text;
+						
+						SInt32 _underline = _font->isUnderline() ? kCTUnderlineStyleSingle: kCTUnderlineStyleNone;
+						CFNumberRef underline = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &_underline);
+						
+						CGColorRef color = GraphicsPlatform::getCGColorFromColor(param.color);
+						CFStringRef keys[] = { kCTFontAttributeName, kCTUnderlineStyleAttributeName, kCTForegroundColorAttributeName };
+						CFTypeRef values[] = { font, underline, color };
+						CFDictionaryRef attributes = CFDictionaryCreate(
+																		kCFAllocatorDefault,
+																		(const void**)&keys, (const void**)&values,
+																		sizeof(keys) / sizeof(keys[0]),
+																		&kCFCopyStringDictionaryKeyCallBacks,
+																		&kCFTypeDictionaryValueCallBacks);
+						if (attributes) {
+							
+							CFAttributedStringRef attrString = CFAttributedStringCreate(kCFAllocatorDefault, string, attributes);
+							
+							if (attrString) {
+								
+								CTLineRef line = CTLineCreateWithAttributedString(attrString);
+								
+								if (line) {
+									CGFloat leading = CTFontGetLeading(font);
+									CGFloat ascent = CTFontGetAscent(font);
+									CGFloat descent = CTFontGetDescent(font);
+									
+									CGAffineTransform trans;
+									trans.a = 1;
+									trans.b = 0;
+									trans.c = 0;
+									trans.d = -1;
+									trans.tx = x;
+									trans.ty = y + leading + ascent;
+									
+									CGContextSaveGState(m_graphics);
+									CGContextSetTextMatrix(m_graphics, trans);
+									
+									sl_real shadowOpacity = param.shadowOpacity;
+									if (shadowOpacity > 0.0001f) {
+										Color _shadowColor = param.shadowColor;
+										_shadowColor.multiplyAlpha((float)shadowOpacity);
+										CGColorRef shadowColor = GraphicsPlatform::getCGColorFromColor(_shadowColor);
+										if (shadowColor) {
+											CGSize offset;
+											offset.width = (CGFloat)(param.shadowOffset.x);
+											offset.height = (CGFloat)(param.shadowOffset.y);
+#ifdef SLIB_PLATFORM_IS_MACOS
+											if (getType() == CanvasType::View) {
+												offset.height = -offset.height;
+											}
+#endif
+											CGContextSetShadowWithColor(m_graphics, offset, (CGFloat)(param.shadowRadius), shadowColor);
+											CFRelease(shadowColor);
+										}
+									}
+									
+									CTLineDraw(line, m_graphics);
+									
+									if (_font->isStrikeout()) {
+										CGFloat yStrike = leading + ascent / 2 + descent;
+										CGRect rect = CTLineGetBoundsWithOptions(line, 0);
+										CGFloat widthStrike = rect.size.width;
+										CGContextBeginPath(m_graphics);
+										CGContextMoveToPoint(m_graphics, 0, yStrike);
+										CGContextAddLineToPoint(m_graphics, widthStrike, yStrike);
+										CGContextSetRGBStrokeColor(m_graphics, param.color.getRedF(), param.color.getGreenF(), param.color.getBlueF(), param.color.getAlphaF());
+										CGContextStrokePath(m_graphics);
+									}
+									
+									CGContextRestoreGState(m_graphics);
+									CFRelease(line);
+								}
+								CFRelease(attrString);
+							}
+							CFRelease(attributes);
+						}
+						
+						if (underline) {
+							CFRelease(underline);
+						}
+						if (color) {
+							CFRelease(color);
+						}
+					}
+					
 				}
 				
 				void _setAlpha(sl_real alpha) override
@@ -539,7 +615,6 @@ namespace slib
 		
 		sl_bool flagBlur = param.isBlur();
 		sl_bool flagOpaque = param.isOpaque();
-		sl_bool flagTiled = param.tiled;
 		
 		CIImage* ciImage = nil;
 		sl_bool flagFreeImage = sl_false;
@@ -583,17 +658,6 @@ namespace slib
 					[filter setValue:ciImage forKey:kCIInputImageKey];
 					[filter setValue:[NSNumber numberWithFloat:param.blurRadius] forKey:@"inputRadius"];
 					ciImage = [filter outputImage];
-				}
-				if (ciImage != nil) {
-					if (flagTiled) {
-						CIContext *ciContext = [CIContext contextWithOptions:nil];
-						CGImageRef t = [ciContext createCGImage:ciImage fromRect:[ciImage extent]];
-						if (t) {
-							image = t;
-							flagFreeImage = sl_true;
-							ciImage = nil;
-						}
-					}
 				}
 			}
 		}
@@ -684,11 +748,7 @@ namespace slib
 				CGContextScaleCTM(graphics, 1, -1);
 				CGContextTranslateCTM(graphics, 0, -rectDst.origin.y);
 			}
-			if (flagTiled) {
-				CGContextDrawTiledImage(graphics, rectDst, image);
-			} else {
-				CGContextDrawImage(graphics, rectDst, image);
-			}
+			CGContextDrawImage(graphics, rectDst, image);
 			if (flagSaveState) {
 				CGContextRestoreGState(graphics);
 			}
