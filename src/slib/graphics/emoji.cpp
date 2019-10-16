@@ -44,25 +44,22 @@ namespace slib
 			class StaticContext
 			{
 			public:
-				CMap<String16, sl_bool> mapEmojis;
+				CHashMap<String16, sl_bool> mapEmojis;
 				CHashMap<sl_char32, sl_bool> mapEmojiFirstChars;
-				sl_size maxLength;
-				
+				CHashMap< sl_char32, List<String16> > mapEmojiList;
+
 			public:
 				StaticContext()
 				{
-					maxLength = 0;
 					for (sl_uint32 index = 0; ; index++) {
 						const sl_char32* sz = emojis[index];
 						if (sz) {
+							mapEmojiFirstChars.add_NoLock(sz[0], sl_true);
 							String16 str(sz);
-							sl_size len = str.getLength();
-							if (len) {
-								if (len > maxLength) {
-									maxLength = len;
-								}
-								mapEmojis.add_NoLock(Move(str), sl_true);
-								mapEmojiFirstChars.emplace_NoLock(sz[0], sl_true);
+							mapEmojis.add_NoLock(str, sl_true);
+							auto ret = mapEmojiList.emplace_NoLock(sz[0], sl_null);
+							if (ret.node) {
+								ret.node->value.add_NoLock(str);
 							}
 						} else {
 							break;
@@ -86,21 +83,18 @@ namespace slib
 							return 0;
 						}
 					}
-					if (mapEmojiFirstChars.getValue(ch)) {
-						if (len > maxLength) {
-							len = maxLength;
-						}
-						len = Base::getStringLength2(sz, len);
-						MapNode<String16, sl_bool>* node = sl_null;
-						mapEmojis.getNearest(String16(sz, len), &node);
-						if (node) {
-							sl_size lenKey = node->key.getLength();
-							if (lenKey <= len && Base::equalsMemory2((sl_uint16*)sz, (sl_uint16*)(node->key.getData()), lenKey)) {
-								return node->key.getLength();
+					sl_size ret = 0;
+					ListElements<String16> list(mapEmojiList.getValue_NoLock(ch));
+					for (sl_size i = 0; i < list.count; i++) {
+						String16& str = list[i];
+						sl_size lenStr = str.getLength();
+						if (lenStr <= len && lenStr > ret) {
+							if (Base::equalsMemory2((sl_uint16*)(str.getData()), (sl_uint16*)sz, lenStr)) {
+								ret = lenStr;
 							}
 						}
 					}
-					return 0;
+					return ret;
 				}
 				
 			};
