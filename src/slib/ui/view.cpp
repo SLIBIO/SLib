@@ -1159,7 +1159,7 @@ namespace slib
 	
 	void View::_removeChild(View* child)
 	{
-		child->_cancelPressState();
+		child->cancelPressedState();
 
 		onRemoveChild(child);
 		
@@ -1357,7 +1357,9 @@ namespace slib
 		UIRect boundsOld = m_boundsInParent;
 		if (Math::isAlmostZero(boundsOld.getWidth()) || Math::isAlmostZero(boundsOld.getHeight())) {
 			m_boundsInParent = convertCoordinateToParent(getBoundsIncludingShadow());
-			parent->invalidate(m_boundsInParent, mode);
+			if (m_instance.isNull()) {
+				parent->invalidate(m_boundsInParent, mode);
+			}
 			return;
 		}
 		UIRect boundsNew = convertCoordinateToParent(getBoundsIncludingShadow());
@@ -1366,12 +1368,14 @@ namespace slib
 		boundsNew.right += 2;
 		boundsNew.bottom += 2;
 		m_boundsInParent = boundsNew;
-		if (boundsOld.intersectRectangle(boundsNew)) {
-			boundsNew.mergeRectangle(boundsOld);
-			parent->invalidate(boundsNew, mode);
-		} else {
-			parent->invalidate(boundsOld, mode);
-			parent->invalidate(boundsNew, mode);
+		if (m_instance.isNull()) {
+			if (boundsOld.intersectRectangle(boundsNew)) {
+				boundsNew.mergeRectangle(boundsOld);
+				parent->invalidate(boundsNew, mode);
+			} else {
+				parent->invalidate(boundsOld, mode);
+				parent->invalidate(boundsNew, mode);
+			}
 		}
 	}
 	
@@ -1751,7 +1755,7 @@ namespace slib
 			return;
 		}
 		if (visibility != Visibility::Visible) {
-			_cancelPressState();
+			cancelPressedState();
 		}
 		
 		_setInstanceVisible(visibility == Visibility::Visible);
@@ -2047,6 +2051,29 @@ namespace slib
 					if (attrs->backgroundPressed.isNotNull() && attrs->background != attrs->backgroundPressed) {
 						invalidate();
 					}
+				}
+			}
+		}
+	}
+	
+	void View::cancelPressedState()
+	{
+		if (m_flagPressed) {
+			setPressedState(sl_false);
+		}
+		cancelPressedStateOfChildren();
+	}
+	
+	void View::cancelPressedStateOfChildren()
+	{
+		Ref<ChildAttributes>& childAttrs = m_childAttrs;
+		if (childAttrs.isNotNull()) {
+			childAttrs->childMouseDown.setNull();
+			ListElements< Ref<View> > children(getChildren());
+			for (sl_size i = 0; i < children.count; i++) {
+				Ref<View>& child = children[i];
+				if (child->isPressedState()) {
+					child->cancelPressedState();
 				}
 			}
 		}
@@ -9095,22 +9122,6 @@ namespace slib
 		}
 	}
 	
-	void View::_cancelPressState()
-	{
-		Ref<View> view = this;
-		while (view.isNotNull()) {
-			if (view->m_flagPressed) {
-				view->setPressedState(sl_false);
-			}
-			Ref<ChildAttributes>& childAttrs = view->m_childAttrs;
-			if (childAttrs.isNotNull()) {
-				view = childAttrs->childMouseDown;
-			} else {
-				return;
-			}
-		}
-	}
-
 	void View::_processEventForStateAndClick(UIEvent* ev)
 	{
 		UIAction action = ev->getAction();

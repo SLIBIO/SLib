@@ -23,6 +23,7 @@
 #include "slib/ui/view_pager.h"
 
 #include "slib/core/timer.h"
+#include "slib/ui/core.h"
 
 namespace slib
 {
@@ -36,6 +37,7 @@ namespace slib
 		
 		m_indexCurrent = 0;
 		
+		m_flagMouseCapure = sl_false;
 		m_flagMouseDown = sl_false;
 		m_posMouseDown = 0;
 		m_offsetPages = 0;
@@ -44,6 +46,11 @@ namespace slib
 	
 	ViewPager::~ViewPager()
 	{
+	}
+	
+	void ViewPager::init()
+	{
+		ViewGroup::init();
 	}
 	
 	void ViewPager::setAdapter(const Ref<ViewAdapter>& adapter, UIUpdateMode mode)
@@ -145,13 +152,55 @@ namespace slib
 	{
 		selectPage(m_indexCurrent + 1, mode);
 	}
+	
+	void ViewPager::dispatchMouseEvent(UIEvent* ev)
+	{
+		if (ev->getAction() != UIAction::LeftButtonDrag) {
+			m_flagMouseCapure = sl_false;
+		}
+		_onMouseEvent(ev);
+		if (m_flagMouseCapure) {
+			ev->stopPropagation();
+		} else {
+			ViewGroup::dispatchTouchEvent(ev);
+		}
+	}
+	
+	void ViewPager::dispatchTouchEvent(UIEvent* ev)
+	{
+		if (ev->getAction() != UIAction::TouchMove) {
+			m_flagMouseCapure = sl_false;
+		}
+		_onMouseEvent(ev);
+		if (m_flagMouseCapure) {
+			ev->stopPropagation();
+		} else {
+			ViewGroup::dispatchTouchEvent(ev);
+		}
+	}
 
-	void ViewPager::onMouseEvent(UIEvent* ev)
+	void ViewPager::onResize(sl_ui_len width, sl_ui_len height)
+	{
+		_resizePages();
+	}
+	
+	void ViewPager::onChangePadding()
+	{
+		_resizePages();
+	}
+	
+	void ViewPager::_onMouseEvent(UIEvent* ev)
 	{
 		sl_uint64 countPages = getPagesCount();
 		if (countPages <= 0) {
 			return;
 		}
+		
+		sl_real dimUnit = Math::ceil(UI::dpToPixel(1));
+		if (dimUnit < 1) {
+			dimUnit = 1;
+		}
+		
 		UIAction action = ev->getAction();
 		sl_real pos = ev->getX();
 		if (action == UIAction::LeftButtonDown || action == UIAction::TouchBegin) {
@@ -162,6 +211,10 @@ namespace slib
 			m_timer.setNull();
 		} else if (action == UIAction::LeftButtonDrag || action == UIAction::TouchMove) {
 			if (m_flagMouseDown) {
+				if (Math::abs(pos - m_posMouseDown) > 5 * dimUnit) {
+					cancelPressedStateOfChildren();
+					m_flagMouseCapure = sl_true;
+				}
 				m_motionTracker.addMovement(pos, 0);
 				sl_uint64 indexCurrent = m_indexCurrent;
 				sl_real offset = m_offsetPagesMouseDown + (pos - m_posMouseDown);
@@ -205,7 +258,7 @@ namespace slib
 				m_flagMouseDown = sl_false;
 				sl_real v = 0;
 				m_motionTracker.getVelocity(&v, sl_null);
-				sl_real t = (sl_real)(getWidth()) * 0.05f;
+				sl_real t = dimUnit * 10;
 				if (v > t) {
 					if (m_offsetPages > 0) {
 						goToPrevious();
@@ -231,16 +284,6 @@ namespace slib
 				m_motionTracker.clearMovements();
 			}
 		}
-	}
-	
-	void ViewPager::onResize(sl_ui_len width, sl_ui_len height)
-	{
-		_resizePages();
-	}
-	
-	void ViewPager::onChangePadding()
-	{
-		_resizePages();
 	}
 	
 	Ref<View> ViewPager::_loadPage(sl_uint64 index)

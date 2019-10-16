@@ -39,6 +39,9 @@ namespace slib
 		ViewPager();
 		
 		~ViewPager();
+		
+	protected:
+		void init() override;
 
 	public:
 		void setAdapter(const Ref<ViewAdapter>& adapter, UIUpdateMode mode = UIUpdateMode::Redraw);
@@ -55,14 +58,19 @@ namespace slib
 		
 		void goToNext(UIUpdateMode mode = UIUpdateMode::Animate);
 
-	protected:
-		void onMouseEvent(UIEvent* ev) override;
+	public:
+		void dispatchMouseEvent(UIEvent* ev) override;
 		
+		void dispatchTouchEvent(UIEvent* ev) override;
+		
+	protected:
 		void onResize(sl_ui_len width, sl_ui_len height) override;
 		
 		void onChangePadding() override;
 		
 	private:
+		void _onMouseEvent(UIEvent* ev);
+				
 		Ref<View> _loadPage(sl_uint64 index);
 		
 		sl_real _getPagePosition(sl_uint64 index);
@@ -81,8 +89,9 @@ namespace slib
 		AtomicRef<ViewAdapter> m_adapter;
 		CHashMap< sl_uint64, Ref<View> > m_cache;
 		sl_uint64 m_indexCurrent;
-
+		
 		MotionTracker m_motionTracker;
+		sl_bool m_flagMouseCapure;
 		sl_bool m_flagMouseDown;
 		sl_real m_posMouseDown;
 		sl_real m_offsetPages;

@@ -296,6 +296,10 @@ namespace slib
 		
 		virtual void setPressedState(sl_bool flagState, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
+		void cancelPressedState();
+		
+		void cancelPressedStateOfChildren();
+		
 		sl_bool isHoverState();
 		
 		virtual void setHoverState(sl_bool flagState, UIUpdateMode mode = UIUpdateMode::Redraw);
@@ -1414,8 +1418,6 @@ namespace slib
 				
 		sl_bool _scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagPreprocess, sl_bool flagFinish, sl_bool flagAnimate);
 
-		void _cancelPressState();
-		
 		void _processEventForStateAndClick(UIEvent* ev);
 		
 		void _processContentScrollingEvents(UIEvent* ev);
