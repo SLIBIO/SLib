@@ -188,7 +188,7 @@ namespace slib
 		param.frame = bounds;
 		param.color = m_textColor;
 		sl_real shadowOpacity = getShadowOpacity();
-		if (shadowOpacity > 0 && getCurrentBackground().isNull()) {
+		if (shadowOpacity > 0 && !(isLayer()) && getCurrentBackground().isNull()) {
 			param.shadowOpacity = shadowOpacity;
 			param.shadowRadius = (sl_real)(getShadowRadius());
 			param.shadowColor = getShadowColor();

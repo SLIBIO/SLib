@@ -30,6 +30,7 @@ import slib.platform.android.ui.UiThread;
 import slib.platform.android.ui.window.UiWindow;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Rect;
@@ -112,10 +113,16 @@ public class SlibActivity extends Activity {
 	private static Vector<PauseActivityListener> mListPauseActivityListeners = new Vector<PauseActivityListener>();
 	private static Vector<IntentListener> mListIntentListeners = new Vector<IntentListener>();
 
+	public static Context applicationContext;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
+
+		if (applicationContext == null) {
+			applicationContext = getApplicationContext();
+		}
 
 		Window window = getWindow();
 		window.addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);

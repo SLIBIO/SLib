@@ -25,11 +25,12 @@ package slib.platform.android.ui;
 import java.util.Vector;
 
 import slib.platform.android.Logger;
+import slib.platform.android.SlibActivity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.ColorMatrixColorFilter;
@@ -37,7 +38,11 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Shader;
+import android.os.Build;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 
 public class UiBitmap {
 	
@@ -187,7 +192,8 @@ public class UiBitmap {
 			Canvas canvas = graphics.getCanvas();
 			RectF rd = new RectF(dx1, dy1, dx2, dy2);
 			Rect rs = new Rect(sx1, sy1, sx2, sy2);
-			if (alpha < 255 || cm != null || blur > 0.5f) {
+			int iblur = (int)(Math.ceil(blur));
+			if (alpha < 255 || cm != null || iblur >= 1) {
 				Paint paint = new Paint();
 				if (alpha < 255) {
 					paint.setAlpha(alpha);				
@@ -196,10 +202,21 @@ public class UiBitmap {
 					ColorMatrixColorFilter cf = new ColorMatrixColorFilter(cm);
 					paint.setColorFilter(cf);
 				}
-				if (blur > 0.5f) {
-					paint.setMaskFilter(new BlurMaskFilter(blur, BlurMaskFilter.Blur.SOLID));
+				if (iblur >= 1) {
+					if (iblur > 25) {
+						iblur = 25;
+					}
+					Bitmap bitmapBlured = blurBitmap(bitmap, rs, (int)(dx2 - dx1), (int)(dy2 - dy1), iblur);
+					if (bitmapBlured != null) {
+						rd.left -= iblur;
+						rd.top -= iblur;
+						rd.right += iblur;
+						rd.bottom += iblur;
+						canvas.drawBitmap(bitmapBlured, new Rect(0, 0, bitmapBlured.getWidth(), bitmapBlured.getHeight()), rd, paint);
+					}
+				} else {
+					canvas.drawBitmap(bitmap, rs, rd, paint);
 				}
-				canvas.drawBitmap(bitmap, rs, rd, paint);
 			} else {
 				canvas.drawBitmap(bitmap, rs, rd, null);
 			}
@@ -262,7 +279,7 @@ public class UiBitmap {
 					paint.setColorFilter(cf);
 				}
 				if (blur > 0.5f) {
-					paint.setMaskFilter(new BlurMaskFilter(blur, BlurMaskFilter.Blur.SOLID));
+					paint.setMaskFilter(new BlurMaskFilter(blur, BlurMaskFilter.Blur.NORMAL));
 				}
 				canvas.drawBitmap(pixels, 0, stride, dx1, dy1, sw, sh, true, paint);
 			} else {
@@ -358,4 +375,31 @@ public class UiBitmap {
 			mTempStorage = buf;
 		}
 	}
+
+	public static Bitmap blurBitmap(Bitmap src, Rect region, int width, int height, int blur) {
+		if (width <= 0 || height <= 0 || blur <= 0) {
+			return null;
+		}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+			Bitmap bitmap = Bitmap.createBitmap(width + blur * 2, height + blur * 2, src.getConfig());
+			if (bitmap != null) {
+				Canvas canvas = new Canvas(bitmap);
+				canvas.drawBitmap(src, region, new RectF(blur, blur, blur + width, blur + height), null);
+				Context context = SlibActivity.applicationContext;
+				if (context != null) {
+					RenderScript rs = RenderScript.create(context);
+					Allocation input = Allocation.createFromBitmap(rs, bitmap, Allocation.MipmapControl.MIPMAP_NONE, Allocation.USAGE_SCRIPT);
+					Allocation output = Allocation.createTyped(rs, input.getType());
+					ScriptIntrinsicBlur script = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
+					script.setRadius(blur);
+					script.setInput(input);
+					script.forEach(output);
+					output.copyTo(bitmap);
+					return bitmap;
+				}
+			}
+		}
+		return null;
+	}
+
 }

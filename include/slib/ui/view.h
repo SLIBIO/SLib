@@ -1214,7 +1214,9 @@ namespace slib
 		
 		void draw(Canvas* canvas);
 		
-		void drawShadow(Canvas* canvas);
+		sl_bool drawLayerShadow(Canvas* canvas);
+		
+		void drawBoundShadow(Canvas* canvas);
 		
 		void clipBounds(Canvas* canvas);
 		
@@ -1347,6 +1349,8 @@ namespace slib
 		void _removeAllViewInstances();
 		
 		void _attachChild(const Ref<View>& child);
+		
+		void _invalidate(const UIRect& rect, sl_bool flagDrawOutside, UIUpdateMode mode);
 		
 		void _setInstanceVisible(sl_bool flagVisible);
 		

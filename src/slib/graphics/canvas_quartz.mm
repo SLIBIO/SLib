@@ -435,7 +435,7 @@ namespace slib
 							CGGradientRef gradient = GraphicsPlatform::getGradientBrushHandle(brush);
 							if (gradient) {
 								if (desc.style == BrushStyle::LinearGradient) {
-									CGContextDrawLinearGradient(m_graphics, gradient, CGPointMake(detail->point1.x, detail->point1.y), CGPointMake(detail->point2.x, detail->point2.y), 0);
+									CGContextDrawLinearGradient(m_graphics, gradient, CGPointMake(detail->point1.x, detail->point1.y), CGPointMake(detail->point2.x, detail->point2.y), kCGGradientDrawsBeforeStartLocation | kCGGradientDrawsAfterEndLocation);
 								} else {
 									CGContextDrawRadialGradient(m_graphics, gradient, CGPointMake(detail->point1.x, detail->point1.y), 0, CGPointMake(detail->point1.x, detail->point1.y), detail->radius, 0);
 								}

@@ -779,8 +779,11 @@ namespace slib
 	
 	void Button::onDrawShadow(Canvas* canvas)
 	{
+		if (drawLayerShadow(canvas)) {
+			return;
+		}
 		if (getCurrentButtonBackground().isNotNull()) {
-			drawShadow(canvas);
+			drawBoundShadow(canvas);
 		}
 	}
 
@@ -1116,7 +1119,7 @@ namespace slib
 			param.alignment = m_textAlignment;
 			param.flagMultiLine = m_flagMultiLine;
 			sl_real shadowOpacity = getShadowOpacity();
-			if (shadowOpacity > 0 && getCurrentButtonBackground().isNull()) {
+			if (shadowOpacity > 0 && !(isLayer()) && getCurrentButtonBackground().isNull()) {
 				param.shadowOpacity = shadowOpacity;
 				param.shadowRadius = (sl_real)(getShadowRadius());
 				param.shadowColor = getShadowColor();

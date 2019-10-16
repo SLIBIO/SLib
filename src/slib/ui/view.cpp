@@ -1261,12 +1261,24 @@ namespace slib
 
 			Ref<View> parent = m_parent;
 			if (parent.isNotNull()) {
-				parent->invalidate(m_boundsInParent, mode);
+				sl_bool flagDrawOutside = sl_false;
+				Ref<DrawAttributes>& attrs = m_drawAttrs;
+				if (attrs.isNotNull()) {
+					if (attrs->shadowOpacity > 0.0001f) {
+						flagDrawOutside = sl_true;
+					}
+				}
+				parent->_invalidate(m_boundsInParent, flagDrawOutside, mode);
 			}
 		}
 	}
 
 	void View::invalidate(const UIRect& rect, UIUpdateMode mode)
+	{
+		_invalidate(rect, sl_false, mode);
+	}
+	
+	void View::_invalidate(const UIRect& rect, sl_bool flagDrawOutside, UIUpdateMode mode)
 	{
 		if (!SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
 			return;
@@ -1288,6 +1300,23 @@ namespace slib
 			return;
 #endif
 		}
+		
+		if (instance.isNotNull() || m_flagClipping) {
+			flagDrawOutside = sl_false;
+		}
+		
+		if (flagDrawOutside) {
+			UIRect rectIntersect;
+			if (getBounds().intersectRectangle(rect, &rectIntersect)) {
+				invalidateLayer(rectIntersect);
+			}
+			Ref<View> parent = m_parent;
+			if (parent.isNotNull()) {
+				parent->_invalidate(convertCoordinateToParent(rect), sl_true, mode);
+			}
+			return;
+		}
+		
 		UIRect rectIntersect;
 		if (getBounds().intersectRectangle(rect, &rectIntersect)) {
 
@@ -1300,7 +1329,7 @@ namespace slib
 
 			Ref<View> parent = m_parent;
 			if (parent.isNotNull()) {
-				parent->invalidate(convertCoordinateToParent(rectIntersect), mode);
+				parent->_invalidate(convertCoordinateToParent(rectIntersect), sl_false, mode);
 			}
 		}
 	}
@@ -7618,13 +7647,24 @@ namespace slib
 
 	void View::draw(Canvas* canvas)
 	{
+		Ref<DrawAttributes>& drawAttrs = m_drawAttrs;
+		sl_bool flagShadow = m_instance.isNull() && drawAttrs.isNotNull() && drawAttrs->shadowOpacity > 0;
+		
 		if (isLayer()) {
 			Ref<Bitmap> bitmap = drawLayer();
 			if (bitmap.isNotNull()) {
+				if (flagShadow) {
+					dispatchDrawShadow(canvas);
+				}
 				Rectangle rcInvalidated = canvas->getInvalidatedRect();
-				canvas->draw(rcInvalidated, bitmap, rcInvalidated);
-				return;
+				if (rcInvalidated.intersectRectangle(getBounds(), &rcInvalidated)) {
+					canvas->draw(rcInvalidated, bitmap, rcInvalidated);
+				}
 			}
+			return;
+		}
+		if (flagShadow) {
+			dispatchDrawShadow(canvas);
 		}
 		BoundShape boundShape = getBoundShape();
 		if (m_flagClipping && boundShape != BoundShape::None) {
@@ -7636,7 +7676,38 @@ namespace slib
 		}
 	}
 	
-	void View::drawShadow(Canvas* canvas)
+	sl_bool View::drawLayerShadow(Canvas *canvas)
+	{
+		Ref<DrawAttributes>& drawAttrs = m_drawAttrs;
+		if (drawAttrs.isNull()) {
+			return sl_false;
+		}
+		sl_real opacity = drawAttrs->shadowOpacity;
+		if (opacity < 0.0001f) {
+			return sl_false;
+		}
+		Ref<Bitmap> layer = drawAttrs->bitmapLayer;
+		if (layer.isNotNull()) {
+			Color& color = drawAttrs->shadowColor;
+			DrawParam param;
+			param.useBlur = sl_true;
+			param.blurRadius = drawAttrs->shadowRadius;
+			param.useColorMatrix = sl_true;
+			param.colorMatrix.red = Color4f::zero();
+			param.colorMatrix.green = Color4f::zero();
+			param.colorMatrix.blue = Color4f::zero();
+			param.colorMatrix.alpha = Color4f(0, 0, 0, color.getAlphaF() * opacity);
+			param.colorMatrix.bias = Color4f(color.getRedF(), color.getGreenF(), color.getBlueF(), 0);
+			Rectangle rcSrc = getBounds();
+			Rectangle rcDst = rcSrc;
+			rcDst.translate(drawAttrs->shadowOffset);
+			canvas->draw(rcDst, layer, rcSrc, param);
+			return sl_true;
+		}
+		return sl_false;
+	}
+	
+	void View::drawBoundShadow(Canvas* canvas)
 	{
 		Ref<DrawAttributes>& drawAttrs = m_drawAttrs;
 		if (drawAttrs.isNull()) {
@@ -7647,21 +7718,21 @@ namespace slib
 			return;
 		}
 		sl_real opacity = drawAttrs->shadowOpacity;
-		if (opacity < SLIB_EPSILON) {
+		if (opacity < 0.0001f) {
 			return;
 		}
 		Color color = drawAttrs->shadowColor;
 		color.multiplyAlpha((float)opacity);
-		sl_real radius = (sl_real)(drawAttrs->shadowRadius);
+		sl_real radius = (sl_real)(sl_ui_pos)(drawAttrs->shadowRadius);
 		Rectangle bounds = getBounds();
-		sl_real x = (sl_real)(bounds.left + drawAttrs->shadowOffset.x);
-		sl_real y = (sl_real)(bounds.top + drawAttrs->shadowOffset.y);
+		sl_real x = (sl_real)(sl_ui_pos)(bounds.left + drawAttrs->shadowOffset.x);
+		sl_real y = (sl_real)(sl_ui_pos)(bounds.top + drawAttrs->shadowOffset.y);
 		sl_real width = bounds.getWidth();
 		sl_real height = bounds.getHeight();
 		if (shape == BoundShape::Rectangle) {
 			canvas->drawShadowRectangle(x, y, width, height, color, radius);
 		} else if (shape == BoundShape::RoundRect) {
-			canvas->drawShadowRoundRect(x, y, width, height, (sl_real)(drawAttrs->boundRadius.x), color, radius);
+			canvas->drawShadowRoundRect(x, y, width, height, (sl_real)(sl_ui_pos)(drawAttrs->boundRadius.x), color, radius);
 		} else if (shape == BoundShape::Ellipse) {
 			sl_real w2 = width / 2;
 			sl_real h2 = height / 2;
@@ -7991,10 +8062,6 @@ namespace slib
 
 			if (m_flagDrawing) {
 				
-				if (m_instance.isNull() && drawAttrs.isNotNull() && drawAttrs->shadowOpacity > 0) {
-					dispatchDrawShadow(canvas);
-				}
-				
 				getOnPreDraw()(this, canvas);
 
 				draw(canvas);
@@ -8045,8 +8112,11 @@ namespace slib
 	
 	void View::onDrawShadow(Canvas* canvas)
 	{
+		if (drawLayerShadow(canvas)) {
+			return;
+		}
 		if (getCurrentBackground().isNotNull()) {
-			drawShadow(canvas);
+			drawBoundShadow(canvas);
 		}
 	}
 	
