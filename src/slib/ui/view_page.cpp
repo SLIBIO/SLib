@@ -39,7 +39,7 @@ namespace slib
 			TransitionType g_defaultOpeningPopupTransitionType = TransitionType::Zoom;
 			TransitionDirection g_defaultOpeningPopupTransitionDirection = TransitionDirection::FromBottomToTop;
 			float g_defaultOpeningPopupTransitionDuration = 0.25f;
-			AnimationCurve g_defaultOpeningPopupTransitionCurve = AnimationCurve::EaseInOut;
+			AnimationCurve g_defaultOpeningPopupTransitionCurve = AnimationCurve::EaseOut;
 			TransitionType g_defaultClosingPopupTransitionType = TransitionType::Fade;
 			TransitionDirection g_defaultClosingPopupTransitionDirection = TransitionDirection::FromTopToBottom;
 			float g_defaultClosingPopupTransitionDuration = 0.2f;
