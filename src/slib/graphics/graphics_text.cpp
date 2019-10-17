@@ -1696,6 +1696,8 @@ namespace slib
 				Color color = style->textColor;
 				if (color.isNotZero()) {
 					param.color = color;
+				} else {
+					param.color = _param.color;
 				}
 				if (type == TextItemType::Word) {
 					TextWordItem* wordItem = static_cast<TextWordItem*>(item);
