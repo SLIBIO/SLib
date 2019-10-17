@@ -1029,7 +1029,8 @@ using namespace slib::priv::window;
 
 - (void)sendEvent:(NSEvent *)event
 {
-	if (event.type == NSEventTypeKeyDown) {
+	NSEventType type = event.type;
+	if (type == NSEventTypeKeyDown) {
 		id view = [self firstResponder];
 		if ([view isKindOfClass:[NSTextView class]]) {
 			// Find NSTextField
@@ -1048,7 +1049,7 @@ using namespace slib::priv::window;
 				}
 			}
 		}
-	} else if (event.type == NSEventTypeMouseMoved) {
+	} else if (type == NSEventTypeMouseMoved) {
 		NSPoint pt = [event locationInWindow];
 		NSView* hit = nil;
 		NSView* content = [self contentView];
@@ -1072,6 +1073,15 @@ using namespace slib::priv::window;
 			[hit mouseMoved:event];
 		}
 		return;
+	}
+	if (type == NSEventTypeKeyDown || type == NSEventTypeKeyUp) {
+		id responder = [self firstResponder];
+		if (responder == self) {
+			responder = self.contentView;
+			if (responder != nil) {
+				[self makeFirstResponder:responder];
+			}
+		}
 	}
 	[super sendEvent:event];
 }
