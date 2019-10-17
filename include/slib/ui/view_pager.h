@@ -58,6 +58,10 @@ namespace slib
 		
 		void goToNext(UIUpdateMode mode = UIUpdateMode::Animate);
 		
+		sl_bool isLoop();
+		
+		void setLoop(sl_bool flag);
+		
 	public:
 		SLIB_DECLARE_EVENT_HANDLER(ViewPager, SelectPage, sl_uint64 index)
 
@@ -76,7 +80,7 @@ namespace slib
 				
 		Ref<View> _loadPage(sl_uint64 index);
 		
-		sl_real _getPagePosition(sl_uint64 index);
+		sl_ui_pos _getPagePosition(sl_uint64 index);
 		
 		void _relocatePages();
 		
@@ -93,12 +97,14 @@ namespace slib
 		CHashMap< sl_uint64, Ref<View> > m_cache;
 		sl_uint64 m_indexCurrent;
 		
+		sl_bool m_flagLoop;
+		
 		MotionTracker m_motionTracker;
 		sl_bool m_flagMouseCapure;
 		sl_bool m_flagMouseDown;
 		Point m_posMouseDown;
-		sl_real m_offsetPages;
-		sl_real m_offsetPagesMouseDown;
+		sl_ui_len m_offsetPages;
+		sl_ui_len m_offsetPagesMouseDown;
 
 		AtomicRef<Timer> m_timer;
 	};

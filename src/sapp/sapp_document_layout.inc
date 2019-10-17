@@ -4170,6 +4170,8 @@ namespace slib
 	{
 		LAYOUT_CONTROL_PROCESS_SUPER(View)
 		
+		LAYOUT_CONTROL_GENERIC_ATTR(loop, setLoop)
+		
 		if (op == OP_PARSE) {
 			ListLocker< Ref<XmlElement> > itemXmls(_getLayoutItemChildElements(resourceItem, resource->name, "item"));
 			for (sl_size i = 0; i < itemXmls.count; i++) {

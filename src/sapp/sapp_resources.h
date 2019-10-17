@@ -755,6 +755,9 @@ namespace slib
 	{
 	public:
 		CList<SAppLayoutPagerItem> items;
+		
+		SAppBooleanValue loop;
+		
 	};
 
 	class SAppLayoutNavigationAttributes : public Referable
