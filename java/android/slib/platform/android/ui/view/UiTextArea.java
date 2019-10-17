@@ -23,12 +23,70 @@
 package slib.platform.android.ui.view;
 
 import android.content.Context;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.ViewParent;
+
+import slib.platform.android.Logger;
 
 public class UiTextArea extends UiEditView {
 
 	public UiTextArea(Context context) {
 		super(context);
+		initializeTextArea(context);
+	}
+
+	public UiTextArea(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		initializeTextArea(context);
+	}
+
+	public UiTextArea(Context context, AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
+		initializeTextArea(context);
+	}
+
+	private void initializeTextArea(Context context) {
 		_setMultiLine(this, true);
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent ev) {
+		int action = ev.getAction();
+		if ((action == MotionEvent.ACTION_MOVE || action == MotionEvent.ACTION_DOWN) && isScrolling()) {
+			lockScrollParent(true);
+		} else {
+			lockScrollParent(false);
+		}
+		return super.onTouchEvent(ev);
+	}
+
+	void lockScrollParent(boolean lock) {
+		ViewParent view = getParent();
+		for (;;) {
+			if (view == null) {
+				return;
+			}
+			if (view instanceof UiScrollView) {
+				((UiScrollView)view).setLockScroll(lock);
+				return;
+			} else if (view instanceof UiHorizontalScrollView) {
+				((UiHorizontalScrollView)view).setLockScroll(lock);
+				return;
+			}
+			view = view.getParent();
+		}
+	}
+
+	boolean isScrolling() {
+		try {
+			if (computeVerticalScrollRange() > computeVerticalScrollExtent()) {
+				return true;
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		return false;
 	}
 
 }

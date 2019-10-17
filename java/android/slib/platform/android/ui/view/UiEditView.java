@@ -39,9 +39,11 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextWatcher;
+import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -64,12 +66,10 @@ public class UiEditView extends EditText implements IView {
 		try {
 			if (type == 0) {
 				// EditView
-				UiEditView view = new UiEditView(context);
-				return view;
+				return new UiEditView(context);
 			} else if (type == 2) {
 				// TextArea
-				UiTextArea view = new UiTextArea(context);
-				return view;
+				return (UiTextArea)(LayoutInflater.from(context).inflate(R.layout.slib_text_area, null, false));
 			}
 		} catch (Exception e) {
 			Logger.exception(e);
@@ -453,9 +453,21 @@ public class UiEditView extends EditText implements IView {
 	}
 
 	public UiEditView(Context context) {
-
 		super(context);
+		initializeEditView(context);
+	}
 
+	public UiEditView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		initializeEditView(context);
+	}
+
+	public UiEditView(Context context, AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
+		initializeEditView(context);
+	}
+
+	private void initializeEditView(Context context) {
 		int padding = 3;
 		try {
 			padding = (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3, context.getResources().getDisplayMetrics()));
