@@ -2105,24 +2105,20 @@ namespace slib
 		return m_flagLockScroll;
 	}
 	
-	void View::lockScroll()
+	void View::setLockScroll(sl_bool flagLock)
 	{
-		m_flagLockScroll = sl_true;
+		m_flagLockScroll = flagLock;
+		Ref<ViewInstance> instance = getNativeWidget();
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&View::setLockScroll, flagLock)
+			instance->setLockScroll(this, flagLock);
+		}
 		Ref<View> parent = m_parent;
 		if (parent.isNotNull()) {
-			parent->lockScroll();
+			parent->setLockScroll(flagLock);
 		}
 	}
 	
-	void View::cancelLockScroll()
-	{
-		m_flagLockScroll = sl_false;
-		Ref<View> parent = m_parent;
-		if (parent.isNotNull()) {
-			parent->cancelLockScroll();
-		}
-	}
-
 	Ref<Cursor> View::getCursor()
 	{
 		Ref<OtherAttributes>& attrs = m_otherAttrs;
@@ -9629,6 +9625,10 @@ namespace slib
 	}
 
 	void ViewInstance::setPaging(View* view, sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight)
+	{
+	}
+	
+	void ViewInstance::setLockScroll(View* view, sl_bool flagLock)
 	{
 	}
 	

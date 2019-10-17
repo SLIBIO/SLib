@@ -306,9 +306,7 @@ namespace slib
 		
 		sl_bool isLockScroll();
 		
-		void lockScroll();
-		
-		void cancelLockScroll();
+		virtual void setLockScroll(sl_bool flagLock);
 		
 		
 		Ref<Cursor> getCursor();
@@ -1900,6 +1898,8 @@ namespace slib
 		
 		virtual void setPaging(View* view, sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight);
 
+		virtual void setLockScroll(View* view, sl_bool flagLock);
+		
 	public:
 		void onDraw(Canvas* canvas);
 		

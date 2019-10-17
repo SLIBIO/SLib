@@ -105,10 +105,9 @@ namespace slib
 			}
 		}
 		
-		if (m_indexCurrent == index) {
-			return;
+		if (m_indexCurrent != index) {
+			dispatchSelectPage(index);
 		}
-		dispatchSelectPage(index);
 		
 		if (!SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
 			m_indexCurrent = index;
@@ -169,9 +168,15 @@ namespace slib
 	
 	void ViewPager::dispatchMouseEvent(UIEvent* ev)
 	{
-		if (ev->getAction() != UIAction::LeftButtonDrag) {
+		UIAction action = ev->getAction();
+		if (action != UIAction::LeftButtonDrag) {
 			m_flagMouseCapure = sl_false;
-			cancelLockScroll();
+			if (action != UIAction::LeftButtonDown) {
+				Ref<View> parent = getParent();
+				if (parent.isNotNull()) {
+					parent->setLockScroll(sl_false);
+				}
+			}
 		}
 		_onMouseEvent(ev);
 		if (m_flagMouseCapure) {
@@ -183,9 +188,15 @@ namespace slib
 	
 	void ViewPager::dispatchTouchEvent(UIEvent* ev)
 	{
-		if (ev->getAction() != UIAction::TouchMove) {
+		UIAction action = ev->getAction();
+		if (action != UIAction::TouchMove) {
 			m_flagMouseCapure = sl_false;
-			cancelLockScroll();
+			if (action != UIAction::TouchBegin) {
+				Ref<View> parent = getParent();
+				if (parent.isNotNull()) {
+					parent->setLockScroll(sl_false);
+				}
+			}
 		}
 		_onMouseEvent(ev);
 		if (m_flagMouseCapure) {
@@ -231,9 +242,12 @@ namespace slib
 				if (dx > 5 * dimUnit) {
 					cancelPressedStateOfChildren();
 					m_flagMouseCapure = sl_true;
-					sl_real dy = Math::abs(pos.x - m_posMouseDown.x);
+					sl_real dy = Math::abs(pos.y - m_posMouseDown.y);
 					if (dy < dx) {
-						lockScroll();
+						Ref<View> parent = getParent();
+						if (parent.isNotNull()) {
+							parent->setLockScroll(sl_true);
+						}
 					}
 				}
 				m_motionTracker.addMovement(pos.x, pos.y);

@@ -194,6 +194,18 @@ namespace slib
 					}
 				}
 				
+				void setLockScroll(View* view, sl_bool flagLock) override
+				{
+					SLIBScrollViewHandle* handle = getHandle();
+					if (handle != nil) {
+						if (flagLock) {
+							handle.scrollEnabled = NO;
+						} else {
+							handle.scrollEnabled = YES;
+						}
+					}
+				}
+				
 				void setBackgroundColor(View* view, const Color& color) override
 				{
 					SLIBScrollViewHandle* handle = getHandle();
@@ -362,6 +374,10 @@ using namespace slib::priv::scroll_view;
 	self.state = UIGestureRecognizerStateEnded;
 	Ref<ScrollViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
+		Ref<View> view = instance->getView();
+		if (view.isNotNull()) {
+			view->setLockScroll(sl_false);
+		}
 		instance->onEventTouch(UIAction::TouchEnd, touches, theEvent, sl_false);
 	}
 }
@@ -370,6 +386,10 @@ using namespace slib::priv::scroll_view;
 {
 	Ref<ScrollViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
+		Ref<View> view = instance->getView();
+		if (view.isNotNull()) {
+			view->setLockScroll(sl_false);
+		}
 		instance->onEventTouch(UIAction::TouchCancel, touches, theEvent, sl_false);
 	}
 }
