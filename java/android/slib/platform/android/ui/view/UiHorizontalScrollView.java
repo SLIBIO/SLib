@@ -120,14 +120,26 @@ public class UiHorizontalScrollView extends HorizontalScrollView implements IVie
 		}
 	}
 
+	boolean flagLock = false;
+
+	public void setLockScroll(boolean flag) {
+		flagLock = flag;
+	}
+
 	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
 		UiWindow.dismissKeyboard(this, ev);
+		int action = ev.getAction();
+		if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+			flagLock = false;
+		}
+		if (flagLock) {
+			return false;
+		}
 		flagFling = false;
 		boolean flag = super.onTouchEvent(ev);
 		if (mPaging) {
-			int action = ev.getAction();
 			if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
 				if (!flagFling) {
 					scrollToPage(0);
@@ -135,6 +147,18 @@ public class UiHorizontalScrollView extends HorizontalScrollView implements IVie
 			}
 		}
 		return flag;
+	}
+
+	@Override
+	public boolean onInterceptTouchEvent(MotionEvent ev) {
+		int action = ev.getAction();
+		if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+			flagLock = false;
+		}
+		if (flagLock) {
+			return false;
+		}
+		return super.onInterceptTouchEvent(ev);
 	}
 
 	void scrollToPage(int velocity) {

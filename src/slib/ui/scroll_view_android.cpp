@@ -47,6 +47,7 @@ namespace slib
 				SLIB_JNI_STATIC_METHOD(getScrollX, "_getScrollX", "(Landroid/view/View;)I");
 				SLIB_JNI_STATIC_METHOD(getScrollY, "_getScrollY", "(Landroid/view/View;)I");
 				SLIB_JNI_STATIC_METHOD(setPaging, "_setPaging", "(Landroid/view/View;ZII)V");
+				SLIB_JNI_STATIC_METHOD(setLockScroll, "_setLockScroll", "(Landroid/view/View;Z)V");
 				SLIB_JNI_STATIC_METHOD(setScrollBarsVisible, "_setScrollBarsVisible", "(Landroid/view/View;ZZ)V");
 
 				SLIB_JNI_NATIVE(nativeOnScroll, "nativeOnScroll", "(JII)V", OnScroll);
@@ -132,6 +133,14 @@ namespace slib
 					}
 				}
 
+				void setLockScroll(View* view, sl_bool flagLock) override
+				{
+					jobject handle = m_handle.get();
+					if (handle) {
+						JScrollView::setLockScroll.call(sl_null, handle, flagLock);
+					}
+				}
+				
 				void setScrollBarsVisible(View* view, sl_bool flagHorizontal, sl_bool flagVertical) override
 				{
 					jobject handle = m_handle.get();

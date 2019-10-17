@@ -110,6 +110,18 @@ public class UiScrollView extends ScrollView implements IView {
 		}
 	}
 
+	public static void _setLockScroll(View view, boolean flagLock) {
+		try {
+			if (view instanceof UiScrollView) {
+				((UiScrollView) view).setLockScroll(flagLock);
+			} else if (view instanceof UiHorizontalScrollView) {
+				((UiHorizontalScrollView) view).setLockScroll(flagLock);
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+
 	public static void _setScrollBarsVisible(View view, boolean flagHorz, boolean flagVert) {
 		try {
 			view.setHorizontalScrollBarEnabled(flagHorz);
@@ -210,14 +222,26 @@ public class UiScrollView extends ScrollView implements IView {
 		}
 	}
 
+	boolean flagLock = false;
+
+	public void setLockScroll(boolean flag) {
+		flagLock = flag;
+	}
+
 	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
 		UiWindow.dismissKeyboard(this, ev);
+		int action = ev.getAction();
+		if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+			flagLock = false;
+		}
+		if (flagLock) {
+			return false;
+		}
 		flagFling = false;
 		boolean flag = super.onTouchEvent(ev);
 		if (mPaging) {
-			int action = ev.getAction();
 			if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
 				if (!flagFling) {
 					scrollToPage(0);
@@ -225,6 +249,18 @@ public class UiScrollView extends ScrollView implements IView {
 			}
 		}
 		return flag;
+	}
+
+	@Override
+	public boolean onInterceptTouchEvent(MotionEvent ev) {
+		int action = ev.getAction();
+		if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+			flagLock = false;
+		}
+		if (flagLock) {
+			return false;
+		}
+		return super.onInterceptTouchEvent(ev);
 	}
 
 	@Override

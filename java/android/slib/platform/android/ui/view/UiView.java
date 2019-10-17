@@ -535,7 +535,7 @@ public class UiView {
 	}
 
 	public static boolean onEventTouch(IView view, MotionEvent event) {
-		return onEventTouch(view, event, false, false);
+		return onEventTouch(view, event, true, false);
 	}
 
 	private static native void nativeOnSetFocus(long instance);
