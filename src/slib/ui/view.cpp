@@ -9744,11 +9744,17 @@ namespace slib
 		if (view.isNotNull()) {
 			if (ev->getFlags() & UIEventFlags::DispatchToParent) {
 				view->dispatchKeyEvent(ev);
+				if (ev->isStoppedPropagation()) {
+					return;
+				}
 				view = view->getParent();
 				while (view.isNotNull()) {
 					if (!(view->isNativeWidget())) {
 						ev->addFlag(UIEventFlags::NotDispatchToChildren);
 						view->dispatchKeyEvent(ev);
+						if (ev->isStoppedPropagation()) {
+							return;
+						}
 					}
 					view = view->getParent();
 				}
@@ -9764,6 +9770,9 @@ namespace slib
 		if (view.isNotNull()) {
 			if (ev->getFlags() & UIEventFlags::DispatchToParent) {
 				view->dispatchMouseEvent(ev);
+				if (ev->isStoppedPropagation()) {
+					return;
+				}
 				UIPoint pt = ev->getPoint();
 				Ref<View> child = view;
 				view = view->getParent();
@@ -9773,6 +9782,9 @@ namespace slib
 						ev->setPoint(pt);
 						ev->addFlag(UIEventFlags::NotDispatchToChildren);
 						view->dispatchMouseEvent(ev);
+						if (ev->isStoppedPropagation()) {
+							return;
+						}
 					}
 					child = view;
 					view = view->getParent();
@@ -9792,6 +9804,9 @@ namespace slib
 			if (ev->getFlags() & UIEventFlags::DispatchToParent) {
 			
 				view->dispatchTouchEvent(ev);
+				if (ev->isStoppedPropagation()) {
+					return;
+				}
 				
 				UIPoint pt = ev->getPoint();
 				Array<TouchPoint> arrPts = ev->getTouchPoints();
@@ -9822,6 +9837,9 @@ namespace slib
 						ev->setTouchPoints(arrPts);
 						ev->addFlag(UIEventFlags::NotDispatchToChildren);
 						view->dispatchTouchEvent(ev);
+						if (ev->isStoppedPropagation()) {
+							return;
+						}
 					}
 					child = view;
 					view = view->getParent();
