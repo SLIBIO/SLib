@@ -311,6 +311,7 @@ namespace slib
 		SAppBooleanValue scrollingByMouseWheel;
 		SAppBooleanValue scrollingByKeyboard;
 		
+		SAppBooleanValue hitTest;
 		SAppBooleanValue touchMultipleChildren;
 		SAppBooleanValue tabStop;
 		String nextTabStop;

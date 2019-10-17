@@ -2367,6 +2367,7 @@ namespace slib
 		LAYOUT_CONTROL_GENERIC_ATTR(scrollingByMouseWheel, setContentScrollingByMouseWheel)
 		LAYOUT_CONTROL_GENERIC_ATTR(scrollingByKeyboard, setContentScrollingByKeyboard)
 		
+		LAYOUT_CONTROL_GENERIC_ATTR(hitTest, setHitTestable)
 		LAYOUT_CONTROL_GENERIC_ATTR(touchMultipleChildren, setTouchMultipleChildren)
 		if (flagView) {
 			LAYOUT_CONTROL_GENERIC_ATTR(tabStop, setTabStopEnabled)
