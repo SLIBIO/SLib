@@ -72,6 +72,7 @@ namespace slib
 		m_flagFocused(sl_false),
 		m_flagPressed(sl_false),
 		m_flagHover(sl_false),
+		m_flagLockScroll(sl_false),
 	
 		m_attachMode(UIAttachMode::AttachAlways),
 		m_visibility(Visibility::Visible),
@@ -2096,6 +2097,29 @@ namespace slib
 					}
 				}
 			}
+		}
+	}
+	
+	sl_bool View::isLockScroll()
+	{
+		return m_flagLockScroll;
+	}
+	
+	void View::lockScroll()
+	{
+		m_flagLockScroll = sl_true;
+		Ref<View> parent = m_parent;
+		if (parent.isNotNull()) {
+			parent->lockScroll();
+		}
+	}
+	
+	void View::cancelLockScroll()
+	{
+		m_flagLockScroll = sl_false;
+		Ref<View> parent = m_parent;
+		if (parent.isNotNull()) {
+			parent->cancelLockScroll();
 		}
 	}
 

@@ -304,6 +304,12 @@ namespace slib
 		
 		virtual void setHoverState(sl_bool flagState, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
+		sl_bool isLockScroll();
+		
+		void lockScroll();
+		
+		void cancelLockScroll();
+		
 		
 		Ref<Cursor> getCursor();
 		
@@ -1461,6 +1467,7 @@ namespace slib
 		sl_bool m_flagFocused : 1;
 		sl_bool m_flagPressed : 1;
 		sl_bool m_flagHover : 1;
+		sl_bool m_flagLockScroll: 1;
 		
 		AtomicString m_id;
 		UIAttachMode m_attachMode;

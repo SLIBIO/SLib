@@ -57,6 +57,9 @@ namespace slib
 		void goToPrevious(UIUpdateMode mode = UIUpdateMode::Animate);
 		
 		void goToNext(UIUpdateMode mode = UIUpdateMode::Animate);
+		
+	public:
+		SLIB_DECLARE_EVENT_HANDLER(ViewPager, SelectPage, sl_uint64 index)
 
 	public:
 		void dispatchMouseEvent(UIEvent* ev) override;
@@ -93,7 +96,7 @@ namespace slib
 		MotionTracker m_motionTracker;
 		sl_bool m_flagMouseCapure;
 		sl_bool m_flagMouseDown;
-		sl_real m_posMouseDown;
+		Point m_posMouseDown;
 		sl_real m_offsetPages;
 		sl_real m_offsetPagesMouseDown;
 

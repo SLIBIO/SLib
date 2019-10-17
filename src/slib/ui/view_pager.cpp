@@ -39,7 +39,8 @@ namespace slib
 		
 		m_flagMouseCapure = sl_false;
 		m_flagMouseDown = sl_false;
-		m_posMouseDown = 0;
+		m_posMouseDown.x = 0;
+		m_posMouseDown.y = 0;
 		m_offsetPages = 0;
 		m_offsetPagesMouseDown = 0;
 	}
@@ -103,6 +104,12 @@ namespace slib
 				index = n - 1;
 			}
 		}
+		
+		if (m_indexCurrent == index) {
+			return;
+		}
+		dispatchSelectPage(index);
+		
 		if (!SLIB_UI_UPDATE_MODE_IS_REDRAW(mode)) {
 			m_indexCurrent = index;
 			return;
@@ -153,10 +160,18 @@ namespace slib
 		selectPage(m_indexCurrent + 1, mode);
 	}
 	
+	SLIB_DEFINE_EVENT_HANDLER(ViewPager, SelectPage, sl_uint64 index)
+	
+	void ViewPager::dispatchSelectPage(sl_uint64 index)
+	{
+		SLIB_INVOKE_EVENT_HANDLER(SelectPage, index)
+	}
+	
 	void ViewPager::dispatchMouseEvent(UIEvent* ev)
 	{
 		if (ev->getAction() != UIAction::LeftButtonDrag) {
 			m_flagMouseCapure = sl_false;
+			cancelLockScroll();
 		}
 		_onMouseEvent(ev);
 		if (m_flagMouseCapure) {
@@ -170,6 +185,7 @@ namespace slib
 	{
 		if (ev->getAction() != UIAction::TouchMove) {
 			m_flagMouseCapure = sl_false;
+			cancelLockScroll();
 		}
 		_onMouseEvent(ev);
 		if (m_flagMouseCapure) {
@@ -202,7 +218,7 @@ namespace slib
 		}
 		
 		UIAction action = ev->getAction();
-		sl_real pos = ev->getX();
+		Point pos = ev->getPoint();
 		if (action == UIAction::LeftButtonDown || action == UIAction::TouchBegin) {
 			m_motionTracker.clearMovements();
 			m_flagMouseDown = sl_true;
@@ -211,13 +227,18 @@ namespace slib
 			m_timer.setNull();
 		} else if (action == UIAction::LeftButtonDrag || action == UIAction::TouchMove) {
 			if (m_flagMouseDown) {
-				if (Math::abs(pos - m_posMouseDown) > 5 * dimUnit) {
+				sl_real dx = Math::abs(pos.x - m_posMouseDown.x);
+				if (dx > 5 * dimUnit) {
 					cancelPressedStateOfChildren();
 					m_flagMouseCapure = sl_true;
+					sl_real dy = Math::abs(pos.x - m_posMouseDown.x);
+					if (dy < dx) {
+						lockScroll();
+					}
 				}
-				m_motionTracker.addMovement(pos, 0);
+				m_motionTracker.addMovement(pos.x, pos.y);
 				sl_uint64 indexCurrent = m_indexCurrent;
-				sl_real offset = m_offsetPagesMouseDown + (pos - m_posMouseDown);
+				sl_real offset = m_offsetPagesMouseDown + (pos.x - m_posMouseDown.x);
 				sl_uint64 indexOther = indexCurrent;
 				if (indexCurrent <= 0) {
 					if (offset > 0) {
