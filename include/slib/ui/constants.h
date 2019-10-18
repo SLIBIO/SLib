@@ -423,12 +423,21 @@ namespace slib
 		Light = 2
 	};
 	
-	struct UIEdgeInsets
+	class UIEdgeInsets
 	{
+	public:
 		sl_ui_len left;
 		sl_ui_len top;
 		sl_ui_len right;
 		sl_ui_len bottom;
+		
+	public:
+		UIEdgeInsets(): left(0), top(0), right(0), bottom(0) {}
+		
+		UIEdgeInsets(sl_ui_len _left, sl_ui_len _top, sl_ui_len _right, sl_ui_len _bottom): left(_left), top(_top), right(_right), bottom(_bottom) {}
+		
+		SLIB_DEFINE_CLASS_DEFAULT_MEMBERS_INLINE(UIEdgeInsets)
+		
 	};
 	
 }
