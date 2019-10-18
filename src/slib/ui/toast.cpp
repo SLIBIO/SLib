@@ -54,7 +54,10 @@ namespace slib
 					}
 					Ref<Font> font = toast->font;
 					if (font.isNull()) {
-						return;
+						font = Toast::getDefaultFont();
+						if (font.isNull()) {
+							return;
+						}
 					}
 					Ref<View> parent = toast->parent;
 					if (parent.isNull()) {
@@ -90,12 +93,32 @@ namespace slib
 					view->setBackgroundColor(Color(0, 0, 0, 160), UIUpdateMode::Init);
 					view->setBoundRadius(font->getFontHeight() / 3, UIUpdateMode::Init);
 					view->setPadding((sl_ui_pos)(font->getFontHeight() / 3), UIUpdateMode::Init);
-					view->setCenterInParent(UIUpdateMode::Init);
+					Alignment halign = toast->gravity & Alignment::HorizontalMask;
+					Alignment valign = toast->gravity & Alignment::VerticalMask;
+					if (halign == Alignment::Left) {
+						view->setAlignParentLeft(UIUpdateMode::Init);
+					} else if (halign == Alignment::Right) {
+						view->setAlignParentRight(UIUpdateMode::Init);
+					} else {
+						view->setCenterHorizontal(UIUpdateMode::Init);
+					}
+					if (valign == Alignment::Top) {
+						view->setAlignParentTop(UIUpdateMode::Init);
+					} else if (valign == Alignment::Bottom) {
+						view->setAlignParentBottom(UIUpdateMode::Init);
+					} else {
+						view->setCenterVertical(UIUpdateMode::Init);
+					}
+					view->setMargin(toast->margin, UIUpdateMode::Init);
 					view->setClipping(sl_true, UIUpdateMode::Init);
 					currentToast = view;
 					parent->addChild(view);
 					animation = view->startAlphaAnimation(0, 1, 0.3f, sl_null, AnimationCurve::Linear, AnimationFlags::NotSelfAlive);
 					
+					sl_uint32 duration = toast->duration;
+					if (!duration) {
+						duration = Toast::getDefaultDuration();
+					}
 					UI::dispatchToUiThread(Function<void()>::with(ToWeakRef(view), [this, view]() {
 						MutexLocker locker(&lock);
 						if (currentToast.isNotNull()) {
@@ -108,15 +131,15 @@ namespace slib
 								}
 							}), AnimationCurve::Linear, AnimationFlags::NotSelfAlive);
 						}
-					}), (sl_uint32)(toast->duration * 1000));
+					}), duration);
 				}
 				
 			};
 			
 			SLIB_SAFE_STATIC_GETTER(ToastManager, GetToastManager)
 			
-			
-			float g_defaultDuration = 2.0f;
+			// milliseconds
+			sl_uint32 g_defaultDuration = 2000;
 			
 			SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Font>, g_defaultFont)
 			
@@ -129,8 +152,9 @@ namespace slib
 
 	Toast::Toast()
 	{
-		duration = getDefaultDuration();
-		font = getDefaultFont();
+		duration = 0; // default duration will be used
+		gravity = Alignment::MiddleCenter;
+		margin.left = margin.top = margin.right = margin.bottom = UI::dpToPixel(50);
 	}
 	
 	void Toast::show()
@@ -148,12 +172,50 @@ namespace slib
 		toast.show();
 	}
 	
-	float Toast::getDefaultDuration()
+	void Toast::show(const String& text, sl_uint32 duration)
+	{
+		Toast toast;
+		toast.text = text;
+		toast.duration = duration;
+		toast.show();
+	}
+	
+	void Toast::show(const String& text, sl_uint32 duration, const Ref<Font>& font)
+	{
+		Toast toast;
+		toast.text = text;
+		toast.duration = duration;
+		toast.font = font;
+		toast.show();
+	}
+	
+	void Toast::show(const String& text, sl_uint32 duration, const Ref<Font>& font, const Alignment& gravity)
+	{
+		Toast toast;
+		toast.text = text;
+		toast.duration = duration;
+		toast.font = font;
+		toast.gravity = gravity;
+		toast.show();
+	}
+	
+	void Toast::show(const String& text, sl_uint32 duration, const Ref<Font>& font, const Alignment& gravity, const UIEdgeInsets& margin)
+	{
+		Toast toast;
+		toast.text = text;
+		toast.duration = duration;
+		toast.font = font;
+		toast.gravity = gravity;
+		toast.margin = margin;
+		toast.show();
+	}
+	
+	sl_uint32 Toast::getDefaultDuration()
 	{
 		return g_defaultDuration;
 	}
 	
-	void Toast::setDefaultDuration(float duration)
+	void Toast::setDefaultDuration(sl_uint32 duration)
 	{
 		g_defaultDuration = duration;
 	}

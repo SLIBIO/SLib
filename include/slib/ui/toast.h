@@ -35,8 +35,10 @@ namespace slib
 	public:
 		Ref<View> parent;
 		String text;
-		float duration; // Seconds
+		sl_uint32 duration; // milliseconds
 		Ref<Font> font;
+		Alignment gravity;
+		UIEdgeInsets margin;
 		
 	public:
 		Toast();
@@ -49,10 +51,20 @@ namespace slib
 	public:
 		static void show(const String& text);
 		
-	public:
-		static float getDefaultDuration();
+		static void show(const String& text, sl_uint32 durationMillis);
 		
-		static void setDefaultDuration(float duration);
+		static void show(const String& text, sl_uint32 durationMillis, const Ref<Font>& font);
+		
+		static void show(const String& text, sl_uint32 durationMillis, const Ref<Font>& font, const Alignment& gravity);
+		
+		static void show(const String& text, sl_uint32 durationMillis, const Ref<Font>& font, const Alignment& gravity, const UIEdgeInsets& margin);
+
+	public:
+		// milliseconds
+		static sl_uint32 getDefaultDuration();
+		
+		// milliseconds
+		static void setDefaultDuration(sl_uint32 duration);
 		
 		static Ref<Font> getDefaultFont();
 		
