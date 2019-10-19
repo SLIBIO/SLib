@@ -2066,8 +2066,19 @@ namespace slib
 			}
 			
 			LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(aspectRatio, setAspectRatio)
+			
 			if (op == OP_PARSE) {
 				if (!flagRoot || resource->layoutType == SAppLayoutType::View) {
+					if (!(attr->width.flagDefined) && attr->leftMode != PositionMode::Free && attr->rightMode != PositionMode::Free) {
+						attr->width.flagDefined = sl_true;
+						attr->width.amount = 1;
+						attr->width.unit = SAppDimensionValue::FILL;
+					}
+					if (!(attr->height.flagDefined) && attr->topMode != PositionMode::Free && attr->bottomMode != PositionMode::Free) {
+						attr->height.flagDefined = sl_true;
+						attr->height.amount = 1;
+						attr->height.unit = SAppDimensionValue::FILL;
+					}
 					if (resourceItem->itemType != SAppLayoutItemType::Import && resourceItem->itemType != SAppLayoutItemType::Drawer && resourceItem->itemType != SAppLayoutItemType::Image) {
 						if (attr->aspectRatio.flagDefined) {
 							if (!(attr->width.flagDefined) && !(attr->height.flagDefined)) {
