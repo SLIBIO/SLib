@@ -67,7 +67,7 @@ namespace slib
 
 			class EditViewInstance;
 
-			class EditViewHelper : public TextArea
+			class EditViewHelper : public EditView
 			{
 			public:
 				void apply(jobject handle, EditViewInstance* instance);
@@ -341,7 +341,7 @@ namespace slib
 			Ref<EditViewInstance> ret = Android_ViewInstance::create<EditViewInstance>(this, parent, handle.get());
 			if (ret.isNotNull()) {
 				jobject jhandle = ret->getHandle();
-				(static_cast<EditViewHelper*>(this))->apply(jhandle, ret.get());
+				((EditViewHelper*)(this))->apply(jhandle, ret.get());
 				return ret;
 			}
 		}
