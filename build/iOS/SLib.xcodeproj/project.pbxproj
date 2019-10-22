@@ -691,6 +691,8 @@
 		267B9D67225D11760057DF2A /* instagram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 267B9D66225D11760057DF2A /* instagram.cpp */; };
 		2698A54A226A1C4300662528 /* refresh_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2698A549226A1C4300662528 /* refresh_view.cpp */; };
 		2698A54C226A1C4C00662528 /* refresh_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2698A54B226A1C4B00662528 /* refresh_view_ios.mm */; };
+		269C2FA0235EDDB600775765 /* charset_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 269C2F9E235EDDB600775765 /* charset_apple.mm */; };
+		269C2FA1235EDDB600775765 /* charset_ext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269C2F9F235EDDB600775765 /* charset_ext.cpp */; };
 		269E31A72255EAAF005CD0ED /* paypal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31A62255EAAF005CD0ED /* paypal.cpp */; };
 		269E31AB2255F4F2005CD0ED /* paypal_ui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31AA2255F4F2005CD0ED /* paypal_ui.cpp */; };
 		26A304B7230B1D0B00852FC9 /* global_event_monitor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A304B6230B1D0B00852FC9 /* global_event_monitor.cpp */; };
@@ -2196,6 +2198,8 @@
 		269462091CAD1C47001B2130 /* xml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = xml.cpp; sourceTree = "<group>"; };
 		2698A549226A1C4300662528 /* refresh_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = refresh_view.cpp; sourceTree = "<group>"; };
 		2698A54B226A1C4B00662528 /* refresh_view_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = refresh_view_ios.mm; sourceTree = "<group>"; };
+		269C2F9E235EDDB600775765 /* charset_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = charset_apple.mm; sourceTree = "<group>"; };
+		269C2F9F235EDDB600775765 /* charset_ext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = charset_ext.cpp; sourceTree = "<group>"; };
 		269E31A62255EAAF005CD0ED /* paypal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = paypal.cpp; sourceTree = "<group>"; };
 		269E31AA2255F4F2005CD0ED /* paypal_ui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = paypal_ui.cpp; sourceTree = "<group>"; };
 		26A304B6230B1D0B00852FC9 /* global_event_monitor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = global_event_monitor.cpp; sourceTree = "<group>"; };
@@ -4007,6 +4011,8 @@
 				2683BFAD1C39710C0068AC42 /* atomic.cpp */,
 				A25F2ECF1B039EF600854DAF /* base.cpp */,
 				26D6C37C1D1E87E2008720E4 /* charset.cpp */,
+				269C2F9E235EDDB600775765 /* charset_apple.mm */,
+				269C2F9F235EDDB600775765 /* charset_ext.cpp */,
 				26C72AD01E22484F00F7D6D0 /* collection.cpp */,
 				265A935D2304783200B155A2 /* console.cpp */,
 				265A936D230485B200B155A2 /* console_unix.cpp */,
@@ -5271,6 +5277,7 @@
 				26E1B8EE222ABCDD007C222E /* jdtrans.c in Sources */,
 				26D9D8E81E962976005F7BD3 /* view.cpp in Sources */,
 				26D9D80D1E9628E0005F7BD3 /* charset.cpp in Sources */,
+				269C2FA0235EDDB600775765 /* charset_apple.mm in Sources */,
 				26D9D8A71E962962005F7BD3 /* url.cpp in Sources */,
 				26E1B8C6222ABBE7007C222E /* pngwrite.c in Sources */,
 				26D9D88B1E96295A005F7BD3 /* codec_vpx.cpp in Sources */,
@@ -5280,6 +5287,7 @@
 				26D9D8D21E962976005F7BD3 /* scroll_view_ios.mm in Sources */,
 				26D9D8C71E962976005F7BD3 /* motion_tracker.cpp in Sources */,
 				26D9D8BA1E962976005F7BD3 /* common_dialogs_ios.mm in Sources */,
+				269C2FA1235EDDB600775765 /* charset_ext.cpp in Sources */,
 				26D9D8101E9628E0005F7BD3 /* mutex.cpp in Sources */,
 				262ED4EA228DEBEE0029F409 /* ecc.cpp in Sources */,
 				26BAE04522267D100085B5AB /* tls.cpp in Sources */,

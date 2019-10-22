@@ -194,9 +194,9 @@ namespace slib
 		 * Creates a string copying the characters from the UTF-16 Big Endian text.
 		 *
 		 * @param[in] text string buffer containing the UTF-16 Big Endian text
-		 * @param[in] len length of the `text`. negative value means that `text` is null terminated.
+		 * @param[in] size size (in bytes) of the `text`
 		 */
-		static String16 fromUtf16BE(const void* text, sl_reg len = -1) noexcept;
+		static String16 fromUtf16BE(const void* text, sl_size size) noexcept;
 		
 		/**
 		 * Creates a string copying the characters from the UTF-16 Big Endian text in `mem`.
@@ -207,9 +207,9 @@ namespace slib
 		 * Creates a string copying the characters from the UTF-16 Little Endian text.
 		 *
 		 * @param[in] text string buffer containing the UTF-16 Little Endian text
-		 * @param[in] len length of the `text`. negative value means that `text` is null terminated.
+		 * @param[in] size size (in bytes) of the `text`
 		 */
-		static String16 fromUtf16LE(const void* text, sl_reg len = -1) noexcept;
+		static String16 fromUtf16LE(const void* text, sl_size size) noexcept;
 		
 		/**
 		 * Creates a string copying the characters from the UTF-16 Little Endian text in `mem`.
@@ -221,15 +221,25 @@ namespace slib
 		 * This function detects the encoding type from the first 3 bytes of `text`.
 		 *
 		 * @param[in] text string buffer containing the unicode text.
-		 * @param[in] len length of the `text`. negative value means that `text` is null terminated.
+		 * @param[in] size size (in bytes) of the `text`
 		 */
-		static String16 fromUtf(const void* text, sl_size len) noexcept;
+		static String16 fromUtf(const void* text, sl_size size) noexcept;
 		
 		/**
 		 * Creates a string copying the characters from the UTF-8, UTF-16BE, or UTF-16LE text in `mem`.
 		 * This function detects the encoding type from the first 3 bytes of the text.
 		 */
 		static String16 fromUtf(const Memory& mem) noexcept;
+		
+		/**
+		 * Creates a string copying the characters from `text` encoded by `charset`.
+		 */
+		static String16 decode(Charset charset, const void* text, sl_size size);
+		
+		/**
+		 * Creates a string copying the characters from text in `mem`, encoded by `charset`.
+		 */
+		static String16 decode(Charset charset, const Memory& mem);
 		
 	public:
 		/**
@@ -644,6 +654,11 @@ namespace slib
 		 * Converts to Utf8 and Returns a Memory containing the Utf16 characters and null at last
 		 */
 		Memory toUtf8() const noexcept;
+		
+		/**
+		 * Encodes using `charset` and Returns Memory containing the encoded bytes
+		 */
+		Memory encode(Charset charset) const;
 		
 		/**
 		 * @return a newly constructed string with its value initialized to a copy of a substring of this string.
@@ -1673,6 +1688,11 @@ namespace slib
 		 * Converts to Utf8 and Returns a Memory containing the Utf16 characters and null at last
 		 */
 		Memory toUtf8() const noexcept;
+		
+		/**
+		 * Encodes using `charset` and Returns Memory containing the encoded bytes
+		 */
+		Memory encode(Charset charset) const;
 		
 		/**
 		 * @return a newly constructed string with its value initialized to a copy of a substring of this string.

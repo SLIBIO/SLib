@@ -798,14 +798,13 @@ namespace slib
 							}
 						}
 						size -= 2;
-						sl_size len = size >> 1;
-						SLIB_SCOPED_BUFFER(sl_uint16, 4096, buf, len);
+						SLIB_SCOPED_BUFFER(sl_uint8, 4096, buf, size);
 						if (buf) {
 							if (read(buf, size) == (sl_reg)size) {
 								if (flagUTF16LE) {
-									return String::fromUtf16LE(buf, len);
+									return String::fromUtf16LE(buf, size);
 								} else {
-									return String::fromUtf16BE(buf, len);
+									return String::fromUtf16BE(buf, size);
 								}
 							}
 						}

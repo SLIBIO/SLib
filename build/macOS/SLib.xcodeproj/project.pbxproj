@@ -823,6 +823,7 @@
 		262ED4DF228DD35B0029F409 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 262ED4DE228DD35B0029F409 /* main.cpp */; };
 		262ED4E2228DD6ED0029F409 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 264AF11B21AEE6BE004E58CB /* Cocoa.framework */; };
 		263051D1225CA21700A6609E /* pinterest_ui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263051D0225CA21700A6609E /* pinterest_ui.cpp */; };
+		26366D43235E53DA00B97807 /* charset_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26366D42235E53D900B97807 /* charset_apple.mm */; };
 		263916EC21C8F462008B335B /* qr_code_scanner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263916EB21C8F462008B335B /* qr_code_scanner.cpp */; };
 		263918EE21CBA121008B335B /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 263918ED21CBA121008B335B /* MainMenu.xib */; };
 		263918F021CBA128008B335B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 263918EF21CBA128008B335B /* Assets.xcassets */; };
@@ -1398,6 +1399,7 @@
 		26F5EA6622D6835C00CD1595 /* toast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5EA6522D6835B00CD1595 /* toast.cpp */; };
 		26FADD30215676D50057F7EA /* stun.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FADD2F215676D40057F7EA /* stun.cpp */; };
 		26FBB34B1ED5581F0086C27A /* ui_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FBB34A1ED5581F0086C27A /* ui_text.cpp */; };
+		26FD9030235DE31600574068 /* charset_ext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FD902F235DE31600574068 /* charset_ext.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -2398,6 +2400,7 @@
 		262ED4E0228DD6D70029F409 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		262ED4E8228DDA5D0029F409 /* ecc_secp256k1.inc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = ecc_secp256k1.inc; sourceTree = "<group>"; };
 		263051D0225CA21700A6609E /* pinterest_ui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pinterest_ui.cpp; path = social/pinterest_ui.cpp; sourceTree = "<group>"; };
+		26366D42235E53D900B97807 /* charset_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = charset_apple.mm; sourceTree = "<group>"; };
 		263916EB21C8F462008B335B /* qr_code_scanner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = qr_code_scanner.cpp; sourceTree = "<group>"; };
 		263918D221CB90DD008B335B /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		263918D921CBA047008B335B /* sapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = sapp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2885,6 +2888,7 @@
 		26FBDE621DA2B41700FF1B55 /* graphics_path_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = graphics_path_quartz.mm; sourceTree = "<group>"; };
 		26FBDE661DA2B48800FF1B55 /* bitmap_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = bitmap_quartz.mm; sourceTree = "<group>"; };
 		26FBDE681DA2BDE900FF1B55 /* graphics_platform_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = graphics_platform_apple.mm; sourceTree = "<group>"; };
+		26FD902F235DE31600574068 /* charset_ext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = charset_ext.cpp; sourceTree = "<group>"; };
 		A21C166A1BA74E8F006B1FA1 /* hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = hash.cpp; sourceTree = "<group>"; };
 		A234D6EA1B3F12A600ADDF4E /* content_type.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = content_type.cpp; sourceTree = "<group>"; };
 		A25F2F901B03A32300854DAF /* slib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = slib; sourceTree = "<group>"; };
@@ -5248,6 +5252,8 @@
 				26AFF77A1C34CE2B00AF9470 /* atomic.cpp */,
 				A25F2FA41B03A33700854DAF /* base.cpp */,
 				26B5737E1D1051DF00304424 /* charset.cpp */,
+				26366D42235E53D900B97807 /* charset_apple.mm */,
+				26FD902F235DE31600574068 /* charset_ext.cpp */,
 				2626C12E1E15AA55004E150C /* collection.cpp */,
 				265A93692304832300B155A2 /* console.cpp */,
 				265A936B2304832B00B155A2 /* console_unix.cpp */,
@@ -6993,6 +6999,7 @@
 				26D9D9741E96466A005F7BD3 /* graphics_util.cpp in Sources */,
 				26D9D90F1E9645CE005F7BD3 /* mutex.cpp in Sources */,
 				262D59AA232587AF00F85780 /* noto_emoji_png.cpp in Sources */,
+				26FD9030235DE31600574068 /* charset_ext.cpp in Sources */,
 				26D9D9E41E96468D005F7BD3 /* ui_event_macos.mm in Sources */,
 				26D9D98D1E964675005F7BD3 /* media_player.cpp in Sources */,
 				26E1B877222ABA51007C222E /* pngwio.c in Sources */,
@@ -7194,6 +7201,7 @@
 				26C1B64020D51D1D00E36539 /* font_quartz.mm in Sources */,
 				26D9D9391E9645CE005F7BD3 /* aes.cpp in Sources */,
 				26C795A122154CBE0053C5A1 /* clipboard_macos.mm in Sources */,
+				26366D43235E53DA00B97807 /* charset_apple.mm in Sources */,
 				26E1B87C222ABA55007C222E /* intel_init.c in Sources */,
 				26F2F8D91EC2E0EB0074C29E /* red_black_tree.cpp in Sources */,
 				265A937723051C2500B155A2 /* canvas_quartz.mm in Sources */,

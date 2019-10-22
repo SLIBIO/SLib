@@ -1724,26 +1724,21 @@ namespace slib
 	}
 
 
-	String String::fromUtf16BE(const void* _utf16, sl_reg len) noexcept
+	String String::fromUtf16BE(const void* utf16, sl_size size) noexcept
 	{
-		if (!_utf16) {
+		if (!utf16) {
 			return sl_null;
 		}
-		if (len == 0) {
+		if (!size) {
 			return String::getEmpty();
 		}
-		if (((((sl_reg)(_utf16)) & 1) == 0) && Endian::isBE()) {
-			return String((sl_char16*)_utf16, len);
-		}
-		SLIB_SCOPED_BUFFER(sl_char16, 4096, utf16, len);
-		if (utf16) {
-			Base::copyMemory(utf16, _utf16, len<<1);
-			if (Endian::isLE()) {
-				for (sl_reg i = 0; i < len; i++) {
-					utf16[i] = Endian::swap16(utf16[i]);
-				}
+		sl_size n = Charsets::decode8_UTF16BE(utf16, size, sl_null, -1);
+		if (n) {
+			String str = String16::allocate(n);
+			if (str.isNotNull()) {
+				Charsets::decode8_UTF16BE(utf16, size, str.getData(), n);
+				return str;
 			}
-			return String(utf16, len);
 		}
 		return sl_null;
 	}
@@ -1753,12 +1748,13 @@ namespace slib
 		return fromUtf16BE(mem.getData(), mem.getSize());
 	}
 
-	String16 String16::fromUtf16BE(const void* _utf16, sl_reg len) noexcept
+	String16 String16::fromUtf16BE(const void* _utf16, sl_size size) noexcept
 	{
 		if (!_utf16) {
 			return sl_null;
 		}
-		if (len == 0) {
+		sl_size len = size >> 1;
+		if (!len) {
 			return String16::getEmpty();
 		}
 		if (((((sl_reg)(_utf16)) & 1) == 0) && Endian::isBE()) {
@@ -1768,7 +1764,7 @@ namespace slib
 		if (str.isNotNull()) {
 			sl_char16* utf16 = str.getData();
 			const sl_uint8* c = (const sl_uint8*)_utf16;
-			for (sl_reg i = 0; i < len; i++) {
+			for (sl_size i = 0; i < len; i++) {
 				utf16[i] = MIO::readUint16BE(c);
 				c += 2;
 			}
@@ -1783,26 +1779,21 @@ namespace slib
 	}
 
 
-	String String::fromUtf16LE(const void* _utf16, sl_reg len) noexcept
+	String String::fromUtf16LE(const void* utf16, sl_size size) noexcept
 	{
-		if (!_utf16) {
+		if (!utf16) {
 			return sl_null;
 		}
-		if (len == 0) {
+		if (!size) {
 			return String::getEmpty();
 		}
-		if ((((sl_reg)(_utf16)) & 1) == 0 && Endian::isLE()) {
-			return String((sl_char16*)_utf16, len);
-		}
-		SLIB_SCOPED_BUFFER(sl_char16, 4096, utf16, len);
-		if (utf16) {
-			Base::copyMemory(utf16, _utf16, len<<1);
-			if (Endian::isBE()) {
-				for (sl_reg i = 0; i < len; i++) {
-					utf16[i] = Endian::swap16(utf16[i]);
-				}
+		sl_size n = Charsets::decode8_UTF16LE(utf16, size, sl_null, -1);
+		if (n) {
+			String str = String16::allocate(n);
+			if (str.isNotNull()) {
+				Charsets::decode8_UTF16LE(utf16, size, str.getData(), n);
+				return str;
 			}
-			return String(utf16, len);
 		}
 		return sl_null;
 	}
@@ -1812,23 +1803,23 @@ namespace slib
 		return fromUtf16LE(mem.getData(), mem.getSize());
 	}
 
-	String16 String16::fromUtf16LE(const void* _utf16, sl_reg len) noexcept
+	String16 String16::fromUtf16LE(const void* _utf16, sl_size size) noexcept
 	{
 		if (!_utf16) {
 			return sl_null;
 		}
-		if (len == 0) {
+		sl_size len = size >> 1;
+		if (!len) {
 			return String16::getEmpty();
 		}
 		if ((((sl_reg)(_utf16)) & 1) == 0 && Endian::isLE()) {
 			return String16((sl_char16*)_utf16, len);
 		}
-
 		String16 str = String16::allocate(len);
 		if (str.isNotNull()) {
 			sl_char16* utf16 = str.getData();
 			const sl_uint8* c = (const sl_uint8*)_utf16;
-			for (sl_reg i = 0; i < len; i++) {
+			for (sl_size i = 0; i < len; i++) {
 				utf16[i] = MIO::readUint16LE(c);
 				c += 2;
 			}
@@ -1843,29 +1834,29 @@ namespace slib
 	}
 
 
-	String String::fromUtf(const void* _buf, sl_size len) noexcept
+	String String::fromUtf(const void* _buf, sl_size size) noexcept
 	{
 		sl_char8* buf = (sl_char8*)_buf;
 		if (!buf) {
 			return sl_null;
 		}
-		if (len == 0) {
+		if (size == 0) {
 			return String::getEmpty();
 		}
-		if (len >= 2) {
+		if (size >= 2) {
 			if (buf[0] == (sl_char8)0xFF && buf[1] == (sl_char8)0xFE) {
-				return String::fromUtf16LE(buf, (len - 2) >> 1);
+				return String::fromUtf16LE(buf, size - 2);
 			}
 			if (buf[0] == (sl_char8)0xFE && buf[1] == (sl_char8)0xFF) {
-				return String::fromUtf16BE(buf, (len - 2) >> 1);
+				return String::fromUtf16BE(buf, size - 2);
 			}
 		}
-		if (len >= 3) {
+		if (size >= 3) {
 			if (buf[0] == (sl_char8)0xEF && buf[1] == (sl_char8)0xBB && buf[2] == (sl_char8)0xBF) {
-				return String(buf, len - 3);
+				return String(buf, size - 3);
 			}
 		}
-		return String(buf, len);
+		return String(buf, size);
 	}
 
 	String String::fromUtf(const Memory& mem) noexcept
@@ -1873,29 +1864,29 @@ namespace slib
 		return fromUtf(mem.getData(), mem.getSize());
 	}
 
-	String16 String16::fromUtf(const void* _buf, sl_size len) noexcept
+	String16 String16::fromUtf(const void* _buf, sl_size size) noexcept
 	{
 		sl_char8* buf = (sl_char8*)_buf;
 		if (!buf) {
 			return sl_null;
 		}
-		if (len == 0) {
+		if (size == 0) {
 			return String16::getEmpty();
 		}
-		if (len >= 2) {
+		if (size >= 2) {
 			if (buf[0] == (sl_char8)0xFF && buf[1] == (sl_char8)0xFE) {
-				return String16::fromUtf16LE(buf, (len - 2) >> 1);
+				return String16::fromUtf16LE(buf, size - 2);
 			}
 			if (buf[0] == (sl_char8)0xFE && buf[1] == (sl_char8)0xFF) {
-				return String16::fromUtf16BE(buf, (len - 2) >> 1);
+				return String16::fromUtf16BE(buf, size - 2);
 			}
 		}
-		if (len >= 3) {
+		if (size >= 3) {
 			if (buf[0] == (sl_char8)0xEF && buf[1] == (sl_char8)0xBB && buf[2] == (sl_char8)0xBF) {
-				return String16(buf, len - 3);
+				return String16(buf, size - 3);
 			}
 		}
-		return String16(buf, len);
+		return String16(buf, size);
 	}
 
 	String16 String16::fromUtf(const Memory& mem) noexcept

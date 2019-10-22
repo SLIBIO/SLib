@@ -126,6 +126,8 @@
     <ClCompile Include="..\..\src\slib\core\atomic.cpp" />
     <ClCompile Include="..\..\src\slib\core\base.cpp" />
     <ClCompile Include="..\..\src\slib\core\charset.cpp" />
+    <ClCompile Include="..\..\src\slib\core\charset_ext.cpp" />
+    <ClCompile Include="..\..\src\slib\core\charset_windows.cpp" />
     <ClCompile Include="..\..\src\slib\core\collection.cpp" />
     <ClCompile Include="..\..\src\slib\core\console.cpp" />
     <ClCompile Include="..\..\src\slib\core\console_windows.cpp" />
