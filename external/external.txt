@@ -26,6 +26,7 @@ libmysqlclient 8.0
 
 # Headers
 gl
+icu4c 65.1 (include/unicode)
 cairo 1.14.2
 pango 1.28.3
 curl 7.59.0
