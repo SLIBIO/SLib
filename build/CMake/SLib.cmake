@@ -74,6 +74,7 @@ set (SLIB_CORE_FILES
  "${SLIB_PATH}/src/slib/core/atomic.cpp"
  "${SLIB_PATH}/src/slib/core/base.cpp"
  "${SLIB_PATH}/src/slib/core/charset.cpp"
+ "${SLIB_PATH}/src/slib/core/charset_ext.cpp"
  "${SLIB_PATH}/src/slib/core/collection.cpp"
  "${SLIB_PATH}/src/slib/core/console.cpp"
  "${SLIB_PATH}/src/slib/core/console_unix.cpp"
@@ -198,6 +199,7 @@ set (SLIB_CORE_FILES
 )
 if(ANDROID)
  set (SLIB_CORE_PLATFORM_FILES
+  "${SLIB_PATH}/src/slib/core/charset_android.cpp"
   "${SLIB_PATH}/src/slib/core/platform_android.cpp"
   "${SLIB_PATH}/src/slib/core/preference_android.cpp"
   "${SLIB_PATH}/src/slib/core/system_android.cpp"
@@ -205,6 +207,7 @@ if(ANDROID)
  )
 else ()
  set (SLIB_CORE_PLATFORM_FILES
+  "${SLIB_PATH}/src/slib/core/charset_icu.cpp"
   "${SLIB_PATH}/src/slib/core/preference_linux.cpp"
   "${SLIB_PATH}/src/slib/core/wrap_memcpy.cpp"
  )
