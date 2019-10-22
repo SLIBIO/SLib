@@ -10,7 +10,7 @@ import java.nio.charset.CoderResult;
 
 public class Charsets {
 
-	private final static int LENGTH_TEMP_BUFFER = 2;
+	private final static int LENGTH_TEMP_BUFFER = 2048;
 
 	public static int encode(int codepage, ByteBuffer input, ByteBuffer output) {
 		int total = 0;
