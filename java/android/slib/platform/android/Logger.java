@@ -27,19 +27,23 @@ import android.util.Log;
 public class Logger {
 
 	public static void exception(Throwable e) {
-		Log.e("Exception", e.getMessage(), e);
+		Log.e("EXCEPTION", e.getMessage(), e);
 	}
 	
 	public static void warning(String warning) {
-		Log.w("Warning", warning);
+		Log.w("WARNING", warning);
 	}
 	
 	public static void info(String info) {
-		Log.d("INFO", info);
+		Log.i("INFO", info);
 	}
-	
+
+	public static void debug(String info) {
+		Log.d("DEBUG", info);
+	}
+
 	public static void error(String error) {
-		Log.e("Error", error);
+		Log.e("ERROR", error);
 	}
 	
 }
