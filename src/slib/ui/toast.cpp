@@ -154,7 +154,7 @@ namespace slib
 	{
 		duration = 0; // default duration will be used
 		gravity = Alignment::MiddleCenter;
-		margin.left = margin.top = margin.right = margin.bottom = UI::dpToPixel(50);
+		margin.left = margin.top = margin.right = margin.bottom = (sl_ui_len)(UI::dpToPixel(50));
 	}
 	
 	void Toast::show()
