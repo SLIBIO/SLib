@@ -41,10 +41,10 @@ public class Sensor {
 	private long mInstance = 0;
 	
 	private Activity mContext = null;
-	boolean mFlagUseLocation;
-	int mLocationProviderType;
-	boolean mFlagUseCompass;
-	boolean mFlagUseAccelerometer;
+	private boolean mFlagUseLocation;
+	private int mLocationProviderType;
+	private boolean mFlagUseCompass;
+	private boolean mFlagUseAccelerometer;
 	
 	private SensorManager mSensorManager = null;
 	private LocationManager mLocationManager = null;
@@ -59,8 +59,8 @@ public class Sensor {
 		
 		mContext = context;
 		
-		mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-		mLocationManager = (LocationManager) context.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+		mSensorManager = (SensorManager)(context.getSystemService(Context.SENSOR_SERVICE));
+		mLocationManager = (LocationManager)(context.getSystemService(Context.LOCATION_SERVICE));
 
 		locationTracker = new LocationTracker();
 		compass = new Compass();
@@ -68,7 +68,7 @@ public class Sensor {
 	}
 
 	public static boolean isAvailableLocation(Activity context) {
-		LocationManager locationManager = (LocationManager) context.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+		LocationManager locationManager = (LocationManager)(context.getSystemService(Context.LOCATION_SERVICE));
 		if (locationManager != null && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 			return true;
 		}
@@ -76,7 +76,7 @@ public class Sensor {
 	}
 
 	public static boolean isAvailableCompass(Activity context) {
-		SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+		SensorManager sensorManager = (SensorManager)(context.getSystemService(Context.SENSOR_SERVICE));
 		if (sensorManager.getDefaultSensor(android.hardware.Sensor.TYPE_ACCELEROMETER) != null) {
 			return true;
 		}
@@ -84,7 +84,7 @@ public class Sensor {
 	}
 
 	public static boolean isAvailableAccelerometer(Activity context) {
-		SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+		SensorManager sensorManager = (SensorManager)(context.getSystemService(Context.SENSOR_SERVICE));
 		if (sensorManager.getDefaultSensor(android.hardware.Sensor.TYPE_MAGNETIC_FIELD) != null) {
 			return true;
 		}
@@ -140,6 +140,7 @@ public class Sensor {
 					acceleromter.start();
 				}
 			}
+			return true;
 		} catch (Throwable e) {
 			Logger.exception(e);
 		}
@@ -183,7 +184,7 @@ public class Sensor {
 				public void onSensorChanged(SensorEvent event) {
 					switch (event.sensor.getType()) {
 					case android.hardware.Sensor.TYPE_ACCELEROMETER:
-						final int axisSwap[][] = {
+						final int[][] axisSwap = {
 								{ 1,  -1,  0,  1  },     // ROTATION_0 
 								{-1,  -1,  1,  0  },     // ROTATION_90 
 								{-1,   1,  0,  1  },     // ROTATION_180 
@@ -281,9 +282,12 @@ public class Sensor {
 				return false;
 			}
 			if (!isLocationEnabled()) {
-				//openSettings(mContext);
-				return false;
-		}
+				mContext.runOnUiThread(new Runnable() {
+                   public void run() {
+                       openSettings(mContext);
+                   }
+				});
+			}
 			lastLocation = mLocationManager.getLastKnownLocation(providerName);
 
 			if (lastLocation != null) {
