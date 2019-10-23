@@ -357,7 +357,7 @@ using namespace slib::priv::scroll_view;
 	self.state = UIGestureRecognizerStateBegan;
 	Ref<ScrollViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		instance->onEventTouch(UIAction::TouchBegin, touches, theEvent, sl_false);
+		instance->onEventTouch(slib::UIAction::TouchBegin, touches, theEvent, sl_false);
 	}
 }
 
@@ -365,7 +365,7 @@ using namespace slib::priv::scroll_view;
 {
 	Ref<ScrollViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		instance->onEventTouch(UIAction::TouchMove, touches, theEvent, sl_false);
+		instance->onEventTouch(slib::UIAction::TouchMove, touches, theEvent, sl_false);
 	}
 }
 
@@ -378,7 +378,7 @@ using namespace slib::priv::scroll_view;
 		if (view.isNotNull()) {
 			view->setLockScroll(sl_false);
 		}
-		instance->onEventTouch(UIAction::TouchEnd, touches, theEvent, sl_false);
+		instance->onEventTouch(slib::UIAction::TouchEnd, touches, theEvent, sl_false);
 	}
 }
 
@@ -390,7 +390,7 @@ using namespace slib::priv::scroll_view;
 		if (view.isNotNull()) {
 			view->setLockScroll(sl_false);
 		}
-		instance->onEventTouch(UIAction::TouchCancel, touches, theEvent, sl_false);
+		instance->onEventTouch(slib::UIAction::TouchCancel, touches, theEvent, sl_false);
 	}
 }
 
