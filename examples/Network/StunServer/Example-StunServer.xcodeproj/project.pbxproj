@@ -92,7 +92,7 @@
 		26FADD49215932210057F7EA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0940;
+				LastUpgradeCheck = 1110;
 				ORGANIZATIONNAME = SLIBIO;
 				TargetAttributes = {
 					26FADD50215932210057F7EA = {
@@ -242,6 +242,7 @@
 		26FADD59215932210057F7EA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				HEADER_SEARCH_PATHS = "$(SLIB_PATH)/include";
 				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/macOS/$(CONFIGURATION)";
@@ -253,6 +254,7 @@
 		26FADD5A215932210057F7EA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				HEADER_SEARCH_PATHS = "$(SLIB_PATH)/include";
 				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/macOS/$(CONFIGURATION)";

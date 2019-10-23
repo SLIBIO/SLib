@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1020"
+   LastUpgradeVersion = "1110"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -17,6 +17,34 @@
                BlueprintIdentifier = "26D9D8F61E9645CE005F7BD3"
                BuildableName = "libslib.a"
                BlueprintName = "slib"
+               ReferencedContainer = "container:SLib.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "260D8CCA20CBDC7C0013B34E"
+               BuildableName = "libyasm.a"
+               BlueprintName = "libyasm"
+               ReferencedContainer = "container:SLib.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "2605036220CEC39100032B2C"
+               BuildableName = "yasm"
+               BlueprintName = "yasm"
                ReferencedContainer = "container:SLib.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,34 +73,6 @@
                BlueprintIdentifier = "26D15C3F1E93A966003BD61A"
                BuildableName = "libsqlite3.a"
                BlueprintName = "sqlite3"
-               ReferencedContainer = "container:SLib.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "26D15C491E93A97C003BD61A"
-               BuildableName = "libopus.a"
-               BlueprintName = "opus"
-               ReferencedContainer = "container:SLib.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "26D15C531E93A9B4003BD61A"
-               BuildableName = "libvpx.a"
-               BlueprintName = "vpx"
                ReferencedContainer = "container:SLib.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -126,37 +126,37 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "26D15C491E93A97C003BD61A"
+               BuildableName = "libopus.a"
+               BlueprintName = "opus"
+               ReferencedContainer = "container:SLib.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "26D15C531E93A9B4003BD61A"
+               BuildableName = "libvpx.a"
+               BlueprintName = "vpx"
+               ReferencedContainer = "container:SLib.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "264AF12021B0590C004E58CB"
                BuildableName = "libsapp.a"
                BlueprintName = "libsapp"
-               ReferencedContainer = "container:SLib.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "260D8CCA20CBDC7C0013B34E"
-               BuildableName = "libyasm.a"
-               BlueprintName = "libyasm"
-               ReferencedContainer = "container:SLib.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "2605036220CEC39100032B2C"
-               BuildableName = "yasm"
-               BlueprintName = "yasm"
                ReferencedContainer = "container:SLib.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -181,8 +181,6 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
-      <Testables>
-      </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
@@ -192,8 +190,8 @@
             ReferencedContainer = "container:SLib.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
-      <AdditionalOptions>
-      </AdditionalOptions>
+      <Testables>
+      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -214,8 +212,6 @@
             ReferencedContainer = "container:SLib.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

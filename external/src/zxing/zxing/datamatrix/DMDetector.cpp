@@ -742,7 +742,7 @@ public:
 	EdgeTracer(const EdgeTracer&) = default;
 	~EdgeTracer() = default;
 	EdgeTracer(EdgeTracer&&) noexcept(true) = default;
-	EdgeTracer& operator=(EdgeTracer&&) = default;
+	//EdgeTracer& operator=(EdgeTracer&&) = default;
 
 	bool step(int s = 1)
 	{

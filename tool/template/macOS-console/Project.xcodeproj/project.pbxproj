@@ -82,7 +82,7 @@
 			dependencies = (
 			);
 			name = SLIB_TEMPLATE_APP_NAME;
-			productName = "SLIB_TEMPLATE_APP_NAME";
+			productName = SLIB_TEMPLATE_APP_NAME;
 			productReference = 263BCA551EA6891E005C75F4 /* SLIB_TEMPLATE_APP_NAME */;
 			productType = "com.apple.product-type.tool";
 		};
@@ -92,7 +92,7 @@
 		263BCA4D1EA6891E005C75F4 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0940;
+				LastUpgradeCheck = 1110;
 				ORGANIZATIONNAME = YourOrganization;
 				TargetAttributes = {
 					263BCA541EA6891E005C75F4 = {
@@ -103,10 +103,11 @@
 			};
 			buildConfigurationList = 263BCA501EA6891E005C75F4 /* Build configuration list for PBXProject "Project" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 263BCA4C1EA6891E005C75F4;
 			productRefGroup = 263BCA561EA6891E005C75F4 /* Products */;
@@ -134,6 +135,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -190,6 +192,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -238,6 +241,7 @@
 		263BCA5D1EA6891E005C75F4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = "$(SLIB_PATH)/include";
 				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/macOS/$(CONFIGURATION)";
 				OTHER_LDFLAGS = "-lslib";
@@ -248,6 +252,7 @@
 		263BCA5E1EA6891E005C75F4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = "$(SLIB_PATH)/include";
 				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/macOS/$(CONFIGURATION)";
 				OTHER_LDFLAGS = "-lslib";

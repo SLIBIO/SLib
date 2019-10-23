@@ -92,7 +92,7 @@
 		263BCA4D1EA6891E005C75F4 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0940;
+				LastUpgradeCheck = 1110;
 				ORGANIZATIONNAME = SLIBIO;
 				TargetAttributes = {
 					263BCA541EA6891E005C75F4 = {
@@ -240,6 +240,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CODE_SIGN_IDENTITY = "-";
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/build";
 				HEADER_SEARCH_PATHS = "$(SLIB_PATH)/include";
 				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/macOS/$(CONFIGURATION)";
@@ -252,6 +253,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CODE_SIGN_IDENTITY = "-";
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/build";
 				HEADER_SEARCH_PATHS = "$(SLIB_PATH)/include";
 				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/macOS/$(CONFIGURATION)";
