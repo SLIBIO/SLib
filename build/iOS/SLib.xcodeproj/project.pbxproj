@@ -1068,6 +1068,8 @@
 			compilerSpec = com.apple.compilers.proxy.script;
 			filePatterns = "*.asm";
 			fileType = pattern.proxy;
+			inputFiles = (
+			);
 			isEditable = 1;
 			outputFiles = (
 				"$(DERIVED_FILE_DIR)/${arch}/${INPUT_FILE_NAME}.o",
@@ -4438,7 +4440,7 @@
 		A27731191A1655640002E735 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1020;
+				LastUpgradeCheck = 1110;
 				ORGANIZATIONNAME = slib;
 			};
 			buildConfigurationList = A277311C1A1655640002E735 /* Build configuration list for PBXProject "SLib" */;
@@ -5578,24 +5580,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = NO;
 				CLANG_X86_VECTOR_INSTRUCTIONS = avx2;
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				"EXCLUDED_SOURCE_FILE_NAMES[arch=arm64]" = (
+				EXCLUDED_SOURCE_FILE_NAMES = (
 					"x86/*",
-					"*.asm",
-					"*.S",
-				);
-				"EXCLUDED_SOURCE_FILE_NAMES[arch=i386]" = (
 					"arm/*",
-					"neon/*",
-					arm_cpudetect.c,
-					"*_x86_64.asm",
-				);
-				"EXCLUDED_SOURCE_FILE_NAMES[sdk=iphoneos*]" = (
-					"x86/*",
-					"*.asm",
-				);
-				"EXCLUDED_SOURCE_FILE_NAMES[sdk=iphonesimulator*]" = (
-					"arm/*",
-					"neon/*",
+					"arm/neon/*",
+					emms.asm,
 					arm_cpudetect.c,
 				);
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
@@ -5605,6 +5594,29 @@
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../external/src/libvpx/gen/asm_apple/armv7",
 					"$(PROJECT_DIR)/../../external/src/libvpx",
+				);
+				"INCLUDED_SOURCE_FILE_NAMES[arch=arm64]" = (
+					"arm/*.c",
+					"arm/neon/*.c",
+					arm_cpudetect.c,
+				);
+				"INCLUDED_SOURCE_FILE_NAMES[arch=armv7]" = (
+					"arm/*",
+					"arm/neon/*",
+					arm_cpudetect.c,
+				);
+				"INCLUDED_SOURCE_FILE_NAMES[arch=i386]" = (
+					"x86/*.c",
+					"x86/*sse2.asm",
+					"x86/*sse3.asm",
+					"x86/*sse4.asm",
+					"x86/*mmx.asm",
+					x86/encodeopt.asm,
+					emms.asm,
+				);
+				"INCLUDED_SOURCE_FILE_NAMES[arch=x86_64]" = (
+					"x86/*",
+					emms.asm,
 				);
 				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -5621,24 +5633,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = NO;
 				CLANG_X86_VECTOR_INSTRUCTIONS = avx2;
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				"EXCLUDED_SOURCE_FILE_NAMES[arch=arm64]" = (
+				EXCLUDED_SOURCE_FILE_NAMES = (
 					"x86/*",
-					"*.asm",
-					"*.S",
-				);
-				"EXCLUDED_SOURCE_FILE_NAMES[arch=i386]" = (
 					"arm/*",
-					"neon/*",
-					arm_cpudetect.c,
-					"*_x86_64.asm",
-				);
-				"EXCLUDED_SOURCE_FILE_NAMES[sdk=iphoneos*]" = (
-					"x86/*",
-					"*.asm",
-				);
-				"EXCLUDED_SOURCE_FILE_NAMES[sdk=iphonesimulator*]" = (
-					"arm/*",
-					"neon/*",
+					"arm/neon/*",
+					emms.asm,
 					arm_cpudetect.c,
 				);
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
@@ -5648,6 +5647,29 @@
 				HEADER_SEARCH_PATHS = (
 					"$(PROJECT_DIR)/../../external/src/libvpx/gen/asm_apple/armv7",
 					"$(PROJECT_DIR)/../../external/src/libvpx",
+				);
+				"INCLUDED_SOURCE_FILE_NAMES[arch=arm64]" = (
+					"arm/*.c",
+					"arm/neon/*.c",
+					arm_cpudetect.c,
+				);
+				"INCLUDED_SOURCE_FILE_NAMES[arch=armv7]" = (
+					"arm/*",
+					"arm/neon/*",
+					arm_cpudetect.c,
+				);
+				"INCLUDED_SOURCE_FILE_NAMES[arch=i386]" = (
+					"x86/*.c",
+					"x86/*sse2.asm",
+					"x86/*sse3.asm",
+					"x86/*sse4.asm",
+					"x86/*mmx.asm",
+					x86/encodeopt.asm,
+					emms.asm,
+				);
+				"INCLUDED_SOURCE_FILE_NAMES[arch=x86_64]" = (
+					"x86/*",
+					emms.asm,
 				);
 				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -5811,12 +5833,11 @@
 				CLANG_WARN_COMMA = NO;
 				CLANG_X86_VECTOR_INSTRUCTIONS = avx;
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				"EXCLUDED_SOURCE_FILE_NAMES[arch=arm64]" = (
-					"celt_pitch_xcorr_arm-apple.S",
+				EXCLUDED_SOURCE_FILE_NAMES = (
+					"arm/*",
 					"x86/*",
+					"celt_pitch_xcorr_arm-apple.S",
 				);
-				"EXCLUDED_SOURCE_FILE_NAMES[sdk=iphoneos*]" = "x86/*";
-				"EXCLUDED_SOURCE_FILE_NAMES[sdk=iphonesimulator*]" = "arm/*";
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
@@ -5829,6 +5850,9 @@
 					"$(PROJECT_DIR)/../../external/src/opus/silk",
 					"$(PROJECT_DIR)/../../external/src/opus/silk/fixed",
 				);
+				"INCLUDED_SOURCE_FILE_NAMES[arch=arm64]" = "arm/*.c";
+				"INCLUDED_SOURCE_FILE_NAMES[arch=armv7]" = "arm/*";
+				"INCLUDED_SOURCE_FILE_NAMES[sdk=iphonesimulator*]" = "x86/*";
 				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
@@ -5844,12 +5868,11 @@
 				CLANG_WARN_COMMA = NO;
 				CLANG_X86_VECTOR_INSTRUCTIONS = avx;
 				CONFIGURATION_BUILD_DIR = "$(PROJECT_DIR)/../../lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				"EXCLUDED_SOURCE_FILE_NAMES[arch=arm64]" = (
-					"celt_pitch_xcorr_arm-apple.S",
+				EXCLUDED_SOURCE_FILE_NAMES = (
+					"arm/*",
 					"x86/*",
+					"celt_pitch_xcorr_arm-apple.S",
 				);
-				"EXCLUDED_SOURCE_FILE_NAMES[sdk=iphoneos*]" = "x86/*";
-				"EXCLUDED_SOURCE_FILE_NAMES[sdk=iphonesimulator*]" = "arm/*";
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
@@ -5862,6 +5885,9 @@
 					"$(PROJECT_DIR)/../../external/src/opus/silk",
 					"$(PROJECT_DIR)/../../external/src/opus/silk/fixed",
 				);
+				"INCLUDED_SOURCE_FILE_NAMES[arch=arm64]" = "arm/*.c";
+				"INCLUDED_SOURCE_FILE_NAMES[arch=armv7]" = "arm/*";
+				"INCLUDED_SOURCE_FILE_NAMES[sdk=iphonesimulator*]" = "x86/*";
 				LLVM_LTO = YES;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
