@@ -51,6 +51,11 @@ namespace slib
 	{
 		return 0;
 	}
+
+	sl_uint32 ViewAdapter::getMaximumItemsCountPerPage(View* parent)
+	{
+		return 50;
+	}
 	
 	void ViewAdapter::populateInto(View* parent, UIUpdateMode mode)
 	{
@@ -272,4 +277,13 @@ namespace slib
 		return ViewAdapter::getItemHeight(index, parent);
 	}
 	
+	sl_uint32 ViewRowAdapter::getMaximumItemsCountPerPage(View* parent)
+	{
+		Ref<ViewAdapter> adapter = m_itemAdapter;
+		if (adapter.isNotNull()) {
+			return adapter->getMaximumItemsCountPerPage(parent);
+		}
+		return ViewAdapter::getMaximumItemsCountPerPage(parent);
+	}
+
 }

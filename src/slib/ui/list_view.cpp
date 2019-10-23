@@ -24,7 +24,7 @@
 
 #include "slib/ui/core.h"
 
-#define MAX_ITEMS_VISIBLE 500
+#define MAX_ITEMS_PER_PAGE 500
 #define MAX_ITEMS_SAVE_HEIGHTS 10000
 #define MAX_MID_HEIGHT 1000000
 
@@ -111,23 +111,23 @@ namespace slib
 		m_flagScrollToLastItem = sl_false;
 		m_flagSmoothScrollToLastItem = sl_false;
 		
-		m_viewsVisibleItems = (Ref<View>*)(Base::createZeroMemory(sizeof(Ref<View>)*MAX_ITEMS_VISIBLE*4));
-		m_viewsGoDownItems = m_viewsVisibleItems + MAX_ITEMS_VISIBLE;
-		m_viewsGoUpItems = m_viewsGoDownItems + MAX_ITEMS_VISIBLE;
-		m_viewsFreeItems = m_viewsGoUpItems + MAX_ITEMS_VISIBLE;
+		m_viewsVisibleItems = (Ref<View>*)(Base::createZeroMemory(sizeof(Ref<View>)*MAX_ITEMS_PER_PAGE*4));
+		m_viewsGoDownItems = m_viewsVisibleItems + MAX_ITEMS_PER_PAGE;
+		m_viewsGoUpItems = m_viewsGoDownItems + MAX_ITEMS_PER_PAGE;
+		m_viewsFreeItems = m_viewsGoUpItems + MAX_ITEMS_PER_PAGE;
 		
-		m_heightsVisibleItems = (sl_ui_len*)(Base::createMemory(sizeof(sl_ui_len)*(MAX_ITEMS_VISIBLE*3+MAX_ITEMS_SAVE_HEIGHTS*2)));
-		m_heightsTopItems = m_heightsVisibleItems + MAX_ITEMS_VISIBLE;
+		m_heightsVisibleItems = (sl_ui_len*)(Base::createMemory(sizeof(sl_ui_len)*(MAX_ITEMS_PER_PAGE*3+MAX_ITEMS_SAVE_HEIGHTS*2)));
+		m_heightsTopItems = m_heightsVisibleItems + MAX_ITEMS_PER_PAGE;
 		m_heightsBottomItems = m_heightsTopItems + MAX_ITEMS_SAVE_HEIGHTS;
 		m_heightsGoDownItems = m_heightsBottomItems + MAX_ITEMS_SAVE_HEIGHTS;
-		m_heightsGoUpItems = m_heightsGoDownItems + MAX_ITEMS_VISIBLE;
+		m_heightsGoUpItems = m_heightsGoDownItems + MAX_ITEMS_PER_PAGE;
 		
 		_initStatus();
 	}
 
 	ListView::~ListView()
 	{
-		for (sl_size i = 0; i < MAX_ITEMS_VISIBLE*3; i++) {
+		for (sl_size i = 0; i < MAX_ITEMS_PER_PAGE*3; i++) {
 			if (m_viewsVisibleItems[i].isNotNull()) {
 				m_viewsVisibleItems[i].setNull();
 			}
@@ -219,7 +219,7 @@ namespace slib
 						m_flagResetingAdapter = sl_false;
 						m_adapterCurrent = adapter;
 						m_contentView->removeAllChildren(UIUpdateMode::None);
-						for (sl_size i = 0; i < MAX_ITEMS_VISIBLE; i++) {
+						for (sl_size i = 0; i < MAX_ITEMS_PER_PAGE; i++) {
 							m_viewsVisibleItems[i].setNull();
 						}
 						_layoutItemViews(sl_false, sl_false, sl_true);
@@ -233,7 +233,7 @@ namespace slib
 				_initHeights(sl_null);
 				_initStatus();
 				m_contentView->removeAllChildren(UIUpdateMode::None);
-				for (sl_size i = 0; i < MAX_ITEMS_VISIBLE; i++) {
+				for (sl_size i = 0; i < MAX_ITEMS_PER_PAGE; i++) {
 					m_viewsVisibleItems[i].setNull();
 				}
 				m_adapterCurrent = adapter;
@@ -536,6 +536,11 @@ namespace slib
 					windowStart = 0;
 				}
 				sl_ui_pos windowEnd = scrollY + heightListView + heightListView / 2;
+				
+				sl_uint32 nMaxItemsPerPage = adapter->getMaximumItemsCountPerPage(this);
+				if (nMaxItemsPerPage > MAX_ITEMS_PER_PAGE) {
+					nMaxItemsPerPage = MAX_ITEMS_PER_PAGE;
+				}
 
 				if (flagRefresh) {
 					
@@ -600,7 +605,7 @@ namespace slib
 					heightTotalItems = priv::list_view::getTotalHeights(countTotalItems, lastAverageItemHeight, heightsTopItems, heightsBottomItems, lastAverageMidItemHeight);
 					
 					// free visible views
-					for (sl_uint32 iItem = 0; iItem < MAX_ITEMS_VISIBLE; iItem++) {
+					for (sl_uint32 iItem = 0; iItem < MAX_ITEMS_PER_PAGE; iItem++) {
 						Ref<View>& view = viewsVisibleItems[iItem];
 						if (view.isNotNull()) {
 							viewsFreeItems[countFreeViews] = view;
@@ -614,7 +619,7 @@ namespace slib
 					// removes scrolled-over items
 					sl_ui_pos yItem = m_yFirstItem;
 					sl_uint32 iItem;
-					for (iItem = 0; iItem < MAX_ITEMS_VISIBLE; iItem++) {
+					for (iItem = 0; iItem < nMaxItemsPerPage; iItem++) {
 						Ref<View>& view = viewsVisibleItems[iItem];
 						if (view.isNull()) {
 							flagClearAll = sl_true;
@@ -634,7 +639,7 @@ namespace slib
 					indexGoUp = lastIndexFirstItem + iItem;
 					
 					// reuse visible items
-					for (; iItem < MAX_ITEMS_VISIBLE && yItem < windowEnd; iItem++) {
+					for (; iItem < nMaxItemsPerPage && yItem < windowEnd; iItem++) {
 						Ref<View>& view = viewsVisibleItems[iItem];
 						if (view.isNull()) {
 							break;
@@ -656,7 +661,7 @@ namespace slib
 					}
 					
 					// free remaining visible views
-					for (; iItem < MAX_ITEMS_VISIBLE; iItem++) {
+					for (; iItem < MAX_ITEMS_PER_PAGE; iItem++) {
 						Ref<View>& view = viewsVisibleItems[iItem];
 						if (view.isNotNull()) {
 							viewsFreeItems[countFreeViews] = view;
@@ -721,14 +726,14 @@ namespace slib
 							
 							if (!flagFound) {
 								y = windowStart;
-								if (i < MAX_ITEMS_VISIBLE || Math::isAlmostZero(lastAverageMidItemHeight)) {
+								if (i < nMaxItemsPerPage || Math::isAlmostZero(lastAverageMidItemHeight)) {
 									index = 0;
 								} else {
 									double no = (double)(y - yTop) / lastAverageMidItemHeight;
 									if (no < 0) {
 										no = 0;
 									}
-									index = MAX_ITEMS_VISIBLE + (sl_uint64)(no);
+									index = nMaxItemsPerPage + (sl_uint64)(no);
 									if (index > countTotalItems) {
 										index = countTotalItems;
 									}
@@ -750,7 +755,7 @@ namespace slib
 				
 				// Go Up
 				{
-					while (yGoUp > windowStart && indexGoUp > 0 && countGoUpViews < MAX_ITEMS_VISIBLE) {
+					while (yGoUp > windowStart && indexGoUp > 0 && countGoUpViews < nMaxItemsPerPage) {
 						Ref<View> viewFree;
 						if (countFreeViews > 0) {
 							viewFree = viewsFreeItems[countFreeViews - 1];
@@ -777,7 +782,7 @@ namespace slib
 				
 				// Go Down
 				{
-					while (yGoDown < windowEnd && indexGoDown < countTotalItems && countGoDownViews < MAX_ITEMS_VISIBLE) {
+					while (yGoDown < windowEnd && indexGoDown < countTotalItems && countGoDownViews < nMaxItemsPerPage) {
 						Ref<View> viewFree;
 						if (countFreeViews > 0) {
 							viewFree = viewsFreeItems[countFreeViews - 1];
@@ -805,7 +810,7 @@ namespace slib
 					sl_uint32 i;
 					sl_uint32 k = countGoUpViews - 1;
 					for (i = 0; i < countGoUpViews; i++) {
-						if (countVisibleItems < MAX_ITEMS_VISIBLE) {
+						if (countVisibleItems < nMaxItemsPerPage) {
 							viewsVisibleItems[countVisibleItems] = viewsGoUpItems[k];
 							heightsVisibleItems[countVisibleItems] = heightsGoUpItems[k];
 							countVisibleItems++;
@@ -817,7 +822,7 @@ namespace slib
 						k--;
 					}
 					for (i = 0; i < countGoDownViews; i++) {
-						if (countVisibleItems < MAX_ITEMS_VISIBLE) {
+						if (countVisibleItems < nMaxItemsPerPage) {
 							viewsVisibleItems[countVisibleItems] = viewsGoDownItems[i];
 							heightsVisibleItems[countVisibleItems] = heightsGoDownItems[i];
 							countVisibleItems++;
@@ -967,7 +972,7 @@ namespace slib
 			param.flagVertical = sl_false;
 			itemView->updateLayoutFrameInParent(param);
 			sl_ui_len height = itemView->getLayoutHeight() + itemView->getMarginTop() + itemView->getMarginBottom();
-			sl_ui_len minItemHeight = (heightList / MAX_ITEMS_VISIBLE) + 1;
+			sl_ui_len minItemHeight = (heightList / MAX_ITEMS_PER_PAGE) + 1;
 			if (height < minItemHeight) {
 				itemView->setLayoutHeight(minItemHeight);
 				height = minItemHeight;
