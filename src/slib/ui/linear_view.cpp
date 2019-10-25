@@ -138,13 +138,9 @@ namespace slib
 		for (i = 0; i < children.count; i++) {
 			Ref<View>& child = children[i];
 			if (child->getVisibility() != Visibility::Gone) {
-				Ref<LayoutAttributes>& childLayoutAttrs = child->m_layoutAttrs;
-				if (childLayoutAttrs.isNotNull()) {
-					childLayoutAttrs->flagInvalidLayoutInParent = sl_true;
-				}
+				child->setInvalidateLayoutFrameInParent();
 				childSizes[i] = child->getLayoutSize();
 				if (flagHorizontalLayout) {
-					sizeSum += child->getMarginLeft();
 					if (child->getWidthMode() != SizeMode::Filling) {
 						child->updateLayoutFrameInParent(updateLayoutParam);
 						sizeSum += child->getLayoutWidth();
@@ -152,9 +148,9 @@ namespace slib
 						countFill++;
 						sumFillWeights += child->getWidthWeight();
 					}
+					sizeSum += child->getMarginLeft();
 					sizeSum += child->getMarginRight();
 				} else {
-					sizeSum += child->getMarginTop();
 					if (child->getHeightMode() != SizeMode::Filling) {
 						child->updateLayoutFrameInParent(updateLayoutParam);
 						sizeSum += child->getLayoutHeight();
@@ -162,16 +158,16 @@ namespace slib
 						countFill++;
 						sumFillWeights += child->getHeightWeight();
 					}
+					sizeSum += child->getMarginTop();
 					sizeSum += child->getMarginBottom();
 				}
 			}
 		}
 		
-		if (sizeSum < 0) {
-			sizeSum = 0;
-		}
-		
 		if (countFill > 0) {
+			if (sizeSum < 0) {
+				sizeSum = 0;
+			}
 			sl_ui_pos remainedSize;
 			if (flagHorizontalLayout) {
 				sl_ui_len n = widthContainer;

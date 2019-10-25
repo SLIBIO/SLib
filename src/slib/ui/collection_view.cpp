@@ -258,7 +258,7 @@ namespace slib
 		if (columns.isNotEmpty()) {
 			Column* column = columns.getPointerAt(index);
 			if (column) {
-				return column->contentHeight;
+				return (sl_ui_len)(column->contentHeight);
 			}
 		}
 		return 0;
@@ -547,7 +547,7 @@ namespace slib
 						x = (i * widthCollectionView) / nColumns;
 					}
 					_layoutColumn(columns + i, flagRefresh, x, width);
-					sl_ui_len height = columns[i].contentHeight;
+					sl_ui_len height = (sl_ui_len)(columns[i].contentHeight);
 					if (height > maxHeight) {
 						maxHeight = height;
 					}
