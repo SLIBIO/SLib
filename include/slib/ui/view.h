@@ -318,6 +318,10 @@ namespace slib
 		
 		void measureAndSetLayoutWrappingSize(sl_bool flagHorizontalWrapping, sl_bool flagVerticalWrapping);
 
+		void updateLayoutFrameWithRequestedFrame();
+
+		void setInvalidateLayoutFrameInParent();
+
 		struct UpdateLayoutFrameParam
 		{
 			UIRect parentContentFrame;
@@ -327,7 +331,7 @@ namespace slib
 		};
 		
 		void updateLayoutFrameInParent(const UpdateLayoutFrameParam& param);
-		
+
 		sl_bool isCustomLayout();
 		
 		void setCustomLayout(sl_bool flagCustom);
@@ -1377,7 +1381,7 @@ namespace slib
 		void _restrictSize(UIRect& rect);
 		
 		UIRect _updateLayoutFrameInParent_getReferFrame(const UpdateLayoutFrameParam& param, View* refer);
-		
+
 		void _updateLayout();
 		
 		void _applyLayout(UIUpdateMode mode);
@@ -1814,6 +1818,7 @@ namespace slib
 		friend class LinearView;
 		friend class ListView;
 		friend class CollectionView;
+		friend class GridView;
 
 	};
 

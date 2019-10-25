@@ -2217,6 +2217,28 @@ namespace slib
 		}
 		return frame;
 	}
+
+	void View::updateLayoutFrameWithRequestedFrame()
+	{
+		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
+		if (layoutAttrs.isNotNull()) {
+			if (layoutAttrs->flagRequestedFrame) {
+				if (!(layoutAttrs->layoutFrame.getSize().isAlmostEqual(layoutAttrs->requestedFrame.getSize()))) {
+					_setInvalidateLayout();
+					layoutAttrs->layoutFrame = layoutAttrs->requestedFrame;
+				}
+				layoutAttrs->flagRequestedFrame = sl_false;
+			}
+		}
+	}
+
+	void View::setInvalidateLayoutFrameInParent()
+	{
+		Ref<LayoutAttributes>& layoutAttrs = m_layoutAttrs;
+		if (layoutAttrs.isNotNull()) {
+			layoutAttrs->flagInvalidLayoutInParent = sl_true;
+		}
+	}
 	
 	void View::updateLayoutFrameInParent(const UpdateLayoutFrameParam& param)
 	{
@@ -2541,10 +2563,7 @@ namespace slib
 					param.flagVertical = sl_true;
 					for (i = 0; i < children.count; i++) {
 						Ref<View>& child = children[i];
-						Ref<LayoutAttributes>& childLayoutAttrs = child->m_layoutAttrs;
-						if (childLayoutAttrs.isNotNull()) {
-							childLayoutAttrs->flagInvalidLayoutInParent = sl_true;
-						}
+						child->setInvalidateLayoutFrameInParent();
 					}
 					for (i = 0; i < children.count; i++) {
 						Ref<View>& child = children[i];
