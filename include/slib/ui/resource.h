@@ -355,6 +355,7 @@ namespace slib
 	class ChatView;
 	class RefreshView;
 	class CollectionView;
+	class GridView;
 
 }
 

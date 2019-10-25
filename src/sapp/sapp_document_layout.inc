@@ -916,6 +916,7 @@ namespace slib
 			PROCESS_CONTROL_SWITCH(Linear)
 			PROCESS_CONTROL_SWITCH(List)
 			PROCESS_CONTROL_SWITCH(Collection)
+			PROCESS_CONTROL_SWITCH(Grid)
 			PROCESS_CONTROL_SWITCH(ListReport)
 			PROCESS_CONTROL_SWITCH(Render)
 			PROCESS_CONTROL_SWITCH(Tab)
@@ -954,7 +955,7 @@ namespace slib
 							const Ref<XmlElement>& child = children[i];
 							if (child.isNotNull()) {
 								String tagName = child->getName();
-								if (tagName == "item" || tagName == "column") {
+								if (tagName == "item" || tagName == "column" || tagName == "row") {
 									continue;
 								}
 								Ref<SAppLayoutResourceItem> childItem = _parseLayoutResourceItemChild(params->resource, resourceItem, child, params->source);
@@ -3318,6 +3319,305 @@ namespace slib
 		
 	}
 	END_PROCESS_LAYOUT_CONTROL
+
+	BEGIN_PROCESS_LAYOUT_CONTROL(Grid, GridView)
+	{
+		
+		LAYOUT_CONTROL_PROCESS_SUPER(View)
+		
+		if (op == OP_PARSE) {
+			{
+				ListLocker< Ref<XmlElement> > columnXmls(_getLayoutItemChildElements(resourceItem, resource->name, "column"));
+				for (sl_size i = 0; i < columnXmls.count; i++) {
+					Ref<XmlElement>& columnXml = columnXmls[i];
+					if (columnXml.isNotNull()) {
+						SAppLayoutGridColumn column;
+						LAYOUT_CONTROL_PARSE_XML_DIMENSION_ATTR(columnXml, column., width)
+						if (!(column.width.checkSize())) {
+							LOG_ERROR_LAYOUT_CONTROL_XML_ATTR(columnXml, width)
+							return sl_false;
+						}
+						LAYOUT_CONTROL_PARSE_XML_DIMENSION_ATTR(columnXml, column., minWidth)
+						if (!(column.minWidth.checkScalarSize())) {
+							LOG_ERROR_LAYOUT_CONTROL_XML_ATTR(columnXml, minWidth)
+							return sl_false;
+						}
+						LAYOUT_CONTROL_PARSE_XML_DIMENSION_ATTR(columnXml, column., maxWidth)
+						if (!(column.maxWidth.checkScalarSize())) {
+							LOG_ERROR_LAYOUT_CONTROL_XML_ATTR(columnXml, maxWidth)
+							return sl_false;
+						}
+						if (!(attr->columns.add_NoLock(column))) {
+							_logError(columnXml, g_str_error_out_of_memory);
+							return sl_false;
+						}
+					}
+				}
+			}
+			{
+				CHashMap< Pair<sl_uint32, sl_uint32>, sl_bool > cellAllocs;
+				ListLocker< Ref<XmlElement> > rowXmls(_getLayoutItemChildElements(resourceItem, resource->name, "row"));
+				sl_uint32 nRows = (sl_uint32)(rowXmls.count);
+				for (sl_uint32 i = 0; i < nRows; i++) {
+					Ref<XmlElement>& rowXml = rowXmls[i];
+					if (rowXml.isNotNull()) {
+						SAppLayoutGridRow row;
+						LAYOUT_CONTROL_PARSE_XML_DIMENSION_ATTR(rowXml, row., height)
+						if (!(row.height.checkSize())) {
+							LOG_ERROR_LAYOUT_CONTROL_XML_ATTR(rowXml, height)
+							return sl_false;
+						}
+						LAYOUT_CONTROL_PARSE_XML_DIMENSION_ATTR(rowXml, row., minHeight)
+						if (!(row.minHeight.checkScalarSize())) {
+							LOG_ERROR_LAYOUT_CONTROL_XML_ATTR(rowXml, minHeight)
+							return sl_false;
+						}
+						LAYOUT_CONTROL_PARSE_XML_DIMENSION_ATTR(rowXml, row., maxHeight)
+						if (!(row.maxHeight.checkScalarSize())) {
+							LOG_ERROR_LAYOUT_CONTROL_XML_ATTR(rowXml, maxHeight)
+							return sl_false;
+						}
+						
+						sl_uint32 iCell = 0;
+						ListLocker< Ref<XmlElement> > childXmls(rowXml->getChildElements());
+						for (sl_size k = 0; k < childXmls.count; k++) {
+							Ref<XmlElement>& xmlView = childXmls[k];
+							if (xmlView.isNotNull()) {
+								Ref<SAppLayoutResourceItem> subItemView = _parseLayoutResourceItemChild(params->resource, resourceItem, xmlView, params->source);
+								if (subItemView.isNull()) {
+									return sl_false;
+								}
+								SAppLayoutGridCell cell;
+								cell.view = subItemView;
+								LAYOUT_CONTROL_PARSE_XML_ATTR(xmlView, cell., rowspan)
+								LAYOUT_CONTROL_PARSE_XML_ATTR(xmlView, cell., colspan)
+								if (!(cell.rowspan.flagDefined) || cell.rowspan.value < 1) {
+									cell.rowspan.value = 1;
+								}
+								if (!(cell.colspan.flagDefined) || cell.colspan.value < 1) {
+									cell.colspan.value = 1;
+								}
+								while (cellAllocs.find_NoLock(Pair<sl_uint32, sl_uint32>(i, iCell))) {
+									iCell++;
+								}
+								if (iCell + cell.colspan.value > attr->columns.getCount()) {
+									attr->columns.setCount_NoLock(iCell+cell.colspan.value);
+								}
+								for (sl_uint32 t1 = 0; t1 < cell.rowspan.value; t1++) {
+									for (sl_uint32 t2 = 0; t2 < cell.colspan.value; t2++) {
+										cellAllocs.put_NoLock(Pair<sl_uint32, sl_uint32>(i + t1, iCell + t2), sl_true);
+									}
+								}
+								row.cells.setCount_NoLock(iCell+1);
+								row.cells.setAt_NoLock(iCell, cell);
+							}
+						}
+						
+						if (!(attr->rows.add_NoLock(row))) {
+							_logError(rowXml, g_str_error_out_of_memory);
+							return sl_false;
+						}
+					}
+				}
+			}
+		} else if (op == OP_GENERATE_CPP) {
+			ListElements<SAppLayoutGridColumn> cols(attr->columns);
+			ListElements<SAppLayoutGridRow> rows(attr->rows);
+			sl_uint32 iRow, iCol;
+			sl_uint32 nCols = (sl_uint32)(cols.count);
+			sl_uint32 nRows = (sl_uint32)(rows.count);
+			params->sbDefineInit->add(String::format("%s%s->setColumnsCount(%d, slib::UIUpdateMode::Init);%n", strTab, name, nCols));
+			params->sbDefineInit->add(String::format("%s%s->setRowsCount(%d, slib::UIUpdateMode::Init);%n", strTab, name, nRows));
+			for (iCol = 0; iCol < nCols; iCol++) {
+				SAppLayoutGridColumn& col = cols[iCol];
+				if (col.width.flagDefined) {
+					if (col.width.unit == SAppDimensionValue::WRAP) {
+						params->sbDefineInit->add(String::format("%s%s->setColumnWidthWrapping(%d, slib::UIUpdateMode::Init);%n", strTab, name, iCol));
+					} else if (col.width.unit == SAppDimensionValue::FILL) {
+						params->sbDefineInit->add(String::format("%s%s->setColumnWidthFilling(%d, %ff, slib::UIUpdateMode::Init);%n", strTab, name, iCol, col.width.amount));
+					} else if (col.width.unit == SAppDimensionValue::WEIGHT) {
+						params->sbDefineInit->add(String::format("%s%s->setColumnWidthWeight(%d, %ff, slib::UIUpdateMode::Init);%n", strTab, name, iCol, col.width.amount));
+					} else {
+						if (col.width.isNeededOnLayoutFunction()) {
+							params->sbDefineLayout->add(String::format("%s%s->setColumnWidth(%d, %s, slib::UIUpdateMode::None);%n", strTab, name, iCol, col.width.getAccessString()));
+						} else {
+							params->sbDefineInit->add(String::format("%s%s->setColumnWidth(%d, %s, slib::UIUpdateMode::Init);%n", strTab, name, iCol, col.width.getAccessString()));
+						}
+					}
+					if (col.minWidth.flagDefined) {
+						if (col.minWidth.isNeededOnLayoutFunction()) {
+							params->sbDefineLayout->add(String::format("%s%s->setColumnMinimumWidth(%d, %s, slib::UIUpdateMode::None);%n", strTab, name, iCol, col.minWidth.getAccessString()));
+						} else {
+							params->sbDefineInit->add(String::format("%s%s->setColumnMinimumWidth(%d, %s, slib::UIUpdateMode::Init);%n", strTab, name, iCol, col.minWidth.getAccessString()));
+						}
+					}
+					if (col.maxWidth.flagDefined) {
+						if (col.maxWidth.isNeededOnLayoutFunction()) {
+							params->sbDefineLayout->add(String::format("%s%s->setColumnMaximumWidth(%d, %s, slib::UIUpdateMode::None);%n", strTab, name, iCol, col.maxWidth.getAccessString()));
+						} else {
+							params->sbDefineInit->add(String::format("%s%s->setColumnMaximumWidth(%d, %s, slib::UIUpdateMode::Init);%n", strTab, name, iCol, col.maxWidth.getAccessString()));
+						}
+					}
+				}
+			}
+			for (iRow = 0; iRow < nRows; iRow++) {
+				SAppLayoutGridRow& row = rows[iRow];
+				if (row.height.flagDefined) {
+					if (row.height.unit == SAppDimensionValue::WRAP) {
+						params->sbDefineInit->add(String::format("%s%s->setRowHeightWrapping(%d, slib::UIUpdateMode::Init);%n", strTab, name, iRow));
+					} else if (row.height.unit == SAppDimensionValue::FILL) {
+						params->sbDefineInit->add(String::format("%s%s->setRowHeightFilling(%d, %ff, slib::UIUpdateMode::Init);%n", strTab, name, iRow, row.height.amount));
+					} else if (row.height.unit == SAppDimensionValue::WEIGHT) {
+						params->sbDefineInit->add(String::format("%s%s->setRowHeightWeight(%d, %ff, slib::UIUpdateMode::Init);%n", strTab, name, iRow, row.height.amount));
+					} else {
+						if (row.height.isNeededOnLayoutFunction()) {
+							params->sbDefineLayout->add(String::format("%s%s->setRowHeight(%d, %s, slib::UIUpdateMode::None);%n", strTab, name, iRow, row.height.getAccessString()));
+						} else {
+							params->sbDefineInit->add(String::format("%s%s->setRowHeight(%d, %s, slib::UIUpdateMode::Init);%n", strTab, name, iRow, row.height.getAccessString()));
+						}
+					}
+					if (row.minHeight.flagDefined) {
+						if (row.minHeight.isNeededOnLayoutFunction()) {
+							params->sbDefineLayout->add(String::format("%s%s->setRowMinimumHeight(%d, %s, slib::UIUpdateMode::None);%n", strTab, name, iRow, row.minHeight.getAccessString()));
+						} else {
+							params->sbDefineInit->add(String::format("%s%s->setRowMinimumHeight(%d, %s, slib::UIUpdateMode::Init);%n", strTab, name, iRow, row.minHeight.getAccessString()));
+						}
+					}
+					if (row.maxHeight.flagDefined) {
+						if (row.maxHeight.isNeededOnLayoutFunction()) {
+							params->sbDefineLayout->add(String::format("%s%s->setRowMaximumHeight(%d, %s, slib::UIUpdateMode::None);%n", strTab, name, iRow, row.maxHeight.getAccessString()));
+						} else {
+							params->sbDefineInit->add(String::format("%s%s->setRowMaximumHeight(%d, %s, slib::UIUpdateMode::Init);%n", strTab, name, iRow, row.maxHeight.getAccessString()));
+						}
+					}
+				}
+			}
+		} else if (op == OP_SIMULATE) {
+			ListElements<SAppLayoutGridColumn> cols(attr->columns);
+			ListElements<SAppLayoutGridRow> rows(attr->rows);
+			sl_uint32 iRow, iCol;
+			sl_uint32 nCols = (sl_uint32)(cols.count);
+			sl_uint32 nRows = (sl_uint32)(rows.count);
+			if (!flagOnLayout) {
+				view->setColumnsCount(nCols, UIUpdateMode::Init);
+				view->setRowsCount(nRows, UIUpdateMode::Init);
+			}
+			for (iCol = 0; iCol < nCols; iCol++) {
+				SAppLayoutGridColumn& col = cols[iCol];
+				if (col.width.flagDefined) {
+					if (col.width.unit == SAppDimensionValue::WRAP) {
+						if (!flagOnLayout) {
+							view->setColumnWidthWrapping(iCol, UIUpdateMode::Init);
+						}
+					} else if (col.width.unit == SAppDimensionValue::FILL) {
+						if (!flagOnLayout) {
+							view->setColumnWidthFilling(iCol, col.width.amount, UIUpdateMode::Init);
+						}
+					} else if (col.width.unit == SAppDimensionValue::WEIGHT) {
+						if (!flagOnLayout) {
+							view->setColumnWidthWeight(iCol, col.width.amount, UIUpdateMode::Init);
+						}
+					} else {
+						if (flagOnLayout) {
+							view->setColumnWidth(iCol, _getDimensionIntValue(col.width), UIUpdateMode::None);
+						}
+					}
+				}
+				if (col.minWidth.flagDefined) {
+					if (flagOnLayout) {
+						view->setColumnMinimumWidth(iCol, _getDimensionIntValue(col.minWidth), UIUpdateMode::None);
+					}
+				}
+				if (col.maxWidth.flagDefined) {
+					if (flagOnLayout) {
+						view->setColumnMaximumWidth(iCol, _getDimensionIntValue(col.maxWidth), UIUpdateMode::None);
+					}
+				}
+			}
+			for (iRow = 0; iRow < nRows; iRow++) {
+				SAppLayoutGridRow& row = rows[iRow];
+				if (row.height.flagDefined) {
+					if (row.height.unit == SAppDimensionValue::WRAP) {
+						if (!flagOnLayout) {
+							view->setRowHeightWrapping(iRow, UIUpdateMode::Init);
+						}
+					} else if (row.height.unit == SAppDimensionValue::FILL) {
+						if (!flagOnLayout) {
+							view->setRowHeightFilling(iRow, row.height.amount, UIUpdateMode::Init);
+						}
+					} else if (row.height.unit == SAppDimensionValue::WEIGHT) {
+						if (!flagOnLayout) {
+							view->setRowHeightWeight(iRow, row.height.amount, UIUpdateMode::Init);
+						}
+					} else {
+						if (flagOnLayout) {
+							view->setRowHeight(iRow, _getDimensionIntValue(row.height), UIUpdateMode::None);
+						}
+					}
+				}
+				if (row.minHeight.flagDefined) {
+					if (flagOnLayout) {
+						view->setRowMinimumHeight(iRow, _getDimensionIntValue(row.minHeight), UIUpdateMode::None);
+					}
+				}
+				if (row.maxHeight.flagDefined) {
+					if (flagOnLayout) {
+						view->setRowMaximumHeight(iRow, _getDimensionIntValue(row.maxHeight), UIUpdateMode::None);
+					}
+				}
+			}
+			for (iRow = 0; iRow < nRows; iRow++) {
+				SAppLayoutGridRow& row = rows[iRow];
+				ListElements<SAppLayoutGridCell> cells(row.cells);
+				sl_uint32 nCells = Math::min((sl_uint32)(cells.count), nCols);
+				for (iCol = 0; iCol < nCells; iCol++) {
+					SAppLayoutGridCell& cell = cells[iCol];
+					if (cell.view.isNotNull()) {
+						Ref<View> contentView = _simulateLayoutCreateOrLayoutView(params->simulator, cell.view.get(), resourceItem, view, flagOnLayout);
+						if (contentView.isNotNull()) {
+							if (!flagOnLayout) {
+								view->setCell(iRow, iCol, contentView, cell.rowspan.value, cell.colspan.value, UIUpdateMode::Init);
+							}
+						} else {
+							return sl_false;
+						}
+					}
+				}
+			}
+		}
+		
+		LAYOUT_CONTROL_ADD_STATEMENT
+		
+		if (op == OP_GENERATE_CPP) {
+			ListElements<SAppLayoutGridColumn> cols(attr->columns);
+			ListElements<SAppLayoutGridRow> rows(attr->rows);
+			sl_uint32 iRow, iCol;
+			sl_uint32 nCols = (sl_uint32)(cols.count);
+			sl_uint32 nRows = (sl_uint32)(rows.count);
+			for (iRow = 0; iRow < nRows; iRow++) {
+				SAppLayoutGridRow& row = rows[iRow];
+				ListElements<SAppLayoutGridCell> cells(row.cells);
+				sl_uint32 nCells = Math::min((sl_uint32)(cells.count), nCols);
+				for (iCol = 0; iCol < nCells; iCol++) {
+					SAppLayoutGridCell& cell = cells[iCol];
+					if (cell.view.isNotNull()) {
+						String addChildStatement;
+						if (cell.colspan.value <= 1 && cell.rowspan.value <= 1) {
+							addChildStatement = String::format("%s%s->setCell(%d, %d, %s, slib::UIUpdateMode::Init);%n%n", strTab, name, iRow, iCol, cell.view->name);
+						} else {
+							addChildStatement = String::format("%s%s->setCell(%d, %d, %s, %d, %d, slib::UIUpdateMode::Init);%n%n", strTab, name, iRow, iCol, cell.view->name, cell.rowspan.value, cell.colspan.value);
+						}
+						if (!(_generateLayoutsCpp_Item(params->resource, cell.view.get(), resourceItem, *(params->sbDeclare), *(params->sbDefineInit), *(params->sbDefineLayout), addChildStatement))) {
+							return sl_false;
+						}
+					}
+				}
+			}
+		}
+		
+	}
+	END_PROCESS_LAYOUT_CONTROL
+
 
 	BEGIN_PROCESS_LAYOUT_CONTROL(ListReport, ListReportView)
 	{

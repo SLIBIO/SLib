@@ -379,6 +379,7 @@
     <ClCompile Include="..\..\src\slib\ui\gesture.cpp" />
     <ClCompile Include="..\..\src\slib\ui\global_event_monitor.cpp" />
     <ClCompile Include="..\..\src\slib\ui\global_event_monitor_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\grid_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\image_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\image_view_url.cpp" />
     <ClCompile Include="..\..\src\slib\ui\label_view.cpp" />

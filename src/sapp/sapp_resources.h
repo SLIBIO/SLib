@@ -518,6 +518,40 @@ namespace slib
 		
 	};
 
+	class SAppLayoutGridColumn
+	{
+	public:
+		SAppDimensionValue width;
+		SAppDimensionValue minWidth;
+		SAppDimensionValue maxWidth;
+	};
+
+	class SAppLayoutGridCell
+	{
+	public:
+		Ref<SAppLayoutResourceItem> view;
+		SAppUint32Value colspan;
+		SAppUint32Value rowspan;
+	};
+
+	class SAppLayoutGridRow
+	{
+	public:
+		SAppDimensionValue height;
+		SAppDimensionValue minHeight;
+		SAppDimensionValue maxHeight;
+		
+		List<SAppLayoutGridCell> cells;
+	};
+
+	class SAppLayoutGridAttributes : public Referable
+	{
+	public:
+		CList<SAppLayoutGridColumn> columns;
+		CList<SAppLayoutGridRow> rows;
+		
+	};
+
 	struct SAppLayoutListReportColumn
 	{
 		SAppStringValue title;
@@ -873,7 +907,8 @@ namespace slib
 		Tree = 0x0237,
 		Web = 0x0238,
 		Split = 0x0239,
-		
+		Grid = 0x023A,
+
 		Progress = 0x0240,
 		Slider = 0x0241,
 		Switch = 0x0242,
@@ -920,6 +955,7 @@ namespace slib
 		Ref<SAppLayoutLinearAttributes> attrsLinear;
 		Ref<SAppLayoutListAttributes> attrsList;
 		Ref<SAppLayoutCollectionAttributes> attrsCollection;
+		Ref<SAppLayoutGridAttributes> attrsGrid;
 		Ref<SAppLayoutListReportAttributes> attrsListReport;
 		Ref<SAppLayoutRenderAttributes> attrsRender;
 		Ref<SAppLayoutTabAttributes> attrsTab;
@@ -987,6 +1023,7 @@ namespace slib
 		sl_uint32 nAutoIncreaseNameLinear = 0;
 		sl_uint32 nAutoIncreaseNameList = 0;
 		sl_uint32 nAutoIncreaseNameCollection = 0;
+		sl_uint32 nAutoIncreaseNameGrid = 0;
 		sl_uint32 nAutoIncreaseNameListReport = 0;
 		sl_uint32 nAutoIncreaseNameRender = 0;
 		sl_uint32 nAutoIncreaseNameTab = 0;
