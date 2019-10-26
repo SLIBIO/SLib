@@ -1197,6 +1197,16 @@ namespace slib
 		return _type == VariantType::Boolean;
 	}
 
+	sl_bool Variant::isTrue() const noexcept
+	{
+		return _type == VariantType::Boolean && REF_VAR(sl_bool const, _value) != sl_false;
+	}
+
+	sl_bool Variant::isFalse() const noexcept
+	{
+		return _type == VariantType::Boolean && REF_VAR(sl_bool const, _value) == sl_false;
+	}
+
 	sl_bool Variant::getBoolean(sl_bool def) const noexcept
 	{
 		switch (_type) {

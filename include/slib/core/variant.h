@@ -329,6 +329,10 @@ namespace slib
 
 		sl_bool isBoolean() const noexcept;
 	
+		sl_bool isTrue() const noexcept;
+
+		sl_bool isFalse() const noexcept;
+
 		sl_bool getBoolean(sl_bool def = sl_false) const noexcept;
 
 		void setBoolean(sl_bool value) noexcept;
