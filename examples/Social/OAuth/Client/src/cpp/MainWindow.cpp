@@ -14,7 +14,7 @@ void MainWindow::onCreate()
 	btnExampleServer->setOnClick([this](View*) {
 		txtAuthUrl->setText("http://localhost:8080/login");
 		txtAccessTokenUrl->setText("http://localhost:8080/access_token");
-		txtRedirectUri->setText("http://localhost:8080");
+		txtRedirectUri->setText("redirect://");
 		txtClientId->setText("test");
 		txtScopes->setText("public,email");
 		txtRequestURL->setText("http://localhost:8080/me");
