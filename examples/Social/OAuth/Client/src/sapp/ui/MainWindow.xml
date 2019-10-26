@@ -1,0 +1,169 @@
+<sapp>
+	<layout
+		type='window'
+		title='OAuth 2.0 Testing Client'
+		width='900dp'
+		minWidth='600dp'
+		height='wrap'
+		centerScreen='true'
+		resizable='true'
+		fontSize='20dp'
+		>
+
+		<grid
+			width='*'
+			height='wrap'
+			margin='20dp'>
+
+			<column
+				width='250dp'
+				/>
+
+			<row>
+				<hlinear					
+					centerHorizontal='true'
+					colspan='2'
+					>
+					<button
+						name='btnExampleServer'
+						style='button'
+						text='Example Server'
+						/>
+					<button
+						name='btnFacebookAPI'
+						style='button'
+						text='Facebook API'
+						marginLeft='20dp'
+						/>
+				</hlinear>
+			</row>
+			
+			<row>
+				<label
+					text='Authorize URL'
+					style='label'
+					/>
+				<edit
+					name='txtAuthUrl'
+					style='input'
+					/>
+			</row>
+			<row>
+				<label
+					text='Access Token URL'
+					style='label'
+					/>
+				<edit
+					name='txtAccessTokenUrl'
+					style='input'
+					/>
+			</row>
+			<row>
+				<label
+					text='Redirect URI'
+					style='label'
+					/>
+				<edit
+					name='txtRedirectUri'
+					style='input'
+					/>
+			</row>
+			<row>
+				<label
+					text='Client ID'
+					style='label'
+					/>
+				<edit
+					name='txtClientId'
+					style='input'
+					/>
+			</row>
+			<row>
+				<label
+					text='Scopes'
+					style='label'
+					/>
+				<edit
+					name='txtScopes'
+					style='input'
+					/>
+			</row>
+			<row>
+				<label
+					text='Access Token'
+					style='label'
+					/>
+				<edit
+					name='txtAccessToken'
+					style='input'
+					/>
+			</row>
+			<row>
+				<label
+					text='Request URL'
+					style='label'
+					/>
+				<edit
+					name='txtRequestURL'
+					style='input'
+					/>
+			</row>
+			<row>
+				<label
+					text='Response'
+					colspan='2'
+					margin='5dp'
+					/>
+			</row>
+			<row>
+				<textArea
+					name='txtResponse'
+					width='*'
+					height='200dp'
+					colspan='2'
+					readOnly='true'
+					margin='5dp'
+					/>
+			</row>
+			<row>
+				<hlinear					
+					centerHorizontal='true'
+					colspan='2'
+					>
+					<button
+						name='btnAuth'
+						style='button'
+						text='Authorize'
+						/>
+					<button
+						name='btnSendRequest'
+						style='button'
+						text='Send Request'
+						marginLeft='20dp'
+						/>
+				</hlinear>
+			</row>
+		</grid>
+
+ 	</layout>
+
+	<style
+		name='label'
+		alignCenter='true'
+		/>
+
+	<style
+		name='input'
+		width='*'
+		gravity='left'
+		margin='5dp'
+		/>
+	
+	<style
+		name='button'
+		width='200dp'
+		fontSize='25dp'
+		nativeWidget='true'
+		/>
+
+</sapp>
