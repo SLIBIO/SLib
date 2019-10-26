@@ -72,7 +72,7 @@ namespace slib
 		
 		void popup(const Ref<View>& parent, sl_bool flagFillParentBackground = sl_true);
 
-		Ref<Window> popupWindow(const Ref<Window>& parent);
+		Ref<Window> popupWindow(const Ref<Window>& parent, sl_ui_len width = 0, sl_ui_len height = 0);
 
 		sl_bool isPopup();
 		
