@@ -93,7 +93,7 @@ namespace slib
 
 	Ref<HttpServer> HttpServerContext::getServer()
 	{
-		Ref<HttpServerConnection> connection = getConnection();
+		Ref<HttpServerConnection> connection = m_connection;
 		if (connection.isNotNull()) {
 			return connection->getServer();
 		}
@@ -759,13 +759,13 @@ namespace slib
 		*route = _route;
 	}
 	
-	void HttpServerRoute::add(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest)
+	void HttpServerRoute::add(const String& path, const Function<Variant(HttpServerContext*)>& onRequest)
 	{
 		HttpServerRoute* route = createRoute(path);
 		route->onRequest = onRequest;
 	}
 	
-	Variant HttpServerRoute::processRequest(const String& path, HttpServer* server, HttpServerContext* context)
+	Variant HttpServerRoute::processRequest(const String& path, HttpServerContext* context)
 	{
 		HashMap<String, String> params;
 		HttpServerRoute* route = getRoute(path, params);
@@ -774,7 +774,7 @@ namespace slib
 				if (params.isNotNull()) {
 					context->getParameters().addAll_NoLock(params);
 				}
-				return route->onRequest(server, context);
+				return route->onRequest(context);
 			}
 		}
 		return sl_false;
@@ -787,7 +787,7 @@ namespace slib
 	{
 	}
 	
-	Variant HttpServerRouter::processRequest(const String& path, HttpServer* server, HttpServerContext* context)
+	Variant HttpServerRouter::processRequest(const String& path, HttpServerContext* context)
 	{
 		if (routes.isNull()) {
 			return sl_false;
@@ -795,14 +795,14 @@ namespace slib
 		HttpMethod method = context->getMethod();
 		HttpServerRoute* route = routes.getItemPointer(method);
 		if (route) {
-			Variant result = route->processRequest(path, server, context);
+			Variant result = route->processRequest(path, context);
 			if (!(result.isFalse())) {
 				return result;
 			}
 		}
 		route = routes.getItemPointer(HttpMethod::Unknown);
 		if (route) {
-			Variant result = route->processRequest(path, server, context);
+			Variant result = route->processRequest(path, context);
 			if (!(result.isFalse())) {
 				return result;
 			}
@@ -810,7 +810,7 @@ namespace slib
 		return sl_false;
 	}
 	
-	Variant HttpServerRouter::preProcessRequest(const String& path, HttpServer* server, HttpServerContext* context)
+	Variant HttpServerRouter::preProcessRequest(const String& path, HttpServerContext* context)
 	{
 		if (preRoutes.isNull()) {
 			return sl_false;
@@ -818,14 +818,14 @@ namespace slib
 		HttpMethod method = context->getMethod();
 		HttpServerRoute* route = preRoutes.getItemPointer(method);
 		if (route) {
-			Variant result = route->processRequest(path, server, context);
+			Variant result = route->processRequest(path, context);
 			if (!(result.isFalse())) {
 				return result;
 			}
 		}
 		route = preRoutes.getItemPointer(HttpMethod::Unknown);
 		if (route) {
-			Variant result = route->processRequest(path, server, context);
+			Variant result = route->processRequest(path, context);
 			if (!(result.isFalse())) {
 				return result;
 			}
@@ -833,7 +833,7 @@ namespace slib
 		return sl_false;
 	}
 	
-	Variant HttpServerRouter::postProcessRequest(const String& path, HttpServer* server, HttpServerContext* context)
+	Variant HttpServerRouter::postProcessRequest(const String& path, HttpServerContext* context)
 	{
 		if (postRoutes.isNull()) {
 			return sl_false;
@@ -841,14 +841,14 @@ namespace slib
 		HttpMethod method = context->getMethod();
 		HttpServerRoute* route = postRoutes.getItemPointer(method);
 		if (route) {
-			Variant result = route->processRequest(path, server, context);
+			Variant result = route->processRequest(path, context);
 			if (!(result.isFalse())) {
 				return result;
 			}
 		}
 		route = postRoutes.getItemPointer(HttpMethod::Unknown);
 		if (route) {
-			Variant result = route->processRequest(path, server, context);
+			Variant result = route->processRequest(path, context);
 			if (!(result.isFalse())) {
 				return result;
 			}
@@ -865,7 +865,7 @@ namespace slib
 		route->add(path, _route);
 	}
 	
-	void HttpServerRouter::add(HttpMethod method, const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest)
+	void HttpServerRouter::add(HttpMethod method, const String& path, const Function<Variant(HttpServerContext*)>& onRequest)
 	{
 		HttpServerRoute* route = routes.getItemPointer(method);
 		if (!route) {
@@ -883,7 +883,7 @@ namespace slib
 		route->add(path, _route);
 	}
 	
-	void HttpServerRouter::before(HttpMethod method, const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest)
+	void HttpServerRouter::before(HttpMethod method, const String& path, const Function<Variant(HttpServerContext*)>& onRequest)
 	{
 		HttpServerRoute* route = preRoutes.getItemPointer(method);
 		if (!route) {
@@ -901,7 +901,7 @@ namespace slib
 		route->add(path, _route);
 	}
 	
-	void HttpServerRouter::after(HttpMethod method, const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest)
+	void HttpServerRouter::after(HttpMethod method, const String& path, const Function<Variant(HttpServerContext*)>& onRequest)
 	{
 		HttpServerRoute* route = postRoutes.getItemPointer(method);
 		if (!route) {
@@ -928,7 +928,7 @@ namespace slib
 		add(HttpMethod::GET, path, route);
 	}
 	
-	void HttpServerRouter::GET(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest)
+	void HttpServerRouter::GET(const String& path, const Function<Variant(HttpServerContext*)>& onRequest)
 	{
 		add(HttpMethod::GET, path, onRequest);
 	}
@@ -938,7 +938,7 @@ namespace slib
 		add(HttpMethod::POST, path, route);
 	}
 	
-	void HttpServerRouter::POST(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest)
+	void HttpServerRouter::POST(const String& path, const Function<Variant(HttpServerContext*)>& onRequest)
 	{
 		add(HttpMethod::POST, path, onRequest);
 	}
@@ -948,7 +948,7 @@ namespace slib
 		add(HttpMethod::PUT, path, route);
 	}
 	
-	void HttpServerRouter::PUT(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest)
+	void HttpServerRouter::PUT(const String& path, const Function<Variant(HttpServerContext*)>& onRequest)
 	{
 		add(HttpMethod::PUT, path, onRequest);
 	}
@@ -958,7 +958,7 @@ namespace slib
 		add(HttpMethod::DELETE, path, route);
 	}
 	
-	void HttpServerRouter::DELETE(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest)
+	void HttpServerRouter::DELETE(const String& path, const Function<Variant(HttpServerContext*)>& onRequest)
 	{
 		add(HttpMethod::DELETE, path, onRequest);
 	}
@@ -968,7 +968,7 @@ namespace slib
 		add(HttpMethod::Unknown, path, route);
 	}
 	
-	void HttpServerRouter::ALL(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest)
+	void HttpServerRouter::ALL(const String& path, const Function<Variant(HttpServerContext*)>& onRequest)
 	{
 		add(HttpMethod::Unknown, path, onRequest);
 	}
@@ -1467,25 +1467,25 @@ namespace slib
 	Variant HttpServer::dispatchRequest(HttpServerContext* context)
 	{
 		if (m_param.onPreRequest.isNotNull()) {
-			Variant result = m_param.onPreRequest(this, context);
+			Variant result = m_param.onPreRequest(context);
 			if (!(result.isFalse())) {
 				return result;
 			}
 		}
 		{
-			Variant result = m_param.router.preProcessRequest(context->getPath(), this, context);
+			Variant result = m_param.router.preProcessRequest(context->getPath(), context);
 			if (!(result.isFalse())) {
 				return result;
 			}
 		}
 		{
-			Variant result = m_param.router.processRequest(context->getPath(), this, context);
+			Variant result = m_param.router.processRequest(context->getPath(), context);
 			if (!(result.isFalse())) {
 				return result;
 			}
 		}
 		if (m_param.onRequest.isNotNull()) {
-			Variant result = m_param.onRequest(this, context);
+			Variant result = m_param.onRequest(context);
 			if (!(result.isFalse())) {
 				return result;
 			}
@@ -1503,8 +1503,8 @@ namespace slib
 			context->setResponseAccessControlAllowOrigin("*");
 		}
 
-		m_param.router.postProcessRequest(context->getPath(), this, context);
-		m_param.onPostRequest(this, context);
+		m_param.router.postProcessRequest(context->getPath(), context);
+		m_param.onPostRequest(context);
 		onPostRequest(context);
 		
 		if (!(context->isProcessed())) {

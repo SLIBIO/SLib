@@ -199,7 +199,7 @@ namespace slib
 	class SLIB_EXPORT HttpServerRoute
 	{
 	public:
-		Function<Variant(HttpServer*, HttpServerContext*)> onRequest;
+		Function<Variant(HttpServerContext*)> onRequest;
 		HashMap<String, HttpServerRoute> routes;
 		Ptr<HttpServerRoute> defaultRoute;
 		Ptr<HttpServerRoute> ellipsisRoute;
@@ -217,9 +217,9 @@ namespace slib
 		
 		void add(const String& path, const HttpServerRoute& route);
 		
-		void add(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest);
+		void add(const String& path, const Function<Variant(HttpServerContext*)>& onRequest);
 		
-		Variant processRequest(const String& path, HttpServer* server, HttpServerContext* context);
+		Variant processRequest(const String& path, HttpServerContext* context);
 		
 	};
 	
@@ -236,45 +236,45 @@ namespace slib
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(HttpServerRouter)
 		
 	public:
-		Variant processRequest(const String& path, HttpServer* server, HttpServerContext* context);
+		Variant processRequest(const String& path, HttpServerContext* context);
 
-		Variant preProcessRequest(const String& path, HttpServer* server, HttpServerContext* context);
+		Variant preProcessRequest(const String& path, HttpServerContext* context);
 
-		Variant postProcessRequest(const String& path, HttpServer* server, HttpServerContext* context);
+		Variant postProcessRequest(const String& path, HttpServerContext* context);
 
 		void add(HttpMethod method, const String& path, const HttpServerRoute& route);
 		
-		void add(HttpMethod method, const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest);
+		void add(HttpMethod method, const String& path, const Function<Variant(HttpServerContext*)>& onRequest);
 		
 		void before(HttpMethod method, const String& path, const HttpServerRoute& route);
 		
-		void before(HttpMethod method, const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest);
+		void before(HttpMethod method, const String& path, const Function<Variant(HttpServerContext*)>& onRequest);
 		
 		void after(HttpMethod method, const String& path, const HttpServerRoute& route);
 		
-		void after(HttpMethod method, const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest);
+		void after(HttpMethod method, const String& path, const Function<Variant(HttpServerContext*)>& onRequest);
 		
 		void add(const String& path, const HttpServerRouter& router);
 		
 		void GET(const String& path, const HttpServerRoute& route);
 		
-		void GET(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest);
+		void GET(const String& path, const Function<Variant(HttpServerContext*)>& onRequest);
 		
 		void POST(const String& path, const HttpServerRoute& route);
 		
-		void POST(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest);
+		void POST(const String& path, const Function<Variant(HttpServerContext*)>& onRequest);
 		
 		void PUT(const String& path, const HttpServerRoute& route);
 		
-		void PUT(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest);
+		void PUT(const String& path, const Function<Variant(HttpServerContext*)>& onRequest);
 		
 		void DELETE(const String& path, const HttpServerRoute& route);
 		
-		void DELETE(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest);
+		void DELETE(const String& path, const Function<Variant(HttpServerContext*)>& onRequest);
 		
 		void ALL(const String& path, const HttpServerRoute& route);
 		
-		void ALL(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest);
+		void ALL(const String& path, const Function<Variant(HttpServerContext*)>& onRequest);
 		
 	};
 	
@@ -309,9 +309,9 @@ namespace slib
 		
 		HttpServerRouter router;
 
-		Function<Variant(HttpServer*, HttpServerContext*)> onRequest;
-		Function<Variant(HttpServer*, HttpServerContext*)> onPreRequest;
-		Function<void(HttpServer*, HttpServerContext*)> onPostRequest;
+		Function<Variant(HttpServerContext*)> onRequest;
+		Function<Variant(HttpServerContext*)> onPreRequest;
+		Function<void(HttpServerContext*)> onPostRequest;
 
 	public:
 		HttpServerParam();

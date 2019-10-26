@@ -61,7 +61,7 @@ namespace slib
 
 		void dispatchStopService() override;
 		
-		sl_bool onHttpRequest(HttpServer*, HttpServerContext*);
+		sl_bool onHttpRequest(HttpServerContext*);
 
 	protected:
 		Ref<HttpServer> m_http;

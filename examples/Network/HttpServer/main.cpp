@@ -38,14 +38,14 @@ int main(int argc, const char * argv[])
 		param.parseJsonFile("/etc/slib_http.conf");
 	} while (0);
 	
-	param.onPreRequest = [](HttpServer*, HttpServerContext* context) {
+	param.onPreRequest = [](HttpServerContext* context) {
 		if (context->getPath() == "/test") {
 			context->write("Intercepted!<br>");
 		}
 		return sl_false;
 	};
 	
-	param.router.GET("/", [](HttpServer*, HttpServerContext* context) {
+	param.router.GET("/", [](HttpServerContext* context) {
 		Console::println("Method: %s, Path: %s", context->getMethodText(), context->getPath());
 		Console::println("Headers:");
 		for (auto& pair : context->getRequestHeaders()) {
@@ -87,64 +87,64 @@ int main(int argc, const char * argv[])
 													 ), data));
 		return sl_true;
 	});
-	param.router.GET("/test", [](HttpServer*, HttpServerContext* context) {
+	param.router.GET("/test", [](HttpServerContext* context) {
 		context->write("Welcome Test!");
 		return sl_true;
 	});
-	param.router.GET("/test/me", [](HttpServer*, HttpServerContext* context) {
+	param.router.GET("/test/me", [](HttpServerContext* context) {
 		context->write("Welcome Test Me!");
 		return sl_true;
 	});
-	param.router.GET("/:userId/books/:bookId", [](HttpServer*, HttpServerContext* context) {
+	param.router.GET("/:userId/books/:bookId", [](HttpServerContext* context) {
 		context->write(String::format("UserId=%s, BookId=%s", context->getParameter("userId"), context->getParameter("bookId")));
 		return sl_true;
 	});
-	param.router.GET("/:bookId/users", [](HttpServer*, HttpServerContext* context) {
+	param.router.GET("/:bookId/users", [](HttpServerContext* context) {
 		context->write(String::format("BookId=%s", context->getParameter("bookId")));
 		return sl_true;
 	});
-	param.router.GET("/1/*/a/:id", [](HttpServer*, HttpServerContext* context) {
+	param.router.GET("/1/*/a/:id", [](HttpServerContext* context) {
 		context->write("Test1, id=" + context->getParameter("id"));
 		return sl_true;
 	});
-	param.router.GET("/2/**/b/:id", [](HttpServer*, HttpServerContext* context) {
+	param.router.GET("/2/**/b/:id", [](HttpServerContext* context) {
 		context->write("Test2, id=" + context->getParameter("id"));
 		return sl_true;
 	});
-	param.router.GET("/2/**", [](HttpServer*, HttpServerContext* context) {
+	param.router.GET("/2/**", [](HttpServerContext* context) {
 		context->write("Test2");
 		return sl_true;
 	});
 	HttpServerRouter router;
-	router.GET("/", [](HttpServer*, HttpServerContext* context) {
+	router.GET("/", [](HttpServerContext* context) {
 		context->write("Search All");
 		return sl_true;
 	});
-	router.GET("/:keyword", [](HttpServer*, HttpServerContext* context) {
+	router.GET("/:keyword", [](HttpServerContext* context) {
 		context->write("Search Keyword: " + context->getParameter("keyword"));
 		return sl_true;
 	});
-	router.before(HttpMethod::GET, "/**", [](HttpServer*, HttpServerContext* context) {
+	router.before(HttpMethod::GET, "/**", [](HttpServerContext* context) {
 		context->write("Intercepted by Search<br><br>");
 		return sl_false;
 	});
-	router.after(HttpMethod::GET, "/**", [](HttpServer*, HttpServerContext* context) {
+	router.after(HttpMethod::GET, "/**", [](HttpServerContext* context) {
 		context->write("<br><br>Powered by Search");
 		return sl_true;
 	});
 	param.router.add("/search", router);
 	
-	param.router.before(HttpMethod::GET, "/test/**", [](HttpServer*, HttpServerContext* context) {
+	param.router.before(HttpMethod::GET, "/test/**", [](HttpServerContext* context) {
 		context->write("Intercepted Router<br><br>");
 		return sl_false;
 	});
 
-	param.router.after(HttpMethod::GET, "/test/**", [](HttpServer*, HttpServerContext* context) {
+	param.router.after(HttpMethod::GET, "/test/**", [](HttpServerContext* context) {
 		context->write("<br><br>Post Router");
 		return sl_true;
 	});
 
-	param.onRequest = [](HttpServer*, HttpServerContext* context) {
+	param.onRequest = [](HttpServerContext* context) {
 		if (context->getPath() == "/example") {
 			context->write("Example!");
 			return sl_true;
@@ -152,7 +152,7 @@ int main(int argc, const char * argv[])
 		return sl_false;
 	};
 	
-	param.onPostRequest = [](HttpServer*, HttpServerContext* context) {
+	param.onPostRequest = [](HttpServerContext* context) {
 		if (!(context->isProcessed())) {
 			context->setResponseCode(HttpStatus::NotFound);
 			context->write("Not found the specified file!");

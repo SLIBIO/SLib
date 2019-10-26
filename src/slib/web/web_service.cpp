@@ -90,7 +90,7 @@ namespace slib
 		Service::dispatchStopService();
 	}
 	
-	sl_bool WebService::onHttpRequest(HttpServer*, HttpServerContext* context)
+	sl_bool WebService::onHttpRequest(HttpServerContext* context)
 	{
 		if (m_controller.isNotNull()) {
 			return m_controller->processHttpRequest(context);
