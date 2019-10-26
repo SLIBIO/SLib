@@ -238,7 +238,13 @@ namespace slib
 		}
 		if (delayMillis == 0) {
 			if (UIDispatcher::addCallback(callback)) {
-				[NSApp postEvent:context->dispatchEvent atStart:YES];
+				if ([NSThread isMainThread]) {
+					[NSApp postEvent:context->dispatchEvent atStart:YES];
+				} else {
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[NSApp postEvent:context->dispatchEvent atStart:YES];
+					});
+				}
 			}
 		} else {
 			Function<void()> refCallback(callback);
