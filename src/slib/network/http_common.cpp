@@ -121,8 +121,10 @@ namespace slib
 			HTTP_STATUS_CASE(SeeOther, "See Other");
 			HTTP_STATUS_CASE(NotModified, "Not Modified");
 			HTTP_STATUS_CASE(UseProxy, "Use Proxy");
+			HTTP_STATUS_CASE(SwitchProxy, "Switch Proxy");
 			HTTP_STATUS_CASE(TemporaryRedirect, "Temporary Redirect");
-			
+			HTTP_STATUS_CASE(PermanentRedirect, "Permanent Redirect");
+
 			HTTP_STATUS_CASE(BadRequest, "Bad Request");
 			HTTP_STATUS_CASE(Unauthorized, "Unauthorized");
 			HTTP_STATUS_CASE(PaymentRequired, "Payment Required");
@@ -215,6 +217,7 @@ namespace slib
 	DEFINE_HTTP_HEADER(AcceptRanges, "Accept-Ranges")
 	DEFINE_HTTP_HEADER(ContentRange, "Content-Range")
 	DEFINE_HTTP_HEADER(LastModified, "Last-Modified")
+	DEFINE_HTTP_HEADER(Location, "Location")
 
 	sl_reg HttpHeaders::parseHeaders(HttpHeaderMap& map, const void* _data, sl_size size)
 	{
@@ -2019,6 +2022,22 @@ namespace slib
 	void HttpResponse::addResponseCookie(const HttpCookie& cookie)
 	{
 		m_responseHeaders.add_NoLock(HttpHeaders::SetCookie, cookie.toHeaderValue());
+	}
+
+	String HttpResponse::getResponseRedirectLocation()
+	{
+		return getResponseHeader(HttpHeaders::Location);
+	}
+
+	void HttpResponse::setResponseRedirectLocation(const String& location)
+	{
+		setResponseHeader(HttpHeaders::Location, location);
+	}
+
+	void HttpResponse::setResponseRedirect(const String& location, HttpStatus status)
+	{
+		setResponseHeader(HttpHeaders::Location, location);
+		setResponseCode(status);
 	}
 	
 	Memory HttpResponse::makeResponsePacket() const

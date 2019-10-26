@@ -86,7 +86,9 @@ namespace slib
 		SeeOther = 303,
 		NotModified = 304,
 		UseProxy = 305,
+		SwitchProxy = 306,
 		TemporaryRedirect = 307,
+		PermanentRedirect = 308,
 		
 		// Client Error
 		BadRequest = 400,
@@ -182,7 +184,8 @@ namespace slib
 		static const String& AcceptRanges;
 		static const String& ContentRange;
 		static const String& LastModified;
-		
+		static const String& Location;
+
 	public:
 		
 		/*
@@ -653,6 +656,12 @@ namespace slib
 		
 		void addResponseCookie(const HttpCookie& cookie);
 		
+		String getResponseRedirectLocation();
+		
+		void setResponseRedirectLocation(const String& location);
+
+		void setResponseRedirect(const String& location, HttpStatus status = HttpStatus::Found);
+
 		
 		Memory makeResponsePacket() const;
 		
