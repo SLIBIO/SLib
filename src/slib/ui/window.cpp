@@ -423,11 +423,13 @@ namespace slib
 		return m_flagWidthWrapping;
 	}
 	
-	void Window::setWidthWrapping(sl_bool flag)
+	void Window::setWidthWrapping(sl_bool flag, UIUpdateMode mode)
 	{
 		m_flagWidthWrapping = flag;
 		if (flag) {
-			_applyContentWrappingSize();
+			if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
+				_applyContentWrappingSize();
+			}
 		}
 	}
 	
@@ -436,11 +438,13 @@ namespace slib
 		return m_flagHeightWrapping;
 	}
 	
-	void Window::setHeightWrapping(sl_bool flag)
+	void Window::setHeightWrapping(sl_bool flag, UIUpdateMode mode)
 	{
 		m_flagHeightWrapping = flag;
 		if (flag) {
-			_applyContentWrappingSize();
+			if (SLIB_UI_UPDATE_MODE_IS_UPDATE_LAYOUT(mode)) {
+				_applyContentWrappingSize();
+			}
 		}
 	}
 

@@ -170,11 +170,11 @@ namespace slib
 
 		sl_bool isWidthWrapping();
 		
-		void setWidthWrapping(sl_bool flag = sl_true);
+		void setWidthWrapping(sl_bool flag = sl_true, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		sl_bool isHeightWrapping();
 		
-		void setHeightWrapping(sl_bool flag = sl_true);
+		void setHeightWrapping(sl_bool flag = sl_true, UIUpdateMode mode = UIUpdateMode::UpdateLayout);
 		
 		
 		UIRect getClientFrame();
