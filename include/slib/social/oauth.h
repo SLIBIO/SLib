@@ -49,6 +49,10 @@ namespace slib
 	public:
 		Ref<Window> parentWindow;
 		
+		String title;
+		sl_uint32 width;
+		sl_uint32 height;
+		
 	public:
 		OAuthWebRedirectDialogOptions();
 		

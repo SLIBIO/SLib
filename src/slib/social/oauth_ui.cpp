@@ -38,7 +38,9 @@ namespace slib
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(OAuthWebRedirectDialogOptions)
 	
-	OAuthWebRedirectDialogOptions::OAuthWebRedirectDialogOptions()
+	OAuthWebRedirectDialogOptions::OAuthWebRedirectDialogOptions():
+		width(800),
+		height(600)
 	{
 	}
 	
@@ -72,6 +74,8 @@ namespace slib
 				{
 					ViewPage::init();
 					
+#ifdef SLIB_PLATFORM_IS_MOBILE
+					sl_real fontSize = (sl_real)(UIResource::getScreenMinimum() / 20);
 					Ref<Button> btnCancel = new Button;
 					btnCancel->setCancelOnClick();
 					btnCancel->setText(::slib::string::cancel::get(), UIUpdateMode::Init);
@@ -80,18 +84,18 @@ namespace slib
 					btnCancel->setWidthWrapping(UIUpdateMode::Init);
 					btnCancel->setHeightWrapping(UIUpdateMode::Init);
 					btnCancel->setMarginTop(UIResource::getSafeAreaInsetTop(), UIUpdateMode::Init);
-#ifdef SLIB_PLATFORM_IS_MOBILE
-					sl_real fontSize = (sl_real)(UIResource::getScreenMinimum() / 20);
-#else
-					sl_real fontSize = 20;
-#endif
 					btnCancel->setFontSize(fontSize, UIUpdateMode::Init);
 					btnCancel->setPadding((sl_ui_pos)(fontSize / 3), UIUpdateMode::Init);
 					addChild(btnCancel, UIUpdateMode::Init);
+#endif
 					
 					m_webView = new WebView;
 					m_webView->setAlignParentLeft(UIUpdateMode::Init);
+#ifdef SLIB_PLATFORM_IS_MOBILE
 					m_webView->setBelow(btnCancel, UIUpdateMode::Init);
+#else
+					m_webView->setAlignParentTop(UIUpdateMode::Init);
+#endif
 					m_webView->setWidthFilling(1, UIUpdateMode::Init);
 					m_webView->setHeightFilling(1, UIUpdateMode::Init);
 					addChild(m_webView, UIUpdateMode::Init);
@@ -127,21 +131,18 @@ namespace slib
 						transition.direction = TransitionDirection::FromBottomToTop;
 						transition.duration = 0.2f;
 						app->popupPage(this, transition);
-						return;
 					}
-					setSize(UIResource::getScreenWidth(), UIResource::getScreenHeight(), UIUpdateMode::Init);
 #else
-					setSize(400, 600, UIUpdateMode::Init);
-#endif
-					setLeft((UIResource::getScreenWidth() - getWidth()) / 2, UIUpdateMode::Init);
-					setTop((UIResource::getScreenHeight() - getHeight()) / 2, UIUpdateMode::Init);
-					Ref<Window> window = popupWindow(param.options.parentWindow);
+					setCenterInParent(UIUpdateMode::Init);
+					Ref<Window> window = popupWindow(param.options.parentWindow, (sl_ui_len)(param.options.width), (sl_ui_len)(param.options.height));
 					if (window.isNull()) {
 						onRedirect(sl_null);
 						return;
 					}
+					window->setTitle(param.options.title);
 					window->increaseReference();
 					m_window = window;
+#endif
 				}
 				
 				void close() override
