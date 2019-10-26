@@ -73,17 +73,9 @@ namespace slib
 		
 		const SocketAddress& getRemoteAddress();
 		
-		sl_bool isAsynchronousResponse();
-		
-		void setAsynchronousResponse(sl_bool flagAsync);
-		
-		sl_bool isProcessed();
+		sl_bool isProcessed() const;
 		
 		void setProcessed(sl_bool flag = sl_true);
-		
-		sl_bool isCompleted();
-
-		void completeResponse();
 		
 	public:
 		SLIB_BOOLEAN_PROPERTY(ClosingConnection);
@@ -95,9 +87,8 @@ namespace slib
 		sl_uint64 m_requestContentLength;
 		MemoryQueue m_requestBodyBuffer;
 		AtomicMemory m_requestBody;
-		sl_bool m_flagAsynchronousResponse;
+		
 		sl_bool m_flagProcessed;
-		sl_bool m_flagCompleted;
 
 	private:
 		WeakRef<HttpServerConnection> m_connection;
@@ -170,7 +161,8 @@ namespace slib
 		
 		void _processContext(const Ref<HttpServerContext>& context);
 		
-		void _completeResponse(HttpServerContext* context);
+	public:
+		void completeContext(HttpServerContext* context);
 		
 	protected:
 		void onReadStream(AsyncStreamResult& result);
@@ -207,7 +199,7 @@ namespace slib
 	class SLIB_EXPORT HttpServerRoute
 	{
 	public:
-		Function<sl_bool(HttpServer*, HttpServerContext*)> onRequest;
+		Function<Variant(HttpServer*, HttpServerContext*)> onRequest;
 		HashMap<String, HttpServerRoute> routes;
 		Ptr<HttpServerRoute> defaultRoute;
 		Ptr<HttpServerRoute> ellipsisRoute;
@@ -225,9 +217,9 @@ namespace slib
 		
 		void add(const String& path, const HttpServerRoute& route);
 		
-		void add(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
+		void add(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest);
 		
-		sl_bool processRequest(const String& path, HttpServer* server, HttpServerContext* context);
+		Variant processRequest(const String& path, HttpServer* server, HttpServerContext* context);
 		
 	};
 	
@@ -244,45 +236,45 @@ namespace slib
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(HttpServerRouter)
 		
 	public:
-		sl_bool processRequest(const String& path, HttpServer* server, HttpServerContext* context);
+		Variant processRequest(const String& path, HttpServer* server, HttpServerContext* context);
 
-		sl_bool preProcessRequest(const String& path, HttpServer* server, HttpServerContext* context);
+		Variant preProcessRequest(const String& path, HttpServer* server, HttpServerContext* context);
 
-		sl_bool postProcessRequest(const String& path, HttpServer* server, HttpServerContext* context);
+		Variant postProcessRequest(const String& path, HttpServer* server, HttpServerContext* context);
 
 		void add(HttpMethod method, const String& path, const HttpServerRoute& route);
 		
-		void add(HttpMethod method, const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
+		void add(HttpMethod method, const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest);
 		
 		void before(HttpMethod method, const String& path, const HttpServerRoute& route);
 		
-		void before(HttpMethod method, const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
+		void before(HttpMethod method, const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest);
 		
 		void after(HttpMethod method, const String& path, const HttpServerRoute& route);
 		
-		void after(HttpMethod method, const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
+		void after(HttpMethod method, const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest);
 		
 		void add(const String& path, const HttpServerRouter& router);
 		
 		void GET(const String& path, const HttpServerRoute& route);
 		
-		void GET(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
+		void GET(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest);
 		
 		void POST(const String& path, const HttpServerRoute& route);
 		
-		void POST(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
+		void POST(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest);
 		
 		void PUT(const String& path, const HttpServerRoute& route);
 		
-		void PUT(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
+		void PUT(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest);
 		
 		void DELETE(const String& path, const HttpServerRoute& route);
 		
-		void DELETE(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
+		void DELETE(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest);
 		
 		void ALL(const String& path, const HttpServerRoute& route);
 		
-		void ALL(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest);
+		void ALL(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest);
 		
 	};
 	
@@ -317,8 +309,8 @@ namespace slib
 		
 		HttpServerRouter router;
 
-		Function<sl_bool(HttpServer*, HttpServerContext*)> onRequest;
-		Function<sl_bool(HttpServer*, HttpServerContext*)> onPreRequest;
+		Function<Variant(HttpServer*, HttpServerContext*)> onRequest;
+		Function<Variant(HttpServer*, HttpServerContext*)> onPreRequest;
 		Function<void(HttpServer*, HttpServerContext*)> onPostRequest;
 
 	public:
@@ -358,25 +350,27 @@ namespace slib
 		
 	public:
 		// called before processing body, returns true if the server is trying to process the connection itself.
-		virtual sl_bool preprocessRequest(const Ref<HttpServerContext>& context);
+		virtual sl_bool preprocessRequest(HttpServerContext* context);
 		
 		// called after inputing body
-		virtual void processRequest(const Ref<HttpServerContext>& context);
+		void processRequest(HttpServerContext* context, HttpServerConnection* connection);
 		
-		virtual sl_bool processAsset(const Ref<HttpServerContext>& context, const String& path);
+		void processRequest(HttpServerContext* context, HttpServerConnection* connection, const Variant& response);
 		
-		sl_bool processFile(const Ref<HttpServerContext>& context, const String& path);
+		virtual sl_bool processAsset(HttpServerContext* context, const String& path);
 		
-		sl_bool processRangeRequest(const Ref<HttpServerContext>& context, sl_uint64 totalLength, const String& range, sl_uint64& outStart, sl_uint64& outLength);
+		sl_bool processFile(HttpServerContext* context, const String& path);
+		
+		sl_bool processRangeRequest(HttpServerContext* context, sl_uint64 totalLength, const String& range, sl_uint64& outStart, sl_uint64& outLength);
 		
 		virtual Ref<HttpServerConnection> addConnection(const Ref<AsyncStream>& stream, const SocketAddress& remoteAddress, const SocketAddress& localAddress);
 		
 		virtual void closeConnection(HttpServerConnection* connection);
 		
 	protected:
-		virtual sl_bool onRequest(HttpServerContext* context);
+		virtual Variant onRequest(HttpServerContext* context);
 		
-		void dispatchRequest(HttpServerContext* context);
+		Variant dispatchRequest(HttpServerContext* context);
 		
 		virtual void onPostRequest(HttpServerContext* context);
 		
@@ -404,7 +398,7 @@ namespace slib
 	protected:
 		sl_bool _init(const HttpServerParam& param);
 		
-		void _processCacheControl(const Ref<HttpServerContext>& context);
+		void _processCacheControl(HttpServerContext* context);
 		
 	protected:
 		AtomicRef<AsyncIoLoop> m_ioLoop;

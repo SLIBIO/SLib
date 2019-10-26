@@ -44,9 +44,7 @@ namespace slib
 	HttpServerContext::HttpServerContext()
 	{
 		m_requestContentLength = 0;
-		m_flagAsynchronousResponse = sl_false;
 		m_flagProcessed = sl_false;
-		m_flagCompleted = sl_false;
 
 		setClosingConnection(sl_false);
 		setProcessingByThread(sl_true);
@@ -145,39 +143,16 @@ namespace slib
 		}
 	}
 
-	sl_bool HttpServerContext::isAsynchronousResponse()
-	{
-		return m_flagAsynchronousResponse;
-	}
-
-	void HttpServerContext::setAsynchronousResponse(sl_bool flagAsync)
-	{
-		m_flagAsynchronousResponse = flagAsync;
-	}
-	
-	sl_bool HttpServerContext::isProcessed()
+	sl_bool HttpServerContext::isProcessed() const
 	{
 		return m_flagProcessed;
 	}
-	
+
 	void HttpServerContext::setProcessed(sl_bool flag)
 	{
 		m_flagProcessed = flag;
 	}
-	
-	sl_bool HttpServerContext::isCompleted()
-	{
-		return m_flagCompleted;
-	}
 
-	void HttpServerContext::completeResponse()
-	{
-		Ref<HttpServerConnection> connection = m_connection;
-		if (connection.isNotNull()) {
-			connection->_completeResponse(this);
-			connection.setNull();
-		}
-	}
 
 /******************************************************
 			HttpServerConnection
@@ -405,24 +380,11 @@ namespace slib
 			sendConnectResponse_Failed();
 			return;
 		}
-		server->processRequest(context.get());
-		if (!(context->isAsynchronousResponse())) {
-			_completeResponse(context.get());
-		}
+		server->processRequest(context.get(), this);
 	}
 
-	void HttpServerConnection::_completeResponse(HttpServerContext* context)
+	void HttpServerConnection::completeContext(HttpServerContext* context)
 	{
-		if (context->isCompleted()) {
-			return;
-		}
-		context->m_flagCompleted = sl_true;
-		
-		context->setResponseHeader(HttpHeaders::ContentLength, String::fromUint64(context->getResponseContentLength()));
-		String oldResponseContentType = context->getResponseContentType();
-		if (oldResponseContentType.isEmpty()) {
-			context->setResponseContentType(ContentTypes::TextHtml_Utf8);
-		}
 		Memory header = context->makeResponsePacket();
 		if (header.isNull()) {
 			close();
@@ -797,15 +759,14 @@ namespace slib
 		*route = _route;
 	}
 	
-	void HttpServerRoute::add(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest)
+	void HttpServerRoute::add(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest)
 	{
 		HttpServerRoute* route = createRoute(path);
 		route->onRequest = onRequest;
 	}
 	
-	sl_bool HttpServerRoute::processRequest(const String& path, HttpServer* server, HttpServerContext* context)
+	Variant HttpServerRoute::processRequest(const String& path, HttpServer* server, HttpServerContext* context)
 	{
-		sl_bool result = sl_false;
 		HashMap<String, String> params;
 		HttpServerRoute* route = getRoute(path, params);
 		if (route) {
@@ -813,10 +774,10 @@ namespace slib
 				if (params.isNotNull()) {
 					context->getParameters().addAll_NoLock(params);
 				}
-				result = route->onRequest(server, context);
+				return route->onRequest(server, context);
 			}
 		}
-		return result;
+		return sl_false;
 	}
 	
 	
@@ -826,7 +787,7 @@ namespace slib
 	{
 	}
 	
-	sl_bool HttpServerRouter::processRequest(const String& path, HttpServer* server, HttpServerContext* context)
+	Variant HttpServerRouter::processRequest(const String& path, HttpServer* server, HttpServerContext* context)
 	{
 		if (routes.isNull()) {
 			return sl_false;
@@ -834,20 +795,22 @@ namespace slib
 		HttpMethod method = context->getMethod();
 		HttpServerRoute* route = routes.getItemPointer(method);
 		if (route) {
-			if (route->processRequest(path, server, context)) {
-				return sl_true;
+			Variant result = route->processRequest(path, server, context);
+			if (!(result.isFalse())) {
+				return result;
 			}
 		}
 		route = routes.getItemPointer(HttpMethod::Unknown);
 		if (route) {
-			if (route->processRequest(path, server, context)) {
-				return sl_true;
+			Variant result = route->processRequest(path, server, context);
+			if (!(result.isFalse())) {
+				return result;
 			}
 		}
 		return sl_false;
 	}
 	
-	sl_bool HttpServerRouter::preProcessRequest(const String& path, HttpServer* server, HttpServerContext* context)
+	Variant HttpServerRouter::preProcessRequest(const String& path, HttpServer* server, HttpServerContext* context)
 	{
 		if (preRoutes.isNull()) {
 			return sl_false;
@@ -855,20 +818,22 @@ namespace slib
 		HttpMethod method = context->getMethod();
 		HttpServerRoute* route = preRoutes.getItemPointer(method);
 		if (route) {
-			if (route->processRequest(path, server, context)) {
-				return sl_true;
+			Variant result = route->processRequest(path, server, context);
+			if (!(result.isFalse())) {
+				return result;
 			}
 		}
 		route = preRoutes.getItemPointer(HttpMethod::Unknown);
 		if (route) {
-			if (route->processRequest(path, server, context)) {
-				return sl_true;
+			Variant result = route->processRequest(path, server, context);
+			if (!(result.isFalse())) {
+				return result;
 			}
 		}
 		return sl_false;
 	}
 	
-	sl_bool HttpServerRouter::postProcessRequest(const String& path, HttpServer* server, HttpServerContext* context)
+	Variant HttpServerRouter::postProcessRequest(const String& path, HttpServer* server, HttpServerContext* context)
 	{
 		if (postRoutes.isNull()) {
 			return sl_false;
@@ -876,14 +841,16 @@ namespace slib
 		HttpMethod method = context->getMethod();
 		HttpServerRoute* route = postRoutes.getItemPointer(method);
 		if (route) {
-			if (route->processRequest(path, server, context)) {
-				return sl_true;
+			Variant result = route->processRequest(path, server, context);
+			if (!(result.isFalse())) {
+				return result;
 			}
 		}
 		route = postRoutes.getItemPointer(HttpMethod::Unknown);
 		if (route) {
-			if (route->processRequest(path, server, context)) {
-				return sl_true;
+			Variant result = route->processRequest(path, server, context);
+			if (!(result.isFalse())) {
+				return result;
 			}
 		}
 		return sl_false;
@@ -898,7 +865,7 @@ namespace slib
 		route->add(path, _route);
 	}
 	
-	void HttpServerRouter::add(HttpMethod method, const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest)
+	void HttpServerRouter::add(HttpMethod method, const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest)
 	{
 		HttpServerRoute* route = routes.getItemPointer(method);
 		if (!route) {
@@ -916,7 +883,7 @@ namespace slib
 		route->add(path, _route);
 	}
 	
-	void HttpServerRouter::before(HttpMethod method, const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest)
+	void HttpServerRouter::before(HttpMethod method, const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest)
 	{
 		HttpServerRoute* route = preRoutes.getItemPointer(method);
 		if (!route) {
@@ -934,7 +901,7 @@ namespace slib
 		route->add(path, _route);
 	}
 	
-	void HttpServerRouter::after(HttpMethod method, const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest)
+	void HttpServerRouter::after(HttpMethod method, const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest)
 	{
 		HttpServerRoute* route = postRoutes.getItemPointer(method);
 		if (!route) {
@@ -961,7 +928,7 @@ namespace slib
 		add(HttpMethod::GET, path, route);
 	}
 	
-	void HttpServerRouter::GET(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest)
+	void HttpServerRouter::GET(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest)
 	{
 		add(HttpMethod::GET, path, onRequest);
 	}
@@ -971,7 +938,7 @@ namespace slib
 		add(HttpMethod::POST, path, route);
 	}
 	
-	void HttpServerRouter::POST(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest)
+	void HttpServerRouter::POST(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest)
 	{
 		add(HttpMethod::POST, path, onRequest);
 	}
@@ -981,7 +948,7 @@ namespace slib
 		add(HttpMethod::PUT, path, route);
 	}
 	
-	void HttpServerRouter::PUT(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest)
+	void HttpServerRouter::PUT(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest)
 	{
 		add(HttpMethod::PUT, path, onRequest);
 	}
@@ -991,7 +958,7 @@ namespace slib
 		add(HttpMethod::DELETE, path, route);
 	}
 	
-	void HttpServerRouter::DELETE(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest)
+	void HttpServerRouter::DELETE(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest)
 	{
 		add(HttpMethod::DELETE, path, onRequest);
 	}
@@ -1001,7 +968,7 @@ namespace slib
 		add(HttpMethod::Unknown, path, route);
 	}
 	
-	void HttpServerRouter::ALL(const String& path, const Function<sl_bool(HttpServer*, HttpServerContext*)>& onRequest)
+	void HttpServerRouter::ALL(const String& path, const Function<Variant(HttpServer*, HttpServerContext*)>& onRequest)
 	{
 		add(HttpMethod::Unknown, path, onRequest);
 	}
@@ -1187,70 +1154,120 @@ namespace slib
 		return m_param;
 	}
 
-	sl_bool HttpServer::preprocessRequest(const Ref<HttpServerContext>& context)
+	sl_bool HttpServer::preprocessRequest(HttpServerContext* context)
 	{
 		return sl_false;
 	}
 
-	void HttpServer::processRequest(const Ref<HttpServerContext>& context)
+	void HttpServer::processRequest(HttpServerContext* context, HttpServerConnection* connection)
 	{
-		Ref<HttpServerConnection> connection = context->getConnection();
-		if (connection.isNull()) {
-			return;
-		}
 		if (m_param.flagLogDebug) {
 			Log(SERVER_TAG, "[%s] Method=%s Path=%s Query=%s Host=%s",
-				String::fromPointerValue(connection.get()),
+				String::fromPointerValue(connection),
 				context->getMethodText(),
 				context->getPath(),
 				context->getQuery(),
 				context->getHost());
 		}
 		
-		do {
-			
-			dispatchRequest(context.get());
-			if (context->isProcessed()) {
-				break;
-			}
-		
-			sl_bool flagProcessAsResource = m_param.flagUseWebRoot || m_param.flagUseAsset;
-			if (flagProcessAsResource && (m_param.allowedFileExtensions.isNotEmpty() || m_param.blockedFileExtensions.isNotEmpty())) {
-				String ext = File::getFileExtension(context->getPath()).trim();
-				if (m_param.blockedFileExtensions.isNotEmpty()) {
-					if (m_param.blockedFileExtensions.contains(ext)) {
-						flagProcessAsResource = sl_false;
+		Variant result = dispatchRequest(context);
+		if (result.isVariantPromise()) {
+			Promise<Variant> promise = result.getVariantPromise();
+			if (promise.isNotNull()) {
+				Ref<HttpServerContext> refContext(context);
+				Ref<HttpServerConnection> refConnection(connection);
+				WeakRef<HttpServer> weakThis(this);
+				promise.then([this, weakThis, refContext, refConnection](Variant& response) {
+					Ref<HttpServer> refThis = weakThis;
+					if (refThis.isNotNull()) {
+						processRequest(refContext.get(), refConnection.get(), response);
 					}
-				} else if (m_param.allowedFileExtensions.isNotEmpty()) {
-					if (!(m_param.allowedFileExtensions.contains(ext))) {
-						flagProcessAsResource = sl_false;
+				});
+				return;
+			}
+		}
+		processRequest(context, connection, result);
+	}
+
+	void HttpServer::processRequest(HttpServerContext* context, HttpServerConnection* connection, const Variant& response)
+	{
+		sl_bool flagProcessed = sl_false;
+		if (response.isBoolean()) {
+			if (response.isTrue()) {
+				flagProcessed = sl_true;
+			}
+		} else {
+			flagProcessed = sl_true;
+			if (response.isString()) {
+				context->write(response.getString());
+			} else if (response.isMemory()) {
+				context->write(response.getMemory());
+			} else if (response.isVariantList() || response.isVariantMapOrVariantHashMap() || response.isVariantMapListOrVariantHashMapList()) {
+				context->write(Json(response).toJsonString());
+			} else {
+				context->write(response.getString());
+			}
+		}
+		if (!flagProcessed) {
+			flagProcessed = sl_true;
+			do {
+				sl_bool flagProcessAsResource = m_param.flagUseWebRoot || m_param.flagUseAsset;
+				if (flagProcessAsResource && (m_param.allowedFileExtensions.isNotEmpty() || m_param.blockedFileExtensions.isNotEmpty())) {
+					String ext = File::getFileExtension(context->getPath()).trim();
+					if (m_param.blockedFileExtensions.isNotEmpty()) {
+						if (m_param.blockedFileExtensions.contains(ext)) {
+							flagProcessAsResource = sl_false;
+						}
+					} else if (m_param.allowedFileExtensions.isNotEmpty()) {
+						if (!(m_param.allowedFileExtensions.contains(ext))) {
+							flagProcessAsResource = sl_false;
+						}
 					}
 				}
-			}
-			
-			if (flagProcessAsResource) {
-				if (m_param.flagUseWebRoot) {
-					if (context->getMethod() == HttpMethod::GET) {
-						String path = context->getPath();
-						if (path.startsWith('/')) {
-							path = path.substring(1);
-						}
-						FilePathSegments seg;
-						seg.parsePath(path);
-						if (seg.parentLevel == 0) {
-							String webRootPath = m_param.webRootPath;
-							if (webRootPath.isEmpty()) {
-								webRootPath = Application::getApplicationDirectory();
+				if (flagProcessAsResource) {
+					if (m_param.flagUseWebRoot) {
+						if (context->getMethod() == HttpMethod::GET) {
+							String path = context->getPath();
+							if (path.startsWith('/')) {
+								path = path.substring(1);
 							}
-							path = webRootPath + "/" + path;
-							if (processFile(context, path)) {
+							FilePathSegments seg;
+							seg.parsePath(path);
+							if (seg.parentLevel == 0) {
+								String webRootPath = m_param.webRootPath;
+								if (webRootPath.isEmpty()) {
+									webRootPath = Application::getApplicationDirectory();
+								}
+								path = webRootPath + "/" + path;
+								if (processFile(context, path)) {
+									break;
+								}
+								if (path.endsWith('/')) {
+									if (processFile(context, path + "index.html")) {
+										break;
+									}
+									if (processFile(context, path + "index.htm")) {
+										break;
+									}
+								}
+							}
+						}
+					}
+					if (m_param.flagUseAsset) {
+						if (context->getMethod() == HttpMethod::GET) {
+							String path = context->getPath();
+							if (path.startsWith('/')) {
+								path = path.substring(1);
+							}
+							path = m_param.prefixAsset + path;
+							if (processAsset(context, path)) {
 								break;
 							}
 							if (path.endsWith('/')) {
-								if (processFile(context, path + "index.html")) {
+								if (processAsset(context, path + "index.html")) {
 									break;
 								}
-								if (processFile(context, path + "index.htm")) {
+								if (processAsset(context, path + "index.htm")) {
 									break;
 								}
 							}
@@ -1258,39 +1275,21 @@ namespace slib
 					}
 				}
 				
-				if (m_param.flagUseAsset) {
-					if (context->getMethod() == HttpMethod::GET) {
-						String path = context->getPath();
-						if (path.startsWith('/')) {
-							path = path.substring(1);
-						}
-						path = m_param.prefixAsset + path;
-						if (processAsset(context, path)) {
-							break;
-						}
-						if (path.endsWith('/')) {
-							if (processAsset(context, path + "index.html")) {
-								break;
-							}
-							if (processAsset(context, path + "index.htm")) {
-								break;
-							}
-						}
-					}
-				}
-			}
+				flagProcessed = sl_false;
+				
+			} while (0);
 			
-			dispatchPostRequest(context.get());
-			return;
-			
-		} while (0);
+		}
 		
-		context->setProcessed();
-		dispatchPostRequest(context.get());
+		if (flagProcessed) {
+			context->setProcessed();
+		}
+		dispatchPostRequest(context);
 		
+		connection->completeContext(context);
 	}
 
-	sl_bool HttpServer::processAsset(const Ref<HttpServerContext>& context, const String& path)
+	sl_bool HttpServer::processAsset(HttpServerContext* context, const String& path)
 	{
 		FilePathSegments seg;
 		seg.parsePath(path);
@@ -1319,7 +1318,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool HttpServer::processFile(const Ref<HttpServerContext>& context, const String& path)
+	sl_bool HttpServer::processFile(HttpServerContext* context, const String& path)
 	{
 		if (File::exists(path) && !(File::isDirectory(path))) {
 
@@ -1385,7 +1384,7 @@ namespace slib
 		return sl_false;
 	}
 	
-	void HttpServer::_processCacheControl(const Ref<HttpServerContext>& context)
+	void HttpServer::_processCacheControl(HttpServerContext* context)
 	{
 		if (m_param.flagUseCacheControl) {
 			HttpCacheControlResponse cc;
@@ -1398,7 +1397,7 @@ namespace slib
 		}
 	}
 
-	sl_bool HttpServer::processRangeRequest(const Ref<HttpServerContext>& context, sl_uint64 totalLength, const String& range, sl_uint64& outStart, sl_uint64& outLength)
+	sl_bool HttpServer::processRangeRequest(HttpServerContext* context, sl_uint64 totalLength, const String& range, sl_uint64& outStart, sl_uint64& outLength)
 	{
 		if (range.getLength() < 2 || !(range.startsWith("bytes="))) {
 			context->setResponseCode(HttpStatus::BadRequest);
@@ -1460,37 +1459,38 @@ namespace slib
 		return sl_true;
 	}
 	
-	sl_bool HttpServer::onRequest(HttpServerContext* context)
+	Variant HttpServer::onRequest(HttpServerContext* context)
 	{
 		return sl_false;
 	}
 	
-	void HttpServer::dispatchRequest(HttpServerContext* context)
+	Variant HttpServer::dispatchRequest(HttpServerContext* context)
 	{
 		if (m_param.onPreRequest.isNotNull()) {
-			if (m_param.onPreRequest(this, context)) {
-				context->setProcessed();
-				return;
+			Variant result = m_param.onPreRequest(this, context);
+			if (!(result.isFalse())) {
+				return result;
 			}
 		}
-		if (m_param.router.preProcessRequest(context->getPath(), this, context)) {
-			context->setProcessed();
-			return;
+		{
+			Variant result = m_param.router.preProcessRequest(context->getPath(), this, context);
+			if (!(result.isFalse())) {
+				return result;
+			}
 		}
-		if (m_param.router.processRequest(context->getPath(), this, context)) {
-			context->setProcessed();
-			return;
+		{
+			Variant result = m_param.router.processRequest(context->getPath(), this, context);
+			if (!(result.isFalse())) {
+				return result;
+			}
 		}
 		if (m_param.onRequest.isNotNull()) {
-			if (m_param.onRequest(this, context)) {
-				context->setProcessed();
-				return;
+			Variant result = m_param.onRequest(this, context);
+			if (!(result.isFalse())) {
+				return result;
 			}
 		}
-		if (onRequest(context)) {
-			context->setProcessed();
-			return;
-		}
+		return onRequest(context);
 	}
 	
 	void HttpServer::onPostRequest(HttpServerContext* context)
@@ -1499,17 +1499,29 @@ namespace slib
 	
 	void HttpServer::dispatchPostRequest(HttpServerContext* context)
 	{
-		if (!(context->isProcessed())) {
-			context->setResponseCode(HttpStatus::NotFound);
+		if (m_param.flagAllowCrossOrigin) {
+			context->setResponseAccessControlAllowOrigin("*");
 		}
+
 		m_param.router.postProcessRequest(context->getPath(), this, context);
 		m_param.onPostRequest(this, context);
 		onPostRequest(context);
-		if (m_param.flagAllowCrossOrigin) {
-			context->setResponseAccessControlAllowOrigin("*");
-			if (!(context->isProcessed()) && context->getMethod() == HttpMethod::OPTIONS) {
-				context->setResponseCode(HttpStatus::OK);
+		
+		if (!(context->isProcessed())) {
+			HttpStatus status = HttpStatus::NotFound;
+			if (m_param.flagAllowCrossOrigin) {
+				if (context->getMethod() == HttpMethod::OPTIONS) {
+					status = HttpStatus::OK;
+				}
 			}
+			context->setResponseCode(status);
+		}
+		
+		context->setResponseHeader(HttpHeaders::ContentLength, String::fromUint64(context->getResponseContentLength()));
+
+		String oldResponseContentType = context->getResponseContentType();
+		if (oldResponseContentType.isEmpty()) {
+			context->setResponseContentType(ContentTypes::TextHtml_Utf8);
 		}
 	}
 
