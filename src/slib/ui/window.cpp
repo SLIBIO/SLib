@@ -107,9 +107,12 @@ namespace slib
 					}
 					if (window->getWindowInstance().isNotNull()) {
 						if (window->isCenterScreenOnCreate()) {
-							UIPoint posOld = window->getLocation();
-							window->setClientSize(sizeNew);
-							window->setLocation(posOld + (sizeOld - sizeNew) / 2);
+							UISize sizeWindowNew = window->getWindowSizeFromClientSize(sizeNew);
+							UIRect frame = window->getFrame();
+							frame.left -= (sizeWindowNew.x - frame.getWidth()) / 2;
+							frame.top -= (sizeWindowNew.y - frame.getHeight()) / 2;
+							frame.setSize(sizeWindowNew);
+							window->setFrame(frame);
 							return;
 						}
 					}
