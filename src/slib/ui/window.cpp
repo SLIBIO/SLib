@@ -1475,8 +1475,15 @@ namespace slib
 
 	void Window::dispatchResizing(UISize& size)
 	{
-		_constrainSize(size, m_flagStateResizingWidth);
+		if (isWidthWrapping()) {
+			size.x = getWidth();
+		}
+		if (isHeightWrapping()) {
+			size.y = getHeight();
+		}
 		
+		_constrainSize(size, m_flagStateResizingWidth);
+
 		SLIB_INVOKE_EVENT_HANDLER(Resizing, size)
 	}
 	
