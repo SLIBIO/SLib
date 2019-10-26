@@ -23,6 +23,7 @@
 #include "slib/ui/view_page.h"
 
 #include "slib/ui/mobile_app.h"
+#include "slib/ui/core.h"
 
 #if defined(SLIB_UI_IS_ANDROID)
 #	include "slib/core/platform_android.h"
@@ -361,7 +362,7 @@ namespace slib
 		popup(parent, m_openingTransition, flagFillParentBackground);
 	}
 
-	Ref<Window> ViewPage::popupWindow(const Ref<Window>& parent)
+	Ref<Window> ViewPage::popupWindow(const Ref<Window>& parent, sl_ui_len width, sl_ui_len height)
 	{
 		ObjectLocker lock(this);
 		
@@ -372,13 +373,35 @@ namespace slib
 		Ref<Window> window = new Window;
 		
 		if (window.isNotNull()) {
-			window->addView(this);
 			if (isWidthWrapping()) {
-				window->setWidthWrapping();
+				window->setWidthWrapping(sl_true, UIUpdateMode::Init);
 			}
 			if (isHeightWrapping()) {
-				window->setHeightWrapping();
+				window->setHeightWrapping(sl_true, UIUpdateMode::Init);
 			}
+			sl_ui_len contentWidth = width;
+			if (!contentWidth) {
+				if (isWidthFilling() || isWidthWeight()) {
+					contentWidth = UI::getScreenWidth();
+				} else {
+					contentWidth = getWidth();
+				}
+			}
+			sl_ui_len contentHeight = height;
+			if (!contentHeight) {
+				if (isHeightFilling() || isHeightWeight()) {
+					contentHeight = UI::getScreenHeight();
+				} else {
+					contentHeight = getHeight();
+				}
+			}
+			window->setClientSize(contentWidth, contentHeight);
+			if (!width || !height) {
+				if (isWidthFilling() && isHeightFilling()) {
+					window->setFullScreenOnCreate(sl_true);
+				}
+			}
+			window->addView(this, UIUpdateMode::Init);
 			window->setParent(parent);
 			window->setDialog(sl_true);
 			if (isCenterVertical() && isCenterHorizontal()) {
@@ -387,7 +410,6 @@ namespace slib
 				window->setLeft(getLeft());
 				window->setTop(getTop());
 			}
-			window->setClientSize(getWidth(), getHeight());
 			window->setModal(sl_true);
 			window->setOnClose(SLIB_FUNCTION_WEAKREF(ViewPage, _onClosePopupWindow, this));
 			
