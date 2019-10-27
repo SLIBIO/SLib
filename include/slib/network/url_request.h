@@ -83,17 +83,14 @@ namespace slib
 		
 		void setRequestBodyAsXml(const Ref<XmlDocument>& xml);
 		
-		template <class KT, class VT, class KEY_COMPARE>
-		void setRequestBodyAsMap(const Map<KT, VT, KEY_COMPARE>& map);
-		
-		template <class KT, class VT, class HASH, class KEY_COMPARE>
-		void setRequestBodyAsHashMap(const HashMap<KT, VT, HASH, KEY_COMPARE>& map);
+		template <class MAP>
+		void setRequestBodyAsMap(const MAP& map);
 		
 		void setRequestBody(const Variant& var);
 		
 
-		template <class KT, class VT, class HASH, class KEY_COMPARE>
-		void setFormData(const HashMap<KT, VT, HASH, KEY_COMPARE>& map);
+		template <class MAP>
+		void setFormData(const MAP& map);
 		
 		void setMultipartFormData(const HashMap<String, Variant>& params);
 		

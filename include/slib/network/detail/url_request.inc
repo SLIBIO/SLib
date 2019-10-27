@@ -23,23 +23,17 @@
 namespace slib
 {
 	
-	template <class KT, class VT, class KEY_COMPARE>
-	void UrlRequestParam::setRequestBodyAsMap(const Map<KT, VT, KEY_COMPARE>& params)
+	template <class MAP>
+	void UrlRequestParam::setRequestBodyAsMap(const MAP& params)
 	{
-		setRequestBodyAsString(HttpRequest::buildFormUrlEncodedFromMap(params));
+		setRequestBodyAsString(HttpRequest::buildFormUrlEncoded(params));
 	}
 	
-	template <class KT, class VT, class HASH, class KEY_COMPARE>
-	void UrlRequestParam::setRequestBodyAsHashMap(const HashMap<KT, VT, HASH, KEY_COMPARE>& params)
-	{
-		setRequestBodyAsString(HttpRequest::buildFormUrlEncodedFromHashMap(params));
-	}
-
-	template <class KT, class VT, class HASH, class KEY_COMPARE>
-	void UrlRequestParam::setFormData(const HashMap<KT, VT, HASH, KEY_COMPARE>& params)
+	template <class MAP>
+	void UrlRequestParam::setFormData(const MAP& params)
 	{
 		setContentType(ContentType::WebForm);
-		setRequestBodyAsHashMap(params);
+		setRequestBodyAsMap(params);
 	}
 
 }

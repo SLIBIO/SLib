@@ -328,7 +328,7 @@ namespace slib
 		rp.method = m_requestTokenMethod;
 		rp.url = m_requestTokenUrl;
 		if (rp.method == HttpMethod::POST) {
-			rp.setRequestBodyAsHashMap(param.customParameters);
+			rp.setRequestBodyAsMap(param.customParameters);
 		} else {
 			rp.parameters = param.customParameters;
 		}
@@ -690,7 +690,11 @@ namespace slib
 		} else {
 			params.put_NoLock("response_type", "code");
 		}
-		params.put_NoLock("client_id", m_clientId);
+		if (param.clientId.isNotEmpty()) {
+			params.put_NoLock("client_id", param.clientId);
+		} else {
+			params.put_NoLock("client_id", m_clientId);
+		}
 		String redirectUri = param.redirectUri;
 		if (redirectUri.isEmpty()) {
 			redirectUri = m_redirectUri;
@@ -754,7 +758,7 @@ namespace slib
 			params.put_NoLock("client_secret", m_clientSecret);
 		}
 		if (rp.method == HttpMethod::POST) {
-			rp.setRequestBodyAsHashMap(params);
+			rp.setRequestBodyAsMap(params);
 		} else {
 			rp.parameters = params;
 		}

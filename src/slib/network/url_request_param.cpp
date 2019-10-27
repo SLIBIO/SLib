@@ -92,7 +92,7 @@ namespace slib
 						if (requestHeaders.getValue(HttpHeaders::ContentType).compareIgnoreCase(ContentTypes::toString(ContentType::Json)) == 0) {
 							requestBody = varBody.toJsonString().toMemory();
 						} else {
-							setRequestBodyAsHashMap(HashMap<String, Variant>(hashMap));
+							setRequestBodyAsMap(HashMap<String, Variant>(hashMap));
 						}
 					} else if (IsInstanceOf< CList<Variant> >(obj.get()) || IsInstanceOf< CList< HashMap<String, Json> > >(obj.get()) || IsInstanceOf< CList< Map<String, Json> > >(obj.get())) {
 						requestBody = varBody.toJsonString().toMemory();

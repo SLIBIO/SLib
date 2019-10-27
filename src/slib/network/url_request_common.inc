@@ -32,7 +32,7 @@
 					url += "?";
 				}
 			}
-			url += HttpRequest::buildQueryFromHashMap(param.parameters);
+			url += HttpRequest::buildQuery(param.parameters);
 			Ref<UrlRequest> request = _create(param, url);
 			if (request.isNotNull()) {
 				if (param.flagSynchronous) {

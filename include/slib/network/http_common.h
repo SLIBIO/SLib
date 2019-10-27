@@ -504,17 +504,11 @@ namespace slib
 		 */
 		sl_reg parseRequestPacket(const void* packet, sl_size size);
 		
-		template <class KT, class VT, class KEY_COMPARE>
-		static String buildQueryFromMap(const Map<KT, VT, KEY_COMPARE>& map);
+		template <class MAP>
+		static String buildQuery(const MAP& map);
 		
-		template <class KT, class VT, class HASH, class KEY_COMPARE>
-		static String buildQueryFromHashMap(const HashMap<KT, VT, HASH, KEY_COMPARE>& map);
-		
-		template <class KT, class VT, class KEY_COMPARE>
-		static String buildFormUrlEncodedFromMap(const Map<KT, VT, KEY_COMPARE>& map);
-		
-		template <class KT, class VT, class HASH, class KEY_COMPARE>
-		static String buildFormUrlEncodedFromHashMap(const HashMap<KT, VT, HASH, KEY_COMPARE>& map);
+		template <class MAP>
+		static String buildFormUrlEncoded(const MAP& map);
 		
 		static sl_bool buildMultipartFormData(MemoryBuffer& output, const String& boundary, HashMap<String, Variant>& parameters);
 		
@@ -661,6 +655,9 @@ namespace slib
 		void setResponseRedirectLocation(const String& location);
 
 		void setResponseRedirect(const String& location, HttpStatus status = HttpStatus::Found);
+		
+		template <class MAP>
+		void setResponseRedirect(const String& location, const MAP& queryParams, HttpStatus status = HttpStatus::Found);
 
 		
 		Memory makeResponsePacket() const;

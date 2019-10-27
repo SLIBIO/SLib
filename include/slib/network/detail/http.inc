@@ -26,8 +26,8 @@
 namespace slib
 {
 	
-	template <class KT, class VT, class KEY_COMPARE>
-	String HttpRequest::buildQueryFromMap(const Map<KT, VT, KEY_COMPARE>& params)
+	template <class MAP>
+	String HttpRequest::buildQuery(const MAP& params)
 	{
 		StringBuffer sb;
 		sl_bool flagFirst = sl_true;
@@ -36,15 +36,15 @@ namespace slib
 				sb.addStatic("&", 1);
 			}
 			flagFirst = sl_false;
-			sb.add(Cast<KT, String>()(pair.key));
+			sb.add(Cast<typename MAP::KEY_TYPE, String>()(pair.key));
 			sb.addStatic("=", 1);
-			sb.add(Url::encodePercent(Cast<VT, String>()(pair.value)));
+			sb.add(Url::encodePercent(Cast<typename MAP::VALUE_TYPE, String>()(pair.value)));
 		}
 		return sb.merge();
 	}
 	
-	template <class KT, class VT, class HASH, class KEY_COMPARE>
-	String HttpRequest::buildQueryFromHashMap(const HashMap<KT, VT, HASH, KEY_COMPARE>& params)
+	template <class MAP>
+	String HttpRequest::buildFormUrlEncoded(const MAP& params)
 	{
 		StringBuffer sb;
 		sl_bool flagFirst = sl_true;
@@ -53,45 +53,27 @@ namespace slib
 				sb.addStatic("&", 1);
 			}
 			flagFirst = sl_false;
-			sb.add(Cast<KT, String>()(pair.key));
+			sb.add(Cast<typename MAP::KEY_TYPE, String>()(pair.key));
 			sb.addStatic("=", 1);
-			sb.add(Url::encodePercent(Cast<VT, String>()(pair.value)));
-		}
-		return sb.merge();
-	}
-
-	template <class KT, class VT, class KEY_COMPARE>
-	String HttpRequest::buildFormUrlEncodedFromMap(const Map<KT, VT, KEY_COMPARE>& params)
-	{
-		StringBuffer sb;
-		sl_bool flagFirst = sl_true;
-		for (auto& pair : params) {
-			if (!flagFirst) {
-				sb.addStatic("&", 1);
-			}
-			flagFirst = sl_false;
-			sb.add(Cast<KT, String>()(pair.key));
-			sb.addStatic("=", 1);
-			sb.add(Url::encodeForm(Cast<VT, String>()(pair.value)));
+			sb.add(Url::encodeForm(Cast<typename MAP::VALUE_TYPE, String>()(pair.value)));
 		}
 		return sb.merge();
 	}
 	
-	template <class KT, class VT, class HASH, class KEY_COMPARE>
-	String HttpRequest::buildFormUrlEncodedFromHashMap(const HashMap<KT, VT, HASH, KEY_COMPARE>& params)
+	template <class MAP>
+	void HttpResponse::setResponseRedirect(const String& location, const MAP& map, HttpStatus status)
 	{
-		StringBuffer sb;
-		sl_bool flagFirst = sl_true;
-		for (auto& pair : params) {
-			if (!flagFirst) {
-				sb.addStatic("&", 1);
+		String url = location;
+		String query = HttpRequest::buildQuery(map);
+		if (query.isNotEmpty()) {
+			if (url.indexOf('?') >= 0) {
+				url += "&";
+			} else {
+				url += "?";
 			}
-			flagFirst = sl_false;
-			sb.add(Cast<KT, String>()(pair.key));
-			sb.addStatic("=", 1);
-			sb.add(Url::encodeForm(Cast<VT, String>()(pair.value)));
+			url += query;
 		}
-		return sb.merge();
+		setResponseRedirect(url, status);
 	}
-
+	
 }

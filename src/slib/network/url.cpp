@@ -288,7 +288,7 @@ namespace slib
 	
 	void Url::setQueryParameters(const HashMap<String, String>& params)
 	{
-		query = HttpRequest::buildQueryFromHashMap(params);
+		query = HttpRequest::buildQuery(params);
 	}
 	
 	String Url::encodePercent(const String& value)
