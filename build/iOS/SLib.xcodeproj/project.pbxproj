@@ -674,6 +674,7 @@
 		2639196B21CD4605008B335B /* hiredis.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639196521CD4605008B335B /* hiredis.c */; };
 		2639196E21CD469E008B335B /* redis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639196C21CD469B008B335B /* redis.cpp */; };
 		2644BD0823638FFB001B9842 /* grid_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2644BD0723638FFA001B9842 /* grid_view.cpp */; };
+		2644BD0E2364BE5B001B9842 /* oauth_server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2644BD0D2364BE5B001B9842 /* oauth_server.cpp */; };
 		264DF0EE22455E3B007DB734 /* chat_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264DF0ED22455E3B007DB734 /* chat_view.cpp */; };
 		265A934C2303558A00B155A2 /* screen_capture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265A934B2303558A00B155A2 /* screen_capture.cpp */; };
 		265A935623043C3400B155A2 /* global_unique_instance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265A935523043C3400B155A2 /* global_unique_instance.cpp */; };
@@ -2077,6 +2078,7 @@
 		2639196C21CD469B008B335B /* redis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis.cpp; sourceTree = "<group>"; };
 		2640CB6D1DC27BC7006376AC /* font_atlas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = font_atlas.cpp; sourceTree = "<group>"; };
 		2644BD0723638FFA001B9842 /* grid_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = grid_view.cpp; sourceTree = "<group>"; };
+		2644BD0D2364BE5B001B9842 /* oauth_server.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = oauth_server.cpp; sourceTree = "<group>"; };
 		2648D5471D096AB000819E09 /* ui_app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_app.cpp; sourceTree = "<group>"; };
 		2648D5491D096AC400819E09 /* mobile_app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mobile_app.cpp; sourceTree = "<group>"; };
 		2648D54A1D096AC400819E09 /* mobile_game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mobile_game.cpp; sourceTree = "<group>"; };
@@ -3923,6 +3925,7 @@
 				26BAE02722239EA80085B5AB /* linkedin_ui.cpp */,
 				260B73EE220CAD1C00858EEA /* oauth.cpp */,
 				260B73FB220DCA8D00858EEA /* oauth_ui.cpp */,
+				2644BD0D2364BE5B001B9842 /* oauth_server.cpp */,
 				269E31A62255EAAF005CD0ED /* paypal.cpp */,
 				269E31AA2255F4F2005CD0ED /* paypal_ui.cpp */,
 				26E1B85522283BD3007C222E /* pinterest.cpp */,
@@ -5300,6 +5303,7 @@
 				26C795A72215675C0053C5A1 /* url_request_param.cpp in Sources */,
 				26D9D8531E96292E005F7BD3 /* database.cpp in Sources */,
 				260B73FC220DCA8E00858EEA /* oauth_ui.cpp in Sources */,
+				2644BD0E2364BE5B001B9842 /* oauth_server.cpp in Sources */,
 				26D9D8731E96294F005F7BD3 /* graphics_text.cpp in Sources */,
 				267B9D65225D11450057DF2A /* instagram_ios.mm in Sources */,
 				26D9D8111E9628E0005F7BD3 /* math.cpp in Sources */,

@@ -24,6 +24,7 @@
 #define CHECKHEADER_SLIB_SOCIAL_HEADER
 
 #include "social/oauth.h"
+#include "social/oauth_server.h"
 
 #include "social/facebook.h"
 #include "social/instagram.h"

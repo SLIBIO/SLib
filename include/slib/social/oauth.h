@@ -355,6 +355,7 @@ namespace slib
 	class SLIB_EXPORT OAuthAuthorizationRequestParam
 	{
 	public:
+		String clientId;
 		OAuthGrantType grantType;
 		List<String> scopes;
 		String state;

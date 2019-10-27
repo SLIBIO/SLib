@@ -306,6 +306,7 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/social/linkedin_ui.cpp"
  "${SLIB_PATH}/src/slib/social/oauth.cpp"
  "${SLIB_PATH}/src/slib/social/oauth_ui.cpp"
+ "${SLIB_PATH}/src/slib/social/oauth_server.cpp"
  "${SLIB_PATH}/src/slib/social/paypal.cpp"
  "${SLIB_PATH}/src/slib/social/paypal_ui.cpp"
  "${SLIB_PATH}/src/slib/social/pinterest.cpp"

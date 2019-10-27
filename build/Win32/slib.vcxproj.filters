@@ -1310,5 +1310,8 @@
     <ClCompile Include="..\..\src\slib\ui\grid_view.cpp">
       <Filter>src\ui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\oauth_server.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
