@@ -94,6 +94,8 @@ namespace slib
 	class SLIB_EXPORT HashTable
 	{
 	public:
+		typedef KT KEY_TYPE;
+		typedef VT VALUE_TYPE;
 		typedef HashTableNode<KT, VT> NODE;
 		
 	public:

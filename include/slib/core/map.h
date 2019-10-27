@@ -92,6 +92,8 @@ namespace slib
 		SLIB_TEMPLATE_OBJECT(Object, priv::map::g_classID)
 		
 	public:
+		typedef KT KEY_TYPE;
+		typedef VT VALUE_TYPE;
 		typedef MapNode<KT, VT> NODE;
 		typedef NodePosition<NODE> POSITION;
 		
@@ -325,6 +327,8 @@ namespace slib
 		SLIB_REF_WRAPPER(Map, CMap<KT, VT, KEY_COMPARE>)
 		
 	public:
+		typedef KT KEY_TYPE;
+		typedef VT VALUE_TYPE;
 		typedef MapNode<KT, VT> NODE;
 		typedef NodePosition<NODE> POSITION;
 		typedef CMap<KT, VT, KEY_COMPARE> CMAP;
@@ -558,6 +562,8 @@ namespace slib
 		SLIB_ATOMIC_REF_WRAPPER(CMap<KT, VT, KEY_COMPARE>)
 		
 	public:
+		typedef KT KEY_TYPE;
+		typedef VT VALUE_TYPE;
 		typedef MapNode<KT, VT> NODE;
 		typedef NodePositionWithRef<NODE> POSITION;
 		typedef CMap<KT, VT, KEY_COMPARE> CMAP;

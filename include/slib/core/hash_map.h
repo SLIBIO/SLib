@@ -91,6 +91,8 @@ namespace slib
 		SLIB_TEMPLATE_OBJECT(Object, priv::hash_map::g_classID)
 		
 	public:
+		typedef KT KEY_TYPE;
+		typedef VT VALUE_TYPE;
 		typedef HashMapNode<KT, VT> NODE;
 		typedef NodePosition<NODE> POSITION;
 		
@@ -361,6 +363,8 @@ namespace slib
 		SLIB_REF_WRAPPER(HashMap, CHashMap<KT, VT, HASH, KEY_COMPARE>)
 		
 	public:
+		typedef KT KEY_TYPE;
+		typedef VT VALUE_TYPE;
 		typedef HashMapNode<KT, VT> NODE;
 		typedef NodePosition<NODE> POSITION;
 		typedef CHashMap<KT, VT, HASH, KEY_COMPARE> CMAP;
@@ -601,6 +605,8 @@ namespace slib
 		SLIB_ATOMIC_REF_WRAPPER(CHashMap<KT, VT, HASH, KEY_COMPARE>)
 		
 	public:
+		typedef KT KEY_TYPE;
+		typedef VT VALUE_TYPE;
 		typedef HashMapNode<KT, VT> NODE;
 		typedef NodePositionWithRef<NODE> POSITION;
 		typedef CHashMap<KT, VT, HASH, KEY_COMPARE> CMAP;
