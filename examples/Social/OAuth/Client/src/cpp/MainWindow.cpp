@@ -2,11 +2,24 @@
 
 void MainWindow::onCreate()
 {
+
+	radioGrantType->setOnSelect([this](RadioGroup*, RadioButton* button) {
+		String value = button->getValue();
+		if (value == "password") {
+			txtUsername->setEnabled(sl_true);
+			txtPassword->setEnabled(sl_true);
+		} else {
+			txtUsername->setEnabled(sl_false);
+			txtPassword->setEnabled(sl_false);
+		}
+	});
+	
 	btnFacebookAPI->setOnClick([this](View*) {
 		txtAuthUrl->setText("https://www.facebook.com/dialog/oauth");
 		txtAccessTokenUrl->setText("https://graph.facebook.com/oauth/access_token");
 		txtRedirectUri->setText("https://github.com/SLIBIO/SLib");
 		txtClientId->setText("895581487493562");
+		txtClientSecret->setText("e12a12f9451b49a890e96dd662bd39d4");
 		txtScopes->setText("public_profile,email");
 		txtRequestURL->setText("https://graph.facebook.com/me?fields=id,name");
 	});
@@ -16,28 +29,110 @@ void MainWindow::onCreate()
 		txtAccessTokenUrl->setText("http://localhost:8080/access_token");
 		txtRedirectUri->setText("redirect://");
 		txtClientId->setText("test");
+		txtClientSecret->setText("test-secret");
 		txtScopes->setText("public,email");
 		txtRequestURL->setText("http://localhost:8080/me");
 	});
 	
 	btnAuth->setOnClick([this](View*) {
+		String grantType = radioGrantType->getSelectedValue();
+		
 		OAuthParam param;
 		param.authorizeUrl = txtAuthUrl->getText();
 		param.accessTokenUrl = txtAccessTokenUrl->getText();
 		param.clientId = txtClientId->getText();
+		if (grantType != "implicit") {
+			param.clientSecret = txtClientSecret->getText();
+		}
 		param.redirectUri = txtRedirectUri->getText();
-		param.defaultScopes.addAll(txtScopes->getText().split(","));
+		List<String> scopes = txtScopes->getText().split(",");
+		Ref<OAuth2> oauth = new OAuth2(param);
+		
+		if (grantType == "implicit" || grantType == "code") {
+			OAuthLoginParam loginParam;
+			loginParam.authorization.grantType = grantType == "code" ? OAuthGrantType::Code : OAuthGrantType::Token;
+			loginParam.authorization.scopes = scopes;
+			loginParam.dialogOptions.width = 800;
+			loginParam.dialogOptions.height = 600;
+			loginParam.dialogOptions.title = "Authentication";
+			auto ref = ToRef(this);
+			loginParam.onComplete = [ref, this, grantType](OAuthLoginResult& result) {
+				if (grantType == "code") {
+					txtAuthCode->setText(result.code);
+					txtAccessToken->setText(String::null());
+					txtRefreshToken->setText(String::null());
+				} else {
+					txtAccessToken->setText(result.accessToken.token);
+					txtRefreshToken->setText(result.accessToken.refreshToken);
+				}
+				txtResponse->setText(result.response.toJsonString());
+			};
+			oauth->login(loginParam);
+		} else if (grantType == "client") {
+			auto ref = ToRef(this);
+			oauth->requestAccessTokenFromClientCredentials(scopes, [ref, this](OAuthAccessTokenResult& result) {
+				txtAccessToken->setText(result.accessToken.token);
+				txtRefreshToken->setText(result.accessToken.refreshToken);
+				txtResponse->setText(result.response.toJsonString());
+			});
+		} else if (grantType == "password") {
+			String username = txtUsername->getText();
+			if (username.isEmpty()) {
+				UI::alert("Input the username");
+				return;
+			}
+			String password = txtPassword->getText();
+			if (password.isEmpty()) {
+				UI::alert("Input the password");
+				return;
+			}
+			auto ref = ToRef(this);
+			oauth->requestAccessTokenFromUserPassword(username, password, scopes, [ref, this](OAuthAccessTokenResult& result) {
+				txtAccessToken->setText(result.accessToken.token);
+				txtRefreshToken->setText(result.accessToken.refreshToken);
+				txtResponse->setText(result.response.toJsonString());
+			});
+		}
+	});
+	
+	btnGetToken->setOnClick([this](View*) {
+		OAuthParam param;
+		param.accessTokenUrl = txtAccessTokenUrl->getText();
+		param.clientId = txtClientId->getText();
+		param.clientSecret = txtClientSecret->getText();
+		String code = txtAuthCode->getText();
+		if (code.isEmpty()) {
+			UI::alert("Input or authorize the authorization code");
+			return;
+		}
+		String redirectUri = txtRedirectUri->getText();
+		List<String> scopes = txtScopes->getText().split(",");
 		Ref<OAuth2> oauth = new OAuth2(param);
 		auto ref = ToRef(this);
-		OAuthLoginParam loginParam;
-		loginParam.dialogOptions.width = 800;
-		loginParam.dialogOptions.height = 600;
-		loginParam.dialogOptions.title = "Authentication";
-		loginParam.onComplete = [ref, this](OAuthLoginResult& result) {
+		oauth->requestAccessTokenFromCode(code, redirectUri, scopes, [ref, this](OAuthAccessTokenResult& result) {
+			txtAccessToken->setText(result.accessToken.token);
+			txtRefreshToken->setText(result.accessToken.refreshToken);
+			txtResponse->setText(result.response.toJsonString());
+		});
+	});
+	
+	btnRefresh->setOnClick([this](View*) {
+		OAuthParam param;
+		param.accessTokenUrl = txtAccessTokenUrl->getText();
+		param.clientId = txtClientId->getText();
+		param.clientSecret = txtClientSecret->getText();
+		String refreshToken = txtRefreshToken->getText();
+		if (refreshToken.isEmpty()) {
+			UI::alert("Input or get the refresh token");
+			return;
+		}
+		List<String> scopes = txtScopes->getText().split(",");
+		Ref<OAuth2> oauth = new OAuth2(param);
+		auto ref = ToRef(this);
+		oauth->refreshAccessToken(refreshToken, scopes, [ref, this](OAuthAccessTokenResult& result) {
 			txtAccessToken->setText(result.accessToken.token);
 			txtResponse->setText(result.response.toJsonString());
-		};
-		oauth->login(loginParam);
+		});
 	});
 	
 	btnSendRequest->setOnClick([this](View*) {

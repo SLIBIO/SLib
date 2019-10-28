@@ -16,7 +16,7 @@
 			margin='20dp'>
 
 			<column
-				width='250dp'
+				width='220dp'
 				/>
 
 			<row>
@@ -68,6 +68,7 @@
 					style='input'
 					/>
 			</row>
+			<row height='15sp' />
 			<row>
 				<label
 					text='Client ID'
@@ -75,6 +76,16 @@
 					/>
 				<edit
 					name='txtClientId'
+					style='input'
+					/>
+			</row>
+			<row>
+				<label
+					text='Client Secret'
+					style='label'
+					/>
+				<edit
+					name='txtClientSecret'
 					style='input'
 					/>
 			</row>
@@ -90,6 +101,89 @@
 			</row>
 			<row>
 				<label
+					text='Username'
+					style='label'
+					/>
+				<hlinear width='*'>
+					<edit
+						name='txtUsername'
+						style='input'
+						/>
+					<label
+						text='Password'
+						style='label'
+						width='wrap'
+						marginLeft='30sp'
+						marginRight='5sp'
+						/>
+					<password
+						name='txtPassword'
+						style='input'
+						/>
+				</hlinear>
+			</row>
+			<row height='35sp'>
+				<label
+					text='Grant Type'
+					style='label'
+					/>
+				<hlinear width='*' alignCenter='true'>
+					<radio
+						text='Implicit'
+						group='radioGrantType'
+						value='implicit'
+						style='radio'
+						checked='true'
+						/>
+					<radio
+						text='Code'
+						group='radioGrantType'
+						value='code'
+						style='radio'
+						/>
+					<radio
+						text='Client'
+						group='radioGrantType'
+						value='client'
+						style='radio'
+						/>
+					<radio
+						text='Password'
+						group='radioGrantType'
+						value='password'
+						style='radio'
+						/>
+					<view width='*'/>
+					<button
+						name='btnAuth'
+						style='button'
+						text='Authorize'
+						width='150dp'
+						centerVertical='true'
+						/>
+				</hlinear>
+			</row>
+			<row>
+				<label
+					text='Authorization Code'
+					style='label'
+					/>
+				<hlinear width='*'>
+					<edit
+						name='txtAuthCode'
+						style='input'
+						/>
+					<button
+						name='btnGetToken'
+						style='button'
+						text='Get Token'
+						width='150dp'
+						centerVertical='true'
+						/>
+				</hlinear>
+			</row>
+			<row>
+				<label
 					text='Access Token'
 					style='label'
 					/>
@@ -100,27 +194,51 @@
 			</row>
 			<row>
 				<label
+					text='Refresh Token'
+					style='label'
+					/>
+				<hlinear width='*'>
+					<edit
+						name='txtRefreshToken'
+						style='input'
+						/>
+					<button
+						name='btnRefresh'
+						style='button'
+						text='Refresh'
+						width='150dp'
+						centerVertical='true'
+						/>
+				</hlinear>
+			</row>
+			<row height='15sp'/>
+			<row>
+				<label
 					text='Request URL'
 					style='label'
 					/>
-				<edit
-					name='txtRequestURL'
-					style='input'
-					/>
+				<hlinear width='*'>
+					<edit
+						name='txtRequestURL'
+						style='input'
+						/>
+					<button
+						name='btnSendRequest'
+						style='button'
+						text='Send'
+						width='150dp'
+						/>
+				</hlinear>
 			</row>
 			<row>
 				<label
 					text='Response'
-					colspan='2'
-					margin='5dp'
+					style='label'
 					/>
-			</row>
-			<row>
 				<textArea
 					name='txtResponse'
 					width='*'
-					height='200dp'
-					colspan='2'
+					height='150dp'
 					readOnly='true'
 					margin='5dp'
 					/>
@@ -130,17 +248,8 @@
 					centerHorizontal='true'
 					colspan='2'
 					>
-					<button
-						name='btnAuth'
-						style='button'
-						text='Authorize'
-						/>
-					<button
-						name='btnSendRequest'
-						style='button'
-						text='Send Request'
-						marginLeft='20dp'
-						/>
+					
+					
 				</hlinear>
 			</row>
 		</grid>
@@ -164,6 +273,14 @@
 		width='200dp'
 		fontSize='25dp'
 		nativeWidget='true'
+		/>
+
+	<style
+		name='radio'
+		fontSize='25dp'
+		marginLeft='5sp'
+		nativeWidget='true'
+		centerVertical='true'
 		/>
 
 </sapp>
