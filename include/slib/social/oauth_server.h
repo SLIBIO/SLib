@@ -96,6 +96,8 @@ namespace slib
 		
 		void completeAuthorizationRequestWithError(HttpServerContext* context, const OAuthServerAuthorizationRequest& request, OAuthErrorCode err, const String& errorDescription = String::null(), const String& errorUri = String::null());
 		
+		static String getParameter(HttpServerContext* context, const String& name);
+		
 		static String getAccessToken(HttpServerContext* context);
 		
 	public:

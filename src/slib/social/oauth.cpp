@@ -778,28 +778,74 @@ namespace slib
 		UrlRequest::send(rp);
 	}
 	
-	void OAuth2::requestAccessToken(const Function<void(OAuthAccessTokenResult&)>& onComplete)
-	{
-		HashMap<String, Variant> params;
-		params.put_NoLock("grant_type", "client_credentials");
-		requestAccessToken(params, onComplete);
-	}
-	
-	void OAuth2::requestAccessToken(const String& code, const String& redirectUri, const Function<void(OAuthAccessTokenResult&)>& onComplete)
+	void OAuth2::requestAccessTokenFromCode(const String& code, const String& redirectUri, const List<String>& scopes, const Function<void(OAuthAccessTokenResult&)>& onComplete)
 	{
 		HashMap<String, Variant> params;
 		params.put_NoLock("grant_type", "authorization_code");
 		params.put_NoLock("code", code);
-		params.put_NoLock("redirect_uri", redirectUri);
+		if (redirectUri.isNotEmpty()) {
+			params.put_NoLock("redirect_uri", redirectUri);
+		} else {
+			params.put_NoLock("redirect_uri", m_redirectUri);
+		}
+		if (scopes.isNotNull()) {
+			String s = StringBuffer::join(" ", scopes).trim();
+			if (s.isNotEmpty()) {
+				params.put_NoLock("scope", s);
+			}
+		}
 		requestAccessToken(params, onComplete);
 	}
 	
-	void OAuth2::requestAccessToken(const String& code, const Function<void(OAuthAccessTokenResult&)>& onComplete)
+	void OAuth2::requestAccessTokenFromCode(const String& code, const String& redirectUri, const Function<void(OAuthAccessTokenResult&)>& onComplete)
 	{
-		requestAccessToken(code, m_redirectUri, onComplete);
+		requestAccessTokenFromCode(code, redirectUri, sl_null, onComplete);
 	}
 	
-	void OAuth2::requestRefreshToken(const String& refreshToken, const List<String>& scopes, const Function<void(OAuthAccessTokenResult&)>& onComplete)
+	void OAuth2::requestAccessTokenFromCode(const String& code, const Function<void(OAuthAccessTokenResult&)>& onComplete)
+	{
+		requestAccessTokenFromCode(code, sl_null, sl_null, onComplete);
+	}
+	
+	void OAuth2::requestAccessTokenFromClientCredentials(const List<String>& scopes, const Function<void(OAuthAccessTokenResult&)>& onComplete)
+	{
+		HashMap<String, Variant> params;
+		params.put_NoLock("grant_type", "client_credentials");
+		if (scopes.isNotNull()) {
+			String s = StringBuffer::join(" ", scopes).trim();
+			if (s.isNotEmpty()) {
+				params.put_NoLock("scope", s);
+			}
+		}
+		requestAccessToken(params, onComplete);
+	}
+	
+	void OAuth2::requestAccessTokenFromClientCredentials(const Function<void(OAuthAccessTokenResult&)>& onComplete)
+	{
+		requestAccessTokenFromClientCredentials(sl_null, onComplete);
+	}
+	
+	void OAuth2::requestAccessTokenFromUserPassword(const String& username, const String& password, const List<String>& scopes, const Function<void(OAuthAccessTokenResult&)>& onComplete)
+	{
+		HashMap<String, Variant> params;
+		params.put_NoLock("grant_type", "password");
+		params.put_NoLock("username", username);
+		params.put_NoLock("password", password);
+		if (scopes.isNotNull()) {
+			String s = StringBuffer::join(" ", scopes).trim();
+			if (s.isNotEmpty()) {
+				params.put_NoLock("scope", s);
+			}
+		}
+		requestAccessToken(params, onComplete);
+	}
+	
+	void OAuth2::requestAccessTokenFromUserPassword(const String& username, const String& password, const Function<void(OAuthAccessTokenResult&)>& onComplete)
+	{
+		requestAccessTokenFromUserPassword(username, password, sl_null, onComplete);
+	}
+	
+	void OAuth2::refreshAccessToken(const String& refreshToken, const List<String>& scopes, const Function<void(OAuthAccessTokenResult&)>& onComplete)
 	{
 		HashMap<String, Variant> params;
 		params.put_NoLock("grant_type", "refresh_token");
@@ -807,15 +853,15 @@ namespace slib
 		if (scopes.isNotNull()) {
 			String s = StringBuffer::join(" ", scopes).trim();
 			if (s.isNotEmpty()) {
-				params.put_NoLock("scopes", s);
+				params.put_NoLock("scope", s);
 			}
 		}
 		requestAccessToken(params, onComplete);
 	}
 	
-	void OAuth2::requestRefreshToken(const String& refreshToken, const Function<void(OAuthAccessTokenResult&)>& onComplete)
+	void OAuth2::refreshAccessToken(const String& refreshToken, const Function<void(OAuthAccessTokenResult&)>& onComplete)
 	{
-		requestRefreshToken(refreshToken, sl_null, onComplete);
+		refreshAccessToken(refreshToken, sl_null, onComplete);
 	}
 	
 	void OAuth2::logUrlRequestError(UrlRequest* request)

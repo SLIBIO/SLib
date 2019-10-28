@@ -287,6 +287,7 @@ namespace slib
 	OAuthLoginParam::OAuthLoginParam()
 	{
 		flagIgnoreExistingAccessToken = sl_false;
+		flagAlwaysRequireAccessToken = sl_false;
 	}
 	
 	void OAuth2::login(const OAuthLoginParam& param)
@@ -384,6 +385,7 @@ namespace slib
 		OAuthLoginParam _param = param;
 		if (!m_flagSupportTokenGrantType && _param.authorization.grantType == OAuthGrantType::Token) {
 			_param.authorization.grantType = OAuthGrantType::Code;
+			_param.flagAlwaysRequireAccessToken = sl_true;
 		}
 		_param.authorization.redirectUri = redirectUri;
 		_param.authorization.scopes = scopes;
@@ -394,25 +396,27 @@ namespace slib
 		_param.url = getLoginUrl(_param.authorization);
 		
 		if (_param.authorization.grantType == OAuthGrantType::Code) {
-			auto onComplete = _param.onComplete;
-			auto thiz = ToRef(this);
-			_param.onComplete = [thiz, redirectUri, scopes, onComplete](OAuthLoginResult& result) {
-				if (!(result.flagSuccess) || result.code.isEmpty()) {
-					onComplete(result);
-					return;
-				}
-				thiz->requestAccessToken(result.code, redirectUri, [thiz, scopes, onComplete](OAuthAccessTokenResult& _result) {
-					OAuthLoginResult result;
-					*((OAuthAccessTokenResult*)&result) = _result;
-					if (result.flagSuccess) {
-						if (result.accessToken.scopes.isNull()) {
-							result.accessToken.scopes = scopes;
-						}
-						thiz->setAccessToken(result.accessToken);
+			if (_param.flagAlwaysRequireAccessToken) {
+				auto onComplete = _param.onComplete;
+				auto thiz = ToRef(this);
+				_param.onComplete = [thiz, redirectUri, scopes, onComplete](OAuthLoginResult& result) {
+					if (!(result.flagSuccess) || result.code.isEmpty()) {
+						onComplete(result);
+						return;
 					}
-					onComplete(result);
-				});
-			};
+					thiz->requestAccessTokenFromCode(result.code, redirectUri, [thiz, scopes, onComplete](OAuthAccessTokenResult& _result) {
+						OAuthLoginResult result;
+						*((OAuthAccessTokenResult*)&result) = _result;
+						if (result.flagSuccess) {
+							if (result.accessToken.scopes.isNull()) {
+								result.accessToken.scopes = scopes;
+							}
+							thiz->setAccessToken(result.accessToken);
+						}
+						onComplete(result);
+					});
+				};
+			}
 		}
 		login(_param);
 	}

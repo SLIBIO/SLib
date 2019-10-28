@@ -233,9 +233,17 @@ namespace slib
 		}
 	}
 
+	String OAuthServer::getParameter(HttpServerContext* context, const String& name)
+	{
+		if (context->containsRequestHeader(name)) {
+			return context->getRequestHeader(name);
+		}
+		return context->getParameter(name);
+	}
+
 	String OAuthServer::getAccessToken(HttpServerContext* context)
 	{
-		String auth = context->getRequestHeader("Authorization");
+		String auth = getParameter(context, "Authorization");
 		if (auth.substring(0, 7).equalsIgnoreCase("Bearer ")) {
 			return auth.substring(7);
 		}

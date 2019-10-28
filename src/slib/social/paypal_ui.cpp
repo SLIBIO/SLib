@@ -30,7 +30,7 @@ namespace slib
 	{
 		auto thiz = ToRef(this);
 		if (m_accessToken.isNull()) {
-			requestAccessToken([thiz, this, param](OAuthAccessTokenResult& result) {
+			requestAccessTokenFromClientCredentials([thiz, this, param](OAuthAccessTokenResult& result) {
 				if (!(result.flagSuccess)) {
 					PayPalCheckoutResult r;
 					param.onComplete(r);

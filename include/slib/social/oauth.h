@@ -172,7 +172,7 @@ namespace slib
 	class SLIB_EXPORT OAuth1_LoginParam
 	{
 	public:
-		String url; // Should be defined in uncofidental clients (such as mobile/desktop app). See class description for detail.
+		String url; // Should be defined in unconfidental clients (such as mobile/desktop app). See class description for detail.
 		
 		OAuth1_AuthorizationRequestParam authorization;
 		
@@ -224,7 +224,7 @@ namespace slib
 	 	After getting `login url`, you can call `login()` function in client app (put the `login url`
 	 	in the param), and then you can get `verifier` in callback after user-web-login process.
 	 	After getting `verifier`, you should send it to your server, and you can call
-	 	`requesteAccessToken` in the server. Your server should return the `access token` to the client,
+	 	`requestAccessToken` in the server. Your server should return the `access token` to the client,
 	 	and then your client app can call Twitter APIs after setting `access token` by `setAccessToken()`.
 	 	Btw, `OAuth1` supports complete authentication flow, but you should follow above instruction for security.
 	 	your Twitter
@@ -430,12 +430,13 @@ namespace slib
 	public:
 		String url; // Used in process of `Code` grant type
 		
-		OAuthAuthorizationRequestParam authorization; // `Code` grant type should not be used in unconfidental clients (such as Mobile/Desktop app)
+		OAuthAuthorizationRequestParam authorization;
 		
 		OAuthWebRedirectDialogOptions dialogOptions;
 		Ptr<OAuthWebRedirectDialog> dialog;
 
 		sl_bool flagIgnoreExistingAccessToken; // Ignored if `url` is not empty
+		sl_bool flagAlwaysRequireAccessToken; // Should not be set on unconfidental clients (Mobile/Desktop apps)
 		String loginRedirectUri; // If empty, uses `authorization`'s `redirectUri`
 		
 		Function<void(OAuthLoginResult&)> onComplete;
@@ -514,20 +515,32 @@ namespace slib
 
 		void requestAccessToken(HashMap<String, Variant>& params, const Function<void(OAuthAccessTokenResult&)>& onComplete);
 		
-		// grant_type=client_credentials
-		void requestAccessToken(const Function<void(OAuthAccessTokenResult&)>& onComplete);
-
 		// grant_type=authorization_code
-		void requestAccessToken(const String& code, const String& redirectUri, const Function<void(OAuthAccessTokenResult&)>& onComplete);
+		void requestAccessTokenFromCode(const String& code, const String& redirectUri, const List<String>& scopes, const Function<void(OAuthAccessTokenResult&)>& onComplete);
 		
 		// grant_type=authorization_code
-		void requestAccessToken(const String& code, const Function<void(OAuthAccessTokenResult&)>& onComplete);
+		void requestAccessTokenFromCode(const String& code, const String& redirectUri, const Function<void(OAuthAccessTokenResult&)>& onComplete);
+		
+		// grant_type=authorization_code
+		void requestAccessTokenFromCode(const String& code, const Function<void(OAuthAccessTokenResult&)>& onComplete);
+		
+		// grant_type=client_credentials
+		void requestAccessTokenFromClientCredentials(const List<String>& scopes, const Function<void(OAuthAccessTokenResult&)>& onComplete);
+
+		// grant_type=client_credentials
+		void requestAccessTokenFromClientCredentials(const Function<void(OAuthAccessTokenResult&)>& onComplete);
+		
+		// grant_type=password
+		void requestAccessTokenFromUserPassword(const String& username, const String& password, const List<String>& scopes, const Function<void(OAuthAccessTokenResult&)>& onComplete);
+
+		// grant_type=client_credentials
+		void requestAccessTokenFromUserPassword(const String& username, const String& password, const Function<void(OAuthAccessTokenResult&)>& onComplete);
 
 		// grant_type=refresh_token
-		void requestRefreshToken(const String& refreshToken, const List<String>& scopes, const Function<void(OAuthAccessTokenResult&)>& onComplete);
+		void refreshAccessToken(const String& refreshToken, const List<String>& scopes, const Function<void(OAuthAccessTokenResult&)>& onComplete);
 
 		// grant_type=refresh_token
-		void requestRefreshToken(const String& refreshToken, const Function<void(OAuthAccessTokenResult&)>& onComplete);
+		void refreshAccessToken(const String& refreshToken, const Function<void(OAuthAccessTokenResult&)>& onComplete);
 		
 		void login(const OAuthLoginParam& param);
 		
