@@ -44,6 +44,23 @@ namespace slib
 			SLIB_STATIC_STRING(g_field_iat, "iat")
 			SLIB_STATIC_STRING(g_field_jti, "jti")
 			
+			SLIB_STATIC_STRING(g_field_typ, "typ")
+			SLIB_STATIC_STRING(g_field_cty, "cty")
+			SLIB_STATIC_STRING(g_field_alg, "alg")
+
+			SLIB_STATIC_STRING(g_alg_HS256, "HS256")
+			SLIB_STATIC_STRING(g_alg_HS384, "HS384")
+			SLIB_STATIC_STRING(g_alg_HS512, "HS512")
+			SLIB_STATIC_STRING(g_alg_RS256, "RS256")
+			SLIB_STATIC_STRING(g_alg_RS384, "RS384")
+			SLIB_STATIC_STRING(g_alg_RS512, "RS512")
+			SLIB_STATIC_STRING(g_alg_ES256, "ES256")
+			SLIB_STATIC_STRING(g_alg_ES384, "ES384")
+			SLIB_STATIC_STRING(g_alg_ES512, "ES512")
+			SLIB_STATIC_STRING(g_alg_PS256, "PS256")
+			SLIB_STATIC_STRING(g_alg_PS384, "PS384")
+			SLIB_STATIC_STRING(g_alg_PS512, "PS512")
+
 		}
 	}
 	
@@ -140,10 +157,6 @@ namespace slib
 		return Base64::encodeUrl(signature, sizeSignature);
 	}
 	
-	SLIB_STATIC_STRING(g_field_typ, "typ")
-	SLIB_STATIC_STRING(g_field_cty, "cty")
-	SLIB_STATIC_STRING(g_field_alg, "alg")
-	
 	String Jwt::getType() const noexcept
 	{
 		return header.getItem(g_field_typ).getString();
@@ -163,19 +176,6 @@ namespace slib
 	{
 		header.putItem(g_field_cty, value);
 	}
-	
-	SLIB_STATIC_STRING(g_alg_HS256, "HS256")
-	SLIB_STATIC_STRING(g_alg_HS384, "HS384")
-	SLIB_STATIC_STRING(g_alg_HS512, "HS512")
-	SLIB_STATIC_STRING(g_alg_RS256, "RS256")
-	SLIB_STATIC_STRING(g_alg_RS384, "RS384")
-	SLIB_STATIC_STRING(g_alg_RS512, "RS512")
-	SLIB_STATIC_STRING(g_alg_ES256, "ES256")
-	SLIB_STATIC_STRING(g_alg_ES384, "ES384")
-	SLIB_STATIC_STRING(g_alg_ES512, "ES512")
-	SLIB_STATIC_STRING(g_alg_PS256, "PS256")
-	SLIB_STATIC_STRING(g_alg_PS384, "PS384")
-	SLIB_STATIC_STRING(g_alg_PS512, "PS512")
 	
 	JwtAlgorithm Jwt::getAlgorithm() const noexcept
 	{
@@ -248,24 +248,36 @@ namespace slib
 	
 	Time Jwt::getExpirationTime() const noexcept
 	{
-		sl_int64 n = payload.getItem(g_field_exp).getInt64();
-		return Time::fromUnixTime(n);
+		Variant var = payload.getItem(g_field_exp);
+		if (var.isNotNull()) {
+			return Time::fromUnixTime(var.getInt64());
+		} else {
+			return Time::zero();
+		}
 	}
 	
 	void Jwt::setExpirationTime(const Time& value) noexcept
 	{
-		payload.putItem(g_field_exp, value.toUnixTime());
+		if (value.isNotZero()) {
+			payload.putItem(g_field_exp, value.toUnixTime());
+		}
 	}
 	
 	Time Jwt::getNotBefore() const noexcept
 	{
-		sl_int64 n = payload.getItem(g_field_nbf).getInt64();
-		return Time::fromUnixTime(n);
+		Variant var = payload.getItem(g_field_nbf);
+		if (var.isNotNull()) {
+			return Time::fromUnixTime(var.getInt64());
+		} else {
+			return Time::zero();
+		}
 	}
 	
 	void Jwt::setNotBefore(const Time& value) noexcept
 	{
-		payload.putItem(g_field_nbf, value.toUnixTime());
+		if (value.isNotZero()) {
+			payload.putItem(g_field_nbf, value.toUnixTime());
+		}
 	}
 	
 	String Jwt::getIssuedAt() const noexcept
