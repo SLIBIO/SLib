@@ -383,8 +383,8 @@ namespace slib
 		}
 		
 		OAuthLoginParam _param = param;
-		if (!m_flagSupportTokenGrantType && _param.authorization.grantType == OAuthGrantType::Token) {
-			_param.authorization.grantType = OAuthGrantType::Code;
+		if (!m_flagSupportImplicitGrantType && _param.authorization.responseType == OAuthResponseType::Token) {
+			_param.authorization.responseType = OAuthResponseType::Code;
 			_param.flagAlwaysRequireAccessToken = sl_true;
 		}
 		_param.authorization.redirectUri = redirectUri;
@@ -395,7 +395,7 @@ namespace slib
 		_param.authorization.state = state;
 		_param.url = getLoginUrl(_param.authorization);
 		
-		if (_param.authorization.grantType == OAuthGrantType::Code) {
+		if (_param.authorization.responseType == OAuthResponseType::Code) {
 			if (_param.flagAlwaysRequireAccessToken) {
 				auto onComplete = _param.onComplete;
 				auto thiz = ToRef(this);

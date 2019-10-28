@@ -2,49 +2,32 @@
 
 using namespace slib;
 
-OAuthServer oauth;
-
-struct MyUser
+class MyAuth : public OAuthServerWithJwt
 {
-	String userId;
-	String clientId;
-	List<String> scopes;
-	
-	SLIB_JSON_MEMBERS(userId, clientId, scopes)
-};
-
-Memory oauth_secret = String("oauth example").toMemory();
-
-void IssueToken(OAuthAccessToken& ret, OAuthClientEntity* client, const OAuthUserEntity& entity, const List<String>& scopes) {
-	MyUser user;
-	user.userId = entity.userId;
-	user.clientId = client->clientId;
-	user.scopes = scopes;
-	ret.expirationTime = Time::now() + Time::withHours(12);
-	Jwt jwt;
-	jwt.payload = user.toJson();
-	jwt.setExpirationTime(ret.expirationTime);
-	ret.token = jwt.encode(oauth_secret);
-}
-
-sl_bool ValidateToken(HttpServerContext* context, MyUser& user)
-{
-	String token = OAuthServer::getAccessToken(context);
-	if (token.isNotEmpty()) {
-		Jwt jwt;
-		if (jwt.decode(oauth_secret, token)) {
-			user.fromJson(jwt.payload);
-			if (user.userId.isNotEmpty()) {
-				return sl_true;
-			}
-		}
+public:
+	MyAuth()
+	{
+		setMasterKey(Memory::create("1234", 4));
 	}
-	return sl_false;
-}
+	
+public:
+	sl_bool onClientCredentialsGrant(OAuthTokenPayload& payload) override
+	{
+		payload.user.putItem("type", "credential");
+		return sl_true;
+	}
+
+	sl_bool onPasswordGrant(const String& username, const String& password, OAuthTokenPayload& payload) override
+	{
+		payload.user.putItem("type", "password");
+		payload.user.putItem("username", username);
+		return sl_true;
+	}
+	
+} oauth;
 
 int main(int argc, const char * argv[])
 {
-	oauth.setOnIssueAccessToken(&IssueToken);
 	
 	HttpServerParam param;
 	param.port = 8080;
@@ -52,7 +35,14 @@ int main(int argc, const char * argv[])
 	param.router.GET("/", [](HttpServerContext* context) {
 		return "Welcome to OAuth 2.0 Test Server";
 	});
+	param.router.POST("/access_token", [](HttpServerContext* context) {
+		oauth.respondToAccessTokenRequest(context);
+		return sl_true;
+	});
 	param.router.GET("/login", [](HttpServerContext* context) {
+		auto params = context->getParameters();
+		params.put("code_challenge", params.getValue("code_challenge", ""));
+		params.put("code_challenge_method", params.getValue("code_challenge_method", ""));
 		return Ginger::render(
 			SLIB_STRINGIFY(
 				<html>
@@ -81,11 +71,13 @@ int main(int argc, const char * argv[])
 								<input type='hidden' name='redirect_uri' value='${redirect_uri}' />
 								<input type='hidden' name='scope' value='${scope}' />
 								<input type='hidden' name='state' value='${state}' />
+								<input type='hidden' name='code_challenge' value='${code_challenge}' />
+								<input type='hidden' name='code_challenge_method' value='${code_challenge_method}' />
 							</form>
 						</center>
 					</body>
 				</html>
-			), context->getParameters()
+			), params
 		);
 	});
 	param.router.POST("/login", [](HttpServerContext* context) {
@@ -96,16 +88,21 @@ int main(int argc, const char * argv[])
 			if (loginId.isEmpty() || password.isEmpty()) {
 				return String::format(SLIB_STRINGIFY(<html><body><a href='/login?%s'>Invalid Login. Go Back.</a></body></html>), HttpRequest::buildQuery(context->getParameters()));
 			}
-			OAuthUserEntity user;
-			user.userId = loginId;
+			Json user;
+			user.putItem("type", "login");
+			user.putItem("loginId", loginId);
 			oauth.completeAuthorizationRequest(context, request, user);
 		}
 		return String::null();
 	});
 	param.router.GET("/me", [](HttpServerContext* context) {
-		MyUser user;
-		if (ValidateToken(context, user)) {
-			return user.toJson();
+		OAuthTokenPayload data;
+		if (oauth.validateAccessToken(context, data)) {
+			Json ret;
+			ret.putItem("user", data.user);
+			ret.putItem("exp", data.accessTokenExpirationTime);
+			ret.putItem("scope", data.scopes);
+			return ret;
 		}
 		return Json("Invalid Authorization");
 	});

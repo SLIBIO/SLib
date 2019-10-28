@@ -25,6 +25,8 @@
 #include "slib/crypto/base64.h"
 #include "slib/crypto/hmac.h"
 #include "slib/crypto/sha1.h"
+#include "slib/crypto/sha2.h"
+#include "slib/crypto/base64.h"
 #include "slib/core/preference.h"
 #include "slib/core/log.h"
 
@@ -453,30 +455,32 @@ namespace slib
 		return sl_true;
 	}
 	
-	void OAuthAccessToken::setResponse(const HashMap<String, String>& params)
+	void OAuthAccessToken::setResponse(const Json& json)
 	{
-		token = params.getValue("access_token");
+		token = json.getItem("access_token").getString();
 		if (token.isEmpty()) {
 			return;
 		}
-		tokenType = params.getValue("token_type");
+		tokenType = json.getItem("token_type").getString();
 		refreshTime = Time::now();
-		if (params.find("expires_in")) {
-			sl_uint32 nSecondsExpiresIn = params.getValue("expires_in").parseUint32();
+		Json jsonExpireIn = json.getItem("expires_in");
+		if (jsonExpireIn.isNotNull()) {
+			sl_uint32 nSecondsExpiresIn = jsonExpireIn.getUint32();
 			expirationTime = refreshTime;
 			expirationTime.addSeconds(nSecondsExpiresIn);
 		} else {
 			expirationTime.setZero();
 		}
-		refreshToken = params.getValue("refresh_token");
-		scopes = params.getValue("scope").split(" ");
+		refreshToken = json.getItem("refresh_token").getString();
+		scopes = json.getItem("scope").getString().split(" ");
 	}
 
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(OAuthAuthorizationRequestParam)
 	
 	OAuthAuthorizationRequestParam::OAuthAuthorizationRequestParam()
 	{
-		grantType = OAuthGrantType::Token;
+		responseType = OAuthResponseType::Token;
+		codeChallengeMethod = OAuthCodeChallengeMethod::S256;
 	}
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(OAuthResult)
@@ -487,12 +491,13 @@ namespace slib
 		errorCode = OAuthErrorCode::None;
 	}
 	
-	void OAuthResult::setResponse(const HashMap<String, String>& params)
+	void OAuthResult::setResponse(const Json& json)
 	{
 		flagSuccess = sl_false;
-		error = params.getValue("error");
-		errorDescription = params.getValue("error_description");
-		errorUri = params.getValue("error_uri");
+		response = json;
+		error = json.getItem("error").getString();
+		errorDescription = json.getItem("error_description").getString();
+		errorUri = json.getItem("error_uri").getString();
 		if (error.isNotEmpty()) {
 			if (error == "invalid_request") {
 				errorCode = OAuthErrorCode::InvalidRequest;
@@ -521,6 +526,18 @@ namespace slib
 			flagSuccess = sl_true;
 		}
 	}
+
+	void OAuthResult::setResult(UrlRequest* req)
+	{
+		if (req->getResponseHeader(HttpHeaders::ContentType).equalsIgnoreCase(ContentTypes::WebForm)) {
+			setResponse(HttpRequest::parseFormUrlEncoded(req->getResponseContentAsString()));
+		} else {
+			JsonParseParam param;
+			param.flagLogError = sl_false;
+			Json json = Json::parseJson(req->getResponseContentAsString(), param);
+			setResponse(json);
+		}
+	}
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(OAuthAccessTokenResult)
 	
@@ -528,13 +545,10 @@ namespace slib
 	{
 	}
 	
-	void OAuthAccessTokenResult::setResponse(const Json& response)
+	void OAuthAccessTokenResult::setResult(UrlRequest* req)
 	{
-		this->response = response;
-		HashMap<String, String> params;
-		FromJson(response, params);
-		OAuthResult::setResponse(params);
-		accessToken.setResponse(params);
+		OAuthResult::setResult(req);
+		accessToken.setResponse(response);
 		if (!(accessToken.isValid())) {
 			flagSuccess = sl_false;
 		}
@@ -578,7 +592,7 @@ namespace slib
 	{
 		accessTokenMethod = HttpMethod::POST;
 		flagUseBasicAuthorizationForAccessToken = sl_false;
-		flagSupportTokenGrantType = sl_true;
+		flagSupportImplicitGrantType = sl_true;
 		flagLoggingErrors = sl_true;
 	}
 	
@@ -602,7 +616,7 @@ namespace slib
 		m_redirectUri = param.redirectUri;
 		m_loginRedirectUri = param.loginRedirectUri;
 		m_defaultScopes = param.defaultScopes;
-		m_flagSupportTokenGrantType = param.flagSupportTokenGrantType;
+		m_flagSupportImplicitGrantType = param.flagSupportImplicitGrantType;
 		
 		m_flagLogErrors = param.flagLoggingErrors;
 	}
@@ -685,7 +699,7 @@ namespace slib
 		Url url(m_authorizeUrl);
 		auto oldParameters = url.getQueryParameters();
 		HashMap<String, String> params;
-		if (m_flagSupportTokenGrantType && param.grantType == OAuthGrantType::Token) {
+		if (param.responseType == OAuthResponseType::Token) {
 			params.put_NoLock("response_type", "token");
 		} else {
 			params.put_NoLock("response_type", "code");
@@ -719,15 +733,31 @@ namespace slib
 				params.put_NoLock(item.key, item.value.getString());
 			}
 		}
+		if (param.responseType == OAuthResponseType::Code) {
+			String codeChallenge;
+			if (param.codeChallenge.isNotEmpty()) {
+				codeChallenge = param.codeChallenge;
+			} else if (param.codeVerifier.isNotEmpty()) {
+				codeChallenge = generateCodeChallenge(param.codeVerifier, param.codeChallengeMethod);
+			}
+			if (codeChallenge.isNotEmpty()) {
+				params.put_NoLock("code_challenge", codeChallenge);
+				if (param.codeChallengeMethod == OAuthCodeChallengeMethod::S256) {
+					params.put_NoLock("code_challenge_method", "S256");
+				} else {
+					params.put_NoLock("code_challenge_method", "plain");
+				}
+			}
+		}
 		params.putAll_NoLock(oldParameters);
 		url.setQueryParameters(params);
 		return url.toString();
 	}
 	
-	String OAuth2::getLoginUrl(OAuthGrantType grantType, const List<String>& scopes, const String& state)
+	String OAuth2::getLoginUrl(OAuthResponseType type, const List<String>& scopes, const String& state)
 	{
 		OAuthAuthorizationRequestParam param;
-		param.grantType = grantType;
+		param.responseType = type;
 		param.scopes = scopes;
 		param.state = state;
 		return getLoginUrl(param);
@@ -765,7 +795,7 @@ namespace slib
 		auto thiz = ToRef(this);
 		rp.onComplete = [thiz, onComplete](UrlRequest* request) {
 			OAuthAccessTokenResult result;
-			result.setResponse(request->getResponseContentAsJson());
+			result.setResult(request);
 			if (request->isError()) {
 				thiz->logUrlRequestError(request);
 				result.flagSuccess = sl_false;
@@ -778,7 +808,7 @@ namespace slib
 		UrlRequest::send(rp);
 	}
 	
-	void OAuth2::requestAccessTokenFromCode(const String& code, const String& redirectUri, const List<String>& scopes, const Function<void(OAuthAccessTokenResult&)>& onComplete)
+	void OAuth2::requestAccessTokenFromCode(const String& code, const String& redirectUri, const String& codeVerifier, const List<String>& scopes, const Function<void(OAuthAccessTokenResult&)>& onComplete)
 	{
 		HashMap<String, Variant> params;
 		params.put_NoLock("grant_type", "authorization_code");
@@ -787,6 +817,9 @@ namespace slib
 			params.put_NoLock("redirect_uri", redirectUri);
 		} else {
 			params.put_NoLock("redirect_uri", m_redirectUri);
+		}
+		if (codeVerifier.isNotEmpty()) {
+			params.put_NoLock("code_verifier", codeVerifier);
 		}
 		if (scopes.isNotNull()) {
 			String s = StringBuffer::join(" ", scopes).trim();
@@ -797,14 +830,19 @@ namespace slib
 		requestAccessToken(params, onComplete);
 	}
 	
+	void OAuth2::requestAccessTokenFromCode(const String& code, const String& redirectUri, const String& codeVerifier, const Function<void(OAuthAccessTokenResult&)>& onComplete)
+	{
+		requestAccessTokenFromCode(code, redirectUri, sl_null, sl_null, onComplete);
+	}
+	
 	void OAuth2::requestAccessTokenFromCode(const String& code, const String& redirectUri, const Function<void(OAuthAccessTokenResult&)>& onComplete)
 	{
-		requestAccessTokenFromCode(code, redirectUri, sl_null, onComplete);
+		requestAccessTokenFromCode(code, redirectUri, sl_null, sl_null, onComplete);
 	}
 	
 	void OAuth2::requestAccessTokenFromCode(const String& code, const Function<void(OAuthAccessTokenResult&)>& onComplete)
 	{
-		requestAccessTokenFromCode(code, sl_null, sl_null, onComplete);
+		requestAccessTokenFromCode(code, sl_null, sl_null, sl_null, onComplete);
 	}
 	
 	void OAuth2::requestAccessTokenFromClientCredentials(const List<String>& scopes, const Function<void(OAuthAccessTokenResult&)>& onComplete)
@@ -862,6 +900,35 @@ namespace slib
 	void OAuth2::refreshAccessToken(const String& refreshToken, const Function<void(OAuthAccessTokenResult&)>& onComplete)
 	{
 		refreshAccessToken(refreshToken, sl_null, onComplete);
+	}
+
+	sl_bool OAuth2::checkCodeVerifier(const String& challenge)
+	{
+		// Validate code_challenge according to RFC-7636
+		// https://tools.ietf.org/html/rfc7636#section-4.2
+		sl_size len = challenge.getLength();
+		if (len < 43 || len > 128) {
+			return sl_false;
+		}
+		sl_char8* sz = challenge.getData();
+		for (sl_size i = 0; i < len; i++) {
+			sl_char8 ch = sz[i];
+			if (!(SLIB_CHAR_IS_ALNUM(ch) || ch == '-' || ch == '_' || ch == '.' || ch == '~')) {
+				return sl_false;
+			}
+		}
+		return sl_true;
+	}
+
+	String OAuth2::generateCodeChallenge(const String& verifier, OAuthCodeChallengeMethod method)
+	{
+		if (method == OAuthCodeChallengeMethod::S256) {
+			char hash[32];			
+			SHA256::hash(verifier, hash);
+			return Base64::encodeUrl(hash, 32);
+		} else {
+			return verifier;
+		}
 	}
 	
 	void OAuth2::logUrlRequestError(UrlRequest* request)

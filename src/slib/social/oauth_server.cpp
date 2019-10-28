@@ -27,6 +27,30 @@
 namespace slib
 {
 
+	namespace priv
+	{
+		namespace oauth_server
+		{
+
+			SLIB_STATIC_STRING(g_string_space, " ")
+
+			SLIB_STATIC_STRING(g_field_tokenType, "t")
+			SLIB_STATIC_STRING(g_field_clientId, "cid")
+			SLIB_STATIC_STRING(g_field_scope, "scp")
+			SLIB_STATIC_STRING(g_field_user, "usr")
+			SLIB_STATIC_STRING(g_field_redirectUri, "dir")
+			SLIB_STATIC_STRING(g_field_codeChallenge, "cc")
+			SLIB_STATIC_STRING(g_field_codeChallengeMode, "cm")
+
+			SLIB_STATIC_STRING(g_tokenType_access, "access")
+			SLIB_STATIC_STRING(g_tokenType_refresh, "refresh")
+			SLIB_STATIC_STRING(g_tokenType_code, "code")
+
+		}
+	}
+
+	using namespace priv::oauth_server;
+
 	SLIB_DEFINE_OBJECT(OAuthClientEntity, Object)
 
 	OAuthClientEntity::OAuthClientEntity()
@@ -35,6 +59,11 @@ namespace slib
 
 	OAuthClientEntity::~OAuthClientEntity()
 	{
+	}
+
+	sl_bool OAuthClientEntity::validateSecret(const String& clientSecret)
+	{
+		return sl_true;
 	}
 
 	sl_bool OAuthClientEntity::validateRedirectUri(String& redirectUri)
@@ -47,88 +76,137 @@ namespace slib
 		return sl_true;
 	}
 
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(OAuthTokenPayload)
+
+	OAuthTokenPayload::OAuthTokenPayload()
+	{
+		grantType = OAuthGrantType::None;
+		accessTokenExpirationTime.setZero();
+		refreshTokenExpirationTime.setZero();
+		authorizationCodeExpirationTime.setZero();
+		codeChallengeMethod = OAuthCodeChallengeMethod::Plain;
+	}
+
+	SLIB_DEFINE_OBJECT(OAuthTokenRepository, Object)
+
+	OAuthTokenRepository::OAuthTokenRepository()
+	{
+	}
+
+	OAuthTokenRepository::~OAuthTokenRepository()
+	{
+	}
+
+	SLIB_DEFINE_OBJECT(OAuthTokenMemoryRepository, OAuthTokenRepository)
+
+	OAuthTokenMemoryRepository::OAuthTokenMemoryRepository()
+	{
+	}
+
+	OAuthTokenMemoryRepository::~OAuthTokenMemoryRepository()
+	{
+	}
+
+	void OAuthTokenMemoryRepository::registerToken(const String& code, const Json& data)
+	{
+		m_repo.put(code, data);
+	}
+
+	void OAuthTokenMemoryRepository::revokeToken(const String& code)
+	{
+		m_repo.remove(code);
+	}
+
+	sl_bool OAuthTokenMemoryRepository::isValid(const String& code)
+	{
+		return m_repo.find(code);
+	}
+
+	Json OAuthTokenMemoryRepository::getTokenData(const String& code)
+	{
+		return m_repo.getValue(code);
+	}
+
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(OAuthServerAuthorizationRequest)
+
+	OAuthServerAuthorizationRequest::OAuthServerAuthorizationRequest()
+	{
+	}
+
 	SLIB_DEFINE_OBJECT(OAuthServer, Object)
 	
 	OAuthServer::OAuthServer()
 	{
-		m_flagSupportTokenGrant = sl_true;
-		m_flagSupportCodeGrant = sl_true;
+		setSupportImplicitGrant(sl_true);
+		setSupportAuthorizationCodeGrant(sl_true);
+		setSupportClientCredentialsGrant(sl_true);
+		setSupportPasswordGrant(sl_true);
+		setSupportRefreshToken(sl_true);
+
+		setAccessTokenExpirySeconds(50000);
+		setRefreshTokenExpirySeconds(1000000);
+		setAuthorizationCodeExpirySeconds(3600);
 	}
 
 	OAuthServer::~OAuthServer()
 	{
 	}
 
-	sl_bool OAuthServer::isSupportTokenGrant()
-	{
-		return m_flagSupportTokenGrant;
-	}
-
-	void OAuthServer::setSupportTokenGrant(sl_bool flag)
-	{
-		m_flagSupportTokenGrant = flag;
-	}
-
-	sl_bool OAuthServer::isSupportCodeGrant()
-	{
-		return m_flagSupportCodeGrant;
-	}
-
-	void OAuthServer::setSupportCodeGrant(sl_bool flag)
-	{
-		m_flagSupportCodeGrant = flag;
-	}
-
-	String OAuthServer::getDefaultRedirectUri()
-	{
-		return m_defaultRedirectUri;
-	}
-
-	void OAuthServer::setDefaultRedirectUri(const String uri)
-	{
-		m_defaultRedirectUri = uri;
-	}
-
-	String OAuthServer::getRedirectUri(const OAuthServerAuthorizationRequest& request)
-	{
-		if (request.redirectUri.isNotEmpty()) {
-			return request.redirectUri;
-		} else {
-			return m_defaultRedirectUri;
-		}
-	}
-
 	sl_bool OAuthServer::validateAuthorizationRequest(HttpServerContext* context, OAuthServerAuthorizationRequest& request)
 	{
-		String strGrantType = context->getParameter("response_type");
-		sl_bool flagGrantTypeError = sl_false;
-		if (strGrantType == "token") {
-			request.grantType = OAuthGrantType::Token;
-		} else if (strGrantType == "code") {
-			request.grantType = OAuthGrantType::Code;
+		String strResponseType = context->getParameter("response_type");
+		sl_bool flagResponseTypeError = sl_false;
+		if (strResponseType == "token") {
+			request.responseType = OAuthResponseType::Token;
+		} else if (strResponseType == "code") {
+			request.responseType = OAuthResponseType::Code;
 		} else {
-			flagGrantTypeError = sl_true;
+			flagResponseTypeError = sl_true;
 		}
 		request.redirectUri = context->getParameter("redirect_uri");
 		request.clientId = context->getParameter("client_id");
 		request.scopes = context->getParameter("scope").split(" ");
 		request.state = context->getParameter("state");
 		
+		request.codeChallenge = context->getParameter("code_challenge");
+		String strCodeChallengeMethod = context->getParameter("code_challenge_method");
+		sl_bool flagCodeChallengeMethodError = sl_false;
+		if (strCodeChallengeMethod.isEmpty() || strCodeChallengeMethod == "plain") {
+			request.codeChallengeMethod = OAuthCodeChallengeMethod::Plain;
+		} else if (strCodeChallengeMethod == "S256") {
+			request.codeChallengeMethod = OAuthCodeChallengeMethod::S256;
+		} else {
+			flagCodeChallengeMethodError = sl_true;
+		}
+		
 		if (request.clientId.isEmpty()) {
-			completeAuthorizationRequestWithError(context, request, OAuthErrorCode::InvalidRequest, "client_id is missing");
+			completeAuthorizationRequestWithError(context, request, OAuthErrorCode::InvalidRequest, "client_id is not found");
 			return sl_false;
 		}
-		if (flagGrantTypeError) {
+		if (flagResponseTypeError) {
 			completeAuthorizationRequestWithError(context, request, OAuthErrorCode::InvalidRequest, "response_type is invalid");
 			return sl_false;
 		}
-		if (request.grantType == OAuthGrantType::Code) {
-			if (!m_flagSupportTokenGrant) {
+		if (flagCodeChallengeMethodError) {
+			completeAuthorizationRequestWithError(context, request, OAuthErrorCode::InvalidRequest, "code_challenge_method is invalid");
+			return sl_false;
+		}
+		if (request.codeChallenge.isNotEmpty()) {
+			if (!(OAuth2::checkCodeVerifier(request.codeChallenge))) {
+				completeAuthorizationRequestWithError(context, request, OAuthErrorCode::InvalidRequest, "Code challenge must follow the specifications of RFC-7636.");
+				return sl_false;
+			}
+		}
+		
+		if (request.responseType == OAuthResponseType::Code) {
+			if (!(isSupportAuthorizationCodeGrant())) {
 				completeAuthorizationRequestWithError(context, request, OAuthErrorCode::UnsupportedGrantType);
 				return sl_false;
 			}
 		} else {
-			if (!m_flagSupportCodeGrant) {
+			if (!(isSupportImplicitGrant())) {
 				completeAuthorizationRequestWithError(context, request, OAuthErrorCode::UnsupportedGrantType);
 				return sl_false;
 			}
@@ -137,7 +215,7 @@ namespace slib
 		request.client = getClientEntity(request.clientId);
 		OAuthClientEntity* client = request.client.get();
 		if (!client) {
-			completeAuthorizationRequestWithError(context, request, OAuthErrorCode::InvalidClient, "Cannot find the client entity");
+			completeAuthorizationRequestWithError(context, request, OAuthErrorCode::InvalidClient, "Client entity is not found");
 			return sl_false;
 		}
 		
@@ -153,31 +231,64 @@ namespace slib
 		return sl_true;
 	}
 
-	void OAuthServer::completeAuthorizationRequest(HttpServerContext* context, const OAuthServerAuthorizationRequest& request, const OAuthUserEntity& userEntity)
+	void OAuthServer::completeAuthorizationRequest(HttpServerContext* context, const OAuthServerAuthorizationRequest& request, const Json& userEntity)
 	{
-		OAuthAccessToken token;
-		token.tokenType = "Bearer";
-		issueAccessToken(token, request.client.get(), userEntity, request.scopes);
-		if (token.token.isEmpty()) {
-			completeAuthorizationRequestWithError(context, request, OAuthErrorCode::ServerError, "Cannot generate access token");
-			return;
+		if (request.responseType == OAuthResponseType::Token) {
+
+			OAuthTokenPayload payload;
+			payload.grantType = OAuthGrantType::Implicit;
+			payload.client = request.client;
+			payload.clientId = request.clientId;
+			payload.user = userEntity;
+			payload.scopes = request.scopes;
+
+			setExpirySeconds(payload);
+			issueAccessToken(payload);
+
+			if (payload.accessToken.isEmpty()) {
+				completeAuthorizationRequestWithError(context, request, OAuthErrorCode::ServerError, "Failed to generate access token");
+				return;
+			}
+
+			registerAccessToken(payload);
+			if (payload.refreshToken.isNotEmpty()) {
+				registerRefreshToken(payload);
+			}
+
+			HashMap<String, String> params = generateAccessTokenResponseParams(payload);
+			if (request.state.isNotEmpty()) {
+				params.add_NoLock("state", request.state);
+			}
+			context->setResponseRedirect(request.redirectUri, params);
+
+		} else if (request.responseType == OAuthResponseType::Code) {
+
+			OAuthTokenPayload payload;
+			payload.client = request.client;
+			payload.clientId = request.clientId;
+			payload.user = userEntity;
+			payload.scopes = request.scopes;
+			payload.redirectUri = request.redirectUri;
+			payload.codeChallenge = request.codeChallenge;
+			payload.codeChallengeMethod = request.codeChallengeMethod;
+
+			setExpirySeconds(payload);
+			issueAuthorizationCode(payload);
+			
+			if (payload.authorizationCode.isEmpty()) {
+				completeAuthorizationRequestWithError(context, request, OAuthErrorCode::ServerError, "Failed to generate authorization code");
+				return;
+			}
+
+			registerAuthorizationCode(payload);
+
+			CHashMap<String, String> params;
+			params.add_NoLock("code", payload.authorizationCode);
+			if (request.state.isNotEmpty()) {
+				params.add_NoLock("state", request.state);
+			}
+			context->setResponseRedirect(request.redirectUri, params);
 		}
-		CHashMap<String, String> params;
-		params.add_NoLock("access_token", token.token);
-		params.add_NoLock("token_type", token.tokenType);
-		sl_int64 exp = (token.expirationTime - Time::now()).getSecondsCount();
-		if (exp < 0) {
-			exp = 0;
-		}
-		params.add_NoLock("expires_in", String::fromInt64(exp));
-		if (token.refreshToken.isNotEmpty()) {
-			params.add_NoLock("refresh_token", token.refreshToken);
-		}
-		if (request.state.isNotEmpty()) {
-			params.add_NoLock("state", request.state);
-		}
-		params.add_NoLock("scope", StringBuffer::join(" ", request.scopes));
-		context->setResponseRedirect(request.redirectUri, params);
 	}
 
 	void OAuthServer::completeAuthorizationRequestWithError(HttpServerContext* context, const OAuthServerAuthorizationRequest& request, OAuthErrorCode err, const String& errorDescription, const String& errorUri)
@@ -185,41 +296,7 @@ namespace slib
 		String redirectUri = getRedirectUri(request);
 		if (request.redirectUri.isNotEmpty()) {
 			CHashMap<String, String> params;
-			String strError;
-			switch (err) {
-				case OAuthErrorCode::InvalidRequest:
-					strError = "invalid_request";
-					break;
-				case OAuthErrorCode::UnauthorizedClient:
-					strError = "unauthorized_client";
-					break;
-				case OAuthErrorCode::AccessDenied:
-					strError = "access_denied";
-					break;
-				case OAuthErrorCode::UnsupportedResponseType:
-					strError = "unsupported_response_type";
-					break;
-				case OAuthErrorCode::InvalidScope:
-					strError = "invalid_scope";
-					break;
-				case OAuthErrorCode::ServerError:
-					strError = "server_error";
-					break;
-				case OAuthErrorCode::TemporarilyUnavailable:
-					strError = "temporarily_unavailable";
-					break;
-				case OAuthErrorCode::InvalidClient:
-					strError = "invalid_client";
-					break;
-				case OAuthErrorCode::InvalidGrant:
-					strError = "invalid_grant";
-				case OAuthErrorCode::UnsupportedGrantType:
-					strError = "unsupported_grant_type";
-				default:
-					strError = "unknown";
-					break;
-			}
-			params.add_NoLock("error", strError);
+			params.add_NoLock("error", getErrorCodeText(err));
 			if (errorDescription.isNotEmpty()) {
 				params.add_NoLock("error_description", errorDescription);
 			}
@@ -230,6 +307,413 @@ namespace slib
 				params.add_NoLock("state", request.state);
 			}
 			context->setResponseRedirect(request.redirectUri, params);
+		} else {
+			respondError(context, HttpStatus::BadRequest, err, errorDescription, errorUri, request.state);
+		}
+	}
+
+	void OAuthServer::respondToAccessTokenRequest(HttpServerContext* context)
+	{
+		String grantType = context->getParameter("grant_type");
+		String clientId = getParameter(context, "client_id");
+		String clientSecret = getParameter(context, "client_secret");
+		List<String> scopes = context->getParameter("scope").split(" ");
+		
+		if (clientId.isEmpty()) {
+			respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "client_id is not found");
+			return;
+		}
+		Ref<OAuthClientEntity> refClient = getClientEntity(clientId);
+		OAuthClientEntity* client = refClient.get();
+		if (!client) {
+			respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidClient, "Client entity is not found");
+			return;
+		}
+		if (clientSecret.isEmpty() || !(validateClientSecret(client, clientSecret))) {
+			respondError(context, HttpStatus::Unauthorized, OAuthErrorCode::InvalidClient, "Client authentication failed");
+			return;
+		}
+		if (!(validateScopes(client, scopes))) {
+			respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidScope);
+			return;
+		}
+
+		OAuthTokenPayload payload;
+		payload.client = client;
+		payload.clientId = clientId;
+
+		if (grantType == "authorization_code") {
+
+			if (!(isSupportAuthorizationCodeGrant())) {
+				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::UnsupportedGrantType);
+				return;
+			}
+
+			String code = context->getParameter("code");
+			if (code.isEmpty()) {
+				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "Authorization code is not found");
+				return;
+			}
+
+			Ref<OAuthTokenRepository> repo = getAuthorizationCodeRepository();
+			if (repo.isNotNull()) {
+				if (!(repo->isValid(code))) {
+					respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "Authorization code is revoked or invalid");
+					return;
+				}
+			}
+
+			payload.grantType = OAuthGrantType::AuthorizationCode;
+			payload.authorizationCode = code;
+			
+			if (!(getAuthorizationCodePayload(payload))) {
+				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "Authorization code is invalid");
+				return;
+			}
+
+			if (payload.authorizationCodeExpirationTime.isNotZero() && payload.authorizationCodeExpirationTime < Time::now()) {
+				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "Authorization code has expired");
+				revokeAuthorizationCode(payload);
+				return;
+			}
+			if (payload.clientId != clientId) {
+				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "Authorization code was not issued to this client");
+				return;
+			}
+			if (payload.redirectUri != context->getParameter("redirect_uri")) {
+				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "redirect_uri is invalid");
+				return;
+			}
+			ListElements<String> requiredScopes(scopes);
+			for (sl_size i = 0; i < requiredScopes.count; i++) {
+				if (!(payload.scopes.contains(requiredScopes[i]))) {
+					respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidScope);
+					return;
+				}
+			}
+			
+			String codeVerifier = context->getParameter("code_verifier");
+			if (payload.codeChallenge.isNotEmpty() || codeVerifier.isNotEmpty()) {
+				if (codeVerifier.isEmpty()) {
+					respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "code_verifier is not found");
+					return;
+				}
+				if (payload.codeChallenge.isEmpty()) {
+					respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "Failed to verify code_verifier");
+					return;
+				}
+				if (!(OAuth2::checkCodeVerifier(codeVerifier))) {
+					respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "code_verifier must follow the specifications of RFC-7636.");
+					return;
+				}
+				if (payload.codeChallenge != OAuth2::generateCodeChallenge(codeVerifier, payload.codeChallengeMethod)) {
+					respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "Failed to verify code_verifier");
+					return;
+				}
+
+			}
+
+		} else if (grantType == "client_credentials") {			
+
+			if (!(isSupportClientCredentialsGrant())) {
+				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::UnsupportedGrantType);
+				return;
+			}
+			payload.grantType = OAuthGrantType::ClientCredentials;
+			if (!(onClientCredentialsGrant(payload))) {
+				respondError(context, HttpStatus::Unauthorized, OAuthErrorCode::AccessDenied);
+				return;
+			}
+
+		} else if (grantType == "password") {
+
+			if (!(isSupportPasswordGrant())) {
+				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::UnsupportedGrantType);
+				return;
+			}
+			payload.grantType = OAuthGrantType::Password;
+			String username = context->getParameter("username");
+			if (username.isEmpty()) {
+				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "username is not found");
+				return;
+			}
+			String password = context->getParameter("password");
+			if (password.isEmpty()) {
+				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "password is not found");
+				return;
+			}
+			if (!(onPasswordGrant(username, password, payload))) {
+				respondError(context, HttpStatus::Unauthorized, OAuthErrorCode::AccessDenied, "username or password is not match");
+				return;
+			}
+
+		} else if (grantType == "refresh_token") {
+			
+			if (!(isSupportRefreshToken())) {
+				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::UnsupportedGrantType);
+				return;
+			}
+
+			payload.grantType = OAuthGrantType::RefreshToken;
+			payload.refreshToken = context->getParameter("refresh_token");
+			if (payload.refreshToken.isEmpty()) {
+				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "refresh_token is not found");
+				return;
+			}
+
+			Ref<OAuthTokenRepository> repo = getRefreshTokenRepository();
+			if (repo.isNotNull()) {
+				if (!(repo->isValid(payload.refreshToken))) {
+					respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "refresh_token is revoked or invalid");
+					return;
+				}
+			}
+
+			if (!(getRefreshTokenPayload(payload))) {
+				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "refresh_token is invalid");
+				return;
+			}
+
+			if (payload.refreshTokenExpirationTime.isNotZero() && payload.refreshTokenExpirationTime < Time::now()) {
+				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "refresh_token has expired");
+				revokeRefreshToken(payload);
+				return;
+			}
+			if (payload.clientId != clientId) {
+				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "refresh_token was not issued to this client");
+				return;
+			}
+			ListElements<String> requiredScopes(scopes);
+			for (sl_size i = 0; i < requiredScopes.count; i++) {
+				if (!(payload.scopes.contains(requiredScopes[i]))) {
+					respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidScope);
+					return;
+				}
+			}
+
+		} else {
+			respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidGrant);
+			return;
+		}
+
+		payload.scopes = scopes;
+
+		setExpirySeconds(payload);
+		issueAccessToken(payload);
+
+		if (payload.accessToken.isEmpty()) {
+			respondError(context, HttpStatus::InternalServerError, OAuthErrorCode::ServerError, "Failed to generate access token");
+			return;
+		}
+
+		registerAccessToken(payload);
+		if (payload.refreshToken.isNotEmpty()) {
+			registerRefreshToken(payload);
+		}
+
+		HashMap<String, String> params = generateAccessTokenResponseParams(payload);
+		context->write(Json(params).toJsonString());
+	}
+
+	sl_bool OAuthServer::validateAccessToken(HttpServerContext* context, OAuthTokenPayload& payload)
+	{
+		String token = getAccessToken(context);
+		if (token.isNotEmpty()) {
+			Ref<OAuthTokenRepository> repo = getAccessTokenRepository();
+			if (repo.isNotNull()) {
+				if (!(repo->isValid(token))) {
+					return sl_false;
+				}
+			}
+			payload.accessToken = token;
+			if (getAccessTokenPayload(payload)) {
+				if (payload.accessTokenExpirationTime.isNotZero() && payload.accessTokenExpirationTime < Time::now()) {
+					revokeAccessToken(payload);
+					return sl_false;
+				}
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+
+	void OAuthServer::respondError(HttpServerContext* context, HttpStatus status, OAuthErrorCode err, const String& errorDescription, const String& errorUri, const String& state)
+	{
+		context->setResponseCode(status);
+		context->setResponseContentType(ContentType::WebForm);
+
+		CHashMap<String, String> params;
+		params.add_NoLock("error", getErrorCodeText(err));
+		if (errorDescription.isNotEmpty()) {
+			params.add_NoLock("error_description", errorDescription);
+		}
+		if (errorUri.isNotEmpty()) {
+			params.add_NoLock("error_uri", errorUri);
+		}
+		if (state.isNotEmpty()) {
+			params.add_NoLock("state", state);
+		}
+		context->write(HttpRequest::buildFormUrlEncoded(params));
+	}
+
+	Ref<OAuthClientEntity> OAuthServer::getClientEntity(const String& clientId)
+	{
+		Ref<OAuthClientEntity> client = new OAuthClientEntity;
+		if (client.isNotNull()) {
+			client->clientId = clientId;
+		}
+		return client;
+	}
+
+	sl_bool OAuthServer::validateClientSecret(OAuthClientEntity* client, const String& clientSecret)
+	{
+		return client->validateSecret(clientSecret);
+	}
+
+	sl_bool OAuthServer::validateRedirectUri(OAuthClientEntity* client, String& redirectUri)
+	{
+		return client->validateRedirectUri(redirectUri);
+	}
+
+	sl_bool OAuthServer::validateScopes(OAuthClientEntity* client, List<String>& scopes)
+	{
+		return client->validateScopes(scopes);
+	}
+
+	void OAuthServer::registerAccessToken(OAuthTokenPayload& payload)
+	{
+		if (payload.accessToken.isEmpty()) {
+			return;
+		}
+		Ref<OAuthTokenRepository> repo = getAccessTokenRepository();
+		if (repo.isNotNull()) {
+			repo->registerToken(payload.accessToken, sl_null);
+		}
+	}
+
+	void OAuthServer::revokeAccessToken(OAuthTokenPayload& payload)
+	{
+		if (payload.accessToken.isEmpty()) {
+			return;
+		}
+		Ref<OAuthTokenRepository> repo = getAccessTokenRepository();
+		if (repo.isNotNull()) {
+			repo->revokeToken(payload.accessToken);
+		}
+	}
+
+	void OAuthServer::registerRefreshToken(OAuthTokenPayload& payload)
+	{
+		if (payload.refreshToken.isEmpty()) {
+			return;
+		}
+		Ref<OAuthTokenRepository> repo = getRefreshTokenRepository();
+		if (repo.isNotNull()) {
+			repo->registerToken(payload.refreshToken, sl_null);
+		}
+	}
+
+	void OAuthServer::revokeRefreshToken(OAuthTokenPayload& payload)
+	{
+		if (payload.refreshToken.isEmpty()) {
+			return;
+		}
+		Ref<OAuthTokenRepository> repo = getRefreshTokenRepository();
+		if (repo.isNotNull()) {
+			repo->revokeToken(payload.refreshToken);
+		}
+	}
+
+	void OAuthServer::registerAuthorizationCode(OAuthTokenPayload& payload)
+	{
+		if (payload.authorizationCode.isEmpty()) {
+			return;
+		}
+		Ref<OAuthTokenRepository> repo = getAuthorizationCodeRepository();
+		if (repo.isNotNull()) {
+			repo->registerToken(payload.authorizationCode, sl_null);
+		}
+	}
+
+	void OAuthServer::revokeAuthorizationCode(OAuthTokenPayload& payload)
+	{
+		if (payload.authorizationCode.isEmpty()) {
+			return;
+		}
+		Ref<OAuthTokenRepository> repo = getAuthorizationCodeRepository();
+		if (repo.isNotNull()) {
+			repo->revokeToken(payload.authorizationCode);
+		}
+	}
+
+	sl_bool OAuthServer::onClientCredentialsGrant(OAuthTokenPayload& payload)
+	{
+		return sl_false;
+	}
+
+	sl_bool OAuthServer::onPasswordGrant(const String& username, const String& password, OAuthTokenPayload& payload)
+	{
+		return sl_false;
+	}
+
+	String OAuthServer::getRedirectUri(const OAuthServerAuthorizationRequest& request)
+	{
+		if (request.redirectUri.isNotEmpty()) {
+			return request.redirectUri;
+		} else {
+			return getDefaultRedirectUri();
+		}
+	}
+
+	void OAuthServer::setExpirySeconds(OAuthTokenPayload& payload)
+	{
+		payload.accessTokenExpirationTime = getExpiryTime(getAccessTokenExpirySeconds());
+		payload.refreshTokenExpirationTime = getExpiryTime(getRefreshTokenExpirySeconds());
+		payload.authorizationCodeExpirationTime = getExpiryTime(getAuthorizationCodeExpirySeconds());
+	}
+
+	HashMap<String, String> OAuthServer::generateAccessTokenResponseParams(const OAuthTokenPayload& payload)
+	{
+		HashMap<String, String> params;
+		params.add_NoLock("access_token", payload.accessToken);
+		params.add_NoLock("token_type", "Bearer");
+		sl_int64 exp = (payload.accessTokenExpirationTime - Time::now()).getSecondsCount();
+		if (exp < 0) {
+			exp = 0;
+		}
+		params.add_NoLock("expires_in", String::fromInt64(exp));
+		if (payload.refreshToken.isNotEmpty()) {
+			params.add_NoLock("refresh_token", payload.refreshToken);
+		}
+		params.add_NoLock("scope", StringBuffer::join(" ", payload.scopes));
+		return Move(params);
+	}
+
+	String OAuthServer::getErrorCodeText(OAuthErrorCode err)
+	{
+		switch (err) {
+		case OAuthErrorCode::InvalidRequest:
+			return "invalid_request";
+		case OAuthErrorCode::UnauthorizedClient:
+			return "unauthorized_client";
+		case OAuthErrorCode::AccessDenied:
+			return "access_denied";
+		case OAuthErrorCode::UnsupportedResponseType:
+			return "unsupported_response_type";
+		case OAuthErrorCode::InvalidScope:
+			return "invalid_scope";
+		case OAuthErrorCode::ServerError:
+			return "server_error";
+		case OAuthErrorCode::TemporarilyUnavailable:
+			return "temporarily_unavailable";
+		case OAuthErrorCode::InvalidClient:
+			return "invalid_client";
+		case OAuthErrorCode::InvalidGrant:
+			return "invalid_grant";
+		case OAuthErrorCode::UnsupportedGrantType:
+			return "unsupported_grant_type";
+		default:
+			return "unknown";
 		}
 	}
 
@@ -244,41 +728,124 @@ namespace slib
 	String OAuthServer::getAccessToken(HttpServerContext* context)
 	{
 		String auth = getParameter(context, "Authorization");
-		if (auth.substring(0, 7).equalsIgnoreCase("Bearer ")) {
+		if (auth.startsWith("Bearer ")) {
 			return auth.substring(7);
 		}
 		return sl_null;
 	}
 
-	Ref<OAuthClientEntity> OAuthServer::getClientEntity(const String& clientId)
+	Time OAuthServer::getExpiryTime(sl_uint32 seconds)
 	{
-		auto func = getOnResolveClientEntity();
-		if (func.isNotNull()) {
-			return func(clientId);
+		if (seconds) {
+			return Time::now() + Time::withSeconds(seconds);
+		} else {
+			return Time::zero();
 		}
-		Ref<OAuthClientEntity> client = new OAuthClientEntity;
-		if (client.isNotNull()) {
-			client->clientId = clientId;
-		}
-		return client;
 	}
 
-	sl_bool OAuthServer::validateRedirectUri(OAuthClientEntity* client, String& redirectUri)
+
+	SLIB_DEFINE_OBJECT(OAuthServerWithJwt, OAuthServer)
+
+	OAuthServerWithJwt::OAuthServerWithJwt()
 	{
-		return client->validateRedirectUri(redirectUri);
+		setAlgorithm(JwtAlgorithm::HS256);
 	}
 
-	sl_bool OAuthServer::validateScopes(OAuthClientEntity* client, List<String>& scopes)
+	OAuthServerWithJwt::~OAuthServerWithJwt()
 	{
-		return client->validateScopes(scopes);
 	}
 
-	void OAuthServer::issueAccessToken(OAuthAccessToken& outToken, OAuthClientEntity* client, const OAuthUserEntity& user, const List<String>& scopes)
+	void OAuthServerWithJwt::issueAccessToken(OAuthTokenPayload& payload)
 	{
-		auto func = getOnIssueAccessToken();
-		if (func.isNotNull()) {
-			func(outToken, client, user, scopes);
+		payload.accessToken = generateToken(TokenType::Access, payload);
+		if (isSupportRefreshToken()) {
+			payload.refreshToken = generateToken(TokenType::Refresh, payload);
 		}
+	}
+
+	sl_bool OAuthServerWithJwt::getAccessTokenPayload(OAuthTokenPayload& payload)
+	{
+		return parseToken(payload.accessToken, payload) == TokenType::Access;
+	}
+
+	sl_bool OAuthServerWithJwt::getRefreshTokenPayload(OAuthTokenPayload& payload)
+	{
+		return parseToken(payload.refreshToken, payload) == TokenType::Refresh;
+	}
+
+	void OAuthServerWithJwt::issueAuthorizationCode(OAuthTokenPayload& payload)
+	{
+		payload.authorizationCode = generateToken(TokenType::AuthorizationCode, payload);
+	}
+
+	sl_bool OAuthServerWithJwt::getAuthorizationCodePayload(OAuthTokenPayload& payload)
+	{
+		return parseToken(payload.authorizationCode, payload) == TokenType::AuthorizationCode;
+	}
+
+	String OAuthServerWithJwt::generateToken(OAuthServerWithJwt::TokenType type, OAuthTokenPayload& payload)
+	{
+		Jwt jwt;
+		jwt.setAlgorithm(getAlgorithm());
+		if (type == TokenType::Refresh) {
+			jwt.payload.putItem(g_field_tokenType, g_tokenType_refresh);
+			jwt.setExpirationTime(payload.refreshTokenExpirationTime);
+		} else if (type == TokenType::AuthorizationCode) {
+			jwt.payload.putItem(g_field_tokenType, g_tokenType_code);
+			jwt.setExpirationTime(payload.authorizationCodeExpirationTime);
+			if (payload.codeChallenge.isNotEmpty()) {
+				jwt.payload.putItem(g_field_codeChallenge, payload.codeChallenge);
+				jwt.payload.putItem(g_field_codeChallengeMode, (int)(payload.codeChallengeMethod));
+			}
+			if (payload.redirectUri.isNotEmpty()) {
+				jwt.payload.putItem(g_field_redirectUri, payload.redirectUri);
+			}
+		} else {
+			jwt.payload.putItem(g_field_tokenType, g_tokenType_access);
+			jwt.setExpirationTime(payload.accessTokenExpirationTime);
+		}
+		jwt.payload.putItem(g_field_clientId, payload.clientId);
+		jwt.payload.putItem(g_field_user, payload.user);
+		if (payload.scopes.isNotEmpty()) {
+			jwt.payload.putItem(g_field_scope, StringBuffer::join(g_string_space, payload.scopes));
+		}
+		return encrypt(jwt);
+	}
+
+	OAuthServerWithJwt::TokenType OAuthServerWithJwt::parseToken(const String& token, OAuthTokenPayload& payload)
+	{
+		Jwt jwt;
+		jwt.setAlgorithm(getAlgorithm());
+		if (decrypt(token, jwt)) {
+			String strType = jwt.payload.getItem(g_field_tokenType).getString();
+			payload.clientId = jwt.payload.getItem(g_field_clientId).getString();
+			payload.user = jwt.payload.getItem(g_field_user);
+			payload.scopes = jwt.payload.getItem(g_field_scope).getString().split(g_string_space);
+			if (strType == g_tokenType_access) {
+				payload.accessTokenExpirationTime = jwt.getExpirationTime();
+				return TokenType::Access;
+			} else if (strType == g_tokenType_refresh) {
+				payload.refreshTokenExpirationTime = jwt.getExpirationTime();
+				return TokenType::Refresh;
+			} else if (strType == g_tokenType_code) {
+				payload.authorizationCodeExpirationTime = jwt.getExpirationTime();
+				payload.redirectUri = jwt.payload.getItem(g_field_redirectUri).getString();
+				payload.codeChallenge = jwt.payload.getItem(g_field_codeChallenge).getString();
+				payload.codeChallengeMethod = (OAuthCodeChallengeMethod)(jwt.payload.getItem(g_field_codeChallengeMode).getUint32());
+				return TokenType::AuthorizationCode;
+			}
+		}
+		return TokenType::None;
+	}
+
+	String OAuthServerWithJwt::encrypt(const Jwt& jwt)
+	{
+		return jwt.encode(getMasterKey());
+	}
+
+	sl_bool OAuthServerWithJwt::decrypt(const String& str, Jwt& jwt)
+	{
+		return jwt.decode(getMasterKey(), str);
 	}
 
 }

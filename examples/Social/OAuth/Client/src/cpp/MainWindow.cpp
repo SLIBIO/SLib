@@ -50,7 +50,8 @@ void MainWindow::onCreate()
 		
 		if (grantType == "implicit" || grantType == "code") {
 			OAuthLoginParam loginParam;
-			loginParam.authorization.grantType = grantType == "code" ? OAuthGrantType::Code : OAuthGrantType::Token;
+			loginParam.authorization.responseType = grantType == "code" ? OAuthResponseType::Code : OAuthResponseType::Token;
+			loginParam.authorization.codeVerifier = txtVerifier->getText();
 			loginParam.authorization.scopes = scopes;
 			loginParam.dialogOptions.width = 800;
 			loginParam.dialogOptions.height = 600;
@@ -106,10 +107,11 @@ void MainWindow::onCreate()
 			return;
 		}
 		String redirectUri = txtRedirectUri->getText();
+		String codeVerifier = txtVerifier->getText();
 		List<String> scopes = txtScopes->getText().split(",");
 		Ref<OAuth2> oauth = new OAuth2(param);
 		auto ref = ToRef(this);
-		oauth->requestAccessTokenFromCode(code, redirectUri, scopes, [ref, this](OAuthAccessTokenResult& result) {
+		oauth->requestAccessTokenFromCode(code, redirectUri, codeVerifier, scopes, [ref, this](OAuthAccessTokenResult& result) {
 			txtAccessToken->setText(result.accessToken.token);
 			txtRefreshToken->setText(result.accessToken.refreshToken);
 			txtResponse->setText(result.response.toJsonString());

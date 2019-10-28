@@ -85,7 +85,7 @@ namespace slib
 		accessTokenUrl = "https://www.linkedin.com/oauth/v2/accessToken";
 		defaultScopes.add_NoLock("r_liteprofile");
 		defaultScopes.add_NoLock("r_emailaddress");
-		flagSupportTokenGrantType = sl_false;
+		flagSupportImplicitGrantType = sl_false;
 	}
 	
 	SLIB_DEFINE_OBJECT(Linkedin, OAuth2)

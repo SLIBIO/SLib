@@ -300,11 +300,27 @@ namespace slib
 
 	};
 	
-	
+
 	enum class OAuthGrantType
+	{
+		None = 0,
+		Implicit = 1,
+		AuthorizationCode = 2,
+		ClientCredentials = 3,
+		Password = 4,
+		RefreshToken = 5
+	};
+
+	enum class OAuthResponseType
 	{
 		Token = 0,
 		Code = 1
+	};
+
+	enum class OAuthCodeChallengeMethod
+	{
+		Plain = 0,
+		S256 = 1 // SHA256
 	};
 	
 	enum class OAuthErrorCode
@@ -348,7 +364,7 @@ namespace slib
 		
 		sl_bool isValid(const List<String>& requiredScopes) const;
 		
-		void setResponse(const HashMap<String, String>& params);
+		void setResponse(const Json& json);
 		
 	};
 	
@@ -356,10 +372,15 @@ namespace slib
 	{
 	public:
 		String clientId;
-		OAuthGrantType grantType;
+		OAuthResponseType responseType;
 		List<String> scopes;
 		String state;
 		String redirectUri; // If empty, uses instance's `redirectUri` attribute
+		
+		String codeVerifier;
+		String codeChallenge;
+		OAuthCodeChallengeMethod codeChallengeMethod;
+		
 		HashMap<String, Variant> customParameters;
 		
 	public:
@@ -379,14 +400,18 @@ namespace slib
 		String errorUri;
 		OAuthErrorCode errorCode;
 		
+		Json response;
+		
 	public:
 		OAuthResult();
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(OAuthResult)
 		
 	public:
-		void setResponse(const HashMap<String, String>& params);
+		void setResponse(const Json& json);
 		
+		void setResult(UrlRequest* req);
+
 	};
 	
 	class SLIB_EXPORT OAuthAccessTokenResult : public OAuthResult
@@ -394,15 +419,13 @@ namespace slib
 	public:
 		OAuthAccessToken accessToken;
 
-		Json response;
-		
 	public:
 		OAuthAccessTokenResult();
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(OAuthAccessTokenResult)
 
 	public:
-		void setResponse(const Json& response);
+		void setResult(UrlRequest* req);
 
 	};
 	
@@ -463,7 +486,7 @@ namespace slib
 		String redirectUri;
 		String loginRedirectUri;
 		List<String> defaultScopes;
-		sl_bool flagSupportTokenGrantType;
+		sl_bool flagSupportImplicitGrantType;
 		
 		String preferenceName;
 		
@@ -509,14 +532,17 @@ namespace slib
 		
 		String getLoginUrl(const OAuthAuthorizationRequestParam& param);
 
-		String getLoginUrl(OAuthGrantType grantType, const List<String>& scopes = List<String>::null(), const String& state = String::null());
+		String getLoginUrl(OAuthResponseType type, const List<String>& scopes = List<String>::null(), const String& state = String::null());
 
 		String getLoginUrl(const List<String>& scopes = List<String>::null(), const String& state = String::null());
 
 		void requestAccessToken(HashMap<String, Variant>& params, const Function<void(OAuthAccessTokenResult&)>& onComplete);
 		
 		// grant_type=authorization_code
-		void requestAccessTokenFromCode(const String& code, const String& redirectUri, const List<String>& scopes, const Function<void(OAuthAccessTokenResult&)>& onComplete);
+		void requestAccessTokenFromCode(const String& code, const String& redirectUri, const String& codeVerifier, const List<String>& scopes, const Function<void(OAuthAccessTokenResult&)>& onComplete);
+
+		// grant_type=authorization_code
+		void requestAccessTokenFromCode(const String& code, const String& redirectUri, const String& codeVerifier, const Function<void(OAuthAccessTokenResult&)>& onComplete);
 		
 		// grant_type=authorization_code
 		void requestAccessTokenFromCode(const String& code, const String& redirectUri, const Function<void(OAuthAccessTokenResult&)>& onComplete);
@@ -546,6 +572,11 @@ namespace slib
 		
 		void login(const Function<void(OAuthLoginResult& result)>& onComplete);
 		
+		
+		static sl_bool checkCodeVerifier(const String& str);
+		
+		static String generateCodeChallenge(const String& verifier, OAuthCodeChallengeMethod method);
+		
 	protected:
 		void logUrlRequestError(UrlRequest* request);
 		
@@ -567,7 +598,7 @@ namespace slib
 		String m_redirectUri;
 		String m_loginRedirectUri;
 		List<String> m_defaultScopes;
-		sl_bool m_flagSupportTokenGrantType;
+		sl_bool m_flagSupportImplicitGrantType;
 		
 		sl_bool m_flagLogErrors;
 		

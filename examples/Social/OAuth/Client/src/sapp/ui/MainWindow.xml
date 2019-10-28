@@ -163,6 +163,7 @@
 						/>
 				</hlinear>
 			</row>
+			<row height='20sp'/>
 			<row>
 				<label
 					text='Authorization Code'
@@ -173,12 +174,16 @@
 						name='txtAuthCode'
 						style='input'
 						/>
-					<button
-						name='btnGetToken'
-						style='button'
-						text='Get Token'
-						width='150dp'
-						centerVertical='true'
+					<label
+						text='Verifier'
+						style='label'
+						marginLeft='10sp'
+						marginRight='5sp'						
+						/>
+					<edit
+						name='txtVerifier'
+						style='input'
+						width='150sp'
 						/>
 				</hlinear>
 			</row>
@@ -187,10 +192,19 @@
 					text='Access Token'
 					style='label'
 					/>
-				<edit
-					name='txtAccessToken'
-					style='input'
-					/>
+				<hlinear width='*'>
+					<edit
+						name='txtAccessToken'
+						style='input'
+						/>
+					<button
+						name='btnGetToken'
+						style='button'
+						text='Get Token'
+						width='150dp'
+						centerVertical='true'
+						/>
+				</hlinear>
 			</row>
 			<row>
 				<label
