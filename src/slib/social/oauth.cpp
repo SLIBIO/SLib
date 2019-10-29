@@ -529,14 +529,7 @@ namespace slib
 
 	void OAuthResult::setResult(UrlRequest* req)
 	{
-		if (req->getResponseHeader(HttpHeaders::ContentType).equalsIgnoreCase(ContentTypes::WebForm)) {
-			setResponse(HttpRequest::parseFormUrlEncoded(req->getResponseContentAsString()));
-		} else {
-			JsonParseParam param;
-			param.flagLogError = sl_false;
-			Json json = Json::parseJson(req->getResponseContentAsString(), param);
-			setResponse(json);
-		}
+		setResponse(req->getResponseContentAsJson());
 	}
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(OAuthAccessTokenResult)

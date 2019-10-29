@@ -161,7 +161,7 @@ namespace slib
 
 		sl_bool validateAccessToken(HttpServerContext* context, OAuthTokenPayload& payload);
 
-		static void respondError(HttpServerContext* context, HttpStatus status, OAuthErrorCode err, const String& errorDescription = String::null(), const String& errorUri = String::null(), const String& state = String::null());
+		static void respondError(HttpServerContext* context, OAuthErrorCode err, const String& errorDescription = String::null(), const String& errorUri = String::null(), const String& state = String::null());
 
 	public:
 		virtual Ref<OAuthClientEntity> getClientEntity(const String& clientId);

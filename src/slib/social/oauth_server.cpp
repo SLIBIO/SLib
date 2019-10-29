@@ -308,7 +308,7 @@ namespace slib
 			}
 			context->setResponseRedirect(request.redirectUri, params);
 		} else {
-			respondError(context, HttpStatus::BadRequest, err, errorDescription, errorUri, request.state);
+			respondError(context, err, errorDescription, errorUri, request.state);
 		}
 	}
 
@@ -320,21 +320,21 @@ namespace slib
 		List<String> scopes = context->getParameter("scope").split(" ");
 		
 		if (clientId.isEmpty()) {
-			respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "client_id is not found");
+			respondError(context, OAuthErrorCode::InvalidRequest, "client_id is not found");
 			return;
 		}
 		Ref<OAuthClientEntity> refClient = getClientEntity(clientId);
 		OAuthClientEntity* client = refClient.get();
 		if (!client) {
-			respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidClient, "Client entity is not found");
+			respondError(context, OAuthErrorCode::InvalidClient, "Client entity is not found");
 			return;
 		}
 		if (clientSecret.isEmpty() || !(validateClientSecret(client, clientSecret))) {
-			respondError(context, HttpStatus::Unauthorized, OAuthErrorCode::InvalidClient, "Client authentication failed");
+			respondError(context, OAuthErrorCode::InvalidClient, "Client authentication failed");
 			return;
 		}
 		if (!(validateScopes(client, scopes))) {
-			respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidScope);
+			respondError(context, OAuthErrorCode::InvalidScope);
 			return;
 		}
 
@@ -345,20 +345,20 @@ namespace slib
 		if (grantType == "authorization_code") {
 
 			if (!(isSupportAuthorizationCodeGrant())) {
-				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::UnsupportedGrantType);
+				respondError(context, OAuthErrorCode::UnsupportedGrantType);
 				return;
 			}
 
 			String code = context->getParameter("code");
 			if (code.isEmpty()) {
-				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "Authorization code is not found");
+				respondError(context, OAuthErrorCode::InvalidRequest, "Authorization code is not found");
 				return;
 			}
 
 			Ref<OAuthTokenRepository> repo = getAuthorizationCodeRepository();
 			if (repo.isNotNull()) {
 				if (!(repo->isValid(code))) {
-					respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "Authorization code is revoked or invalid");
+					respondError(context, OAuthErrorCode::InvalidRequest, "Authorization code is revoked or invalid");
 					return;
 				}
 			}
@@ -367,27 +367,27 @@ namespace slib
 			payload.authorizationCode = code;
 			
 			if (!(getAuthorizationCodePayload(payload))) {
-				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "Authorization code is invalid");
+				respondError(context, OAuthErrorCode::InvalidRequest, "Authorization code is invalid");
 				return;
 			}
 
 			if (payload.authorizationCodeExpirationTime.isNotZero() && payload.authorizationCodeExpirationTime < Time::now()) {
-				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "Authorization code has expired");
+				respondError(context, OAuthErrorCode::InvalidRequest, "Authorization code has expired");
 				revokeAuthorizationCode(payload);
 				return;
 			}
 			if (payload.clientId != clientId) {
-				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "Authorization code was not issued to this client");
+				respondError(context, OAuthErrorCode::InvalidRequest, "Authorization code was not issued to this client");
 				return;
 			}
 			if (payload.redirectUri != context->getParameter("redirect_uri")) {
-				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "redirect_uri is invalid");
+				respondError(context, OAuthErrorCode::InvalidRequest, "redirect_uri is invalid");
 				return;
 			}
 			ListElements<String> requiredScopes(scopes);
 			for (sl_size i = 0; i < requiredScopes.count; i++) {
 				if (!(payload.scopes.contains(requiredScopes[i]))) {
-					respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidScope);
+					respondError(context, OAuthErrorCode::InvalidScope);
 					return;
 				}
 			}
@@ -395,19 +395,19 @@ namespace slib
 			String codeVerifier = context->getParameter("code_verifier");
 			if (payload.codeChallenge.isNotEmpty() || codeVerifier.isNotEmpty()) {
 				if (codeVerifier.isEmpty()) {
-					respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "code_verifier is not found");
+					respondError(context, OAuthErrorCode::InvalidRequest, "code_verifier is not found");
 					return;
 				}
 				if (payload.codeChallenge.isEmpty()) {
-					respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "Failed to verify code_verifier");
+					respondError(context, OAuthErrorCode::InvalidRequest, "Failed to verify code_verifier");
 					return;
 				}
 				if (!(OAuth2::checkCodeVerifier(codeVerifier))) {
-					respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "code_verifier must follow the specifications of RFC-7636.");
+					respondError(context, OAuthErrorCode::InvalidRequest, "code_verifier must follow the specifications of RFC-7636.");
 					return;
 				}
 				if (payload.codeChallenge != OAuth2::generateCodeChallenge(codeVerifier, payload.codeChallengeMethod)) {
-					respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "Failed to verify code_verifier");
+					respondError(context, OAuthErrorCode::InvalidRequest, "Failed to verify code_verifier");
 					return;
 				}
 
@@ -416,83 +416,83 @@ namespace slib
 		} else if (grantType == "client_credentials") {			
 
 			if (!(isSupportClientCredentialsGrant())) {
-				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::UnsupportedGrantType);
+				respondError(context, OAuthErrorCode::UnsupportedGrantType);
 				return;
 			}
 			payload.grantType = OAuthGrantType::ClientCredentials;
 			if (!(onClientCredentialsGrant(payload))) {
-				respondError(context, HttpStatus::Unauthorized, OAuthErrorCode::AccessDenied);
+				respondError(context, OAuthErrorCode::AccessDenied);
 				return;
 			}
 
 		} else if (grantType == "password") {
 
 			if (!(isSupportPasswordGrant())) {
-				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::UnsupportedGrantType);
+				respondError(context, OAuthErrorCode::UnsupportedGrantType);
 				return;
 			}
 			payload.grantType = OAuthGrantType::Password;
 			String username = context->getParameter("username");
 			if (username.isEmpty()) {
-				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "username is not found");
+				respondError(context, OAuthErrorCode::InvalidRequest, "username is not found");
 				return;
 			}
 			String password = context->getParameter("password");
 			if (password.isEmpty()) {
-				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "password is not found");
+				respondError(context, OAuthErrorCode::InvalidRequest, "password is not found");
 				return;
 			}
 			if (!(onPasswordGrant(username, password, payload))) {
-				respondError(context, HttpStatus::Unauthorized, OAuthErrorCode::AccessDenied, "username or password is not match");
+				respondError(context, OAuthErrorCode::AccessDenied, "username or password is not match");
 				return;
 			}
 
 		} else if (grantType == "refresh_token") {
 			
 			if (!(isSupportRefreshToken())) {
-				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::UnsupportedGrantType);
+				respondError(context, OAuthErrorCode::UnsupportedGrantType);
 				return;
 			}
 
 			payload.grantType = OAuthGrantType::RefreshToken;
 			payload.refreshToken = context->getParameter("refresh_token");
 			if (payload.refreshToken.isEmpty()) {
-				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "refresh_token is not found");
+				respondError(context, OAuthErrorCode::InvalidRequest, "refresh_token is not found");
 				return;
 			}
 
 			Ref<OAuthTokenRepository> repo = getRefreshTokenRepository();
 			if (repo.isNotNull()) {
 				if (!(repo->isValid(payload.refreshToken))) {
-					respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "refresh_token is revoked or invalid");
+					respondError(context, OAuthErrorCode::InvalidRequest, "refresh_token is revoked or invalid");
 					return;
 				}
 			}
 
 			if (!(getRefreshTokenPayload(payload))) {
-				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "refresh_token is invalid");
+				respondError(context, OAuthErrorCode::InvalidRequest, "refresh_token is invalid");
 				return;
 			}
 
 			if (payload.refreshTokenExpirationTime.isNotZero() && payload.refreshTokenExpirationTime < Time::now()) {
-				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "refresh_token has expired");
+				respondError(context, OAuthErrorCode::InvalidRequest, "refresh_token has expired");
 				revokeRefreshToken(payload);
 				return;
 			}
 			if (payload.clientId != clientId) {
-				respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidRequest, "refresh_token was not issued to this client");
+				respondError(context, OAuthErrorCode::InvalidRequest, "refresh_token was not issued to this client");
 				return;
 			}
 			ListElements<String> requiredScopes(scopes);
 			for (sl_size i = 0; i < requiredScopes.count; i++) {
 				if (!(payload.scopes.contains(requiredScopes[i]))) {
-					respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidScope);
+					respondError(context, OAuthErrorCode::InvalidScope);
 					return;
 				}
 			}
 
 		} else {
-			respondError(context, HttpStatus::BadRequest, OAuthErrorCode::InvalidGrant);
+			respondError(context, OAuthErrorCode::InvalidGrant);
 			return;
 		}
 
@@ -502,7 +502,7 @@ namespace slib
 		issueAccessToken(payload);
 
 		if (payload.accessToken.isEmpty()) {
-			respondError(context, HttpStatus::InternalServerError, OAuthErrorCode::ServerError, "Failed to generate access token");
+			respondError(context, OAuthErrorCode::ServerError, "Failed to generate access token");
 			return;
 		}
 
@@ -537,23 +537,32 @@ namespace slib
 		return sl_false;
 	}
 
-	void OAuthServer::respondError(HttpServerContext* context, HttpStatus status, OAuthErrorCode err, const String& errorDescription, const String& errorUri, const String& state)
+	void OAuthServer::respondError(HttpServerContext* context, OAuthErrorCode err, const String& errorDescription, const String& errorUri, const String& state)
 	{
+		HttpStatus status = HttpStatus::BadRequest;
+		if (err == OAuthErrorCode::InvalidClient || err == OAuthErrorCode::UnauthorizedClient || err == OAuthErrorCode::AccessDenied) {
+			status = HttpStatus::Unauthorized;
+		} else if (err == OAuthErrorCode::ServerError) {
+			status = HttpStatus::InternalServerError;
+		} else if (err == OAuthErrorCode::TemporarilyUnavailable) {
+			status = HttpStatus::ServiceUnavailable;
+		}
+		
 		context->setResponseCode(status);
-		context->setResponseContentType(ContentType::WebForm);
+		context->setResponseContentType(ContentType::Json);
 
-		CHashMap<String, String> params;
-		params.add_NoLock("error", getErrorCodeText(err));
+		Json json;
+		json.putItem("error", getErrorCodeText(err));
 		if (errorDescription.isNotEmpty()) {
-			params.add_NoLock("error_description", errorDescription);
+			json.putItem("error_description", errorDescription);
 		}
 		if (errorUri.isNotEmpty()) {
-			params.add_NoLock("error_uri", errorUri);
+			json.putItem("error_uri", errorUri);
 		}
 		if (state.isNotEmpty()) {
-			params.add_NoLock("state", state);
+			json.putItem("state", state);
 		}
-		context->write(HttpRequest::buildFormUrlEncoded(params));
+		context->write(json.toJsonString());
 	}
 
 	Ref<OAuthClientEntity> OAuthServer::getClientEntity(const String& clientId)
