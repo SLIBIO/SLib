@@ -33,7 +33,7 @@
 namespace slib
 {
 
-	class OAuthClientEntity : public Object
+	class SLIB_EXPORT OAuthClientEntity : public Object
 	{
 		SLIB_DECLARE_OBJECT
 		
@@ -54,7 +54,7 @@ namespace slib
 
 	};
 
-	class OAuthTokenPayload
+	class SLIB_EXPORT OAuthTokenPayload
 	{
 	public:
 		OAuthGrantType grantType;
@@ -86,7 +86,7 @@ namespace slib
 		
 	};
 
-	class OAuthTokenRepository : public Object
+	class SLIB_EXPORT OAuthTokenRepository : public Object
 	{
 		SLIB_DECLARE_OBJECT
 		
@@ -106,7 +106,7 @@ namespace slib
 
 	};
 
-	class OAuthTokenMemoryRepository : public OAuthTokenRepository
+	class SLIB_EXPORT OAuthTokenMemoryRepository : public OAuthTokenRepository
 	{
 		SLIB_DECLARE_OBJECT
 		
@@ -129,7 +129,7 @@ namespace slib
 		
 	};
 
-	class OAuthServerAuthorizationRequest : public OAuthAuthorizationRequestParam
+	class SLIB_EXPORT OAuthServerAuthorizationRequest : public OAuthAuthorizationRequestParam
 	{
 	public:
 		Ref<OAuthClientEntity> client;
@@ -141,7 +141,7 @@ namespace slib
 
 	};
 
-	class OAuthServer : public Object
+	class SLIB_EXPORT OAuthServer : public Object
 	{
 		SLIB_DECLARE_OBJECT
 		
@@ -235,7 +235,7 @@ namespace slib
 
 	};
 	
-	class OAuthServerWithJwt : public OAuthServer
+	class SLIB_EXPORT OAuthServerWithJwt : public OAuthServer
 	{
 		SLIB_DECLARE_OBJECT
 
