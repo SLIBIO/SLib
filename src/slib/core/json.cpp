@@ -37,7 +37,7 @@ namespace slib
 	
 	JsonParseParam::JsonParseParam()
 	{
-		flagLogError = sl_true;
+		flagLogError = sl_false;
 		flagSupportComments = sl_true;
 		
 		flagError = sl_false;

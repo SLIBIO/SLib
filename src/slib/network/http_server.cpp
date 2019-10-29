@@ -1040,6 +1040,8 @@ namespace slib
 	
 	sl_bool HttpServerParam::parseJsonFile(const String& filePath)
 	{
+		JsonParseParam param;
+		param.flagLogError = sl_true;
 		Json json = Json::parseJsonFromTextFile(filePath);
 		if (json.isNotNull()) {
 			setJson(json);
