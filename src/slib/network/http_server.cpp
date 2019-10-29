@@ -26,9 +26,10 @@
 #include "slib/core/app.h"
 #include "slib/core/asset.h"
 #include "slib/core/file.h"
-#include "slib/core/log.h"
 #include "slib/core/json.h"
+#include "slib/core/xml.h"
 #include "slib/core/content_type.h"
+#include "slib/core/log.h"
 
 #define SERVER_TAG "HTTP SERVER"
 
@@ -1201,13 +1202,35 @@ namespace slib
 		} else {
 			flagProcessed = sl_true;
 			if (response.isString()) {
+				if (context->getResponseContentType().isNull()) {
+					context->setResponseContentType(ContentTypes::TextHtml_Utf8);
+				}
 				context->write(response.getString());
-			} else if (response.isMemory()) {
-				context->write(response.getMemory());
-			} else if (response.isVariantList() || response.isVariantMapOrVariantHashMap() || response.isVariantMapListOrVariantHashMapList()) {
-				context->write(Json(response).toJsonString());
 			} else {
-				context->write(response.getString());
+				Ref<Referable> ref = response.getObject();
+				if (ref.isNotNull()) {
+					if (IsInstanceOf<CMemory>(ref)) {
+						if (context->getResponseContentType().isNull()) {
+							context->setResponseContentType(ContentTypes::OctetStream);
+						}
+						context->write(Memory((CMemory*)(ref.get())));
+					} else if (IsInstanceOf<XmlDocument>(ref)) {
+						if (context->getResponseContentType().isNull()) {
+							context->setResponseContentType(ContentTypes::TextXml);
+						}
+						context->write(((XmlDocument*)(ref.get()))->toString());
+					} else if (response.isVariantList() || response.isVariantMapOrVariantHashMap() || response.isVariantMapListOrVariantHashMapList()) {
+						if (context->getResponseContentType().isNull()) {
+							context->setResponseContentType(ContentTypes::Json);
+						}
+						context->write(Json(response).toJsonString());
+					}
+				} else {
+					if (context->getResponseContentType().isNull()) {
+						context->setResponseContentType(ContentTypes::TextHtml_Utf8);
+					}
+					context->write(response.getString());
+				}
 			}
 		}
 		if (!flagProcessed) {
