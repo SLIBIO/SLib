@@ -260,6 +260,9 @@ namespace slib
 					} else {
 						handle.cell = [[NSTextFieldCell alloc] init];
 					}
+					if (!(view->isEnabled())) {
+						handle.enabled = NO;
+					}
 					
 					setHandleFont(handle, view->getFont());
 					[handle setStringValue:(Apple::getNSStringFromString(view->getText(), @""))];
