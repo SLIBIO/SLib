@@ -477,6 +477,15 @@ namespace slib
 					runJavaScript(sl_null, "window.slib = {send: slib_send};");
 				}
 
+				void onNavigateError(BSTR szURL)
+				{
+					Ref<WebViewHelper> helper = getHelper();
+					if (helper.isNotNull()) {
+						helper->dispatchStartLoad(szURL);
+						helper->dispatchFinishLoad(szURL, sl_true);
+					}
+				}
+
 				void onDocumentComplete(BSTR szURL)
 				{
 					Ref<WebViewHelper> helper = getHelper();
@@ -876,6 +885,9 @@ namespace slib
 					case DISPID_NAVIGATECOMPLETE2:
 						m_viewInstance->onNavigateComplete(pDispParams->rgvarg[0].pvarVal->bstrVal);
 						break;
+					case DISPID_NAVIGATEERROR:
+						m_viewInstance->onNavigateError(pDispParams->rgvarg[3].pvarVal->bstrVal);
+						break;
 					case DISPID_DOCUMENTCOMPLETE:
 						m_viewInstance->onDocumentComplete(pDispParams->rgvarg[0].pvarVal->bstrVal);
 						break;
@@ -897,17 +909,25 @@ namespace slib
 				m_oleClient->m_viewInstance = this;
 			}
 
+			void WebViewInstanceReleaser(HWND hWnd, IWebBrowser2* browser, IOleObject* control, OleClient* client)
+			{
+				if (hWnd) {
+					DestroyWindow(hWnd);
+				}
+				if (browser) {
+					browser->Quit();
+					SLIB_WIN32_COM_SAFE_RELEASE(browser);
+				}
+				if (control) {
+					control->Close(OLECLOSE_NOSAVE);
+					SLIB_WIN32_COM_SAFE_RELEASE(control);
+				}
+				delete client;
+			}
+
 			WebViewInstance::~WebViewInstance()
 			{
-				if (m_browser) {
-					m_browser->Quit();
-					SLIB_WIN32_COM_SAFE_RELEASE(m_browser);
-				}
-				if (m_control) {
-					m_control->Close(OLECLOSE_NOSAVE);
-					SLIB_WIN32_COM_SAFE_RELEASE(m_control);
-				}
-				delete m_oleClient;
+				UI::dispatchToUiThread(Function<void()>::bind(&WebViewInstanceReleaser, m_handle, m_browser, m_control, m_oleClient));
 			}
 
 			sl_bool WebViewInstance::prepare(WebView* view)
