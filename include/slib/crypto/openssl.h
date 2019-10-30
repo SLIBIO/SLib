@@ -32,9 +32,72 @@
 
 struct ssl_ctx_st;
 struct ssl_st;
+struct evp_pkey_st;
 
 namespace slib
 {
+
+	class SLIB_EXPORT OpenSSL_Key: public Object
+	{
+		SLIB_DECLARE_OBJECT
+		
+	public:
+		OpenSSL_Key();
+		
+		~OpenSSL_Key();
+		
+	public:
+		static Ref<OpenSSL_Key> createPublicKey(const String& pem);
+		
+		static Ref<OpenSSL_Key> createPrivateKey(const String& pem);
+		
+	public:
+		SLIB_INLINE evp_pkey_st* get_EVP_PKEY()
+		{
+			return m_key;
+		}
+		
+		Memory sign_RSA_SHA256(const void* data, sl_size sizeData);
+		
+		sl_bool verify_RSA_SHA256(const void* data, sl_size sizeData, const void* signature, sl_uint32 sizeSignature);
+
+		Memory sign_RSA_SHA384(const void* data, sl_size sizeData);
+		
+		sl_bool verify_RSA_SHA384(const void* data, sl_size sizeData, const void* signature, sl_uint32 sizeSignature);
+
+		Memory sign_RSA_SHA512(const void* data, sl_size sizeData);
+		
+		sl_bool verify_RSA_SHA512(const void* data, sl_size sizeData, const void* signature, sl_uint32 sizeSignature);
+		
+		Memory sign_RSA_PSS_SHA256(const void* data, sl_size sizeData);
+		
+		sl_bool verify_RSA_PSS_SHA256(const void* data, sl_size sizeData, const void* signature, sl_uint32 sizeSignature);
+
+		Memory sign_RSA_PSS_SHA384(const void* data, sl_size sizeData);
+		
+		sl_bool verify_RSA_PSS_SHA384(const void* data, sl_size sizeData, const void* signature, sl_uint32 sizeSignature);
+
+		Memory sign_RSA_PSS_SHA512(const void* data, sl_size sizeData);
+		
+		sl_bool verify_RSA_PSS_SHA512(const void* data, sl_size sizeData, const void* signature, sl_uint32 sizeSignature);
+
+
+		Memory sign_ECDSA_SHA256(const void* data, sl_size sizeData);
+		
+		sl_bool verify_ECDSA_SHA256(const void* data, sl_size sizeData, const void* signature, sl_uint32 sizeSignature);
+		
+		Memory sign_ECDSA_SHA384(const void* data, sl_size sizeData);
+		
+		sl_bool verify_ECDSA_SHA384(const void* data, sl_size sizeData, const void* signature, sl_uint32 sizeSignature);
+		
+		Memory sign_ECDSA_SHA512(const void* data, sl_size sizeData);
+		
+		sl_bool verify_ECDSA_SHA512(const void* data, sl_size sizeData, const void* signature, sl_uint32 sizeSignature);
+		
+	private:
+		evp_pkey_st* m_key;
+		
+	};
 	
 	class SLIB_EXPORT OpenSSL_Context : public TlsContext
 	{
@@ -241,7 +304,7 @@ namespace slib
 		static sl_bool verify_ECDSA_SHA256_secp256k1(const ECPublicKey& key, const void* data, sl_size size, const ECDSA_Signature& signature);
 		
 		static BigInt getSharedKey_ECDH_secp256k1(const ECPrivateKey& keyLocal, const ECPublicKey& keyRemote);
-
+		
 	};
 
 }
