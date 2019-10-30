@@ -1315,6 +1315,7 @@
 		26D9D9F21E964693005F7BD3 /* web_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26912BC21DEA81D5008C5FFD /* web_service.cpp */; };
 		26D9D9F41E968240005F7BD3 /* http_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D9D9F31E968240005F7BD3 /* http_io.cpp */; };
 		26DA4B39223980B500706393 /* media_player_ffmpeg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26DA4B38223980B500706393 /* media_player_ffmpeg.cpp */; };
+		26DF6FBB2369E1FB009C1339 /* openssl_chacha_poly1305.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26DF6FBA2369E1FB009C1339 /* openssl_chacha_poly1305.cpp */; };
 		26E1ADB623688B7E002BF6B8 /* jwt_openssl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E1ADB523688B7E002BF6B8 /* jwt_openssl.cpp */; };
 		26E1B858222841AC007C222E /* pinterest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E1B857222841AB007C222E /* pinterest.cpp */; };
 		26E1B85C22291D54007C222E /* ebay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E1B85B22291D53007C222E /* ebay.cpp */; };
@@ -2869,6 +2870,7 @@
 		26D9D9F31E968240005F7BD3 /* http_io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_io.cpp; sourceTree = "<group>"; };
 		26DA34F91C4B47CF004DC204 /* video_frame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_frame.cpp; sourceTree = "<group>"; };
 		26DA4B38223980B500706393 /* media_player_ffmpeg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = media_player_ffmpeg.cpp; sourceTree = "<group>"; };
+		26DF6FBA2369E1FB009C1339 /* openssl_chacha_poly1305.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = openssl_chacha_poly1305.cpp; sourceTree = "<group>"; };
 		26E1ADB523688B7E002BF6B8 /* jwt_openssl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jwt_openssl.cpp; sourceTree = "<group>"; };
 		26E1B857222841AB007C222E /* pinterest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pinterest.cpp; path = social/pinterest.cpp; sourceTree = "<group>"; };
 		26E1B85B22291D53007C222E /* ebay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ebay.cpp; path = social/ebay.cpp; sourceTree = "<group>"; };
@@ -5346,6 +5348,7 @@
 				266DD45D1C11930800D47AB0 /* md5.cpp */,
 				26BAE0302223CEC60085B5AB /* openssl.cpp */,
 				269308652368DE7D00C9C7F9 /* openssl_crypto.cpp */,
+				26DF6FBA2369E1FB009C1339 /* openssl_chacha_poly1305.cpp */,
 				26A3DA91228AFDDE0031CBDA /* poly1305.cpp */,
 				26A3DA892289ED9B0031CBDA /* rc4.cpp */,
 				266DD45E1C11930800D47AB0 /* rsa.cpp */,
@@ -6920,6 +6923,7 @@
 				26D9D8FD1E9645CE005F7BD3 /* animation.cpp in Sources */,
 				26D9D95E1E964662005F7BD3 /* geo_rectangle.cpp in Sources */,
 				26D9D9B81E96468D005F7BD3 /* check_box_macos.mm in Sources */,
+				26DF6FBB2369E1FB009C1339 /* openssl_chacha_poly1305.cpp in Sources */,
 				26C795BD2215F9C70053C5A1 /* menus.cpp in Sources */,
 				26D9D9731E96466A005F7BD3 /* graphics_text.cpp in Sources */,
 				26D9D9941E96467B005F7BD3 /* ethernet.cpp in Sources */,

@@ -140,6 +140,7 @@ set (SLIB_CORE_FILES
  "${SLIB_PATH}/src/slib/crypto/md5.cpp"
  "${SLIB_PATH}/src/slib/crypto/openssl.cpp"
  "${SLIB_PATH}/src/slib/crypto/openssl_crypto.cpp"
+ "${SLIB_PATH}/src/slib/crypto/openssl_chacha_poly1305.cpp"
  "${SLIB_PATH}/src/slib/crypto/poly1305.cpp"
  "${SLIB_PATH}/src/slib/crypto/rc4.cpp"
  "${SLIB_PATH}/src/slib/crypto/rsa.cpp"
