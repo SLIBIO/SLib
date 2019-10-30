@@ -25,6 +25,8 @@
 
 #include "definition.h"
 
+#include "openssl.h"
+
 #include "../core/json.h"
 
 /*
@@ -72,6 +74,14 @@ namespace slib
 		
 		String generateSignature(const Memory& secret, const void* data, sl_size size) const noexcept;
 		
+		String encode_OpenSSL(const Ref<OpenSSL_Key>& key) const noexcept;
+		
+		sl_bool decode_OpenSSL(const Ref<OpenSSL_Key>& key, const String& token) noexcept;
+		
+		String generateSignature_OpenSSL(const Ref<OpenSSL_Key>& key, const void* data, sl_size size) const noexcept;
+		
+		sl_bool verifySignature_OpenSSL(const Ref<OpenSSL_Key>& key, const String& signature, const void* data, sl_size size) const noexcept;
+		
 		// header
 	public:
 		String getType() const noexcept;
@@ -106,6 +116,9 @@ namespace slib
 		String getId() const noexcept;
 		void setId(const String& value) noexcept;
 
+	private:		
+		sl_size _decode(const String& token, String& signature) noexcept;
+		
 	};
 
 }

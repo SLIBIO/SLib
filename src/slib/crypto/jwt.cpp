@@ -90,17 +90,17 @@ namespace slib
 			return content;
 		}
 	}
-	
-	sl_bool Jwt::decode(const Memory& secret, const String& token) noexcept
+
+	sl_size Jwt::_decode(const String& token, String& signature) noexcept
 	{
 		sl_reg pos1 = token.indexOf('.');
 		if (pos1 < 0) {
-			return sl_false;
+			return 0;
 		}
 		String s1, s2, s3;
 		sl_reg pos2 = token.indexOf('.', pos1 + 1);
 		if (pos2 < 0) {
-			return sl_false;
+			return 0;
 		}
 		s1 = token.substring(0, pos1);
 		s2 = token.substring(pos1 + 1, pos2);
@@ -108,29 +108,40 @@ namespace slib
 		if (s1.isNotEmpty()) {
 			Memory mem = Base64::decode(s1);
 			if (mem.isNull()) {
-				return sl_false;
+				return 0;
 			}
 			JsonParseParam pp;
 			header = Json::parseJson(String::fromUtf8(mem), pp);
 			if (pp.flagError) {
-				return sl_false;
+				return 0;
 			}
 		}
 		if (s2.isNotEmpty()) {
 			Memory mem = Base64::decode(s2);
 			if (mem.isNull()) {
-				return sl_false;
+				return 0;
 			}
 			JsonParseParam pp;
 			payload = Json::parseJson(String::fromUtf8(mem), pp);
 			if (pp.flagError) {
-				return sl_false;
+				return 0;
 			}
 		}
 		if (s3.isEmpty()) {
-			return sl_false;
+			return 0;
 		}
-		return s3 == generateSignature(secret, token.getData(), pos2);
+		signature = Move(s3);
+		return pos2;
+	}
+
+	sl_bool Jwt::decode(const Memory& secret, const String& token) noexcept
+	{
+		String signature;
+		sl_size n = _decode(token, signature);
+		if (n) {
+			return signature == generateSignature(secret, token.getData(), n);
+		}
+		return sl_false;
 	}
 	
 	String Jwt::generateSignature(const Memory& secret, const void* data, sl_size size) const noexcept
