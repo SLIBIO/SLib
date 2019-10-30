@@ -82,9 +82,17 @@ namespace slib
 		return m_requestBody;
 	}
 
-	Variant HttpServerContext::getRequestBodyAsJson() const
+	Json HttpServerContext::getRequestBodyAsJson() const
 	{
 		return Json::parseJson16Utf8(m_requestBody);
+	}
+
+	void HttpServerContext::applyRequestBodyAsFormUrlEncoded()
+	{
+		Memory body = getRequestBody();
+		if (body.isNotNull()) {
+			applyFormUrlEncoded(body.getData(), body.getSize());
+		}
 	}
 
 	sl_uint64 HttpServerContext::getResponseContentLength() const

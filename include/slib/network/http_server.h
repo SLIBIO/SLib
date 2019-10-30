@@ -57,7 +57,9 @@ namespace slib
 		
 		Memory getRequestBody() const;
 		
-		Variant getRequestBodyAsJson() const;
+		Json getRequestBodyAsJson() const;
+		
+		void applyRequestBodyAsFormUrlEncoded();
 		
 		sl_uint64 getResponseContentLength() const;
 		

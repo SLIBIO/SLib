@@ -86,13 +86,13 @@ namespace slib
 						if (requestHeaders.getValue(HttpHeaders::ContentType).compareIgnoreCase(ContentTypes::toString(ContentType::Json)) == 0) {
 							requestBody = varBody.toJsonString().toMemory();
 						} else {
-							setRequestBodyAsMap(Map<String, Variant>(map));
+							setFormData(Map<String, Variant>(map));
 						}
 					} else if (CHashMap<String, Variant>* hashMap = CastInstance< CHashMap<String, Variant> >(obj.get())) {
 						if (requestHeaders.getValue(HttpHeaders::ContentType).compareIgnoreCase(ContentTypes::toString(ContentType::Json)) == 0) {
 							requestBody = varBody.toJsonString().toMemory();
 						} else {
-							setRequestBodyAsMap(HashMap<String, Variant>(hashMap));
+							setFormData(HashMap<String, Variant>(hashMap));
 						}
 					} else if (IsInstanceOf< CList<Variant> >(obj.get()) || IsInstanceOf< CList< HashMap<String, Json> > >(obj.get()) || IsInstanceOf< CList< Map<String, Json> > >(obj.get())) {
 						requestBody = varBody.toJsonString().toMemory();

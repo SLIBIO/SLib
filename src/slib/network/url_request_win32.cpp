@@ -88,8 +88,8 @@ namespace slib
 					lastConnectionId = 0;
 					lastTaskId = 0;
 					
-					hInternet = ::WinHttpOpen(L"Windows Client", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, NULL, NULL, WINHTTP_FLAG_ASYNC);
-					::WinHttpSetStatusCallback(hInternet, callback,
+					hInternet = WinHttpOpen(L"Windows Client", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, NULL, NULL, WINHTTP_FLAG_ASYNC);
+					WinHttpSetStatusCallback(hInternet, callback,
 						WINHTTP_CALLBACK_STATUS_REQUEST_ERROR |
 						WINHTTP_CALLBACK_STATUS_SENDREQUEST_COMPLETE |
 						WINHTTP_CALLBACK_STATUS_HEADERS_AVAILABLE |
@@ -100,8 +100,8 @@ namespace slib
 
 				~Session()
 				{
-					::WinHttpSetStatusCallback(hInternet, NULL, 0, NULL);
-					::WinHttpCloseHandle(hInternet);
+					WinHttpSetStatusCallback(hInternet, NULL, 0, NULL);
+					WinHttpCloseHandle(hInternet);
 				}
 
 				Ref<Connection> getConnection(const String& url, String16& outPath)
@@ -114,7 +114,7 @@ namespace slib
 					comps.dwUserNameLength = lenURL;
 					comps.dwPasswordLength = lenURL;
 					comps.dwUrlPathLength = lenURL;
-					if (::WinHttpCrackUrl((LPCWSTR)(urlBuffer.getData()), lenURL, 0, &comps)) {
+					if (WinHttpCrackUrl((LPCWSTR)(urlBuffer.getData()), lenURL, 0, &comps)) {
 						if (comps.lpszHostName && (comps.nScheme == INTERNET_SCHEME_HTTP || comps.nScheme == INTERNET_SCHEME_HTTPS)) {
 							if (comps.lpszUrlPath && *(comps.lpszUrlPath)) {
 								outPath = comps.lpszUrlPath;
@@ -145,17 +145,17 @@ namespace slib
 								comps.lpszPassword[comps.dwPasswordLength] = 0;
 							}
 							sl_int32 connectionId = Base::interlockedIncrement32(&(lastConnectionId)) & 0x7FFFFFFF;
-							HINTERNET hConnect = ::WinHttpConnect(hInternet, comps.lpszHostName, comps.nPort, 0);					
+							HINTERNET hConnect = WinHttpConnect(hInternet, comps.lpszHostName, comps.nPort, 0);					
 							if (hConnect) {
 								Ref<Connection> ret = new Connection(hConnect, connectionId, address, comps.nScheme == INTERNET_SCHEME_HTTPS);
 								if (ret.isNotNull()) {
 									if (comps.lpszUserName || comps.lpszPassword) {
-										::WinHttpSetCredentials(hConnect, WINHTTP_AUTH_TARGET_SERVER, WINHTTP_AUTH_SCHEME_BASIC, comps.lpszUserName, comps.lpszPassword, NULL);
+										WinHttpSetCredentials(hConnect, WINHTTP_AUTH_TARGET_SERVER, WINHTTP_AUTH_SCHEME_BASIC, comps.lpszUserName, comps.lpszPassword, NULL);
 									}
 									connections.put(connectionId, ret);
 									return ret;
 								}
-								::WinHttpCloseHandle(hConnect);
+								WinHttpCloseHandle(hConnect);
 							}
 						}
 					}
@@ -237,16 +237,16 @@ namespace slib
 								ret->m_taskId = taskId;
 								ret->m_fileDownload = fileDownload;
 								session->requests.put(taskId, ret);
-								HINTERNET hRequest = ::WinHttpOpenRequest(connection->hConnect, (LPCWSTR)(verb.getData()), (LPCWSTR)(path.getData()), NULL, NULL, NULL, flags);
+								HINTERNET hRequest = WinHttpOpenRequest(connection->hConnect, (LPCWSTR)(verb.getData()), (LPCWSTR)(path.getData()), NULL, NULL, NULL, flags);
 								if (hRequest) {
-									::WinHttpSetTimeouts(hRequest, param.timeout, param.timeout, param.timeout, param.timeout);
+									WinHttpSetTimeouts(hRequest, param.timeout, param.timeout, param.timeout, param.timeout);
 									if (connection->flagHttps && param.flagAllowInsecureConnection) {
 										DWORD dwFlags =
 											SECURITY_FLAG_IGNORE_UNKNOWN_CA |
 											SECURITY_FLAG_IGNORE_CERT_WRONG_USAGE |
 											SECURITY_FLAG_IGNORE_CERT_CN_INVALID |
 											SECURITY_FLAG_IGNORE_CERT_DATE_INVALID;
-										::WinHttpSetOption(hRequest, WINHTTP_OPTION_SECURITY_FLAGS, &dwFlags, sizeof(dwFlags));
+										WinHttpSetOption(hRequest, WINHTTP_OPTION_SECURITY_FLAGS, &dwFlags, sizeof(dwFlags));
 									}
 									ret->m_hRequest = hRequest;
 									return ret;
@@ -273,7 +273,7 @@ namespace slib
 				void clean()
 				{
 					if (m_hRequest) {
-						::WinHttpCloseHandle(m_hRequest);
+						WinHttpCloseHandle(m_hRequest);
 						m_hRequest = NULL;
 						Ref<Session> session = getSession();
 						if (session.isNotNull()) {
@@ -292,14 +292,14 @@ namespace slib
 					{
 						for (auto& pair : m_requestHeaders) {
 							String16 line = String16::format("%s: %s\r\n", pair.key, pair.value);
-							::WinHttpAddRequestHeaders(m_hRequest, (LPCWSTR)(line.getData()), (DWORD)(line.getLength()), WINHTTP_ADDREQ_FLAG_ADD);
+							WinHttpAddRequestHeaders(m_hRequest, (LPCWSTR)(line.getData()), (DWORD)(line.getLength()), WINHTTP_ADDREQ_FLAG_ADD);
 						}
 					}
 
 					Memory body = m_requestBody;
 
 					m_step = STEP_SENDING_REQUEST;
-					if (!(::WinHttpSendRequest(m_hRequest, NULL, 0, body.getData(), (DWORD)(body.getSize()), (DWORD)(body.getSize()), (DWORD_PTR)m_taskId))) {
+					if (!(WinHttpSendRequest(m_hRequest, NULL, 0, body.getData(), (DWORD)(body.getSize()), (DWORD)(body.getSize()), (DWORD_PTR)m_taskId))) {
 						processLastError();
 					}
 				}
@@ -310,7 +310,7 @@ namespace slib
 					onUploadBody(m_sizeBodySent);
 
 					m_step = STEP_RECEIVING_RESPONSE;
-					if (!(::WinHttpReceiveResponse(m_hRequest, NULL))) {
+					if (!(WinHttpReceiveResponse(m_hRequest, NULL))) {
 						processLastError();
 					}
 				}
@@ -319,7 +319,7 @@ namespace slib
 				{
 					DWORD status = 0;
 					DWORD len = 4;
-					if (!(::WinHttpQueryHeaders(m_hRequest, WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER, NULL, &status, &len, NULL))) {
+					if (!(WinHttpQueryHeaders(m_hRequest, WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER, NULL, &status, &len, NULL))) {
 						processLastError();
 						return;
 					}
@@ -328,9 +328,9 @@ namespace slib
 					m_sizeContentTotal = SLIB_UINT64_MAX;
 
 					len = 0;
-					::WinHttpQueryHeaders(m_hRequest, WINHTTP_QUERY_RAW_HEADERS_CRLF, NULL, NULL, &len, NULL);
+					WinHttpQueryHeaders(m_hRequest, WINHTTP_QUERY_RAW_HEADERS_CRLF, NULL, NULL, &len, NULL);
 					SLIB_SCOPED_BUFFER(char, 1024, bufHeaders, len);
-					if (!(::WinHttpQueryHeaders(m_hRequest, WINHTTP_QUERY_RAW_HEADERS_CRLF, NULL, bufHeaders, &len, NULL))) {
+					if (!(WinHttpQueryHeaders(m_hRequest, WINHTTP_QUERY_RAW_HEADERS_CRLF, NULL, bufHeaders, &len, NULL))) {
 						processLastError();
 						return;
 					}
@@ -369,7 +369,7 @@ namespace slib
 					if (m_step != STEP_RECEIVING_DATA) {
 						return;
 					}
-					if (!(::WinHttpQueryDataAvailable(m_hRequest, NULL))) {
+					if (!(WinHttpQueryDataAvailable(m_hRequest, NULL))) {
 						processLastError();
 					}
 				}
@@ -388,7 +388,7 @@ namespace slib
 					}
 					m_flagDownloadReading = sl_true;
 					lock.unlock();
-					if (!(::WinHttpQueryDataAvailable(m_hRequest, NULL))) {
+					if (!(WinHttpQueryDataAvailable(m_hRequest, NULL))) {
 						processLastError();
 					}
 				}
@@ -423,7 +423,7 @@ namespace slib
 					if (m_offsetReceiving + size > sizeBuf) {
 						processReadData();
 					}
-					if (!(::WinHttpReadData(m_hRequest, (char*)(m_memReceiving.getData()) + m_offsetReceiving, (DWORD)size, NULL))) {
+					if (!(WinHttpReadData(m_hRequest, (char*)(m_memReceiving.getData()) + m_offsetReceiving, (DWORD)size, NULL))) {
 						processLastError();
 					}
 				}
@@ -558,7 +558,7 @@ namespace slib
 
 				void processLastError()
 				{
-					processErrorCode(::GetLastError());
+					processErrorCode(GetLastError());
 				}
 
 				void processErrorCode(DWORD dwError)
@@ -582,7 +582,7 @@ namespace slib
 
 			Connection::~Connection()
 			{
-				::WinHttpCloseHandle(hConnect);
+				WinHttpCloseHandle(hConnect);
 				Ref<Session> session = UrlRequestImpl::getSession();
 				if (session.isNotNull()) {
 					session->connections.remove(id);
