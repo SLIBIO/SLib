@@ -314,6 +314,9 @@ namespace slib
 
 	void OAuthServer::respondToAccessTokenRequest(HttpServerContext* context)
 	{
+		if (context->getRequestContentType().isEmpty()) {
+			context->applyRequestBodyAsFormUrlEncoded();
+		}
 		String grantType = context->getParameter("grant_type");
 		String clientId = getParameter(context, "client_id");
 		String clientSecret = getParameter(context, "client_secret");

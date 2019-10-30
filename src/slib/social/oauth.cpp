@@ -330,7 +330,7 @@ namespace slib
 		rp.method = m_requestTokenMethod;
 		rp.url = m_requestTokenUrl;
 		if (rp.method == HttpMethod::POST) {
-			rp.setRequestBodyAsMap(param.customParameters);
+			rp.setFormData(param.customParameters);
 		} else {
 			rp.parameters = param.customParameters;
 		}
@@ -781,7 +781,7 @@ namespace slib
 			params.put_NoLock("client_secret", m_clientSecret);
 		}
 		if (rp.method == HttpMethod::POST) {
-			rp.setRequestBodyAsMap(params);
+			rp.setFormData(params);
 		} else {
 			rp.parameters = params;
 		}
