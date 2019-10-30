@@ -108,6 +108,7 @@
 					<edit
 						name='txtUsername'
 						style='input'
+						enabled='false'
 						/>
 					<label
 						text='Password'
@@ -119,6 +120,7 @@
 					<password
 						name='txtPassword'
 						style='input'
+						enabled='false'
 						/>
 				</hlinear>
 			</row>
@@ -291,7 +293,7 @@
 
 	<style
 		name='radio'
-		fontSize='25dp'
+		fontSize='20dp'
 		marginLeft='5sp'
 		nativeWidget='true'
 		centerVertical='true'
