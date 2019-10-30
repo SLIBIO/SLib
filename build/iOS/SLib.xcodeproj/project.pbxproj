@@ -974,6 +974,9 @@
 		26D9D8EE1E962976005F7BD3 /* window_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD42F1C118FB700D47AB0 /* window_ios.mm */; };
 		26D9D9F71E968364005F7BD3 /* http_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D9D9F61E968364005F7BD3 /* http_io.cpp */; };
 		26DA4B50223C22DE00706393 /* media_player_ffmpeg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26DA4B4F223C22DE00706393 /* media_player_ffmpeg.cpp */; };
+		26DF6FB7236975C0009C1339 /* openssl_crypto.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26DF6FB6236975C0009C1339 /* openssl_crypto.cpp */; };
+		26DF6FB9236975CA009C1339 /* oauth_server_openssl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26DF6FB8236975CA009C1339 /* oauth_server_openssl.cpp */; };
+		26E1ADB823688B8F002BF6B8 /* jwt_openssl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E1ADB723688B8F002BF6B8 /* jwt_openssl.cpp */; };
 		26E1B85622283BD3007C222E /* pinterest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E1B85522283BD3007C222E /* pinterest.cpp */; };
 		26E1B85A22290380007C222E /* ebay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E1B85922290380007C222E /* ebay.cpp */; };
 		26E1B8AB222ABBDC007C222E /* adler32.c in Sources */ = {isa = PBXBuildFile; fileRef = 260D833C20C7DB590013B34E /* adler32.c */; };
@@ -2311,6 +2314,9 @@
 		26DA34FC1C4B8B1D004DC204 /* audio_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = audio_data.cpp; path = media/audio_data.cpp; sourceTree = "<group>"; };
 		26DA34FE1C4B8B2D004DC204 /* video_frame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = video_frame.cpp; path = media/video_frame.cpp; sourceTree = "<group>"; };
 		26DA4B4F223C22DE00706393 /* media_player_ffmpeg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = media_player_ffmpeg.cpp; path = media/media_player_ffmpeg.cpp; sourceTree = "<group>"; };
+		26DF6FB6236975C0009C1339 /* openssl_crypto.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = openssl_crypto.cpp; sourceTree = "<group>"; };
+		26DF6FB8236975CA009C1339 /* oauth_server_openssl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = oauth_server_openssl.cpp; sourceTree = "<group>"; };
+		26E1ADB723688B8F002BF6B8 /* jwt_openssl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jwt_openssl.cpp; sourceTree = "<group>"; };
 		26E1B85522283BD3007C222E /* pinterest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pinterest.cpp; sourceTree = "<group>"; };
 		26E1B85922290380007C222E /* ebay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ebay.cpp; sourceTree = "<group>"; };
 		26E44AEA2322F39C00A88D93 /* collection_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = collection_view.cpp; sourceTree = "<group>"; };
@@ -3926,6 +3932,7 @@
 				260B73EE220CAD1C00858EEA /* oauth.cpp */,
 				260B73FB220DCA8D00858EEA /* oauth_ui.cpp */,
 				2644BD0D2364BE5B001B9842 /* oauth_server.cpp */,
+				26DF6FB8236975CA009C1339 /* oauth_server_openssl.cpp */,
 				269E31A62255EAAF005CD0ED /* paypal.cpp */,
 				269E31AA2255F4F2005CD0ED /* paypal_ui.cpp */,
 				26E1B85522283BD3007C222E /* pinterest.cpp */,
@@ -4092,8 +4099,10 @@
 				262ED4E9228DEBEE0029F409 /* ecc.cpp */,
 				266DD37A1C117A3100D47AB0 /* gcm.cpp */,
 				2628EAE221C410CF00D8CD00 /* jwt.cpp */,
+				26E1ADB723688B8F002BF6B8 /* jwt_openssl.cpp */,
 				266DD37B1C117A3100D47AB0 /* md5.cpp */,
 				26BAE02E2223CEB80085B5AB /* openssl.cpp */,
+				26DF6FB6236975C0009C1339 /* openssl_crypto.cpp */,
 				26A3DA93228B43EA0031CBDA /* poly1305.cpp */,
 				26A3DA8B228A03430031CBDA /* rc4.cpp */,
 				266DD37C1C117A3100D47AB0 /* rsa.cpp */,
@@ -5204,6 +5213,7 @@
 				26E1B8F0222ABCDD007C222E /* jfdctflt.c in Sources */,
 				262D59AF2325996700F85780 /* noto_emoji_png.cpp in Sources */,
 				26A3DA94228B43EA0031CBDA /* poly1305.cpp in Sources */,
+				26DF6FB7236975C0009C1339 /* openssl_crypto.cpp in Sources */,
 				26E1B8E0222ABCDD007C222E /* jdarith.c in Sources */,
 				26CF4DF01ED69AD000954B7A /* ui_text.cpp in Sources */,
 				26E1B8F1222ABCDD007C222E /* jfdctfst.c in Sources */,
@@ -5338,6 +5348,7 @@
 				26D9D8C91E962976005F7BD3 /* notification_apns_ios.mm in Sources */,
 				26C7959D221538D90053C5A1 /* clipboard.cpp in Sources */,
 				26D9D8161E9628E0005F7BD3 /* platform_android.cpp in Sources */,
+				26E1ADB823688B8F002BF6B8 /* jwt_openssl.cpp in Sources */,
 				26E1B8B9222ABBDC007C222E /* zutil.c in Sources */,
 				26D9D8171E9628E0005F7BD3 /* async_kqueue.cpp in Sources */,
 				26D9D8CD1E962976005F7BD3 /* radio_button.cpp in Sources */,
@@ -5403,6 +5414,7 @@
 				26C1B64820D51D4300E36539 /* canvas_ext.cpp in Sources */,
 				26072FFC20D8F535004EB272 /* font_quartz.mm in Sources */,
 				26D9D8581E962932005F7BD3 /* sensor_ios.mm in Sources */,
+				26DF6FB9236975CA009C1339 /* oauth_server_openssl.cpp in Sources */,
 				26E1B8B0222ABBDC007C222E /* gzlib.c in Sources */,
 				26D9D8C41E962976005F7BD3 /* list_view.cpp in Sources */,
 				26D9D8291E9628E0005F7BD3 /* bigint.cpp in Sources */,

@@ -243,8 +243,14 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = "$(SLIB_PATH)/include";
-				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/macOS/$(CONFIGURATION)";
-				OTHER_LDFLAGS = "-lslib";
+				LIBRARY_SEARCH_PATHS = (
+					"$(SLIB_PATH)/lib/macOS/$(CONFIGURATION)",
+					"$(SLIB_PATH)/external/bin/OpenSSL/macOS",
+				);
+				OTHER_LDFLAGS = (
+					"-lslib",
+					"-lcrypto",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -254,8 +260,14 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = "$(SLIB_PATH)/include";
-				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/macOS/$(CONFIGURATION)";
-				OTHER_LDFLAGS = "-lslib";
+				LIBRARY_SEARCH_PATHS = (
+					"$(SLIB_PATH)/lib/macOS/$(CONFIGURATION)",
+					"$(SLIB_PATH)/external/bin/OpenSSL/macOS",
+				);
+				OTHER_LDFLAGS = (
+					"-lslib",
+					"-lcrypto",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

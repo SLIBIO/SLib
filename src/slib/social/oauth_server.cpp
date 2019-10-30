@@ -764,6 +764,21 @@ namespace slib
 	{
 	}
 
+	Memory& OAuthServerWithJwt::getMasterKey()
+	{
+		return m_masterKey;
+	}
+
+	void OAuthServerWithJwt::setMasterKey(const Memory& key)
+	{
+		m_masterKey = key;
+	}
+
+	void OAuthServerWithJwt::setMasterKey(const void* key, sl_size len)
+	{
+		m_masterKey = Memory::create(key, len);
+	}
+
 	void OAuthServerWithJwt::issueAccessToken(OAuthTokenPayload& payload)
 	{
 		payload.accessToken = generateToken(TokenType::Access, payload);
@@ -824,7 +839,6 @@ namespace slib
 	OAuthServerWithJwt::TokenType OAuthServerWithJwt::parseToken(const String& token, OAuthTokenPayload& payload)
 	{
 		Jwt jwt;
-		jwt.setAlgorithm(getAlgorithm());
 		if (decrypt(token, jwt)) {
 			String strType = jwt.payload.getItem(g_field_tokenType).getString();
 			payload.clientId = jwt.payload.getItem(g_field_clientId).getString();
@@ -849,12 +863,12 @@ namespace slib
 
 	String OAuthServerWithJwt::encrypt(const Jwt& jwt)
 	{
-		return jwt.encode(getMasterKey());
+		return jwt.encode(m_masterKey);
 	}
 
 	sl_bool OAuthServerWithJwt::decrypt(const String& str, Jwt& jwt)
 	{
-		return jwt.decode(getMasterKey(), str);
+		return jwt.decode(m_masterKey, str);
 	}
 
 }

@@ -1313,5 +1313,14 @@
     <ClCompile Include="..\..\src\slib\social\oauth_server.cpp">
       <Filter>src\social</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\crypto\jwt_openssl.cpp">
+      <Filter>src\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\oauth_server_openssl.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\crypto\openssl_crypto.cpp">
+      <Filter>src\crypto</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

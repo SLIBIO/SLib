@@ -245,6 +245,12 @@ namespace slib
 		~OAuthServerWithJwt();
 
 	public:
+		Memory& getMasterKey();
+		
+		void setMasterKey(const Memory& key);
+		
+		void setMasterKey(const void* key, sl_size len);
+		
 		void issueAccessToken(OAuthTokenPayload& payload) override;
 
 		sl_bool getAccessTokenPayload(OAuthTokenPayload& payload) override;
@@ -269,8 +275,43 @@ namespace slib
 		virtual sl_bool decrypt(const String& str, Jwt& jwt);
 
 	public:
-		SLIB_PROPERTY(AtomicMemory, MasterKey)
 		SLIB_PROPERTY(JwtAlgorithm, Algorithm)
+		
+	protected:
+		Memory m_masterKey;
+
+	};
+
+	class SLIB_EXPORT OAuthServerWithJwtAndOpenSSL : public OAuthServerWithJwt
+	{
+		SLIB_DECLARE_OBJECT
+
+	public:
+		OAuthServerWithJwtAndOpenSSL();
+
+		~OAuthServerWithJwtAndOpenSSL();
+		
+	public:
+		Ref<OpenSSL_Key>& getPrivateKey();
+		
+		void setPrivateKey(const Ref<OpenSSL_Key>& key);
+		
+		void setPrivateKey(const String& pem);
+		
+		Ref<OpenSSL_Key>& getPublicKey();
+		
+		void setPublicKey(const Ref<OpenSSL_Key>& key);
+		
+		void setPublicKey(const String& pem);
+		
+	protected:
+		String encrypt(const Jwt& jwt) override;
+
+		sl_bool decrypt(const String& str, Jwt& jwt) override;
+		
+	protected:
+		Ref<OpenSSL_Key> m_publicKey;
+		Ref<OpenSSL_Key> m_privateKey;
 
 	};
 

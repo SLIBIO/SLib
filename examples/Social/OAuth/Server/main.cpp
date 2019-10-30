@@ -2,12 +2,23 @@
 
 using namespace slib;
 
-class MyAuth : public OAuthServerWithJwt
+class MyAuth : public OAuthServerWithJwtAndOpenSSL
 {
 public:
 	MyAuth()
 	{
-		setMasterKey(Memory::create("1234", 4));
+		// setMasterKey("1234", 4); // HS256
+		
+		setAlgorithm(JwtAlgorithm::ES256);
+		setPrivateKey(R"(-----BEGIN PRIVATE KEY-----
+MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgevZzL1gdAFr88hb2
+OF/2NxApJCzGCEDdfSp6VQO30hyhRANCAAQRWz+jn65BtOMvdyHKcvjBeBSDZH2r
+1RTwjmYSi9R/zpBnuQ4EiMnCqfMPWiZqB4QdbAd0E7oH50VpuZ1P087G
+-----END PRIVATE KEY-----)");
+		setPublicKey(R"(-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEVs/o5+uQbTjL3chynL4wXgUg2R9
+q9UU8I5mEovUf86QZ7kOBIjJwqnzD1omageEHWwHdBO6B+dFabmdT9POxg==
+-----END PUBLIC KEY-----)");
 	}
 	
 public:
@@ -27,8 +38,7 @@ public:
 } oauth;
 
 int main(int argc, const char * argv[])
-{
-	
+{	
 	HttpServerParam param;
 	param.port = 8080;
 	

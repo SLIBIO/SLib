@@ -1040,6 +1040,7 @@
 		26805B6723533D4300D8817C /* string_param.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26805B6623533D4300D8817C /* string_param.cpp */; };
 		26805B6923533D6B00D8817C /* string_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26805B6823533D6A00D8817C /* string_buffer.cpp */; };
 		2682569F21E464630079600F /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2682569E21E464630079600F /* IOKit.framework */; };
+		269308662368DE7E00C9C7F9 /* openssl_crypto.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269308652368DE7D00C9C7F9 /* openssl_crypto.cpp */; };
 		2698A54E226A383500662528 /* refresh_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2698A54D226A383400662528 /* refresh_view.cpp */; };
 		269E31A92255F431005CD0ED /* paypal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31A82255F430005CD0ED /* paypal.cpp */; };
 		269E31AD2255F53B005CD0ED /* paypal_ui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31AC2255F53B005CD0ED /* paypal_ui.cpp */; };
@@ -1053,6 +1054,7 @@
 		26ACB3F82209872C0093FF3F /* device_id_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26ACB3F72209872B0093FF3F /* device_id_macos.mm */; };
 		26AFC5FD22B05B580034C634 /* crc32c.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26AFC5FC22B05B580034C634 /* crc32c.cpp */; settings = {COMPILER_FLAGS = "-mavx2"; }; };
 		26AFC5FF22B1773F0034C634 /* asm_x64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26AFC5FE22B1773F0034C634 /* asm_x64.cpp */; };
+		26B748C423696FEF002C1AA4 /* oauth_server_openssl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B748C323696FEF002C1AA4 /* oauth_server_openssl.cpp */; };
 		26B92D4921D33E6E003F6F82 /* des.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D4821D33E6E003F6F82 /* des.cpp */; };
 		26B92D4E21D34698003F6F82 /* ginger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D4D21D34698003F6F82 /* ginger.cpp */; };
 		26B92D6621D770F0003F6F82 /* device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B92D6521D770F0003F6F82 /* device.cpp */; };
@@ -1313,6 +1315,7 @@
 		26D9D9F21E964693005F7BD3 /* web_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26912BC21DEA81D5008C5FFD /* web_service.cpp */; };
 		26D9D9F41E968240005F7BD3 /* http_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D9D9F31E968240005F7BD3 /* http_io.cpp */; };
 		26DA4B39223980B500706393 /* media_player_ffmpeg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26DA4B38223980B500706393 /* media_player_ffmpeg.cpp */; };
+		26E1ADB623688B7E002BF6B8 /* jwt_openssl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E1ADB523688B7E002BF6B8 /* jwt_openssl.cpp */; };
 		26E1B858222841AC007C222E /* pinterest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E1B857222841AB007C222E /* pinterest.cpp */; };
 		26E1B85C22291D54007C222E /* ebay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E1B85B22291D53007C222E /* ebay.cpp */; };
 		26E1B85D222A8250007C222E /* adler32.c in Sources */ = {isa = PBXBuildFile; fileRef = 2605065820CF8E6E00032B2C /* adler32.c */; settings = {COMPILER_FLAGS = "-Os"; }; };
@@ -2764,6 +2767,7 @@
 		2688DD861C16FBDF00973672 /* camera_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera_view.cpp; sourceTree = "<group>"; };
 		268A13011E7AE8BD0048F2CE /* blowfish.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = blowfish.cpp; sourceTree = "<group>"; };
 		26912BC21DEA81D5008C5FFD /* web_service.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = web_service.cpp; sourceTree = "<group>"; };
+		269308652368DE7D00C9C7F9 /* openssl_crypto.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = openssl_crypto.cpp; sourceTree = "<group>"; };
 		2698A54D226A383400662528 /* refresh_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = refresh_view.cpp; sourceTree = "<group>"; };
 		2699DC8F1D43682D0085EE67 /* list_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list_view.cpp; sourceTree = "<group>"; };
 		269E31A82255F430005CD0ED /* paypal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = paypal.cpp; path = social/paypal.cpp; sourceTree = "<group>"; };
@@ -2798,6 +2802,7 @@
 		26B0AF841C13E08600CD8673 /* bitmap_format.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_format.cpp; sourceTree = "<group>"; };
 		26B1C9A01DC7ABB60092C84F /* text_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = text_view.cpp; sourceTree = "<group>"; };
 		26B5737E1D1051DF00304424 /* charset.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = charset.cpp; sourceTree = "<group>"; };
+		26B748C323696FEF002C1AA4 /* oauth_server_openssl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = oauth_server_openssl.cpp; path = social/oauth_server_openssl.cpp; sourceTree = "<group>"; };
 		26B89A6B1DC3467B00ABE895 /* font_atlas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = font_atlas.cpp; sourceTree = "<group>"; };
 		26B92D4821D33E6E003F6F82 /* des.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = des.cpp; sourceTree = "<group>"; };
 		26B92D4D21D34698003F6F82 /* ginger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ginger.cpp; sourceTree = "<group>"; };
@@ -2864,6 +2869,7 @@
 		26D9D9F31E968240005F7BD3 /* http_io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_io.cpp; sourceTree = "<group>"; };
 		26DA34F91C4B47CF004DC204 /* video_frame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_frame.cpp; sourceTree = "<group>"; };
 		26DA4B38223980B500706393 /* media_player_ffmpeg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = media_player_ffmpeg.cpp; sourceTree = "<group>"; };
+		26E1ADB523688B7E002BF6B8 /* jwt_openssl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jwt_openssl.cpp; sourceTree = "<group>"; };
 		26E1B857222841AB007C222E /* pinterest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pinterest.cpp; path = social/pinterest.cpp; sourceTree = "<group>"; };
 		26E1B85B22291D53007C222E /* ebay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ebay.cpp; path = social/ebay.cpp; sourceTree = "<group>"; };
 		26E376D61C984CC400B178E6 /* vector2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vector2.cpp; sourceTree = "<group>"; };
@@ -4207,6 +4213,7 @@
 				260B73F4220D7DF600858EEA /* oauth.cpp */,
 				260B73FD220DCB1D00858EEA /* oauth_ui.cpp */,
 				2644BD0B2364BE42001B9842 /* oauth_server.cpp */,
+				26B748C323696FEF002C1AA4 /* oauth_server_openssl.cpp */,
 				269E31A82255F430005CD0ED /* paypal.cpp */,
 				269E31AC2255F53B005CD0ED /* paypal_ui.cpp */,
 				26E1B857222841AB007C222E /* pinterest.cpp */,
@@ -5335,8 +5342,10 @@
 				262ED4E8228DDA5D0029F409 /* ecc_secp256k1.inc */,
 				266DD45C1C11930800D47AB0 /* gcm.cpp */,
 				2628EAE821C410ED00D8CD00 /* jwt.cpp */,
+				26E1ADB523688B7E002BF6B8 /* jwt_openssl.cpp */,
 				266DD45D1C11930800D47AB0 /* md5.cpp */,
 				26BAE0302223CEC60085B5AB /* openssl.cpp */,
+				269308652368DE7D00C9C7F9 /* openssl_crypto.cpp */,
 				26A3DA91228AFDDE0031CBDA /* poly1305.cpp */,
 				26A3DA892289ED9B0031CBDA /* rc4.cpp */,
 				266DD45E1C11930800D47AB0 /* rsa.cpp */,
@@ -6896,6 +6905,7 @@
 				265A93542304298C00B155A2 /* global_unique_instance_unix.cpp in Sources */,
 				26B92D7021D7C237003F6F82 /* device_macos.mm in Sources */,
 				26BAE00C221C8FFC0085B5AB /* etsy.cpp in Sources */,
+				26E1ADB623688B7E002BF6B8 /* jwt_openssl.cpp in Sources */,
 				26D9D9E81E96468D005F7BD3 /* ui_resource.cpp in Sources */,
 				26D9D8FA1E9645CE005F7BD3 /* compress_zlib.cpp in Sources */,
 				26E1B875222ABA51007C222E /* pngset.c in Sources */,
@@ -6916,6 +6926,7 @@
 				269E31A92255F431005CD0ED /* paypal.cpp in Sources */,
 				26C1B64220D51D1D00E36539 /* graphics_path.cpp in Sources */,
 				26D9D8FE1E9645CE005F7BD3 /* base.cpp in Sources */,
+				269308662368DE7E00C9C7F9 /* openssl_crypto.cpp in Sources */,
 				26D9D9971E96467B005F7BD3 /* icmp.cpp in Sources */,
 				26BAE00E221C90020085B5AB /* etsy_ui.cpp in Sources */,
 				26D9D9AB1E964683005F7BD3 /* opengl_gles.cpp in Sources */,
@@ -6963,6 +6974,7 @@
 				26D9D9871E964675005F7BD3 /* camera.cpp in Sources */,
 				26E1B86D222ABA51007C222E /* pngerror.c in Sources */,
 				26D9D9D11E96468D005F7BD3 /* scroll_view.cpp in Sources */,
+				26B748C423696FEF002C1AA4 /* oauth_server_openssl.cpp in Sources */,
 				26E1B85E222A8250007C222E /* compress.c in Sources */,
 				26C795BE2215F9C70053C5A1 /* colors.cpp in Sources */,
 				26E1B86E222ABA51007C222E /* pngget.c in Sources */,
