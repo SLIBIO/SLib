@@ -46,7 +46,7 @@ namespace slib
 		return m_socket;
 	}
 
-	sl_bool AsyncTcpSocketInstance::isSupportingConnect()
+	sl_bool AsyncTcpSocketInstance::isSupportedConnect()
 	{
 		return m_flagSupportingConnect;
 	}
@@ -182,7 +182,7 @@ namespace slib
 		if (instance.isNotNull()) {
 			Ref<Socket> socket = instance->getSocket();
 			if (socket.isNotNull()) {
-				if (instance->isSupportingConnect()) {
+				if (instance->isSupportedConnect()) {
 					SocketType type = socket->getType();
 					SocketAddress addr = address;
 					if (addr.ip.isIPv4() && type == SocketType::Stream) {

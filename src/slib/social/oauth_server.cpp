@@ -139,11 +139,11 @@ namespace slib
 	
 	OAuthServer::OAuthServer()
 	{
-		setSupportImplicitGrant(sl_true);
-		setSupportAuthorizationCodeGrant(sl_true);
-		setSupportClientCredentialsGrant(sl_true);
-		setSupportPasswordGrant(sl_true);
-		setSupportRefreshToken(sl_true);
+		setSupportedImplicitGrant(sl_true);
+		setSupportedAuthorizationCodeGrant(sl_true);
+		setSupportedClientCredentialsGrant(sl_true);
+		setSupportedPasswordGrant(sl_true);
+		setSupportedRefreshToken(sl_true);
 
 		setAccessTokenExpirySeconds(50000);
 		setRefreshTokenExpirySeconds(1000000);
@@ -201,12 +201,12 @@ namespace slib
 		}
 		
 		if (request.responseType == OAuthResponseType::Code) {
-			if (!(isSupportAuthorizationCodeGrant())) {
+			if (!(isSupportedAuthorizationCodeGrant())) {
 				completeAuthorizationRequestWithError(context, request, OAuthErrorCode::UnsupportedGrantType);
 				return sl_false;
 			}
 		} else {
-			if (!(isSupportImplicitGrant())) {
+			if (!(isSupportedImplicitGrant())) {
 				completeAuthorizationRequestWithError(context, request, OAuthErrorCode::UnsupportedGrantType);
 				return sl_false;
 			}
@@ -347,7 +347,7 @@ namespace slib
 
 		if (grantType == "authorization_code") {
 
-			if (!(isSupportAuthorizationCodeGrant())) {
+			if (!(isSupportedAuthorizationCodeGrant())) {
 				respondError(context, OAuthErrorCode::UnsupportedGrantType);
 				return;
 			}
@@ -418,7 +418,7 @@ namespace slib
 
 		} else if (grantType == "client_credentials") {			
 
-			if (!(isSupportClientCredentialsGrant())) {
+			if (!(isSupportedClientCredentialsGrant())) {
 				respondError(context, OAuthErrorCode::UnsupportedGrantType);
 				return;
 			}
@@ -430,7 +430,7 @@ namespace slib
 
 		} else if (grantType == "password") {
 
-			if (!(isSupportPasswordGrant())) {
+			if (!(isSupportedPasswordGrant())) {
 				respondError(context, OAuthErrorCode::UnsupportedGrantType);
 				return;
 			}
@@ -452,7 +452,7 @@ namespace slib
 
 		} else if (grantType == "refresh_token") {
 			
-			if (!(isSupportRefreshToken())) {
+			if (!(isSupportedRefreshToken())) {
 				respondError(context, OAuthErrorCode::UnsupportedGrantType);
 				return;
 			}
@@ -785,7 +785,7 @@ namespace slib
 	void OAuthServerWithJwt::issueAccessToken(OAuthTokenPayload& payload)
 	{
 		payload.accessToken = generateToken(TokenType::Access, payload);
-		if (isSupportRefreshToken()) {
+		if (isSupportedRefreshToken()) {
 			payload.refreshToken = generateToken(TokenType::Refresh, payload);
 		}
 	}

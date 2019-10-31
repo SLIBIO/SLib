@@ -39,7 +39,7 @@
 
 #define PRIV_SLIB_RENDER_GL_SUPPORT(name) \
 	sl_bool flagSupports##name; \
-	SLIB_INLINE sl_bool isSupporting##name() \
+	SLIB_INLINE sl_bool isSupported##name() \
 	{ \
 		return flagSupports##name; \
 	}

@@ -219,11 +219,11 @@ namespace slib
 	public:
 		SLIB_PROPERTY(AtomicString, DefaultRedirectUri)
 
-		SLIB_BOOLEAN_PROPERTY(SupportImplicitGrant)
-		SLIB_BOOLEAN_PROPERTY(SupportAuthorizationCodeGrant)
-		SLIB_BOOLEAN_PROPERTY(SupportClientCredentialsGrant)
-		SLIB_BOOLEAN_PROPERTY(SupportPasswordGrant)
-		SLIB_BOOLEAN_PROPERTY(SupportRefreshToken)
+		SLIB_BOOLEAN_PROPERTY(SupportedImplicitGrant)
+		SLIB_BOOLEAN_PROPERTY(SupportedAuthorizationCodeGrant)
+		SLIB_BOOLEAN_PROPERTY(SupportedClientCredentialsGrant)
+		SLIB_BOOLEAN_PROPERTY(SupportedPasswordGrant)
+		SLIB_BOOLEAN_PROPERTY(SupportedRefreshToken)
 
 		SLIB_PROPERTY(sl_uint32, AccessTokenExpirySeconds)
 		SLIB_PROPERTY(sl_uint32, RefreshTokenExpirySeconds)

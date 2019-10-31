@@ -44,7 +44,7 @@ namespace slib
 	public:
 		Ref<Socket> getSocket();
 		
-		sl_bool isSupportingConnect();
+		sl_bool isSupportedConnect();
 		
 	public:
 		sl_bool connect(const SocketAddress& address);
