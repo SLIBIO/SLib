@@ -926,7 +926,6 @@ namespace slib
 			PROCESS_CONTROL_SWITCH(Progress)
 			PROCESS_CONTROL_SWITCH(Slider)
 			PROCESS_CONTROL_SWITCH(Switch)
-			PROCESS_CONTROL_SWITCH(SwitchLabel)
 			PROCESS_CONTROL_SWITCH(Picker)
 			PROCESS_CONTROL_SWITCH(DatePicker)
 			PROCESS_CONTROL_SWITCH(Pager)
@@ -4316,10 +4315,10 @@ namespace slib
 		
 		if (op == OP_PARSE) {
 			String value = resourceItem->getXmlAttribute("value").trim().toLower();
-			if (value == "left") {
+			if (value == "left" || value == "off") {
 				attr->value.flagDefined = sl_true;
 				attr->value.value = sl_false;
-			} else if (value == "right") {
+			} else if (value == "right" || value == "on") {
 				attr->value.flagDefined = sl_true;
 				attr->value.value = sl_true;
 			} else {
@@ -4329,45 +4328,41 @@ namespace slib
 			LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(value, setValue)
 		}
 		
-		LAYOUT_CONTROL_DRAWABLE_ATTR(thumbOff, setThumbOff)
-		LAYOUT_CONTROL_DRAWABLE_ATTR(thumbOn, setThumbOn)
-		LAYOUT_CONTROL_DRAWABLE_ATTR(thumb, setThumb)
-		LAYOUT_CONTROL_DRAWABLE_ATTR(trackOff, setTrackOff)
-		LAYOUT_CONTROL_DRAWABLE_ATTR(trackOn, setTrackOn)
-		LAYOUT_CONTROL_DRAWABLE_ATTR(track, setTrack)
-		LAYOUT_CONTROL_DRAWABLE_ATTR(pressedThumbOff, setPressedThumbOff)
-		LAYOUT_CONTROL_DRAWABLE_ATTR(pressedThumbOn, setPressedThumbOn)
-		LAYOUT_CONTROL_DRAWABLE_ATTR(pressedThumb, setPressedThumb)
-		LAYOUT_CONTROL_DRAWABLE_ATTR(pressedTrackOn, setPressedTrackOff)
-		LAYOUT_CONTROL_DRAWABLE_ATTR(pressedTrack, setPressedTrackOn)
-		LAYOUT_CONTROL_DRAWABLE_ATTR(pressedTrackOff, setPressedTrack)
-		LAYOUT_CONTROL_DRAWABLE_ATTR(hoverThumbOff, setHoverThumbOff)
-		LAYOUT_CONTROL_DRAWABLE_ATTR(hoverThumbOn, setHoverThumbOn)
-		LAYOUT_CONTROL_DRAWABLE_ATTR(hoverThumb, setHoverThumb)
-		LAYOUT_CONTROL_DRAWABLE_ATTR(hoverTrackOff, setHoverTrackOff)
-		LAYOUT_CONTROL_DRAWABLE_ATTR(hoverTrackOn, setHoverTrackOn)
-		LAYOUT_CONTROL_DRAWABLE_ATTR(hoverTrack, setHoverTrack)
-		
-		LAYOUT_CONTROL_ADD_STATEMENT
-		
-	}
-	END_PROCESS_LAYOUT_CONTROL
-	
+		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(textInButton, setTextInButton)
 
-	BEGIN_PROCESS_LAYOUT_CONTROL(SwitchLabel, SwitchLabelView)
-	{
-		LAYOUT_CONTROL_PROCESS_SUPER(Switch)
-		
+		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(text, setText)
+		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(textOff, setTextOff)
+		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(textOn, setTextOn)
 		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(leftText, setLeftText)
 		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(rightText, setRightText)
 		LAYOUT_CONTROL_COLOR_ATTR(textColor, setTextColor)
-		LAYOUT_CONTROL_COLOR_ATTR(selectedTextColor, setSelectedTextColor)
+		LAYOUT_CONTROL_COLOR_ATTR(textColorOff, setTextColorOff)
+		LAYOUT_CONTROL_COLOR_ATTR(textColorOn, setTextColorOn)
+
+		LAYOUT_CONTROL_DRAWABLE_ATTR(thumb, setThumb)
+		LAYOUT_CONTROL_DRAWABLE_ATTR(thumbOff, setThumbOff)
+		LAYOUT_CONTROL_DRAWABLE_ATTR(thumbOn, setThumbOn)
+		LAYOUT_CONTROL_DRAWABLE_ATTR(track, setTrack)
+		LAYOUT_CONTROL_DRAWABLE_ATTR(trackOff, setTrackOff)
+		LAYOUT_CONTROL_DRAWABLE_ATTR(trackOn, setTrackOn)
+		LAYOUT_CONTROL_DRAWABLE_ATTR(pressedThumb, setPressedThumb)
+		LAYOUT_CONTROL_DRAWABLE_ATTR(pressedThumbOff, setPressedThumbOff)
+		LAYOUT_CONTROL_DRAWABLE_ATTR(pressedThumbOn, setPressedThumbOn)
+		LAYOUT_CONTROL_DRAWABLE_ATTR(pressedTrack, setPressedTrackOn)
+		LAYOUT_CONTROL_DRAWABLE_ATTR(pressedTrackOff, setPressedTrack)
+		LAYOUT_CONTROL_DRAWABLE_ATTR(pressedTrackOn, setPressedTrackOff)
+		LAYOUT_CONTROL_DRAWABLE_ATTR(hoverThumb, setHoverThumb)
+		LAYOUT_CONTROL_DRAWABLE_ATTR(hoverThumbOff, setHoverThumbOff)
+		LAYOUT_CONTROL_DRAWABLE_ATTR(hoverThumbOn, setHoverThumbOn)
+		LAYOUT_CONTROL_DRAWABLE_ATTR(hoverTrack, setHoverTrack)
+		LAYOUT_CONTROL_DRAWABLE_ATTR(hoverTrackOff, setHoverTrackOff)
+		LAYOUT_CONTROL_DRAWABLE_ATTR(hoverTrackOn, setHoverTrackOn)
 		
 		LAYOUT_CONTROL_ADD_STATEMENT
 		
 	}
 	END_PROCESS_LAYOUT_CONTROL
-	
+
 	
 	BEGIN_PROCESS_LAYOUT_CONTROL(Picker, PickerView)
 	{

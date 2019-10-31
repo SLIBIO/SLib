@@ -242,7 +242,6 @@ namespace slib
 		sl_bool _processLayoutResourceControl_Progress(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_Slider(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_Switch(LayoutControlProcessParams* params);
-		sl_bool _processLayoutResourceControl_SwitchLabel(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_Picker(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_DatePicker(LayoutControlProcessParams* params);
 		sl_bool _processLayoutResourceControl_Pager(LayoutControlProcessParams* params);

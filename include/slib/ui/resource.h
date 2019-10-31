@@ -343,7 +343,6 @@ namespace slib
 	class ProgressBar;
 	class Slider;
 	class SwitchView;
-	class SwitchLabelView;
 	class PickerView;
 	class DatePicker;
 	class ViewPager;

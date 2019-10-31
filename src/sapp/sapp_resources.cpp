@@ -449,7 +449,6 @@ namespace slib
 				pN = &nAutoIncreaseNameSlider;
 				break;
 			case SAppLayoutItemType::Switch:
-			case SAppLayoutItemType::SwitchLabel:
 				prefix = "switch";
 				pN = &nAutoIncreaseNameSwitch;
 				break;
@@ -564,8 +563,6 @@ namespace slib
 			type = SAppLayoutItemType::Slider;
 		} else if (strType == "switch") {
 			type = SAppLayoutItemType::Switch;
-		} else if (strType == "switchlabel" || strType == "switch-label") {
-			type = SAppLayoutItemType::SwitchLabel;
 		} else if (strType == "picker") {
 			type = SAppLayoutItemType::Picker;
 		} else if (strType == "datepicker" || strType == "date-picker") {

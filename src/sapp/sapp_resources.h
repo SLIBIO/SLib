@@ -722,6 +722,16 @@ namespace slib
 	{
 	public:
 		SAppBooleanValue value;
+		SAppBooleanValue textInButton;
+		
+		SAppStringValue text;
+		SAppStringValue textOn;
+		SAppStringValue textOff;
+		SAppStringValue leftText;
+		SAppStringValue rightText;
+		SAppColorValue textColor;
+		SAppColorValue textColorOn;
+		SAppColorValue textColorOff;
 		
 		SAppDrawableValue thumbOff;
 		SAppDrawableValue thumbOn;
@@ -741,17 +751,6 @@ namespace slib
 		SAppDrawableValue hoverTrackOff;
 		SAppDrawableValue hoverTrackOn;
 		SAppDrawableValue hoverTrack;
-
-	};
-
-	class SAppLayoutSwitchLabelAttributes : public Referable
-	{
-	public:
-		SAppStringValue leftText;
-		SAppStringValue rightText;
-
-		SAppColorValue textColor;
-		SAppColorValue selectedTextColor;
 
 	};
 
@@ -912,7 +911,6 @@ namespace slib
 		Progress = 0x0240,
 		Slider = 0x0241,
 		Switch = 0x0242,
-		SwitchLabel = 0x0243,
 		Picker = 0x0244,
 		Pager = 0x0245,
 		Navigation = 0x0246,
@@ -965,7 +963,6 @@ namespace slib
 		Ref<SAppLayoutProgressAttributes> attrsProgress;
 		Ref<SAppLayoutSliderAttributes> attrsSlider;
 		Ref<SAppLayoutSwitchAttributes> attrsSwitch;
-		Ref<SAppLayoutSwitchLabelAttributes> attrsSwitchLabel;
 		Ref<SAppLayoutPickerAttributes> attrsPicker;
 		Ref<SAppLayoutDatePickerAttributes> attrsDatePicker;
 		Ref<SAppLayoutPagerAttributes> attrsPager;
