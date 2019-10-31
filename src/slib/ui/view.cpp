@@ -9271,15 +9271,6 @@ namespace slib
 		sl_scroll_pos lineX = (sl_scroll_pos)(getWidth() / 20);
 		sl_scroll_pos lineY = (sl_scroll_pos)(getHeight() / 20);
 		
-		if (scrollAttrs->flagSmoothContentScrolling) {
-			if (scrollAttrs->motionTracker.isNull()) {
-				ObjectLocker lock(this);
-				if (scrollAttrs->motionTracker.isNull()) {
-					scrollAttrs->motionTracker = new MotionTracker;
-				}
-			}
-		}
-		
 		UIAction action = ev->getAction();
 		switch (action) {
 			case UIAction::LeftButtonDown:
@@ -9290,8 +9281,8 @@ namespace slib
 					scrollAttrs->mousePointBefore = ev->getPoint();
 					scrollAttrs->touchPointerIdBefore = ev->getTouchPoint().pointerId;
 					if (scrollAttrs->flagSmoothContentScrolling) {
-						scrollAttrs->motionTracker->clearMovements();
-						scrollAttrs->motionTracker->addMovement(ev);
+						scrollAttrs->motionTracker.clearMovements();
+						scrollAttrs->motionTracker.addMovement(ev->getPoint());
 					}
 				}
 				ev->stopPropagation();
@@ -9312,7 +9303,7 @@ namespace slib
 						}
 						if (scrollAttrs->flagSmoothContentScrolling) {
 							_scrollTo(sx, sy, sl_true, sl_true, sl_false);
-							scrollAttrs->motionTracker->addMovement(ev);
+							scrollAttrs->motionTracker.addMovement(ev->getPoint());
 							invalidate();
 						} else {
 							scrollTo(sx, sy);
@@ -9348,8 +9339,8 @@ namespace slib
 						sl_scroll_pos y = scrollAttrs->y;
 						Point speed = Point::zero();
 						if (scrollAttrs->flagSmoothContentScrolling) {
-							scrollAttrs->motionTracker->addMovement(ev);
-							scrollAttrs->motionTracker->getVelocity(&speed);
+							scrollAttrs->motionTracker.addMovement(ev->getPoint());
+							scrollAttrs->motionTracker.getVelocity(&speed);
 						}
 						if (flagHorz) {
 							sl_scroll_pos pageWidth = (sl_scroll_pos)(scrollAttrs->pageWidth == 0 ? getWidth() : scrollAttrs->pageWidth);
@@ -9362,9 +9353,9 @@ namespace slib
 						smoothScrollTo(x, y);
 					} else {
 						if (scrollAttrs->flagSmoothContentScrolling) {
-							scrollAttrs->motionTracker->addMovement(ev);
+							scrollAttrs->motionTracker.addMovement(ev->getPoint());
 							Point speed;
-							if (scrollAttrs->motionTracker->getVelocity(&speed)) {
+							if (scrollAttrs->motionTracker.getVelocity(&speed)) {
 								if (!flagHorz) {
 									speed.x = 0;
 								}

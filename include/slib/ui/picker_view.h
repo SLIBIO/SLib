@@ -123,7 +123,7 @@ namespace slib
 		
 		sl_ui_pos m_yOffset;
 		
-		Ref<MotionTracker> m_motionTracker;
+		MotionTracker m_motionTracker;
 		Ref<Timer> m_timerFlow;
 		sl_real m_speedFlow;
 		Time m_timeFlowFrameBefore;

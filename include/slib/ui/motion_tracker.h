@@ -46,16 +46,16 @@ namespace slib
 	
 	class UIEvent;
 	
-	class MotionTracker : public Referable
+	class CMotionTracker : public Referable
 	{
 	public:
-		MotionTracker();
+		CMotionTracker();
 		
-		MotionTracker(sl_uint32 degree);
+		CMotionTracker(sl_uint32 degree);
 		
-		~MotionTracker();
+		~CMotionTracker();
 		
-		SLIB_DELETE_CLASS_DEFAULT_MEMBERS(MotionTracker)
+		SLIB_DELETE_CLASS_DEFAULT_MEMBERS(CMotionTracker)
 		
 	public:
 		void addMovement(sl_real x, sl_real y, const Time& time);
@@ -65,8 +65,6 @@ namespace slib
 		void addMovement(const Point& pt, const Time& time);
 		
 		void addMovement(const Point& pt);
-		
-		void addMovement(UIEvent* ev);
 		
 		sl_bool getLastPosition(Point* _out);
 		
@@ -98,6 +96,43 @@ namespace slib
 		
 		sl_bool m_flagRefreshTrack;
 		sl_bool m_flagValidTrack;
+		
+	};
+
+	class MotionTracker
+	{
+	public:
+		MotionTracker();
+		
+		MotionTracker(sl_uint32 degree);
+		
+		~MotionTracker();
+		
+		SLIB_DELETE_CLASS_DEFAULT_MEMBERS(MotionTracker)
+		
+	public:
+		void addMovement(sl_real x, sl_real y, const Time& time);
+		
+		void addMovement(sl_real x, sl_real y);
+		
+		void addMovement(const Point& pt, const Time& time);
+		
+		void addMovement(const Point& pt);
+		
+		sl_bool getLastPosition(Point* _out);
+		
+		void clearMovements();
+		
+		sl_bool getVelocity(sl_real* outX, sl_real* outY);
+		
+		sl_bool getVelocity(Point* _out);
+		
+	private:
+		CMotionTracker* _create();
+
+	private:
+		Ref<CMotionTracker> m_ref;
+		sl_uint32 m_degree;
 		
 	};
 

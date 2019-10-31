@@ -215,15 +215,17 @@ namespace slib
 			case UIAction::LeftButtonDown:
 			case UIAction::TouchBegin:
 				m_tracker.clearMovements();
-				m_tracker.addMovement(ev);
+				m_tracker.addMovement(ev->getPoint());
 				break;
 			case UIAction::LeftButtonDrag:
 			case UIAction::TouchMove:
 			case UIAction::LeftButtonUp:
 			case UIAction::TouchEnd:
-			case UIAction::TouchCancel:
-				m_tracker.addMovement(ev);
+				m_tracker.addMovement(ev->getPoint());
 				break;
+			case UIAction::TouchCancel:
+				m_tracker.clearMovements();
+				return;
 			default:
 				break;
 		}
@@ -231,6 +233,9 @@ namespace slib
 			if (m_recognizers[i].isNotNull() && !(flagNative[i])) {
 				m_recognizers[i]->processEvent(ev, view, &m_tracker);
 			}
+		}
+		if (action == UIAction::LeftButtonUp || action == UIAction::TouchEnd) {
+			m_tracker.clearMovements();
 		}
 	}
 	

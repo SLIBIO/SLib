@@ -1707,7 +1707,7 @@ namespace slib
 			
 			Point mousePointBefore;
 			sl_uint64 touchPointerIdBefore;
-			Ref<MotionTracker> motionTracker;
+			MotionTracker motionTracker;
 			Ref<Timer> timerFlow;
 			Time timeFlowFrameBefore;
 			Point speedFlow;

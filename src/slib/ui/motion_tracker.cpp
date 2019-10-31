@@ -37,11 +37,11 @@
 namespace slib
 {
 
-	MotionTracker::MotionTracker() : MotionTracker(1)
+	CMotionTracker::CMotionTracker() : CMotionTracker(1)
 	{
 	}
 	
-	MotionTracker::MotionTracker(sl_uint32 degree)
+	CMotionTracker::CMotionTracker(sl_uint32 degree)
 	{
 		if (degree < 1) {
 			degree = 1;
@@ -58,11 +58,11 @@ namespace slib
 		m_currentConfidence = 0;
 	}
 	
-	MotionTracker::~MotionTracker()
+	CMotionTracker::~CMotionTracker()
 	{
 	}
 	
-	void MotionTracker::addMovement(sl_real x, sl_real y, const Time& time)
+	void CMotionTracker::addMovement(sl_real x, sl_real y, const Time& time)
 	{
 		if (m_lastTime.isNotZero() && (time - m_lastTime).getMillisecondsCount() > MOVEMENT_STOP_MILLIS) {
 			clearMovements();
@@ -82,27 +82,22 @@ namespace slib
 		m_flagRefreshTrack = sl_true;
 	}
 	
-	void MotionTracker::addMovement(sl_real x, sl_real y)
+	void CMotionTracker::addMovement(sl_real x, sl_real y)
 	{
 		addMovement(x, y, Time::now());
 	}
 	
-	void MotionTracker::addMovement(const Point& pt, const Time& time)
+	void CMotionTracker::addMovement(const Point& pt, const Time& time)
 	{
 		addMovement(pt.x, pt.y, time);
 	}
 	
-	void MotionTracker::addMovement(const Point& pt)
+	void CMotionTracker::addMovement(const Point& pt)
 	{
 		addMovement(pt.x, pt.y, Time::now());
 	}
 	
-	void MotionTracker::addMovement(UIEvent* ev)
-	{
-		addMovement(ev->getX(), ev->getY(), ev->getTime());
-	}
-	
-	sl_bool MotionTracker::getLastPosition(Point* _out)
+	sl_bool CMotionTracker::getLastPosition(Point* _out)
 	{
 		if (m_nHistory > 0) {
 			if (_out) {
@@ -119,13 +114,13 @@ namespace slib
 		return sl_false;
 	}
 	
-	void MotionTracker::clearMovements()
+	void CMotionTracker::clearMovements()
 	{
 		m_nHistory = 0;
 		m_flagRefreshTrack = sl_true;
 	}
 	
-	sl_bool MotionTracker::getVelocity(sl_real* outX, sl_real* outY)
+	sl_bool CMotionTracker::getVelocity(sl_real* outX, sl_real* outY)
 	{
 		_computeVelocity();
 		if (m_flagRefreshTrack) {
@@ -143,7 +138,7 @@ namespace slib
 		return sl_false;
 	}
 	
-	sl_bool MotionTracker::getVelocity(Point* _out)
+	sl_bool CMotionTracker::getVelocity(Point* _out)
 	{
 		_computeVelocity();
 		if (m_flagRefreshTrack) {
@@ -151,13 +146,14 @@ namespace slib
 		}
 		if (m_flagValidTrack) {
 			if (_out) {
-				*_out = m_currentVelocity;
+				_out->x = m_currentVelocity.x;
+				_out->y = m_currentVelocity.y;
 			}
 			return sl_true;
 		}
 		return sl_false;
 	}
-
+	
 	namespace priv
 	{
 		namespace motion_tracker
@@ -263,7 +259,7 @@ namespace slib
 		}
 	}
 		
-	void MotionTracker::_computeVelocity()
+	void CMotionTracker::_computeVelocity()
 	{
 		if (!m_flagRefreshTrack) {
 			return;
@@ -321,4 +317,90 @@ namespace slib
 		
 	}
 
+
+	MotionTracker::MotionTracker() : MotionTracker(1)
+	{
+	}
+
+	MotionTracker::MotionTracker(sl_uint32 degree)
+	{
+		m_degree = degree;
+	}
+
+	MotionTracker::~MotionTracker()
+	{
+	}
+
+	CMotionTracker* MotionTracker::_create()
+	{
+		if (m_ref.isNull()) {
+			m_ref = new CMotionTracker(m_degree);
+		}
+		return m_ref.get();
+	}
+
+	void MotionTracker::addMovement(sl_real x, sl_real y, const Time& time)
+	{
+		CMotionTracker* t = _create();
+		if (t) {
+			t->addMovement(x, y, time);
+		}
+	}
+	
+	void MotionTracker::addMovement(sl_real x, sl_real y)
+	{
+		CMotionTracker* t = _create();
+		if (t) {
+			t->addMovement(x, y);
+		}
+	}
+	
+	void MotionTracker::addMovement(const Point& pt, const Time& time)
+	{
+		CMotionTracker* t = _create();
+		if (t) {
+			t->addMovement(pt, time);
+		}
+	}
+	
+	void MotionTracker::addMovement(const Point& pt)
+	{
+		CMotionTracker* t = _create();
+		if (t) {
+			t->addMovement(pt);
+		}
+	}
+	
+	sl_bool MotionTracker::getLastPosition(Point* _out)
+	{
+		CMotionTracker* t = _create();
+		if (t) {
+			return t->getLastPosition(_out);
+		}
+		return sl_false;
+	}
+	
+	void MotionTracker::clearMovements()
+	{
+		m_ref.setNull();
+	}
+	
+	sl_bool MotionTracker::getVelocity(sl_real* outX, sl_real* outY)
+	{
+		CMotionTracker* t = _create();
+		if (t) {
+			return t->getVelocity(outX, outY);
+		}
+		return sl_false;
+	}
+	
+	sl_bool MotionTracker::getVelocity(Point* _out)
+	{
+		CMotionTracker* t = _create();
+		if (t) {
+			return t->getVelocity(_out);
+		}
+		return sl_false;
+	}
+	
 }

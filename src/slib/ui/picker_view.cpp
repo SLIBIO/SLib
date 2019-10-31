@@ -304,32 +304,26 @@ namespace slib
 	void PickerView::onMouseEvent(UIEvent* ev)
 	{
 		UIAction action = ev->getAction();
-		
-		if (m_motionTracker.isNull()) {
-			m_motionTracker = new MotionTracker;
-			if (m_motionTracker.isNull()) {
-				return;
-			}
-		}
-		
+				
 		if (action == UIAction::LeftButtonDown || action == UIAction::TouchBegin) {
 			_stopFlow();
-			m_motionTracker->clearMovements();
-			m_motionTracker->addMovement(ev);
+			m_motionTracker.clearMovements();
+			m_motionTracker.addMovement(ev->getPoint());
 			invalidate();
 		} else if (action == UIAction::LeftButtonDrag || action == UIAction::TouchMove) {
 			_stopFlow();
 			Point ptLast;
-			if (m_motionTracker->getLastPosition(&ptLast)) {
+			if (m_motionTracker.getLastPosition(&ptLast)) {
 				sl_real offset = ev->getY() - ptLast.y;
 				_flow((sl_ui_pos)offset);
 				invalidate();
 			}
-			m_motionTracker->addMovement(ev);
+			m_motionTracker.addMovement(ev->getPoint());
 		} else if (action == UIAction::LeftButtonUp || action == UIAction::TouchEnd || action == UIAction::TouchCancel) {
-			m_motionTracker->addMovement(ev);
+			m_motionTracker.addMovement(ev->getPoint());
 			sl_real speed = 0;
-			m_motionTracker->getVelocity(sl_null, &speed);
+			m_motionTracker.getVelocity(sl_null, &speed);
+			m_motionTracker.clearMovements();
 			_startFlow(speed);
 			invalidate();
 		}
