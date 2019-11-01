@@ -1,0 +1,35 @@
+<sapp>
+	<layout
+		type='page'
+		background='white'
+		>
+
+		<linear
+			width='fill'
+			margin='20dp'
+			centerVertical='true'
+			>
+
+			<label
+				text='Phone Call App'
+				fontSize='30dp'
+				centerHorizontal='true'
+				marginBottom='25dp'
+				/>
+			<switch
+				name='switchSetDefault'
+				style='switch'
+				text='Set as Default App'
+				/>
+		</linear>
+
+ 	</layout>
+
+	<style
+		name='switch'
+		width='fill'
+		fontSize='17dp'
+		padding='10dp'
+		/>
+
+</sapp>

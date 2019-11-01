@@ -1,0 +1,51 @@
+apply plugin: 'com.android.application'
+
+task generate_sapp(type: Exec, description: 'Generating sapp resources') {
+    commandLine 'sapp', 'gen', "${projectDir}/../../src/sapp"
+}
+
+project.afterEvaluate {
+    preBuild.dependsOn("generate_sapp")
+}
+
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "io.slib.examples.phonecall"
+        minSdkVersion 23
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        externalNativeBuild {
+            cmake {
+                arguments "-DSLIB_PATH=${System.env.SLIB_PATH}"
+            }
+        }
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs "${System.env.SLIB_PATH}/lib/Android"
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation ':slib@aar'
+    implementation ':slib_call@aar'
+}

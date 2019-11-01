@@ -1,0 +1,19 @@
+#include "app.h"
+
+#include "MainPage.h"
+
+SLIB_DEFINE_APPLICATION(PhoneCallApp, MobileApp)
+
+PhoneCallApp::PhoneCallApp()
+{
+}
+
+Ref<View> PhoneCallApp::getStartupPage()
+{
+	return new MainPage;
+}
+
+void PhoneCallApp::onStart()
+{
+	UI::setAvailableScreenOrientationsPortrait();
+}
