@@ -5204,6 +5204,9 @@ namespace slib
 		Ref<DrawAttributes>& attrs = m_drawAttrs;
 		if (attrs.isNotNull()) {
 			attrs->boundShape = shape;
+			if (shape != BoundShape::None && shape != BoundShape::Rectangle) {
+				m_flagClipping = sl_true;
+			}
 			invalidate(mode);
 		}
 	}
@@ -5226,6 +5229,7 @@ namespace slib
 			if (attrs->boundShape != BoundShape::Ellipse && attrs->boundShape != BoundShape::Path) {
 				if (radius.x > SLIB_EPSILON && radius.y > SLIB_EPSILON) {
 					attrs->boundShape = BoundShape::RoundRect;
+					m_flagClipping = sl_true;
 				} else {
 					attrs->boundShape = BoundShape::Rectangle;
 				}

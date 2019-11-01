@@ -2198,12 +2198,6 @@ namespace slib
 			}
 		}
 		
-		if (flagView) {
-			LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(visibility, setVisibility)
-			LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(visible, setVisible)
-			LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(enabled, setEnabled)
-			LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(clipping, setClipping)
-		}
 		LAYOUT_CONTROL_DRAWABLE_ATTR(background, setBackground)
 		LAYOUT_CONTROL_DRAWABLE_ATTR(pressedBackground, setPressedBackground)
 		LAYOUT_CONTROL_DRAWABLE_ATTR(hoverBackground, setHoverBackground)
@@ -2398,6 +2392,22 @@ namespace slib
 				if (!flagOnLayout) {
 					view->setNextTabStop(params->simulator->getViewByName(attr->nextTabStop));
 					view->setPreviousTabStop(params->simulator->getViewByName(attr->previousTabStop));
+				}
+			}
+		}
+		
+		if (flagView) {
+			LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(visibility, setVisibility)
+			LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(visible, setVisible)
+			LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(enabled, setEnabled)
+			LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(clipping, setClipping)
+			if (op == OP_SIMULATE) {
+				if (attr->clipping.flagDefined) {
+					if (attr->boundShape.flagDefined || attr->boundRadius.flagDefined || attr->boundRadiusX.flagDefined || attr->boundRadiusY.flagDefined) {
+						if (flagOnLayout) {
+							view->setClipping(attr->clipping.value, UIUpdateMode::None);
+						}
+					}
 				}
 			}
 		}
