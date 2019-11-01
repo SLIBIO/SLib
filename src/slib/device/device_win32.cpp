@@ -117,8 +117,16 @@ namespace slib
 		ret.x = (int)(GetSystemMetrics(SM_CXSCREEN));
 		ret.y = (int)(GetSystemMetrics(SM_CYSCREEN));
 		return ret;
+	}	
+
+	void Device::openUrl(const String& url)
+	{
+		Windows::ShellExecuteParam param;
+		param.operation = "open";
+		param.path = url;
+		Windows::shellExecute(param);
 	}
-	
+
 }
 
 #endif

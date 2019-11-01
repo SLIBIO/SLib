@@ -204,15 +204,6 @@ namespace slib
 		return UIPlatform::createScreen(screen);
 	}
 
-	void UI::openUrl(const String& _url)
-	{
-		if (_url.isNotEmpty()) {
-			NSString* s = Apple::getNSStringFromString(_url);
-			NSURL* url = [NSURL URLWithString:s];
-			[[NSWorkspace sharedWorkspace] openURL:url];
-		}
-	}
-	
 	void UI::setBadgeNumber(sl_uint32 number)
 	{
 		if (number) {

@@ -78,6 +78,21 @@ namespace slib
 		return [[UIScreen mainScreen] scale] * 160;
 	}
 
+	void Device::openUrl(const String& _url)
+	{
+		if (_url.isNotEmpty()) {
+			NSString* s = Apple::getNSStringFromString(_url);
+			NSURL* url = [NSURL URLWithString:s];
+			if (![NSThread isMainThread]) {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[[UIApplication sharedApplication] openURL:url];
+				});
+			} else {
+				[[UIApplication sharedApplication] openURL:url];
+			}
+		}
+	}
+
 }
 
 #endif

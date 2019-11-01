@@ -325,14 +325,6 @@ namespace slib
 		}
 	}
 
-	void UI::openUrl(const String& url)
-	{
-		Windows::ShellExecuteParam param;
-		param.operation = "open";
-		param.path = url;
-		Windows::shellExecute(param);
-	}
-
 	void UI::setBadgeNumber(sl_uint32 num)
 	{
 		g_nBadgeNumber = num;

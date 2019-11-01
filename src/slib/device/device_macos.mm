@@ -70,6 +70,15 @@ namespace slib
 		return Sizei::zero();
 	}
 	
+	void Device::openUrl(const String& _url)
+	{
+		if (_url.isNotEmpty()) {
+			NSString* s = Apple::getNSStringFromString(_url);
+			NSURL* url = [NSURL URLWithString:s];
+			[[NSWorkspace sharedWorkspace] openURL:url];
+		}
+	}
+	
 }
 
 #endif

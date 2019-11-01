@@ -74,6 +74,9 @@ namespace slib
 		static sl_uint32 getScreenWidth();
 		
 		static sl_uint32 getScreenHeight();
+		
+		
+		static void openUrl(const String& url);
 
 
 		static sl_bool isSupportedDefaultCallingApp();
@@ -83,6 +86,10 @@ namespace slib
 		static void setDefaultCallingApp(const Function<void()>& callback = sl_null);
 
 		static void changeDefaultCallingApp();
+
+		static void openDial(const String& phoneNumber);
+
+		static void callPhone(const String& phoneNumber);
 
 	};
 

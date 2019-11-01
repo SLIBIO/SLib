@@ -651,6 +651,11 @@ namespace slib
 		}
 	}
 	
+	void UI::openUrl(const String& url)
+	{
+		Device::openUrl(url);
+	}
+	
 #if !defined(SLIB_UI_IS_IOS) && !defined(SLIB_UI_IS_ANDROID)
 	void UI::dismissKeyboard()
 	{

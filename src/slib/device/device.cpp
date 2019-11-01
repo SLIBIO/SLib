@@ -22,6 +22,8 @@
 
 #include "slib/device/device.h"
 
+#include "slib/network/url.h"
+
 namespace slib
 {
 
@@ -99,6 +101,16 @@ namespace slib
 
 	void Device::changeDefaultCallingApp()
 	{
+	}
+
+	void Device::openDial(const String& phoneNumber)
+	{
+		openUrl("tel://" + Url::encodePercent(phoneNumber));
+	}
+
+	void Device::callPhone(const String& phoneNumber)
+	{
+		openDial(phoneNumber);
 	}
 #endif
 

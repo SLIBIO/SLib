@@ -161,12 +161,6 @@ namespace slib
 		return sl_null;
 	}
 
-	void UI::openUrl(const String& url)
-	{
-		GError* error = NULL;
-		gtk_show_uri(NULL, url.getData(), GDK_CURRENT_TIME, &error);
-	}
-
 	sl_bool UI::isUiThread()
 	{
 		return g_threadMain == ::pthread_self();

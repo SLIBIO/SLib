@@ -161,21 +161,6 @@ namespace slib
 		return getPrimaryScreen();
 	}
 	
-	void UI::openUrl(const String& _url)
-	{
-		if (_url.isNotEmpty()) {
-			NSString* s = Apple::getNSStringFromString(_url);
-			NSURL* url = [NSURL URLWithString:s];
-			if (![NSThread isMainThread]) {
-				dispatch_async(dispatch_get_main_queue(), ^{
-					[[UIApplication sharedApplication] openURL:url];
-				});
-			} else {
-				[[UIApplication sharedApplication] openURL:url];
-			}
-		}
-	}
-	
 	void UI::dismissKeyboard()
 	{
 		UIWindow* window = UIPlatform::getKeyWindow();
