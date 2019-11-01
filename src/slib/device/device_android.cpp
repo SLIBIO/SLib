@@ -46,6 +46,7 @@ namespace slib
 			SLIB_JNI_BEGIN_CLASS(JDevice, "slib/platform/android/device/Device")
 				SLIB_JNI_STATIC_METHOD(checkPermissions, "checkPermissions", "(Landroid/app/Activity;I)Z");
 				SLIB_JNI_STATIC_METHOD(grantPermissions, "grantPermissions", "(Landroid/app/Activity;I)V");
+
 				SLIB_JNI_STATIC_METHOD(getIMEIs, "getIMEIs", "(Landroid/app/Activity;)Ljava/lang/String;");
 				SLIB_JNI_STATIC_METHOD(getPhoneNumbers, "getPhoneNumbers", "(Landroid/app/Activity;)Ljava/lang/String;");
 				SLIB_JNI_STATIC_METHOD(getDeviceId, "getDeviceId", "(Landroid/app/Activity;)Ljava/lang/String;");
@@ -53,6 +54,11 @@ namespace slib
 				SLIB_JNI_STATIC_METHOD(getDeviceName, "getDeviceName", "()Ljava/lang/String;");
 				SLIB_JNI_STATIC_METHOD(getScreenSize, "getScreenSize", "(Landroid/app/Activity;)Landroid/graphics/Point;");
 				SLIB_JNI_STATIC_METHOD(getScreenPPI, "getScreenPPI", "(Landroid/app/Activity;)I");
+
+				SLIB_JNI_STATIC_METHOD(isSupportedDefaultCallingApp, "isSupportedDefaultCallingApp", "()Z");
+				SLIB_JNI_STATIC_METHOD(isDefaultCallingApp, "isDefaultCallingApp", "(Landroid/app/Activity;)Z");
+				SLIB_JNI_STATIC_METHOD(setDefaultCallingApp, "setDefaultCallingApp", "(Landroid/app/Activity;)V");
+				SLIB_JNI_STATIC_METHOD(changeDefaultCallingApp, "changeDefaultCallingApp", "(Landroid/app/Activity;)V");
 			SLIB_JNI_END_CLASS
 
 			SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void()>, g_callbackOnGrantPermission);
@@ -65,6 +71,19 @@ namespace slib
 					}
 					g_callbackOnGrantPermission();
 					g_callbackOnGrantPermission.setNull();
+				}
+			SLIB_JNI_END_CLASS_SECTION
+
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void()>, g_callbackOnSetDefaultCallingApp);
+
+			SLIB_JNI_BEGIN_CLASS_SECTION(JDevice)
+				SLIB_JNI_NATIVE_IMPL(nativeOnCallbackSetDefaultCallingApp, "nativeOnCallbackSetDefaultCallingApp", "()V", void, jlong instance)
+				{
+					if (SLIB_SAFE_STATIC_CHECK_FREED(g_callbackOnSetDefaultCallingApp)) {
+						return;
+					}
+					g_callbackOnSetDefaultCallingApp();
+					g_callbackOnSetDefaultCallingApp.setNull();
 				}
 			SLIB_JNI_END_CLASS_SECTION
 
@@ -89,6 +108,7 @@ namespace slib
 		}
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
+			g_callbackOnGrantPermission();
 			g_callbackOnGrantPermission = callback;
 			JDevice::grantPermissions.call(sl_null, jactivity, (int)permissions);
 		}
@@ -167,6 +187,41 @@ namespace slib
 			return JDevice::getScreenPPI.callInt(sl_null, jactivity);
 		}
 		return 0;
+	}
+
+	sl_bool Device::isSupportedDefaultCallingApp()
+	{
+		return JDevice::isSupportedDefaultCallingApp.callBoolean(sl_null);
+	}
+
+	sl_bool Device::isDefaultCallingApp()
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			return JDevice::isDefaultCallingApp.callBoolean(sl_null, jactivity);
+		}
+		return sl_false;
+	}
+
+	void Device::setDefaultCallingApp(const Function<void()>& callback)
+	{
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_callbackOnSetDefaultCallingApp)) {
+			return;
+		}
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			g_callbackOnSetDefaultCallingApp();
+			g_callbackOnSetDefaultCallingApp = callback;
+			JDevice::setDefaultCallingApp.call(sl_null, jactivity);
+		}
+	}
+
+	void Device::changeDefaultCallingApp()
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JDevice::changeDefaultCallingApp.call(sl_null, jactivity);
+		}
 	}
 
 }

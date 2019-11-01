@@ -3,9 +3,12 @@ package slib.platform.android.device;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
 import android.os.Build;
 import android.provider.Settings;
+import android.telecom.TelecomManager;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
@@ -286,6 +289,67 @@ public class Device {
 		DisplayMetrics dm = new DisplayMetrics();
 		context.getWindowManager().getDefaultDisplay().getMetrics(dm);
 		return dm.densityDpi;
+	}
+
+
+	public static boolean isSupportedDefaultCallingApp() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+	}
+
+	public static boolean isDefaultCallingApp(Activity activity) {
+		try {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				TelecomManager manger = (TelecomManager) (activity.getSystemService(Context.TELECOM_SERVICE));
+				if (manger != null) {
+					String current = manger.getDefaultDialerPackage();
+					if (current != null && current.equals(activity.getPackageName())) {
+						return true;
+					}
+				}
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		return false;
+	}
+
+	private static native void nativeOnCallbackSetDefaultCallingApp();
+
+	public static void onSetDefaultCallingAppResult(Activity activity) {
+		nativeOnCallbackSetDefaultCallingApp();
+	}
+
+	private static boolean mFlagInitedSetDefaultCallingAppListener = false;
+
+	public static void setDefaultCallingApp(Activity activity) {
+		try {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				if (!mFlagInitedSetDefaultCallingAppListener) {
+					mFlagInitedSetDefaultCallingAppListener = true;
+					SlibActivity.addActivityResultListener(SlibActivity.REQUEST_ACTIVITY_SET_DEFAULT_CALLING_APP, new SlibActivity.ActivityResultListener() {
+						@Override
+						public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+							onSetDefaultCallingAppResult(activity);
+						}
+					});
+				}
+				Intent intent = new Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER);
+				intent.putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, activity.getPackageName());
+				activity.startActivityForResult(intent, SlibActivity.REQUEST_ACTIVITY_SET_DEFAULT_CALLING_APP);
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+
+	public static void changeDefaultCallingApp(Activity activity) {
+		try {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				activity.startActivity(new Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"));
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
 	}
 
 }

@@ -42,7 +42,7 @@ namespace slib
 		callback();
 	}
 #endif
-	
+
 	String Device::getIMEI()
 	{
 		return getIMEIs().getValueAt(0);
@@ -64,14 +64,14 @@ namespace slib
 		return sl_null;
 	}
 #endif
-	
+
 #if !defined(SLIB_PLATFORM_IS_ANDROID) && !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_MACOS) && !defined(SLIB_PLATFORM_IS_TIZEN)
 	String Device::getDeviceId()
 	{
 		return sl_null;
 	}
 #endif
-	
+
 	sl_uint32 Device::getScreenWidth()
 	{
 		return (sl_uint32)(getScreenSize().x);
@@ -81,5 +81,25 @@ namespace slib
 	{
 		return (sl_uint32)(getScreenSize().y);
 	}
+
+#if !defined(SLIB_PLATFORM_IS_ANDROID)
+	sl_bool Device::isSupportedDefaultCallingApp()
+	{
+		return sl_false;
+	}
+
+	sl_bool Device::isDefaultCallingApp()
+	{
+		return sl_false;
+	}
+
+	void Device::setDefaultCallingApp(const Function<void()>& callback)
+	{
+	}
+
+	void Device::changeDefaultCallingApp()
+	{
+	}
+#endif
 
 }

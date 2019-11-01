@@ -50,6 +50,7 @@ public class SlibActivity extends Activity {
 
 	public static final int REQUEST_ACTIVITY_TAKE_PHOTO = 0x000100;
 	public static final int REQUEST_ACTIVITY_WEBVIEW_CHOOSE_FILE = 0x000101;
+	public static final int REQUEST_ACTIVITY_SET_DEFAULT_CALLING_APP = 0x000102;
 
 	public static final int REQUEST_PERMISSIONS = 0x000200;
 	public static final int REQUEST_PERMISSION_SCAMERA = 0x000201;

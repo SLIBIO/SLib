@@ -75,6 +75,15 @@ namespace slib
 		
 		static sl_uint32 getScreenHeight();
 
+
+		static sl_bool isSupportedDefaultCallingApp();
+
+		static sl_bool isDefaultCallingApp();
+
+		static void setDefaultCallingApp(const Function<void()>& callback = sl_null);
+
+		static void changeDefaultCallingApp();
+
 	};
 
 }
