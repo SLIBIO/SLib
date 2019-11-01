@@ -43,6 +43,7 @@ dependencies {
     
     implementation project(':external_ShortcutBadger')
     implementation project(':slib_fcm')
+    implementation project(':slib_call')
 
     implementation "com.android.support:support-v4:$SUPPORT_LIBRARY_VERSION"
     implementation "com.android.support:appcompat-v7:$SUPPORT_LIBRARY_VERSION"
@@ -60,6 +61,7 @@ tasks.all { task ->
     if (task.name == "assembleDebug" || task.name == "assembleRelease") {
         task.dependsOn(project(":external_ShortcutBadger").getTasksByName(task.name, true)[0])
         task.dependsOn(project(":slib_fcm").getTasksByName(task.name, true)[0])
+        task.dependsOn(project(":slib_call").getTasksByName(task.name, true)[0])
         task.doLast {
             def copyAAR = { srcDir, srcFileName, dstFileName ->
                 def sourceFile = projectDir.getPath() + "/" + srcDir + "/" + srcFileName + ".aar";
@@ -73,6 +75,7 @@ tasks.all { task ->
             System.out.println("Moving slib.aar into lib!")
             copyAAR("build/outputs/aar", "slib", "slib")
             copyAAR("../slib_fcm/build/outputs/aar", "slib_fcm", "slib_fcm")
+            copyAAR("../slib_call/build/outputs/aar", "slib_call", "slib_call")
             copyAAR("../../../external/java/ShortcutBadger/build/outputs/aar", "external_ShortcutBadger", "ShortcutBadger")
         }
     }

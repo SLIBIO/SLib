@@ -1,0 +1,1 @@
+-keep class slib.call.android.**
