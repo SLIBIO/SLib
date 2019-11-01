@@ -276,6 +276,7 @@ namespace slib
 		Ref<Timer> m_timer;
 		MotionTracker m_tracker;
 		Point m_ptMouseDown;
+		Time m_timeMouseDown;
 		sl_real m_posMouseDown;
 		sl_bool m_flagTapping;
 		

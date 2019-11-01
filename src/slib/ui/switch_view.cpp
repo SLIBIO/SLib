@@ -539,6 +539,7 @@ namespace slib
 			case UIAction::LeftButtonDown:
 			case UIAction::TouchBegin:
 				{
+					m_timeMouseDown = ev->getTime();
 					m_ptMouseDown = ev->getPoint();
 					m_posMouseDown = m_posThumb;
 					m_flagTapping = sl_true;
@@ -582,21 +583,25 @@ namespace slib
 			case UIAction::LeftButtonUp:
 			case UIAction::TouchEnd:
 				if (isPressedState()) {
-					sl_real v = 0;
-					m_tracker.getVelocity(&v, sl_null);
-					sl_real t = dimUnit * 10;
-					if (v > t) {
-						_changeValue(sl_true);
-					} else if (v < -t) {
-						_changeValue(sl_false);
+					if (m_flagTapping && (ev->getTime() - m_timeMouseDown).getMillisecondsCount() < 250) {
+						_changeValue(!m_value);
 					} else {
-						if (m_flagTapping) {
-							_changeValue(!m_value);
+						sl_real v = 0;
+						m_tracker.getVelocity(&v, sl_null);
+						sl_real t = dimUnit * 10;
+						if (v > t) {
+							_changeValue(sl_true);
+						} else if (v < -t) {
+							_changeValue(sl_false);
 						} else {
-							if (m_posThumb > 0.5f) {
-								_changeValue(sl_true);
+							if (m_flagTapping) {
+								_changeValue(!m_value);
 							} else {
-								_changeValue(sl_false);
+								if (m_posThumb > 0.5f) {
+									_changeValue(sl_true);
+								} else {
+									_changeValue(sl_false);
+								}
 							}
 						}
 					}
