@@ -2,34 +2,65 @@
 	<layout
 		type='page'
 		background='white'
+		fontSize='6%sw'
 		>
 
 		<linear
 			width='fill'
-			margin='20dp'
+			margin='1%sw'
 			centerVertical='true'
 			>
 
 			<label
 				text='Phone Call App'
-				fontSize='30dp'
+				fontSize='10%sw'
 				centerHorizontal='true'
-				marginBottom='25dp'
 				/>
 			<switch
 				name='switchSetDefault'
-				style='switch'
 				text='Set as Default App'
+				width='80%sw'
+				padding='2%sw'
+				marginTop='10%sw'
+				centerHorizontal='true'
 				/>
+
+			<edit
+				name='txtPhoneNumber'
+				width='60%'
+				centerHorizontal='true'
+				marginTop='5%sw'
+				/>
+
+			<hlinear
+				centerHorizontal='true'
+				marginTop='2%sw'
+				>
+				<button
+					style='button'
+					name='btnDial'
+					text='Dial'
+					/>
+				<button
+					style='button'
+					name='btnCall'
+					text='Call'
+					marginLeft='5%sw'
+					/>
+			</hlinear>
+
 		</linear>
 
  	</layout>
 
 	<style
-		name='switch'
-		width='fill'
-		fontSize='17dp'
-		padding='10dp'
+		name='button'
+		background='white'
+		boundRadius='3%sw'
+		width='25%sw'
+		shadowOpacity='0.5'
+		shadowRadius='1.3%sw'
+		textColor='black'
 		/>
 
 </sapp>

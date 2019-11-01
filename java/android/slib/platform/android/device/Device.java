@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
 import android.telecom.TelecomManager;
@@ -16,10 +17,12 @@ import android.util.DisplayMetrics;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 
+import java.io.File;
 import java.util.Vector;
 
 import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
+import slib.platform.android.helper.FileHelper;
 import slib.platform.android.helper.Permissions;
 import slib.platform.android.ui.UiThread;
 
@@ -291,6 +294,37 @@ public class Device {
 		return dm.densityDpi;
 	}
 
+	public static void openURL(final Activity activity, final String url) {
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					if (url.startsWith("file://")) {
+						File file = new File(url.substring(7));
+						Uri uri = FileHelper.getUriForFile(activity, file);
+						if (uri == null) {
+							Logger.error("File exposed beyond app: " + file.getAbsolutePath());
+							return;
+						}
+						Intent intent;
+						if (url.endsWith("jpg") || url.endsWith("jpeg") || url.endsWith("png")) {
+							intent = new Intent(Intent.ACTION_VIEW);
+							intent.setDataAndType(uri, "image/*");
+						} else {
+							intent = new Intent(Intent.ACTION_VIEW, uri);
+						}
+						intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+						activity.startActivity(intent);
+					} else {
+						Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+						activity.startActivity(intent);
+					}
+				} catch (Exception e) {
+					Logger.exception(e);
+				}
+			}
+		});
+	}
 
 	public static boolean isSupportedDefaultCallingApp() {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
@@ -321,7 +355,7 @@ public class Device {
 
 	private static boolean mFlagInitedSetDefaultCallingAppListener = false;
 
-	public static void setDefaultCallingApp(Activity activity) {
+	public static void setDefaultCallingApp(final Activity activity) {
 		try {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 				if (!mFlagInitedSetDefaultCallingAppListener) {
@@ -333,20 +367,65 @@ public class Device {
 						}
 					});
 				}
-				Intent intent = new Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER);
-				intent.putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, activity.getPackageName());
-				activity.startActivityForResult(intent, SlibActivity.REQUEST_ACTIVITY_SET_DEFAULT_CALLING_APP);
+				activity.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						final Intent intent = new Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER);
+						intent.putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, activity.getPackageName());
+						activity.startActivityForResult(intent, SlibActivity.REQUEST_ACTIVITY_SET_DEFAULT_CALLING_APP);
+					}
+				});
 			}
 		} catch (Exception e) {
 			Logger.exception(e);
 		}
 	}
 
-	public static void changeDefaultCallingApp(Activity activity) {
+	public static void changeDefaultCallingApp(final Activity activity) {
 		try {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-				activity.startActivity(new Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"));
+				activity.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						activity.startActivity(new Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"));
+					}
+				});
 			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+
+	public static void openDial(final Activity activity, final String phoneNumber) {
+		try {
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					Intent intent;
+					if (phoneNumber != null && phoneNumber.length() > 0) {
+						intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phoneNumber, null));
+					} else {
+						intent = new Intent(Intent.ACTION_DIAL);
+					}
+					activity.startActivity(intent);
+				}
+			});
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+
+	public static void callPhone(final Activity activity, final String phoneNumber) {
+		try {
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					if( phoneNumber !=null && phoneNumber.length()>0) {
+						Intent intent = new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", phoneNumber, null));
+						activity.startActivity(intent);
+					}
+				}
+			});
 		} catch (Exception e) {
 			Logger.exception(e);
 		}

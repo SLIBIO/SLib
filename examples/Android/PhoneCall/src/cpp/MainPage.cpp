@@ -11,6 +11,16 @@ void MainPage::onOpen()
 			Device::changeDefaultCallingApp();
 		}
 	});
+
+	btnDial->setOnClick([this](View*) {
+		Device::openDial(txtPhoneNumber->getText());
+	});
+
+	btnCall->setOnClick([this](View*) {
+		Device::grantPermissions(DevicePermissions::CallPhone, [this]() {
+			Device::callPhone(txtPhoneNumber->getText());
+		});
+	});
 }
 
 void MainPage::onResume()

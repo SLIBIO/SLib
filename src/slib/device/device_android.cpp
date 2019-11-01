@@ -55,10 +55,14 @@ namespace slib
 				SLIB_JNI_STATIC_METHOD(getScreenSize, "getScreenSize", "(Landroid/app/Activity;)Landroid/graphics/Point;");
 				SLIB_JNI_STATIC_METHOD(getScreenPPI, "getScreenPPI", "(Landroid/app/Activity;)I");
 
+				SLIB_JNI_STATIC_METHOD(openURL, "openURL", "(Landroid/app/Activity;Ljava/lang/String;)V");
+
 				SLIB_JNI_STATIC_METHOD(isSupportedDefaultCallingApp, "isSupportedDefaultCallingApp", "()Z");
 				SLIB_JNI_STATIC_METHOD(isDefaultCallingApp, "isDefaultCallingApp", "(Landroid/app/Activity;)Z");
 				SLIB_JNI_STATIC_METHOD(setDefaultCallingApp, "setDefaultCallingApp", "(Landroid/app/Activity;)V");
 				SLIB_JNI_STATIC_METHOD(changeDefaultCallingApp, "changeDefaultCallingApp", "(Landroid/app/Activity;)V");
+				SLIB_JNI_STATIC_METHOD(openDial, "openDial", "(Landroid/app/Activity;Ljava/lang/String;)V");
+				SLIB_JNI_STATIC_METHOD(callPhone, "callPhone", "(Landroid/app/Activity;Ljava/lang/String;)V");
 			SLIB_JNI_END_CLASS
 
 			SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void()>, g_callbackOnGrantPermission);
@@ -189,6 +193,14 @@ namespace slib
 		return 0;
 	}
 
+	void Device::openUrl(const String& _url) {
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JniLocal<jstring> jurl = Jni::getJniString(_url);
+			JDevice::openURL.call(sl_null, jactivity, jurl.get());
+		}
+	}
+	
 	sl_bool Device::isSupportedDefaultCallingApp()
 	{
 		return JDevice::isSupportedDefaultCallingApp.callBoolean(sl_null);
@@ -221,6 +233,24 @@ namespace slib
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			JDevice::changeDefaultCallingApp.call(sl_null, jactivity);
+		}
+	}
+
+	void Device::openDial(const String& phoneNumber)
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JniLocal<jstring> tel = Jni::getJniString(phoneNumber);
+			JDevice::openDial.call(sl_null, jactivity, tel.get());
+		}
+	}
+
+	void Device::callPhone(const String& phoneNumber)
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JniLocal<jstring> tel = Jni::getJniString(phoneNumber);
+			JDevice::callPhone.call(sl_null, jactivity, tel.get());
 		}
 	}
 

@@ -65,7 +65,6 @@ namespace slib
 				SLIB_JNI_STATIC_METHOD(getDisplaySize, "getDisplaySize", "(Landroid/view/Display;)Landroid/graphics/Point;");
 				SLIB_JNI_STATIC_METHOD(getScreenOrientation, "getScreenOrientation", "(Landroid/app/Activity;)I");
 				SLIB_JNI_STATIC_METHOD(setScreenOrientations, "setScreenOrientations", "(Landroid/app/Activity;ZZZZ)V");
-				SLIB_JNI_STATIC_METHOD(openURL, "openURL", "(Landroid/app/Activity;Ljava/lang/String;)V");
 				SLIB_JNI_STATIC_METHOD(getSafeAreaInsets, "getSafeAreaInsets", "(Landroid/app/Activity;)Landroid/graphics/Rect;");
 				SLIB_JNI_STATIC_METHOD(getStatusBarHeight, "getStatusBarHeight", "(Landroid/app/Activity;)I");
 				SLIB_JNI_STATIC_METHOD(setStatusBarStyle, "setStatusBarStyle", "(Landroid/app/Activity;I)V");		
@@ -302,14 +301,6 @@ namespace slib
 		}
 	}
 
-	void UI::openUrl(const String& _url) {
-		jobject jactivity = Android::getCurrentActivity();
-		if (jactivity) {
-			JniLocal<jstring> jurl = Jni::getJniString(_url);
-			JUtil::openURL.call(sl_null, jactivity, jurl.get());
-		}
-	}
-	
 	void UI::dismissKeyboard()
 	{
 		Android::dismissKeyboard();
