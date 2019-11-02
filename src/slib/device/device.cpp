@@ -105,7 +105,7 @@ namespace slib
 
 	void Device::openDial(const String& phoneNumber)
 	{
-		openUrl("tel://" + Url::encodePercent(phoneNumber));
+		openUrl("tel:" + Url::encodePercent(phoneNumber));
 	}
 
 	void Device::callPhone(const String& phoneNumber)
