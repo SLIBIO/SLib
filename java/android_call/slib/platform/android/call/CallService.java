@@ -1,4 +1,4 @@
-package slib.call.android;
+package slib.platform.android.call;
 
 import android.annotation.TargetApi;
 import android.os.Build;

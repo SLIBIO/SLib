@@ -25,6 +25,7 @@ void MainPage::onOpen()
 	MobileApp::getApp()->setOnOpenUrl([this](MobileApp* app, UIEvent* ev) {
 		String phoneNumber = Url::getPhoneNumber(ev->getUrl());
 		if (phoneNumber.isNotEmpty()) {
+			Toast::show("Open Dial: " + phoneNumber);
 			txtPhoneNumber->setText(phoneNumber);
 		}
 	});

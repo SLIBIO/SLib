@@ -1,4 +1,4 @@
-package slib.platform.android.social;
+package slib.platform.android.facebook;
 
 public class FacebookToken {
 

@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
@@ -15,9 +16,8 @@ import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 
-import com.google.android.gms.ads.identifier.AdvertisingIdClient;
-
 import java.io.File;
+import java.util.UUID;
 import java.util.Vector;
 
 import slib.platform.android.Logger;
@@ -250,19 +250,15 @@ public class Device {
 
 	public static String getDeviceId(Activity context) {
 		try {
-			AdvertisingIdClient.Info info = AdvertisingIdClient.getAdvertisingIdInfo(context);
-			if (info != null) {
-				String id = info.getId();
-				if (id != null && id.length() > 0) {
-					return id;
-				}
+			final String KEY_DEVICEID = "DeviceId";
+			SharedPreferences prefs = context.getSharedPreferences("Slib.device_id_prefs", 0);
+			String value = prefs.getString(KEY_DEVICEID, null);
+			if (value == null) {
+				value = UUID.randomUUID().toString();
+				prefs.edit().putString(KEY_DEVICEID, value).apply();
 			}
-		} catch (Throwable e) {
-			Logger.exception(e);
-		}
-		try {
-			return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-		} catch (Throwable e) {
+			return value;
+		} catch (Exception e) {
 			Logger.exception(e);
 		}
 		return null;

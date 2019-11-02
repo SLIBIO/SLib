@@ -1,4 +1,4 @@
-package slib.platform.android.notification;
+package slib.platform.android.fcm;
 
 import android.app.Activity;
 import android.app.NotificationChannel;
@@ -9,14 +9,13 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import slib.fcm.android.NotificationService;
 import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
 import slib.platform.android.ui.Util;

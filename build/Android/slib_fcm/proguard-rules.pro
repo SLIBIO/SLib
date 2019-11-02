@@ -1,1 +1,1 @@
--keep class slib.fcm.android.**
+-keep class slib.platform.android.**

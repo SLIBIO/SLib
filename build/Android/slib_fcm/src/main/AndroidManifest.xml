@@ -1,9 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="io.slib.fcm">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application>
 
         <service
-            android:name="slib.fcm.android.NotificationService"
+            android:name="slib.platform.android.fcm.NotificationService"
             android:exported="false"
             >
             <intent-filter>

@@ -19,7 +19,7 @@
 
         <!-- added for capture photo -->
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="io.slib.examplewebview.slib.filechooser"
             android:exported="false"
             android:grantUriPermissions="true">

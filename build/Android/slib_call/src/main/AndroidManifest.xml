@@ -3,26 +3,20 @@
     <application>
 
         <service
-            android:name="slib.call.android.CallService"
+            android:name="slib.platform.android.call.CallService"
             android:permission="android.permission.BIND_INCALL_SERVICE"
             >
             <meta-data
                 android:name="android.telecom.IN_CALL_SERVICE_UI"
                 android:value="true" />
+            <meta-data
+                android:name="android.telecom.IN_CALL_SERVICE_RINGING"
+                android:value="true" />
             <intent-filter>
                 <action android:name="android.telecom.InCallService" />
             </intent-filter>
         </service>
-<!--
-        <service
-            android:name="slib.call.android.ListenerService"
-            android:enabled="true"
-            >
-            <intent-filter android:priority="1000">
-                <action android:name="slib.call.android.ListenerService" />
-            </intent-filter>
-        </service>
--->
+
     </application>
 
 </manifest>

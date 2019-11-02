@@ -24,7 +24,7 @@ package slib.platform.android.ui.view;
 
 import android.content.Context;
 import android.graphics.Rect;
-import android.support.v4.widget.SwipeRefreshLayout;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.View;
 
 import slib.platform.android.Logger;

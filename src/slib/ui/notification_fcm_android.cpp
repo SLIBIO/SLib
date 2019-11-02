@@ -43,7 +43,7 @@ namespace slib
 
 			void OnMessageReceived(JNIEnv* env, jobject _this, jstring title, jstring content, jobjectArray data, jboolean flagClicked, jboolean flagBackground);
 
-			SLIB_JNI_BEGIN_CLASS(JFCM, "slib/platform/android/notification/FCM")
+			SLIB_JNI_BEGIN_CLASS(JFCM, "slib/platform/android/fcm/FCM")
 				SLIB_JNI_STATIC_METHOD(initialize, "initialize", "(Landroid/app/Activity;)V");
 				SLIB_JNI_NATIVE(onToken, "nativeOnToken", "(Ljava/lang/String;)V", OnToken);
 				SLIB_JNI_NATIVE(onReceive, "nativeOnMessageReceived", "(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;ZZ)V", OnMessageReceived);
