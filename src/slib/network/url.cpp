@@ -420,4 +420,14 @@ namespace slib
 		}
 	}
 
+	String Url::getPhoneNumber(const String& url)
+	{
+		if (url.startsWith("tel://")) {
+			return url.substring(6);
+		} else if (url.startsWith("tel:")) {
+			return url.substring(4);
+		}
+		return sl_null;
+	}
+
 }

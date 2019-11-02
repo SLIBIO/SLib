@@ -81,6 +81,9 @@ namespace slib
 		static String encodeForm(const String& value);
 		
 		static String decodeForm(const String& value);
+
+
+		static String getPhoneNumber(const String& url);
 		
 	};
 
