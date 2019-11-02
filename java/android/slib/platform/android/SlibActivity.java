@@ -352,7 +352,7 @@ public class SlibActivity extends Activity {
 		}
 		String action = intent.getAction();
 		if (action != null) {
-			if (action.equals(Intent.ACTION_VIEW)) {
+			if (action.equals(Intent.ACTION_VIEW) || action.equals(Intent.ACTION_DIAL)) {
 				Uri uri = intent.getData();
 				if (uri != null) {
 					String path = uri.toString();

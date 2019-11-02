@@ -21,6 +21,13 @@ void MainPage::onOpen()
 			Device::callPhone(txtPhoneNumber->getText());
 		});
 	});
+
+	MobileApp::getApp()->setOnOpenUrl([this](MobileApp* app, UIEvent* ev) {
+		String phoneNumber = Url::getPhoneNumber(ev->getUrl());
+		if (phoneNumber.isNotEmpty()) {
+			txtPhoneNumber->setText(phoneNumber);
+		}
+	});
 }
 
 void MainPage::onResume()
