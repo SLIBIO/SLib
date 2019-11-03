@@ -38,6 +38,7 @@ namespace slib
 		{
 
 			SLIB_JNI_BEGIN_CLASS(JAndroid, "slib/platform/android/Android")
+				SLIB_JNI_STATIC_METHOD(getSdkVersion, "getSdkVersion", "()I")
 				SLIB_JNI_STATIC_METHOD(finishActivity, "finishActivity", "(Landroid/app/Activity;)V")
 				SLIB_JNI_STATIC_METHOD(openAsset, "openAsset", "(Landroid/app/Activity;Ljava/lang/String;)Ljava/io/InputStream;")
 				SLIB_JNI_STATIC_METHOD(showKeyboard, "showKeyboard", "(Landroid/app/Activity;)V")
@@ -57,19 +58,18 @@ namespace slib
 		Jni::initialize(jvm);
 	}
 
+	sl_uint32 Android::getSdkVersion()
+	{
+		return (sl_uint32)(JAndroid::getSdkVersion.callInt(sl_null));
+	}
+
 	jobject Android::getCurrentActivity()
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(g_activityCurrent)) {
-			return 0;
-		}
 		return g_activityCurrent.get();
 	}
 
 	void Android::setCurrentActivity(jobject activity)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(g_activityCurrent)) {
-			return;
-		}
 		g_activityCurrent = activity;
 	}
 

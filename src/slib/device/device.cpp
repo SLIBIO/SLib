@@ -33,18 +33,6 @@ namespace slib
 	}
 #endif
 
-#if !defined(SLIB_UI_IS_ANDROID)
-	sl_bool Device::checkPermissions(const DevicePermissions& permissions)
-	{
-		return sl_true;
-	}
-	
-	void Device::grantPermissions(const DevicePermissions& permissions, const Function<void()>& callback)
-	{
-		callback();
-	}
-#endif
-
 	String Device::getIMEI()
 	{
 		return getIMEIs().getValueAt(0);
@@ -85,24 +73,6 @@ namespace slib
 	}
 
 #if !defined(SLIB_PLATFORM_IS_ANDROID)
-	sl_bool Device::isSupportedDefaultCallingApp()
-	{
-		return sl_false;
-	}
-
-	sl_bool Device::isDefaultCallingApp()
-	{
-		return sl_false;
-	}
-
-	void Device::setDefaultCallingApp(const Function<void()>& callback)
-	{
-	}
-
-	void Device::changeDefaultCallingApp()
-	{
-	}
-
 	void Device::openDial(const String& phoneNumber)
 	{
 		openUrl("tel:" + Url::encodePercent(phoneNumber));

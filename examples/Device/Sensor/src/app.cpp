@@ -18,7 +18,7 @@ void ExampleSensorApp::onStart()
 	label->setMultiLine(MultiLineMode::Multiple);
 	addViewToContent(label);
 	
-	Device::grantPermissions(DevicePermissions::AccessFineLocation, [this, label]() {
+	Application::grantPermissions(AppPermissions::AccessFineLocation, [this, label]() {
 		SensorParam param;
 		param.flagUseLocation = sl_true;
 		param.onLocationChanged = [label](Sensor*, const GeoLocation& location) {

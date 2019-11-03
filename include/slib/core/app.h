@@ -27,6 +27,7 @@
 
 #include "object.h"
 #include "string.h"
+#include "function.h"
 #include "global_unique_instance.h"
 
 namespace slib
@@ -37,7 +38,64 @@ namespace slib
 		UI = 0,
 		Service = 1
 	};
+	
+	class AppPermissions
+	{
+	public:
+		int value;
+		SLIB_MEMBERS_OF_FLAGS(AppPermissions, value)
 		
+		enum {
+			Camera = 1,
+			
+			RecordAudio = (1<<1),
+			
+			WriteExternalStorage = (1<<2),
+			ReadExternalStorage = (1<<3),
+			
+			ReadPhoneState = (1<<4),
+			ReadPhoneNumbers = (1<<5),
+			CallPhone = (1<<6),
+			AnswerPhoneCalls = (1<<7),
+			AddVoiceMail = (1<<8),
+			UseSip = (1<<9),
+			
+			SendSMS = (1<<10),
+			ReceiveSMS = (1<<11),
+			ReadSMS = (1<<12),
+			ReceiveWapPush = (1<<13),
+			ReceiveMMS = (1<<14),
+			
+			ReadContacts = (1<<15),
+			WriteContacts = (1<<16),
+			GetAccounts = (1<<17),
+
+			AccessFineLocation = (1<<18),
+			AccessCoarseLocation = (1<<19),
+
+			ReadCalendar = (1<<20),
+			WriteCalendar = (1<<21),
+			
+			ReadCallLog = (1<<22),
+			WriteCallLog = (1<<23),
+			ProcessOutgoingCalls = (1<<24),
+			
+			BodySensors = (1<<25)
+		};
+	};
+
+	enum class AppRole
+	{
+		Home = 0,
+		Browser = 1,
+		Dialer = 2,
+		SMS = 3,
+		Emergency = 4,
+		CallRedirection = 5,
+		CallScreening = 6,
+		Assistant = 7
+	};
+
 	class SLIB_EXPORT Application : public Object
 	{
 		SLIB_DECLARE_OBJECT
@@ -108,6 +166,23 @@ namespace slib
 		static List<String> breakCommandLine(const String& commandLine);
 
 		static String buildCommandLine(const String* argv, sl_size argc);
+		
+	public:
+		static sl_bool checkPermissions(const AppPermissions& permissions);
+
+		static void grantPermissions(const AppPermissions& permissions, const Function<void()>& callback = sl_null);
+		
+		static sl_bool isRoleHeld(AppRole role);
+
+		static void requestRole(AppRole role, const Function<void()>& callback = sl_null);
+
+		static sl_bool isSupportedDefaultCallingApp();
+
+		static sl_bool isDefaultCallingApp();
+
+		static void setDefaultCallingApp(const Function<void()>& callback = sl_null);
+
+		static void changeDefaultCallingApp();
 
 	protected:
 		String m_executablePath;

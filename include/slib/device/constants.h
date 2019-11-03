@@ -41,51 +41,6 @@ namespace slib
 		VideoChat = 6
 	};
 	
-	class DevicePermissions
-	{
-	public:
-		int value;
-		SLIB_MEMBERS_OF_FLAGS(DevicePermissions, value)
-		
-		enum {
-			Camera = 1,
-			
-			RecordAudio = (1<<1),
-			
-			WriteExternalStorage = (1<<2),
-			ReadExternalStorage = (1<<3),
-			
-			ReadPhoneState = (1<<4),
-			ReadPhoneNumbers = (1<<5),
-			CallPhone = (1<<6),
-			AnswerPhoneCalls = (1<<7),
-			AddVoiceMail = (1<<8),
-			UseSip = (1<<9),
-			
-			SendSMS = (1<<10),
-			ReceiveSMS = (1<<11),
-			ReadSMS = (1<<12),
-			ReceiveWapPush = (1<<13),
-			ReceiveMMS = (1<<14),
-			
-			ReadContacts = (1<<15),
-			WriteContacts = (1<<16),
-			GetAccounts = (1<<17),
-
-			AccessFineLocation = (1<<18),
-			AccessCoarseLocation = (1<<19),
-
-			ReadCalendar = (1<<20),
-			WriteCalendar = (1<<21),
-			
-			ReadCallLog = (1<<22),
-			WriteCallLog = (1<<23),
-			ProcessOutgoingCalls = (1<<24),
-			
-			BodySensors = (1<<25)
-		};
-	};
-
 }
 
 #endif

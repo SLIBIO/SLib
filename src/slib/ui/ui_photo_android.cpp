@@ -28,8 +28,8 @@
 
 #include "slib/ui/core.h"
 #include "slib/ui/platform.h"
-#include "slib/device/device.h"
 
+#include "slib/core/app.h"
 #include "slib/core/file.h"
 #include "slib/core/safe_static.h"
 
@@ -196,8 +196,8 @@ namespace slib
 
 	void PhotoKit::saveImage(const PhotoKit::SaveImageParam& param)
 	{
-		Device::grantPermissions(DevicePermissions::WriteExternalStorage, [param]() {
-			if (Device::checkPermissions(DevicePermissions::WriteExternalStorage)) {
+		Application::grantPermissions(AppPermissions::WriteExternalStorage, [param]() {
+			if (Application::checkPermissions(AppPermissions::WriteExternalStorage)) {
 				Memory content;
 				if (param.image.isNotNull()) {
 					Ref<Image> image = param.image->toImage();

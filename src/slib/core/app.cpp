@@ -439,4 +439,45 @@ Microsoft Specific
 		return commandLine.merge();
 	}
 
+
+#if !defined(SLIB_UI_IS_ANDROID)
+	sl_bool Application::checkPermissions(const AppPermissions& permissions)
+	{
+		return sl_true;
+	}
+	
+	void Application::grantPermissions(const AppPermissions& permissions, const Function<void()>& callback)
+	{
+		callback();
+	}
+
+	sl_bool Application::isRoleHeld(AppRole role)
+	{
+		return sl_true;
+	}
+
+	void Application::requestRole(AppRole role, const Function<void()>& callback)
+	{
+		callback();
+	}
+
+	sl_bool Application::isSupportedDefaultCallingApp()
+	{
+		return sl_false;
+	}
+
+	sl_bool Application::isDefaultCallingApp()
+	{
+		return sl_false;
+	}
+
+	void Application::setDefaultCallingApp(const Function<void()>& callback)
+	{
+	}
+
+	void Application::changeDefaultCallingApp()
+	{
+	}
+#endif
+
 }

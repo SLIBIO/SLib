@@ -25,6 +25,7 @@ package slib.platform.android;
 import java.util.HashMap;
 import java.util.Vector;
 
+import slib.platform.android.app.Application;
 import slib.platform.android.device.Device;
 import slib.platform.android.ui.UiThread;
 import slib.platform.android.ui.window.UiWindow;
@@ -56,7 +57,9 @@ public class SlibActivity extends Activity {
 	public static final int REQUEST_PERMISSION_SCAMERA = 0x000201;
 	public static final int REQUEST_PERMISSION_TAKE_PHOTO = 0x000202;
 
-	public static final int REQUEST_INTENT_REMOTE_NOTIFICATION = 0x000300;
+	public static final int REQUEST_ROLE = 0x000300;
+
+	public static final int REQUEST_INTENT_REMOTE_NOTIFICATION = 0x001000;
 
 	public interface ActivityResultListener {
 		void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data);
@@ -274,6 +277,13 @@ public class SlibActivity extends Activity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		 if (requestCode == REQUEST_ROLE) {
+			try {
+				Application.onRequestRoleResult(this);
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
+		}
 		try {
 			{
 				ActivityResultListener listener = mActivityResultListeners.get(requestCode);
@@ -301,7 +311,7 @@ public class SlibActivity extends Activity {
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		if (requestCode == REQUEST_PERMISSIONS) {
 			try {
-				Device.onRequestPermissionsResult(this);
+				Application.onRequestPermissionsResult(this);
 			} catch (Exception e) {
 				Logger.exception(e);
 			}

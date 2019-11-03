@@ -42,6 +42,10 @@ import slib.platform.android.helper.FileHelper;
 import slib.platform.android.ui.UiThread;
 
 public class Android {
+
+	public static int getSdkVersion() {
+		return Build.VERSION.SDK_INT;
+	}
 	
 	public static void finishActivity(Activity activity)
 	{

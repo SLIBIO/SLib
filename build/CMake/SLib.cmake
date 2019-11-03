@@ -202,6 +202,7 @@ set (SLIB_CORE_FILES
 )
 if(ANDROID)
  set (SLIB_CORE_PLATFORM_FILES
+  "${SLIB_PATH}/src/slib/core/app_android.cpp"
   "${SLIB_PATH}/src/slib/core/charset_android.cpp"
   "${SLIB_PATH}/src/slib/core/platform_android.cpp"
   "${SLIB_PATH}/src/slib/core/preference_android.cpp"

@@ -4,11 +4,11 @@ void MainPage::onOpen()
 {
 	switchSetDefault->setOnChange([](SwitchView*, sl_bool value) {
 		if (value) {
-			Device::setDefaultCallingApp([]() {
-				Println("Set Default Calling App Result: %d", Device::isDefaultCallingApp());
+			Application::setDefaultCallingApp([]() {
+				Println("Set Default Calling App Result: %d", Application::isDefaultCallingApp());
 			});
 		} else {
-			Device::changeDefaultCallingApp();
+			Application::changeDefaultCallingApp();
 		}
 	});
 
@@ -17,7 +17,7 @@ void MainPage::onOpen()
 	});
 
 	btnCall->setOnClick([this](View*) {
-		Device::grantPermissions(DevicePermissions::CallPhone, [this]() {
+		Application::grantPermissions(AppPermissions::CallPhone, [this]() {
 			Device::callPhone(txtPhoneNumber->getText());
 		});
 	});
@@ -33,5 +33,5 @@ void MainPage::onOpen()
 
 void MainPage::onResume()
 {
-	switchSetDefault->setValue(Device::isDefaultCallingApp());
+	switchSetDefault->setValue(Application::isDefaultCallingApp());
 }

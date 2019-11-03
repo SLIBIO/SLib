@@ -99,8 +99,6 @@ void ExampleChromiumViewApp::onStart()
 
 void ExampleChromiumViewApp::onClickTest1(View* button)
 {
-	Device::grantPermissions(DevicePermissions::Camera | DevicePermissions::WriteExternalStorage);
-
 	String html = SLIB_STRINGIFY
 	(
 		<html>

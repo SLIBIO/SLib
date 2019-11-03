@@ -36,6 +36,8 @@ namespace slib
 	{
 	public:
 		static void initialize(JavaVM* jvm);
+		
+		static sl_uint32 getSdkVersion();
 
 
 		static jobject getCurrentActivity();

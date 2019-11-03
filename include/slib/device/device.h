@@ -42,11 +42,6 @@ namespace slib
 		static void setAudioCategory(const DeviceAudioCategory& category);
 		
 		
-		static sl_bool checkPermissions(const DevicePermissions& permissions);
-
-		static void grantPermissions(const DevicePermissions& permissions, const Function<void()>& callback = sl_null);
-
-		
 		// Works on Android
 		static String getIMEI();
 		
@@ -78,14 +73,6 @@ namespace slib
 		
 		static void openUrl(const String& url);
 
-
-		static sl_bool isSupportedDefaultCallingApp();
-
-		static sl_bool isDefaultCallingApp();
-
-		static void setDefaultCallingApp(const Function<void()>& callback = sl_null);
-
-		static void changeDefaultCallingApp();
 
 		static void openDial(const String& phoneNumber);
 
