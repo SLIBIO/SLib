@@ -19,7 +19,6 @@ void MainWindow::onCreate()
 		txtAccessTokenUrl->setText("https://graph.facebook.com/oauth/access_token");
 		txtRedirectUri->setText("https://github.com/SLIBIO/SLib");
 		txtClientId->setText("895581487493562");
-		txtClientSecret->setText("e12a12f9451b49a890e96dd662bd39d4");
 		txtScopes->setText("public_profile,email");
 		txtRequestURL->setText("https://graph.facebook.com/me?fields=id,name");
 	});
