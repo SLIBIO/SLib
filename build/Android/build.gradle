@@ -42,7 +42,7 @@ ext.setLibraryOutput = { project, srcName, dstName ->
     project.tasks.all { task ->
         if (task.name == "assembleDebug" || task.name == "assembleRelease") {
             task.doLast {
-                System.out.println("Moving " + name + ".aar into lib!")
+                System.out.println("Moving " + dstName + ".aar into lib!")
                 copyAAR("build/outputs/aar", srcName, dstName)
             }
         }
