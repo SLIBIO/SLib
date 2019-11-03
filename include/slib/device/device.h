@@ -35,6 +35,8 @@
 namespace slib
 {
 
+	typedef Function<void(const String& callId, const String& phoneNumber)> PhoneCallCallback;
+
 	class SLIB_EXPORT Device
 	{
 	public:
@@ -77,6 +79,22 @@ namespace slib
 		static void openDial(const String& phoneNumber);
 
 		static void callPhone(const String& phoneNumber);
+		
+		
+		static void answerCall(const String& callId);
+		
+		
+		static void addOnIncomingCall(const PhoneCallCallback& callback);
+		
+		static void removeOnIncomingCall(const PhoneCallCallback& callback);
+
+		static void addOnOutgoingCall(const PhoneCallCallback& callback);
+		
+		static void removeOnOutgoingCall(const PhoneCallCallback& callback);
+		
+		static void addOnEndCall(const PhoneCallCallback& callback);
+		
+		static void removeOnEndCall(const PhoneCallCallback& callback);
 
 	};
 

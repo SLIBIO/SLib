@@ -162,39 +162,4 @@ public class Device {
 		});
 	}
 
-	public static void openDial(final Activity activity, final String phoneNumber) {
-		try {
-			activity.runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					Intent intent;
-					if (phoneNumber != null && phoneNumber.length() > 0) {
-						intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phoneNumber, null));
-					} else {
-						intent = new Intent(Intent.ACTION_DIAL);
-					}
-					activity.startActivity(intent);
-				}
-			});
-		} catch (Exception e) {
-			Logger.exception(e);
-		}
-	}
-
-	public static void callPhone(final Activity activity, final String phoneNumber) {
-		try {
-			activity.runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					if( phoneNumber !=null && phoneNumber.length()>0) {
-						Intent intent = new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", phoneNumber, null));
-						activity.startActivity(intent);
-					}
-				}
-			});
-		} catch (Exception e) {
-			Logger.exception(e);
-		}
-	}
-
 }

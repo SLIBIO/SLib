@@ -27,6 +27,7 @@
 #include "slib/device/device.h"
 
 #include "slib/core/platform_android.h"
+#include "slib/core/safe_static.h"
 
 namespace slib
 {
@@ -51,10 +52,40 @@ namespace slib
 				SLIB_JNI_STATIC_METHOD(getScreenPPI, "getScreenPPI", "(Landroid/app/Activity;)I");
 
 				SLIB_JNI_STATIC_METHOD(openURL, "openURL", "(Landroid/app/Activity;Ljava/lang/String;)V");
+			SLIB_JNI_END_CLASS
 
+			SLIB_JNI_BEGIN_CLASS(JPhoneCall, "slib/platform/android/device/PhoneCall")
 				SLIB_JNI_STATIC_METHOD(openDial, "openDial", "(Landroid/app/Activity;Ljava/lang/String;)V");
 				SLIB_JNI_STATIC_METHOD(callPhone, "callPhone", "(Landroid/app/Activity;Ljava/lang/String;)V");
+				SLIB_JNI_STATIC_METHOD(answerCall, "answerCall", "(Ljava/lang/String;)V");
 			SLIB_JNI_END_CLASS
+
+			SLIB_STATIC_ZERO_INITIALIZED(Atomic<PhoneCallCallback>, g_callbackOnIncomingCall)
+
+			SLIB_JNI_BEGIN_CLASS_SECTION(JPhoneCall)
+				SLIB_JNI_NATIVE_IMPL(nativeOnIncomingCall, "nativeOnIncomingCall", "(Ljava/lang/String;Ljava/lang/String;)V", void, jlong instance, jstring callId, jstring phoneNumber)
+				{
+					g_callbackOnIncomingCall(Jni::getString(callId), Jni::getString(phoneNumber));
+				}
+			SLIB_JNI_END_CLASS_SECTION
+
+			SLIB_STATIC_ZERO_INITIALIZED(Atomic<PhoneCallCallback>, g_callbackOnOutgoingCall)
+
+			SLIB_JNI_BEGIN_CLASS_SECTION(JPhoneCall)
+				SLIB_JNI_NATIVE_IMPL(nativeOnOutgoingCall, "nativeOnOutgoingCall", "(Ljava/lang/String;Ljava/lang/String;)V", void, jlong instance, jstring callId, jstring phoneNumber)
+				{
+					g_callbackOnOutgoingCall(Jni::getString(callId), Jni::getString(phoneNumber));
+				}
+			SLIB_JNI_END_CLASS_SECTION
+
+			SLIB_STATIC_ZERO_INITIALIZED(Atomic<PhoneCallCallback>, g_callbackOnEndCall)
+
+			SLIB_JNI_BEGIN_CLASS_SECTION(JPhoneCall)
+				SLIB_JNI_NATIVE_IMPL(nativeOnEndCall, "nativeOnEndCall", "(Ljava/lang/String;Ljava/lang/String;)V", void, jlong instance, jstring callId, jstring phoneNumber)
+				{
+					g_callbackOnEndCall(Jni::getString(callId), Jni::getString(phoneNumber));
+				}
+			SLIB_JNI_END_CLASS_SECTION
 
 		}
 	}
@@ -149,7 +180,7 @@ namespace slib
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			JniLocal<jstring> tel = Jni::getJniString(phoneNumber);
-			JDevice::openDial.call(sl_null, jactivity, tel.get());
+			JPhoneCall::openDial.call(sl_null, jactivity, tel.get());
 		}
 	}
 
@@ -158,8 +189,44 @@ namespace slib
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			JniLocal<jstring> tel = Jni::getJniString(phoneNumber);
-			JDevice::callPhone.call(sl_null, jactivity, tel.get());
+			JPhoneCall::callPhone.call(sl_null, jactivity, tel.get());
 		}
+	}
+
+	void Device::answerCall(const String& callId)
+	{
+		JniLocal<jstring> s = Jni::getJniString(callId);
+		JPhoneCall::answerCall.call(sl_null, s.get());
+	}
+
+	void Device::addOnIncomingCall(const PhoneCallCallback& callback)
+	{
+		g_callbackOnIncomingCall.add(callback);
+	}
+
+	void Device::removeOnIncomingCall(const PhoneCallCallback& callback)
+	{
+		g_callbackOnIncomingCall.remove(callback);
+	}
+
+	void Device::addOnOutgoingCall(const PhoneCallCallback& callback)
+	{
+		g_callbackOnOutgoingCall.add(callback);
+	}
+
+	void Device::removeOnOutgoingCall(const PhoneCallCallback& callback)
+	{
+		g_callbackOnOutgoingCall.remove(callback);
+	}
+
+	void Device::addOnEndCall(const PhoneCallCallback& callback)
+	{
+		g_callbackOnEndCall.add(callback);
+	}
+
+	void Device::removeOnEndCall(const PhoneCallCallback& callback)
+	{
+		g_callbackOnEndCall.remove(callback);
 	}
 
 }
