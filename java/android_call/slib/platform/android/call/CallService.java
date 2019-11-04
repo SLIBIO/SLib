@@ -12,10 +12,10 @@ import slib.platform.android.device.PhoneCall;
 @TargetApi(Build.VERSION_CODES.M)
 public class CallService extends InCallService {
 
-	private Class<?> mActivityClassForeground = null;
+	private Class<?> mCallActivityClass = null;
 
-	public void setForegroundActivityClass(Class<?> activity) {
-		mActivityClassForeground = activity;
+	public void setCallActivityClass(Class<?> activity) {
+		mCallActivityClass = activity;
 	}
 
 	private Call.Callback callback = new Call.Callback() {
@@ -40,16 +40,16 @@ public class CallService extends InCallService {
 			if (state == Call.STATE_RINGING) {
 				call.registerCallback(callback);
 				String callId = PhoneCall.registerCall(call);
-				if (mActivityClassForeground != null) {
-					PhoneCall.launchActivity(this, mActivityClassForeground, "in", callId, getPhoneNumber(call));
+				if (mCallActivityClass != null) {
+					PhoneCall.launchActivity(this, mCallActivityClass, "in", callId, getPhoneNumber(call));
 				} else {
 					PhoneCall.onIncomingCall(callId, getPhoneNumber(call));
 				}
 			} else if (state == Call.STATE_CONNECTING) {
 				call.registerCallback(callback);
 				String callId = PhoneCall.registerCall(call);
-				if (mActivityClassForeground != null) {
-					PhoneCall.launchActivity(this, mActivityClassForeground, "out", callId, getPhoneNumber(call));
+				if (mCallActivityClass != null) {
+					PhoneCall.launchActivity(this, mCallActivityClass, "out", callId, getPhoneNumber(call));
 				} else {
 					PhoneCall.onOutgoingCall(callId, getPhoneNumber(call));
 				}
@@ -73,8 +73,8 @@ public class CallService extends InCallService {
 	private void removeCall(Call call) {
 		String callId = PhoneCall.unregisterCall(call);
 		if (callId != null) {
-			if (mActivityClassForeground != null) {
-				PhoneCall.launchActivity(this, mActivityClassForeground, "end", callId, getPhoneNumber(call));
+			if (mCallActivityClass != null) {
+				PhoneCall.launchActivity(this, mCallActivityClass, "end", callId, getPhoneNumber(call));
 			} else {
 				PhoneCall.onEndCall(callId, getPhoneNumber(call));
 			}
