@@ -171,10 +171,12 @@ namespace slib
 		static sl_bool checkPermissions(const AppPermissions& permissions);
 
 		static void grantPermissions(const AppPermissions& permissions, const Function<void()>& callback = sl_null);
-		
+
 		static sl_bool isRoleHeld(AppRole role);
 
 		static void requestRole(AppRole role, const Function<void()>& callback = sl_null);
+
+		static void openDefaultAppsSetting();
 
 		static sl_bool isSupportedDefaultCallingApp();
 
@@ -182,7 +184,11 @@ namespace slib
 
 		static void setDefaultCallingApp(const Function<void()>& callback = sl_null);
 
-		static void changeDefaultCallingApp();
+		// Android only
+		static sl_bool isEnabledSystemOverlay();
+
+		// Android only
+		static void openSystemOverlaySetting();
 
 	protected:
 		String m_executablePath;

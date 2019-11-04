@@ -461,6 +461,10 @@ Microsoft Specific
 		callback();
 	}
 
+	void Application::openDefaultAppsSetting()
+	{
+	}
+
 	sl_bool Application::isSupportedDefaultCallingApp()
 	{
 		return sl_false;
@@ -475,7 +479,12 @@ Microsoft Specific
 	{
 	}
 
-	void Application::changeDefaultCallingApp()
+	sl_bool Application::isEnabledSystemOverlay()
+	{
+		return sl_false;
+	}
+
+	void Application::openSystemOverlaySetting()
 	{
 	}
 #endif

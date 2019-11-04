@@ -46,10 +46,12 @@ namespace slib
 				SLIB_JNI_STATIC_METHOD(isRoleHeld, "isRoleHeld", "(Landroid/app/Activity;I)Z");
 				SLIB_JNI_STATIC_METHOD(requestRole, "requestRole", "(Landroid/app/Activity;I)V");
 
+				SLIB_JNI_STATIC_METHOD(openDefaultAppsSetting, "openDefaultAppsSetting", "(Landroid/app/Activity;)V");
 				SLIB_JNI_STATIC_METHOD(isSupportedDefaultCallingApp, "isSupportedDefaultCallingApp", "()Z");
 				SLIB_JNI_STATIC_METHOD(isDefaultCallingApp, "isDefaultCallingApp", "(Landroid/app/Activity;)Z");
 				SLIB_JNI_STATIC_METHOD(setDefaultCallingApp, "setDefaultCallingApp", "(Landroid/app/Activity;)V");
-				SLIB_JNI_STATIC_METHOD(changeDefaultCallingApp, "changeDefaultCallingApp", "(Landroid/app/Activity;)V");
+				SLIB_JNI_STATIC_METHOD(isEnabledSystemOverlay, "isEnabledSystemOverlay", "(Landroid/app/Activity;)Z");
+				SLIB_JNI_STATIC_METHOD(openSystemOverlaySetting, "openSystemOverlaySetting", "(Landroid/app/Activity;)V");
 			SLIB_JNI_END_CLASS
 
 			SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void()>, g_callbackOnGrantPermission);
@@ -125,6 +127,14 @@ namespace slib
 		}
 	}
 
+	void Application::openDefaultAppsSetting()
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JApplication::openDefaultAppsSetting.call(sl_null, jactivity);
+		}
+	}
+
 	sl_bool Application::isSupportedDefaultCallingApp()
 	{
 		return JApplication::isSupportedDefaultCallingApp.callBoolean(sl_null);
@@ -156,11 +166,20 @@ namespace slib
 		}
 	}
 
-	void Application::changeDefaultCallingApp()
+	sl_bool Application::isEnabledSystemOverlay()
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			JApplication::changeDefaultCallingApp.call(sl_null, jactivity);
+			return JApplication::isEnabledSystemOverlay.callBoolean(sl_null, jactivity);
+		}
+		return sl_false;
+	}
+
+	void Application::openSystemOverlaySetting()
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JApplication::openSystemOverlaySetting.call(sl_null, jactivity);
 		}
 	}
 

@@ -5,7 +5,9 @@ import android.app.Activity;
 import android.app.role.RoleManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 import android.telecom.TelecomManager;
 
 import java.util.Vector;
@@ -213,6 +215,15 @@ public class Application {
 
 	public static void requestRole(final Activity activity, final int role) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			if (!(UiThread.isUiThread())) {
+				activity.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						requestRole(activity, role);
+					}
+				});
+				return;
+			}
 			try {
 				RoleManager manager = (RoleManager) (activity.getSystemService(Context.ROLE_SERVICE));
 				if (manager != null) {
@@ -233,6 +244,30 @@ public class Application {
 
 	public static void onRequestRoleResult(Activity activity) {
 		nativeOnCallbackRequestRole();
+	}
+
+	public static void openDefaultAppsSetting(final Activity activity) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			if (!(UiThread.isUiThread())) {
+				activity.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						openDefaultAppsSetting(activity);
+					}
+				});
+				return;
+			}
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						activity.startActivity(new Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS));
+					} catch (Exception e) {
+						Logger.exception(e);
+					}
+				}
+			});
+		}
 	}
 
 	public static boolean isSupportedDefaultCallingApp() {
@@ -265,43 +300,72 @@ public class Application {
 	private static boolean mFlagInitedSetDefaultCallingAppListener = false;
 
 	public static void setDefaultCallingApp(final Activity activity) {
-		try {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-				if (!mFlagInitedSetDefaultCallingAppListener) {
-					mFlagInitedSetDefaultCallingAppListener = true;
-					SlibActivity.addActivityResultListener(SlibActivity.REQUEST_ACTIVITY_SET_DEFAULT_CALLING_APP, new SlibActivity.ActivityResultListener() {
-						@Override
-						public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
-							onSetDefaultCallingAppResult(activity);
-						}
-					});
-				}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			if (!(UiThread.isUiThread())) {
 				activity.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						final Intent intent = new Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER);
-						intent.putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, activity.getPackageName());
-						activity.startActivityForResult(intent, SlibActivity.REQUEST_ACTIVITY_SET_DEFAULT_CALLING_APP);
+						setDefaultCallingApp(activity);
 					}
 				});
+				return;
+			}
+			if (!mFlagInitedSetDefaultCallingAppListener) {
+				mFlagInitedSetDefaultCallingAppListener = true;
+				SlibActivity.addActivityResultListener(SlibActivity.REQUEST_ACTIVITY_SET_DEFAULT_CALLING_APP, new SlibActivity.ActivityResultListener() {
+					@Override
+					public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+						try {
+							onSetDefaultCallingAppResult(activity);
+						} catch (Exception e) {
+							Logger.exception(e);
+						}
+					}
+				});
+			}
+			try {
+				final Intent intent = new Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER);
+				intent.putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, activity.getPackageName());
+				activity.startActivityForResult(intent, SlibActivity.REQUEST_ACTIVITY_SET_DEFAULT_CALLING_APP);
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
+		}
+
+	}
+
+	public static boolean isEnabledSystemOverlay(Activity activity) {
+		try {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				return Settings.canDrawOverlays(activity);
+			} else {
+				return Permissions.checkPermission(activity, Manifest.permission.SYSTEM_ALERT_WINDOW);
 			}
 		} catch (Exception e) {
 			Logger.exception(e);
 		}
+		return false;
 	}
 
-	public static void changeDefaultCallingApp(final Activity activity) {
-		try {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+	public static void openSystemOverlaySetting(final Activity activity) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			if (!(UiThread.isUiThread())) {
 				activity.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						activity.startActivity(new Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"));
+						openSystemOverlaySetting(activity);
 					}
 				});
+				return;
 			}
-		} catch (Exception e) {
-			Logger.exception(e);
+			try {
+				Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				intent.setData(Uri.parse("package:" + activity.getPackageName()));
+				activity.startActivity(intent);
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
 		}
 	}
 
