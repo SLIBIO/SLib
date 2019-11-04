@@ -79,7 +79,11 @@ namespace slib
 			return sl_null;
 		}
 		String name = File::makeSafeFileName(_name);
-		String pathRoot = System::getHomeDirectory() + "/.SLib.io/global_lock";
+		String pathHome = System::getHomeDirectory() + "/.SLib.io";
+		if (!(File::exists(pathHome))) {
+			File::createDirectory(pathHome);
+		}
+		String pathRoot = pathHome + "/global_lock";
 		if (!(File::exists(pathRoot))) {
 			File::createDirectory(pathRoot);
 		}
