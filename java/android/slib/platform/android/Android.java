@@ -46,9 +46,8 @@ public class Android {
 	public static int getSdkVersion() {
 		return Build.VERSION.SDK_INT;
 	}
-	
-	public static void finishActivity(Activity activity)
-	{
+
+	public static void finishActivity(Activity activity) {
 		try {
 			activity.finish();
 		} catch (Throwable e) {
@@ -56,8 +55,7 @@ public class Android {
 		}
 	}
 	
-	public static InputStream openAsset(Activity activity, String path)
-	{
+	public static InputStream openAsset(Activity activity, String path) {
 		try {
 			AssetManager assets = activity.getAssets();			
 			return assets.open(path);
