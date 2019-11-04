@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
 
@@ -15,6 +16,7 @@
         android:allowBackup="true"
         android:supportsRtl="true"
         >
+
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTask"
@@ -37,6 +39,23 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+
+        <service
+            android:name=".CallService"
+            android:permission="android.permission.BIND_INCALL_SERVICE"
+            >
+            <meta-data
+                android:name="android.telecom.IN_CALL_SERVICE_UI"
+                android:value="true" />
+            <meta-data
+                android:name="android.telecom.IN_CALL_SERVICE_RINGING"
+                android:value="true" />
+            <intent-filter>
+                <action android:name="android.telecom.InCallService" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>

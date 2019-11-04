@@ -4,9 +4,11 @@
 
 class MainPage : public ui::MainPage
 {
-public:
+protected:
+	void init() override;
+
 	void onOpen() override;
 
 	void onResume() override;
-	
+
 };

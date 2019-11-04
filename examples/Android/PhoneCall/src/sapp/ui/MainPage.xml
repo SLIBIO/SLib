@@ -24,12 +24,20 @@
 				marginTop='10%sw'
 				centerHorizontal='true'
 				/>
+			<switch
+				name='switchSystemOverlay'
+				text='System Overlay'
+				width='80%sw'
+				padding='2%sw'
+				marginTop='1%sw'
+				centerHorizontal='true'
+				/>
 
 			<edit
 				name='txtPhoneNumber'
 				width='60%'
 				centerHorizontal='true'
-				marginTop='5%sw'
+				marginTop='10%sw'
 				/>
 
 			<hlinear
@@ -48,6 +56,38 @@
 					marginLeft='5%sw'
 					/>
 			</hlinear>
+
+			<linear
+				name='groupCall'
+				width='fill'
+				marginTop='5%sw'
+				visible='false'
+				>
+				<label
+					name='lblCallInfo'
+					width='60%'
+					centerHorizontal='true'
+					marginTop='5%sw'
+					text='Info'
+					/>
+
+				<hlinear
+					centerHorizontal='true'
+					marginTop='2%sw'
+					>
+					<button
+						style='button'
+						name='btnAnswer'
+						text='Answer'
+						/>
+					<button
+						style='button'
+						name='btnEndCall'
+						text='End call'
+						marginLeft='5%sw'
+						/>
+				</hlinear>
+			</linear>
 
 		</linear>
 

@@ -4,13 +4,16 @@
 
 SLIB_DEFINE_APPLICATION(PhoneCallApp, MobileApp)
 
+Ref<MainPage> g_mainPage;
+
 PhoneCallApp::PhoneCallApp()
 {
+	g_mainPage = new MainPage;
 }
 
 Ref<View> PhoneCallApp::getStartupPage()
 {
-	return new MainPage;
+	return g_mainPage;
 }
 
 void PhoneCallApp::onStart()
