@@ -82,6 +82,14 @@ namespace slib
 	{
 		openDial(phoneNumber);
 	}
+
+	void Device::answerCall(const String& callId)
+	{
+	}
+
+	void Device::endCall(const String& callId)
+	{
+	}
 #endif
 
 }

@@ -82,7 +82,9 @@ namespace slib
 		
 		
 		static void answerCall(const String& callId);
-		
+
+		static void endCall(const String& callId);
+
 		
 		static void addOnIncomingCall(const PhoneCallCallback& callback);
 		

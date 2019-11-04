@@ -58,12 +58,13 @@ namespace slib
 				SLIB_JNI_STATIC_METHOD(openDial, "openDial", "(Landroid/app/Activity;Ljava/lang/String;)V");
 				SLIB_JNI_STATIC_METHOD(callPhone, "callPhone", "(Landroid/app/Activity;Ljava/lang/String;)V");
 				SLIB_JNI_STATIC_METHOD(answerCall, "answerCall", "(Ljava/lang/String;)V");
+				SLIB_JNI_STATIC_METHOD(endCall, "endCall", "(Ljava/lang/String;)V");
 			SLIB_JNI_END_CLASS
 
 			SLIB_STATIC_ZERO_INITIALIZED(Atomic<PhoneCallCallback>, g_callbackOnIncomingCall)
 
 			SLIB_JNI_BEGIN_CLASS_SECTION(JPhoneCall)
-				SLIB_JNI_NATIVE_IMPL(nativeOnIncomingCall, "nativeOnIncomingCall", "(Ljava/lang/String;Ljava/lang/String;)V", void, jlong instance, jstring callId, jstring phoneNumber)
+				SLIB_JNI_NATIVE_IMPL(nativeOnIncomingCall, "nativeOnIncomingCall", "(Ljava/lang/String;Ljava/lang/String;)V", void, jstring callId, jstring phoneNumber)
 				{
 					g_callbackOnIncomingCall(Jni::getString(callId), Jni::getString(phoneNumber));
 				}
@@ -72,7 +73,7 @@ namespace slib
 			SLIB_STATIC_ZERO_INITIALIZED(Atomic<PhoneCallCallback>, g_callbackOnOutgoingCall)
 
 			SLIB_JNI_BEGIN_CLASS_SECTION(JPhoneCall)
-				SLIB_JNI_NATIVE_IMPL(nativeOnOutgoingCall, "nativeOnOutgoingCall", "(Ljava/lang/String;Ljava/lang/String;)V", void, jlong instance, jstring callId, jstring phoneNumber)
+				SLIB_JNI_NATIVE_IMPL(nativeOnOutgoingCall, "nativeOnOutgoingCall", "(Ljava/lang/String;Ljava/lang/String;)V", void, jstring callId, jstring phoneNumber)
 				{
 					g_callbackOnOutgoingCall(Jni::getString(callId), Jni::getString(phoneNumber));
 				}
@@ -81,7 +82,7 @@ namespace slib
 			SLIB_STATIC_ZERO_INITIALIZED(Atomic<PhoneCallCallback>, g_callbackOnEndCall)
 
 			SLIB_JNI_BEGIN_CLASS_SECTION(JPhoneCall)
-				SLIB_JNI_NATIVE_IMPL(nativeOnEndCall, "nativeOnEndCall", "(Ljava/lang/String;Ljava/lang/String;)V", void, jlong instance, jstring callId, jstring phoneNumber)
+				SLIB_JNI_NATIVE_IMPL(nativeOnEndCall, "nativeOnEndCall", "(Ljava/lang/String;Ljava/lang/String;)V", void, jstring callId, jstring phoneNumber)
 				{
 					g_callbackOnEndCall(Jni::getString(callId), Jni::getString(phoneNumber));
 				}
@@ -197,6 +198,12 @@ namespace slib
 	{
 		JniLocal<jstring> s = Jni::getJniString(callId);
 		JPhoneCall::answerCall.call(sl_null, s.get());
+	}
+
+	void Device::endCall(const String& callId)
+	{
+		JniLocal<jstring> s = Jni::getJniString(callId);
+		JPhoneCall::endCall.call(sl_null, s.get());
 	}
 
 	void Device::addOnIncomingCall(const PhoneCallCallback& callback)

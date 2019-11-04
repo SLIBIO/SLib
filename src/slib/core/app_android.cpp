@@ -57,7 +57,7 @@ namespace slib
 			SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void()>, g_callbackOnGrantPermission);
 
 			SLIB_JNI_BEGIN_CLASS_SECTION(JApplication)
-				SLIB_JNI_NATIVE_IMPL(nativeOnCallbackGrantPermissions, "nativeOnCallbackGrantPermissions", "()V", void, jlong instance)
+				SLIB_JNI_NATIVE_IMPL(nativeOnCallbackGrantPermissions, "nativeOnCallbackGrantPermissions", "()V", void)
 				{
 					g_callbackOnGrantPermission();
 					g_callbackOnGrantPermission.setNull();
@@ -67,7 +67,7 @@ namespace slib
 			SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void()>, g_callbackOnRequestRole);
 
 			SLIB_JNI_BEGIN_CLASS_SECTION(JApplication)
-				SLIB_JNI_NATIVE_IMPL(nativeOnCallbackRequestRole, "nativeOnCallbackRequestRole", "()V", void, jlong instance)
+				SLIB_JNI_NATIVE_IMPL(nativeOnCallbackRequestRole, "nativeOnCallbackRequestRole", "()V", void)
 				{
 					g_callbackOnRequestRole();
 					g_callbackOnRequestRole.setNull();
@@ -77,7 +77,7 @@ namespace slib
 			SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void()>, g_callbackOnSetDefaultCallingApp);
 
 			SLIB_JNI_BEGIN_CLASS_SECTION(JApplication)
-				SLIB_JNI_NATIVE_IMPL(nativeOnCallbackSetDefaultCallingApp, "nativeOnCallbackSetDefaultCallingApp", "()V", void, jlong instance)
+				SLIB_JNI_NATIVE_IMPL(nativeOnCallbackSetDefaultCallingApp, "nativeOnCallbackSetDefaultCallingApp", "()V", void)
 				{
 					g_callbackOnSetDefaultCallingApp();
 					g_callbackOnSetDefaultCallingApp.setNull();

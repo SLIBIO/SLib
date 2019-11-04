@@ -1,6 +1,7 @@
 package slib.platform.android.device;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -10,6 +11,7 @@ import android.telecom.VideoProfile;
 import java.util.HashMap;
 
 import slib.platform.android.Logger;
+import slib.platform.android.SlibActivity;
 
 public class PhoneCall {
 
@@ -61,6 +63,19 @@ public class PhoneCall {
 		}
 	}
 
+	public static void endCall(String callId) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			try {
+				Call call = getCall(callId);
+				if (call != null) {
+					call.disconnect();
+				}
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
+		}
+	}
+
 	private static native void nativeOnIncomingCall(String callId, String phoneNumber);
 
 	public static void onIncomingCall(String callId, String phoneNumber) {
@@ -95,12 +110,21 @@ public class PhoneCall {
 
 	public static String unregisterCall(Call call) {
 		synchronized (mLock) {
-			String callId = mCallsByCall.get(call);
+			String callId = mCallsByCall.remove(call);
 			if (callId != null) {
 				mCallsById.remove(callId);
 			}
-			mCallsByCall.remove(call);
 			return callId;
+		}
+	}
+
+	public static Call unregisterCall(String callId) {
+		synchronized (mLock) {
+			Call call = mCallsById.remove(callId);
+			if (call != null) {
+				mCallsByCall.remove(call);
+			}
+			return call;
 		}
 	}
 
@@ -114,6 +138,46 @@ public class PhoneCall {
 		synchronized (mLock) {
 			return mCallsById.get(callId);
 		}
+	}
+
+	private static boolean mFlagInitIntentListener = false;
+	public static void launchActivity(Context context, Class<?> activityClass, String type, String callId, String phoneNumber) {
+		synchronized (mLock) {
+			if (!mFlagInitIntentListener) {
+				mFlagInitIntentListener = true;
+				SlibActivity.addIntentListener(new SlibActivity.IntentListener() {
+					@Override
+					public void onIntent(Intent intent) {
+						try {
+							String category = intent.getStringExtra("category");
+							if (category != null && category.equals("phone_call")) {
+								String type = intent.getStringExtra("type");
+								String id = intent.getStringExtra("id");
+								String pn = intent.getStringExtra("pn");
+								if (type != null && id != null && pn != null) {
+									if (type.equals("in")) {
+										onIncomingCall(id, pn);
+									} else if (type.equals("out")) {
+										onOutgoingCall(id, pn);
+									} else if (type.equals("end")) {
+										onEndCall(id, pn);
+									}
+								}
+							}
+						} catch (Exception e) {
+							Logger.exception(e);
+						}
+					}
+				});
+			}
+		}
+		Intent intent = new Intent(context, activityClass);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.putExtra("category", "phone_call");
+		intent.putExtra("type", type);
+		intent.putExtra("id", callId);
+		intent.putExtra("pn", phoneNumber);
+		context.startActivity(intent);
 	}
 
 	private static final Object mLock = new Object();
