@@ -211,7 +211,6 @@
     <ClCompile Include="..\..\src\slib\device\device.cpp" />
     <ClCompile Include="..\..\src\slib\device\device_win32.cpp" />
     <ClCompile Include="..\..\src\slib\device\sensor.cpp" />
-    <ClCompile Include="..\..\src\slib\device\vibrator.cpp" />
     <ClCompile Include="..\..\src\slib\geo\earth.cpp" />
     <ClCompile Include="..\..\src\slib\geo\geo_line.cpp" />
     <ClCompile Include="..\..\src\slib\geo\geo_location.cpp" />

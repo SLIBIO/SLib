@@ -6,8 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Vibrator;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
@@ -21,6 +23,162 @@ import slib.platform.android.helper.FileHelper;
 import slib.platform.android.ui.UiThread;
 
 public class Device {
+
+	public static int getAudioMode(Activity context) {
+		try {
+			AudioManager am = (AudioManager)(context.getSystemService(Context.AUDIO_SERVICE));
+			if (am != null) {
+				return am.getMode();
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		return 0;
+	}
+
+	public static void setAudioMode(Activity context, int mode) {
+		try {
+			AudioManager am = (AudioManager)(context.getSystemService(Context.AUDIO_SERVICE));
+			if (am != null) {
+				am.setMode(mode);
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+
+	public static int getRingerMode(Activity context) {
+		try {
+			AudioManager am = (AudioManager)(context.getSystemService(Context.AUDIO_SERVICE));
+			if (am != null) {
+				return am.getRingerMode();
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		return 0;
+	}
+
+	public static void setRingerMode(Activity context, int mode) {
+		try {
+			AudioManager am = (AudioManager)(context.getSystemService(Context.AUDIO_SERVICE));
+			if (am != null) {
+				am.setRingerMode(mode);
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+
+	public static float getVolume(Activity context, int stream) {
+		try {
+			AudioManager am = (AudioManager)(context.getSystemService(Context.AUDIO_SERVICE));
+			if (am != null) {
+				return (float)(am.getStreamVolume(stream)) / (float)(am.getStreamMaxVolume(stream));
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		return 0;
+	}
+
+	public static void setVolume(Activity context, float volume, int stream, int flags) {
+		try {
+			AudioManager am = (AudioManager)(context.getSystemService(Context.AUDIO_SERVICE));
+			if (am != null) {
+				int max = am.getStreamMaxVolume(stream);
+				int vol = (int)(max * volume);
+				am.setStreamVolume(stream, vol, flags);
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+
+	public static boolean isMicrophoneMute(Activity context) {
+		try {
+			AudioManager am = (AudioManager)(context.getSystemService(Context.AUDIO_SERVICE));
+			if (am != null) {
+				return am.isMicrophoneMute();
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		return false;
+	}
+
+	public static void setMicrophoneMute(Activity context, boolean flag) {
+		try {
+			AudioManager am = (AudioManager)(context.getSystemService(Context.AUDIO_SERVICE));
+			if (am != null) {
+				am.setMicrophoneMute(flag);
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+
+	public static boolean isSpeakerOn(Activity context) {
+		try {
+			AudioManager am = (AudioManager)(context.getSystemService(Context.AUDIO_SERVICE));
+			if (am != null) {
+				return am.isSpeakerphoneOn();
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		return false;
+	}
+
+	public static void setSpeakerOn(Activity context, boolean flag) {
+		try {
+			AudioManager am = (AudioManager)(context.getSystemService(Context.AUDIO_SERVICE));
+			if (am != null) {
+				am.setSpeakerphoneOn(flag);
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+
+	public static boolean isBluetoothScoOn(Activity context) {
+		try {
+			AudioManager am = (AudioManager)(context.getSystemService(Context.AUDIO_SERVICE));
+			if (am != null) {
+				return am.isBluetoothScoOn();
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		return false;
+	}
+
+	public static void setBluetoothScoOn(Activity context, boolean flag) {
+		try {
+			AudioManager am = (AudioManager)(context.getSystemService(Context.AUDIO_SERVICE));
+			if (am != null) {
+				am.setBluetoothScoOn(flag);
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+
+	@SuppressLint("MissingPermission")
+	public static void vibrate(Activity context, int durationMillis) {
+		try {
+			Vibrator v = (Vibrator)(context.getSystemService(Context.VIBRATOR_SERVICE));
+			if (v != null) {
+				if (durationMillis > 0) {
+					v.vibrate(durationMillis);
+				} else {
+					v.cancel();
+				}
+			}
+		} catch (Throwable e) {
+			Logger.exception(e);
+		}
+	}
 
 	private static final int MAX_SIM_SLOT_COUNT = 8;
 

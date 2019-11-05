@@ -279,7 +279,6 @@ set (SLIB_EXTRA_FILES
  
  "${SLIB_PATH}/src/slib/device/device.cpp"
  "${SLIB_PATH}/src/slib/device/sensor.cpp"
- "${SLIB_PATH}/src/slib/device/vibrator.cpp"
  
  "${SLIB_PATH}/src/slib/db/database.cpp"
  "${SLIB_PATH}/src/slib/db/database_cursor.cpp"
@@ -407,7 +406,6 @@ if(ANDROID)
 
   "${SLIB_PATH}/src/slib/device/device_android.cpp"
   "${SLIB_PATH}/src/slib/device/sensor_android.cpp"
-  "${SLIB_PATH}/src/slib/device/vibrator_android.cpp"
 
   "${SLIB_PATH}/src/slib/social/facebook_android.cpp"
   "${SLIB_PATH}/src/slib/social/instagram_android.cpp"

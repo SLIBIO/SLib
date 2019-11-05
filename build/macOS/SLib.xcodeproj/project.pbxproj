@@ -1174,7 +1174,6 @@
 		26D9D9571E964659005F7BD3 /* mysql.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF221C23041600AD81D9 /* mysql.cpp */; };
 		26D9D9581E964659005F7BD3 /* sqlite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF231C23041600AD81D9 /* sqlite.cpp */; };
 		26D9D9591E96465E005F7BD3 /* sensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4761C1193AB00D47AB0 /* sensor.cpp */; };
-		26D9D95A1E96465E005F7BD3 /* vibrator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4781C1193AB00D47AB0 /* vibrator.cpp */; };
 		26D9D95B1E964662005F7BD3 /* earth.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5B3131E9010D100F9FB7F /* earth.cpp */; };
 		26D9D95C1E964662005F7BD3 /* geo_line.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5B3141E9010D100F9FB7F /* geo_line.cpp */; };
 		26D9D95D1E964662005F7BD3 /* geo_location.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5B3151E9010D100F9FB7F /* geo_location.cpp */; };
@@ -2495,7 +2494,6 @@
 		266DD4601C11930800D47AB0 /* sha2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sha2.cpp; sourceTree = "<group>"; };
 		266DD4611C11930800D47AB0 /* compress_zlib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = compress_zlib.cpp; sourceTree = "<group>"; };
 		266DD4761C1193AB00D47AB0 /* sensor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sensor.cpp; sourceTree = "<group>"; };
-		266DD4781C1193AB00D47AB0 /* vibrator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vibrator.cpp; sourceTree = "<group>"; };
 		266DD47F1C1193C400D47AB0 /* brush.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = brush.cpp; sourceTree = "<group>"; };
 		266DD4801C1193C400D47AB0 /* canvas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = canvas.cpp; sourceTree = "<group>"; };
 		266DD4811C1193C400D47AB0 /* color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = color.cpp; sourceTree = "<group>"; };
@@ -4699,7 +4697,6 @@
 				26B92D6F21D7C237003F6F82 /* device_macos.mm */,
 				26ACB3F72209872B0093FF3F /* device_id_macos.mm */,
 				266DD4761C1193AB00D47AB0 /* sensor.cpp */,
-				266DD4781C1193AB00D47AB0 /* vibrator.cpp */,
 			);
 			path = device;
 			sourceTree = "<group>";
@@ -6953,7 +6950,6 @@
 				26D9D9041E9645CE005F7BD3 /* event.cpp in Sources */,
 				26E1B858222841AC007C222E /* pinterest.cpp in Sources */,
 				260B73F5220D7DF600858EEA /* facebook.cpp in Sources */,
-				26D9D95A1E96465E005F7BD3 /* vibrator.cpp in Sources */,
 				26A3DA96228B698A0031CBDA /* ecc.cpp in Sources */,
 				26D9D9051E9645CE005F7BD3 /* timer.cpp in Sources */,
 				26E1B8A0222ABAB2007C222E /* jfdctflt.c in Sources */,

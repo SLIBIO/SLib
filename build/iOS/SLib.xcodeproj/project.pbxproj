@@ -829,8 +829,6 @@
 		26D9D8541E96292E005F7BD3 /* sqlite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF2D1C23051F00AD81D9 /* sqlite.cpp */; };
 		26D9D8571E962932005F7BD3 /* sensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A34D1C128D80005690FE /* sensor.cpp */; };
 		26D9D8581E962932005F7BD3 /* sensor_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E1D264B91DE9B1C800F1D44C /* sensor_ios.mm */; };
-		26D9D8591E962932005F7BD3 /* vibrator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A34F1C128D80005690FE /* vibrator.cpp */; };
-		26D9D85A1E962932005F7BD3 /* vibrator_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E1B9F8F21DEC887700BAA9F0 /* vibrator_ios.mm */; };
 		26D9D85B1E962937005F7BD3 /* earth.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5B3201E90125200F9FB7F /* earth.cpp */; };
 		26D9D85C1E962937005F7BD3 /* geo_line.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5B3211E90125200F9FB7F /* geo_line.cpp */; };
 		26D9D85D1E962937005F7BD3 /* geo_location.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5B3221E90125200F9FB7F /* geo_location.cpp */; };
@@ -2277,7 +2275,6 @@
 		26BC2EC51E2DFF4900D0801E /* dispatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dispatch.cpp; sourceTree = "<group>"; };
 		26BFCFC21E41CFAF00F4493D /* graphics_text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graphics_text.cpp; sourceTree = "<group>"; };
 		26C0A34D1C128D80005690FE /* sensor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sensor.cpp; sourceTree = "<group>"; };
-		26C0A34F1C128D80005690FE /* vibrator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vibrator.cpp; sourceTree = "<group>"; };
 		26C0A3551C131F8E005690FE /* bitmap_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_data.cpp; sourceTree = "<group>"; };
 		26C0A3571C133969005690FE /* bitmap_format.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_format.cpp; sourceTree = "<group>"; };
 		26C1B64520D51D3D00E36539 /* drawable_ext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = drawable_ext.cpp; sourceTree = "<group>"; };
@@ -2380,7 +2377,6 @@
 		E15AC4FA1E1F66A60083D3E2 /* notification_apns_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = notification_apns_ios.mm; sourceTree = "<group>"; };
 		E17DADEA1E0C9060006161F6 /* gesture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gesture.cpp; sourceTree = "<group>"; };
 		E1B34E9C1E0A909A006217F4 /* picker_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = picker_view.cpp; sourceTree = "<group>"; };
-		E1B9F8F21DEC887700BAA9F0 /* vibrator_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = vibrator_ios.mm; sourceTree = "<group>"; };
 		E1D264B91DE9B1C800F1D44C /* sensor_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = sensor_ios.mm; sourceTree = "<group>"; };
 		E1D3A4281E14A2FC00007A98 /* preference.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = preference.cpp; sourceTree = "<group>"; };
 		E1D3A42A1E14A38C00007A98 /* preference_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = preference_apple.mm; sourceTree = "<group>"; };
@@ -3962,8 +3958,6 @@
 				26ACB3F5220985EE0093FF3F /* device_audio_ios.mm */,
 				26C0A34D1C128D80005690FE /* sensor.cpp */,
 				E1D264B91DE9B1C800F1D44C /* sensor_ios.mm */,
-				26C0A34F1C128D80005690FE /* vibrator.cpp */,
-				E1B9F8F21DEC887700BAA9F0 /* vibrator_ios.mm */,
 			);
 			path = device;
 			sourceTree = "<group>";
@@ -5282,7 +5276,6 @@
 				26D9D8E61E962976005F7BD3 /* ui_resource.cpp in Sources */,
 				26D9D8A31E962962005F7BD3 /* socket_event_unix.cpp in Sources */,
 				26B92D5B21D4CF22003F6F82 /* device.cpp in Sources */,
-				26D9D85A1E962932005F7BD3 /* vibrator_ios.mm in Sources */,
 				26D9D87E1E96295A005F7BD3 /* audio_player.cpp in Sources */,
 				26E1B8AB222ABBDC007C222E /* adler32.c in Sources */,
 				26D9D88A1E96295A005F7BD3 /* codec_opus.cpp in Sources */,
@@ -5379,7 +5372,6 @@
 				26E1B8E1222ABCDD007C222E /* jdatadst.c in Sources */,
 				26D9D8E11E962976005F7BD3 /* ui_core_ios.mm in Sources */,
 				26D9D8E51E962976005F7BD3 /* ui_platform.cpp in Sources */,
-				26D9D8591E962932005F7BD3 /* vibrator.cpp in Sources */,
 				26D9D8D91E962976005F7BD3 /* transition.cpp in Sources */,
 				26E1B8CD222ABCDD007C222E /* jaricom.c in Sources */,
 				26D9D8B11E962969005F7BD3 /* render_program.cpp in Sources */,

@@ -341,9 +341,6 @@
     <ClCompile Include="..\..\src\slib\device\sensor.cpp">
       <Filter>src\device</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\slib\device\vibrator.cpp">
-      <Filter>src\device</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\slib\geo\earth.cpp">
       <Filter>src\geo</Filter>
     </ClCompile>
