@@ -305,14 +305,13 @@ namespace slib
 						if (audioPlayer.isNotNull()) {
 							AudioPlayerBufferParam audioBufferParam;
 							audioBufferParam.flagAutoStart = sl_false;
-							audioBufferParam.bufferLengthInMilliseconds = 5000;
 							audioBufferParam.frameLengthInMilliseconds = 50;
 							audioBufferParam.samplesPerSecond = params->sample_rate;
 							audioBufferParam.channelsCount = params->channels;
 							if (audioBufferParam.channelsCount != 1) {
 								audioBufferParam.channelsCount = 2;
 							}
-							audioBufferParam.onRequireAudioData = SLIB_FUNCTION_WEAKREF(FFmpegPlayer, onRequireAudioData, this);
+							audioBufferParam.onPlayAudio = SLIB_FUNCTION_WEAKREF(FFmpegPlayer, onPlayAudio, this);
 							m_audioBuffer = audioPlayer->createBuffer(audioBufferParam);
 							if (m_audioBuffer.isNotNull()) {
 								SwrContext* swrAudio = swr_alloc();
@@ -403,7 +402,7 @@ namespace slib
 					}
 				}
 				
-				void onRequireAudioData(AudioPlayerBuffer* buffer, sl_uint32 requestedSamplesCount)
+				void onPlayAudio(AudioPlayerBuffer* buffer, sl_uint32 requestedSamplesCount)
 				{
 				}
 				

@@ -42,9 +42,9 @@ namespace slib
 		samplesPerSecond = 16000;
 		channelsCount = 1;
 		frameLengthInMilliseconds = 50;
-		bufferLengthInMilliseconds = 1000;
+		maxBufferLengthInMilliseconds = 0;
 		
-		flagAutoStart = sl_true;
+		flagAutoStart = sl_false;
 	}
 
 
@@ -52,6 +52,7 @@ namespace slib
 
 	AudioPlayerBuffer::AudioPlayerBuffer()
 	{
+		m_lenBufferMax = 0;
 		m_lastSample = 0;
 	}
 
@@ -62,7 +63,7 @@ namespace slib
 	void AudioPlayerBuffer::_init(const AudioPlayerBufferParam& param)
 	{
 		m_param = param;
-		m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000 * param.channelsCount);
+		m_lenBufferMax = param.samplesPerSecond * param.maxBufferLengthInMilliseconds / 1000 * param.channelsCount;
 	}
 	
 	const AudioPlayerBufferParam& AudioPlayerBuffer::getParam()
@@ -79,30 +80,49 @@ namespace slib
 		} else {
 			format = AudioFormat::Int16_Stereo;
 		}
+		sl_size nOriginal = m_buffer.getSize() >> 1;
+		sl_size nSamples = audioIn.count;
+		if (m_lenBufferMax) {
+			if (nOriginal >= m_lenBufferMax) {
+				return;
+			}
+			if (nOriginal + nSamples > m_lenBufferMax) {
+				nSamples = m_lenBufferMax - nOriginal;
+			}
+		}
+		sl_size countTotal = nChannels * nSamples;
+		sl_size sizeTotal = countTotal << 1;
 		if (audioIn.format == format && (((sl_size)(audioIn.data)) & 1) == 0) {
-			m_queue.push((sl_int16*)(audioIn.data), nChannels * audioIn.count);
+			if (audioIn.ref.isNotNull()) {
+				MemoryData m;
+				m.data = audioIn.data;
+				m.size = sizeTotal;
+				m.refer = audioIn.ref;
+				m_buffer.add(m);
+			} else {
+				m_buffer.add(Memory::create(audioIn.data, sizeTotal));
+			}
 		} else {
-			sl_uint32 countTotal = (sl_uint32)(nChannels * audioIn.count);
-			Array<sl_int16> buf = _getProcessData(countTotal);
-			if (buf.isNotNull()) {
+			Memory mem = Memory::create(sizeTotal);
+			if (mem.isNotNull()) {
 				AudioData temp;
 				temp.format = format;
-				temp.data = buf.getData();
-				temp.count = audioIn.count;
-				temp.copySamplesFrom(audioIn, audioIn.count);
-				m_queue.push(buf.getData(), countTotal);
+				temp.data = mem.getData();
+				temp.count = nSamples;
+				temp.copySamplesFrom(audioIn, nSamples);
+				m_buffer.add(mem);
 			}
 		}
 	}
 	
 	void AudioPlayerBuffer::flush()
 	{
-		m_queue.removeAll();
+		m_buffer.clear();
 	}
 	
 	sl_size AudioPlayerBuffer::getSamplesCountInQueue()
 	{
-		return m_queue.getCount();
+		return m_buffer.getSize() >> 1;
 	}
 
 	Array<sl_int16> AudioPlayerBuffer::_getProcessData(sl_uint32 count)
@@ -122,8 +142,8 @@ namespace slib
 		if (m_param.event.isNotNull()) {
 			m_param.event->set();
 		}
-		m_param.onRequireAudioData(this, count / m_param.channelsCount);
-		if (!(m_queue.pop(s, count))) {
+		m_param.onPlayAudio(this, count / m_param.channelsCount);
+		if (!(m_buffer.pop(s, count << 1))) {
 			for (sl_uint32 i = 0; i < count; i++) {
 				s[i] = m_lastSample;
 			}

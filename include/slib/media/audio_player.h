@@ -58,12 +58,13 @@ namespace slib
 	public:
 		sl_uint32 samplesPerSecond;
 		sl_uint32 channelsCount;
-		sl_uint32 bufferLengthInMilliseconds;
 		sl_uint32 frameLengthInMilliseconds;
-		
+		sl_uint32 maxBufferLengthInMilliseconds;
+
 		sl_bool flagAutoStart;
 		
-		Function<void(AudioPlayerBuffer*, sl_uint32 requestedSamplesCount)> onRequireAudioData;
+		// called before playing a frame
+		Function<void(AudioPlayerBuffer*, sl_uint32 samplesCount)> onPlayAudio;
 		Ref<Event> event;
 		
 	public:
@@ -119,7 +120,9 @@ namespace slib
 	protected:
 		AudioPlayerBufferParam m_param;
 		
-		LoopQueue<sl_int16> m_queue;
+		MemoryQueue m_buffer;
+		sl_size m_lenBufferMax;
+		
 		sl_int16 m_lastSample;
 		AtomicArray<sl_int16> m_processData;
 	};
