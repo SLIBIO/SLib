@@ -41,9 +41,37 @@ namespace slib
 	{
 	public:
 		// Works on iOS
-		static void setAudioCategory(const DeviceAudioCategory& category);
+		static void setAudioCategory(DeviceAudioCategory category);
+
+		static DeviceAudioMode getAudioMode();
 		
+		static void setAudioMode(DeviceAudioMode mode);
 		
+		static DeviceRingerMode getRingerMode();
+		
+		static void setRingerMode(DeviceRingerMode mode);
+		
+		static float getVolume(DeviceAudioStreamType stream = DeviceAudioStreamType::Default);
+		
+		static void setVolume(float volume, DeviceAudioStreamType stream, const DeviceSetVolumeFlags& flags);
+		
+		static void setVolume(float volume, DeviceAudioStreamType stream = DeviceAudioStreamType::Default);
+		
+		static sl_bool isMicrophoneMute();
+		
+		static void setMicrophoneMute(sl_bool flag = sl_true);
+		
+		static sl_bool isSpeakerOn();
+		
+		static void setSpeakerOn(sl_bool flag = sl_true);
+		
+		static sl_bool isBluetoothScoOn();
+		
+		static void setBluetoothScoOn(sl_bool flag = sl_true);
+		
+		static void vibrate(sl_uint32 durationMillis = 500);
+
+
 		// Works on Android
 		static String getIMEI();
 		

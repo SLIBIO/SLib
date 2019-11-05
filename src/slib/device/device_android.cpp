@@ -43,6 +43,20 @@ namespace slib
 			SLIB_JNI_END_CLASS
 
 			SLIB_JNI_BEGIN_CLASS(JDevice, "slib/platform/android/device/Device")
+				SLIB_JNI_STATIC_METHOD(getAudioMode, "getAudioMode", "(Landroid/app/Activity;)I");
+				SLIB_JNI_STATIC_METHOD(setAudioMode, "setAudioMode", "(Landroid/app/Activity;I)V");
+				SLIB_JNI_STATIC_METHOD(getRingerMode, "getRingerMode", "(Landroid/app/Activity;)I");
+				SLIB_JNI_STATIC_METHOD(setRingerMode, "setRingerMode", "(Landroid/app/Activity;I)V");
+				SLIB_JNI_STATIC_METHOD(getVolume, "getVolume", "(Landroid/app/Activity;I)F");
+				SLIB_JNI_STATIC_METHOD(setVolume, "setVolume", "(Landroid/app/Activity;FII)V");
+				SLIB_JNI_STATIC_METHOD(isMicrophoneMute, "isMicrophoneMute", "(Landroid/app/Activity;)Z");
+				SLIB_JNI_STATIC_METHOD(setMicrophoneMute, "setMicrophoneMute", "(Landroid/app/Activity;Z)V");
+				SLIB_JNI_STATIC_METHOD(isSpeakerOn, "isSpeakerOn", "(Landroid/app/Activity;)Z");
+				SLIB_JNI_STATIC_METHOD(setSpeakerOn, "setSpeakerOn", "(Landroid/app/Activity;Z)V");
+				SLIB_JNI_STATIC_METHOD(isBluetoothScoOn, "isBluetoothScoOn", "(Landroid/app/Activity;)Z");
+				SLIB_JNI_STATIC_METHOD(setBluetoothScoOn, "setBluetoothScoOn", "(Landroid/app/Activity;Z)V");
+				SLIB_JNI_STATIC_METHOD(vibrate, "vibrate", "(Landroid/app/Activity;I)V");
+
 				SLIB_JNI_STATIC_METHOD(getIMEIs, "getIMEIs", "(Landroid/app/Activity;)Ljava/lang/String;");
 				SLIB_JNI_STATIC_METHOD(getPhoneNumbers, "getPhoneNumbers", "(Landroid/app/Activity;)Ljava/lang/String;");
 				SLIB_JNI_STATIC_METHOD(getSimSlotsCount, "getSimSlotsCount", "(Landroid/app/Activity;)I");
@@ -95,6 +109,116 @@ namespace slib
 	}
 
 	using namespace priv::device;
+
+	DeviceAudioMode Device::getAudioMode()
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			return (DeviceAudioMode)(JDevice::getAudioMode.callInt(sl_null, jactivity));
+		}
+		return DeviceAudioMode::Default;
+	}
+
+	void Device::setAudioMode(DeviceAudioMode mode)
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JDevice::setAudioMode.call(sl_null, jactivity, (jint)mode);
+		}
+	}
+
+	DeviceRingerMode Device::getRingerMode()
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			return (DeviceRingerMode)(JDevice::getRingerMode.callInt(sl_null, jactivity));
+		}
+		return DeviceRingerMode::Normal;
+	}
+
+	void Device::setRingerMode(DeviceRingerMode mode)
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JDevice::setRingerMode.call(sl_null, jactivity, (jint)mode);
+		}
+	}
+
+	float Device::getVolume(DeviceAudioStreamType stream)
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			return JDevice::getVolume.callFloat(sl_null, jactivity, (jint)stream);
+		}
+		return 0;
+	}
+
+	void Device::setVolume(float volume, DeviceAudioStreamType stream, const DeviceSetVolumeFlags& flags)
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JDevice::setVolume.call(sl_null, jactivity, (jint)stream, (jint)(flags.value));
+		}
+	}
+
+	sl_bool Device::isMicrophoneMute()
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			return JDevice::isMicrophoneMute.callBoolean(sl_null, jactivity);
+		}
+		return sl_false;
+	}
+
+	void Device::setMicrophoneMute(sl_bool flag)
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JDevice::setMicrophoneMute.call(sl_null, jactivity, (jboolean)(flag ? 1 : 0));
+		}
+	}
+
+	sl_bool Device::isSpeakerOn()
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			return JDevice::isSpeakerOn.callBoolean(sl_null, jactivity);
+		}
+		return sl_false;
+	}
+
+	void Device::setSpeakerOn(sl_bool flag)
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JDevice::setSpeakerOn.call(sl_null, jactivity, (jboolean)(flag ? 1 : 0));
+		}
+	}
+
+	sl_bool Device::isBluetoothScoOn()
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			return JDevice::isBluetoothScoOn.callBoolean(sl_null, jactivity);
+		}
+		return sl_false;
+	}
+
+	void Device::setBluetoothScoOn(sl_bool flag)
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JDevice::setBluetoothScoOn.call(sl_null, jactivity, (jboolean)(flag ? 1 : 0));
+		}
+	}
+
+	void Device::vibrate(sl_uint32 millisec)
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JDevice::vibrate.callBoolean(sl_null, jactivity, millisec);
+		}
+	}
 
 	List<String> Device::getIMEIs()
 	{

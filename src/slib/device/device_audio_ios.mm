@@ -31,7 +31,7 @@
 namespace slib
 {
 
-	void Device::setAudioCategory(const DeviceAudioCategory& _category)
+	void Device::setAudioCategory(DeviceAudioCategory _category)
 	{
 		AVAudioSession* session = [AVAudioSession sharedInstance];
 		if (session == nil) {
@@ -76,6 +76,13 @@ namespace slib
 		}
 	}
 	
+	void Device::vibrate(sl_uint32 durationMillis)
+	{
+		if (durationMillis) {
+			AudioServicesPlayAlertSound(kSystemSoundID_Vibrate);
+		}
+	}
+
 }
 
 #endif

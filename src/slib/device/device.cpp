@@ -28,7 +28,74 @@ namespace slib
 {
 
 #if !defined(SLIB_PLATFORM_IS_IOS)
-	void Device::setAudioCategory(const DeviceAudioCategory& category)
+	void Device::setAudioCategory(DeviceAudioCategory category)
+	{
+	}
+#endif
+	
+#if !defined(SLIB_PLATFORM_IS_ANDROID)
+	DeviceAudioMode Device::getAudioMode()
+	{
+		return DeviceAudioMode::Default;
+	}
+
+	void Device::setAudioMode(DeviceAudioMode mode)
+	{
+	}
+
+	DeviceRingerMode Device::getRingerMode()
+	{
+		return DeviceRingerMode::Normal;
+	}
+
+	void Device::setRingerMode(DeviceRingerMode mode)
+	{
+	}
+
+	float Device::getVolume(DeviceAudioStreamType stream)
+	{
+		return 0;
+	}
+
+	void Device::setVolume(float volume, DeviceAudioStreamType stream, const DeviceSetVolumeFlags& flags)
+	{
+	}
+
+	sl_bool Device::isMicrophoneMute()
+	{
+		return sl_false;
+	}
+
+	void Device::setMicrophoneMute(sl_bool flag)
+	{
+	}
+
+	sl_bool Device::isSpeakerOn()
+	{
+		return sl_false;
+	}
+
+	void Device::setSpeakerOn(sl_bool flag)
+	{
+	}
+
+	sl_bool Device::isBluetoothScoOn()
+	{
+		return sl_false;
+	}
+
+	void Device::setBluetoothScoOn(sl_bool flag)
+	{
+	}
+#endif
+
+	void Device::setVolume(float volume, DeviceAudioStreamType stream)
+	{
+		setVolume(volume, stream, 0);
+	}
+
+#if !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_ANDROID)
+	void Device::vibrate(sl_uint32 durationMillis)
 	{
 	}
 #endif

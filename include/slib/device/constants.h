@@ -41,6 +41,53 @@ namespace slib
 		VideoChat = 6
 	};
 	
+	enum class DeviceAudioMode
+	{
+		Default = 0,
+		Ringtone = 1,
+		InCall = 2,
+		InCommunication = 3,
+		
+		Current = -1,
+		Invalid = -2
+	};
+
+	enum class DeviceRingerMode
+	{
+		Silent = 0,
+		Vibrate = 1,
+		Normal = 2
+	};
+
+	enum class DeviceAudioStreamType
+	{
+		Default = -1,
+		VoiceCall = 0,
+		System = 1,
+		Ring = 2,
+		Music = 3,
+		Alarm = 4,
+		Notification = 5,
+		BluetoothSco = 6,
+		SystemEnforced = 7,
+		DTMF = 8,
+		TTS = 9,
+		Accessibility = 10
+	};
+
+	class DeviceSetVolumeFlags
+	{
+	public:
+		int value;
+		SLIB_MEMBERS_OF_FLAGS(DeviceSetVolumeFlags, value)
+		
+	public:
+		enum {
+			ShowUI = 1,
+			PlaySound = 4
+		};
+	};
+
 }
 
 #endif

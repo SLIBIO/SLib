@@ -25,6 +25,5 @@
 
 #include "device/device.h"
 #include "device/sensor.h"
-#include "device/vibrator.h"
 
 #endif
