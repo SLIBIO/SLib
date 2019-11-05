@@ -4,9 +4,12 @@
 
 class MainPage : public ui::MainPage
 {
-protected:
-	void init() override;
+	SLIB_DECLARE_SINGLETON(MainPage)
 
+public:
+	void initCallbacks();
+
+protected:
 	void onOpen() override;
 
 	void onResume() override;

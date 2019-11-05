@@ -2,6 +2,7 @@ package slib.platform.android.device;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
@@ -64,7 +65,7 @@ public class Device {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
 			try {
 				String numbers = "";
-				SubscriptionManager sm = SubscriptionManager.from(context);
+				SubscriptionManager sm = (SubscriptionManager)(context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE));
 				if (sm != null) {
 					for (SubscriptionInfo info : sm.getActiveSubscriptionInfoList()) {
 						if (numbers.length() > 0) {
@@ -100,7 +101,7 @@ public class Device {
 					return tm.getPhoneCount();
 				}
 			} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-				SubscriptionManager sm = SubscriptionManager.from(context);
+				SubscriptionManager sm = (SubscriptionManager)(context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE));
 				if (sm != null) {
 					int n = 0;
 					for (int i = 0; i < MAX_SIM_SLOT_COUNT; i++) {
@@ -128,7 +129,7 @@ public class Device {
 	public static String getPhoneNumber(Activity context, int slot) {
 		try {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-				SubscriptionManager sm = SubscriptionManager.from(context);
+				SubscriptionManager sm = (SubscriptionManager)(context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE));
 				if (sm != null) {
 					SubscriptionInfo info = sm.getActiveSubscriptionInfoForSimSlotIndex(slot);
 					if (info != null) {

@@ -4,19 +4,17 @@
 
 SLIB_DEFINE_APPLICATION(PhoneCallApp, MobileApp)
 
-Ref<MainPage> g_mainPage;
-
 PhoneCallApp::PhoneCallApp()
 {
-	g_mainPage = new MainPage;
 }
 
 Ref<View> PhoneCallApp::getStartupPage()
 {
-	return g_mainPage;
+	return MainPage::getInstance();
 }
 
 void PhoneCallApp::onStart()
 {
 	UI::setAvailableScreenOrientationsPortrait();
+	MainPage::getInstance()->initCallbacks(); // Initialize singleton object
 }

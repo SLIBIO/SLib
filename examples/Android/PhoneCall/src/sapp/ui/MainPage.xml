@@ -46,8 +46,9 @@
 				>
 				<select
 					name='selectSIM'
-					width='30%sw'
+					width='50%sw'
 					centerVertical='true'
+					fontSize='4%sw'
 					>
 					<item selected='true'>Default</item>
 				</select>

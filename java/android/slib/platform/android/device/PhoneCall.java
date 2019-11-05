@@ -65,7 +65,7 @@ public class PhoneCall {
 		}
 	}
 
-	private final static String mSimSlotNames[] = {
+	private final static String[] mSimSlotNames = {
 			"extra_asus_dial_use_dualsim",
 			"com.android.phone.extra.slot",
 			"slot",
@@ -106,11 +106,20 @@ public class PhoneCall {
 			}
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 				try {
-					TelecomManager telecomManager = (TelecomManager) (activity.getSystemService(Context.TELECOM_SERVICE));
-					if (telecomManager != null) {
-						List<PhoneAccountHandle> accounts = telecomManager.getCallCapablePhoneAccounts();
-						if (accounts != null && accounts.size() > simSlot) {
-							intent.putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", accounts.get(simSlot));
+					TelecomManager tm = (TelecomManager) (activity.getSystemService(Context.TELECOM_SERVICE));
+					if (tm != null) {
+						String p1 = Device.getPhoneNumber(activity, simSlot);
+						if (p1 != null) {
+							List<PhoneAccountHandle> accounts = tm.getCallCapablePhoneAccounts();
+							if (accounts != null) {
+								for (PhoneAccountHandle handle : accounts) {
+									String p2 = tm.getLine1Number(handle);
+									if (p1.equals(p2)) {
+										intent.putExtra(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, handle);
+										break;
+									}
+								}
+							}
 						}
 					}
 				} catch (Exception e) {

@@ -1,8 +1,9 @@
 #include "MainPage.h"
 
-void MainPage::init()
+SLIB_DEFINE_SINGLETON(MainPage)
+
+void MainPage::initCallbacks()
 {
-	ui::MainPage::init();
 	Device::addOnIncomingCall([this](String callId, String phoneNumber) {
 		Println("Incoming: %s, %s", callId, phoneNumber);
 		groupCall->setVisible(sl_true);
@@ -33,7 +34,7 @@ void MainPage::init()
 	sl_uint32 nSIM = Device::getSimSlotsCount();
 	if (nSIM > 0) {
 		for (sl_uint32 i = 0; i < nSIM; i++) {
-			selectSIM->addItem(String::fromUint32(i), String::format("SIM %d", i+1), UIUpdateMode::Init);
+			selectSIM->addItem(String::fromUint32(i), String::format("SIM%d(%s)", i+1, Device::getPhoneNumber(i)), UIUpdateMode::Init);
 		}
 	}
 }
