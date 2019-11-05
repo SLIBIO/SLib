@@ -40,7 +40,6 @@
             </intent-filter>
         </activity>
 
-
         <service
             android:name=".CallService"
             android:permission="android.permission.BIND_INCALL_SERVICE"

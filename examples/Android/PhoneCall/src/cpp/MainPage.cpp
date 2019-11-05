@@ -29,6 +29,13 @@ void MainPage::init()
 		Println("End: %s, %s", callId, phoneNumber);
 		groupCall->setVisible(sl_false);
 	});
+
+	sl_uint32 nSIM = Device::getSimSlotsCount();
+	if (nSIM > 0) {
+		for (sl_uint32 i = 0; i < nSIM; i++) {
+			selectSIM->addItem(String::fromUint32(i), String::format("SIM %d", i+1), UIUpdateMode::Init);
+		}
+	}
 }
 
 void MainPage::onOpen()
@@ -48,13 +55,14 @@ void MainPage::onOpen()
 		Application::openSystemOverlaySetting();
 	});
 
-	btnDial->setOnClick([this](View*) {
-		Device::openDial(txtPhoneNumber->getText());
-	});
-
 	btnCall->setOnClick([this](View*) {
 		Application::grantPermissions(AppPermissions::CallPhone, [this]() {
-			Device::callPhone(txtPhoneNumber->getText());
+			String value = selectSIM->getSelectedValue();
+			if (value.isNotEmpty()) {
+				Device::callPhone(txtPhoneNumber->getText(), value.parseUint32());
+			} else {
+				Device::callPhone(txtPhoneNumber->getText());
+			}
 		});
 	});
 

@@ -1,50 +1,123 @@
 package slib.platform.android.device;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.telecom.Call;
+import android.telecom.PhoneAccountHandle;
+import android.telecom.TelecomManager;
 import android.telecom.VideoProfile;
 
 import java.util.HashMap;
+import java.util.List;
 
 import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
+import slib.platform.android.ui.UiThread;
 
 public class PhoneCall {
 
 	public static void openDial(final Activity activity, final String phoneNumber) {
-		try {
+		if (!(UiThread.isUiThread())) {
 			activity.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					Intent intent;
-					if (phoneNumber != null && phoneNumber.length() > 0) {
-						intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phoneNumber, null));
-					} else {
-						intent = new Intent(Intent.ACTION_DIAL);
-					}
-					activity.startActivity(intent);
+					openDial(activity, phoneNumber);
 				}
 			});
+			return;
+		}
+		try {
+			Intent intent;
+			if (phoneNumber != null && phoneNumber.length() > 0) {
+				intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phoneNumber, null));
+			} else {
+				intent = new Intent(Intent.ACTION_DIAL);
+			}
+			activity.startActivity(intent);
 		} catch (Exception e) {
 			Logger.exception(e);
 		}
 	}
 
+	@SuppressLint("MissingPermission")
 	public static void callPhone(final Activity activity, final String phoneNumber) {
-		try {
+		if( phoneNumber ==null || phoneNumber.length() == 0) {
+			return;
+		}
+		if (!(UiThread.isUiThread())) {
 			activity.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					if( phoneNumber !=null && phoneNumber.length()>0) {
-						Intent intent = new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", phoneNumber, null));
-						activity.startActivity(intent);
-					}
+					callPhone(activity, phoneNumber);
 				}
 			});
+			return;
+		}
+		try {
+			Intent intent = new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", phoneNumber, null));
+			activity.startActivity(intent);
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+
+	private final static String mSimSlotNames[] = {
+			"extra_asus_dial_use_dualsim",
+			"com.android.phone.extra.slot",
+			"slot",
+			"simslot",
+			"sim_slot",
+			"subscription",
+			"Subscription",
+			"phone",
+			"com.android.phone.DialingMode",
+			"simSlot",
+			"slot_id",
+			"simId",
+			"simnum",
+			"phone_type",
+			"slotId",
+			"slotIdx"
+	};
+
+	@SuppressLint("MissingPermission")
+	public static void callPhone(final Activity activity, final String phoneNumber, final int simSlot) {
+		if( phoneNumber ==null || phoneNumber.length() == 0) {
+			return;
+		}
+		if (!(UiThread.isUiThread())) {
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					callPhone(activity, phoneNumber, simSlot);
+				}
+			});
+			return;
+		}
+		try {
+			Intent intent = new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", phoneNumber, null));
+			intent.putExtra("Cdma_Supp", true);
+			for (String name : mSimSlotNames) {
+				intent.putExtra(name, simSlot);
+			}
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				try {
+					TelecomManager telecomManager = (TelecomManager) (activity.getSystemService(Context.TELECOM_SERVICE));
+					if (telecomManager != null) {
+						List<PhoneAccountHandle> accounts = telecomManager.getCallCapablePhoneAccounts();
+						if (accounts != null && accounts.size() > simSlot) {
+							intent.putExtra("android.telecom.extra.PHONE_ACCOUNT_HANDLE", accounts.get(simSlot));
+						}
+					}
+				} catch (Exception e) {
+					Logger.exception(e);
+				}
+			}
+			activity.startActivity(intent);
 		} catch (Exception e) {
 			Logger.exception(e);
 		}

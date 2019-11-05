@@ -56,6 +56,12 @@ namespace slib
 		// Works on Android
 		static List<String> getPhoneNumbers();
 		
+		// Works on Android
+		static sl_uint32 getSimSlotsCount();
+		
+		// Works on Android
+		static String getPhoneNumber(sl_uint32 indexSIM);
+
 		static String getDeviceId();
 		
 		static String getDeviceName();
@@ -79,6 +85,8 @@ namespace slib
 		static void openDial(const String& phoneNumber);
 
 		static void callPhone(const String& phoneNumber);
+		
+		static void callPhone(const String& phoneNumber, sl_uint32 indexSIM);
 		
 		
 		static void answerCall(const String& callId);

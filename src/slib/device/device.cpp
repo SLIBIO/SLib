@@ -53,6 +53,20 @@ namespace slib
 	{
 		return sl_null;
 	}
+
+	sl_uint32 Device::getSimSlotsCount()
+	{
+#ifdef SLIB_PLATFORM_IS_MOBILE
+		return 1;
+#else
+		return 0;
+#endif
+	}
+
+	String Device::getPhoneNumber(sl_uint32 indexSIM)
+	{
+		return sl_null;
+	}
 #endif
 
 #if !defined(SLIB_PLATFORM_IS_ANDROID) && !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_MACOS) && !defined(SLIB_PLATFORM_IS_TIZEN)
@@ -79,6 +93,11 @@ namespace slib
 	}
 
 	void Device::callPhone(const String& phoneNumber)
+	{
+		openDial(phoneNumber);
+	}
+
+	void Device::callPhone(const String& phoneNumber, sl_uint32 indexSIM)
 	{
 		openDial(phoneNumber);
 	}

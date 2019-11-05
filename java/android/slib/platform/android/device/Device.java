@@ -17,8 +17,11 @@ import java.util.UUID;
 
 import slib.platform.android.Logger;
 import slib.platform.android.helper.FileHelper;
+import slib.platform.android.ui.UiThread;
 
 public class Device {
+
+	private static final int MAX_SIM_SLOT_COUNT = 8;
 
 	@SuppressLint("MissingPermission")
 	public static String getIMEIs(Activity context) {
@@ -26,7 +29,7 @@ public class Device {
 			TelephonyManager tm = (TelephonyManager)(context.getSystemService(Activity.TELEPHONY_SERVICE));
 			if (tm != null) {
 				String numbers = "";
-				for (int i = 0; i < 128; i++) {
+				for (int i = 0; i < MAX_SIM_SLOT_COUNT; i++) {
 					String number = null;
 					try {
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -88,6 +91,57 @@ public class Device {
 		return null;
 	}
 
+	@SuppressLint("MissingPermission")
+	public static int getSimSlotsCount(Activity context) {
+		try {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				TelephonyManager tm = (TelephonyManager) (context.getSystemService(Activity.TELEPHONY_SERVICE));
+				if (tm != null) {
+					return tm.getPhoneCount();
+				}
+			} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+				SubscriptionManager sm = SubscriptionManager.from(context);
+				if (sm != null) {
+					int n = 0;
+					for (int i = 0; i < MAX_SIM_SLOT_COUNT; i++) {
+						try {
+							SubscriptionInfo info = sm.getActiveSubscriptionInfoForSimSlotIndex(i);
+							if (info != null) {
+								n = i + 1;
+							}
+						} catch (Exception e) {
+							Logger.exception(e);
+						}
+					}
+					return n;
+				}
+			} else {
+				return 1;
+			}
+		} catch (Throwable e) {
+			Logger.exception(e);
+		}
+		return 0;
+	}
+
+	@SuppressLint("MissingPermission")
+	public static String getPhoneNumber(Activity context, int slot) {
+		try {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+				SubscriptionManager sm = SubscriptionManager.from(context);
+				if (sm != null) {
+					SubscriptionInfo info = sm.getActiveSubscriptionInfoForSimSlotIndex(slot);
+					if (info != null) {
+						return info.getNumber();
+					}
+				}
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+		return null;
+	}
+
 	public static String getDeviceId(Activity context) {
 		try {
 			final String KEY_DEVICEID = "DeviceId";
@@ -131,35 +185,39 @@ public class Device {
 	}
 
 	public static void openURL(final Activity activity, final String url) {
-		activity.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					if (url.startsWith("file://")) {
-						File file = new File(url.substring(7));
-						Uri uri = FileHelper.getUriForFile(activity, file);
-						if (uri == null) {
-							Logger.error("File exposed beyond app: " + file.getAbsolutePath());
-							return;
-						}
-						Intent intent;
-						if (url.endsWith("jpg") || url.endsWith("jpeg") || url.endsWith("png")) {
-							intent = new Intent(Intent.ACTION_VIEW);
-							intent.setDataAndType(uri, "image/*");
-						} else {
-							intent = new Intent(Intent.ACTION_VIEW, uri);
-						}
-						intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-						activity.startActivity(intent);
-					} else {
-						Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-						activity.startActivity(intent);
-					}
-				} catch (Exception e) {
-					Logger.exception(e);
+		if (!(UiThread.isUiThread())) {
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					openURL(activity, url);
 				}
+			});
+			return;
+		}
+		try {
+			if (url.startsWith("file://")) {
+				File file = new File(url.substring(7));
+				Uri uri = FileHelper.getUriForFile(activity, file);
+				if (uri == null) {
+					Logger.error("File exposed beyond app: " + file.getAbsolutePath());
+					return;
+				}
+				Intent intent;
+				if (url.endsWith("jpg") || url.endsWith("jpeg") || url.endsWith("png")) {
+					intent = new Intent(Intent.ACTION_VIEW);
+					intent.setDataAndType(uri, "image/*");
+				} else {
+					intent = new Intent(Intent.ACTION_VIEW, uri);
+				}
+				intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+				activity.startActivity(intent);
+			} else {
+				Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+				activity.startActivity(intent);
 			}
-		});
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
 	}
 
 }

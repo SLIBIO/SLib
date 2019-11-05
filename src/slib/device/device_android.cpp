@@ -45,6 +45,8 @@ namespace slib
 			SLIB_JNI_BEGIN_CLASS(JDevice, "slib/platform/android/device/Device")
 				SLIB_JNI_STATIC_METHOD(getIMEIs, "getIMEIs", "(Landroid/app/Activity;)Ljava/lang/String;");
 				SLIB_JNI_STATIC_METHOD(getPhoneNumbers, "getPhoneNumbers", "(Landroid/app/Activity;)Ljava/lang/String;");
+				SLIB_JNI_STATIC_METHOD(getSimSlotsCount, "getSimSlotsCount", "(Landroid/app/Activity;)I");
+				SLIB_JNI_STATIC_METHOD(getPhoneNumber, "getPhoneNumber", "(Landroid/app/Activity;I)Ljava/lang/String;");
 				SLIB_JNI_STATIC_METHOD(getDeviceId, "getDeviceId", "(Landroid/app/Activity;)Ljava/lang/String;");
 				SLIB_JNI_STATIC_METHOD(getDeviceOSVersion, "getDeviceOSVersion", "()Ljava/lang/String;");
 				SLIB_JNI_STATIC_METHOD(getDeviceName, "getDeviceName", "()Ljava/lang/String;");
@@ -57,6 +59,7 @@ namespace slib
 			SLIB_JNI_BEGIN_CLASS(JPhoneCall, "slib/platform/android/device/PhoneCall")
 				SLIB_JNI_STATIC_METHOD(openDial, "openDial", "(Landroid/app/Activity;Ljava/lang/String;)V");
 				SLIB_JNI_STATIC_METHOD(callPhone, "callPhone", "(Landroid/app/Activity;Ljava/lang/String;)V");
+				SLIB_JNI_STATIC_METHOD(callPhoneWithSim, "callPhone", "(Landroid/app/Activity;Ljava/lang/String;I)V");
 				SLIB_JNI_STATIC_METHOD(answerCall, "answerCall", "(Ljava/lang/String;)V");
 				SLIB_JNI_STATIC_METHOD(endCall, "endCall", "(Ljava/lang/String;)V");
 			SLIB_JNI_END_CLASS
@@ -107,6 +110,24 @@ namespace slib
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			return String(JDevice::getPhoneNumbers.callString(sl_null, jactivity)).split(";");
+		}
+		return sl_null;
+	}
+
+	sl_uint32 Device::getSimSlotsCount()
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			return (sl_uint32)(JDevice::getSimSlotsCount.callInt(sl_null, jactivity));
+		}
+		return 1;
+	}
+
+	String Device::getPhoneNumber(sl_uint32 indexSIM)
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			return JDevice::getPhoneNumber.callString(sl_null, jactivity, (jint)indexSIM);
 		}
 		return sl_null;
 	}
@@ -191,6 +212,15 @@ namespace slib
 		if (jactivity) {
 			JniLocal<jstring> tel = Jni::getJniString(phoneNumber);
 			JPhoneCall::callPhone.call(sl_null, jactivity, tel.get());
+		}
+	}
+
+	void Device::callPhone(const String& phoneNumber, sl_uint32 indexSIM)
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JniLocal<jstring> tel = Jni::getJniString(phoneNumber);
+			JPhoneCall::callPhoneWithSim.call(sl_null, jactivity, tel.get(), (jint)indexSIM);
 		}
 	}
 

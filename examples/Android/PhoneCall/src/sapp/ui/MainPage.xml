@@ -44,16 +44,19 @@
 				centerHorizontal='true'
 				marginTop='2%sw'
 				>
-				<button
-					style='button'
-					name='btnDial'
-					text='Dial'
-					/>
+				<select
+					name='selectSIM'
+					width='30%sw'
+					centerVertical='true'
+					>
+					<item selected='true'>Default</item>
+				</select>
 				<button
 					style='button'
 					name='btnCall'
 					text='Call'
 					marginLeft='5%sw'
+					centerVertical='true'
 					/>
 			</hlinear>
 
