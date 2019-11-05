@@ -672,13 +672,15 @@ namespace slib
 	{
 		m_queue.removeAll_NoLock();
 		m_size = 0;
+		m_memCurrent.data = sl_null;
+		m_memCurrent.size = 0;
+		m_posCurrent = 0;
 	}
 	
 	void MemoryQueue::clear()
 	{
 		ObjectLocker lock(this);
-		m_queue.removeAll_NoLock();
-		m_size = 0;
+		clear_NoLock();
 	}
 	
 	sl_bool MemoryQueue::pop_NoLock(MemoryData& data)
