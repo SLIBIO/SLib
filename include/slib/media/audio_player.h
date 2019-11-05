@@ -73,6 +73,8 @@ namespace slib
 		
 	};
 	
+	class AudioPlayerParam;
+
 	class SLIB_EXPORT AudioPlayerBuffer : public Object
 	{
 		SLIB_DECLARE_OBJECT
@@ -81,6 +83,11 @@ namespace slib
 		AudioPlayerBuffer();
 		
 		~AudioPlayerBuffer();
+		
+	public:
+		static Ref<AudioPlayerBuffer> create(const AudioPlayerParam& playerParam, const AudioPlayerBufferParam& bufferParam);
+		
+		static Ref<AudioPlayerBuffer> create(const AudioPlayerBufferParam& param);
 		
 	public:
 		virtual void release() = 0;
@@ -142,7 +149,7 @@ namespace slib
 		static Ref<AudioPlayer> create(const AudioPlayerParam& param);
 		
 		static Ref<AudioPlayer> create();
-		
+
 		static List<AudioPlayerInfo> getPlayersList();
 		
 	public:

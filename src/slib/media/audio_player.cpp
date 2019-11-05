@@ -155,4 +155,18 @@ namespace slib
 		return create(param);
 	}
 
+	Ref<AudioPlayerBuffer> AudioPlayerBuffer::create(const AudioPlayerParam& playerParam, const AudioPlayerBufferParam& bufferParam)
+	{
+		Ref<AudioPlayer> player = AudioPlayer::create(playerParam);
+		if (player.isNotNull()) {
+			return player->createBuffer(bufferParam);
+		}
+		return sl_null;
+	}
+
+	Ref<AudioPlayerBuffer> AudioPlayerBuffer::create(const AudioPlayerBufferParam& param)
+	{
+		return create(AudioPlayerParam(), param);
+	}
+
 }
