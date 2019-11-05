@@ -16,5 +16,6 @@ Ref<View> PhoneCallApp::getStartupPage()
 void PhoneCallApp::onStart()
 {
 	UI::setAvailableScreenOrientationsPortrait();
-	MainPage::getInstance()->initCallbacks(); // Initialize singleton object
+
+	MainPage::getInstance()->initPage();
 }

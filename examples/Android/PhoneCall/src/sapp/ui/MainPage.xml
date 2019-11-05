@@ -61,6 +61,41 @@
 					/>
 			</hlinear>
 
+
+			<label
+				name='lblTime'
+				text='00:00/00:00'
+				marginTop='2%sw'
+				centerHorizontal='true'
+				/>
+
+			<hlinear
+				centerHorizontal='true'
+				marginTop='2%sw'
+				>
+				<button
+					style='button'
+					name='btnRecord'
+					text='Record'
+					marginLeft='5%sw'
+					visible='false'
+					/>
+				<button
+					style='button'
+					name='btnPlay'
+					text='Play'
+					marginLeft='5%sw'
+					visible='false'
+					/>
+				<button
+					style='button'
+					name='btnStop'
+					text='Stop'
+					marginLeft='5%sw'
+					visible='false'
+					/>
+			</hlinear>
+
 			<linear
 				name='groupCall'
 				width='fill'
