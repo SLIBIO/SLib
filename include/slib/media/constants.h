@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,8 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_DEVICE_CONSTANTS
-#define CHECKHEADER_SLIB_DEVICE_CONSTANTS
+#ifndef CHECKHEADER_SLIB_MEDIA_CONSTANTS
+#define CHECKHEADER_SLIB_MEDIA_CONSTANTS
 
 #include "definition.h"
 
@@ -30,46 +30,47 @@
 namespace slib
 {
 
-	enum class DeviceAudioCategory
+	enum class AudioSampleType
 	{
-		Default = 0,
-		Playback = 1,
-		Record = 2,
-		PlayAndRecord = 3,
-		PlayVideo = 4,
-		RecordVideo = 5,
-		VideoChat = 6
-	};
-	
-	enum class DeviceAudioMode
-	{
-		Default = 0,
-		Ringtone = 1,
-		InCall = 2,
-		InCommunication = 3,
+		Int8 = 1,
+		Uint8 = 2,
 		
-		Current = -1,
-		Invalid = -2
+		Int16 = 8,
+		Uint16 = 9,
+		Int16LE = 12,
+		Uint16LE = 13,
+		Int16BE = 14,
+		Uint16BE = 15,
+		
+		Float = 32,
+		FloatLE = 33,
+		FloatBE = 34
 	};
 
-	enum class DeviceRingerMode
+	enum class AudioStreamType
 	{
-		Silent = 0,
-		Vibrate = 1,
-		Normal = 2
+		Default = -1,
+		VoiceCall = 0,
+		System = 1,
+		Ring = 2,
+		Music = 3,
+		Alarm = 4,
+		Notification = 5,
+		BluetoothSco = 6,
+		SystemEnforced = 7,
+		DTMF = 8,
+		TTS = 9,
+		Accessibility = 10
 	};
 
-	class DeviceSetVolumeFlags
+	enum class AudioRecordingPreset
 	{
-	public:
-		int value;
-		SLIB_MEMBERS_OF_FLAGS(DeviceSetVolumeFlags, value)
-		
-	public:
-		enum {
-			ShowUI = 1,
-			PlaySound = 4
-		};
+		None = 0,
+		Generic = 1,
+		Camcorder = 2,
+		VoiceRecognition = 3,
+		VoiceCommunication = 4,
+		Unprocessed = 5
 	};
 
 }

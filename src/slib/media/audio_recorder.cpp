@@ -38,6 +38,8 @@ namespace slib
 	
 	AudioRecorderParam::AudioRecorderParam()
 	{
+		recordingPreset = AudioRecordingPreset::None;
+		
 		samplesPerSecond = 16000;
 		channelsCount = 1;
 		frameLengthInMilliseconds = 50;

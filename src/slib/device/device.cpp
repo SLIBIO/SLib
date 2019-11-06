@@ -52,12 +52,12 @@ namespace slib
 	{
 	}
 
-	float Device::getVolume(DeviceAudioStreamType stream)
+	float Device::getVolume(AudioStreamType stream)
 	{
 		return 0;
 	}
 
-	void Device::setVolume(float volume, DeviceAudioStreamType stream, const DeviceSetVolumeFlags& flags)
+	void Device::setVolume(float volume, AudioStreamType stream, const DeviceSetVolumeFlags& flags)
 	{
 	}
 
@@ -89,7 +89,7 @@ namespace slib
 	}
 #endif
 
-	void Device::setVolume(float volume, DeviceAudioStreamType stream)
+	void Device::setVolume(float volume, AudioStreamType stream)
 	{
 		setVolume(volume, stream, 0);
 	}

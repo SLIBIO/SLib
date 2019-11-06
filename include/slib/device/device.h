@@ -31,6 +31,7 @@
 #include "../core/list.h"
 #include "../core/function.h"
 #include "../math/size.h"
+#include "../media/constants.h"
 
 namespace slib
 {
@@ -51,11 +52,11 @@ namespace slib
 		
 		static void setRingerMode(DeviceRingerMode mode);
 		
-		static float getVolume(DeviceAudioStreamType stream = DeviceAudioStreamType::Default);
+		static float getVolume(AudioStreamType stream = AudioStreamType::Default);
 		
-		static void setVolume(float volume, DeviceAudioStreamType stream, const DeviceSetVolumeFlags& flags);
+		static void setVolume(float volume, AudioStreamType stream, const DeviceSetVolumeFlags& flags);
 		
-		static void setVolume(float volume, DeviceAudioStreamType stream = DeviceAudioStreamType::Default);
+		static void setVolume(float volume, AudioStreamType stream = AudioStreamType::Default);
 		
 		static sl_bool isMicrophoneMute();
 		

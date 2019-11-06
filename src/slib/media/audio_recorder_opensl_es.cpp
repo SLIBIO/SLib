@@ -136,6 +136,13 @@ namespace slib
 						SLRecordItf recordInterface;
 						SLAndroidSimpleBufferQueueItf bufferQueue;
 						if ((*engineInterface)->CreateAudioRecorder(engineInterface, &recorderObject, &slDataSource, &slDataSink, 2, id, req) == SL_RESULT_SUCCESS) {
+							if (param.recordingPreset != AudioRecordingPreset::None) {
+								SLAndroidConfigurationItf confAndroid;
+								if ((*recorderObject)->GetInterface(recorderObject, SL_IID_ANDROIDCONFIGURATION, &confAndroid) == SL_RESULT_SUCCESS) {
+									SLuint32 presetValue = (SLuint32)(param.recordingPreset);
+									(*confAndroid)->SetConfiguration(confAndroid, SL_ANDROID_KEY_RECORDING_PRESET, &presetValue, sizeof(SLuint32));
+								}
+							}
 							if ((*recorderObject)->Realize(recorderObject, SL_BOOLEAN_FALSE) == SL_RESULT_SUCCESS) {
 								if ((*recorderObject)->GetInterface(recorderObject, SL_IID_RECORD, &recordInterface) == SL_RESULT_SUCCESS) {
 									if ((*recorderObject)->GetInterface( recorderObject, SL_IID_ANDROIDSIMPLEBUFFERQUEUE, &bufferQueue) == SL_RESULT_SUCCESS) {

@@ -39,6 +39,8 @@ namespace slib
 
 	AudioPlayerBufferParam::AudioPlayerBufferParam()
 	{
+		streamType = AudioStreamType::Default;
+		
 		samplesPerSecond = 16000;
 		channelsCount = 1;
 		frameLengthInMilliseconds = 50;

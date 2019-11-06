@@ -186,6 +186,13 @@ namespace slib
 					SLInterfaceID ids[3] = { SL_IID_BUFFERQUEUE, SL_IID_VOLUME, SL_IID_ANDROIDCONFIGURATION };
 					SLboolean req[3] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
 					if ((*engineInterface)->CreateAudioPlayer(engineInterface, &playerObject, &slDataSource, &slDataSink, 3, ids, req) == SL_RESULT_SUCCESS) {
+						if (param.streamType != AudioStreamType::Default) {
+							SLAndroidConfigurationItf confAndroid;
+							if ((*playerObject)->GetInterface(playerObject, SL_IID_ANDROIDCONFIGURATION, &confAndroid) == SL_RESULT_SUCCESS) {
+								SLuint32 presetValue = (SLuint32)(param.streamType);
+								(*confAndroid)->SetConfiguration(confAndroid, SL_ANDROID_KEY_STREAM_TYPE, &presetValue, sizeof(SLuint32));
+							}
+						}
 						if ((*playerObject)->Realize(playerObject, SL_BOOLEAN_FALSE) == SL_RESULT_SUCCESS) {
 							if ((*playerObject)->GetInterface(playerObject, SL_IID_PLAY, &playerInterface) == SL_RESULT_SUCCESS) {
 								if ((*playerObject)->GetInterface(playerObject, SL_IID_BUFFERQUEUE, &bufferQueue) == SL_RESULT_SUCCESS) {

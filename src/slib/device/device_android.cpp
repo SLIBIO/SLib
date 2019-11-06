@@ -144,7 +144,7 @@ namespace slib
 		}
 	}
 
-	float Device::getVolume(DeviceAudioStreamType stream)
+	float Device::getVolume(AudioStreamType stream)
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
@@ -153,7 +153,7 @@ namespace slib
 		return 0;
 	}
 
-	void Device::setVolume(float volume, DeviceAudioStreamType stream, const DeviceSetVolumeFlags& flags)
+	void Device::setVolume(float volume, AudioStreamType stream, const DeviceSetVolumeFlags& flags)
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {

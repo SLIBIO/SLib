@@ -55,6 +55,8 @@ namespace slib
 	{
 	public:
 		String deviceId;
+		AudioRecordingPreset recordingPreset;
+		
 		sl_uint32 samplesPerSecond;
 		sl_uint32 channelsCount;
 		sl_uint32 frameLengthInMilliseconds;

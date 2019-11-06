@@ -120,6 +120,7 @@ void MainPage::showRecording()
 				return;
 			}
 			AudioRecorderParam param;
+			param.recordingPreset = AudioRecordingPreset::Unprocessed;
 			param.samplesPerSecond = SAMPLE_PER_SECOND;
 			param.onRecordAudio = [this](AudioRecorder*, AudioData& in) {
 				m_bufRecordedAudio.add(Memory::create(in.data, in.count * sizeof(sl_int16)));

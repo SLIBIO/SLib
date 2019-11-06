@@ -56,6 +56,8 @@ namespace slib
 	class SLIB_EXPORT AudioPlayerBufferParam
 	{
 	public:
+		AudioStreamType streamType;
+		
 		sl_uint32 samplesPerSecond;
 		sl_uint32 channelsCount;
 		sl_uint32 frameLengthInMilliseconds;
