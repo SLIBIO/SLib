@@ -213,14 +213,24 @@ namespace slib
 	
 	void TabView::selectTab(sl_uint32 index, UIUpdateMode mode)
 	{
+		_selectTab(sl_false, index, mode);
+	}
+
+	void TabView::_selectTab(sl_bool flagEvent, sl_uint32 index, UIUpdateMode mode)
+	{
 		Ptr<ITabViewInstance> instance = getTabViewInstance();
 		if (instance.isNotNull()) {
-			SLIB_VIEW_RUN_ON_UI_THREAD(&TabView::selectTab, index, mode)
+			SLIB_VIEW_RUN_ON_UI_THREAD(&TabView::_selectTab, flagEvent, index, mode)
 		}
 		ObjectLocker lock(this);
+		if (instance.isNull()) {
+			if (m_indexSelected == index) {
+				return;
+			}
+		}
 		ListLocker<TabViewItem> items(m_items);
 		if (index >= items.count) {
-			index = 0;
+			return;
 		}
 		m_indexSelected = index;
 		if (instance.isNotNull()) {
@@ -239,6 +249,10 @@ namespace slib
 				}
 			}
 			invalidate(mode);
+		}
+		if (flagEvent) {
+			lock.unlock();
+			dispatchSelectTab(index);
 		}
 	}
 	
@@ -672,8 +686,7 @@ namespace slib
 		sl_uint32 n = (sl_uint32)(items.count);
 		for (sl_uint32 i = 0; i < n; i++) {
 			if (getTabRegion(i).containsPoint(pt)) {
-				selectTab(i);
-				dispatchSelectTab(i);
+				_selectTab(sl_true, i);
 				return;
 			}
 		}

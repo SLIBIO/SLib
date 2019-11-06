@@ -203,7 +203,9 @@ namespace slib
 		
 		virtual void onDrawTab(Canvas* canvas, const UIRect& rect, sl_uint32 index, const Ref<Drawable>& icon, const String& label);
 		
-	protected:
+	private:
+		void _selectTab(sl_bool flagEvent, sl_uint32 index, UIUpdateMode mode = UIUpdateMode::Redraw);
+
 		void _invalidateTabBar(UIUpdateMode mode);
 		
 		void _relayout(UIUpdateMode mode);
