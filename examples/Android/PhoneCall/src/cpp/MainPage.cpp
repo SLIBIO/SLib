@@ -14,8 +14,6 @@ void MainPage::initPage()
 		btnAnswer->setOnClick([this, callId](View*) {
 			Device::answerCall(callId);
 			btnAnswer->setVisibility(Visibility::Gone);
-			Device::setAudioMode(DeviceAudioMode::InCall);
-			Device::setSpeakerOn();
 			showRecording();
 		});
 		btnEndCall->setOnClick([callId](View*) {
@@ -30,8 +28,6 @@ void MainPage::initPage()
 		btnEndCall->setOnClick([callId](View*) {
 			Device::endCall(callId);
 		});
-		Device::setAudioMode(DeviceAudioMode::InCall);
-		Device::setSpeakerOn();
 		showRecording();
 	});
 	Device::addOnEndCall([this](String callId, String phoneNumber) {
@@ -40,22 +36,25 @@ void MainPage::initPage()
 		stopRecording();
 	});
 
-	sl_uint32 nSIM = Device::getSimSlotsCount();
-	if (nSIM > 0) {
-		for (sl_uint32 i = 0; i < nSIM; i++) {
-			String phoneNumber = Device::getPhoneNumber(i);
-			if (phoneNumber.isNotEmpty()) {
-				selectSIM->addItem(String::fromUint32(i), String::format("SIM%d(%s)", i+1, phoneNumber), UIUpdateMode::Init);
-			} else {
-				selectSIM->addItem(String::fromUint32(i), String::format("SIM%d(Empty)", i+1), UIUpdateMode::Init);
-			}
-		}
-	}
 }
 
 void MainPage::onOpen()
 {
-	Application::grantPermissions(AppPermissions::ReadPhoneState);
+	Application::grantPermissions(AppPermissions::ReadPhoneState, [this]() {
+		if (selectSIM->getItemsCount() < 2) {
+			sl_uint32 nSIM = Device::getSimSlotsCount();
+			if (nSIM > 0) {
+				for (sl_uint32 i = 0; i < nSIM; i++) {
+					String phoneNumber = Device::getPhoneNumber(i);
+					if (phoneNumber.isNotEmpty()) {
+						selectSIM->addItem(String::fromUint32(i), String::format("SIM%d(%s)", i+1, phoneNumber), UIUpdateMode::Init);
+					} else {
+						selectSIM->addItem(String::fromUint32(i), String::format("SIM%d(Empty)", i+1), UIUpdateMode::Init);
+					}
+				}
+			}
+		}
+	});
 
 	switchSetDefault->setOnChange([](SwitchView*, sl_bool value) {
 		if (value) {
@@ -133,20 +132,25 @@ void MainPage::showRecording()
 		});
 	});
 
+	Device::setAudioMode(DeviceAudioMode::InCall);
+	Dispatch::setTimeout([]() {
+		Device::setSpeakerOn();
+	}, 500);
 }
 
 void MainPage::stopRecording()
 {
 	lblTime->setTextColor(Color::Black);
+
+	btnRecord->setVisibility(Visibility::Gone);
+	btnPlay->setVisibility(Visibility::Gone);
+	btnStop->setVisibility(Visibility::Gone);
+
 	if (m_recorder.isNull()) {
 		return;
 	}
 	m_recorder->stop();
 	m_recorder.setNull();
-
-	btnRecord->setVisibility(Visibility::Gone);
-	btnPlay->setVisibility(Visibility::Gone);
-	btnStop->setVisibility(Visibility::Gone);
 
 	if (!m_nSamplesPlayed) {
 		return;

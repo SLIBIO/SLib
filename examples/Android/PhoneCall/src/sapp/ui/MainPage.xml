@@ -38,6 +38,7 @@
 				width='60%'
 				centerHorizontal='true'
 				marginTop='10%sw'
+				keyboard='phone'
 				/>
 
 			<hlinear
