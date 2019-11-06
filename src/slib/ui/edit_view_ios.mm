@@ -379,9 +379,6 @@ namespace slib
 					Ref<EditView> view = CastRef<EditView>(getView());
 					if (view.isNotNull()) {
 						view->dispatchReturnKey();
-						if (view->getMultiLine() == MultiLineMode::Single && view->isAutoDismissKeyboard()) {
-							[control resignFirstResponder];
-						}
 					}
 				}
 

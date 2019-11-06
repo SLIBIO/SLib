@@ -96,9 +96,9 @@ public class UiView {
 
 	public static void setFocus(final View view, final boolean flag) {
 		try {
-			view.setFocusable(true);
-			view.setFocusableInTouchMode(true);
 			if (flag) {
+				view.setFocusable(true);
+				view.setFocusableInTouchMode(true);
 				view.requestFocus();
 			} else {
 				view.clearFocus();
@@ -523,7 +523,7 @@ public class UiView {
 				int ret = nativeOnTouchEvent(instance, action, pts, event.getEventTime(), flagDispatchToParent, flagNotDispatchToChildren);
 				if ((ret & 0x4000) == 0) {
 					// Keep Keyboard
-					UiWindow.dismissKeyboard((View)view, event);
+					// UiWindow.dismissKeyboard((View)view, event);
 				}
 				if ((ret & 0x0001) != 0) {
 					// Prevent Default

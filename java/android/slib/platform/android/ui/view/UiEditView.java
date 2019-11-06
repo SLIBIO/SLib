@@ -23,12 +23,10 @@
 package slib.platform.android.ui.view;
 
 import io.slib.R;
-import slib.platform.android.Android;
 import slib.platform.android.Logger;
 import slib.platform.android.ui.UiFont;
 import slib.platform.android.ui.Util;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -495,7 +493,6 @@ public class UiEditView extends EditText implements IView {
 				}
 				if (event == null) {
 					onEventReturn(UiEditView.this);
-					Android.dismissKeyboard((Activity)(getContext()));
 					return true;
 				} else {
 					if (!(event.isShiftPressed())) {

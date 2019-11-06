@@ -234,7 +234,7 @@ public class UiScrollView extends ScrollView implements IView {
 		if (checkLock(ev)) {
 			return false;
 		}
-		UiWindow.dismissKeyboard(this, ev);
+		// UiWindow.dismissKeyboard(this, ev);
 		flagFling = false;
 		boolean flag = super.onTouchEvent(ev);
 		if (mPaging) {

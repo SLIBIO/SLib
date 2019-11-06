@@ -529,6 +529,9 @@ namespace slib
 	void EditView::dispatchReturnKey()
 	{
 		SLIB_INVOKE_EVENT_HANDLER(ReturnKey)
+		if (m_multiLine == MultiLineMode::Single && m_flagAutoDismissKeyboard) {
+			UI::dismissKeyboard();
+		}
 	}
 	
 	void EditView::dispatchKeyEvent(UIEvent* ev)
