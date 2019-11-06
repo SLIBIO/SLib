@@ -421,7 +421,7 @@ namespace slib
 		view->dispatchDraw(canvas.get());
 	}
 	
-	UIEventFlags iOS_ViewInstance::onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event, sl_bool flagDispatchToChildren)
+	UIEventFlags iOS_ViewInstance::onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event, sl_bool flagDispatchToChildren, sl_bool flagDispatchToParent)
 	{
 		UIView* handle = m_handle;
 		
@@ -519,6 +519,9 @@ namespace slib
 							ev->addFlag(UIEventFlags::NotDispatchToChildren);
 						}
 
+						if (flagDispatchToParent) {
+							ev->addFlag(UIEventFlags::DispatchToParent);
+						}
 						onTouchEvent(ev.get());
 						UIEventFlags flags = ev->getFlags();
 						

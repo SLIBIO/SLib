@@ -39,7 +39,6 @@ namespace slib
 		
 		m_flagLoop = sl_false;
 		
-		m_flagMouseCapure = sl_false;
 		m_flagMouseDown = sl_false;
 		m_posMouseDown.x = 0;
 		m_posMouseDown.y = 0;
@@ -95,6 +94,11 @@ namespace slib
 	}
 	
 	void ViewPager::selectPage(sl_uint64 index, UIUpdateMode mode)
+	{
+		_selectPage(sl_false, index, mode);
+	}
+
+	void ViewPager::_selectPage(sl_bool flagEvent, sl_uint64 index, UIUpdateMode mode)
 	{
 		ObjectLocker lock(this);
 		
@@ -200,6 +204,7 @@ namespace slib
 						m_offsetPages -= getWidth();
 					}
 				}
+				_loadPage(index);
 				m_indexCurrent = index;
 			}
 			if (m_offsetPages != 0) {
@@ -209,8 +214,10 @@ namespace slib
 		
 		if (indexCurrent != index) {
 			m_indexCurrent = index;
-			lock.unlock();
-			dispatchSelectPage(index);
+			if (flagEvent) {
+				lock.unlock();
+				dispatchSelectPage(index);
+			}
 		}
 	}
 	
@@ -240,46 +247,6 @@ namespace slib
 	{
 		SLIB_INVOKE_EVENT_HANDLER(SelectPage, index)
 	}
-	
-	void ViewPager::dispatchMouseEvent(UIEvent* ev)
-	{
-		UIAction action = ev->getAction();
-		if (action != UIAction::LeftButtonDrag) {
-			m_flagMouseCapure = sl_false;
-			if (action != UIAction::LeftButtonDown) {
-				Ref<View> parent = getParent();
-				if (parent.isNotNull()) {
-					parent->setLockScroll(sl_false);
-				}
-			}
-		}
-		_onMouseEvent(ev);
-		if (m_flagMouseCapure) {
-			ev->stopPropagation();
-		} else {
-			ViewGroup::dispatchTouchEvent(ev);
-		}
-	}
-	
-	void ViewPager::dispatchTouchEvent(UIEvent* ev)
-	{
-		UIAction action = ev->getAction();
-		if (action != UIAction::TouchMove) {
-			m_flagMouseCapure = sl_false;
-			if (action != UIAction::TouchBegin) {
-				Ref<View> parent = getParent();
-				if (parent.isNotNull()) {
-					parent->setLockScroll(sl_false);
-				}
-			}
-		}
-		_onMouseEvent(ev);
-		if (m_flagMouseCapure) {
-			ev->stopPropagation();
-		} else {
-			ViewGroup::dispatchTouchEvent(ev);
-		}
-	}
 
 	void ViewPager::onResize(sl_ui_len width, sl_ui_len height)
 	{
@@ -291,7 +258,7 @@ namespace slib
 		_resizePages();
 	}
 	
-	void ViewPager::_onMouseEvent(UIEvent* ev)
+	void ViewPager::onMouseEvent(UIEvent* ev)
 	{
 		sl_uint64 countPages = getPagesCount();
 		if (countPages <= 0) {
@@ -305,6 +272,18 @@ namespace slib
 		
 		UIAction action = ev->getAction();
 		Point pos = ev->getPoint();
+		
+		if (action != UIAction::LeftButtonDrag && action != UIAction::TouchMove) {
+			setCapturingTouchEvents(sl_false);
+			setCapturingMouseEvents(sl_false);
+			if (action != UIAction::LeftButtonDown || action != UIAction::TouchBegin) {
+				Ref<View> parent = getParent();
+				if (parent.isNotNull()) {
+					parent->setLockScroll(sl_false);
+				}
+			}
+		}
+		
 		if (action == UIAction::LeftButtonDown || action == UIAction::TouchBegin) {
 			m_motionTracker.clearMovements();
 			m_flagMouseDown = sl_true;
@@ -316,9 +295,13 @@ namespace slib
 				sl_real dx = Math::abs(pos.x - m_posMouseDown.x);
 				if (dx > 5 * dimUnit) {
 					cancelPressedStateOfChildren();
-					m_flagMouseCapure = sl_true;
 					sl_real dy = Math::abs(pos.y - m_posMouseDown.y);
 					if (dy < dx) {
+						if (action == UIAction::TouchMove) {
+							setCapturingTouchEvents(sl_true);
+						} else {
+							setCapturingMouseEvents(sl_true);
+						}
 						Ref<View> parent = getParent();
 						if (parent.isNotNull()) {
 							parent->setLockScroll(sl_true);
@@ -383,24 +366,24 @@ namespace slib
 				sl_real t = dimUnit * 10;
 				if (v > t) {
 					if (m_offsetPages > 0) {
-						goToPrevious();
+						_selectPage(sl_true, m_indexCurrent - 1);
 					} else {
-						selectPage(m_indexCurrent);
+						_selectPage(sl_true, m_indexCurrent);
 					}
 				} else if (v < -t) {
 					if (m_offsetPages < 0) {
-						goToNext();
+						_selectPage(sl_true, m_indexCurrent + 1);
 					} else {
-						selectPage(m_indexCurrent);
+						_selectPage(sl_true, m_indexCurrent);
 					}
 				} else {
 					sl_ui_len o = (sl_ui_len)(getWidth() * 0.4f);
 					if (m_offsetPages > o) {
-						goToPrevious();
+						_selectPage(sl_true, m_indexCurrent - 1);
 					} else if (m_offsetPages < -o) {
-						goToNext();
+						_selectPage(sl_true, m_indexCurrent + 1);
 					} else {
-						selectPage(m_indexCurrent);
+						_selectPage(sl_true, m_indexCurrent);
 					}
 				}
 				m_motionTracker.clearMovements();

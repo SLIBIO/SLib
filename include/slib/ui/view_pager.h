@@ -64,20 +64,17 @@ namespace slib
 		
 	public:
 		SLIB_DECLARE_EVENT_HANDLER(ViewPager, SelectPage, sl_uint64 index)
-
-	public:
-		void dispatchMouseEvent(UIEvent* ev) override;
-		
-		void dispatchTouchEvent(UIEvent* ev) override;
 		
 	protected:
 		void onResize(sl_ui_len width, sl_ui_len height) override;
 		
 		void onChangePadding() override;
 		
+		void onMouseEvent(UIEvent* ev) override;
+
 	private:
-		void _onMouseEvent(UIEvent* ev);
-				
+		void _selectPage(sl_bool flagEvent, sl_uint64 index, UIUpdateMode mode = UIUpdateMode::Animate);
+		
 		Ref<View> _loadPage(sl_uint64 index);
 		
 		sl_ui_pos _getPagePosition(sl_uint64 index);
@@ -100,7 +97,6 @@ namespace slib
 		sl_bool m_flagLoop;
 		
 		MotionTracker m_motionTracker;
-		sl_bool m_flagMouseCapure;
 		sl_bool m_flagMouseDown;
 		Point m_posMouseDown;
 		sl_ui_len m_offsetPages;

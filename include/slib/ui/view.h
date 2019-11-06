@@ -308,6 +308,14 @@ namespace slib
 		
 		virtual void setLockScroll(sl_bool flagLock);
 		
+		sl_bool isCapturingMouseEvents();
+		
+		void setCapturingMouseEvents(sl_bool flag);
+		
+		sl_bool isCapturingTouchEvents();
+		
+		void setCapturingTouchEvents(sl_bool flag);
+
 		
 		Ref<Cursor> getCursor();
 		
@@ -1470,6 +1478,8 @@ namespace slib
 		sl_bool m_flagPressed : 1;
 		sl_bool m_flagHover : 1;
 		sl_bool m_flagLockScroll: 1;
+		sl_bool m_flagCaptureMouseEvents: 1;
+		sl_bool m_flagCaptureTouchEvents: 1;
 		
 		AtomicString m_id;
 		UIAttachMode m_attachMode;
@@ -1705,6 +1715,7 @@ namespace slib
 			sl_ui_pos pageWidth;
 			sl_ui_pos pageHeight;
 			
+			Point mousePointDown;
 			Point mousePointBefore;
 			sl_uint64 touchPointerIdBefore;
 			MotionTracker motionTracker;
