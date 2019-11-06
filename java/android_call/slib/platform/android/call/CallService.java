@@ -1,7 +1,6 @@
 package slib.platform.android.call;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.os.Build;
 import android.telecom.Call;
 import android.telecom.InCallService;
