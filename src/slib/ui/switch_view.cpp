@@ -507,8 +507,8 @@ namespace slib
 				}
 			}
 			if (m_flagTextInButton) {
-				if (widthText > heightSwitch) {
-					setLayoutWidth(widthText * 2 + heightSwitch + paddingWidth);
+				if (widthText > heightSwitch * 3 / 2) {
+					setLayoutWidth(widthText * 2 + heightSwitch * 3 / 2 + paddingWidth);
 				} else {
 					setLayoutWidth(heightSwitch * 3 + paddingWidth);
 				}
