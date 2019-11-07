@@ -2646,16 +2646,26 @@ namespace slib
 		}
 		m_flagNeedApplyLayout = sl_false;
 		
-		ListElements< Ref<View> > children(getChildren());
-		for (sl_size i = 0; i < children.count; i++) {
-			Ref<View>& child = children[i];
-			child->_applyLayout(UIUpdateMode::None);
+		if (isNativeWidget()) {
+			ListElements< Ref<View> > children(getChildren());
+			for (sl_size i = 0; i < children.count; i++) {
+				Ref<View>& child = children[i];
+				child->_applyLayout(mode);
+			}
+			if (layoutAttrs.isNotNull()) {
+				setFrame(layoutAttrs->layoutFrame, UIUpdateMode::None);
+			}
+		} else {
+			ListElements< Ref<View> > children(getChildren());
+			for (sl_size i = 0; i < children.count; i++) {
+				Ref<View>& child = children[i];
+				child->_applyLayout(UIUpdateMode::None);
+			}
+			if (layoutAttrs.isNotNull()) {
+				setFrame(layoutAttrs->layoutFrame, UIUpdateMode::None);
+			}
+			invalidate(mode);
 		}
-		
-		if (layoutAttrs.isNotNull()) {
-			setFrame(layoutAttrs->layoutFrame, UIUpdateMode::None);
-		}
-		invalidate(mode);
 	}
 
 	void View::_updateAndApplyChildLayout(View* child)
@@ -9289,6 +9299,10 @@ namespace slib
 
 	void View::_processContentScrollingEvents(UIEvent* ev)
 	{
+		if (m_flagLockScroll) {
+			return;
+		}
+		
 		Ref<ScrollAttributes>& scrollAttrs = m_scrollAttrs;
 		if (scrollAttrs.isNull()) {
 			return;
