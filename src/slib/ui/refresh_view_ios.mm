@@ -91,8 +91,26 @@ namespace slib
 					_onRefresh_NW();
 				}
 				
+				static void setRefreshing(UIRefreshControl* control, sl_bool flag)
+				{
+					if (flag) {
+						if (!(control.refreshing)) {
+							[control beginRefreshing];
+							UIView* v = control.superview;
+							if ([v isKindOfClass:[UIScrollView class]]) {
+								UIScrollView* scrollView = (UIScrollView*)v;
+								[scrollView setContentOffset:CGPointMake(0, -control.frame.size.height) animated:YES];
+							}
+						}
+					} else {
+						if (control.refreshing) {
+							[control endRefreshing];
+						}
+					}
+				}
+				
 			};
-
+		
 		}
 	}
 
@@ -110,6 +128,7 @@ namespace slib
 				} else {
 					[scrollView addSubview:control];
 				}
+				RefreshViewHelper::setRefreshing(control, m_flagRefreshing);
 			}
 		}
 	}
@@ -119,15 +138,7 @@ namespace slib
 		SLIB_VIEW_RUN_ON_UI_THREAD(&RefreshView::_setRefreshing_NW, flag)
 		UIRefreshControl* control = static_cast<RefreshViewHelper*>(this)->getControl();
 		if (control != nil) {
-			if (flag) {
-				if (!(control.refreshing)) {
-					[control beginRefreshing];
-				}
-			} else {
-				if (control.refreshing) {
-					[control endRefreshing];
-				}
-			}
+			RefreshViewHelper::setRefreshing(control, flag);
 		}
 	}
 	
