@@ -69,7 +69,7 @@ namespace slib
 					JniLocal<jobjectArray> arr = Jni::newStringArray(n);
 					if (arr.isNotNull()) {
 						for (sl_uint32 i = 0; i < titles.count; i++) {
-							Jni::setStringArrayElement(arr, i, titles[i]);
+							Jni::setStringArrayElement(arr, i, titles[i].getNotNull());
 						}
 						titles.unlock();
 						JSelectView::applyList.call(sl_null, jview, arr.get());
