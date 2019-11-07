@@ -402,6 +402,7 @@ namespace slib
 		SAppMultiLineModeValue multiLine;
 		SAppEllipsizeModeValue ellipsize;
 		SAppUint32Value lines;
+		SAppBooleanValue linksInText;
 
 	};
 

@@ -117,6 +117,8 @@ namespace slib
 		Color shadowColor;
 		Point shadowOffset;
 		
+		sl_real lineThickness;
+		
 	public:
 		TextDrawParam();
 		
@@ -175,7 +177,7 @@ namespace slib
 		~TextWordItem() noexcept;
 
 	public:
-		static Ref<TextWordItem> create(const String16& text, const Ref<TextStyle>& style) noexcept;
+		static Ref<TextWordItem> create(const String16& text, const Ref<TextStyle>& style, sl_bool flagEnabledHyperlinksInPlainText = sl_false) noexcept;
 
 	public:
 		String16 getText() noexcept;
@@ -321,7 +323,7 @@ namespace slib
 		~TextParagraph() noexcept;
 
 	public:
-		void addText(const String16& text, const Ref<TextStyle>& style) noexcept;
+		void addText(const String16& text, const Ref<TextStyle>& style, sl_bool flagEnabledHyperlinksInPlainText = sl_false) noexcept;
 		
 		void addHyperTextNodeGroup(const Ref<XmlNodeGroup>& group, const Ref<TextStyle>& style) noexcept;
 		
@@ -361,6 +363,7 @@ namespace slib
 		EllipsizeMode ellipsizeMode;
 		sl_uint32 linesCount;
 		Alignment align;
+		sl_bool flagEnabledHyperlinksInPlainText;
 		
 	public:
 		SimpleTextBoxParam();

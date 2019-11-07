@@ -41,6 +41,7 @@ namespace slib
 		m_multiLineMode = MultiLineMode::Single;
 		m_ellipsizeMode = EllipsizeMode::None;
 		m_linesCount = 0;
+		m_flagEnabledHyperlinksInPlainText = sl_false;
 		
 		setPadding(1, 1, 1, 1, UIUpdateMode::Init);
 	}
@@ -127,6 +128,17 @@ namespace slib
 		m_linesCount = nLines;
 		invalidateLayoutOfWrappingControl(updateMode);
 	}
+
+	sl_bool LabelView::isEnabledHyperlinksInPlainText()
+	{
+		return m_flagEnabledHyperlinksInPlainText;
+	}
+
+	void LabelView::setEnabledHyperlinksInPlainText(sl_bool flag, UIUpdateMode mode)
+	{
+		m_flagEnabledHyperlinksInPlainText = flag;
+		invalidate(mode);
+	}
 	
 	UISize LabelView::measureSize()
 	{
@@ -174,6 +186,7 @@ namespace slib
 		param.ellipsizeMode = m_ellipsizeMode;
 		param.linesCount = m_linesCount;
 		param.align = m_textAlignment;
+		param.flagEnabledHyperlinksInPlainText = m_flagEnabledHyperlinksInPlainText;
 		m_textBox.update(param);
 	}
 	
@@ -193,6 +206,10 @@ namespace slib
 			param.shadowRadius = (sl_real)(getShadowRadius());
 			param.shadowColor = getShadowColor();
 			param.shadowOffset = getShadowOffset();
+		}
+		param.lineThickness = UI::dpToPixel(1);
+		if (param.lineThickness < 1) {
+			param.lineThickness = 1;
 		}
 		m_textBox.draw(canvas, param);
 	}

@@ -50,7 +50,7 @@ namespace slib
 	
 	TextDrawParam::TextDrawParam() :
 		color(Color::Black),
-		shadowOpacity(0), shadowRadius(3), shadowColor(Color::Black), shadowOffset(0, 0)
+		shadowOpacity(0), shadowRadius(3), shadowColor(Color::Black), shadowOffset(0, 0), lineThickness(1)
 	{
 	}
 	
@@ -167,13 +167,26 @@ namespace slib
 	{
 	}
 
-	Ref<TextWordItem> TextWordItem::create(const String16& text, const Ref<TextStyle>& style) noexcept
+	Ref<TextWordItem> TextWordItem::create(const String16& text, const Ref<TextStyle>& style, sl_bool flagEnabledHyperlinksInPlainText) noexcept
 	{
 		if (style.isNotNull()) {
 			Ref<TextWordItem> ret = new TextWordItem;
 			if (ret.isNotNull()) {
 				ret->m_text = text;
 				ret->m_style = style;
+				if (flagEnabledHyperlinksInPlainText) {
+					SLIB_STATIC_STRING16(http, "http://")
+					SLIB_STATIC_STRING16(https, "https://")
+					if ((text.startsWith(http) && text.getLength() > http.getLength()) || (text.startsWith(https) && text.getLength() > https.getLength())) {
+						Ref<TextStyle> styleNew = style->duplicate();
+						if (styleNew.isNotNull()) {
+							styleNew->flagUnderline = sl_true;
+							styleNew->textColor = Color::Blue;
+							styleNew->href = text;
+							ret->m_style = styleNew;
+						}
+					}
+				}
 				return ret;
 			}
 		}
@@ -495,7 +508,7 @@ namespace slib
 	{
 	}
 
-	void TextParagraph::addText(const String16& text, const Ref<TextStyle>& style) noexcept
+	void TextParagraph::addText(const String16& text, const Ref<TextStyle>& style, sl_bool flagEnabledHyperlinksInPlainText) noexcept
 	{
 		if (text.isEmpty()) {
 			return;
@@ -532,7 +545,7 @@ namespace slib
 			}
 			if (SLIB_CHAR_IS_WHITE_SPACE(ch) || flagEmoji) {
 				if (startWord < pos) {
-					Ref<TextWordItem> item = TextWordItem::create(String16(sz + startWord, pos - startWord), style);
+					Ref<TextWordItem> item = TextWordItem::create(String16(sz + startWord, pos - startWord), style, flagEnabledHyperlinksInPlainText);
 					if (item.isNotNull()) {
 						m_items.add_NoLock(item);
 						m_positionLength += pos - startWord;
@@ -581,13 +594,13 @@ namespace slib
 			pos++;
 		}
 		if (startWord == 0) {
-			Ref<TextWordItem> item = TextWordItem::create(text, style);
+			Ref<TextWordItem> item = TextWordItem::create(text, style, flagEnabledHyperlinksInPlainText);
 			if (item.isNotNull()) {
 				m_items.add_NoLock(item);
 				m_positionLength += len;
 			}
 		} else if (startWord < len) {
-			Ref<TextWordItem> item = TextWordItem::create(String16(sz + startWord, len - startWord), style);
+			Ref<TextWordItem> item = TextWordItem::create(String16(sz + startWord, len - startWord), style, flagEnabledHyperlinksInPlainText);
 			if (item.isNotNull()) {
 				m_items.add_NoLock(item);
 				m_positionLength += len - startWord;
@@ -1738,21 +1751,21 @@ namespace slib
 						if (rc.intersectRectangle(frame)) {
 							Ref<Font> font = style->font;
 							if (font.isNotNull()) {
-								Ref<Pen> pen = Pen::createSolidPen(1, color);
+								Ref<Pen> pen = Pen::createSolidPen(param.lineThickness, color);
 								if (pen.isNotNull()) {
 									FontMetrics fm;
 									if (font->getFontMetrics(fm)) {
 										if (style->flagUnderline) {
-											sl_real yLine = frame.bottom - fm.descent / 2;
-											canvas->drawLine(Point(frame.left, yLine), Point(frame.right, yLine), pen);
+											sl_real yLine = y + frame.bottom - fm.descent / 2;
+											canvas->drawLine(Point(x + frame.left, yLine), Point(x + frame.right, yLine), pen);
 										}
 										if (style->flagOverline) {
-											sl_real yLine = frame.bottom - fm.descent - fm.ascent;
-											canvas->drawLine(Point(frame.left, yLine), Point(frame.right, yLine), pen);
+											sl_real yLine = y + frame.bottom - fm.descent - fm.ascent;
+											canvas->drawLine(Point(x + frame.left, yLine), Point(x + frame.right, yLine), pen);
 										}
 										if (style->flagLineThrough) {
-											sl_real yLine = frame.bottom - (fm.descent + fm.ascent) / 2;
-											canvas->drawLine(Point(frame.left, yLine), Point(frame.right, yLine), pen);
+											sl_real yLine = y + frame.bottom - (fm.descent + fm.ascent) / 2;
+											canvas->drawLine(Point(x + frame.left, yLine), Point(x + frame.right, yLine), pen);
 										}
 									}
 								}
@@ -1884,7 +1897,7 @@ namespace slib
 		}
 		
 		sl_bool flagReLayout = sl_false;
-		if (m_text != param.text || m_flagHyperText != param.flagHyperText || (param.flagHyperText && m_font != param.font)) {
+		if (m_text != param.text || m_flagHyperText != param.flagHyperText || (param.flagHyperText && m_font != param.font) || (!(param.flagHyperText) && param.flagEnabledHyperlinksInPlainText)) {
 			m_paragraph.setNull();
 			m_contentWidth = 0;
 			m_contentHeight = 0;
@@ -1894,7 +1907,7 @@ namespace slib
 					m_font = param.font;
 					m_paragraph->addHyperText(param.text, m_style);
 				} else {
-					m_paragraph->addText(param.text, m_style);
+					m_paragraph->addText(param.text, m_style, param.flagEnabledHyperlinksInPlainText);
 				}
 			}
 			m_text = param.text;

@@ -70,6 +70,10 @@ namespace slib
 		
 		virtual void setLinesCount(sl_uint32 nLines, UIUpdateMode updateMode = UIUpdateMode::UpdateLayout);
 		
+		sl_bool isEnabledHyperlinksInPlainText();
+		
+		void setEnabledHyperlinksInPlainText(sl_bool flag, UIUpdateMode updateMode = UIUpdateMode::Redraw);
+		
 		UISize measureSize();
 		
 	public:
@@ -95,6 +99,7 @@ namespace slib
 		MultiLineMode m_multiLineMode;
 		EllipsizeMode m_ellipsizeMode;
 		sl_uint32 m_linesCount;
+		sl_bool m_flagEnabledHyperlinksInPlainText;
 		
 		SimpleTextBox m_textBox;
 		
