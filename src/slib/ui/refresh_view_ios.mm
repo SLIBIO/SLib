@@ -128,7 +128,9 @@ namespace slib
 				} else {
 					[scrollView addSubview:control];
 				}
-				RefreshViewHelper::setRefreshing(control, m_flagRefreshing);
+				if (m_flagRefreshing) {
+					RefreshViewHelper::setRefreshing(control, m_flagRefreshing);
+				}
 			}
 		}
 	}
