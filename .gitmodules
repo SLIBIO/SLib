@@ -14,3 +14,6 @@
 [submodule "external/bin/libcef"]
 	path = external/bin/libcef
 	url = https://github.com/SLIBIO/SLibExternalBin_libcef.git
+[submodule "external/bin/XgPush"]
+	path = external/bin/XgPush
+	url = https://github.com/SLIBIO/SLibExternalBin_XgPush
