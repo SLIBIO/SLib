@@ -240,6 +240,14 @@ namespace slib
 	{
 		m_flagLoop = flag;
 	}
+
+	void ViewPager::setLockScroll(sl_bool flag)
+	{
+		ViewGroup::setLockScroll(flag);
+		if (flag) {
+			m_flagMouseDown = sl_false;
+		}
+	}
 	
 	SLIB_DEFINE_EVENT_HANDLER(ViewPager, SelectPage, sl_uint64 index)
 	

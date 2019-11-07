@@ -63,6 +63,9 @@ namespace slib
 		void setLoop(sl_bool flag);
 		
 	public:
+		void setLockScroll(sl_bool flag) override;
+		
+	public:
 		SLIB_DECLARE_EVENT_HANDLER(ViewPager, SelectPage, sl_uint64 index)
 		
 	protected:
