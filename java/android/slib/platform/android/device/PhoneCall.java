@@ -101,9 +101,6 @@ public class PhoneCall {
 		try {
 			Intent intent = new Intent(Intent.ACTION_CALL, Uri.fromParts("tel", phoneNumber, null));
 			intent.putExtra("Cdma_Supp", true);
-			for (String name : mSimSlotNames) {
-				intent.putExtra(name, simSlot);
-			}
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 				try {
 					TelecomManager tm = (TelecomManager) (activity.getSystemService(Context.TELECOM_SERVICE));
@@ -124,6 +121,10 @@ public class PhoneCall {
 					}
 				} catch (Exception e) {
 					Logger.exception(e);
+				}
+			} else {
+				for (String name : mSimSlotNames) {
+					intent.putExtra(name, simSlot);
 				}
 			}
 			activity.startActivity(intent);

@@ -40,21 +40,6 @@ void MainPage::initPage()
 
 void MainPage::onOpen()
 {
-	Application::grantPermissions(AppPermissions::ReadPhoneState, [this]() {
-		if (selectSIM->getItemsCount() < 2) {
-			sl_uint32 nSIM = Device::getSimSlotsCount();
-			if (nSIM > 0) {
-				for (sl_uint32 i = 0; i < nSIM; i++) {
-					String phoneNumber = Device::getPhoneNumber(i);
-					if (phoneNumber.isNotEmpty()) {
-						selectSIM->addItem(String::fromUint32(i), String::format("SIM%d(%s)", i+1, phoneNumber), UIUpdateMode::Init);
-					} else {
-						selectSIM->addItem(String::fromUint32(i), String::format("SIM%d(Empty)", i+1), UIUpdateMode::Init);
-					}
-				}
-			}
-		}
-	});
 
 	switchSetDefault->setOnChange([](SwitchView*, sl_bool value) {
 		if (value) {
@@ -72,10 +57,12 @@ void MainPage::onOpen()
 	btnCall->setOnClick([this](View*) {
 		Application::grantPermissions(AppPermissions::CallPhone, [this]() {
 			String value = selectSIM->getSelectedValue();
-			if (value.isNotEmpty()) {
-				Device::callPhone(txtPhoneNumber->getText(), value.parseUint32());
-			} else {
-				Device::callPhone(txtPhoneNumber->getText());
+			if (value != "empty") {
+				if (value.isNotEmpty()) {
+					Device::callPhone(txtPhoneNumber->getText(), value.parseUint32());
+				} else {
+					Device::callPhone(txtPhoneNumber->getText());
+				}
 			}
 		});
 	});
@@ -87,12 +74,29 @@ void MainPage::onOpen()
 			txtPhoneNumber->setText(phoneNumber);
 		}
 	});
+
 }
 
 void MainPage::onResume()
 {
 	switchSetDefault->setValue(Application::isDefaultCallingApp());
 	switchSystemOverlay->setValue(Application::isEnabledSystemOverlay());
+
+	Application::grantPermissions(AppPermissions::ReadPhoneState, [this]() {
+		sl_uint32 nSIM = Device::getSimSlotsCount();
+		selectSIM->setItemsCount(1 + nSIM);
+		for (sl_uint32 i = 0; i < nSIM; i++) {
+			String phoneNumber = Device::getPhoneNumber(i);
+			if (phoneNumber.isNotEmpty()) {
+				selectSIM->setItemValue(i+1, String::fromUint32(i));
+				selectSIM->setItemTitle(i+1, String::format("SIM%d(%s)", i+1, phoneNumber));
+			} else {
+				selectSIM->setItemValue(i+1, "empty");
+				selectSIM->setItemTitle(i+1, String::format("SIM%d(Empty)", i+1));
+			}
+		}
+	});
+
 }
 
 void MainPage::showRecording()
