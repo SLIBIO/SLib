@@ -6,6 +6,7 @@
 /build
 /captures
 .externalNativeBuild
+.cxx
 .project
 .settings
 .classpath
