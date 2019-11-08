@@ -449,7 +449,8 @@ using namespace slib::priv::window;
 	}
 }
 
-- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
+{
 	g_callbackDidRegisterForRemoteNotifications(deviceToken, nil);
 }
 
