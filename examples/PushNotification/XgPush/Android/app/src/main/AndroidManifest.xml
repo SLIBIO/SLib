@@ -22,8 +22,6 @@
             </intent-filter>
         </activity>
 
-        <meta-data android:name="com.tencent.rdm.uuid" android:value="289ec194-8882-4f27-b12e-eeda497799c3" />
-
     </application>
 
 </manifest>
