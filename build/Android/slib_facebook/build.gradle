@@ -27,8 +27,8 @@ dependencies {
 
     implementation project(':slib')
 
-    api "com.facebook.android:facebook-login:5.0.1"
-    api "com.facebook.android:facebook-share:5.0.1"
+    compileOnly "com.facebook.android:facebook-login:$FACEBOOK_VERSION"
+    compileOnly "com.facebook.android:facebook-share:$FACEBOOK_VERSION"
 }
 
 rootProject.ext.setLibraryOutput(this, "slib_facebook", "slib_facebook")

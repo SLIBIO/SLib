@@ -45,7 +45,7 @@ dependencies {
     
     implementation project(':external_ShortcutBadger')
 
-    implementation "androidx.appcompat:appcompat:$ANDROIDX_VERSION"
+    compileOnly "androidx.appcompat:appcompat:$ANDROIDX_VERSION"
 }
 
 rootProject.ext.setLibraryOutput(this, "slib", "slib")

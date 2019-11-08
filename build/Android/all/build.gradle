@@ -13,6 +13,14 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    compileOnly project(':external')
+    compileOnly project(':external_ShortcutBadger')
+    compileOnly project(':slib')
+    compileOnly project(':slib_fcm')
+    compileOnly project(':slib_call')
+    compileOnly project(':slib_facebook')
+    compileOnly project(':slib_xgpush')
 }
 
 tasks.all { task ->
@@ -23,5 +31,6 @@ tasks.all { task ->
         task.dependsOn(project(":slib_fcm").getTasksByName(task.name, true)[0])
         task.dependsOn(project(":slib_call").getTasksByName(task.name, true)[0])
         task.dependsOn(project(":slib_facebook").getTasksByName(task.name, true)[0])
+        task.dependsOn(project(":slib_xgpush").getTasksByName(task.name, true)[0])
     }
 }

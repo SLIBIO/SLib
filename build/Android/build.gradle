@@ -2,10 +2,16 @@
 
 ext {
     SDK_VERSION = 29
-    MIN_SDK_VERSION = 15
+    MIN_SDK_VERSION = 16
     VERSION_CODE = 13
     VERSION_NAME = "1.2"
+
     ANDROIDX_VERSION = "1.0.0"
+    FIREBASE_MESSAGING_VERSION = "20.0.0"
+    PLAY_SERVICE_VERSION = "18.3.0"
+
+    FACEBOOK_VERSION = "5.0.1"
+    XGPUSH_VERSION = "4.3.5-release"
 }
 
 buildscript {
@@ -14,7 +20,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.0'
+        classpath 'com.android.tools.build:gradle:3.5.2'
     }
 }
 
@@ -40,10 +46,15 @@ ext.setLibraryOutput = { project, srcName, dstName ->
         new File(sourceFile).renameTo(targetFile);
     }
     project.tasks.all { task ->
-        if (task.name == "assembleDebug" || task.name == "assembleRelease") {
+        if (task.name == "assembleDebug") {
             task.doLast {
-                System.out.println("Moving " + dstName + ".aar into lib!")
-                copyAAR("build/outputs/aar", srcName, dstName)
+                System.out.println("Moving " + srcName + "-debug.aar into lib!")
+                copyAAR("build/outputs/aar", srcName + "-debug", dstName)
+            }
+        } else if (task.name == "assembleRelease") {
+            task.doLast {
+                System.out.println("Moving " + srcName + "-release.aar into lib!")
+                copyAAR("build/outputs/aar", srcName + "-release", dstName)
             }
         }
     }
