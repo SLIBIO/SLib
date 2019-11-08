@@ -31,38 +31,28 @@
 
 #include "slib/core/safe_static.h"
 
+#import <UserNotifications/UserNotifications.h>
+
 namespace slib
 {
 	
 	Ref<APNs> APNs::getInstance()
 	{
 		SLIB_SAFE_STATIC(Mutex, lock)
-		if (SLIB_SAFE_STATIC_CHECK_FREED(lock)) {
-			return sl_null;
-		}
-		
 		MutexLocker locker(&lock);
+		
 		SLIB_STATIC_ZERO_INITIALIZED(Ref<APNs>, instance);
-		if (SLIB_SAFE_STATIC_CHECK_FREED(instance)) {
-			return sl_null;
-		}
 		if (instance.isNotNull()) {
 			return instance;
 		}
-		locker.unlock();
 		
 		instance = new APNs;
+		
 		UIPlatform::registerDidRegisterForRemoteNotifications([&instance](NSData* deviceToken, NSError* error) {
-			if (SLIB_SAFE_STATIC_CHECK_FREED(instance)) {
-				return;
-			}
-			slib::String token = slib::String::makeHexString([deviceToken bytes], [deviceToken length]);
+			String token = String::makeHexString([deviceToken bytes], [deviceToken length]);
 			instance->dispatchTokenRefresh(token);
 		});
 		UIPlatform::registerDidReceiveRemoteNotificationCallback([&instance](NSDictionary* _userInfo) {
-			if (SLIB_SAFE_STATIC_CHECK_FREED(instance)) {
-				return;
-			}
 			PushNotificationMessage message;
 			if (UIPlatform::parseRemoteNotificationInfo(_userInfo, message)) {
 				instance->dispatchNotificationReceived(message);
@@ -73,12 +63,21 @@ namespace slib
 	
 	void APNs::onStart()
 	{
+		[[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:(UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge) completionHandler:^(BOOL granted, NSError * _Nullable error) {
+			if (!granted) {
+				if (error != nil) {
+					NSLog(@"Error on requesting notification authroization: %@", [error localizedDescription]);
+				} else {
+					NSLog(@"Not granted: notification authroization");
+				}
+			}
+		}];
+		
 		UIApplication* application = [UIApplication sharedApplication];
-		
-		[application registerForRemoteNotifications];
-		
 		UIUserNotificationSettings* notificationSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert categories:nil];
 		[application registerUserNotificationSettings:notificationSettings];
+		
+		[application registerForRemoteNotifications];
 	}
 	
 	sl_bool UIPlatform::parseRemoteNotificationInfo(NSDictionary* _userInfo, PushNotificationMessage& message)

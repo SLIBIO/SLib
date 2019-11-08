@@ -25,53 +25,43 @@
 namespace slib
 {
 
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(PushNotificationMessage)
+	SLIB_DEFINE_OBJECT(PushNotificationClient, Object)
 	
-	PushNotificationMessage::PushNotificationMessage()
-	{
-		badge = -1;
-		flagClicked = sl_false;
-		flagBackground = sl_false;
-	}
-	
-	
-	SLIB_DEFINE_OBJECT(PushNotificationService, Object)
-	
-	PushNotificationService::PushNotificationService()
+	PushNotificationClient::PushNotificationClient()
 	{
 		m_flagStarted = sl_false;
 	}
 	
-	PushNotificationService::~PushNotificationService()
+	PushNotificationClient::~PushNotificationClient()
 	{
 	}
 	
-	String PushNotificationService::getDeviceToken()
+	String PushNotificationClient::getDeviceToken()
 	{
 		return m_deviceToken;
 	}
 	
-	void PushNotificationService::addTokenRefreshCallback(const Function<void(String)>& callback)
+	void PushNotificationClient::addTokenRefreshCallback(const Function<void(String)>& callback)
 	{
 		m_callbackTokenRefresh.add(callback);
 	}
 	
-	void PushNotificationService::removeTokenRefreshCallback(const Function<void(String)>& callback)
+	void PushNotificationClient::removeTokenRefreshCallback(const Function<void(String)>& callback)
 	{
 		m_callbackTokenRefresh.remove(callback);
 	}
 	
-	void PushNotificationService::addNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback)
+	void PushNotificationClient::addNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback)
 	{
 		m_callbackNotificationReceived.add(callback);
 	}
 	
-	void PushNotificationService::removeNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback)
+	void PushNotificationClient::removeNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback)
 	{
 		m_callbackNotificationReceived.remove(callback);
 	}
 	
-	void PushNotificationService::start()
+	void PushNotificationClient::start()
 	{
 		{
 			ObjectLocker lock(this);
@@ -83,23 +73,23 @@ namespace slib
 		onStart();
 	}
 	
-	void PushNotificationService::dispatchTokenRefresh(const String& token)
+	void PushNotificationClient::dispatchTokenRefresh(const String& token)
 	{
 		m_deviceToken = token;
 		m_callbackTokenRefresh(token);
 	}
 	
-	void PushNotificationService::dispatchNotificationReceived(PushNotificationMessage& message)
+	void PushNotificationClient::dispatchNotificationReceived(PushNotificationMessage& message)
 	{
 		m_callbackNotificationReceived(message);
 	}
 	
-	void PushNotificationService::onStart()
+	void PushNotificationClient::onStart()
 	{
 	}
 	
 	
-	SLIB_DEFINE_OBJECT(APNs, PushNotificationService)
+	SLIB_DEFINE_OBJECT(APNs, PushNotificationClient)
 	
 	APNs::APNs()
 	{
@@ -121,7 +111,7 @@ namespace slib
 #endif
 	
 	
-	SLIB_DEFINE_OBJECT(FCM, PushNotificationService)
+	SLIB_DEFINE_OBJECT(FCM, PushNotificationClient)
 	
 	FCM::FCM()
 	{

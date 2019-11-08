@@ -25,45 +25,20 @@
 
 #include "definition.h"
 
-#include "../core/object.h"
-#include "../core/string.h"
-#include "../core/json.h"
+#include "../service/push_notification.h"
 #include "../core/function.h"
 
 namespace slib
 {
 
-	class SLIB_EXPORT PushNotificationMessage
-	{
-	public:
-		String title;
-		String content;
-
-		Json data; // custom message
-		
-		// Sending Params
-		sl_int32 badge;
-		String sound;
-		
-		// Received Params
-		sl_bool flagClicked;
-		sl_bool flagBackground;
-		
-	public:
-		PushNotificationMessage();
-		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(PushNotificationMessage)
-
-	};
-	
-	class SLIB_EXPORT PushNotificationService : public Object
+	class SLIB_EXPORT PushNotificationClient : public Object
 	{
 		SLIB_DECLARE_OBJECT
 		
 	public:
-		PushNotificationService();
+		PushNotificationClient();
 		
-		~PushNotificationService();
+		~PushNotificationClient();
 		
 	public:
 		String getDeviceToken();
@@ -95,7 +70,7 @@ namespace slib
 	};
 	
 	// Apple Push Notification service
-	class SLIB_EXPORT APNs : public PushNotificationService
+	class SLIB_EXPORT APNs : public PushNotificationClient
 	{
 		SLIB_DECLARE_OBJECT
 		
@@ -113,7 +88,7 @@ namespace slib
 	};
 
 	// Firebase Cloud Messaging
-	class SLIB_EXPORT FCM : public PushNotificationService
+	class SLIB_EXPORT FCM : public PushNotificationClient
 	{
 		SLIB_DECLARE_OBJECT
 		
