@@ -83,10 +83,12 @@
 #include "ui/mobile_game.h"
 
 #include "ui/clipboard.h"
-#include "ui/notification.h"
 #include "ui/photo.h"
 #include "ui/screen_capture.h"
 #include "ui/global_event_monitor.h"
+
+#include "ui/notification.h"
+#include "ui/xgpush.h"
 
 #include "ui/chromium.h"
 

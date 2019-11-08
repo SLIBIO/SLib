@@ -1,0 +1,14 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="io.slib.xgpush">
+
+    <application>
+
+        <receiver android:name="slib.platform.android.xgpush.MessageReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="com.tencent.android.tpush.action.PUSH_MESSAGE" />
+                <action android:name="com.tencent.android.tpush.action.FEEDBACK" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>

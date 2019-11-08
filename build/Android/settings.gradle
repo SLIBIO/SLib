@@ -1,6 +1,6 @@
 rootProject.name = 'SLib'
 
-include ':all', ':slib', ':external', ':slib_fcm', ':slib_call', ':slib_facebook'
+include ':all', ':slib', ':external', ':slib_fcm', ':slib_call', ':slib_facebook', ':slib_xgpush'
 
 include ':external_ShortcutBadger'
 project(':external_ShortcutBadger').projectDir = new File(settingsDir, '../../external/java/ShortcutBadger')

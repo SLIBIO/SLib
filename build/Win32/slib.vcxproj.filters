@@ -37,9 +37,6 @@
     <Filter Include="src\ui">
       <UniqueIdentifier>{7d146328-ad7f-4cfb-845c-4eff68e1c639}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\web">
-      <UniqueIdentifier>{f8d3e2b1-d55d-440d-b9b8-01fe4590e459}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\social">
       <UniqueIdentifier>{1237d79f-474e-4bde-823e-5ebaea64f22c}</UniqueIdentifier>
     </Filter>
@@ -60,6 +57,9 @@
     </Filter>
     <Filter Include="external\noto_emoji">
       <UniqueIdentifier>{b6db5c2e-9294-4493-b587-14d01c80b04e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\service">
+      <UniqueIdentifier>{f8d3e2b1-d55d-440d-b9b8-01fe4590e459}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -764,12 +764,6 @@
     <ClCompile Include="..\..\src\slib\ui\window_win32.cpp">
       <Filter>src\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\slib\web\web_controller.cpp">
-      <Filter>src\web</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\slib\web\web_service.cpp">
-      <Filter>src\web</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\slib\network\http_io.cpp">
       <Filter>src\network</Filter>
     </ClCompile>
@@ -835,9 +829,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\slib\crypto\jwt.cpp">
       <Filter>src\crypto</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\slib\web\ginger.cpp">
-      <Filter>src\web</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\slib\crypto\des.cpp">
       <Filter>src\crypto</Filter>
@@ -1321,6 +1312,24 @@
     </ClCompile>
     <ClCompile Include="..\..\src\slib\crypto\openssl_chacha_poly1305.cpp">
       <Filter>src\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\service\ginger.cpp">
+      <Filter>src\service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\service\web_service.cpp">
+      <Filter>src\service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\service\xgpush_service.cpp">
+      <Filter>src\service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\ui\ui_notification.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\ui\ui_notification_xgpush.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\service\push_notification.cpp">
+      <Filter>src\service</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

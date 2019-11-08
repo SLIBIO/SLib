@@ -338,6 +338,10 @@
     <ClCompile Include="..\..\src\slib\render\render_resource.cpp" />
     <ClCompile Include="..\..\src\slib\render\texture.cpp" />
     <ClCompile Include="..\..\src\slib\render\vertex_buffer.cpp" />
+    <ClCompile Include="..\..\src\slib\service\ginger.cpp" />
+    <ClCompile Include="..\..\src\slib\service\push_notification.cpp" />
+    <ClCompile Include="..\..\src\slib\service\web_service.cpp" />
+    <ClCompile Include="..\..\src\slib\service\xgpush_service.cpp" />
     <ClCompile Include="..\..\src\slib\social\ebay.cpp" />
     <ClCompile Include="..\..\src\slib\social\etsy.cpp" />
     <ClCompile Include="..\..\src\slib\social\etsy_ui.cpp" />
@@ -429,6 +433,8 @@
     <ClCompile Include="..\..\src\slib\ui\ui_event_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\ui_menu.cpp" />
     <ClCompile Include="..\..\src\slib\ui\ui_menu_win32.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\ui_notification.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\ui_notification_xgpush.cpp" />
     <ClCompile Include="..\..\src\slib\ui\ui_photo.cpp" />
     <ClCompile Include="..\..\src\slib\ui\ui_platform.cpp" />
     <ClCompile Include="..\..\src\slib\ui\ui_resource.cpp" />
@@ -442,9 +448,6 @@
     <ClCompile Include="..\..\src\slib\ui\web_view_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\window.cpp" />
     <ClCompile Include="..\..\src\slib\ui\window_win32.cpp" />
-    <ClCompile Include="..\..\src\slib\web\ginger.cpp" />
-    <ClCompile Include="..\..\src\slib\web\web_controller.cpp" />
-    <ClCompile Include="..\..\src\slib\web\web_service.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FF088AB2-B7A3-4548-8608-4DFACDE182A2}</ProjectGuid>

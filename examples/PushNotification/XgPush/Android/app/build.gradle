@@ -1,0 +1,59 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "27.0.3"
+    defaultConfig {
+        applicationId "io.slib.example"
+        minSdkVersion 20
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        externalNativeBuild {
+            cmake {
+                arguments "-DSLIB_PATH=${System.env.SLIB_PATH}"
+            }
+        }
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a'
+        }
+
+        // XgPush
+        manifestPlaceholders = [
+                XG_ACCESS_ID: "2100320549",
+                XG_ACCESS_KEY: "A8DBP688V5ZG"
+        ]
+        sourceSets {
+            main.java.srcDirs += '../../XgPush/java'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs "${System.env.SLIB_PATH}/lib/Android"
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation ':slib@aar'
+    implementation ':slib_xgpush@aar'
+
+    // XgPush
+    implementation 'com.tencent.xinge:xinge:4.3.5-release'
+    implementation 'com.tencent.jg:jg:1.1'
+    implementation 'com.tencent.wup:wup:1.0.0.E-Release'
+    implementation 'com.tencent.mid:mid:4.0.7-Release'
+}
