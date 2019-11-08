@@ -20,9 +20,23 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_WEB_DEFINITION
-#define CHECKHEADER_SLIB_WEB_DEFINITION
+#define SLIB_SUPPORT_STD_TYPES
 
-#include "../core/definition.h"
+#include "slib/service/ginger.h"
 
-#endif
+#include "ginger/ginger.h"
+
+namespace slib
+{
+	
+	String Ginger::render(const String& _template, const Json& data)
+	{
+		return ginger::render_string(_template.toStd(), data);
+	}
+
+	String Ginger::renderFile(const String& filePath, const Json& data)
+	{
+		return ginger::render_file(filePath.toStd(), data);
+	}
+
+}

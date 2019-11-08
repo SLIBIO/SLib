@@ -20,19 +20,20 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_WEB_CONTROLLER
-#define CHECKHEADER_SLIB_WEB_CONTROLLER
+#ifndef CHECKHEADER_SLIB_SERVICE_WEB
+#define CHECKHEADER_SLIB_SERVICE_WEB
 
 #include "definition.h"
 
+#include "../core/service.h"
 #include "../core/function.h"
 #include "../core/variant.h"
 #include "../network/http_server.h"
 
-#define SWEB_HANDLER_PARAMS_LIST const slib::Ref<slib::HttpServerContext>& context, HttpMethod method, const slib::String& path
-
 namespace slib
 {
+
+#define SWEB_HANDLER_PARAMS_LIST const slib::Ref<slib::HttpServerContext>& context, HttpMethod method, const slib::String& path
 
 	typedef Function<Variant(SWEB_HANDLER_PARAMS_LIST)> WebHandler;
 
@@ -82,6 +83,44 @@ namespace slib
 		CList<Handler> m_handlers;
 		
 	};
+	
+	class SLIB_EXPORT WebService : public Service
+	{
+		SLIB_DECLARE_OBJECT
+
+	public:
+		WebService();
+
+		~WebService();
+
+	public:
+		static Ref<WebService> getApp();
+
+	public:
+		HttpServerParam& getHttpParam();
+
+		sl_uint16 getHttpPort();
+
+		void setHttpPort(sl_uint16 port);
+	
+		void useAsset(const String& prefixForAssetPath);
+
+		const Ref<WebController>& getController();
+
+	protected:
+		sl_bool dispatchStartService() override;
+
+		void dispatchStopService() override;
+		
+		sl_bool onHttpRequest(HttpServerContext*);
+
+	protected:
+		Ref<HttpServer> m_http;
+		HttpServerParam m_httpParam;
+		Ref<WebController> m_controller;
+
+	};
+
 }
 
 #define SWEB_DECALRE_MODULE(NAME) namespace SWEB_MODULE_##NAME { void registerModule(); }

@@ -20,25 +20,9 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_WEB_GINGER
-#define CHECKHEADER_SLIB_WEB_GINGER
+#ifndef CHECKHEADER_SLIB_SERVICE_DEFINITION
+#define CHECKHEADER_SLIB_SERVICE_DEFINITION
 
-#include "definition.h"
-
-#include "../core/json.h"
-
-namespace slib
-{
-	
-	class SLIB_EXPORT Ginger
-	{
-	public:
-		static String render(const String& _template, const Json& data);
-		
-		static String renderFile(const String& filePath, const Json& data);
-
-	};
-	
-}
+#include "../core/definition.h"
 
 #endif

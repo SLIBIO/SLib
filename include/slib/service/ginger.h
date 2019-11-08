@@ -20,23 +20,25 @@
  *   THE SOFTWARE.
  */
 
-#define SLIB_SUPPORT_STD_TYPES
+#ifndef CHECKHEADER_SLIB_SERVICE_GINGER
+#define CHECKHEADER_SLIB_SERVICE_GINGER
 
-#include "slib/web/ginger.h"
+#include "definition.h"
 
-#include "ginger/ginger.h"
+#include "../core/json.h"
 
 namespace slib
 {
 	
-	String Ginger::render(const String& _template, const Json& data)
+	class SLIB_EXPORT Ginger
 	{
-		return ginger::render_string(_template.toStd(), data);
-	}
+	public:
+		static String render(const String& _template, const Json& data);
+		
+		static String renderFile(const String& filePath, const Json& data);
 
-	String Ginger::renderFile(const String& filePath, const Json& data)
-	{
-		return ginger::render_file(filePath.toStd(), data);
-	}
-
+	};
+	
 }
+
+#endif

@@ -20,56 +20,14 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_WEB_SERVICE
-#define CHECKHEADER_SLIB_WEB_SERVICE
+#ifndef CHECKHEADER_SLIB_SERVICE_HEADER
+#define CHECKHEADER_SLIB_SERVICE_HEADER
 
-#include "definition.h"
+#include "service/web.h"
 
-#include "controller.h"
+#include "service/push_notification.h"
+#include "service/xgpush.h"
 
-#include "../core/service.h"
-#include "../network/http_server.h"
-
-namespace slib
-{
-	
-	class SLIB_EXPORT WebService : public Service
-	{
-		SLIB_DECLARE_OBJECT
-
-	public:
-		WebService();
-
-		~WebService();
-
-	public:
-		static Ref<WebService> getApp();
-
-	public:
-		HttpServerParam& getHttpParam();
-
-		sl_uint16 getHttpPort();
-
-		void setHttpPort(sl_uint16 port);
-	
-		void useAsset(const String& prefixForAssetPath);
-
-		const Ref<WebController>& getController();
-
-	protected:
-		sl_bool dispatchStartService() override;
-
-		void dispatchStopService() override;
-		
-		sl_bool onHttpRequest(HttpServerContext*);
-
-	protected:
-		Ref<HttpServer> m_http;
-		HttpServerParam m_httpParam;
-		Ref<WebController> m_controller;
-
-	};
-
-}
+#include "service/ginger.h"
 
 #endif
