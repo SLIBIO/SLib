@@ -42,6 +42,7 @@ namespace slib
 		m_ellipsizeMode = EllipsizeMode::None;
 		m_linesCount = 0;
 		m_flagEnabledHyperlinksInPlainText = sl_false;
+		m_linkColor = Color::Zero;
 		
 		setPadding(1, 1, 1, 1, UIUpdateMode::Init);
 	}
@@ -139,6 +140,20 @@ namespace slib
 		m_flagEnabledHyperlinksInPlainText = flag;
 		invalidate(mode);
 	}
+
+	Color LabelView::getLinkColor()
+	{
+		if (m_linkColor.isNotZero()) {
+			return m_linkColor;
+		}
+		return TextParagraph::getDefaultLinkColor();
+	}
+
+	void LabelView::setLinkColor(const Color& color, UIUpdateMode mode)
+	{
+		m_linkColor = color;
+		invalidate(mode);
+	}
 	
 	UISize LabelView::measureSize()
 	{
@@ -220,9 +235,8 @@ namespace slib
 		if (item.isNotNull()) {
 			Ref<TextStyle> style = item->getStyle();
 			if (style.isNotNull()) {
-				String href = style->href;
-				if (href.isNotEmpty()) {
-					dispatchClickLink(href, ev);
+				if (style->flagLink) {
+					dispatchClickLink(style->href, ev);
 				}
 			}
 		}
@@ -234,8 +248,7 @@ namespace slib
 		if (item.isNotNull()) {
 			Ref<TextStyle> style = item->getStyle();
 			if (style.isNotNull()) {
-				String href = style->href;
-				if (href.isNotEmpty()) {
+				if (style->flagLink) {
 					setCursor(Cursor::getHand());
 					return;
 				}

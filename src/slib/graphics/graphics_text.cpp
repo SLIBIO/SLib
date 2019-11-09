@@ -36,7 +36,11 @@ namespace slib
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TextStyle)
 
-	TextStyle::TextStyle() noexcept : flagUnderline(sl_false), flagOverline(sl_false), flagLineThrough(sl_false), textColor(Color::Zero), backgroundColor(Color::Zero), lineHeight(-1), yOffset(0)
+	TextStyle::TextStyle() noexcept:
+		flagUnderline(sl_false), flagOverline(sl_false), flagLineThrough(sl_false),
+		flagLink(sl_false),
+		textColor(Color::Zero), backgroundColor(Color::Zero),
+		lineHeight(-1), yOffset(0)
 	{
 	}
 	
@@ -46,11 +50,12 @@ namespace slib
 	}
 	
 	
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TextDrawParam)
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TextItemDrawParam)
 	
-	TextDrawParam::TextDrawParam() :
+	TextItemDrawParam::TextItemDrawParam() noexcept:
 		color(Color::Black),
-		shadowOpacity(0), shadowRadius(3), shadowColor(Color::Black), shadowOffset(0, 0), lineThickness(1)
+		shadowOpacity(0), shadowRadius(3), shadowColor(Color::Black), shadowOffset(0, 0),
+		lineThickness(1)
 	{
 	}
 	
@@ -181,7 +186,6 @@ namespace slib
 						Ref<TextStyle> styleNew = style->duplicate();
 						if (styleNew.isNotNull()) {
 							styleNew->flagUnderline = sl_true;
-							styleNew->textColor = Color::Blue;
 							styleNew->href = text;
 							ret->m_style = styleNew;
 						}
@@ -228,7 +232,7 @@ namespace slib
 		return Size::zero();
 	}
 	
-	void TextWordItem::draw(Canvas* canvas, sl_real x, sl_real y, const TextDrawParam& param)
+	void TextWordItem::draw(Canvas* canvas, sl_real x, sl_real y, const TextItemDrawParam& param)
 	{
 		Ref<Font> font = getFont();
 		if (font.isNull()) {
@@ -344,7 +348,7 @@ namespace slib
 		return Size::zero();
 	}
 	
-	void TextEmojiItem::draw(Canvas* canvas, sl_real x, sl_real y, const TextDrawParam& param)
+	void TextEmojiItem::draw(Canvas* canvas, sl_real x, sl_real y, const TextItemDrawParam& param)
 	{
 		Ref<Font> font = getEmojiFont();
 		if (font.isNotNull()) {
@@ -480,19 +484,24 @@ namespace slib
 	}
 
 
-	TextParagraphLayoutParam::TextParagraphLayoutParam() noexcept
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TextParagraphLayoutParam)
+
+	TextParagraphLayoutParam::TextParagraphLayoutParam() noexcept:
+		width(1),
+		tabWidth(1), tabMargin(1),
+		align(Alignment::Left),
+		multiLineMode(MultiLineMode::Single),
+		linesCount(0)
 	{
-		width = 1;
-		tabWidth = 1;
-		tabMargin = 1;
-		align = Alignment::Left;
-		multiLineMode = MultiLineMode::Single;
-		linesCount = 0;
 	}
 
-	TextParagraphLayoutParam::~TextParagraphLayoutParam() noexcept
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TextParagraphDrawParam)
+
+	TextParagraphDrawParam::TextParagraphDrawParam() noexcept:
+		linkColor(Color::Zero)
 	{
 	}
+
 
 	SLIB_DEFINE_OBJECT(TextParagraph, Object)
 
@@ -760,6 +769,7 @@ namespace slib
 		sl_bool attrLineThrough = sl_false;
 		sl_bool flagDefineItalic = sl_false;
 		sl_bool attrItalic = sl_false;
+		sl_bool flagDefineLink = sl_false;
 		sl_bool flagDefineHref = sl_false;
 		XmlString attrHref;
 		sl_bool flagDefineLineHeight = sl_false;
@@ -770,8 +780,7 @@ namespace slib
 
 		XmlString name = element->getName().toLower();
 		if (name == SLIB_UNICODE("a")) {
-			flagDefineTextColor = sl_true;
-			attrTextColor = Color::Blue;
+			flagDefineLink = sl_true;
 			flagDefineUnderline = sl_true;
 			attrUnderline = sl_true;
 		} else if (name == SLIB_UNICODE("b")) {
@@ -1010,6 +1019,12 @@ namespace slib
 						break;
 					}
 				}
+				if (flagDefineLink) {
+					if (!(style->flagLink)) {
+						flagNewStyle = sl_true;
+						break;
+					}
+				}
 				if (flagDefineHref) {
 					if (style->href != attrHref) {
 						flagNewStyle = sl_true;
@@ -1087,6 +1102,9 @@ namespace slib
 			}
 			if (flagDefineBackColor) {
 				styleNew->backgroundColor = attrBackColor;
+			}
+			if (flagDefineLink) {
+				styleNew->flagLink = sl_true;
 			}
 			if (flagDefineHref) {
 				styleNew->href = attrHref;
@@ -1689,9 +1707,9 @@ namespace slib
 		
 	}
 
-	void TextParagraph::draw(Canvas* canvas, sl_real x, sl_real y, const TextDrawParam& _param) noexcept
+	void TextParagraph::draw(Canvas* canvas, sl_real x, sl_real y, const TextParagraphDrawParam& _param) noexcept
 	{
-		TextDrawParam param = _param;
+		TextItemDrawParam param = _param;
 		Rectangle rc = canvas->getInvalidatedRect();
 		rc.left -= x;
 		rc.right -= x;
@@ -1706,11 +1724,17 @@ namespace slib
 			TextItemType type = item->getType();
 			Ref<TextStyle> style = item->getStyle();
 			if (style.isNotNull()) {
-				Color color = style->textColor;
-				if (color.isNotZero()) {
-					param.color = color;
+				if (style->textColor.isNotZero()) {
+					param.color = style->textColor;
 				} else {
-					param.color = _param.color;
+					if (style->flagLink) {
+						param.color = _param.linkColor;
+						if (param.color.isZero()) {
+							param.color = getDefaultLinkColor();
+						}
+					} else {
+						param.color = _param.color;
+					}
 				}
 				if (type == TextItemType::Word) {
 					TextWordItem* wordItem = static_cast<TextWordItem*>(item);
@@ -1751,7 +1775,7 @@ namespace slib
 						if (rc.intersectRectangle(frame)) {
 							Ref<Font> font = style->font;
 							if (font.isNotNull()) {
-								Ref<Pen> pen = Pen::createSolidPen(param.lineThickness, color);
+								Ref<Pen> pen = Pen::createSolidPen(param.lineThickness, param.color);
 								if (pen.isNotNull()) {
 									FontMetrics fm;
 									if (font->getFontMetrics(fm)) {
@@ -1809,24 +1833,43 @@ namespace slib
 	{
 		return m_positionLength;
 	}
+
+	namespace priv
+	{
+		namespace text_paragraph
+		{
+			Color g_defaultLinkColor = Color::Blue;
+		}
+	}
+
+	const Color& TextParagraph::getDefaultLinkColor()
+	{
+		return priv::text_paragraph::g_defaultLinkColor;
+	}
+
+	void TextParagraph::setDefaultLinkColor(const Color& color)
+	{
+		priv::text_paragraph::g_defaultLinkColor = color;
+	}
 	
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(SimpleTextBoxParam)
 	
-	SimpleTextBoxParam::SimpleTextBoxParam()
-	 :	flagHyperText(sl_false),
+	SimpleTextBoxParam::SimpleTextBoxParam() noexcept:
+		flagHyperText(sl_false),
 		width(0),
 		multiLineMode(MultiLineMode::WordWrap),
 		ellipsizeMode(EllipsizeMode::None),
 		linesCount(0),
-		align(Alignment::TopLeft)
+		align(Alignment::TopLeft),
+		flagEnabledHyperlinksInPlainText(sl_false)
 	{
 	}
 	
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(SimpleTextBoxDrawParam)
 	
-	SimpleTextBoxDrawParam::SimpleTextBoxDrawParam()
+	SimpleTextBoxDrawParam::SimpleTextBoxDrawParam() noexcept
 	{
 	}
 
@@ -1847,7 +1890,7 @@ namespace slib
 		m_style = new TextStyle;
 	}
 
-	SimpleTextBox::~SimpleTextBox()
+	SimpleTextBox::~SimpleTextBox() noexcept
 	{
 	}
 

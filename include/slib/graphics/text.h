@@ -86,11 +86,12 @@ namespace slib
 	class SLIB_EXPORT TextStyle : public Referable
 	{
 	public:
-		AtomicRef<Font> font;
-		AtomicString emojiFamilyName;
-		sl_bool flagUnderline;
-		sl_bool flagOverline;
-		sl_bool flagLineThrough;
+		Ref<Font> font;
+		String emojiFamilyName;
+		sl_bool flagUnderline : 1;
+		sl_bool flagOverline : 1;
+		sl_bool flagLineThrough : 1;
+		sl_bool flagLink : 1;
 		Color textColor;
 		Color backgroundColor;
 		String href;
@@ -107,7 +108,7 @@ namespace slib
 
 	};
 	
-	class SLIB_EXPORT TextDrawParam
+	class SLIB_EXPORT TextItemDrawParam
 	{
 	public:
 		Color color;
@@ -120,9 +121,9 @@ namespace slib
 		sl_real lineThickness;
 		
 	public:
-		TextDrawParam();
+		TextItemDrawParam() noexcept;
 		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TextDrawParam)
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TextItemDrawParam)
 		
 	};
 	
@@ -186,7 +187,7 @@ namespace slib
 
 		Size getSize() noexcept;
 		
-		void draw(Canvas* canvas, sl_real x, sl_real y, const TextDrawParam& param);
+		void draw(Canvas* canvas, sl_real x, sl_real y, const TextItemDrawParam& param);
 		
 	private:
 		AtomicString16 m_text;
@@ -213,7 +214,7 @@ namespace slib
 	public:
 		Size getSize() noexcept;
 		
-		void draw(Canvas* canvas, sl_real x, sl_real y, const TextDrawParam& param);
+		void draw(Canvas* canvas, sl_real x, sl_real y, const TextItemDrawParam& param);
 		
 	private:
 		String16 m_text;
@@ -292,7 +293,7 @@ namespace slib
 
 	};
 	
-	class TextParagraphLayoutParam
+	class SLIB_EXPORT TextParagraphLayoutParam
 	{
 	public:
 		sl_real width;
@@ -305,9 +306,21 @@ namespace slib
 
 	public:
 		TextParagraphLayoutParam() noexcept;
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TextParagraphLayoutParam)
 
-		~TextParagraphLayoutParam() noexcept;
+	};
 
+	class SLIB_EXPORT TextParagraphDrawParam : public TextItemDrawParam
+	{
+	public:
+		Color linkColor;
+		
+	public:
+		TextParagraphDrawParam() noexcept;
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TextParagraphDrawParam)
+		
 	};
 	
 	class XmlNodeGroup;
@@ -333,7 +346,7 @@ namespace slib
 
 		void layout(const TextParagraphLayoutParam& param) noexcept;
 
-		void draw(Canvas* canvas, sl_real x, sl_real y, const TextDrawParam& param) noexcept;
+		void draw(Canvas* canvas, sl_real x, sl_real y, const TextParagraphDrawParam& param) noexcept;
 		
 		Ref<TextItem> getTextItemAtPosition(sl_real x, sl_real y) noexcept;
 
@@ -342,7 +355,12 @@ namespace slib
 		sl_real getTotalHeight() noexcept;
 		
 		sl_real getPositionLength() noexcept;
+		
+	public:
+		static const Color& getDefaultLinkColor();
 
+		static void setDefaultLinkColor(const Color& color);
+		
 	protected:
 		CList< Ref<TextItem> > m_items;
 		CList< Ref<TextItem> > m_layoutItems;
@@ -366,19 +384,19 @@ namespace slib
 		sl_bool flagEnabledHyperlinksInPlainText;
 		
 	public:
-		SimpleTextBoxParam();
+		SimpleTextBoxParam() noexcept;
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(SimpleTextBoxParam)
 		
 	};
 	
-	class SLIB_EXPORT SimpleTextBoxDrawParam : public TextDrawParam
+	class SLIB_EXPORT SimpleTextBoxDrawParam : public TextParagraphDrawParam
 	{
 	public:
 		Rectangle frame;
 		
 	public:
-		SimpleTextBoxDrawParam();
+		SimpleTextBoxDrawParam() noexcept;
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(SimpleTextBoxDrawParam)
 
@@ -391,7 +409,7 @@ namespace slib
 	public:
 		SimpleTextBox() noexcept;
 
-		~SimpleTextBox();
+		~SimpleTextBox() noexcept;
 
 	public:
 		void update(const SimpleTextBoxParam& param) noexcept;

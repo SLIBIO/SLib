@@ -74,6 +74,10 @@ namespace slib
 		
 		void setEnabledHyperlinksInPlainText(sl_bool flag, UIUpdateMode updateMode = UIUpdateMode::Redraw);
 		
+		Color getLinkColor();
+		
+		void setLinkColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
+		
 		UISize measureSize();
 		
 	public:
@@ -100,6 +104,7 @@ namespace slib
 		EllipsizeMode m_ellipsizeMode;
 		sl_uint32 m_linesCount;
 		sl_bool m_flagEnabledHyperlinksInPlainText;
+		Color m_linkColor;
 		
 		SimpleTextBox m_textBox;
 		
