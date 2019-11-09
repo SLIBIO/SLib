@@ -50,7 +50,7 @@ namespace slib
 				SLIB_JNI_STATIC_METHOD(isSupportedDefaultCallingApp, "isSupportedDefaultCallingApp", "()Z");
 				SLIB_JNI_STATIC_METHOD(isDefaultCallingApp, "isDefaultCallingApp", "(Landroid/app/Activity;)Z");
 				SLIB_JNI_STATIC_METHOD(setDefaultCallingApp, "setDefaultCallingApp", "(Landroid/app/Activity;)V");
-				SLIB_JNI_STATIC_METHOD(isEnabledSystemOverlay, "isEnabledSystemOverlay", "(Landroid/app/Activity;)Z");
+				SLIB_JNI_STATIC_METHOD(isSystemOverlayEnabled, "isSystemOverlayEnabled", "(Landroid/app/Activity;)Z");
 				SLIB_JNI_STATIC_METHOD(openSystemOverlaySetting, "openSystemOverlaySetting", "(Landroid/app/Activity;)V");
 			SLIB_JNI_END_CLASS
 
@@ -166,11 +166,11 @@ namespace slib
 		}
 	}
 
-	sl_bool Application::isEnabledSystemOverlay()
+	sl_bool Application::isSystemOverlayEnabled()
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			return JApplication::isEnabledSystemOverlay.callBoolean(sl_null, jactivity);
+			return JApplication::isSystemOverlayEnabled.callBoolean(sl_null, jactivity);
 		}
 		return sl_false;
 	}

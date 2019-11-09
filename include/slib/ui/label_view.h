@@ -70,9 +70,9 @@ namespace slib
 		
 		virtual void setLinesCount(sl_uint32 nLines, UIUpdateMode updateMode = UIUpdateMode::UpdateLayout);
 		
-		sl_bool isEnabledHyperlinksInPlainText();
+		sl_bool isDetectingHyperlinksInPlainText();
 		
-		void setEnabledHyperlinksInPlainText(sl_bool flag, UIUpdateMode updateMode = UIUpdateMode::Redraw);
+		void setDetectingHyperlinksInPlainText(sl_bool flag, UIUpdateMode updateMode = UIUpdateMode::Redraw);
 		
 		Color getLinkColor();
 		

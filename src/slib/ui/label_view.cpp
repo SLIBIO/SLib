@@ -130,12 +130,12 @@ namespace slib
 		invalidateLayoutOfWrappingControl(updateMode);
 	}
 
-	sl_bool LabelView::isEnabledHyperlinksInPlainText()
+	sl_bool LabelView::isDetectingHyperlinksInPlainText()
 	{
 		return m_flagEnabledHyperlinksInPlainText;
 	}
 
-	void LabelView::setEnabledHyperlinksInPlainText(sl_bool flag, UIUpdateMode mode)
+	void LabelView::setDetectingHyperlinksInPlainText(sl_bool flag, UIUpdateMode mode)
 	{
 		m_flagEnabledHyperlinksInPlainText = flag;
 		invalidate(mode);

@@ -334,7 +334,7 @@ public class Application {
 
 	}
 
-	public static boolean isEnabledSystemOverlay(Activity activity) {
+	public static boolean isSystemOverlayEnabled(Activity activity) {
 		try {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 				return Settings.canDrawOverlays(activity);

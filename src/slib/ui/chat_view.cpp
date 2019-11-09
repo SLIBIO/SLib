@@ -115,7 +115,7 @@ namespace slib
 					label->setHeightWrapping(UIUpdateMode::Init);
 					label->setMultiLine(MultiLineMode::WordWrap, UIUpdateMode::Init);
 					label->setGravity(Alignment::TopLeft, UIUpdateMode::Init);
-					label->setEnabledHyperlinksInPlainText(sl_true, UIUpdateMode::Init);
+					label->setDetectingHyperlinksInPlainText(sl_true, UIUpdateMode::Init);
 					addChild(label, UIUpdateMode::Init);
 					
 					setOnTouchEvent(SLIB_FUNCTION_WEAKREF(ChatItemView, onTouchMessage, this));

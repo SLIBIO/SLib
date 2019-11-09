@@ -479,7 +479,7 @@ Microsoft Specific
 	{
 	}
 
-	sl_bool Application::isEnabledSystemOverlay()
+	sl_bool Application::isSystemOverlayEnabled()
 	{
 		return sl_false;
 	}

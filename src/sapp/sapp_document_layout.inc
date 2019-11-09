@@ -2800,7 +2800,7 @@ namespace slib
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(multiLine, setMultiLine)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(ellipsize, setEllipsize)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(lines, setLinesCount)
-		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(linksInText, setEnabledHyperlinksInPlainText);
+		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(linksInText, setDetectingHyperlinksInPlainText);
 
 		if (op == OP_PARSE) {
 			if (!(attr->text.flagDefined) && !(attr->hyperText.flagDefined)) {

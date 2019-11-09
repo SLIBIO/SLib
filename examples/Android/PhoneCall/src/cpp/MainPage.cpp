@@ -80,7 +80,7 @@ void MainPage::onOpen()
 void MainPage::onResume()
 {
 	switchSetDefault->setValue(Application::isDefaultCallingApp());
-	switchSystemOverlay->setValue(Application::isEnabledSystemOverlay());
+	switchSystemOverlay->setValue(Application::isSystemOverlayEnabled());
 
 	Application::grantPermissions(AppPermissions::ReadPhoneState, [this]() {
 		sl_uint32 nSIM = Device::getSimSlotsCount();

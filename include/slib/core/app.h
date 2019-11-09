@@ -185,7 +185,7 @@ namespace slib
 		static void setDefaultCallingApp(const Function<void()>& callback = sl_null);
 
 		// Android only
-		static sl_bool isEnabledSystemOverlay();
+		static sl_bool isSystemOverlayEnabled();
 
 		// Android only
 		static void openSystemOverlaySetting();
