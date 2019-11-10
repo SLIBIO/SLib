@@ -317,7 +317,6 @@ IOS_VIEW_DEFINE_ON_FOCUS
 		
 		// picker
 		UIPickerView* picker = [[UIPickerView alloc] init];
-		picker.showsSelectionIndicator = YES;
 		picker.dataSource = self;
 		picker.delegate = self;
 		self->m_picker = picker;

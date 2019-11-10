@@ -228,7 +228,11 @@ namespace slib
 	NSDictionary* attrs = [text attributesAtIndex:index effectiveRange:nil];
 	NSURL* url = attrs[NSLinkAttributeName];
 	if (url != nil) {
+#ifdef SLIB_PLATFORM_IS_IOS_CATALYST
+		[[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+#else
 		[[UIApplication sharedApplication] openURL:url];
+#endif
 	}
 }
 

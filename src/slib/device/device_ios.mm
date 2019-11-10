@@ -81,14 +81,19 @@ namespace slib
 	void Device::openUrl(const String& _url)
 	{
 		if (_url.isNotEmpty()) {
-			NSString* s = Apple::getNSStringFromString(_url);
-			NSURL* url = [NSURL URLWithString:s];
 			if (![NSThread isMainThread]) {
+				String url = _url;
 				dispatch_async(dispatch_get_main_queue(), ^{
-					[[UIApplication sharedApplication] openURL:url];
+					Device::openUrl(url);
 				});
 			} else {
+				NSString* s = Apple::getNSStringFromString(_url);
+				NSURL* url = [NSURL URLWithString:s];
+#ifdef SLIB_PLATFORM_IS_IOS_CATALYST
+				[[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+#else
 				[[UIApplication sharedApplication] openURL:url];
+#endif
 			}
 		}
 	}

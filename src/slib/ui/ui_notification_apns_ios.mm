@@ -63,20 +63,23 @@ namespace slib
 	
 	void APNs::onStart()
 	{
-		[[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:(UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge) completionHandler:^(BOOL granted, NSError * _Nullable error) {
-			if (!granted) {
-				if (error != nil) {
-					NSLog(@"Error on requesting notification authroization: %@", [error localizedDescription]);
-				} else {
-					NSLog(@"Not granted: notification authroization");
-				}
-			}
-		}];
-		
 		UIApplication* application = [UIApplication sharedApplication];
-		UIUserNotificationSettings* notificationSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert categories:nil];
-		[application registerUserNotificationSettings:notificationSettings];
-		
+		if (@available(iOS 10.0, *)) {
+			[[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:(UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge) completionHandler:^(BOOL granted, NSError * _Nullable error) {
+				if (!granted) {
+					if (error != nil) {
+						NSLog(@"Error on requesting notification authroization: %@", [error localizedDescription]);
+					} else {
+						NSLog(@"Not granted: notification authroization");
+					}
+				}
+			}];
+		} else {
+#ifndef SLIB_PLATFORM_IS_IOS_CATALYST
+			UIUserNotificationSettings* notificationSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert categories:nil];
+			[application registerUserNotificationSettings:notificationSettings];
+#endif
+		}
 		[application registerForRemoteNotifications];
 	}
 	

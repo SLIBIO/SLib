@@ -182,7 +182,6 @@ IOS_VIEW_DEFINE_ON_FOCUS
 	self = [super initWithFrame:frame];
 	if (self != nil) {
 		self->m_selectionBefore = 0;
-		self.showsSelectionIndicator = YES;
 		self.dataSource = self;
 		self.delegate = self;
 	}

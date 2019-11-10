@@ -156,6 +156,7 @@ namespace slib
 						window = [[UIWindow alloc] initWithFrame:rect];
 					}
 					if (window != nil) {
+#ifndef SLIB_PLATFORM_IS_IOS_CATALYST
 						if (!flagMainWindow) {
 							UIScreen* screen = UIPlatform::getScreenHandle(_screen.get());
 							if (screen != nil) {
@@ -163,6 +164,7 @@ namespace slib
 							}
 							window.windowLevel = UIWindowLevelNormal + 1;
 						}
+#endif
 						SLIBWindowRootViewController* controller = [[SLIBWindowRootViewController alloc] init];
 						if (controller != nil) {
 							controller->m_sizeClient = _rect.getSize();
@@ -533,7 +535,9 @@ namespace slib
 			
 			void ResetOrientation()
 			{
+#ifndef SLIB_PLATFORM_IS_IOS_CATALYST
 				g_screenOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+#endif
 			}
 			
 			ScreenOrientation ConvertScreenOrientation(UIInterfaceOrientation orientation)
@@ -608,6 +612,7 @@ namespace slib
 	void UI::attemptRotateScreenOrientation()
 	{
 		[UIViewController attemptRotationToDeviceOrientation];
+#ifndef SLIB_PLATFORM_IS_IOS_CATALYST
 		List<ScreenOrientation> orientations(UI::getAvailableScreenOrientations());
 		if (orientations.isEmpty()) {
 			return;
@@ -621,6 +626,7 @@ namespace slib
 		} @catch (NSError* error) {
 			NSLog(@"[Error] %@", error.localizedDescription);
 		}
+#endif
 	}
 
 	void UI::setStatusBarStyle(StatusBarStyle style)
@@ -671,10 +677,12 @@ namespace slib
 
 	UIWindow* UIPlatform::getKeyWindow()
 	{
+#ifndef SLIB_PLATFORM_IS_IOS_CATALYST
 		UIWindow* window = [[UIApplication sharedApplication] keyWindow];
 		if (window != nil) {
 			return window;
 		}
+#endif
 		return UIPlatform::getMainWindow();
 	}
 	

@@ -199,8 +199,12 @@ namespace slib
 
 	sl_ui_len UI::getStatusBarHeight()
 	{
+#ifndef SLIB_PLATFORM_IS_IOS_CATALYST
 		CGRect rectOfStatusbar = [[UIApplication sharedApplication] statusBarFrame];
 		return (sl_ui_len)(rectOfStatusbar.size.height * UIPlatform::getGlobalScaleFactor());
+#else
+		return 0;
+#endif
 	}
 	
 	sl_bool UI::isUiThread()

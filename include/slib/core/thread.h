@@ -111,7 +111,7 @@ namespace slib
 
 		static sl_bool isNotStoppingCurrent();
 		
-		static sl_uint32 getCurrentThreadId();
+		static sl_uint64 getCurrentThreadId();
 
 		static sl_uint64 getCurrentThreadUniqueId();
 

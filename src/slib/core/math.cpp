@@ -527,7 +527,7 @@ namespace slib
 				// 16:4 process id
 				Base::copyMemory(buf + 16, &pid, 4);
 				// 20:4 thread id
-				sl_uint32 tid = Thread::getCurrentThreadId();
+				sl_uint32 tid = (sl_uint32)(Thread::getCurrentThreadId());
 				Base::copyMemory(buf + 20, &tid, 4);
 				// 24:4 new address
 				void* pna = Base::createMemory(1);

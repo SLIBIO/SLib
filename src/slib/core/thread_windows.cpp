@@ -113,7 +113,7 @@ namespace slib
 		}
 	}
 
-	sl_uint32 Thread::getCurrentThreadId()
+	sl_uint64 Thread::getCurrentThreadId()
 	{
 		return (sl_uint32)(GetCurrentThreadId());
 	}

@@ -147,12 +147,12 @@ namespace slib
 		}
 	}
 
-	sl_uint32 Thread::getCurrentThreadId()
+	sl_uint64 Thread::getCurrentThreadId()
 	{
 #if defined(SLIB_PLATFORM_IS_ANDROID)
-		return (sl_uint32)(gettid());
+		return (sl_uint64)(gettid());
 #else
-		return (sl_uint32)(syscall(SYS_gettid));
+		return (sl_uint64)(syscall(SYS_gettid));
 #endif
 	}
 

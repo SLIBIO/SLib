@@ -273,6 +273,9 @@ namespace slib
 				
 				static AVCaptureDevice* _selectDevice(String deviceId)
 				{
+#ifdef SLIB_PLATFORM_IS_IOS_CATALYST
+					return [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+#else
 #if !defined(SLIB_PLATFORM_IS_IOS_DEVICE)
 					if (deviceId == "FRONT" || deviceId == "BACK") {
 						deviceId.setNull();
@@ -298,6 +301,7 @@ namespace slib
 							}
 						}
 					}
+#endif
 					return NULL;
 				}
 				
@@ -621,6 +625,7 @@ namespace slib
 	List<CameraInfo> Camera::getCamerasList()
 	{
 		List<CameraInfo> ret;
+#ifndef SLIB_PLATFORM_IS_IOS_CATALYST
 		NSArray *devices = [AVCaptureDevice devices];
 		for (AVCaptureDevice* device in devices) {
 			if ([device hasMediaType:AVMediaTypeVideo]) {
@@ -630,12 +635,22 @@ namespace slib
 				ret.add_NoLock(info);
 			}
 		}
+#else
+		AVCaptureDevice* device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+		if (device != nil) {
+			CameraInfo info;
+			info.id = Apple::getStringFromNSString([device uniqueID]);
+			info.name = Apple::getStringFromNSString([device localizedName]);
+			ret.add_NoLock(info);
+		}
+#endif
 		return ret;
 	}
 	
 #if defined(SLIB_PLATFORM_IS_IOS)
 	sl_bool Camera::isMobileDeviceTorchActive()
 	{
+#ifndef SLIB_PLATFORM_IS_IOS_CATALYST
 		NSArray *devices = [AVCaptureDevice devices];
 		for (AVCaptureDevice* device in devices) {
 			if ([device hasMediaType:AVMediaTypeVideo]) {
@@ -646,11 +661,13 @@ namespace slib
 				}
 			}
 		}
+#endif
 		return sl_false;
 	}
 	
 	void Camera::setMobileDeviceTorchMode(CameraTorchMode mode, float level)
 	{
+#ifndef SLIB_PLATFORM_IS_IOS_CATALYST
 		NSArray *devices = [AVCaptureDevice devices];
 		for (AVCaptureDevice* device in devices) {
 			if ([device hasMediaType:AVMediaTypeVideo]) {
@@ -682,6 +699,7 @@ namespace slib
 				}
 			}
 		}
+#endif
 	}
 #endif
 	
@@ -700,7 +718,7 @@ using namespace slib::priv::camera;
 	}
 }
 
-#if defined(SLIB_PLATFORM_IS_IOS)
+#if defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_IOS_CATALYST)
 - (void)captureOutput:(AVCapturePhotoOutput *)output
 didFinishProcessingPhotoSampleBuffer:(CMSampleBufferRef)rawSampleBuffer
 previewPhotoSampleBuffer:(CMSampleBufferRef)previewPhotoSampleBuffer

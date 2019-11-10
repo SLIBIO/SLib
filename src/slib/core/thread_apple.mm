@@ -140,9 +140,13 @@ namespace slib
 		}
 	}
 
-	sl_uint32 Thread::getCurrentThreadId()
+	sl_uint64 Thread::getCurrentThreadId()
 	{
+#ifndef SLIB_PLATFORM_IS_IOS_CATALYST
 		return syscall(SYS_thread_selfid);
+#else
+		return getCurrentThreadUniqueId();
+#endif
 	}
 
 }

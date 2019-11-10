@@ -22,7 +22,7 @@
 
 #include "slib/core/definition.h"
 
-#if defined(SLIB_UI_IS_IOS)
+#if defined(SLIB_UI_IS_IOS) && !defined(SLIB_PLATFORM_IS_IOS_CATALYST)
 
 #include "slib/ui/render_view.h"
 

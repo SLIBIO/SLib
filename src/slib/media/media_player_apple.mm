@@ -338,7 +338,11 @@ namespace slib
 						t.timescale = 1;
 						t.flags = kCMTimeFlags_Valid;
 						t.epoch = 0;
+#ifdef SLIB_PLATFORM_IS_IOS_CATALYST
+						[m_playerItem seekToTime:t completionHandler:nil];
+#else
 						[m_playerItem seekToTime:t];
+#endif
 					} else {
 						_release(sl_false, sl_true);
 					}
