@@ -5834,6 +5834,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = "-Wno-ambiguous-macro";
 			};
 			name = Debug;
 		};
@@ -5852,6 +5853,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = "-Wno-ambiguous-macro";
 			};
 			name = Release;
 		};

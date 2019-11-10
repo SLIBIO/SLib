@@ -858,6 +858,10 @@
 		26539FAD2374BA2B0064340D /* ui_notification_xgpush.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26539FAC2374BA2A0064340D /* ui_notification_xgpush.cpp */; };
 		26539FB02374BA310064340D /* ui_notification.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26539FAF2374BA310064340D /* ui_notification.cpp */; };
 		26539FB32374BC0E0064340D /* push_notification.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26539FB22374BC0E0064340D /* push_notification.cpp */; };
+		26539FB8237821C10064340D /* system_tray_icon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26539FB7237821C10064340D /* system_tray_icon.cpp */; };
+		26539FB9237821C10064340D /* system_tray_icon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26539FB7237821C10064340D /* system_tray_icon.cpp */; };
+		26539FBB237821CA0064340D /* system_tray_icon_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26539FBA237821CA0064340D /* system_tray_icon_macos.mm */; };
+		26539FBC237821CA0064340D /* system_tray_icon_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26539FBA237821CA0064340D /* system_tray_icon_macos.mm */; };
 		265A93462301E42700B155A2 /* screen_capture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265A93452301E42700B155A2 /* screen_capture.cpp */; };
 		265A934A2301E43000B155A2 /* screen_capture_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 265A93482301E43000B155A2 /* screen_capture_macos.mm */; };
 		265A934E230428CD00B155A2 /* process.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265A934D230428CD00B155A2 /* process.cpp */; };
@@ -2473,6 +2477,8 @@
 		26539FAC2374BA2A0064340D /* ui_notification_xgpush.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_notification_xgpush.cpp; sourceTree = "<group>"; };
 		26539FAF2374BA310064340D /* ui_notification.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_notification.cpp; sourceTree = "<group>"; };
 		26539FB22374BC0E0064340D /* push_notification.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = push_notification.cpp; sourceTree = "<group>"; };
+		26539FB7237821C10064340D /* system_tray_icon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = system_tray_icon.cpp; sourceTree = "<group>"; };
+		26539FBA237821CA0064340D /* system_tray_icon_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = system_tray_icon_macos.mm; sourceTree = "<group>"; };
 		26599DB91BEA5DD2008659BB /* thread_pool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_pool.cpp; sourceTree = "<group>"; };
 		265A93452301E42700B155A2 /* screen_capture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = screen_capture.cpp; sourceTree = "<group>"; };
 		265A93482301E43000B155A2 /* screen_capture_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = screen_capture_macos.mm; sourceTree = "<group>"; };
@@ -4863,6 +4869,8 @@
 				E1CC6F921D8FC21000C491E5 /* slider.cpp */,
 				26AE7CCB1D8450F80095AACA /* split_view.cpp */,
 				26BB17EA2200E20B0089C7EC /* switch_view.cpp */,
+				26539FB7237821C10064340D /* system_tray_icon.cpp */,
+				26539FBA237821CA0064340D /* system_tray_icon_macos.mm */,
 				266DD5281C11940A00D47AB0 /* tab_view.cpp */,
 				266DD5291C11940A00D47AB0 /* tab_view_macos.mm */,
 				26B1C9A01DC7ABB60092C84F /* text_view.cpp */,
@@ -6223,6 +6231,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				263918FD21CBA29F008B335B /* main.cpp in Sources */,
+				26539FB9237821C10064340D /* system_tray_icon.cpp in Sources */,
+				26539FBC237821CA0064340D /* system_tray_icon_macos.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7038,6 +7048,7 @@
 				26D9D9561E964659005F7BD3 /* database.cpp in Sources */,
 				26D9D9D81E96468D005F7BD3 /* tab_view_macos.mm in Sources */,
 				26E1B87D222ABAB2007C222E /* jaricom.c in Sources */,
+				26539FB8237821C10064340D /* system_tray_icon.cpp in Sources */,
 				26BAE04322267D060085B5AB /* tls.cpp in Sources */,
 				26A3DA92228AFDDE0031CBDA /* poly1305.cpp in Sources */,
 				26D9D9621E964669005F7BD3 /* bitmap_data.cpp in Sources */,
@@ -7134,6 +7145,7 @@
 				26D9D9241E9645CE005F7BD3 /* sha1.cpp in Sources */,
 				26D9D9901E964675005F7BD3 /* video_codec.cpp in Sources */,
 				26D9D9251E9645CE005F7BD3 /* sha2.cpp in Sources */,
+				26539FBB237821CA0064340D /* system_tray_icon_macos.mm in Sources */,
 				26D9D9BC1E96468D005F7BD3 /* cursor_macos.mm in Sources */,
 				26D9D9DB1E96468D005F7BD3 /* tree_view.cpp in Sources */,
 				26D9D9261E9645CE005F7BD3 /* file.cpp in Sources */,
@@ -7894,6 +7906,7 @@
 				PRODUCT_MODULE_NAME = slib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = "-Wno-ambiguous-macro";
 			};
 			name = Debug;
 		};
@@ -7914,6 +7927,7 @@
 				PRODUCT_MODULE_NAME = slib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = "-Wno-ambiguous-macro";
 			};
 			name = Release;
 		};
