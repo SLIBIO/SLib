@@ -39,6 +39,10 @@ namespace slib
 
 		static List< Ref<Image> > takeScreenshotsFromAllMonitors();
 		
+		static sl_bool isScreenRecordingEnabled();
+		
+		static void openSystemPreferencesForScreenRecording();
+		
 	};
 
 }

@@ -31,6 +31,8 @@
 
 #include <AppKit/AppKit.h>
 
+#include <libproc.h>
+
 namespace slib
 {
 	
@@ -135,6 +137,43 @@ namespace slib
 		return ret;
 	}
 	
+	sl_bool ScreenCapture::isScreenRecordingEnabled()
+	{
+		if (@available(macos 10.15, *)) {
+			sl_bool bRet = sl_false;
+			CFArrayRef list = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
+			if (list) {
+				sl_uint32 n = (sl_uint32)(CFArrayGetCount(list));
+				for (sl_uint32 i = 0; i < n; i++) {
+					NSDictionary* info = (NSDictionary*)(CFArrayGetValueAtIndex(list, (CFIndex)i));
+					NSString* name = info[(id)kCGWindowName];
+					NSNumber* pid = info[(id)kCGWindowOwnerPID];
+					if (pid != nil && name != nil) {
+						int nPid = [pid intValue];
+						char path[PROC_PIDPATHINFO_MAXSIZE+1];
+						int lenPath = proc_pidpath(nPid, path, PROC_PIDPATHINFO_MAXSIZE);
+						if (lenPath > 0) {
+							path[lenPath] = 0;
+							if (strcmp(path, "/System/Library/CoreServices/SystemUIServer.app/Contents/MacOS/SystemUIServer") == 0) {
+								bRet = sl_true;
+								break;
+							}
+						}
+					}
+				}
+				CFRelease(list);
+			}
+			return bRet;
+		} else {
+			return sl_true;
+		}
+	}
+
+	void ScreenCapture::openSystemPreferencesForScreenRecording()
+	{
+		[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture"]];
+	}
+
 }
 
 #endif
