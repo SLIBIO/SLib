@@ -213,6 +213,11 @@ namespace slib
 		AXIsProcessTrustedWithOptions((CFDictionaryRef)options);
 	}
 	
+	void GlobalEventMonitor::openSystemPreferencesForKeyboardAccess()
+	{
+		[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"]];
+	}
+
 }
 
 #endif

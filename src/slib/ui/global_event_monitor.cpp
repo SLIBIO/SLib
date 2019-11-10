@@ -299,15 +299,25 @@ namespace slib
 	void GlobalEventMonitor::removeAllKeyboardMonitors()
 	{
 	}
+#endif
 
+#if !defined(SLIB_UI_IS_MACOS)
 	sl_bool GlobalEventMonitor::isKeyboardAccessEnabled()
 	{
+#	if defined(SLIB_UI_IS_WIN32)
+		return sl_true;
+#	else
 		return sl_false;
+#	endif
 	}
-	
+
 	void GlobalEventMonitor::authenticateKeyboardAccess()
 	{
 	}
+
+	void GlobalEventMonitor::openSystemPreferencesForKeyboardAccess()
+	{
+	}
 #endif
-	
+
 }

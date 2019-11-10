@@ -204,15 +204,6 @@ namespace slib
 		return sl_true;
 	}
 
-	sl_bool GlobalEventMonitor::isKeyboardAccessEnabled()
-	{
-		return sl_true;
-	}
-
-	void GlobalEventMonitor::authenticateKeyboardAccess()
-	{
-	}
-
 }
 
 #endif

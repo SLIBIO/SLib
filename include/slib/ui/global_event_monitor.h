@@ -55,6 +55,8 @@ namespace slib
 		
 		static void authenticateKeyboardAccess();
 		
+		static void openSystemPreferencesForKeyboardAccess();
+		
 	protected:
 		enum {
 			MASK_MOUSE = 0x0001,
