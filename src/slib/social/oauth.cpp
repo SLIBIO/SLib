@@ -205,7 +205,7 @@ namespace slib
 		String timestamp = String::fromInt64(_timestamp);
 
 		Map< Pair<String, String>, sl_bool > mapParams;
-		String method = HttpMethods::toString(_method);
+		String method = HttpMethodHelper::toString(_method);
 		String url = _url;
 		sl_reg indexQuery = url.indexOf('?');
 		if (indexQuery > 0) {
@@ -299,7 +299,7 @@ namespace slib
 			if (index >= 0) {
 				type = type.substring(0, index);
 			}
-			if (!(type.trim().equalsIgnoreCase(ContentTypes::MultipartFormData))) {
+			if (!(type.trim().equalsIgnoreCase(ContentTypeHelper::MultipartFormData))) {
 				if (param.requestBody.isNotNull()) {
 					for (auto& item : HttpRequest::parseFormUrlEncoded(param.requestBody.getData(), param.requestBody.getSize())) {
 						parameters.add_NoLock(item.key, item.value);
@@ -392,7 +392,7 @@ namespace slib
 	void OAuth1::logUrlRequestError(UrlRequest* request)
 	{
 		if (m_flagLogErrors) {
-			LogError(TAG, "Error: %s, Status: %s, Response: %s", request->getLastErrorMessage(), HttpStatuses::toString(request->getResponseStatus()), request->getResponseContentAsString());
+			LogError(TAG, "Error: %s, Status: %s, Response: %s", request->getLastErrorMessage(), HttpStatusHelper::toString(request->getResponseStatus()), request->getResponseContentAsString());
 		}
 	}
 	
@@ -927,7 +927,7 @@ namespace slib
 	void OAuth2::logUrlRequestError(UrlRequest* request)
 	{
 		if (m_flagLogErrors) {
-			LogError(TAG, "Error: %s, Status: %s, Response: %s", request->getLastErrorMessage(), HttpStatuses::toString(request->getResponseStatus()), request->getResponseContentAsString());
+			LogError(TAG, "Error: %s, Status: %s, Response: %s", request->getLastErrorMessage(), HttpStatusHelper::toString(request->getResponseStatus()), request->getResponseContentAsString());
 		}
 	}
 	

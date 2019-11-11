@@ -34,7 +34,7 @@ namespace slib
 			SLIB_STATIC_STRING(g_##name, text); \
 		} \
 	} \
-	const String& ContentTypes::name=priv::content_type::g_##name;
+	const String& ContentTypeHelper::name=priv::content_type::g_##name;
 
 	DEFINE_CONTENT_TYPE(TextPlain, "text/plain")
 	DEFINE_CONTENT_TYPE(TextHtml, "text/html")
@@ -79,7 +79,7 @@ namespace slib
 	DEFINE_CONTENT_TYPE(WebForm, "application/x-www-form-urlencoded")
 	DEFINE_CONTENT_TYPE(MultipartFormData, "multipart/form-data")
 
-	String ContentTypes::toString(ContentType type)
+	String ContentTypeHelper::toString(ContentType type)
 	{
 		switch (type) {
 			case ContentType::TextPlain:
@@ -232,13 +232,41 @@ namespace slib
 		}
 	}
 
-	ContentType ContentTypes::getFromFileExtension(const String& fileExt)
+	ContentType ContentTypeHelper::getFromFileExtension(const String& fileExt)
 	{
 		SLIB_SAFE_STATIC(priv::content_type::Mapping, t)
 		if (SLIB_SAFE_STATIC_CHECK_FREED(t)) {
 			return ContentType::Unknown;
 		}
 		return t.maps.getValue(fileExt.toLower(), ContentType::Unknown);
+	}
+
+	sl_bool ContentTypeHelper::equalsContentTypeExceptParams(const String& _type1, const String& _type2)
+	{
+		String type1 = _type1;
+		{
+			sl_reg index = type1.indexOf(';');
+			if (index < 0) {
+				type1 = type1.trim();
+			} else {
+				type1 = type1.substring(0, index).trim();
+			}
+		}
+		String type2 = _type2;
+		{
+			sl_reg index = type2.indexOf(';');
+			if (index < 0) {
+				type2 = type2.trim();
+			} else {
+				type2 = type2.substring(0, index).trim();
+			}
+		}
+		return type1.equalsIgnoreCase(type2);
+	}
+
+	sl_bool ContentTypeHelper::equalsContentTypeExceptParams(const String& type1, ContentType type2)
+	{
+		return equalsContentTypeExceptParams(type1, toString(type2));
 	}
 
 }

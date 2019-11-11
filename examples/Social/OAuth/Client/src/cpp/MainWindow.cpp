@@ -145,7 +145,7 @@ void MainWindow::onCreate()
 		rp.url = txtRequestURL->getText();
 		auto ref = ToRef(this);
 		rp.onComplete = [ref, this](UrlRequest* request) {
-			txtResponse->setText(String::format("%d %s\r\n%s", (int)(request->getResponseStatus()), HttpStatuses::toString(request->getResponseStatus()), request->getResponseContentAsString()));
+			txtResponse->setText(String::format("%d %s\r\n%s", (int)(request->getResponseStatus()), HttpStatusHelper::toString(request->getResponseStatus()), request->getResponseContentAsString()));
 		};
 		oauth->authorizeRequest(rp);
 		UrlRequest::send(rp);

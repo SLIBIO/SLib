@@ -357,7 +357,7 @@ namespace slib
 					context->applyMultipartFormData(multipartBoundary, body);
 				} else if (context->getMethod() == HttpMethod::POST) {
 					String reqContentType = context->getRequestContentTypeNoParams();
-					if (reqContentType == ContentTypes::WebForm) {
+					if (reqContentType == ContentTypeHelper::WebForm) {
 						Memory body = context->getRequestBody();
 						context->applyFormUrlEncoded(body.getData(), body.getSize());
 					}
@@ -1211,7 +1211,7 @@ namespace slib
 			flagProcessed = sl_true;
 			if (response.isString()) {
 				if (context->getResponseContentType().isNull()) {
-					context->setResponseContentType(ContentTypes::TextHtml_Utf8);
+					context->setResponseContentType(ContentTypeHelper::TextHtml_Utf8);
 				}
 				context->write(response.getString());
 			} else {
@@ -1219,23 +1219,23 @@ namespace slib
 				if (ref.isNotNull()) {
 					if (IsInstanceOf<CMemory>(ref)) {
 						if (context->getResponseContentType().isNull()) {
-							context->setResponseContentType(ContentTypes::OctetStream);
+							context->setResponseContentType(ContentTypeHelper::OctetStream);
 						}
 						context->write(Memory((CMemory*)(ref.get())));
 					} else if (IsInstanceOf<XmlDocument>(ref)) {
 						if (context->getResponseContentType().isNull()) {
-							context->setResponseContentType(ContentTypes::TextXml);
+							context->setResponseContentType(ContentTypeHelper::TextXml);
 						}
 						context->write(((XmlDocument*)(ref.get()))->toString());
 					} else if (response.isVariantList() || response.isVariantMapOrVariantHashMap() || response.isVariantMapListOrVariantHashMapList()) {
 						if (context->getResponseContentType().isNull()) {
-							context->setResponseContentType(ContentTypes::Json);
+							context->setResponseContentType(ContentTypeHelper::Json);
 						}
 						context->write(Json(response).toJsonString());
 					}
 				} else {
 					if (context->getResponseContentType().isNull()) {
-						context->setResponseContentType(ContentTypes::TextHtml_Utf8);
+						context->setResponseContentType(ContentTypeHelper::TextHtml_Utf8);
 					}
 					context->write(response.getString());
 				}
@@ -1336,7 +1336,7 @@ namespace slib
 				if (mem.isNotNull()) {
 					String oldResponseContentType = context->getResponseContentType();
 					if (oldResponseContentType.isEmpty()) {
-						ContentType contentType = ContentTypes::getFromFileExtension(ext);
+						ContentType contentType = ContentTypeHelper::getFromFileExtension(ext);
 						if (contentType == ContentType::Unknown) {
 							contentType = ContentType::OctetStream;
 						}
@@ -1361,7 +1361,7 @@ namespace slib
 			
 			String oldResponseContentType = context->getResponseContentType();
 			if (oldResponseContentType.isEmpty()) {
-				ContentType contentType = ContentTypes::getFromFileExtension(ext);
+				ContentType contentType = ContentTypeHelper::getFromFileExtension(ext);
 				if (contentType == ContentType::Unknown) {
 					contentType = ContentType::OctetStream;
 				}
@@ -1554,7 +1554,7 @@ namespace slib
 
 		String oldResponseContentType = context->getResponseContentType();
 		if (oldResponseContentType.isEmpty()) {
-			context->setResponseContentType(ContentTypes::TextHtml_Utf8);
+			context->setResponseContentType(ContentTypeHelper::TextHtml_Utf8);
 		}
 	}
 

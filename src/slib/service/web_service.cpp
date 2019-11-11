@@ -77,7 +77,7 @@ namespace slib
 
 	String WebController::_getHandlerSignature(HttpMethod method, const String& path)
 	{
-		return HttpMethods::toString(method) + " " + path;
+		return HttpMethodHelper::toString(method) + " " + path;
 	}
 
 

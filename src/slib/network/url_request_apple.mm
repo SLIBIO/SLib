@@ -118,7 +118,7 @@ namespace slib
 						if (url != nil) {
 							NSMutableURLRequest* req = [[NSMutableURLRequest alloc] initWithURL:url];
 							if (req != nil) {
-								req.HTTPMethod = Apple::getNSStringFromString(HttpMethods::toString(param.method));
+								req.HTTPMethod = Apple::getNSStringFromString(HttpMethodHelper::toString(param.method));
 								req.HTTPBody = [NSData dataWithBytes:param.requestBody.getData() length:param.requestBody.getSize()];
 								req.timeoutInterval = NSTimeInterval(param.timeout) / 1000;
 								req.HTTPShouldHandleCookies = NO;

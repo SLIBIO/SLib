@@ -227,7 +227,7 @@ namespace slib
 									}
 								}
 								sl_int32 taskId = Base::interlockedIncrement32(&(session->lastTaskId)) & 0x7FFFFFFF;
-								String16 verb = HttpMethods::toString(param.method);
+								String16 verb = HttpMethodHelper::toString(param.method);
 								DWORD flags = WINHTTP_FLAG_REFRESH;
 								if (connection->flagHttps) {
 									flags |= WINHTTP_FLAG_SECURE;

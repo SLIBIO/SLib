@@ -120,7 +120,7 @@ namespace slib
 		
 	};
 	
-	class SLIB_EXPORT HttpStatuses
+	class SLIB_EXPORT HttpStatusHelper
 	{
 	public:
 		static String toString(HttpStatus status);
@@ -146,7 +146,7 @@ namespace slib
 		PATCH // https://tools.ietf.org/html/rfc5789
 	};
 	
-	class SLIB_EXPORT HttpMethods
+	class SLIB_EXPORT HttpMethodHelper
 	{
 	public:
 		static String toString(HttpMethod method);

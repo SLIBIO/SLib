@@ -117,12 +117,16 @@ namespace slib
 
 	};
 	
-	class SLIB_EXPORT ContentTypes
+	class SLIB_EXPORT ContentTypeHelper
 	{
 	public:
 		static String toString(ContentType type);
 
 		static ContentType getFromFileExtension(const String& fileExt);
+		
+		static sl_bool equalsContentTypeExceptParams(const String& type1, const String& type2);
+		
+		static sl_bool equalsContentTypeExceptParams(const String& type1, ContentType type2);
 
 	public:
 		// text/plain

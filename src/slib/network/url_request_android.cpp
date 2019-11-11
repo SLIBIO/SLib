@@ -86,7 +86,7 @@ namespace slib
 				void _sendSync() override
 				{
 					JniLocal<jstring> url = Jni::getJniString(m_url);
-					JniLocal<jstring> method = Jni::getJniString(HttpMethods::toString(m_method));
+					JniLocal<jstring> method = Jni::getJniString(HttpMethodHelper::toString(m_method));
 					JniLocal<jobjectArray> jheaders;
 					{
 						CList<String> list;

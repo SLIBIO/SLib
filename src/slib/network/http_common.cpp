@@ -98,7 +98,7 @@ namespace slib
 #define HTTP_STATUS_CASE(name, text) \
 	case HttpStatus::name: SLIB_RETURN_STRING(text);
 
-	String HttpStatuses::toString(HttpStatus status)
+	String HttpStatusHelper::toString(HttpStatus status)
 	{
 		switch (status) {
 			
@@ -155,7 +155,7 @@ namespace slib
 		return sl_null;
 	}
 
-	String HttpMethods::toString(HttpMethod method)
+	String HttpMethodHelper::toString(HttpMethod method)
 	{
 		switch (method) {
 			case HttpMethod::GET:
@@ -182,7 +182,7 @@ namespace slib
 		return sl_null;
 	}
 
-	HttpMethod HttpMethods::fromString(const String& method)
+	HttpMethod HttpMethodHelper::fromString(const String& method)
 	{
 		SLIB_SAFE_STATIC(HttpMethodMapping, t)
 		if (SLIB_SAFE_STATIC_CHECK_FREED(t)) {
@@ -628,7 +628,7 @@ namespace slib
 	
 	void HttpUploadFile::setContentType(const ContentType& contentType)
 	{
-		setHeader(HttpHeaders::ContentType, ContentTypes::toString(contentType));
+		setHeader(HttpHeaders::ContentType, ContentTypeHelper::toString(contentType));
 	}
 	
 	void HttpUploadFile::setContentType(const String& contentType)
@@ -705,7 +705,7 @@ namespace slib
 	void HttpRequest::setMethod(HttpMethod method)
 	{
 		m_method = method;
-		m_methodText = HttpMethods::toString(method);
+		m_methodText = HttpMethodHelper::toString(method);
 		m_methodTextUpper = m_methodText;
 	}
 
@@ -713,7 +713,7 @@ namespace slib
 	{
 		m_methodText = method;
 		m_methodTextUpper = method.toUpper();
-		m_method = HttpMethods::fromString(m_methodTextUpper);
+		m_method = HttpMethodHelper::fromString(m_methodTextUpper);
 	}
 
 	String HttpRequest::getPath() const
@@ -876,19 +876,19 @@ namespace slib
 
 	void HttpRequest::setRequestContentType(ContentType type)
 	{
-		setRequestHeader(HttpHeaders::ContentType, ContentTypes::toString(type));
+		setRequestHeader(HttpHeaders::ContentType, ContentTypeHelper::toString(type));
 	}
 
 	sl_bool HttpRequest::isRequestMultipartFormData() const
 	{
-		return getRequestContentTypeNoParams().trim().equalsIgnoreCase(ContentTypes::MultipartFormData);
+		return getRequestContentTypeNoParams().trim().equalsIgnoreCase(ContentTypeHelper::MultipartFormData);
 	}
 	
 	String HttpRequest::getRequestMultipartFormDataBoundary() const
 	{
 		String value = getRequestContentType();
 		HttpHeaderValueMap map = HttpHeaders::splitValueToMap(value, ';');
-		if (map.find_NoLock(ContentTypes::MultipartFormData)) {
+		if (map.find_NoLock(ContentTypeHelper::MultipartFormData)) {
 			SLIB_STATIC_STRING(t, "boundary")
 			return map.getValue_NoLock(t);
 		}
@@ -1582,7 +1582,7 @@ namespace slib
 	void HttpResponse::setResponseCode(HttpStatus code)
 	{
 		m_responseCode = code;
-		m_responseMessage = HttpStatuses::toString(code);
+		m_responseMessage = HttpStatusHelper::toString(code);
 	}
 
 	String HttpResponse::getResponseMessage() const
@@ -1725,7 +1725,7 @@ namespace slib
 
 	void HttpResponse::setResponseContentType(ContentType type)
 	{
-		setResponseHeader(HttpHeaders::ContentType, ContentTypes::toString(type));
+		setResponseHeader(HttpHeaders::ContentType, ContentTypeHelper::toString(type));
 	}
 
 	String HttpResponse::getResponseContentEncoding() const
