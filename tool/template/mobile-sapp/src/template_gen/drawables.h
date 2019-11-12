@@ -1,5 +1,4 @@
-#ifndef CHECKHEADER_RESOURCE_DRAWABLES_sapp
-#define CHECKHEADER_RESOURCE_DRAWABLES_sapp
+#pragma once
 
 #include <slib/graphics/resource.h>
 
@@ -14,5 +13,3 @@ namespace sapp
 
 	}
 }
-
-#endif

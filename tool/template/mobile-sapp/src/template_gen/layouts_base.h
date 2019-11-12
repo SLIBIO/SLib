@@ -2,10 +2,12 @@
 
 #include <slib/ui/resource.h>
 
+
 namespace sapp
 {
-	namespace menu
+	namespace ui
 	{
-
+		class LaunchScreen;
+		class MainPage;
 	}
 }

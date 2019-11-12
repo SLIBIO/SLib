@@ -1,5 +1,4 @@
-#ifndef CHECKHEADER_RESOURCE_STRINGS_sapp
-#define CHECKHEADER_RESOURCE_STRINGS_sapp
+#pragma once
 
 #include <slib/core/resource.h>
 
@@ -13,5 +12,3 @@ namespace sapp
 
 	}
 }
-
-#endif

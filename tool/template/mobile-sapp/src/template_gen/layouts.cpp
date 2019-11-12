@@ -7,11 +7,5 @@
 
 #include <slib/ui.h>
 
-namespace sapp
-{
-	namespace ui
-	{
-		#include "ui/LaunchScreen.cpp.inc"
-		#include "ui/MainPage.cpp.inc"
-	}
-}
+#include "ui/LaunchScreen.cpp.inc"
+#include "ui/MainPage.cpp.inc"
