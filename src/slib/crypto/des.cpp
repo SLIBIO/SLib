@@ -313,6 +313,14 @@ namespace slib
 		m_des3.setKey(key3);
 	}
 	
+	void TripleDES::setKey24(const void* _key)
+	{
+		char* key = (char*)(_key);
+		m_des1.setKey(key);
+		m_des2.setKey(key + 8);
+		m_des3.setKey(key + 16);
+	}
+	
 	void TripleDES::setKey(const void* key1, const void* key2)
 	{
 		setKey(key1, key2, key1);
@@ -321,6 +329,14 @@ namespace slib
 	void TripleDES::setKey(sl_uint64 key1, sl_uint64 key2)
 	{
 		setKey(key1, key2, key1);
+	}
+	
+	void TripleDES::setKey16(const void* _key)
+	{
+		char* key = (char*)(_key);
+		m_des1.setKey(key);
+		m_des2.setKey(key + 8);
+		m_des3.setKey(key);
 	}
 	
 	sl_uint64 TripleDES::encrypt(sl_uint64 n) const

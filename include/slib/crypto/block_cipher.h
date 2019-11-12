@@ -65,9 +65,13 @@ namespace slib
 		// Output Size = (size / block + 1) * block (< size + block)
 		static sl_size encrypt(const CLASS* crypto, const void* _src, sl_size size, void* _dst);
 
+		static Memory encrypt(const CLASS* crypto, const void* _src, sl_size size);
+
 		// destination buffer size must equals to or greater than size
 		static sl_size decrypt(const CLASS* crypto, const void* _src, sl_size size, void* _dst);
-	
+
+		static Memory decrypt(const CLASS* crypto, const void* _src, sl_size size);
+		
 	};
 
 /*
@@ -150,6 +154,26 @@ namespace slib
 		sl_size decrypt_ECB_PKCS7Padding(const void* src, sl_size size, void* dst) const
 		{
 			return BlockCipher_ECB<CLASS, BlockCipherPadding_PKCS7>::decrypt((CLASS*)this, src, size, dst);
+		}
+		
+		Memory encrypt_ECB_PKCS7Padding(const void* src, sl_size size) const
+		{
+			return BlockCipher_ECB<CLASS, BlockCipherPadding_PKCS7>::encrypt((CLASS*)this, src, size);
+		}
+		
+		Memory decrypt_ECB_PKCS7Padding(const void* src, sl_size size) const
+		{
+			return BlockCipher_ECB<CLASS, BlockCipherPadding_PKCS7>::decrypt((CLASS*)this, src, size);
+		}
+		
+		Memory encrypt_ECB_PKCS7Padding(const Memory& mem) const
+		{
+			return BlockCipher_ECB<CLASS, BlockCipherPadding_PKCS7>::encrypt((CLASS*)this, mem.getData(), mem.getSize());
+		}
+		
+		Memory decrypt_ECB_PKCS7Padding(const Memory& mem) const
+		{
+			return BlockCipher_ECB<CLASS, BlockCipherPadding_PKCS7>::decrypt((CLASS*)this, mem.getData(), mem.getSize());
 		}
 		
 		sl_size encrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size, void* dst) const

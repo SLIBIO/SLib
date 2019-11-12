@@ -85,8 +85,10 @@ namespace slib
 		// 3 x 64 bit (8 bytes), note that most significant bit of each byte is not used
 		void setKey(const void* key1, const void* key2, const void* key3);
 		void setKey(sl_uint64 key1, sl_uint64 key2, sl_uint64 key3);
+		void setKey24(const void* key);
 		void setKey(const void* key1, const void* key2);
 		void setKey(sl_uint64 key1, sl_uint64 key2);
+		void setKey16(const void* key);
 
 		sl_uint64 encrypt(sl_uint64 data) const;
 		

@@ -50,6 +50,19 @@ namespace slib
 		return p + CLASS::BlockSize;
 	}
 
+	template <class CLASS, class PADDING>
+	Memory BlockCipher_ECB<CLASS, PADDING>::encrypt(const CLASS* crypto, const void* src, sl_size size)
+	{
+		Memory mem = Memory::create(size + CLASS::BlockSize);
+		if (mem.isNotNull()) {
+			sl_size n = encrypt(crypto, src, size, mem.getData());
+			if (n) {
+				return mem.sub(0, n);
+			}
+		}
+		return sl_null;
+	}
+
 	// destination buffer size must equals to or greater than size
 	template <class CLASS, class PADDING>
 	sl_size BlockCipher_ECB<CLASS, PADDING>::decrypt(const CLASS* crypto, const void* _src, sl_size size, void* _dst)
@@ -73,6 +86,18 @@ namespace slib
 		}
 	}
 
+	template <class CLASS, class PADDING>
+	Memory BlockCipher_ECB<CLASS, PADDING>::decrypt(const CLASS* crypto, const void* src, sl_size size)
+	{
+		Memory mem = Memory::create(size);
+		if (mem.isNotNull()) {
+			sl_size n = decrypt(crypto, src, size, mem.getData());
+			if (n) {
+				return mem.sub(0, n);
+			}
+		}
+		return sl_null;
+	}
 
 /**************************************
 		BlockCipher_CBC
