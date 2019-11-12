@@ -88,6 +88,7 @@ namespace slib
 	public:
 		Ref<Font> font;
 		String emojiFamilyName;
+		sl_bool flagDefinedUnderline : 1;
 		sl_bool flagUnderline : 1;
 		sl_bool flagOverline : 1;
 		sl_bool flagLineThrough : 1;
@@ -360,6 +361,10 @@ namespace slib
 		static const Color& getDefaultLinkColor();
 
 		static void setDefaultLinkColor(const Color& color);
+		
+		static sl_bool isDefaultLinkUnderline();
+		
+		static void setDefaultLinkUnderline(sl_bool flag);
 		
 	protected:
 		CList< Ref<TextItem> > m_items;

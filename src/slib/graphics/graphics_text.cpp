@@ -37,7 +37,7 @@ namespace slib
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(TextStyle)
 
 	TextStyle::TextStyle() noexcept:
-		flagUnderline(sl_false), flagOverline(sl_false), flagLineThrough(sl_false),
+		flagDefinedUnderline(sl_false), flagUnderline(sl_false), flagOverline(sl_false), flagLineThrough(sl_false),
 		flagLink(sl_false),
 		textColor(Color::Zero), backgroundColor(Color::Zero),
 		lineHeight(-1), yOffset(0)
@@ -185,7 +185,7 @@ namespace slib
 					if ((text.startsWith(http) && text.getLength() > http.getLength()) || (text.startsWith(https) && text.getLength() > https.getLength())) {
 						Ref<TextStyle> styleNew = style->duplicate();
 						if (styleNew.isNotNull()) {
-							styleNew->flagUnderline = sl_true;
+							styleNew->flagLink = sl_true;
 							styleNew->href = text;
 							ret->m_style = styleNew;
 						}
@@ -781,8 +781,6 @@ namespace slib
 		XmlString name = element->getName().toLower();
 		if (name == SLIB_UNICODE("a")) {
 			flagDefineLink = sl_true;
-			flagDefineUnderline = sl_true;
-			attrUnderline = sl_true;
 		} else if (name == SLIB_UNICODE("b")) {
 			flagDefineBold = sl_true;
 			attrBold = sl_true;
@@ -1089,6 +1087,7 @@ namespace slib
 				styleNew->emojiFamilyName = attrEmojiFamilyName;
 			}
 			if (flagDefineUnderline) {
+				styleNew->flagDefinedUnderline = sl_true;
 				styleNew->flagUnderline = attrUnderline;
 			}
 			if (flagDefineOverline) {
@@ -1767,7 +1766,11 @@ namespace slib
 						}
 					}
 				}
-				if (style->flagUnderline || style->flagOverline || style->flagLineThrough) {
+				sl_bool flagUnderline = style->flagUnderline;
+				if (!(style->flagDefinedUnderline) && style->flagLink) {
+					flagUnderline = isDefaultLinkUnderline();
+				}
+				if (flagUnderline || style->flagOverline || style->flagLineThrough) {
 					if (type == TextItemType::Word || type == TextItemType::Space || type == TextItemType::Tab) {
 						Rectangle frame = item->getLayoutFrame();
 						frame.top += style->yOffset;
@@ -1779,7 +1782,7 @@ namespace slib
 								if (pen.isNotNull()) {
 									FontMetrics fm;
 									if (font->getFontMetrics(fm)) {
-										if (style->flagUnderline) {
+										if (flagUnderline) {
 											sl_real yLine = y + frame.bottom - fm.descent / 2;
 											canvas->drawLine(Point(x + frame.left, yLine), Point(x + frame.right, yLine), pen);
 										}
@@ -1839,6 +1842,7 @@ namespace slib
 		namespace text_paragraph
 		{
 			Color g_defaultLinkColor = Color::Blue;
+			sl_bool g_defaultLinkUnderline = sl_true;
 		}
 	}
 
@@ -1851,8 +1855,18 @@ namespace slib
 	{
 		priv::text_paragraph::g_defaultLinkColor = color;
 	}
+
+	sl_bool TextParagraph::isDefaultLinkUnderline()
+	{
+		return priv::text_paragraph::g_defaultLinkUnderline;
+	}
 	
+	void TextParagraph::setDefaultLinkUnderline(sl_bool flag)
+	{
+		priv::text_paragraph::g_defaultLinkUnderline = flag;
+	}
 	
+
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(SimpleTextBoxParam)
 	
 	SimpleTextBoxParam::SimpleTextBoxParam() noexcept:
