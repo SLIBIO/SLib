@@ -1,0 +1,19 @@
+<sapp>
+	<layout
+		type='page'
+		background='white'
+		>
+		
+		<scroll width='fill' height='fill' marginTop='1safeT' marginBottom='1safeB' marginLeft='1safeL' marginRight='1safeR'>
+			<label
+				name='lblReport'
+				width='fill'
+				fontSize='20dp'
+				gravity='left|top'
+				padding='10dp'
+				multiLine='word-wrap'
+				/>
+		</scroll>
+
+ 	</layout>
+</sapp>
