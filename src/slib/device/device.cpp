@@ -23,6 +23,7 @@
 #include "slib/device/device.h"
 
 #include "slib/network/url.h"
+#include "slib/social/contact.h"
 
 namespace slib
 {
@@ -175,6 +176,13 @@ namespace slib
 
 	void Device::endCall(const String& callId)
 	{
+	}
+#endif
+
+#if !defined(SLIB_PLATFORM_IS_ANDROID) && !defined(SLIB_PLATFORM_IS_IOS)
+	List<Contact> Device::getAllContacts()
+	{
+		return sl_null;
 	}
 #endif
 

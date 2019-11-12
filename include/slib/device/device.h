@@ -38,6 +38,8 @@ namespace slib
 
 	typedef Function<void(const String& callId, const String& phoneNumber)> PhoneCallCallback;
 
+	class Contact;
+
 	class SLIB_EXPORT Device
 	{
 	public:
@@ -134,7 +136,10 @@ namespace slib
 		static void addOnEndCall(const PhoneCallCallback& callback);
 		
 		static void removeOnEndCall(const PhoneCallCallback& callback);
-
+		
+		
+		static List<Contact> getAllContacts();
+		
 	};
 
 }

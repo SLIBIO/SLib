@@ -528,6 +528,7 @@
 		260D8CC720CAC9800013B34E /* loopfilter_16_neon.asm.S in Sources */ = {isa = PBXBuildFile; fileRef = 260D8CBB20CAC97F0013B34E /* loopfilter_16_neon.asm.S */; };
 		260D8CC820CAC9800013B34E /* intrapred_neon_asm.asm.S in Sources */ = {isa = PBXBuildFile; fileRef = 260D8CBC20CAC9800013B34E /* intrapred_neon_asm.asm.S */; };
 		260D8CC920CAC9800013B34E /* loopfilter_4_neon.asm.S in Sources */ = {isa = PBXBuildFile; fileRef = 260D8CBD20CAC9800013B34E /* loopfilter_4_neon.asm.S */; };
+		2614D10D237A6556001C52F0 /* device_contacts_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2614D10C237A6556001C52F0 /* device_contacts_ios.mm */; };
 		261E7F422353AA6100ACE4E8 /* string_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 261E7F402353AA6100ACE4E8 /* string_buffer.cpp */; };
 		261E7F432353AA6100ACE4E8 /* string_param.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 261E7F412353AA6100ACE4E8 /* string_param.cpp */; };
 		2628EAD121C184D400D8CD00 /* regex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2628EAD021C184D400D8CD00 /* regex.cpp */; };
@@ -1064,6 +1065,7 @@
 		26E44AEB2322F39D00A88D93 /* collection_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E44AEA2322F39C00A88D93 /* collection_view.cpp */; };
 		26F53F9E22E1EBD50031D485 /* date_picker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F53F9D22E1EBD50031D485 /* date_picker.cpp */; };
 		26F53FA222E2E6D70031D485 /* line_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F53FA122E2E6D60031D485 /* line_view.cpp */; };
+		26F5C778237AEF35009F3EEF /* contact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5C777237AEF35009F3EEF /* contact.cpp */; };
 		26F5EA6422D6810A00CD1595 /* toast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5EA6322D6810900CD1595 /* toast.cpp */; };
 		26FAA8861EC768C1007BC67F /* red_black_tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FAA8851EC768C1007BC67F /* red_black_tree.cpp */; };
 		26FADD33215754860057F7EA /* stun.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FADD32215754860057F7EA /* stun.cpp */; };
@@ -1770,6 +1772,7 @@
 		260D8CBB20CAC97F0013B34E /* loopfilter_16_neon.asm.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = loopfilter_16_neon.asm.S; path = ../../external/src/libvpx/gen/asm_apple/armv7/vpx_dsp/arm/loopfilter_16_neon.asm.S; sourceTree = "<group>"; };
 		260D8CBC20CAC9800013B34E /* intrapred_neon_asm.asm.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = intrapred_neon_asm.asm.S; path = ../../external/src/libvpx/gen/asm_apple/armv7/vpx_dsp/arm/intrapred_neon_asm.asm.S; sourceTree = "<group>"; };
 		260D8CBD20CAC9800013B34E /* loopfilter_4_neon.asm.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = loopfilter_4_neon.asm.S; path = ../../external/src/libvpx/gen/asm_apple/armv7/vpx_dsp/arm/loopfilter_4_neon.asm.S; sourceTree = "<group>"; };
+		2614D10C237A6556001C52F0 /* device_contacts_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = device_contacts_ios.mm; sourceTree = "<group>"; };
 		261B4C841DB10149000A385A /* transition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = transition.cpp; sourceTree = "<group>"; };
 		261E7F402353AA6100ACE4E8 /* string_buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = string_buffer.cpp; sourceTree = "<group>"; };
 		261E7F412353AA6100ACE4E8 /* string_param.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = string_param.cpp; sourceTree = "<group>"; };
@@ -2338,6 +2341,7 @@
 		26F5B3231E90125200F9FB7F /* geo_rectangle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = geo_rectangle.cpp; sourceTree = "<group>"; };
 		26F5B3241E90125200F9FB7F /* globe.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = globe.cpp; sourceTree = "<group>"; };
 		26F5B3251E90125200F9FB7F /* latlon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = latlon.cpp; sourceTree = "<group>"; };
+		26F5C777237AEF35009F3EEF /* contact.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = contact.cpp; sourceTree = "<group>"; };
 		26F5EA6322D6810900CD1595 /* toast.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = toast.cpp; sourceTree = "<group>"; };
 		26FAA8851EC768C1007BC67F /* red_black_tree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = red_black_tree.cpp; sourceTree = "<group>"; };
 		26FADD32215754860057F7EA /* stun.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stun.cpp; sourceTree = "<group>"; };
@@ -3933,6 +3937,7 @@
 		26ACB3B7220978310093FF3F /* social */ = {
 			isa = PBXGroup;
 			children = (
+				26F5C777237AEF35009F3EEF /* contact.cpp */,
 				26E1B85922290380007C222E /* ebay.cpp */,
 				26BAE007221BEE530085B5AB /* etsy.cpp */,
 				26BAE009221BEE580085B5AB /* etsy_ui.cpp */,
@@ -3963,6 +3968,7 @@
 				26B92D5A21D4CF22003F6F82 /* device.cpp */,
 				26B92D5C21D4CF28003F6F82 /* device_ios.mm */,
 				26ACB3F5220985EE0093FF3F /* device_audio_ios.mm */,
+				2614D10C237A6556001C52F0 /* device_contacts_ios.mm */,
 				26C0A34D1C128D80005690FE /* sensor.cpp */,
 				E1D264B91DE9B1C800F1D44C /* sensor_ios.mm */,
 			);
@@ -5221,6 +5227,7 @@
 				26DF6FB7236975C0009C1339 /* openssl_crypto.cpp in Sources */,
 				26E1B8E0222ABCDD007C222E /* jdarith.c in Sources */,
 				26CF4DF01ED69AD000954B7A /* ui_text.cpp in Sources */,
+				26F5C778237AEF35009F3EEF /* contact.cpp in Sources */,
 				26E1B8F1222ABCDD007C222E /* jfdctfst.c in Sources */,
 				26635C9F226706F3005E4BA6 /* ui_photo_ios.mm in Sources */,
 				26D9D8D11E962976005F7BD3 /* scroll_view.cpp in Sources */,
@@ -5427,6 +5434,7 @@
 				26BB17D821F4E45C0089C7EC /* view_pager.cpp in Sources */,
 				26D9D82A1E9628E0005F7BD3 /* asset.cpp in Sources */,
 				26E1B8B5222ABBDC007C222E /* inflate.c in Sources */,
+				2614D10D237A6556001C52F0 /* device_contacts_ios.mm in Sources */,
 				26E1B8CC222ABC05007C222E /* intel_init.c in Sources */,
 				26D9D8821E96295A005F7BD3 /* audio_recorder.cpp in Sources */,
 				26D9D8981E962962005F7BD3 /* icmp.cpp in Sources */,

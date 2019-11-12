@@ -25,6 +25,7 @@
 #if defined(SLIB_PLATFORM_IS_IOS)
 
 #include "slib/device/device.h"
+
 #include "slib/core/variant.h"
 #include "slib/core/platform_apple.h"
 

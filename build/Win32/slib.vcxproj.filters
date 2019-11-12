@@ -1331,5 +1331,8 @@
     <ClCompile Include="..\..\src\slib\service\push_notification.cpp">
       <Filter>src\service</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\contact.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

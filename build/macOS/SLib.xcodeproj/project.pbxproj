@@ -1407,6 +1407,7 @@
 		26F53F7E22DB4F6D0031D485 /* date_picker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F53F7C22DB4F6C0031D485 /* date_picker.cpp */; };
 		26F53F7F22DB4F6D0031D485 /* date_picker_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26F53F7D22DB4F6D0031D485 /* date_picker_macos.mm */; };
 		26F53FA022E29A000031D485 /* line_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F53F9F22E299FF0031D485 /* line_view.cpp */; };
+		26F5C77A237AEF44009F3EEF /* contact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5C779237AEF44009F3EEF /* contact.cpp */; };
 		26F5EA6622D6835C00CD1595 /* toast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5EA6522D6835B00CD1595 /* toast.cpp */; };
 		26FADD30215676D50057F7EA /* stun.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FADD2F215676D40057F7EA /* stun.cpp */; };
 		26FBB34B1ED5581F0086C27A /* ui_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FBB34A1ED5581F0086C27A /* ui_text.cpp */; };
@@ -2899,6 +2900,7 @@
 		26F5B3161E9010D100F9FB7F /* geo_rectangle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = geo_rectangle.cpp; sourceTree = "<group>"; };
 		26F5B3171E9010D100F9FB7F /* globe.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = globe.cpp; sourceTree = "<group>"; };
 		26F5B3181E9010D100F9FB7F /* latlon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = latlon.cpp; sourceTree = "<group>"; };
+		26F5C779237AEF44009F3EEF /* contact.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = contact.cpp; path = social/contact.cpp; sourceTree = "<group>"; };
 		26F5EA6522D6835B00CD1595 /* toast.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = toast.cpp; sourceTree = "<group>"; };
 		26F900641D994ED0001A6EE9 /* animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = animation.cpp; sourceTree = "<group>"; };
 		26FA807B1C98891B0074F76B /* quaternion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = quaternion.cpp; sourceTree = "<group>"; };
@@ -4211,6 +4213,7 @@
 		260B73F2220D7DC600858EEA /* social */ = {
 			isa = PBXGroup;
 			children = (
+				26F5C779237AEF44009F3EEF /* contact.cpp */,
 				26E1B85B22291D53007C222E /* ebay.cpp */,
 				26BAE00B221C8FFC0085B5AB /* etsy.cpp */,
 				26BAE00D221C90010085B5AB /* etsy_ui.cpp */,
@@ -7199,6 +7202,7 @@
 				26539FAD2374BA2B0064340D /* ui_notification_xgpush.cpp in Sources */,
 				26D9D9601E964662005F7BD3 /* latlon.cpp in Sources */,
 				26E1B873222ABA51007C222E /* pngrtran.c in Sources */,
+				26F5C77A237AEF44009F3EEF /* contact.cpp in Sources */,
 				26D9D9E71E96468D005F7BD3 /* ui_platform.cpp in Sources */,
 				26D9D9C91E96468D005F7BD3 /* motion_tracker.cpp in Sources */,
 				26C795BF2215F9C70053C5A1 /* raws.cpp in Sources */,

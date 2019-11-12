@@ -26,8 +26,10 @@
 
 #include "slib/device/device.h"
 
-#include "slib/core/platform_android.h"
+#include "slib/social/contact.h"
+#include "slib/core/string_buffer.h"
 #include "slib/core/safe_static.h"
+#include "slib/core/platform_android.h"
 
 namespace slib
 {
@@ -76,6 +78,23 @@ namespace slib
 				SLIB_JNI_STATIC_METHOD(callPhoneWithSim, "callPhone", "(Landroid/app/Activity;Ljava/lang/String;I)V");
 				SLIB_JNI_STATIC_METHOD(answerCall, "answerCall", "(Ljava/lang/String;)V");
 				SLIB_JNI_STATIC_METHOD(endCall, "endCall", "(Ljava/lang/String;)V");
+			SLIB_JNI_END_CLASS
+
+			SLIB_JNI_BEGIN_CLASS(JContact, "slib/platform/android/device/Contact")
+				SLIB_JNI_NEW(init, "()V");
+				SLIB_JNI_LONG_FIELD(id);
+				SLIB_JNI_STRING_FIELD(namePrefix);
+				SLIB_JNI_STRING_FIELD(givenName);
+				SLIB_JNI_STRING_FIELD(middleName);
+				SLIB_JNI_STRING_FIELD(familyName);
+				SLIB_JNI_STRING_FIELD(nameSuffix);
+				SLIB_JNI_STRING_FIELD(displayName);
+				SLIB_JNI_STRING_FIELD(nickname);
+				SLIB_JNI_STRING_FIELD(phoneNumbers);
+				SLIB_JNI_STRING_FIELD(emails);
+
+				SLIB_JNI_STATIC_METHOD(getAllContacts, "getAllContacts", "(Landroid/app/Activity;)[Lslib/platform/android/device/Contact;");
+				SLIB_JNI_STATIC_METHOD(addContact, "addContact", "(Landroid/app/Activity;Lslib/platform/android/device/Contact;)Z");
 			SLIB_JNI_END_CLASS
 
 			SLIB_STATIC_ZERO_INITIALIZED(Atomic<PhoneCallCallback>, g_callbackOnIncomingCall)
@@ -389,6 +408,84 @@ namespace slib
 	{
 		g_callbackOnEndCall.remove(callback);
 	}
+
+	List<Contact> Device::getAllContacts()
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JniLocal<jobjectArray> arr = (jobjectArray)(JContact::getAllContacts.callObject(sl_null, jactivity));
+			if (arr.isNotNull()) {
+				sl_uint32 n = Jni::getArrayLength(arr.get());
+				List<Contact> ret;
+				for (sl_uint32 i = 0; i < n; i++) {
+					JniLocal<jobject> obj = Jni::getObjectArrayElement(arr.get(), i);
+					if (obj.isNotNull()) {
+						Contact c;
+						c.namePrefix = JContact::namePrefix.get(obj.get());
+						c.givenName = JContact::givenName.get(obj.get());
+						c.middleName = JContact::middleName.get(obj.get());
+						c.familyName = JContact::familyName.get(obj.get());
+						c.nameSuffix = JContact::nameSuffix.get(obj.get());
+						c.displayName = JContact::displayName.get(obj.get());
+						c.nickname = JContact::nickname.get(obj.get());
+						{
+							ListElements<String16> list(JContact::phoneNumbers.get(obj.get()).split(","));
+							for (sl_size k = 0; k < list.count; k++) {
+								String16& e = list[k];
+								sl_reg t = e.indexOf(':');
+								if (t >= 0) {
+									String label = e.substring(0, t);
+									String value = e.substring(t + 1);
+									c.phoneNumbers.add_NoLock(label, value);
+								} else {
+									c.phoneNumbers.add_NoLock(String::getEmpty(), e);
+								}
+							}
+						}
+						{
+							ListElements<String16> list(JContact::emails.get(obj.get()).split(","));
+							for (sl_size k = 0; k < list.count; k++) {
+								String16& e = list[k];
+								sl_reg t = e.indexOf(':');
+								if (t >= 0) {
+									String label = e.substring(0, t);
+									String value = e.substring(t + 1);
+									c.emails.add_NoLock(label, value);
+								} else {
+									c.emails.add_NoLock(String::getEmpty(), e);
+								}
+							}
+						}
+						ret.add_NoLock(c);
+					}
+				}
+				return ret;
+			}
+		}
+		return sl_null;
+	}
+
+	/*
+	sl_bool Device::addContact(const Contact& contact)
+	{
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			JniLocal<jobject> jcontact = JContact::init.newObject(sl_null);
+			if (jcontact.isNotNull()) {
+				JContact::namePrefix.set(jcontact.get(), contact.namePrefix);
+				JContact::givenName.set(jcontact.get(), contact.givenName);
+				JContact::middleName.set(jcontact.get(), contact.middleName);
+				JContact::familyName.set(jcontact.get(), contact.familyName);
+				JContact::nameSuffix.set(jcontact.get(), contact.nameSuffix);
+				JContact::nickname.set(jcontact.get(), contact.nickname);
+				JContact::phoneNumbers.set(jcontact.get(), StringBuffer::join(",", contact.phoneNumbers));
+				JContact::emails.set(jcontact.get(), StringBuffer::join(",", contact.emails));
+				return JContact::addContact.callBoolean(sl_null, jactivity, jcontact.get());
+			}
+		}
+		return sl_false;
+	}
+	*/
 
 }
 

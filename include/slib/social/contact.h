@@ -20,22 +20,42 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_SOCIAL_HEADER
-#define CHECKHEADER_SLIB_SOCIAL_HEADER
+#ifndef CHECKHEADER_SLIB_SOCIAL_CONTACT
+#define CHECKHEADER_SLIB_SOCIAL_CONTACT
 
-#include "social/contact.h"
+#include "definition.h"
 
-#include "social/oauth.h"
-#include "social/oauth_server.h"
+#include "../core/json.h"
 
-#include "social/facebook.h"
-#include "social/instagram.h"
-#include "social/twitter.h"
-#include "social/linkedin.h"
-#include "social/pinterest.h"
-#include "social/ebay.h"
-#include "social/etsy.h"
+namespace slib
+{
 
-#include "social/paypal.h"
+	class SLIB_EXPORT Contact
+	{
+	public:		
+		String namePrefix;
+		String givenName;
+		String middleName;
+		String familyName;
+		String nameSuffix;
+		String displayName;
+		String nickname;
+
+		HashMap<String, String> phoneNumbers;
+		HashMap<String, String> emails;
+		
+	public:
+		Contact();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(Contact)
+		
+		SLIB_DECLARE_JSON
+		
+	public:
+		String generateVCard();
+		
+	};
+
+}
 
 #endif

@@ -299,6 +299,7 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/service/web_service.cpp"
  "${SLIB_PATH}/src/slib/service/xgpush_service.cpp"
 
+ "${SLIB_PATH}/src/slib/social/contact.cpp"
  "${SLIB_PATH}/src/slib/social/ebay.cpp"
  "${SLIB_PATH}/src/slib/social/etsy.cpp"
  "${SLIB_PATH}/src/slib/social/etsy_ui.cpp"
