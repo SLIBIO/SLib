@@ -139,6 +139,11 @@ namespace slib
 		
 		Ref<Drawable> clipRoundRect(const Size& radius);
 		
+		Ref<Drawable> clipSquare(const Alignment& align);
+		
+		// Middle/Center
+		Ref<Drawable> clipSquare();
+		
 	public:
 		static Ref<Drawable> createColorDrawable(const Color& color);
 
@@ -163,6 +168,11 @@ namespace slib
 		static Ref<Drawable> clipEllipse(const Ref<Drawable>& src);
 
 		static Ref<Drawable> clipRoundRect(const Ref<Drawable>& src, const Size& radius);
+		
+		static Ref<Drawable> clipSquare(const Ref<Drawable>& src, const Alignment& align);
+		
+		// Middle/Center
+		static Ref<Drawable> clipSquare(const Ref<Drawable>& src);
 		
 	};
 	

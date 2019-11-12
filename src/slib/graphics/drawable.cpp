@@ -220,6 +220,16 @@ namespace slib
 		return ClipRoundRectDrawable::create(this, radius);
 	}
 
+	Ref<Drawable> Drawable::clipSquare(const Alignment& align)
+	{
+		return clipSquare(this, align);
+	}
+
+	Ref<Drawable> Drawable::clipSquare()
+	{
+		return clipSquare(this, Alignment::MiddleCenter);
+	}
+
 	Ref<Drawable> Drawable::createColorDrawable(const Color& color)
 	{
 		return ColorDrawable::create(color);
@@ -290,6 +300,38 @@ namespace slib
 	Ref<Drawable> Drawable::clipRoundRect(const Ref<Drawable>& src, const Size& radius)
 	{
 		return ClipRoundRectDrawable::create(src, radius);
+	}
+
+	Ref<Drawable> Drawable::clipSquare(const Ref<Drawable>& src, const Alignment& align)
+	{
+		sl_real width = src->getDrawableWidth();
+		sl_real height = src->getDrawableHeight();
+		if (width > height) {
+			sl_real x = 0;
+			Alignment halign = align & Alignment::HorizontalMask;
+			if (halign == Alignment::Center) {
+				x = (width - height) / 2;
+			} else if (halign == Alignment::Right) {
+				x = width - height;
+			}
+			return src->subDrawable(x, 0, height, height);
+		} else if (width < height) {
+			sl_real y = 0;
+			Alignment valign = align & Alignment::VerticalMask;
+			if (valign == Alignment::Middle) {
+				y = (height - width) / 2;
+			} else if (valign == Alignment::Bottom) {
+				y = height - width;
+			}
+			return src->subDrawable(0, y, width, width);
+		} else {
+			return src;
+		}
+	}
+	
+	Ref<Drawable> Drawable::clipSquare(const Ref<Drawable>& src)
+	{
+		return clipSquare(src, Alignment::MiddleCenter);
 	}
 	
 	
