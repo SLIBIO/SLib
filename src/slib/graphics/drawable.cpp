@@ -304,6 +304,9 @@ namespace slib
 
 	Ref<Drawable> Drawable::clipSquare(const Ref<Drawable>& src, const Alignment& align)
 	{
+		if (src.isNull()) {
+			return sl_null;
+		}
 		sl_real width = src->getDrawableWidth();
 		sl_real height = src->getDrawableHeight();
 		if (width > height) {
