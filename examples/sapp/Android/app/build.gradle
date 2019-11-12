@@ -12,7 +12,7 @@ android {
     compileSdkVersion 29
     defaultConfig {
         applicationId "io.slib.SAppExample"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
