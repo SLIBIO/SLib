@@ -91,6 +91,15 @@ namespace slib
 	{
 		m_mainMenu = menu;
 	}
+
+	sl_bool UIApp::isMenuBarVisible()
+	{
+		return sl_false;
+	}
+
+	void UIApp::setMenuBarVisible(sl_bool flagVisible)
+	{
+	}
 #endif
 	
 	void UIApp::onRunApp()

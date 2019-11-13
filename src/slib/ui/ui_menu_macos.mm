@@ -347,6 +347,16 @@ namespace slib
 		}
 	}
 
+	sl_bool UIApp::isMenuBarVisible()
+	{
+		return [NSMenu menuBarVisible] == YES;
+	}
+
+	void UIApp::setMenuBarVisible(sl_bool flagVisible)
+	{
+		[NSMenu setMenuBarVisible:flagVisible ? YES : NO];
+	}
+
 }
 
 @implementation SLIBMenuItemHandle

@@ -51,15 +51,19 @@ namespace slib
 		
 		static void quit();
 		
+		
 		Ref<Window> getMainWindow();
 		
 		void setMainWindow(const Ref<Window>& window);
 		
-		// Menu Bar (Mainly used in macOS)
+		
 		Ref<Menu> getMenu();
 		
-		// Menu Bar (Mainly used in macOS)
 		void setMenu(const Ref<Menu>& menu);
+		
+		sl_bool isMenuBarVisible();
+		
+		void setMenuBarVisible(sl_bool flagVisible);
 		
 	protected:
 		void onRunApp() override;
