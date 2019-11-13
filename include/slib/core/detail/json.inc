@@ -111,6 +111,9 @@ namespace slib
 	template <class T>
 	SLIB_INLINE void FromJson(const Json& json, Nullable<T>& _out)
 	{
+		if (json.isUndefined()) {
+			return;
+		}
 		if (json.isNull()) {
 			_out.setNull();
 		} else {
@@ -132,6 +135,9 @@ namespace slib
 	template <class T>
 	SLIB_INLINE void FromJson(const Json& json, Ref<T>& _out)
 	{
+		if (json.isUndefined()) {
+			return;
+		}
 		if (json.isNotNull()) {
 			Ref<T> o = new T;
 			if (o.isNotNull()) {
@@ -156,6 +162,9 @@ namespace slib
 	template <class T>
 	SLIB_INLINE void FromJson(const Json& json, AtomicRef<T>& _out)
 	{
+		if (json.isUndefined()) {
+			return;
+		}
 		Ref<T> t;
 		FromJson(json, t);
 		_out = Move(t);
@@ -182,6 +191,9 @@ namespace slib
 	template <class T>
 	void FromJson(const Json& json, List<T>& _out)
 	{
+		if (json.isUndefined()) {
+			return;
+		}
 		List<T> dst;
 		Ref<Referable> obj(json.getObject());
 		if (obj.isNotNull()) {
@@ -233,6 +245,9 @@ namespace slib
 	template <class T>
 	SLIB_INLINE void FromJson(const Json& json, AtomicList<T>& _out)
 	{
+		if (json.isUndefined()) {
+			return;
+		}
 		List<T> t;
 		FromJson(json, t);
 		_out = Move(t);
@@ -247,6 +262,9 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	void FromJson(const Json& json, Map<KT, VT, KEY_COMPARE>& _out)
 	{
+		if (json.isUndefined()) {
+			return;
+		}
 		Map<KT, VT, KEY_COMPARE> dst;
 		Ref<Referable> obj(json.getObject());
 		if (obj.isNotNull()) {
@@ -291,6 +309,9 @@ namespace slib
 	template <class KT, class VT, class KEY_COMPARE>
 	SLIB_INLINE void FromJson(const Json& json, AtomicMap<KT, VT, KEY_COMPARE>& _out)
 	{
+		if (json.isUndefined()) {
+			return;
+		}
 		Map<KT, VT, KEY_COMPARE> t;
 		FromJson(json, t);
 		_out = Move(t);
@@ -305,6 +326,9 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	void FromJson(const Json& json, HashMap<KT, VT, HASH, KEY_COMPARE>& _out)
 	{
+		if (json.isUndefined()) {
+			return;
+		}
 		HashMap<KT, VT, HASH, KEY_COMPARE> dst;
 		Ref<Referable> obj(json.getObject());
 		if (obj.isNotNull()) {
@@ -349,6 +373,9 @@ namespace slib
 	template <class KT, class VT, class HASH, class KEY_COMPARE>
 	SLIB_INLINE void FromJson(const Json& json, AtomicHashMap<KT, VT, HASH, KEY_COMPARE>& _out)
 	{
+		if (json.isUndefined()) {
+			return;
+		}		
 		HashMap<KT, VT, HASH, KEY_COMPARE> t;
 		FromJson(json, t);
 		_out = Move(t);

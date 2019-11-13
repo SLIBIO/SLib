@@ -1355,6 +1355,10 @@ namespace slib
 					}
 				}
 				break;
+			case VariantType::Null:
+				if (_value) {
+					return sl_null;
+				}
 			default:
 				break;
 		}

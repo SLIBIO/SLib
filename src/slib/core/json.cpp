@@ -881,7 +881,9 @@ namespace slib
 	
 	void FromJson(const Json& json, Json& _out)
 	{
-		_out = json;
+		if (json.isNotUndefined()) {
+			_out = json;
+		}
 	}
 	
 	void ToJson(Json& json, const Json& _in)
@@ -891,7 +893,9 @@ namespace slib
 
 	void FromJson(const Json& json, Variant& _out)
 	{
-		_out = json;
+		if (json.isNotUndefined()) {
+			_out = json;
+		}
 	}
 	
 	void ToJson(Json& json, const Variant& _in)
@@ -901,7 +905,9 @@ namespace slib
 	
 	void FromJson(const Json& json, AtomicVariant& _out)
 	{
-		_out = json;
+		if (json.isNotUndefined()) {
+			_out = json;
+		}
 	}
 		
 	void ToJson(Json& json, const AtomicVariant& _in)
@@ -911,7 +917,7 @@ namespace slib
 	
 	void FromJson(const Json& json, signed char& _out)
 	{
-		_out = (char)(json.getInt32());
+		_out = (char)(json.getInt32((sl_int32)_out));
 	}
 	
 	void FromJson(const Json& json, signed char& _out, signed char def)
@@ -926,7 +932,7 @@ namespace slib
 	
 	void FromJson(const Json& json, unsigned char& _out)
 	{
-		_out = (unsigned char)(json.getUint32());
+		_out = (unsigned char)(json.getUint32((sl_uint32)_out));
 	}
 	
 	void FromJson(const Json& json, unsigned char& _out, unsigned char def)
@@ -941,7 +947,7 @@ namespace slib
 	
 	void FromJson(const Json& json, short& _out)
 	{
-		_out = (short)(json.getInt32());
+		_out = (short)(json.getInt32((sl_int32)_out));
 	}
 	
 	void FromJson(const Json& json, short& _out, short def)
@@ -956,7 +962,7 @@ namespace slib
 	
 	void FromJson(const Json& json, unsigned short& _out)
 	{
-		_out = (unsigned short)(json.getUint32());
+		_out = (unsigned short)(json.getUint32(_out));
 	}
 	
 	void FromJson(const Json& json, unsigned short& _out, unsigned short def)
@@ -971,7 +977,7 @@ namespace slib
 	
 	void FromJson(const Json& json, int& _out)
 	{
-		_out = (int)(json.getInt32());
+		_out = (int)(json.getInt32((sl_int32)_out));
 	}
 	
 	void FromJson(const Json& json, int& _out, int def)
@@ -986,7 +992,7 @@ namespace slib
 	
 	void FromJson(const Json& json, unsigned int& _out)
 	{
-		_out = (unsigned int)(json.getUint32());
+		_out = (unsigned int)(json.getUint32((sl_uint32)_out));
 	}
 	
 	void FromJson(const Json& json, unsigned int& _out, unsigned int def)
@@ -1001,7 +1007,7 @@ namespace slib
 	
 	void FromJson(const Json& json, long& _out)
 	{
-		_out = (long)(json.getInt32());
+		_out = (long)(json.getInt32((sl_int32)_out));
 	}
 	
 	void FromJson(const Json& json, long& _out, long def)
@@ -1016,7 +1022,7 @@ namespace slib
 	
 	void FromJson(const Json& json, unsigned long& _out)
 	{
-		_out = (unsigned long)(json.getUint32());
+		_out = (unsigned long)(json.getUint32((sl_uint32)_out));
 	}
 	
 	void FromJson(const Json& json, unsigned long& _out, unsigned long def)
@@ -1031,7 +1037,7 @@ namespace slib
 	
 	void FromJson(const Json& json, sl_int64& _out)
 	{
-		_out = json.getInt64();
+		_out = json.getInt64(_out);
 	}
 	
 	void FromJson(const Json& json, sl_int64& _out, sl_int64 def)
@@ -1046,7 +1052,7 @@ namespace slib
 	
 	void FromJson(const Json& json, sl_uint64& _out)
 	{
-		_out = json.getUint64();
+		_out = json.getUint64(_out);
 	}
 	
 	void FromJson(const Json& json, sl_uint64& _out, sl_uint64 def)
@@ -1061,7 +1067,7 @@ namespace slib
 	
 	void FromJson(const Json& json, float& _out)
 	{
-		_out = json.getFloat();
+		_out = json.getFloat(_out);
 	}
 	
 	void FromJson(const Json& json, float& _out, float def)
@@ -1076,7 +1082,7 @@ namespace slib
 	
 	void FromJson(const Json& json, double& _out)
 	{
-		_out = json.getDouble();
+		_out = json.getDouble(_out);
 	}
 	
 	void FromJson(const Json& json, double& _out, double def)
@@ -1091,7 +1097,7 @@ namespace slib
 	
 	void FromJson(const Json& json, bool& _out)
 	{
-		_out = json.getBoolean();
+		_out = json.getBoolean(_out);
 	}
 	
 	void FromJson(const Json& json, bool& _out, bool def)
@@ -1106,7 +1112,7 @@ namespace slib
 	
 	void FromJson(const Json& json, String& _out)
 	{
-		_out = json.getString();
+		_out = json.getString(_out);
 	}
 	
 	void FromJson(const Json& json, String& _out, const String& def)
@@ -1121,7 +1127,7 @@ namespace slib
 	
 	void FromJson(const Json& json, AtomicString& _out)
 	{
-		_out = json.getString();
+		_out = json.getString(_out);
 	}
 	
 	void FromJson(const Json& json, AtomicString& _out, const String& def)
@@ -1136,7 +1142,7 @@ namespace slib
 	
 	void FromJson(const Json& json, String16& _out)
 	{
-		_out = json.getString16();
+		_out = json.getString16(_out);
 	}
 	
 	void FromJson(const Json& json, String16& _out, const String16& def)
@@ -1151,7 +1157,7 @@ namespace slib
 	
 	void FromJson(const Json& json, AtomicString16& _out)
 	{
-		_out = json.getString16();
+		_out = json.getString16(_out);
 	}
 	
 	void FromJson(const Json& json, AtomicString16& _out, const String16& def)
@@ -1176,7 +1182,7 @@ namespace slib
 	
 	void FromJson(const Json& json, Time& _out)
 	{
-		_out = json.getTime();
+		_out = json.getTime(_out);
 	}
 	
 	void FromJson(const Json& json, Time& _out, const Time& def)
@@ -1191,7 +1197,9 @@ namespace slib
 	
 	void FromJson(const Json& json, Memory& _out)
 	{
-		_out = json.getString().parseHexString();
+		if (json.isNotUndefined()) {
+			_out = json.getString().parseHexString();
+		}
 	}
 	
 	void ToJson(Json& json, const Memory& _in)
@@ -1201,7 +1209,9 @@ namespace slib
 	
 	void FromJson(const Json& json, BigInt& _out)
 	{
-		_out = BigInt::fromHexString(json.getString());
+		if (json.isNotUndefined()) {
+			_out = BigInt::fromHexString(json.getString());
+		}
 	}
 	
 	void ToJson(Json& json, const BigInt& _in)
@@ -1211,7 +1221,9 @@ namespace slib
 	
 	void FromJson(const Json& json, VariantList& _out)
 	{
-		_out = json.getVariantList();
+		if (json.isNotUndefined()) {
+			_out = json.getVariantList();
+		}
 	}
 	
 	void ToJson(Json& json, const VariantList& _in)
@@ -1221,7 +1233,9 @@ namespace slib
 	
 	void FromJson(const Json& json, AtomicVariantList& _out)
 	{
-		_out = json.getVariantList();
+		if (json.isNotUndefined()) {
+			_out = json.getVariantList();
+		}
 	}
 	
 	void ToJson(Json& json, const AtomicVariantList& _in)
@@ -1231,7 +1245,9 @@ namespace slib
 	
 	void FromJson(const Json& json, VariantMap& _out)
 	{
-		_out = json.getVariantMap();
+		if (json.isNotUndefined()) {
+			_out = json.getVariantMap();
+		}
 	}
 	
 	void ToJson(Json& json, const VariantMap& _in)
@@ -1241,7 +1257,9 @@ namespace slib
 	
 	void FromJson(const Json& json, AtomicVariantMap& _out)
 	{
-		_out = json.getVariantMap();
+		if (json.isNotUndefined()) {
+			_out = json.getVariantMap();
+		}
 	}
 	
 	void ToJson(Json& json, const AtomicVariantMap& _in)
@@ -1251,7 +1269,9 @@ namespace slib
 	
 	void FromJson(const Json& json, VariantHashMap& _out)
 	{
-		_out = json.getVariantHashMap();
+		if (json.isNotUndefined()) {
+			_out = json.getVariantHashMap();
+		}
 	}
 	
 	void ToJson(Json& json, const VariantHashMap& _in)
@@ -1261,7 +1281,9 @@ namespace slib
 	
 	void FromJson(const Json& json, AtomicVariantHashMap& _out)
 	{
-		_out = json.getVariantHashMap();
+		if (json.isNotUndefined()) {
+			_out = json.getVariantHashMap();
+		}
 	}
 	
 	void ToJson(Json& json, const AtomicVariantHashMap& _in)
@@ -1271,7 +1293,9 @@ namespace slib
 	
 	void FromJson(const Json& json, VariantMapList& _out)
 	{
-		_out = json.getVariantMapList();
+		if (json.isNotUndefined()) {
+			_out = json.getVariantMapList();
+		}
 	}
 	
 	void ToJson(Json& json, const VariantMapList& _in)
@@ -1281,7 +1305,9 @@ namespace slib
 	
 	void FromJson(const Json& json, AtomicVariantMapList& _out)
 	{
-		_out = json.getVariantMapList();
+		if (json.isNotUndefined()) {
+			_out = json.getVariantMapList();
+		}
 	}
 	
 	void ToJson(Json& json, const AtomicVariantMapList& _in)
@@ -1291,7 +1317,9 @@ namespace slib
 
 	void FromJson(const Json& json, VariantHashMapList& _out)
 	{
-		_out = json.getVariantHashMapList();
+		if (json.isNotUndefined()) {
+			_out = json.getVariantHashMapList();
+		}
 	}
 	
 	void ToJson(Json& json, const VariantHashMapList& _in)
@@ -1301,7 +1329,9 @@ namespace slib
 	
 	void FromJson(const Json& json, AtomicVariantHashMapList& _out)
 	{
-		_out = json.getVariantHashMapList();
+		if (json.isNotUndefined()) {
+			_out = json.getVariantHashMapList();
+		}
 	}
 	
 	void ToJson(Json& json, const AtomicVariantHashMapList& _in)
@@ -1311,7 +1341,9 @@ namespace slib
 	
 	void FromJson(const Json& json, JsonList& _out)
 	{
-		_out = json.getJsonList();
+		if (json.isNotUndefined()) {
+			_out = json.getJsonList();
+		}
 	}
 	
 	void ToJson(Json& json, const JsonList& _in)
@@ -1321,7 +1353,9 @@ namespace slib
 	
 	void FromJson(const Json& json, AtomicJsonList& _out)
 	{
-		_out = json.getJsonList();
+		if (json.isNotUndefined()) {
+			_out = json.getJsonList();
+		}
 	}
 	
 	void ToJson(Json& json, const AtomicJsonList& _in)
@@ -1331,7 +1365,9 @@ namespace slib
 	
 	void FromJson(const Json& json, JsonMap& _out)
 	{
-		_out = json.getJsonMap();
+		if (json.isNotUndefined()) {
+			_out = json.getJsonMap();
+		}
 	}
 	
 	void ToJson(Json& json, const JsonMap& _in)
@@ -1341,7 +1377,9 @@ namespace slib
 	
 	void FromJson(const Json& json, AtomicJsonMap& _out)
 	{
-		_out = json.getJsonMap();
+		if (json.isNotUndefined()) {
+			_out = json.getJsonMap();
+		}
 	}
 	
 	void ToJson(Json& json, const AtomicJsonMap& _in)
@@ -1351,7 +1389,9 @@ namespace slib
 	
 	void FromJson(const Json& json, JsonMapList& _out)
 	{
-		_out = json.getJsonMapList();
+		if (json.isNotUndefined()) {
+			_out = json.getJsonMapList();
+		}
 	}
 	
 	void ToJson(Json& json, const JsonMapList& _in)
@@ -1361,7 +1401,9 @@ namespace slib
 	
 	void FromJson(const Json& json, AtomicJsonMapList& _out)
 	{
-		_out = json.getJsonMapList();
+		if (json.isNotUndefined()) {
+			_out = json.getJsonMapList();
+		}
 	}
 	
 	void ToJson(Json& json, const AtomicJsonMapList& _in)

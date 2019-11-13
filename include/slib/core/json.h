@@ -579,6 +579,9 @@ public: \
 	} \
 	void fromJson(const slib::Json& json) \
 	{ \
+		if (json.isUndefined()) { \
+			return; \
+		} \
 		doJson(*((slib::Json*)&json), sl_true); \
 	} \
 	void doJson(slib::Json& json, sl_bool isFromJson)
@@ -677,6 +680,9 @@ public: \
 	} \
 	void CLASS::fromJson(const slib::Json& json) \
 	{ \
+		if (json.isUndefined()) { \
+			return; \
+		} \
 		doJson(*((slib::Json*)&json), sl_true); \
 	} \
 	void CLASS::doJson(slib::Json& json, sl_bool isFromJson)

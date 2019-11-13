@@ -26,6 +26,9 @@ namespace slib
 	template <class T>
 	void FromJson(const Json& json, std::vector<T>& _out)
 	{
+		if (json.isUndefined()) {
+			return;
+		}
 		_out.clear();
 		Ref<Referable> obj(json.getObject());
 		if (obj.isNotNull()) {
@@ -70,6 +73,9 @@ namespace slib
 	template <class KT, class VT, class COMPARE, class ALLOC>
 	void FromJson(const Json& json, std::map<KT, VT, COMPARE, ALLOC>& _out)
 	{
+		if (json.isUndefined()) {
+			return;
+		}
 		_out.clear();
 		Ref<Referable> obj(json.getObject());
 		if (obj.isNotNull()) {
@@ -108,6 +114,9 @@ namespace slib
 	template <class KT, class VT, class HASH, class PRED, class ALLOC>
 	void FromJson(const Json& json, std::unordered_map<KT, VT, HASH, PRED, ALLOC>& _out)
 	{
+		if (json.isUndefined()) {
+			return;
+		}
 		_out.clear();
 		Ref<Referable> obj(json.getObject());
 		if (obj.isNotNull()) {
