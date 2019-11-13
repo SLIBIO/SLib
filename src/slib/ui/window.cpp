@@ -623,7 +623,7 @@ namespace slib
 
 	sl_bool Window::isVisible()
 	{
-		return m_flagVisible;
+		return isOpened() && m_flagVisible;
 	}
 
 	void Window::setVisible(sl_bool flag)
