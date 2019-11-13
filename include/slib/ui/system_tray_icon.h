@@ -42,9 +42,8 @@ namespace slib
 		sl_bool flagVisible;
 		sl_bool flagHighlight;
 		Ref<Menu> menu;
-		
-		Function<void()> action;
-		Function<void(SystemTrayIcon*, UIEvent*)> onMouseEvent;
+		Function<void(SystemTrayIcon*, UIEvent*)> onAction;
+		Function<void(SystemTrayIcon*, UIEvent*)> onEvent;
 		
 	public:
 		SystemTrayIconParam();
@@ -94,20 +93,18 @@ namespace slib
 		void showMessage(const String& title, const String& message, sl_uint32 millisecondsTimeout = 0);
 		
 	public:
-		SLIB_PROPERTY_FUNCTION(void(), Action)
-
-	public:
-		void dispatchAction();
-		
-		void dispatchMouseEvent(UIEvent* ev);
+		void dispatchEvent(UIEvent* ev);
 		
 	protected:
 		Ref<Bitmap> m_icon;
 		String m_iconName;
 		AtomicString m_toolTip;
 		sl_bool m_flagVisible;
+		sl_bool m_flagHighlight;
 		AtomicRef<Menu> m_menu;
-		Function<void(SystemTrayIcon*, UIEvent*)> m_onMouseEvent;
+		
+		Function<void(SystemTrayIcon*, UIEvent*)> m_onAction;
+		Function<void(SystemTrayIcon*, UIEvent*)> m_onEvent;
 		
 	protected:
 		void _init(const SystemTrayIconParam& param);

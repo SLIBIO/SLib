@@ -30,7 +30,7 @@ namespace slib
 	SystemTrayIconParam::SystemTrayIconParam()
 	{
 		flagVisible = sl_true;
-		flagHighlight = sl_false;
+		flagHighlight = sl_true;
 	}
 
 
@@ -119,14 +119,26 @@ namespace slib
 		showMessage(title, message, Ref<Bitmap>::null(), millisecondsTimeout);
 	}
 
-	void SystemTrayIcon::dispatchAction()
+	void SystemTrayIcon::dispatchEvent(UIEvent* ev)
 	{
-		getAction()();
-	}
-
-	void SystemTrayIcon::dispatchMouseEvent(UIEvent* ev)
-	{
-		m_onMouseEvent(this, ev);
+		m_onEvent(this, ev);
+		if (ev->isPreventedDefault()) {
+			return;
+		}
+		switch (ev->getAction()) {
+			case UIAction::LeftButtonDown:
+			case UIAction::RightButtonDown:
+			case UIAction::MiddleButtonDown:
+			case UIAction::LeftButtonDoubleClick:
+			case UIAction::RightButtonDoubleClick:
+			case UIAction::MiddleButtonDoubleClick:
+			case UIAction::KeyDown:
+			case UIAction::Unknown:
+				m_onAction(this, ev);
+				break;
+			default:
+				break;
+		}
 	}
 
 	void SystemTrayIcon::_init(const SystemTrayIconParam& param)
@@ -138,10 +150,11 @@ namespace slib
 		}
 		m_toolTip = param.toolTip;
 		m_flagVisible = param.flagVisible;
+		m_flagHighlight = param.flagHighlight;
 		m_menu = param.menu;
 		
-		setAction(param.action);
-		m_onMouseEvent = param.onMouseEvent;
+		m_onAction = param.onAction;
+		m_onEvent = param.onEvent;
 	}
 
 #if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_WIN32)

@@ -47,6 +47,12 @@ namespace slib
 
 @end
 
+@interface SLIBSystemTrayIconSubView : NSView
+{
+	@public slib::WeakRef<slib::priv::system_tray_icon::SystemTrayIconImpl> m_object;
+}
+@end
+
 namespace slib
 {
 	
@@ -65,6 +71,7 @@ namespace slib
 				SystemTrayIconImpl()
 				{
 					m_item = nil;
+					m_listener = nil;
 				}
 				
 				~SystemTrayIconImpl()
@@ -109,20 +116,19 @@ namespace slib
 					if (param.menu.isNotNull()) {
 						setMenu_NI(param.menu);
 					}
-					if (param.flagHighlight) {
-						m_item.highlightMode = YES;
-					}
-					
+					m_item.highlightMode = param.flagHighlight;
 					if (@available(macos 10.10, *)) {
-						NSStatusBarButton* button = m_item.button;
-						SLIBSystemTrayIconListener* listener = [SLIBSystemTrayIconListener new];
-						listener->m_object = this;
-						button.target = listener;
-						button.action = @selector(onAction);
-						m_listener = listener;
+						if (m_onAction.isNotNull() || m_onEvent.isNotNull()) {
+							NSStatusBarButton* button = m_item.button;
+							SLIBSystemTrayIconSubView* subview = [SLIBSystemTrayIconSubView new];
+							subview->m_object = this;
+							[subview setFrame:button.frame];
+							[button addSubview:subview];
+						}
 					} else {
 						SLIBSystemTrayIconListener* listener = [SLIBSystemTrayIconListener new];
 						listener->m_object = this;
+						m_listener = listener;
 						m_item.target = listener;
 						m_item.action = @selector(onAction);
 					}
@@ -203,23 +209,74 @@ namespace slib
 					return UIRect::zero();
 				}
 				
-				void _onMouseEvent(UIAction action, NSEvent* event)
+				UIEventFlags _onEvent(UIAction action, NSEvent* event)
+				{
+					if (event == nil) {
+						event = [NSApp currentEvent];
+						if (event == nil) {
+							Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
+							if (ev.isNotNull()) {
+								dispatchEvent(ev.get());
+							}
+							return 0;
+						}
+					}
+					if (action == UIAction::Unknown) {
+						switch ([event type]) {
+							case NSLeftMouseDown:
+								action = UIAction::LeftButtonDown;
+								break;
+							case NSLeftMouseUp:
+								action = UIAction::LeftButtonUp;
+								break;
+							case NSLeftMouseDragged:
+								action = UIAction::LeftButtonDrag;
+								break;
+							case NSRightMouseDown:
+								action = UIAction::RightButtonDown;
+								break;
+							case NSRightMouseUp:
+								action = UIAction::RightButtonUp;
+								break;
+							case NSRightMouseDragged:
+								action = UIAction::RightButtonDrag;
+								break;
+							case NSOtherMouseDown:
+								action = UIAction::MiddleButtonDown;
+								break;
+							case NSOtherMouseUp:
+								action = UIAction::MiddleButtonUp;
+								break;
+							case NSOtherMouseDragged:
+								action = UIAction::MiddleButtonDrag;
+								break;
+							default:
+								return 0;
+						}
+					}
+					Time t;
+					t.setSecondsCountf([event timestamp]);
+					NSPoint pt = [NSEvent mouseLocation];
+					sl_ui_posf x = (sl_ui_posf)(pt.x);
+					sl_ui_posf y = (sl_ui_posf)(pt.y);
+					Ref<UIEvent> ev = UIEvent::createMouseEvent(action, x, y, t);
+					if (ev.isNotNull()) {
+						UIPlatform::applyEventModifiers(ev.get(), event);
+						dispatchEvent(ev.get());
+						return ev->getFlags();
+					}
+					return 0;
+				}
+				
+				void tryHighlight()
 				{
 					if (@available(macos 10.10, *)) {
-						NSStatusBarButton* handle = m_item.button;
-						NSWindow* window = [handle window];
-						if (window != nil) {
-							NSPoint pw = [event locationInWindow];
-							NSPoint pt = [handle convertPoint:pw fromView:nil];
-							sl_ui_posf x = (sl_ui_posf)(pt.x);
-							sl_ui_posf y = (sl_ui_posf)(pt.y);
-							Time t;
-							t.setSecondsCountf([event timestamp]);
-							Ref<UIEvent> ev = UIEvent::createMouseEvent(action, x, y, t);
-							if (ev.isNotNull()) {
-								UIPlatform::applyEventModifiers(ev.get(), event);
-								dispatchMouseEvent(ev.get());
-							}
+						if (m_flagHighlight) {
+							NSStatusBarButton* button = m_item.button;
+							[button highlight:YES];
+							dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+								[button highlight:NO];
+							});
 						}
 					}
 				}
@@ -247,10 +304,136 @@ using namespace slib::priv::system_tray_icon;
 {
 	Ref<SystemTrayIconImpl> object(m_object);
 	if (object.isNotNull()) {
-		object->dispatchAction();
+		object->_onEvent(UIAction::Unknown, nil);
 	}
 }
 
+@end
+
+@implementation SLIBSystemTrayIconSubView
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+	Ref<SystemTrayIconImpl> object(m_object);
+	if (object.isNotNull()) {
+		UIEventFlags flags = object->_onEvent(UIAction::LeftButtonDown, theEvent);
+		if (flags & UIEventFlags::PreventDefault) {
+			object->tryHighlight();
+			return;
+		}
+	}
+	[[self nextResponder] mouseDown:theEvent];
+}
+
+- (void)mouseUp:(NSEvent *)theEvent
+{
+	Ref<SystemTrayIconImpl> object(m_object);
+	if (object.isNotNull()) {
+		UIEventFlags flags = object->_onEvent(UIAction::LeftButtonUp, theEvent);
+		NSInteger clicks = [theEvent clickCount];
+		if (clicks == 2) {
+			flags |= object->_onEvent(UIAction::LeftButtonDoubleClick, theEvent);
+		}
+		if (flags & UIEventFlags::PreventDefault) {
+			return;
+		}
+	}
+	[[self nextResponder] mouseUp:theEvent];
+}
+
+- (void)mouseDragged:(NSEvent *)theEvent
+{
+	Ref<SystemTrayIconImpl> object(m_object);
+	if (object.isNotNull()) {
+		UIEventFlags flags = object->_onEvent(UIAction::LeftButtonDrag, theEvent);
+		if (flags & UIEventFlags::PreventDefault) {
+			return;
+		}
+	}
+	[[self nextResponder] mouseDragged:theEvent];
+}
+
+- (void)rightMouseDown:(NSEvent *)theEvent
+{
+	Ref<SystemTrayIconImpl> object(m_object);
+	if (object.isNotNull()) {
+		UIEventFlags flags = object->_onEvent(UIAction::RightButtonDown, theEvent);
+		if (flags & UIEventFlags::PreventDefault) {
+			object->tryHighlight();
+			return;
+		}
+	}
+	[[self nextResponder] rightMouseDown:theEvent];
+}
+
+- (void)rightMouseUp:(NSEvent *)theEvent
+{
+	Ref<SystemTrayIconImpl> object(m_object);
+	if (object.isNotNull()) {
+		UIEventFlags flags = object->_onEvent(UIAction::RightButtonUp, theEvent);
+		NSInteger clicks = [theEvent clickCount];
+		if (clicks == 2) {
+			flags |= object->_onEvent(UIAction::RightButtonDoubleClick, theEvent);
+		}
+		if (flags & UIEventFlags::PreventDefault) {
+			return;
+		}
+	}
+	[[self nextResponder] rightMouseUp:theEvent];
+}
+
+- (void)rightMouseDragged:(NSEvent *)theEvent
+{
+	Ref<SystemTrayIconImpl> object(m_object);
+	if (object.isNotNull()) {
+		UIEventFlags flags = object->_onEvent(UIAction::RightButtonDrag, theEvent);
+		if (flags & UIEventFlags::PreventDefault) {
+			return;
+		}
+	}
+	[[self nextResponder] rightMouseDragged:theEvent];
+}
+
+- (void)otherMouseDown:(NSEvent *)theEvent
+{
+	Ref<SystemTrayIconImpl> object(m_object);
+	if (object.isNotNull()) {
+		UIEventFlags flags = object->_onEvent(UIAction::MiddleButtonDown, theEvent);
+		if (flags & UIEventFlags::PreventDefault) {
+			object->tryHighlight();
+			return;
+		}
+	}
+	[[self nextResponder] otherMouseDown:theEvent];
+}
+
+- (void)otherMouseUp:(NSEvent *)theEvent
+{
+	Ref<SystemTrayIconImpl> object(m_object);
+	if (object.isNotNull()) {
+		UIEventFlags flags = object->_onEvent(UIAction::MiddleButtonUp, theEvent);
+		NSInteger clicks = [theEvent clickCount];
+		if (clicks == 2) {
+			flags |= object->_onEvent(UIAction::MiddleButtonDoubleClick, theEvent);
+		}
+		if (flags & UIEventFlags::PreventDefault) {
+			return;
+		}
+	}
+	[[self nextResponder] otherMouseUp:theEvent];
+}
+
+- (void)otherMouseDragged:(NSEvent *)theEvent
+{
+	Ref<SystemTrayIconImpl> object(m_object);
+	if (object.isNotNull()) {
+		UIEventFlags flags = object->_onEvent(UIAction::MiddleButtonDrag, theEvent);
+		if (flags & UIEventFlags::PreventDefault) {
+			return;
+		}
+	}
+	[[self nextResponder] otherMouseDragged:theEvent];
+}
 @end
 
 #endif
