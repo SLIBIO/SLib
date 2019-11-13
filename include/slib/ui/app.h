@@ -67,6 +67,8 @@ namespace slib
 				
 		static void setVisibleOnDock(sl_bool flagVisible);
 		
+		static void activate(sl_bool flagIgnoreOtherApps = sl_true);
+		
 	protected:
 		void onRunApp() override;
 		

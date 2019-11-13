@@ -298,7 +298,6 @@ namespace slib
 					NSWindow* window = m_window;
 					if (window != nil) {
 						[window makeKeyAndOrderFront:NSApp];
-						[NSApp activateIgnoringOtherApps:YES];
 					}
 				}
 				

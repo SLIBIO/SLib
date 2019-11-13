@@ -104,6 +104,10 @@ namespace slib
 	void UIApp::setVisibleOnDock(sl_bool flagVisible)
 	{
 	}
+
+	void UIApp::activate(sl_bool flagIgnoreOtherApps)
+	{
+	}
 #endif
 	
 	void UIApp::onRunApp()

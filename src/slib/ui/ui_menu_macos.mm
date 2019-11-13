@@ -367,6 +367,11 @@ namespace slib
 		}
 	}
 
+	void UIApp::activate(sl_bool flagIgnoreOtherApps)
+	{
+		[NSApp activateIgnoringOtherApps:(flagIgnoreOtherApps ? YES : NO)];
+	}
+
 }
 
 @implementation SLIBMenuItemHandle
