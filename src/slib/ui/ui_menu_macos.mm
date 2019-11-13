@@ -357,6 +357,16 @@ namespace slib
 		[NSMenu setMenuBarVisible:flagVisible ? YES : NO];
 	}
 
+	void UIApp::setVisibleOnDock(sl_bool flagVisible)
+	{
+		ProcessSerialNumber psn = { 0, kCurrentProcess };
+		if (flagVisible) {
+			TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+		} else {
+			TransformProcessType(&psn, kProcessTransformToUIElementApplication);
+		}
+	}
+
 }
 
 @implementation SLIBMenuItemHandle

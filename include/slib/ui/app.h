@@ -56,14 +56,16 @@ namespace slib
 		
 		void setMainWindow(const Ref<Window>& window);
 		
-		
 		Ref<Menu> getMenu();
 		
 		void setMenu(const Ref<Menu>& menu);
 		
-		sl_bool isMenuBarVisible();
 		
-		void setMenuBarVisible(sl_bool flagVisible);
+		static sl_bool isMenuBarVisible();
+		
+		static void setMenuBarVisible(sl_bool flagVisible);
+				
+		static void setVisibleOnDock(sl_bool flagVisible);
 		
 	protected:
 		void onRunApp() override;

@@ -100,6 +100,10 @@ namespace slib
 	void UIApp::setMenuBarVisible(sl_bool flagVisible)
 	{
 	}
+
+	void UIApp::setVisibleOnDock(sl_bool flagVisible)
+	{
+	}
 #endif
 	
 	void UIApp::onRunApp()
