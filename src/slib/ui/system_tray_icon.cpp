@@ -29,7 +29,8 @@ namespace slib
 
 	SystemTrayIconParam::SystemTrayIconParam()
 	{
-		flagVisible = sl_false;
+		flagVisible = sl_true;
+		flagHighlight = sl_false;
 	}
 
 
@@ -46,13 +47,30 @@ namespace slib
 
 	Ref<Bitmap> SystemTrayIcon::getIcon()
 	{
+		ObjectLocker lock(this);
 		return m_icon;
 	}
 
 	void SystemTrayIcon::setIcon(const Ref<Bitmap>& icon)
 	{
+		ObjectLocker lock(this);
 		m_icon = icon;
-		setIcon_NI(icon);
+		m_iconName.setNull();
+		setIcon_NI(icon, sl_null);
+	}
+
+	String SystemTrayIcon::getIconName()
+	{
+		ObjectLocker lock(this);
+		return m_iconName;
+	}
+
+	void SystemTrayIcon::setIconName(const String& name)
+	{
+		ObjectLocker lock(this);
+		m_iconName = name;
+		m_icon.setNull();
+		setIcon_NI(sl_null, name);
 	}
 
 	String SystemTrayIcon::getToolTip()
@@ -88,28 +106,45 @@ namespace slib
 		setMenu_NI(menu);
 	}
 
-	void SystemTrayIcon::dispatchClick()
+	void SystemTrayIcon::showMessage(const String& title, const String& message, const Ref<Bitmap>& icon, sl_uint32 millisecondsTimeout)
 	{
-		getOnClick()(this);
+		if (!millisecondsTimeout) {
+			millisecondsTimeout = 10000;
+		}
+		showMessage_NI(title, message, icon, millisecondsTimeout);
+	}
+
+	void SystemTrayIcon::showMessage(const String& title, const String& message, sl_uint32 millisecondsTimeout)
+	{
+		showMessage(title, message, Ref<Bitmap>::null(), millisecondsTimeout);
+	}
+
+	void SystemTrayIcon::dispatchAction()
+	{
+		getAction()();
 	}
 
 	void SystemTrayIcon::dispatchMouseEvent(UIEvent* ev)
 	{
-		getOnMouseEvent()(this, ev);
+		m_onMouseEvent(this, ev);
 	}
 
 	void SystemTrayIcon::_init(const SystemTrayIconParam& param)
 	{
-		m_icon = param.icon;
+		if (param.iconName.isNotEmpty()) {
+			m_iconName = param.iconName;
+		} else {
+			m_icon = param.icon;
+		}
 		m_toolTip = param.toolTip;
 		m_flagVisible = param.flagVisible;
 		m_menu = param.menu;
 		
-		setOnClick(param.onClick);
-		setOnMouseEvent(param.onMouseEvent);
+		setAction(param.action);
+		m_onMouseEvent = param.onMouseEvent;
 	}
 
-#if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_WIN32) && !defined(SLIB_UI_IS_GTK)
+#if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_WIN32)
 	Ref<SystemTrayIcon> SystemTrayIcon::create(const SystemTrayIconParam& param)
 	{
 		return sl_null;

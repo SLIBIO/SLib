@@ -36,12 +36,14 @@ namespace slib
 	class SLIB_EXPORT SystemTrayIconParam
 	{
 	public:
+		String iconName;
 		Ref<Bitmap> icon;
 		String toolTip;
 		sl_bool flagVisible;
+		sl_bool flagHighlight;
 		Ref<Menu> menu;
 		
-		Function<void(SystemTrayIcon*)> onClick;
+		Function<void()> action;
 		Function<void(SystemTrayIcon*, UIEvent*)> onMouseEvent;
 		
 	public:
@@ -68,6 +70,10 @@ namespace slib
 		
 		void setIcon(const Ref<Bitmap>& icon);
 		
+		String getIconName();
+		
+		void setIconName(const String& name);
+		
 		String getToolTip();
 		
 		void setToolTip(const String& toolTip);
@@ -83,32 +89,39 @@ namespace slib
 		// Screen Coordinate
 		virtual UIRect getFrame() = 0;
 		
+		void showMessage(const String& title, const String& message, const Ref<Bitmap>& icon, sl_uint32 millisecondsTimeout = 0);
+		
+		void showMessage(const String& title, const String& message, sl_uint32 millisecondsTimeout = 0);
+		
 	public:
-		SLIB_PROPERTY_FUNCTION(void(SystemTrayIcon*), OnClick)
-		SLIB_PROPERTY_FUNCTION(void(SystemTrayIcon*, UIEvent*), OnMouseEvent)
+		SLIB_PROPERTY_FUNCTION(void(), Action)
 
 	public:
-		void dispatchClick();
+		void dispatchAction();
 		
 		void dispatchMouseEvent(UIEvent* ev);
 		
 	protected:
-		AtomicRef<Bitmap> m_icon;
+		Ref<Bitmap> m_icon;
+		String m_iconName;
 		AtomicString m_toolTip;
 		sl_bool m_flagVisible;
 		AtomicRef<Menu> m_menu;
+		Function<void(SystemTrayIcon*, UIEvent*)> m_onMouseEvent;
 		
 	protected:
 		void _init(const SystemTrayIconParam& param);
 		
 	protected:
-		virtual void setIcon_NI(const Ref<Bitmap>& icon) = 0;
+		virtual void setIcon_NI(const Ref<Bitmap>& icon, const String& name) = 0;
 		
 		virtual void setToolTip_NI(const String& toolTip) = 0;
 		
 		virtual void setVisible_NI(sl_bool flag) = 0;
 		
 		virtual void setMenu_NI(const Ref<Menu>& menu) = 0;
+		
+		virtual void showMessage_NI(const String& title, const String& message, const Ref<Bitmap>& icon, sl_uint32 milliseconsTimeout) = 0;
 		
 	};
 

@@ -38,13 +38,12 @@ namespace slib
 	}
 }
 
-API_AVAILABLE(macos(10.10))
-@interface SLIBSystemTrayIconListener: NSGestureRecognizer
+@interface SLIBSystemTrayIconListener : NSObject
 {
 	@public slib::WeakRef<slib::priv::system_tray_icon::SystemTrayIconImpl> m_object;
 }
 
-- (void)onClick;
+- (void)onAction;
 
 @end
 
@@ -60,6 +59,7 @@ namespace slib
 			{
 			public:
 				NSStatusItem* m_item;
+				SLIBSystemTrayIconListener* m_listener;
 				
 			public:
 				SystemTrayIconImpl()
@@ -99,17 +99,18 @@ namespace slib
 				void _init(const SystemTrayIconParam& param)
 				{
 					SystemTrayIcon::_init(param);
-					if (param.icon.isNotNull()) {
-						setIcon_NI(param.icon);
+					if (param.icon.isNotNull() || param.iconName.isNotEmpty()) {
+						setIcon_NI(param.icon, param.iconName);
 					}
 					if (param.toolTip.isNotEmpty()) {
 						setToolTip_NI(param.toolTip);
 					}
-					if (!(param.flagVisible)) {
-						setVisible_NI(sl_false);
-					}
+					setVisible_NI(param.flagVisible);
 					if (param.menu.isNotNull()) {
 						setMenu_NI(param.menu);
+					}
+					if (param.flagHighlight) {
+						m_item.highlightMode = YES;
 					}
 					
 					if (@available(macos 10.10, *)) {
@@ -117,18 +118,36 @@ namespace slib
 						SLIBSystemTrayIconListener* listener = [SLIBSystemTrayIconListener new];
 						listener->m_object = this;
 						button.target = listener;
-						button.action = @selector(onClick);
-						[button addGestureRecognizer:listener];
+						button.action = @selector(onAction);
+						m_listener = listener;
+					} else {
+						SLIBSystemTrayIconListener* listener = [SLIBSystemTrayIconListener new];
+						listener->m_object = this;
+						m_item.target = listener;
+						m_item.action = @selector(onAction);
 					}
 				}
 				
-				void setIcon_NI(const Ref<Bitmap>& icon) override
+				void setIcon_NI(const Ref<Bitmap>& icon, const String& name) override
 				{
-					NSImage* image = GraphicsPlatform::createNSImageFromBitmap(icon);
+					NSImage* image;
+					if (name.isNotEmpty()) {
+						image = [NSImage imageNamed:Apple::getNSStringFromString(name)];
+					} else {
+						image = GraphicsPlatform::createNSImageFromBitmap(icon);
+						if (image != nil) {
+							CGFloat height = [[NSStatusBar systemStatusBar] thickness];
+							if (image.size.width > height + 0.5 && image.size.height > height + 0.5) {
+								[image setSize:NSMakeSize(height, height)];
+							}
+						}
+					}
 					if (@available(macos 10.10, *)) {
 						m_item.button.image = image;
+						m_item.button.alternateImage = image;
 					} else {
 						m_item.image = image;
+						m_item.alternateImage = image;
 					}
 				}
 				
@@ -152,6 +171,10 @@ namespace slib
 				void setMenu_NI(const Ref<Menu>& menu) override
 				{
 					m_item.menu = UIPlatform::getMenuHandle(menu);
+				}
+				
+				void showMessage_NI(const String& title, const String& message, const Ref<Bitmap>& icon, sl_uint32 milliseconsTimeout) override
+				{
 				}
 				
 				UIRect getFrame() override
@@ -182,7 +205,23 @@ namespace slib
 				
 				void _onMouseEvent(UIAction action, NSEvent* event)
 				{
-					
+					if (@available(macos 10.10, *)) {
+						NSStatusBarButton* handle = m_item.button;
+						NSWindow* window = [handle window];
+						if (window != nil) {
+							NSPoint pw = [event locationInWindow];
+							NSPoint pt = [handle convertPoint:pw fromView:nil];
+							sl_ui_posf x = (sl_ui_posf)(pt.x);
+							sl_ui_posf y = (sl_ui_posf)(pt.y);
+							Time t;
+							t.setSecondsCountf([event timestamp]);
+							Ref<UIEvent> ev = UIEvent::createMouseEvent(action, x, y, t);
+							if (ev.isNotNull()) {
+								UIPlatform::applyEventModifiers(ev.get(), event);
+								dispatchMouseEvent(ev.get());
+							}
+						}
+					}
 				}
 				
 			};
@@ -204,87 +243,14 @@ using namespace slib::priv::system_tray_icon;
 
 @implementation SLIBSystemTrayIconListener
 
-- (void)onClick
+- (void)onAction
 {
 	Ref<SystemTrayIconImpl> object(m_object);
 	if (object.isNotNull()) {
-		object->dispatchClick();
-	}
-}
-
-- (void)mouseDown:(NSEvent *)event
-{
-	Ref<SystemTrayIconImpl> object(m_object);
-	if (object.isNotNull()) {
-		object->_onMouseEvent(UIAction::LeftButtonDown, event);
-	}
-}
-
-- (void)rightMouseDown:(NSEvent *)event
-{
-	Ref<SystemTrayIconImpl> object(m_object);
-	if (object.isNotNull()) {
-		object->_onMouseEvent(UIAction::RightButtonDown, event);
-	}
-}
-
-- (void)otherMouseDown:(NSEvent *)event
-{
-	Ref<SystemTrayIconImpl> object(m_object);
-	if (object.isNotNull()) {
-		object->_onMouseEvent(UIAction::MiddleButtonDown, event);
-	}
-}
-
-- (void)mouseUp:(NSEvent *)event
-{
-	Ref<SystemTrayIconImpl> object(m_object);
-	if (object.isNotNull()) {
-		object->_onMouseEvent(UIAction::LeftButtonUp, event);
-	}
-}
-
-- (void)rightMouseUp:(NSEvent *)event
-{
-	Ref<SystemTrayIconImpl> object(m_object);
-	if (object.isNotNull()) {
-		object->_onMouseEvent(UIAction::RightButtonUp, event);
-	}
-}
-
-- (void)otherMouseUp:(NSEvent *)event
-{
-	Ref<SystemTrayIconImpl> object(m_object);
-	if (object.isNotNull()) {
-		object->_onMouseEvent(UIAction::MiddleButtonUp, event);
-	}
-}
-
-- (void)mouseDragged:(NSEvent *)event
-{
-	Ref<SystemTrayIconImpl> object(m_object);
-	if (object.isNotNull()) {
-		object->_onMouseEvent(UIAction::LeftButtonDrag, event);
-	}
-}
-
-- (void)rightMouseDragged:(NSEvent *)event
-{
-	Ref<SystemTrayIconImpl> object(m_object);
-	if (object.isNotNull()) {
-		object->_onMouseEvent(UIAction::RightButtonDrag, event);
-	}
-}
-
-- (void)otherMouseDragged:(NSEvent *)event
-{
-	Ref<SystemTrayIconImpl> object(m_object);
-	if (object.isNotNull()) {
-		object->_onMouseEvent(UIAction::MiddleButtonDrag, event);
+		object->dispatchAction();
 	}
 }
 
 @end
-
 
 #endif
