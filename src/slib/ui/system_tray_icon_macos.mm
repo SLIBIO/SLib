@@ -139,10 +139,11 @@ namespace slib
 				
 				void setIcon_NI(const Ref<Bitmap>& icon, const String& name) override
 				{
-					NSImage* image;
+					NSImage* image = nil;
 					if (name.isNotEmpty()) {
 						image = [NSImage imageNamed:Apple::getNSStringFromString(name)];
-					} else {
+					}
+					if (image == nil && icon.isNotNull()) {
 						image = GraphicsPlatform::createNSImageFromBitmap(icon);
 						if (image != nil) {
 							CGFloat height = [[NSStatusBar systemStatusBar] thickness];
