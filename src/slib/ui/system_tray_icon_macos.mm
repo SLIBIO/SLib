@@ -107,13 +107,15 @@ namespace slib
 				void _init(const SystemTrayIconParam& param)
 				{
 					SystemTrayIcon::_init(param);
+					if (@available(macos 10.12, *)) {
+						m_item.visible = YES;
+					}
 					if (param.icon.isNotNull() || param.iconName.isNotEmpty()) {
 						setIcon_NI(param.icon, param.iconName);
 					}
 					if (param.toolTip.isNotEmpty()) {
 						setToolTip_NI(param.toolTip);
 					}
-					setVisible_NI(param.flagVisible);
 					if (param.menu.isNotNull()) {
 						setMenu_NI(param.menu);
 					}
@@ -165,13 +167,6 @@ namespace slib
 						m_item.button.toolTip = str;
 					} else {
 						m_item.toolTip = str;
-					}
-				}
-				
-				void setVisible_NI(sl_bool flag) override
-				{
-					if (@available(macos 10.12, *)) {
-						m_item.visible = flag;
 					}
 				}
 				

@@ -29,7 +29,6 @@ namespace slib
 
 	SystemTrayIconParam::SystemTrayIconParam()
 	{
-		flagVisible = sl_true;
 		flagHighlight = sl_true;
 	}
 
@@ -46,7 +45,6 @@ namespace slib
 
 	SystemTrayIcon::SystemTrayIcon()
 	{
-		m_flagVisible = sl_true;
 	}
 
 	SystemTrayIcon::~SystemTrayIcon()
@@ -90,17 +88,6 @@ namespace slib
 	{
 		m_toolTip = toolTip;
 		setToolTip_NI(toolTip);
-	}
-
-	sl_bool SystemTrayIcon::isVisible()
-	{
-		return m_flagVisible;
-	}
-
-	void SystemTrayIcon::setVisible(sl_bool flagVisible)
-	{
-		m_flagVisible = flagVisible;
-		setVisible_NI(flagVisible);
 	}
 
 	Ref<Menu> SystemTrayIcon::getMenu()
@@ -183,7 +170,6 @@ namespace slib
 			m_icon = param.icon;
 		}
 		m_toolTip = param.toolTip;
-		m_flagVisible = param.flagVisible;
 		m_flagHighlight = param.flagHighlight;
 		m_menu = param.menu;
 		

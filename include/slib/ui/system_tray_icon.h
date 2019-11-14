@@ -40,9 +40,9 @@ namespace slib
 		String iconName;
 		Ref<Bitmap> icon;
 		String toolTip;
-		sl_bool flagVisible;
 		sl_bool flagHighlight;
 		Ref<Menu> menu;
+		
 		Function<void(SystemTrayIcon*, UIEvent*)> onAction;
 		Function<void(SystemTrayIcon*, UIEvent*)> onEvent;
 		
@@ -80,10 +80,6 @@ namespace slib
 		
 		void setToolTip(const String& toolTip);
 		
-		sl_bool isVisible();
-		
-		void setVisible(sl_bool flagVisible);
-		
 		Ref<Menu> getMenu();
 		
 		void setMenu(const Ref<Menu>& menu);
@@ -115,7 +111,6 @@ namespace slib
 		Ref<Bitmap> m_icon;
 		String m_iconName;
 		AtomicString m_toolTip;
-		sl_bool m_flagVisible;
 		sl_bool m_flagHighlight;
 		AtomicRef<Menu> m_menu;
 		
@@ -129,9 +124,7 @@ namespace slib
 		virtual void setIcon_NI(const Ref<Bitmap>& icon, const String& name) = 0;
 		
 		virtual void setToolTip_NI(const String& toolTip) = 0;
-		
-		virtual void setVisible_NI(sl_bool flag) = 0;
-		
+				
 		virtual void setMenu_NI(const Ref<Menu>& menu) = 0;
 				
 	};
