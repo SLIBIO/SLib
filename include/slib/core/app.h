@@ -140,6 +140,8 @@ namespace slib
 		virtual void onRunApp() = 0;
 
 		virtual void onQuitApp();
+		
+		virtual void onExistingInstance();
 	
 	public:
 		static Ref<Application> getApp();

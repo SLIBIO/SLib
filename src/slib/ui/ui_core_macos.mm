@@ -378,6 +378,50 @@ namespace slib
 		});
 	}
 
+	void UIApp::onExistingInstance()
+	{
+		String uid = getUniqueInstanceId();
+		if (uid.isEmpty()) {
+			return;
+		}
+		NSArray* arr = [NSRunningApplication runningApplicationsWithBundleIdentifier:[[NSBundle mainBundle] bundleIdentifier]];
+		if (arr.count > 0) {
+			NSRunningApplication* app = [arr objectAtIndex:0];
+			if ([app.bundleURL.absoluteString isEqualToString:([NSRunningApplication currentApplication].bundleURL.absoluteString)]) {
+				[app activateWithOptions:NSApplicationActivateIgnoringOtherApps];
+			} else {
+				[[NSWorkspace sharedWorkspace] launchApplication:app.bundleURL.path];
+			}
+		} else {
+			NSLog(@"Running application is not found! bundleId=%@", [[NSBundle mainBundle] bundleIdentifier]);
+		}
+	}
+
+	sl_bool UIApp::isMenuBarVisible()
+	{
+		return [NSMenu menuBarVisible] == YES;
+	}
+
+	void UIApp::setMenuBarVisible(sl_bool flagVisible)
+	{
+		[NSMenu setMenuBarVisible:flagVisible ? YES : NO];
+	}
+
+	void UIApp::setVisibleOnDock(sl_bool flagVisible)
+	{
+		ProcessSerialNumber psn = { 0, kCurrentProcess };
+		if (flagVisible) {
+			TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+		} else {
+			TransformProcessType(&psn, kProcessTransformToUIElementApplication);
+		}
+	}
+
+	void UIApp::activate(sl_bool flagIgnoreOtherApps)
+	{
+		[NSApp activateIgnoringOtherApps:(flagIgnoreOtherApps ? YES : NO)];
+	}
+
 }
 
 using namespace slib;

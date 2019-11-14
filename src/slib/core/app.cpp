@@ -147,7 +147,7 @@ namespace slib
 		if (instanceId.isNotEmpty()) {
 			m_uniqueInstance = GlobalUniqueInstance::create(instanceId);
 			if (m_uniqueInstance.isNull()) {
-				LogError("APP", "%s is ALREADY RUNNING", instanceId);
+				onExistingInstance();
 				return;
 			}
 		}
@@ -174,6 +174,11 @@ namespace slib
 
 	void Application::onQuitApp()
 	{
+	}
+
+	void Application::onExistingInstance()
+	{
+		LogError("APP", "%s is ALREADY RUNNING", getUniqueInstanceId());
 	}
 
 	sl_bool Application::isUniqueInstanceRunning()

@@ -22,11 +22,12 @@
 
 #include "slib/ui/app.h"
 
+#include "slib/network/url_request.h"
+
 #include "slib/ui/core.h"
 #include "slib/ui/window.h"
 #include "slib/ui/menu.h"
-
-#include "slib/network/url_request.h"
+#include "slib/ui/platform.h"
 
 namespace slib
 {
@@ -114,8 +115,14 @@ namespace slib
 	{
 		UI::runApp();
 	}
-	
-	
+
+#if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_WIN32)
+	void UIApp::onExistingInstance()
+	{		
+	}
+#endif
+
+
 	SLIB_DEFINE_EVENT_HANDLER(UIApp, Start)
 	
 	void UIApp::dispatchStart()

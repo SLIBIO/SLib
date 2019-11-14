@@ -347,31 +347,6 @@ namespace slib
 		}
 	}
 
-	sl_bool UIApp::isMenuBarVisible()
-	{
-		return [NSMenu menuBarVisible] == YES;
-	}
-
-	void UIApp::setMenuBarVisible(sl_bool flagVisible)
-	{
-		[NSMenu setMenuBarVisible:flagVisible ? YES : NO];
-	}
-
-	void UIApp::setVisibleOnDock(sl_bool flagVisible)
-	{
-		ProcessSerialNumber psn = { 0, kCurrentProcess };
-		if (flagVisible) {
-			TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-		} else {
-			TransformProcessType(&psn, kProcessTransformToUIElementApplication);
-		}
-	}
-
-	void UIApp::activate(sl_bool flagIgnoreOtherApps)
-	{
-		[NSApp activateIgnoringOtherApps:(flagIgnoreOtherApps ? YES : NO)];
-	}
-
 }
 
 @implementation SLIBMenuItemHandle

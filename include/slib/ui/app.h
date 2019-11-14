@@ -72,6 +72,11 @@ namespace slib
 	protected:
 		void onRunApp() override;
 		
+		void onExistingInstance() override;
+		
+	protected:
+		void processUniqueInstanceApp(const String& uniqueId, sl_bool flagRun);
+		
 	public:
 		SLIB_DECLARE_EVENT_HANDLER(UIApp, Start)
 		SLIB_DECLARE_EVENT_HANDLER(UIApp, Exit)
