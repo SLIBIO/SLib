@@ -80,14 +80,11 @@ namespace slib
 	public:
 		SLIB_DECLARE_EVENT_HANDLER(UIApp, Start)
 		SLIB_DECLARE_EVENT_HANDLER(UIApp, Exit)
-	
-		// macOS
 		SLIB_DECLARE_EVENT_HANDLER(UIApp, Reopen, sl_bool flagHasVisibleWindows, sl_bool& outFlagPerformNormalTasks)
 
 	public:
 		static void dispatchStartToApp();
 		static void dispatchExitToApp();
-		
 		static void dispatchReopenToApp(sl_bool flagHasVisibleWindows, sl_bool& outFlagPerformNormalTasks);
 
 	private:
