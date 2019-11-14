@@ -261,19 +261,19 @@ namespace slib
 		return bRet;
 	}
 	
-	SLIB_DEFINE_EVENT_HANDLER(UIApp, Reopen, sl_bool flagHasVisibleWindows, sl_bool& outFlagPerformNormalTasks)
+	SLIB_DEFINE_EVENT_HANDLER(UIApp, Reopen, const String& commandLine, sl_bool flagHasVisibleWindows, sl_bool& outFlagPerformNormalTasks)
 	
-	void UIApp::dispatchReopen(sl_bool flagHasVisibleWindows, sl_bool& outFlagPerformNormalTasks)
+	void UIApp::dispatchReopen(const String& commandLine, sl_bool flagHasVisibleWindows, sl_bool& outFlagPerformNormalTasks)
 	{
-		SLIB_INVOKE_EVENT_HANDLER(Reopen, flagHasVisibleWindows, outFlagPerformNormalTasks)
+		SLIB_INVOKE_EVENT_HANDLER(Reopen, commandLine, flagHasVisibleWindows, outFlagPerformNormalTasks)
 	}
 	
-	sl_bool UIApp::dispatchReopenToApp(sl_bool flagHasVisibleWindows)
+	sl_bool UIApp::dispatchReopenToApp(const String& commandLine, sl_bool flagHasVisibleWindows)
 	{
 		sl_bool bRet = sl_true;
 		Ref<UIApp> app = getApp();
 		if (app.isNotNull()) {
-			app->dispatchReopen(flagHasVisibleWindows, bRet);
+			app->dispatchReopen(commandLine, flagHasVisibleWindows, bRet);
 		}
 		return bRet;
 	}

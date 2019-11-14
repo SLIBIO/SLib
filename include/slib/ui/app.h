@@ -91,7 +91,7 @@ namespace slib
 		SLIB_DECLARE_EVENT_HANDLER(UIApp, OpenTempFile, const String& filePath, sl_bool& outFlagOpened)
 		SLIB_DECLARE_EVENT_HANDLER(UIApp, OpenUntitledFile, sl_bool& outFlagOpened)
 
-		SLIB_DECLARE_EVENT_HANDLER(UIApp, Reopen, sl_bool flagHasVisibleWindows, sl_bool& outFlagPerformNormalTasks)
+		SLIB_DECLARE_EVENT_HANDLER(UIApp, Reopen, const String& commandLine, sl_bool flagHasVisibleWindows, sl_bool& outFlagPerformNormalTasks)
 
 	public:
 		static void dispatchStartToApp();
@@ -104,7 +104,7 @@ namespace slib
 		static sl_bool dispatchOpenTempFileToApp(const String& filePath);
 		static sl_bool dispatchOpenUntitledFileToApp();
 
-		static sl_bool dispatchReopenToApp(sl_bool flagHasVisibleWindows);
+		static sl_bool dispatchReopenToApp(const String& commandLine, sl_bool flagHasVisibleWindows);
 
 	private:
 		AtomicRef<Window> m_mainWindow;
