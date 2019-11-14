@@ -9213,6 +9213,9 @@ namespace slib
 	
 	void View::_processEventForStateAndClick(UIEvent* ev)
 	{
+		if (isNativeWidget()) {
+			return;
+		}
 		UIAction action = ev->getAction();
 		switch (action) {
 			case UIAction::LeftButtonDown:

@@ -170,12 +170,25 @@ namespace slib
 		}
 	}
 	
+	SLIB_DEFINE_EVENT_HANDLER(CheckBox, Change, sl_bool newValue)
+	
+	void CheckBox::dispatchChange(sl_bool newValue)
+	{
+		SLIB_INVOKE_EVENT_HANDLER(Change, newValue)
+	}
+	
 	void CheckBox::dispatchClickEvent(UIEvent* ev)
 	{
 		if (isNativeWidget()) {
-			isChecked();
+			sl_bool valueOld = m_flagChecked;
+			sl_bool valueNew = isChecked();
+			if (valueOld != valueNew) {
+				dispatchChange(valueNew);
+			}
 		} else {
-			setChecked(!m_flagChecked);
+			sl_bool valueNew = !m_flagChecked;
+			setChecked(valueNew);
+			dispatchChange(valueNew);
 		}
 		Button::dispatchClickEvent(ev);
 	}

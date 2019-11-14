@@ -48,6 +48,9 @@ namespace slib
 		
 		virtual void setChecked(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
+	public:
+		SLIB_DECLARE_EVENT_HANDLER(CheckBox, Change, sl_bool flagChecked)
+
 	protected:
 		Ref<ViewInstance> createNativeWidget(ViewInstance* parent) override;
 		

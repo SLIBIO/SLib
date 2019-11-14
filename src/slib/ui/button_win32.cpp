@@ -50,14 +50,10 @@ namespace slib
 
 			sl_bool ButtonInstance::processCommand(SHORT code, LRESULT& result)
 			{
-				/*
-					Click events are processed by subclassing
-				-------------------------------------------------
 				if (code == BN_CLICKED) {
 					onClick();
 					return sl_true;
 				}
-				*/
 				return sl_false;
 			}
 
