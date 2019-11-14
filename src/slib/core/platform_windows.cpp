@@ -31,6 +31,7 @@
 #include "slib/core/endian.h"
 
 #include <crtdbg.h>
+#include <shlwapi.h>
 
 namespace slib
 {
@@ -807,6 +808,31 @@ namespace slib
 	WindowsVersion Windows::getVersion()
 	{
 		return priv::platform::GetWindowsVersion();
+	}
+
+	WindowsDllVersion Windows::getDllVersion(const String16& pathDll)
+	{
+		WindowsDllVersion ret;
+		ret.major = 0;
+		ret.minor = 0;
+		ret.build = 0;
+		HINSTANCE hDll = LoadLibraryW((LPCWSTR)(pathDll.getData()));
+		if (hDll) {
+			DLLGETVERSIONPROC proc = (DLLGETVERSIONPROC)(GetProcAddress(hDll, "DllGetVersion"));
+			if (proc) {
+				DLLVERSIONINFO info;
+				Base::zeroMemory(&info, sizeof(info));
+				info.cbSize = sizeof(info);
+				HRESULT hr = proc(&info);
+				if (SUCCEEDED(hr)) {
+					ret.major = (sl_uint32)(info.dwMajorVersion);
+					ret.minor = (sl_uint32)(info.dwMinorVersion);
+					ret.build = (sl_uint32)(info.dwBuildNumber);
+				}
+			}
+			FreeLibrary(hDll);
+		}
+		return ret;
 	}
 
 	sl_bool Windows::isCurrentProcessInAdminGroup()

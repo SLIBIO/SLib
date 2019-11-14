@@ -78,6 +78,13 @@ namespace slib
 		Server2016 = PRIV_SLIB_SERVER_VERSION_CODE(10, 0, 0)
 	};
 
+	struct WindowsDllVersion
+	{
+		sl_uint32 major;
+		sl_uint32 minor;
+		sl_uint32 build;
+	};
+
 	typedef sl_bool(*WINDOWS_DEBUG_ALLOC_HOOK)(void* ptr, sl_size size);
 	
 	typedef BOOL (WINAPI *WINAPI_GetQueuedCompletionStatusEx)
@@ -246,6 +253,8 @@ namespace slib
 
 
 		static WindowsVersion getVersion();
+
+		static WindowsDllVersion getDllVersion(const String16& pathDll);
 
 
 		static sl_bool isCurrentProcessInAdminGroup();
