@@ -175,32 +175,6 @@ namespace slib
 					m_item.menu = UIPlatform::getMenuHandle(menu);
 				}
 				
-				UIRect getFrame() override
-				{
-					if (@available(macos 10.10, *)) {
-						NSStatusBarButton* button = m_item.button;
-						NSRect bounds = button.bounds;
-						NSWindow* window = [button window];
-						if (window != nil) {
-							NSScreen* screen = [window screen];
-							NSPoint pw = [button convertPoint:NSMakePoint(0, 0) toView:nil];
-							NSRect rect;
-							rect.origin.x = pw.x;
-							rect.origin.y = pw.y;
-							rect.size.width = 0;
-							rect.size.height = 0;
-							rect = [window convertRectToScreen:rect];
-							UIRect ret;
-							ret.left = (sl_ui_pos)(rect.origin.x);
-							ret.top = (sl_ui_pos)([screen frame].size.height - 1 - rect.origin.y);
-							ret.right = ret.left + (sl_ui_pos)(bounds.size.width);
-							ret.bottom = ret.top + (sl_ui_pos)(bounds.size.height);
-							return ret;
-						}
-					}
-					return UIRect::zero();
-				}
-				
 				UIEventFlags _onEvent(UIAction action, NSEvent* event)
 				{
 					if (event == nil) {

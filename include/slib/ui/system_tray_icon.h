@@ -84,9 +84,6 @@ namespace slib
 		
 		void setMenu(const Ref<Menu>& menu);
 		
-		// Screen Coordinate
-		virtual UIRect getFrame() = 0;
-		
 		enum class NotifyIcon
 		{
 			None = 0,
