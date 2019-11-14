@@ -34,6 +34,14 @@ namespace slib
 	}
 
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(SystemTrayIconNotifyParam)
+
+	SystemTrayIconNotifyParam::SystemTrayIconNotifyParam()
+	{
+		iconType = SystemTrayIcon::NotifyIcon::None;
+	}
+
+
 	SLIB_DEFINE_OBJECT(SystemTrayIcon, Object)
 
 	SystemTrayIcon::SystemTrayIcon()
@@ -106,17 +114,43 @@ namespace slib
 		setMenu_NI(menu);
 	}
 
-	void SystemTrayIcon::showMessage(const String& title, const String& message, const Ref<Bitmap>& icon, sl_uint32 millisecondsTimeout)
+	void SystemTrayIcon::notify(const SystemTrayIconNotifyParam& param)
 	{
-		if (!millisecondsTimeout) {
-			millisecondsTimeout = 10000;
-		}
-		showMessage_NI(title, message, icon, millisecondsTimeout);
 	}
 
-	void SystemTrayIcon::showMessage(const String& title, const String& message, sl_uint32 millisecondsTimeout)
+	void SystemTrayIcon::notify(const String& title, const String& message)
 	{
-		showMessage(title, message, Ref<Bitmap>::null(), millisecondsTimeout);
+		SystemTrayIconNotifyParam param;
+		param.title = title;
+		param.message = message;
+		notify(param);
+	}
+
+	void SystemTrayIcon::notify(const String& title, const String& message, const Ref<Bitmap>& icon)
+	{
+		SystemTrayIconNotifyParam param;
+		param.title = title;
+		param.message = message;
+		param.icon = icon;
+		notify(param);
+	}
+
+	void SystemTrayIcon::notify(const String& title, const String& message, const String& iconName)
+	{
+		SystemTrayIconNotifyParam param;
+		param.title = title;
+		param.message = message;
+		param.iconName = iconName;
+		notify(param);
+	}
+
+	void SystemTrayIcon::notify(const String& title, const String& message, SystemTrayIcon::NotifyIcon icon)
+	{
+		SystemTrayIconNotifyParam param;
+		param.title = title;
+		param.message = message;
+		param.iconType = icon;
+		notify(param);
 	}
 
 	void SystemTrayIcon::dispatchEvent(UIEvent* ev)

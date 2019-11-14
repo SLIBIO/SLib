@@ -180,10 +180,6 @@ namespace slib
 					m_item.menu = UIPlatform::getMenuHandle(menu);
 				}
 				
-				void showMessage_NI(const String& title, const String& message, const Ref<Bitmap>& icon, sl_uint32 milliseconsTimeout) override
-				{
-				}
-				
 				UIRect getFrame() override
 				{
 					if (@available(macos 10.10, *)) {

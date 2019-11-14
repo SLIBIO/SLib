@@ -27,6 +27,7 @@
 
 #include "menu.h"
 #include "event.h"
+#include "common_dialogs.h"
 
 namespace slib
 {
@@ -51,6 +52,8 @@ namespace slib
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(SystemTrayIconParam)
 		
 	};
+
+	class SystemTrayIconNotifyParam;
 
 	class SLIB_EXPORT SystemTrayIcon : public Object
 	{
@@ -88,10 +91,23 @@ namespace slib
 		// Screen Coordinate
 		virtual UIRect getFrame() = 0;
 		
-		void showMessage(const String& title, const String& message, const Ref<Bitmap>& icon, sl_uint32 millisecondsTimeout = 0);
+		enum class NotifyIcon
+		{
+			None = 0,
+			Information = 1,
+			Warning = 2,
+			Error = 3
+		};
+		virtual void notify(const SystemTrayIconNotifyParam& param);
 		
-		void showMessage(const String& title, const String& message, sl_uint32 millisecondsTimeout = 0);
+		void notify(const String& title, const String& message);
 		
+		void notify(const String& title, const String& message, const Ref<Bitmap>& icon);
+		
+		void notify(const String& title, const String& message, const String& iconName);
+		
+		void notify(const String& title, const String& message, NotifyIcon icon);
+
 	public:
 		void dispatchEvent(UIEvent* ev);
 		
@@ -117,8 +133,23 @@ namespace slib
 		virtual void setVisible_NI(sl_bool flag) = 0;
 		
 		virtual void setMenu_NI(const Ref<Menu>& menu) = 0;
+				
+	};
+
+	class SLIB_EXPORT SystemTrayIconNotifyParam
+	{
+	public:
+		String title;
+		String message;
+
+		SystemTrayIcon::NotifyIcon iconType;
+		String iconName;
+		Ref<Bitmap> icon;
 		
-		virtual void showMessage_NI(const String& title, const String& message, const Ref<Bitmap>& icon, sl_uint32 milliseconsTimeout) = 0;
+	public:
+		SystemTrayIconNotifyParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(SystemTrayIconNotifyParam)
 		
 	};
 
