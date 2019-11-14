@@ -439,11 +439,51 @@ using namespace slib::priv::ui_core;
 	UIApp::dispatchExitToApp();
 }
 
+- (void)application:(NSApplication *)application openURLs:(NSArray<NSURL*>*)urls
+{
+	List<String> list;
+	for (NSURL* url : urls) {
+		list.add_NoLock(Apple::getStringFromNSString(url.absoluteString));
+	}
+	if (list.getCount() == 1) {
+		UIApp::dispatchOpenUrlToApp(list[0]);
+	} else {
+		UIApp::dispatchOpenUrlsToApp(list);
+	}
+}
+
+- (BOOL)application:(NSApplication *)sender openFile:(NSString *)filename
+{
+	return UIApp::dispatchOpenFileToApp(Apple::getStringFromNSString(filename));
+}
+
+- (void)application:(NSApplication *)sender openFiles:(NSArray<NSString*>*)filenames
+{
+	List<String> list;
+	for (NSString* path : filenames) {
+		list.add_NoLock(Apple::getStringFromNSString(path));
+	}
+	UIApp::dispatchOpenUrlsToApp(list);
+}
+
+- (BOOL)application:(NSApplication *)sender openTempFile:(NSString *)filename
+{
+	return UIApp::dispatchOpenTempFileToApp(Apple::getStringFromNSString(filename));
+}
+
+- (BOOL)applicationOpenUntitledFile:(NSApplication *)sender
+{
+	return UIApp::dispatchOpenUntitledFileToApp();
+}
+
+- (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
+{
+	return UIApp::getApp()->shouldOpenUntitledFile();
+}
+
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)sender hasVisibleWindows:(BOOL)flag
 {
-	sl_bool flagRet = sl_true;
-	UIApp::dispatchReopenToApp(flag ? sl_true : sl_false, flagRet);
-	return flagRet ? YES : NO;
+	return UIApp::dispatchReopenToApp(flag);
 }
 
 @end

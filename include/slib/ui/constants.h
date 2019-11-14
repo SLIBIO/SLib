@@ -61,7 +61,6 @@ namespace slib
 		TouchCancel = 0x0304,
 		// other
 		SetCursor = 0x0401,
-		OpenUrl=0x0402
 	};
 	
 	class UIEventFlags

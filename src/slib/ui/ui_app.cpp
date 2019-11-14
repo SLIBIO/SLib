@@ -86,6 +86,11 @@ namespace slib
 	{
 		return m_mainMenu;
 	}
+
+	sl_bool UIApp::shouldOpenUntitledFile()
+	{
+		return sl_false;
+	}
 	
 #if !defined(SLIB_UI_IS_MACOS)
 	void UIApp::setMenu(const Ref<Menu>& menu)
@@ -154,6 +159,108 @@ namespace slib
 		}
 	}
 	
+	SLIB_DEFINE_EVENT_HANDLER(UIApp, OpenUrl, const String& url, sl_bool& outFlagOpened)
+	
+	void UIApp::dispatchOpenUrl(const String& url, sl_bool& outFlagOpened)
+	{
+		SLIB_INVOKE_EVENT_HANDLER(OpenUrl, url, outFlagOpened);
+	}
+	
+	sl_bool UIApp::dispatchOpenUrlToApp(const String& url)
+	{
+		sl_bool bRet = sl_false;
+		Ref<UIApp> app = getApp();
+		if (app.isNotNull()) {
+			app->dispatchOpenUrl(url, bRet);
+		}
+		return bRet;
+	}
+	
+	SLIB_DEFINE_EVENT_HANDLER(UIApp, OpenUrls, const List<String>& urls, sl_bool& outFlagOpened)
+	
+	void UIApp::dispatchOpenUrls(const List<String>& urls, sl_bool& outFlagOpened)
+	{
+		SLIB_INVOKE_EVENT_HANDLER(OpenUrls, urls, outFlagOpened);
+	}
+	
+	sl_bool UIApp::dispatchOpenUrlsToApp(const List<String>& urls)
+	{
+		sl_bool bRet = sl_false;
+		Ref<UIApp> app = getApp();
+		if (app.isNotNull()) {
+			app->dispatchOpenUrls(urls, bRet);
+		}
+		return bRet;
+	}
+	
+	SLIB_DEFINE_EVENT_HANDLER(UIApp, OpenFile, const String& filePath, sl_bool& outFlagOpened)
+	
+	void UIApp::dispatchOpenFile(const String& filePath, sl_bool& outFlagOpened)
+	{
+		SLIB_INVOKE_EVENT_HANDLER(OpenFile, filePath, outFlagOpened);
+	}
+	
+	sl_bool UIApp::dispatchOpenFileToApp(const String& filePath)
+	{
+		sl_bool bRet = sl_false;
+		Ref<UIApp> app = getApp();
+		if (app.isNotNull()) {
+			app->dispatchOpenFile(filePath, bRet);
+		}
+		return bRet;
+	}
+	
+	SLIB_DEFINE_EVENT_HANDLER(UIApp, OpenFiles, const List<String>& files, sl_bool& outFlagOpened)
+	
+	void UIApp::dispatchOpenFiles(const List<String>& files, sl_bool& outFlagOpened)
+	{
+		SLIB_INVOKE_EVENT_HANDLER(OpenFiles, files, outFlagOpened);
+	}
+	
+	sl_bool UIApp::dispatchOpenFilesToApp(const List<String>& files)
+	{
+		sl_bool bRet = sl_false;
+		Ref<UIApp> app = getApp();
+		if (app.isNotNull()) {
+			app->dispatchOpenFiles(files, bRet);
+		}
+		return bRet;
+	}
+	
+	SLIB_DEFINE_EVENT_HANDLER(UIApp, OpenTempFile, const String& filePath, sl_bool& outFlagOpened)
+	
+	void UIApp::dispatchOpenTempFile(const String& filePath, sl_bool& outFlagOpened)
+	{
+		SLIB_INVOKE_EVENT_HANDLER(OpenTempFile, filePath, outFlagOpened);
+	}
+	
+	sl_bool UIApp::dispatchOpenTempFileToApp(const String& filePath)
+	{
+		sl_bool bRet = sl_false;
+		Ref<UIApp> app = getApp();
+		if (app.isNotNull()) {
+			app->dispatchOpenTempFile(filePath, bRet);
+		}
+		return bRet;
+	}
+	
+	SLIB_DEFINE_EVENT_HANDLER(UIApp, OpenUntitledFile, sl_bool& outFlagOpened)
+	
+	void UIApp::dispatchOpenUntitledFile(sl_bool& outFlagOpened)
+	{
+		SLIB_INVOKE_EVENT_HANDLER(OpenUntitledFile, outFlagOpened);
+	}
+	
+	sl_bool UIApp::dispatchOpenUntitledFileToApp()
+	{
+		sl_bool bRet = sl_false;
+		Ref<UIApp> app = getApp();
+		if (app.isNotNull()) {
+			app->dispatchOpenUntitledFile(bRet);
+		}
+		return bRet;
+	}
+	
 	SLIB_DEFINE_EVENT_HANDLER(UIApp, Reopen, sl_bool flagHasVisibleWindows, sl_bool& outFlagPerformNormalTasks)
 	
 	void UIApp::dispatchReopen(sl_bool flagHasVisibleWindows, sl_bool& outFlagPerformNormalTasks)
@@ -161,12 +268,14 @@ namespace slib
 		SLIB_INVOKE_EVENT_HANDLER(Reopen, flagHasVisibleWindows, outFlagPerformNormalTasks)
 	}
 	
-	void UIApp::dispatchReopenToApp(sl_bool flagHasVisibleWindows, sl_bool& outFlagPerformNormalTasks)
+	sl_bool UIApp::dispatchReopenToApp(sl_bool flagHasVisibleWindows)
 	{
+		sl_bool bRet = sl_true;
 		Ref<UIApp> app = getApp();
 		if (app.isNotNull()) {
-			app->dispatchReopen(flagHasVisibleWindows, outFlagPerformNormalTasks);
+			app->dispatchReopen(flagHasVisibleWindows, bRet);
 		}
+		return bRet;
 	}
 
 }

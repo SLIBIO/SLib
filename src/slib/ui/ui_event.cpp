@@ -307,16 +307,6 @@ sl_bool UIEvent::is##NAME##Key() const \
 		return sl_null;
 	}
 	
-	Ref<UIEvent> UIEvent::createOpenUrlEvent(const String& url)
-	{
-		Ref<UIEvent> ret = new UIEvent;
-		if (ret.isNotNull()) {
-			ret->setAction(UIAction::OpenUrl);
-			ret->setUrl(url);
-		}
-		return ret;
-	}
-
 	UIAction UIEvent::getAction() const
 	{
 		return m_action;
@@ -560,16 +550,6 @@ sl_bool UIEvent::is##NAME##Key() const \
 		}
 	}
 
-	const String& UIEvent::getUrl() const
-	{
-		return m_url;
-	}
-	
-	void UIEvent::setUrl(const String& url)
-	{
-		m_url = url;
-	}
-	
 	UIEventFlags UIEvent::getFlags() const
 	{
 		return m_flags;

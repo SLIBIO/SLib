@@ -184,8 +184,6 @@ namespace slib
 		
 		static Ref<UIEvent> createSetCursorEvent(sl_ui_posf x, sl_ui_posf y, const Time& time);
 		
-		static Ref<UIEvent> createOpenUrlEvent(const String& url);
-		
 	public:
 		UIAction getAction() const;
 		
@@ -374,9 +372,6 @@ namespace slib
 		
 		// touch
 		Array<TouchPoint> m_points;
-		
-		// open url
-		String m_url;
 		
 	};
 

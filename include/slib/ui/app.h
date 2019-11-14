@@ -61,6 +61,9 @@ namespace slib
 		void setMenu(const Ref<Menu>& menu);
 		
 		
+		virtual sl_bool shouldOpenUntitledFile();
+		
+		
 		static sl_bool isMenuBarVisible();
 		
 		static void setMenuBarVisible(sl_bool flagVisible);
@@ -80,12 +83,28 @@ namespace slib
 	public:
 		SLIB_DECLARE_EVENT_HANDLER(UIApp, Start)
 		SLIB_DECLARE_EVENT_HANDLER(UIApp, Exit)
+		
+		SLIB_DECLARE_EVENT_HANDLER(UIApp, OpenUrl, const String& url, sl_bool& outFlagOpened)
+		SLIB_DECLARE_EVENT_HANDLER(UIApp, OpenUrls, const List<String>& urls, sl_bool& outFlagOpened)
+		SLIB_DECLARE_EVENT_HANDLER(UIApp, OpenFile, const String& filePath, sl_bool& outFlagOpened)
+		SLIB_DECLARE_EVENT_HANDLER(UIApp, OpenFiles, const List<String>& files, sl_bool& outFlagOpened)
+		SLIB_DECLARE_EVENT_HANDLER(UIApp, OpenTempFile, const String& filePath, sl_bool& outFlagOpened)
+		SLIB_DECLARE_EVENT_HANDLER(UIApp, OpenUntitledFile, sl_bool& outFlagOpened)
+
 		SLIB_DECLARE_EVENT_HANDLER(UIApp, Reopen, sl_bool flagHasVisibleWindows, sl_bool& outFlagPerformNormalTasks)
 
 	public:
 		static void dispatchStartToApp();
 		static void dispatchExitToApp();
-		static void dispatchReopenToApp(sl_bool flagHasVisibleWindows, sl_bool& outFlagPerformNormalTasks);
+		
+		static sl_bool dispatchOpenUrlToApp(const String& url);
+		static sl_bool dispatchOpenUrlsToApp(const List<String>& urls);
+		static sl_bool dispatchOpenFileToApp(const String& filePath);
+		static sl_bool dispatchOpenFilesToApp(const List<String>& files);
+		static sl_bool dispatchOpenTempFileToApp(const String& filePath);
+		static sl_bool dispatchOpenUntitledFileToApp();
+
+		static sl_bool dispatchReopenToApp(sl_bool flagHasVisibleWindows);
 
 	private:
 		AtomicRef<Window> m_mainWindow;
