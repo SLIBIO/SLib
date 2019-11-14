@@ -25,6 +25,7 @@
 #if defined(SLIB_UI_IS_MACOS)
 
 #include "slib/ui/system_tray_icon.h"
+
 #include "slib/ui/platform.h"
 
 namespace slib
