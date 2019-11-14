@@ -418,6 +418,8 @@
     <ClCompile Include="..\..\src\slib\ui\slider.cpp" />
     <ClCompile Include="..\..\src\slib\ui\split_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\switch_view.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\system_tray_icon.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\system_tray_icon_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\tab_view.cpp" />
     <ClCompile Include="..\..\src\slib\ui\tab_view_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\text_view.cpp" />

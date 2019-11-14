@@ -83,6 +83,8 @@ namespace slib
 		namespace ui_core
 		{
 
+			WNDPROC g_wndProc_SystemTrayIcon = NULL;
+
 			DWORD g_threadMain = 0;
 			sl_bool g_bFlagQuit = sl_false;
 
@@ -127,11 +129,22 @@ namespace slib
 				case SLIB_UI_MESSAGE_CUSTOM_MSGBOX:
 					priv::alert_dialog::ProcessCustomMsgBox(wParam, lParam);
 					return 0;
+				case SLIB_UI_MESSAGE_SYSTEM_TRAY_ICON:
+					if (g_wndProc_SystemTrayIcon) {
+						return g_wndProc_SystemTrayIcon(hWnd, uMsg, wParam, lParam);
+					}
+					return 0;
 				case WM_MENUCOMMAND:
 					priv::menu::ProcessMenuCommand(wParam, lParam);
 					return 0;
 				case WM_INPUT:
 					priv::global_event_monitor::ProcessRawInput(wParam, lParam);
+					return 0;
+				case WM_COPYDATA:
+					{
+						COPYDATASTRUCT* data = (COPYDATASTRUCT*)lParam;
+						UIApp::dispatchReopenToApp(String::fromUtf16((sl_char16*)(data->lpData), data->cbData / 2), sl_true);
+					}
 					return 0;
 				}
 				return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -372,6 +385,24 @@ namespace slib
 		PostQuitMessage(0);
 	}
 
+	void UIApp::onExistingInstance()
+	{
+		String16 appId = getUniqueInstanceId();
+		if (appId.isEmpty()) {
+			return;
+		}
+		HWND hWnd = FindWindowW(L"SLIBMESSAGEHANDLER", (LPCWSTR)(appId.getData()));
+		if (hWnd) {
+			COPYDATASTRUCT data;
+			Base::zeroMemory(&data, sizeof(data));
+			data.cbData = sizeof(data);
+			LPWSTR sz = GetCommandLineW();
+			data.lpData = sz;
+			data.cbData = (DWORD)(Base::getStringLength2((sl_char16*)sz) * 2);
+			SendMessageW(hWnd, WM_COPYDATA, 0, (LPARAM)&data);
+		}
+	}
+
 	Win32_UI_Shared::Win32_UI_Shared()
 	{
 		hInstance = GetModuleHandleW(NULL);
@@ -422,7 +453,8 @@ namespace slib
 			wc.lpfnWndProc = MessageWindowProc;
 			wc.lpszClassName = L"SLIBMESSAGEHANDLER";
 			m_wndClassForMessage = RegisterClassW(&wc);
-			hWndMessage = CreateWindowExW(0, (LPCWSTR)((LONG_PTR)m_wndClassForMessage), L"", 0, 0, 0, 0, 0, HWND_MESSAGE, 0, hInstance, 0);
+			String16 appId = UIApp::getApp()->getUniqueInstanceId();
+			hWndMessage = CreateWindowExW(0, (LPCWSTR)((LONG_PTR)m_wndClassForMessage), (LPCWSTR)(appId.getData()), 0, 0, 0, 0, 0, HWND_MESSAGE, 0, hInstance, 0);
 		}
 
 	}

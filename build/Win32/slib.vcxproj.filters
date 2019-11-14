@@ -1334,5 +1334,11 @@
     <ClCompile Include="..\..\src\slib\social\contact.cpp">
       <Filter>src\social</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\ui\system_tray_icon.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\ui\system_tray_icon_win32.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
