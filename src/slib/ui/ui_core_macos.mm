@@ -483,7 +483,7 @@ using namespace slib::priv::ui_core;
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)sender hasVisibleWindows:(BOOL)flag
 {
-	return UIApp::dispatchReopenToApp(flag);
+	return UIApp::dispatchReopenToApp(sl_null, flag);
 }
 
 @end
