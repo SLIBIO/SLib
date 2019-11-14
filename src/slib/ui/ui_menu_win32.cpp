@@ -63,10 +63,10 @@ namespace slib
 				~MenuItemImpl()
 				{
 					if (m_hbmChecked) {
-						::DeleteObject(m_hbmChecked);
+						DeleteObject(m_hbmChecked);
 					}
 					if (m_hbmUnchecked) {
-						::DeleteObject(m_hbmUnchecked);
+						DeleteObject(m_hbmUnchecked);
 					}
 				}
 
@@ -135,7 +135,7 @@ namespace slib
 				~MenuImpl()
 				{
 					if (m_hMenu) {
-						::DestroyMenu(m_hMenu);
+						DestroyMenu(m_hMenu);
 						MenuMap* map = GetMenuMap();
 						if (map) {
 							map->remove(m_hMenu);
@@ -146,13 +146,13 @@ namespace slib
 			public:
 				static Ref<MenuImpl> create()
 				{
-					HMENU hMenu = ::CreateMenu();
+					HMENU hMenu = CreateMenu();
 					if (hMenu) {
 						MENUINFO mi;
 						mi.cbSize = sizeof(mi);
 						mi.fMask = MIM_STYLE;
 						mi.dwStyle = MNS_NOTIFYBYPOS;
-						if (::SetMenuInfo(hMenu, &mi)) {
+						if (SetMenuInfo(hMenu, &mi)) {
 							Ref<MenuImpl> ret = new MenuImpl();
 							if (ret.isNotNull()) {
 								ret->m_hMenu = hMenu;
@@ -163,7 +163,7 @@ namespace slib
 								return ret;
 							}
 						}
-						::DestroyMenu(hMenu);
+						DestroyMenu(hMenu);
 					}
 					return sl_null;
 				}
@@ -200,11 +200,11 @@ namespace slib
 					if (index > n) {
 						index = n;
 					}
-					::MENUITEMINFOW mii;
+					MENUITEMINFOW mii;
 					mii.cbSize = sizeof(mii);
 					mii.fMask = MIIM_FTYPE;
 					mii.fType = MFT_SEPARATOR;
-					if (::InsertMenuItemW(m_hMenu, index, TRUE, &mii)) {
+					if (InsertMenuItemW(m_hMenu, index, TRUE, &mii)) {
 						Ref<MenuItem> item = MenuItem::createSeparator();
 						if (item.isNotNull()) {
 							m_items.insert(index, item);
@@ -218,7 +218,7 @@ namespace slib
 				{
 					ObjectLocker lock(this);
 					if (index < m_items.getCount()) {
-						::RemoveMenu(m_hMenu, index, MF_BYPOSITION);
+						RemoveMenu(m_hMenu, index, MF_BYPOSITION);
 						m_items.removeAt(index);
 					}
 				}
@@ -228,7 +228,7 @@ namespace slib
 					ObjectLocker lock(this);
 					sl_reg index = m_items.indexOf(item);
 					if (index >= 0) {
-						::RemoveMenu(m_hMenu, (sl_uint32)index, MF_BYPOSITION);
+						RemoveMenu(m_hMenu, (sl_uint32)index, MF_BYPOSITION);
 						m_items.removeAt(index);
 					}
 				}
@@ -237,7 +237,7 @@ namespace slib
 				{
 					Win32_UI_Shared* shared = Win32_UI_Shared::get();
 					if (shared) {
-						::TrackPopupMenuEx(m_hMenu, 0, (int)x, (int)y, shared->hWndMessage, NULL);
+						TrackPopupMenuEx(m_hMenu, 0, (int)x, (int)y, shared->hWndMessage, NULL);
 					}
 				}
 
@@ -273,7 +273,7 @@ namespace slib
 				}
 				String16 text = makeText(param.text, param.shortcutKey, param.secondShortcutKey);
 				mii.dwTypeData = (LPWSTR)(text.getData());
-				if (::InsertMenuItemW(parent->m_hMenu, index, TRUE, &mii)) {
+				if (InsertMenuItemW(parent->m_hMenu, index, TRUE, &mii)) {
 					Ref<MenuItemImpl> ret = new MenuItemImpl;
 					if (ret.isNotNull()) {
 						ret->m_parent = parent;
@@ -292,10 +292,10 @@ namespace slib
 					}
 				}
 				if (mii.hbmpChecked) {
-					::DeleteObject(mii.hbmpChecked);
+					DeleteObject(mii.hbmpChecked);
 				}
 				if (mii.hbmpUnchecked) {
-					::DeleteObject(mii.hbmpUnchecked);
+					DeleteObject(mii.hbmpUnchecked);
 				}
 				return sl_null;
 			}
@@ -341,7 +341,7 @@ namespace slib
 				mii.fMask = MIIM_STRING;
 				String16 text = makeText(m_text, m_shortcutKey, m_secondShortcutKey);
 				mii.dwTypeData = (LPWSTR)(text.getData());
-				::SetMenuItemInfoW(hMenu, index, TRUE, &mii);
+				SetMenuItemInfoW(hMenu, index, TRUE, &mii);
 			}
 
 			void MenuItemImpl::_updateState()
@@ -355,7 +355,7 @@ namespace slib
 				if (!(m_flagEnabled)) {
 					mii.fState |= MFS_DISABLED;
 				}
-				::SetMenuItemInfoW(hMenu, index, TRUE, &mii);
+				SetMenuItemInfoW(hMenu, index, TRUE, &mii);
 			}
 
 			void MenuItemImpl::setIcon(const Ref<Bitmap>& icon)
@@ -363,13 +363,13 @@ namespace slib
 				MenuItem::setIcon(icon);
 				MENU_ITEM_SET_PROLOG;
 				if (m_hbmUnchecked) {
-					::DeleteObject(m_hbmUnchecked);
+					DeleteObject(m_hbmUnchecked);
 				}
 				m_hbmUnchecked = GraphicsPlatform::createDIBFromBitmap(icon);
 				mii.fMask = MIIM_CHECKMARKS;
 				mii.hbmpUnchecked = m_hbmUnchecked;
 				mii.hbmpChecked = m_hbmChecked;
-				::SetMenuItemInfoW(hMenu, index, TRUE, &mii);
+				SetMenuItemInfoW(hMenu, index, TRUE, &mii);
 			}
 
 			void MenuItemImpl::setCheckedIcon(const Ref<Bitmap>& icon)
@@ -377,13 +377,13 @@ namespace slib
 				MenuItem::setIcon(icon);
 				MENU_ITEM_SET_PROLOG;
 				if (m_hbmChecked) {
-					::DeleteObject(m_hbmChecked);
+					DeleteObject(m_hbmChecked);
 				}
 				m_hbmChecked = GraphicsPlatform::createDIBFromBitmap(icon);
 				mii.fMask = MIIM_CHECKMARKS;
 				mii.hbmpUnchecked = m_hbmUnchecked;
 				mii.hbmpChecked = m_hbmChecked;
-				::SetMenuItemInfoW(hMenu, index, TRUE, &mii);
+				SetMenuItemInfoW(hMenu, index, TRUE, &mii);
 			}
 
 			void MenuItemImpl::setSubmenu(const Ref<Menu>& menu)
@@ -392,7 +392,7 @@ namespace slib
 				MENU_ITEM_SET_PROLOG;
 				mii.fMask = MIIM_SUBMENU;
 				mii.hSubMenu = UIPlatform::getMenuHandle(menu);
-				::SetMenuItemInfoW(hMenu, index, TRUE, &mii);
+				SetMenuItemInfoW(hMenu, index, TRUE, &mii);
 			}
 
 			void ProcessMenuCommand(WPARAM wParam, LPARAM lParam)
@@ -427,16 +427,16 @@ namespace slib
 								Keycode keycode = UIEvent::getKeycodeFromSystemKeycode((sl_uint32)(msg.wParam));
 								KeycodeAndModifiers km;
 								km.setKeycode(keycode);
-								if (::GetKeyState(VK_CONTROL) & 0x8000) {
+								if (GetKeyState(VK_CONTROL) & 0x8000) {
 									km.setControlKey();
 								}
-								if (::GetKeyState(VK_SHIFT) & 0x8000) {
+								if (GetKeyState(VK_SHIFT) & 0x8000) {
 									km.setShiftKey();
 								}
-								if (::GetKeyState(VK_MENU) & 0x8000) {
+								if (GetKeyState(VK_MENU) & 0x8000) {
 									km.setAltKey();
 								}
-								if ((::GetKeyState(VK_LWIN) & 0x8000) || (::GetKeyState(VK_RWIN) & 0x8000)) {
+								if ((GetKeyState(VK_LWIN) & 0x8000) || (GetKeyState(VK_RWIN) & 0x8000)) {
 									km.setWindowsKey();
 								}
 								if (km != 0) {
