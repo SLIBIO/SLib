@@ -22,6 +22,8 @@
 
 #include "slib/ui/system_tray_icon.h"
 
+#include "slib/ui/core.h"
+
 namespace slib
 {
 
@@ -53,13 +55,15 @@ namespace slib
 
 	Ref<Bitmap> SystemTrayIcon::getIcon()
 	{
-		ObjectLocker lock(this);
 		return m_icon;
 	}
 
 	void SystemTrayIcon::setIcon(const Ref<Bitmap>& icon)
 	{
-		ObjectLocker lock(this);
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), SystemTrayIcon, setIcon, this, icon));
+			return;
+		}
 		m_icon = icon;
 		m_iconName.setNull();
 		setIcon_NI(icon, sl_null);
@@ -67,13 +71,15 @@ namespace slib
 
 	String SystemTrayIcon::getIconName()
 	{
-		ObjectLocker lock(this);
 		return m_iconName;
 	}
 
 	void SystemTrayIcon::setIconName(const String& name)
 	{
-		ObjectLocker lock(this);
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), SystemTrayIcon, setIconName, this, name));
+			return;
+		}
 		m_iconName = name;
 		m_icon.setNull();
 		setIcon_NI(sl_null, name);
@@ -86,6 +92,10 @@ namespace slib
 
 	void SystemTrayIcon::setToolTip(const String& toolTip)
 	{
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), SystemTrayIcon, setToolTip, this, toolTip));
+			return;
+		}
 		m_toolTip = toolTip;
 		setToolTip_NI(toolTip);
 	}
@@ -97,6 +107,10 @@ namespace slib
 
 	void SystemTrayIcon::setMenu(const Ref<Menu>& menu)
 	{
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), SystemTrayIcon, setMenu, this, menu));
+			return;
+		}
 		m_menu = menu;
 		setMenu_NI(menu);
 	}

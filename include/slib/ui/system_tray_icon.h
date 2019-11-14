@@ -108,8 +108,8 @@ namespace slib
 		void dispatchEvent(UIEvent* ev);
 		
 	protected:
-		Ref<Bitmap> m_icon;
-		String m_iconName;
+		AtomicRef<Bitmap> m_icon;
+		AtomicString m_iconName;
 		AtomicString m_toolTip;
 		sl_bool m_flagHighlight;
 		AtomicRef<Menu> m_menu;
