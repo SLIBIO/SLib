@@ -66,13 +66,13 @@ namespace slib
 				
 				void setChecked(sl_bool flag) override;
 				
-				void setIcon(const Ref<Bitmap>& icon) override;
+				void setIcon(const Ref<Drawable>& icon) override;
 				
-				void setCheckedIcon(const Ref<Bitmap>& icon) override;
+				void setCheckedIcon(const Ref<Drawable>& icon) override;
 				
 				void setSubmenu(const Ref<Menu>& menu) override;
 				
-				static NSImage* _createIcon(const Ref<Bitmap>& iconSrc);
+				static NSImage* _createIcon(const Ref<Drawable>& iconSrc);
 				
 			};
 			
@@ -255,16 +255,16 @@ namespace slib
 				m_handle.state = flag ? NSOnState : NSOffState;
 			}
 			
-			void MenuItemImpl::setIcon(const Ref<Bitmap>& icon)
+			void MenuItemImpl::setIcon(const Ref<Drawable>& icon)
 			{
 				MenuItem::setIcon(icon);
-				m_handle.offStateImage = GraphicsPlatform::createNSImageFromBitmap(icon);
+				m_handle.offStateImage = GraphicsPlatform::getNSImage(icon);
 			}
 			
-			void MenuItemImpl::setCheckedIcon(const Ref<Bitmap>& icon)
+			void MenuItemImpl::setCheckedIcon(const Ref<Drawable>& icon)
 			{
 				MenuItem::setCheckedIcon(icon);
-				m_handle.onStateImage = GraphicsPlatform::createNSImageFromBitmap(icon);
+				m_handle.onStateImage = GraphicsPlatform::getNSImage(icon);
 				if (m_handle.onStateImage == nil) {
 					m_handle.onStateImage = m_handle->m_defaultCheckedImage;
 				}
@@ -279,10 +279,10 @@ namespace slib
 				}
 			}
 			
-			NSImage* MenuItemImpl::_createIcon(const Ref<Bitmap>& iconSrc)
+			NSImage* MenuItemImpl::_createIcon(const Ref<Drawable>& iconSrc)
 			{
 				if (iconSrc.isNotNull()) {
-					NSImage* icon = GraphicsPlatform::createNSImageFromBitmap(iconSrc);
+					NSImage* icon = GraphicsPlatform::getNSImage(iconSrc);
 					if (icon != nil) {
 						if (icon.size.width > 0 && icon.size.height > 0) {
 							double w = [[NSFont menuFontOfSize:0] pointSize];

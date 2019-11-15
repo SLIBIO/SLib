@@ -137,14 +137,14 @@ namespace slib
 					}
 				}
 				
-				void setIcon_NI(const Ref<Bitmap>& icon, const String& name) override
+				void setIcon_NI(const Ref<Drawable>& icon, const String& name) override
 				{
 					NSImage* image = nil;
 					if (name.isNotEmpty()) {
 						image = [NSImage imageNamed:Apple::getNSStringFromString(name)];
 					}
 					if (image == nil && icon.isNotNull()) {
-						image = GraphicsPlatform::createNSImageFromBitmap(icon);
+						image = GraphicsPlatform::getNSImage(icon);
 						if (image != nil) {
 							CGFloat height = [[NSStatusBar systemStatusBar] thickness];
 							if (image.size.width > height + 0.5 && image.size.height > height + 0.5) {

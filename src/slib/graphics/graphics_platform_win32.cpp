@@ -63,10 +63,15 @@ namespace slib
 		return ret;
 	}
 
-	HBITMAP GraphicsPlatform::createDIBFromBitmap(const Ref<Bitmap>& bitmap)
+	HBITMAP GraphicsPlatform::createDIB(const Ref<Drawable>& drawable)
 	{
-		if (bitmap.isNotNull() && bitmap->isNotEmpty()) {
+		if (drawable.isNull()) {
+			return NULL;
+		}
 
+		Ref<Bitmap> bitmap = drawable->toBitmap();
+		if (bitmap.isNotNull() && bitmap->isNotEmpty()) {
+		
 			BITMAPINFOHEADER bi;
 			bi.biSize = sizeof(bi);
 			bi.biWidth = bitmap->getWidth();
@@ -99,8 +104,12 @@ namespace slib
 		return NULL;
 	}
 
-	HICON GraphicsPlatform::createIconFromBitmap(const Ref<Bitmap>& bitmap, sl_bool flagCursor, sl_uint32 xHotspot, sl_uint32 yHotspot)
+	HICON GraphicsPlatform::createHICON(const Ref<Drawable>& drawable, sl_bool flagCursor, sl_uint32 xHotspot, sl_uint32 yHotspot)
 	{
+		if (drawable.isNull()) {
+			return NULL;
+		}
+		Ref<Bitmap> bitmap = drawable->toBitmap();
 		if (bitmap.isNull()) {
 			return NULL;
 		}
@@ -109,7 +118,7 @@ namespace slib
 		if (width <= 0 || height <= 0) {
 			return NULL;
 		}
-		HBITMAP dib = createDIBFromBitmap(bitmap);
+		HBITMAP dib = createDIB(bitmap);
 		if (dib) {
 			HICON hIcon = NULL;
 			sl_uint32 maskWidth = BitmapData::calculatePitchAlign4(width, 1);

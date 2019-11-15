@@ -145,8 +145,8 @@ namespace slib
 		static COLORREF getColorRef(const Color& color);
 		static Color getColorFromColorRef(COLORREF cr);
 
-		static HBITMAP createDIBFromBitmap(const Ref<Bitmap>& bitmap);
-		static HICON createIconFromBitmap(const Ref<Bitmap>& bitmap, sl_bool flagCursor = sl_false, sl_uint32 xHotspot = 0, sl_uint32 yHotspot = 0);
+		static HBITMAP createDIB(const Ref<Drawable>& drawable);
+		static HICON createHICON(const Ref<Drawable>& drawable, sl_bool flagCursor = sl_false, sl_uint32 xHotspot = 0, sl_uint32 yHotspot = 0);
 #endif
 
 #if defined(SLIB_PLATFORM_IS_APPLE)
@@ -161,6 +161,7 @@ namespace slib
 		static NSColor* getNSColorFromColor(const Color& color);
 		static Color getColorFromNSColor(NSColor* color);
 		static NSImage* createNSImageFromBitmap(const Ref<Bitmap>& bitmap);
+		static NSImage* getNSImage(const Ref<Drawable>& drawable);
 
 #		elif defined(SLIB_PLATFORM_IS_IOS)
 

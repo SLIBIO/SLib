@@ -69,13 +69,13 @@ namespace slib
 		
 		virtual void setChecked(sl_bool flag);
 		
-		Ref<Bitmap> getIcon() const;
+		Ref<Drawable> getIcon() const;
 		
-		virtual void setIcon(const Ref<Bitmap>& icon);
+		virtual void setIcon(const Ref<Drawable>& icon);
 		
-		Ref<Bitmap> getCheckedIcon() const;
+		Ref<Drawable> getCheckedIcon() const;
 		
-		virtual void setCheckedIcon(const Ref<Bitmap>& icon);
+		virtual void setCheckedIcon(const Ref<Drawable>& icon);
 		
 		Ref<Menu> getSubmenu() const;
 		
@@ -98,8 +98,8 @@ namespace slib
 		KeycodeAndModifiers m_secondShortcutKey;
 		sl_bool m_flagEnabled;
 		sl_bool m_flagChecked;
-		AtomicRef<Bitmap> m_icon;
-		AtomicRef<Bitmap> m_checkedIcon;
+		AtomicRef<Drawable> m_icon;
+		AtomicRef<Drawable> m_checkedIcon;
 		AtomicRef<Menu> m_submenu;
 		
 	};
@@ -112,8 +112,8 @@ namespace slib
 		KeycodeAndModifiers secondShortcutKey;
 		sl_bool flagEnabled;
 		sl_bool flagChecked;
-		Ref<Bitmap> icon;
-		Ref<Bitmap> checkedIcon;
+		Ref<Drawable> icon;
+		Ref<Drawable> checkedIcon;
 		Ref<Menu> submenu;
 		Function<void()> action;
 		
@@ -160,21 +160,21 @@ namespace slib
 		
 		Ref<MenuItem> addMenuItem(const String& title);
 		
-		Ref<MenuItem> addMenuItem(const String& title, const Ref<Bitmap>& icon);
+		Ref<MenuItem> addMenuItem(const String& title, const Ref<Drawable>& icon);
 		
-		Ref<MenuItem> addMenuItem(const String& title, const Ref<Bitmap>& icon, const Ref<Bitmap>& checkedIcon);
+		Ref<MenuItem> addMenuItem(const String& title, const Ref<Drawable>& icon, const Ref<Drawable>& checkedIcon);
 		
 		Ref<MenuItem> addMenuItem(const String& title, const KeycodeAndModifiers& shortcutKey);
 		
-		Ref<MenuItem> addMenuItem(const String& title, const KeycodeAndModifiers& shortcutKey, const Ref<Bitmap>& icon);
+		Ref<MenuItem> addMenuItem(const String& title, const KeycodeAndModifiers& shortcutKey, const Ref<Drawable>& icon);
 		
-		Ref<MenuItem> addMenuItem(const String& title, const KeycodeAndModifiers& shortcutKey, const Ref<Bitmap>& icon, const Ref<Bitmap>& checkedIcon);
+		Ref<MenuItem> addMenuItem(const String& title, const KeycodeAndModifiers& shortcutKey, const Ref<Drawable>& icon, const Ref<Drawable>& checkedIcon);
 		
 		Ref<MenuItem> addSubmenu(Ref<Menu>& submenu, const String& title);
 		
-		Ref<MenuItem> addSubmenu(Ref<Menu>& submenu, const String& title, const Ref<Bitmap>& icon);
+		Ref<MenuItem> addSubmenu(Ref<Menu>& submenu, const String& title, const Ref<Drawable>& icon);
 		
-		Ref<MenuItem> addSubmenu(Ref<Menu>& submenu, const String& title, const Ref<Bitmap>& icon, const Ref<Bitmap>& checkedIcon);
+		Ref<MenuItem> addSubmenu(Ref<Menu>& submenu, const String& title, const Ref<Drawable>& icon, const Ref<Drawable>& checkedIcon);
 		
 		sl_bool processShortcutKey(const KeycodeAndModifiers& km);
 		

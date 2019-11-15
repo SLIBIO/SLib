@@ -109,7 +109,18 @@ namespace slib
 		}
 		return nil;
 	}
-	
+
+	NSImage* GraphicsPlatform::getNSImage(const Ref<Drawable>& drawable)
+	{
+		if (drawable.isNull()) {
+			return nil;
+		}
+		CGImageRef image = getImageDrawableHandle(drawable.get());
+		if (image) {
+			return [[NSImage alloc] initWithCGImage:image size:NSMakeSize(CGImageGetWidth(image), CGImageGetHeight(image))];
+		}
+		return createNSImageFromBitmap(drawable->toBitmap());
+	}
 #endif
 
 #if defined(SLIB_PLATFORM_IS_IOS)

@@ -91,22 +91,22 @@ namespace slib
 		m_flagChecked = flag;
 	}
 	
-	Ref<Bitmap> MenuItem::getIcon() const
+	Ref<Drawable> MenuItem::getIcon() const
 	{
 		return m_icon;
 	}
 	
-	void MenuItem::setIcon(const Ref<Bitmap>& icon)
+	void MenuItem::setIcon(const Ref<Drawable>& icon)
 	{
 		m_icon = icon;
 	}
 	
-	Ref<Bitmap> MenuItem::getCheckedIcon() const
+	Ref<Drawable> MenuItem::getCheckedIcon() const
 	{
 		return m_checkedIcon;
 	}
 	
-	void MenuItem::setCheckedIcon(const Ref<Bitmap>& icon)
+	void MenuItem::setCheckedIcon(const Ref<Drawable>& icon)
 	{
 		m_checkedIcon = icon;
 	}
@@ -208,7 +208,7 @@ namespace slib
 		return addMenuItem(param);
 	}
 	
-	Ref<MenuItem> Menu::addMenuItem(const String& title, const Ref<Bitmap>& icon)
+	Ref<MenuItem> Menu::addMenuItem(const String& title, const Ref<Drawable>& icon)
 	{
 		MenuItemParam param;
 		param.text = title;
@@ -216,7 +216,7 @@ namespace slib
 		return addMenuItem(param);
 	}
 	
-	Ref<MenuItem> Menu::addMenuItem(const String& title, const Ref<Bitmap>& icon, const Ref<Bitmap>& checkedIcon)
+	Ref<MenuItem> Menu::addMenuItem(const String& title, const Ref<Drawable>& icon, const Ref<Drawable>& checkedIcon)
 	{
 		MenuItemParam param;
 		param.text = title;
@@ -233,7 +233,7 @@ namespace slib
 		return addMenuItem(param);
 	}
 	
-	Ref<MenuItem> Menu::addMenuItem(const String& title, const KeycodeAndModifiers& shortcutKey, const Ref<Bitmap>& icon)
+	Ref<MenuItem> Menu::addMenuItem(const String& title, const KeycodeAndModifiers& shortcutKey, const Ref<Drawable>& icon)
 	{
 		MenuItemParam param;
 		param.text = title;
@@ -242,7 +242,7 @@ namespace slib
 		return addMenuItem(param);
 	}
 	
-	Ref<MenuItem> Menu::addMenuItem(const String& title, const KeycodeAndModifiers& shortcutKey, const Ref<Bitmap>& icon, const Ref<Bitmap>& checkedIcon)
+	Ref<MenuItem> Menu::addMenuItem(const String& title, const KeycodeAndModifiers& shortcutKey, const Ref<Drawable>& icon, const Ref<Drawable>& checkedIcon)
 	{
 		MenuItemParam param;
 		param.text = title;
@@ -260,7 +260,7 @@ namespace slib
 		return addMenuItem(param);
 	}
 	
-	Ref<MenuItem> Menu::addSubmenu(Ref<Menu>& submenu, const String& title, const Ref<Bitmap>& icon)
+	Ref<MenuItem> Menu::addSubmenu(Ref<Menu>& submenu, const String& title, const Ref<Drawable>& icon)
 	{
 		MenuItemParam param;
 		param.text = title;
@@ -269,7 +269,7 @@ namespace slib
 		return addMenuItem(param);
 	}
 	
-	Ref<MenuItem> Menu::addSubmenu(Ref<Menu>& submenu, const String& title, const Ref<Bitmap>& icon, const Ref<Bitmap>& checkedIcon)
+	Ref<MenuItem> Menu::addSubmenu(Ref<Menu>& submenu, const String& title, const Ref<Drawable>& icon, const Ref<Drawable>& checkedIcon)
 	{
 		MenuItemParam param;
 		param.text = title;
@@ -336,12 +336,12 @@ namespace slib
 					m_button->setCurrentCategory(flag ? 1 : 0);
 				}
 				
-				void setIcon(const Ref<Bitmap>& icon) override
+				void setIcon(const Ref<Drawable>& icon) override
 				{
 					m_button->setIcon(icon);
 				}
 				
-				void setCheckedIcon(const Ref<Bitmap>& icon) override
+				void setCheckedIcon(const Ref<Drawable>& icon) override
 				{
 					m_button->setIcon(icon, ButtonState::Normal, 1);
 				}

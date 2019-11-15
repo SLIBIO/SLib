@@ -38,7 +38,7 @@ namespace slib
 	{
 	public:
 		String iconName;
-		Ref<Bitmap> icon;
+		Ref<Drawable> icon;
 		String toolTip;
 		sl_bool flagHighlight;
 		Ref<Menu> menu;
@@ -75,9 +75,9 @@ namespace slib
 		static Ref<SystemTrayIcon> create(const SystemTrayIconParam& param);
 		
 	public:
-		Ref<Bitmap> getIcon();
+		Ref<Drawable> getIcon();
 		
-		void setIcon(const Ref<Bitmap>& icon);
+		void setIcon(const Ref<Drawable>& icon);
 		
 		String getIconName();
 		
@@ -102,7 +102,7 @@ namespace slib
 		
 		void notify(const String& title, const String& message);
 		
-		void notify(const String& title, const String& message, const Ref<Bitmap>& icon);
+		void notify(const String& title, const String& message, const Ref<Drawable>& icon);
 		
 		void notify(const String& title, const String& message, const String& iconName);
 		
@@ -126,7 +126,7 @@ namespace slib
 		void dispatchBalloonTimeout();
 
 	protected:
-		AtomicRef<Bitmap> m_icon;
+		AtomicRef<Drawable> m_icon;
 		AtomicString m_iconName;
 		AtomicString m_toolTip;
 		sl_bool m_flagHighlight;
@@ -146,7 +146,7 @@ namespace slib
 		void _init(const SystemTrayIconParam& param);
 		
 	protected:
-		virtual void setIcon_NI(const Ref<Bitmap>& icon, const String& name) = 0;
+		virtual void setIcon_NI(const Ref<Drawable>& icon, const String& name) = 0;
 		
 		virtual void setToolTip_NI(const String& toolTip) = 0;
 				
@@ -164,7 +164,7 @@ namespace slib
 
 		SystemTrayIcon::NotifyIcon iconType;
 		String iconName;
-		Ref<Bitmap> icon;
+		Ref<Drawable> icon;
 
 		sl_uint32 timeout; // In milliseconds (not used on Windows Vista and later)
 		sl_bool flagSound;

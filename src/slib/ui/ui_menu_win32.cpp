@@ -109,9 +109,9 @@ namespace slib
 					_updateState();
 				}
 
-				void setIcon(const Ref<Bitmap>& icon) override;
+				void setIcon(const Ref<Drawable>& icon) override;
 
-				void setCheckedIcon(const Ref<Bitmap>& icon) override;
+				void setCheckedIcon(const Ref<Drawable>& icon) override;
 
 				void setSubmenu(const Ref<Menu>& menu) override;
 
@@ -276,8 +276,8 @@ namespace slib
 						mii.fMask |= MIIM_SUBMENU;
 					}
 				}
-				mii.hbmpUnchecked = GraphicsPlatform::createDIBFromBitmap(param.icon);
-				mii.hbmpChecked = GraphicsPlatform::createDIBFromBitmap(param.checkedIcon);
+				mii.hbmpUnchecked = GraphicsPlatform::createDIB(param.icon);
+				mii.hbmpChecked = GraphicsPlatform::createDIB(param.checkedIcon);
 				if (mii.hbmpUnchecked || mii.hbmpChecked) {
 					mii.fMask |= MIIM_CHECKMARKS;
 				}
@@ -368,28 +368,28 @@ namespace slib
 				SetMenuItemInfoW(hMenu, index, TRUE, &mii);
 			}
 
-			void MenuItemImpl::setIcon(const Ref<Bitmap>& icon)
+			void MenuItemImpl::setIcon(const Ref<Drawable>& icon)
 			{
 				MenuItem::setIcon(icon);
 				MENU_ITEM_SET_PROLOG;
 				if (m_hbmUnchecked) {
 					DeleteObject(m_hbmUnchecked);
 				}
-				m_hbmUnchecked = GraphicsPlatform::createDIBFromBitmap(icon);
+				m_hbmUnchecked = GraphicsPlatform::createDIB(icon);
 				mii.fMask = MIIM_CHECKMARKS;
 				mii.hbmpUnchecked = m_hbmUnchecked;
 				mii.hbmpChecked = m_hbmChecked;
 				SetMenuItemInfoW(hMenu, index, TRUE, &mii);
 			}
 
-			void MenuItemImpl::setCheckedIcon(const Ref<Bitmap>& icon)
+			void MenuItemImpl::setCheckedIcon(const Ref<Drawable>& icon)
 			{
 				MenuItem::setIcon(icon);
 				MENU_ITEM_SET_PROLOG;
 				if (m_hbmChecked) {
 					DeleteObject(m_hbmChecked);
 				}
-				m_hbmChecked = GraphicsPlatform::createDIBFromBitmap(icon);
+				m_hbmChecked = GraphicsPlatform::createDIB(icon);
 				mii.fMask = MIIM_CHECKMARKS;
 				mii.hbmpUnchecked = m_hbmUnchecked;
 				mii.hbmpChecked = m_hbmChecked;

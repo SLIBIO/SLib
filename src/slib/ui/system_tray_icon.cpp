@@ -56,12 +56,12 @@ namespace slib
 	{
 	}
 
-	Ref<Bitmap> SystemTrayIcon::getIcon()
+	Ref<Drawable> SystemTrayIcon::getIcon()
 	{
 		return m_icon;
 	}
 
-	void SystemTrayIcon::setIcon(const Ref<Bitmap>& icon)
+	void SystemTrayIcon::setIcon(const Ref<Drawable>& icon)
 	{
 		if (!(UI::isUiThread())) {
 			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), SystemTrayIcon, setIcon, this, icon));
@@ -135,7 +135,7 @@ namespace slib
 		notify(param);
 	}
 
-	void SystemTrayIcon::notify(const String& title, const String& message, const Ref<Bitmap>& icon)
+	void SystemTrayIcon::notify(const String& title, const String& message, const Ref<Drawable>& icon)
 	{
 		SystemTrayIconNotifyParam param;
 		param.title = title;

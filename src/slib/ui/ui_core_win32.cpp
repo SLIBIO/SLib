@@ -210,7 +210,7 @@ namespace slib
 									canvas->setAntiAlias(sl_false);
 									canvas->drawText(String::fromUint32(n), Rectangle(0, 0, 32, 30), n < 10 ? font1 : font2, Color::White, Alignment::MiddleCenter);
 									canvas.setNull();
-									hIcon = GraphicsPlatform::createIconFromBitmap(bitmap);
+									hIcon = GraphicsPlatform::createHICON(bitmap);
 								}
 							}
 						}

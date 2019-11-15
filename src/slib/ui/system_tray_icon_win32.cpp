@@ -126,7 +126,7 @@ namespace slib
 				}
 
 			public:
-				static HICON createIcon(const String16& name, const Ref<Bitmap>& bitmap, sl_bool& flagLoadIcon)
+				static HICON createIcon(const String16& name, const Ref<Drawable>& drawable, sl_bool& flagLoadIcon)
 				{
 					flagLoadIcon = sl_false;
 					Win32_UI_Shared* shared = Win32_UI_Shared::get();
@@ -148,8 +148,8 @@ namespace slib
 							}
 						}
 					}
-					if (bitmap.isNotNull()) {
-						return GraphicsPlatform::createIconFromBitmap(bitmap);
+					if (drawable.isNotNull()) {
+						return GraphicsPlatform::createHICON(drawable);
 					}
 					return sl_null;
 				}
@@ -242,7 +242,7 @@ namespace slib
 						nid.dwInfoFlags = NIIF_INFO;
 					} else {
 						nid.dwInfoFlags = NIIF_NONE;
-						Ref<Bitmap> icon = param.icon;
+						Ref<Drawable> icon = param.icon;
 						if (icon.isNotNull()) {
 							sl_uint32 w, h;
 							if (param.flagLargeIcon) {
@@ -252,7 +252,7 @@ namespace slib
 								w = GetSystemMetrics(SM_CXSMICON);
 								h = GetSystemMetrics(SM_CYSMICON);
 							}
-							if (icon->getWidth() != w || icon->getHeight() != h) {
+							if ((sl_uint32)(icon->getDrawableWidth()) != w || (sl_uint32)(icon->getDrawableHeight()) != h) {
 								Ref<Image> image = icon->toImage();
 								if (image.isNotNull()) {
 									icon = image->stretch(w, h);
@@ -276,7 +276,7 @@ namespace slib
 					}
 				}
 
-				void setIcon_NI(const Ref<Bitmap>& icon, const String& name) override
+				void setIcon_NI(const Ref<Drawable>& icon, const String& name) override
 				{
 					NOTIFYICONDATAW nid;
 					if (prepareNID(nid)) {
