@@ -181,6 +181,11 @@ namespace slib
 	{
 	}
 
+	Ref<Menu> Menu::createPopup()
+	{
+		return create(sl_true);
+	}
+
 	sl_uint32 Menu::getMenuItemsCount() const
 	{
 		return (sl_uint32)(m_items.getCount());
@@ -471,7 +476,7 @@ namespace slib
 		}
 	}
 
-	Ref<Menu> Menu::create()
+	Ref<Menu> Menu::create(sl_bool flagPopup)
 	{
 		return Ref<Menu>::from(priv::menu::DrawnMenu::create());
 	}

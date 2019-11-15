@@ -180,6 +180,7 @@ namespace slib
 	public:
 		String name;
 		String localNamespace;
+		sl_bool flagPopup;
 		CList< Ref<SAppMenuResourceItem> > children;
 		CHashMap<String, Ref<SAppMenuResourceItem> > itemsWindows;
 		CHashMap<String, Ref<SAppMenuResourceItem> > itemsLinux;

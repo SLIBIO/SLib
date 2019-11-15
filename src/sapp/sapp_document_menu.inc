@@ -23,7 +23,7 @@
 namespace slib
 {
 
-	sl_bool SAppDocument::_parseMenuResource(const String& localNamespace, const Ref<XmlElement>& element)
+	sl_bool SAppDocument::_parseMenuResource(const String& localNamespace, const Ref<XmlElement>& element, sl_bool flagPopup)
 	{
 		if (element.isNull()) {
 			return sl_false;
@@ -34,6 +34,8 @@ namespace slib
 			_logError(element, g_str_error_out_of_memory);
 			return sl_false;
 		}
+		
+		menu->flagPopup = flagPopup;
 		
 		String name = element->getAttribute("name");
 		if (name.isEmpty()) {
@@ -275,7 +277,11 @@ namespace slib
 			if (pair.value.isNotNull()) {
 				
 				sbHeader.add(String::format("\t\tSLIB_DECLARE_MENU_BEGIN(%s)%n", pair.key));
-				sbCpp.add(String::format("\t\tSLIB_DEFINE_MENU_BEGIN(%s)%n", pair.key));
+				if (pair.value->flagPopup) {
+					sbCpp.add(String::format("\t\tSLIB_DEFINE_MENU_BEGIN(%s, sl_true)%n", pair.key));
+				} else {
+					sbCpp.add(String::format("\t\tSLIB_DEFINE_MENU_BEGIN(%s)%n", pair.key));
+				}
 				
 				ListLocker< Ref<SAppMenuResourceItem> > items(pair.value->children);
 				for (sl_size i = 0; i < items.count; i++) {
@@ -475,7 +481,7 @@ namespace slib
 		}
 		Ref<SAppMenuResource> res;
 		if (_checkMenuName(localNamespace, value.resourceName, element, sl_null, &res)) {
-			Ref<Menu> menu = Menu::create();
+			Ref<Menu> menu = Menu::create(res->flagPopup);
 			if (menu.isNull()) {
 				_logError(g_str_error_out_of_memory);
 				return sl_false;

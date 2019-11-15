@@ -302,7 +302,7 @@ namespace slib
 	
 	using namespace priv::menu;
 
-	Ref<Menu> Menu::create()
+	Ref<Menu> Menu::create(sl_bool flagPopup)
 	{
 		return MenuImpl::create();
 	}

@@ -134,7 +134,7 @@ namespace slib
 #define SLIB_DECLARE_MENU_END };
 	
 	
-#define SLIB_DEFINE_MENU_BEGIN(NAME) \
+#define SLIB_DEFINE_MENU_BEGIN(NAME, ...) \
 	const NAME* NAME::get() { \
 		SLIB_SAFE_STATIC(NAME, ret); \
 		if (SLIB_SAFE_STATIC_CHECK_FREED(ret)) { \
@@ -143,11 +143,11 @@ namespace slib
 		return &ret; \
 	} \
 	NAME::NAME() { \
-		root = root_menu = slib::Menu::create(); \
+		root = root_menu = slib::Menu::create(__VA_ARGS__); \
 		if (root.isNull()) return;
 	
 #define SLIB_DEFINE_SUBMENU(PARENT, NAME, ...) \
-	NAME##_menu = slib::Menu::create(); \
+	NAME##_menu = slib::Menu::createPopup(); \
 	if (NAME##_menu.isNull()) return; \
 	NAME = PARENT##_menu->addSubmenu(NAME##_menu, __VA_ARGS__);
 	

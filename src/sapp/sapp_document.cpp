@@ -729,8 +729,9 @@ namespace slib
 		for (i = 0; i < children.count; i++) {
 			Ref<XmlElement>& child = children[i];
 			if (child.isNotNull()) {
-				if (child->getName() == "strings" || child->getName() == "string") {
-					if (child->getName() == "strings") {
+				String type = child->getName().toLower();
+				if (type == "strings" || type == "string") {
+					if (type == "strings") {
 						if (!_parseStringResources(localNamespace, child, locale, textXML)) {
 							return sl_false;
 						}
@@ -739,35 +740,35 @@ namespace slib
 							return sl_false;
 						}
 					}
-				} else if (child->getName() == "color") {
+				} else if (type == "color") {
 					if (!_parseColorResource(localNamespace, child)) {
 						return sl_false;
 					}
-				} else if (child->getName() == "nine-pieces") {
+				} else if (type == "nine-pieces") {
 					if (!_parseNinePiecesDrawableResource(localNamespace, child)) {
 						return sl_false;
 					}
-				} else if (child->getName() == "nine-patch") {
+				} else if (type == "nine-patch") {
 					if (!_parseNinePatchDrawableResource(localNamespace, child)) {
 						return sl_false;
 					}
-				} else if (child->getName() == "menu") {
-					if (!_parseMenuResource(localNamespace, child)) {
+				} else if (type == "menu" || type == "popupmenu" || type == "popup-menu") {
+					if (!_parseMenuResource(localNamespace, child, type != "menu")) {
 						return sl_false;
 					}
-				} else if (child->getName() == "layout-include" || child->getName() == "include") {
+				} else if (type == "layout-include" || type == "include") {
 					if (!_parseLayoutInclude(localNamespace, child)) {
 						return sl_false;
 					}
-				} else if (child->getName() == "layout-style" || child->getName() == "style") {
+				} else if (type == "layout-style" || type == "style") {
 					if (!_parseLayoutStyle(localNamespace, child)) {
 						return sl_false;
 					}
-				} else if (child->getName() == "unit") {
+				} else if (type == "unit") {
 					if (!_parseLayoutUnit(localNamespace, child)) {
 						return sl_false;
 					}
-				} else if (child->getName() == "layout") {
+				} else if (type == "layout") {
 				} else {
 					_logError(child, g_str_error_invalid_tag.arg(child->getName()));
 					return sl_false;

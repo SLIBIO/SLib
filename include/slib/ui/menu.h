@@ -134,7 +134,9 @@ namespace slib
 		~Menu();
 
 	public:
-		static Ref<Menu> create();
+		static Ref<Menu> create(sl_bool flagPopup = sl_false);
+		
+		static Ref<Menu> createPopup();
 		
 		sl_uint32 getMenuItemsCount() const;
 		

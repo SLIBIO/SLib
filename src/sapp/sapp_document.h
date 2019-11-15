@@ -163,7 +163,7 @@ namespace slib
 		Ref<Drawable> _getDrawableValue_NinePatch(SAppDrawableResource* res);
 		
 		// Menu Resources
-		sl_bool _parseMenuResource(const String& localNamespace, const Ref<XmlElement>& element);
+		sl_bool _parseMenuResource(const String& localNamespace, const Ref<XmlElement>& element, sl_bool flagPopup);
 		Ref<SAppMenuResourceItem> _parseMenuResourceItem(const String& localNamespace, const Ref<XmlElement>& element, SAppMenuResource* menu, int platforms);
 		sl_bool _generateMenusCpp(const String& targetPath);
 		sl_bool _generateMenusCpp_Item(SAppMenuResource* resource, const String& parentName, int parentPlatforms, SAppMenuResourceItem* item, StringBuffer& sbHeader, StringBuffer& sbCpp, int tabLevel);

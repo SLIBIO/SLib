@@ -125,11 +125,13 @@ namespace slib
 
 			public:
 				HMENU m_hMenu;
+				HMENU m_hMenuParentForPopup;
 
 			public:
 				MenuImpl()
 				{
 					m_hMenu = NULL;
+					m_hMenuParentForPopup = NULL;
 				}
 
 				~MenuImpl()
@@ -141,12 +143,20 @@ namespace slib
 							map->remove(m_hMenu);
 						}
 					}
+					if (m_hMenuParentForPopup) {
+						DestroyMenu(m_hMenuParentForPopup);
+					}
 				}
 
 			public:
-				static Ref<MenuImpl> create()
+				static Ref<MenuImpl> create(sl_bool flagPopup)
 				{
-					HMENU hMenu = CreateMenu();
+					HMENU hMenu;
+					if (flagPopup) {
+						hMenu = CreatePopupMenu();
+					} else {
+						hMenu = CreateMenu();
+					}
 					if (hMenu) {
 						MENUINFO mi;
 						mi.cbSize = sizeof(mi);
@@ -454,9 +464,9 @@ namespace slib
 
 	using namespace priv::menu;
 
-	Ref<Menu> Menu::create()
+	Ref<Menu> Menu::create(sl_bool flagPopup)
 	{
-		return MenuImpl::create();
+		return MenuImpl::create(flagPopup);
 	}
 
 
