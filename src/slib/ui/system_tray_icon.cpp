@@ -40,6 +40,9 @@ namespace slib
 	SystemTrayIconNotifyParam::SystemTrayIconNotifyParam()
 	{
 		iconType = SystemTrayIcon::NotifyIcon::None;
+		timeout = 5000;
+		flagSound = sl_true;
+		flagLargeIcon = sl_true;
 	}
 
 
@@ -117,6 +120,11 @@ namespace slib
 
 	void SystemTrayIcon::notify(const SystemTrayIconNotifyParam& param)
 	{
+		if (UI::isUiThread()) {
+			notify_NI(param);
+		} else {
+			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), SystemTrayIcon, notify_NI, this, param));
+		}
 	}
 
 	void SystemTrayIcon::notify(const String& title, const String& message)
@@ -174,6 +182,30 @@ namespace slib
 		m_onEvent(this, ev);
 	}
 
+	void SystemTrayIcon::dispatchShowBalloon()
+	{
+		m_onShowBalloon(this);
+	}
+
+	void SystemTrayIcon::dispatchHideBalloon()
+	{
+		m_onHideBalloon(this);
+	}
+
+	void SystemTrayIcon::dispatchClickBalloon()
+	{
+		m_onClickBalloon(this);
+	}
+
+	void SystemTrayIcon::dispatchBalloonTimeout()
+	{
+		m_onBalloonTimeout(this);
+	}
+
+	void SystemTrayIcon::notify_NI(const SystemTrayIconNotifyParam& param)
+	{
+	}
+
 	void SystemTrayIcon::_init(const SystemTrayIconParam& param)
 	{
 		if (param.iconName.isNotEmpty()) {
@@ -189,6 +221,11 @@ namespace slib
 		m_onRightClick = param.onRightClick;
 		m_onKeySelect = param.onKeySelect;
 		m_onEvent = param.onEvent;
+
+		m_onShowBalloon = param.onShowBalloon;
+		m_onHideBalloon = param.onHideBalloon;
+		m_onClickBalloon = param.onClickBalloon;
+		m_onBalloonTimeout = param.onBalloonTimeout;
 	}
 
 #if !defined(SLIB_UI_IS_MACOS) && !defined(SLIB_UI_IS_WIN32)

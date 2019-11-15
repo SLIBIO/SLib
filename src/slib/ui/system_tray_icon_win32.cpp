@@ -29,6 +29,7 @@
 #include "slib/ui/system_tray_icon.h"
 
 #include "slib/core/safe_static.h"
+#include "slib/graphics/image.h"
 #include "slib/ui/platform.h"
 
 #include "ui_core_win32.h"
@@ -133,6 +134,13 @@ namespace slib
 						if (hIcon) {
 							return hIcon;
 						}
+						sl_int32 res = 0;
+						if (name.parseInt32(10, &res)) {
+							hIcon = LoadIconW(shared->hInstance, MAKEINTRESOURCEW(res));
+							if (hIcon) {
+								return hIcon;
+							}
+						}
 					}
 					if (bitmap.isNotNull()) {
 						return GraphicsPlatform::createIconFromBitmap(bitmap);
@@ -178,6 +186,82 @@ namespace slib
 						return sl_true;
 					}
 					return sl_false;
+				}
+
+				static sl_bool setInfo(NOTIFYICONDATAW& nid, const String16& str)
+				{
+					sl_size n = str.getLength() << 1;
+					if (n > sizeof(nid.szInfo)) {
+						n = sizeof(nid.szInfo);
+					}
+					if (n) {
+						Base::copyMemory(nid.szInfo, str.getData(), n);
+						return sl_true;
+					}
+					return sl_false;
+				}
+
+				static sl_bool setInfoTitle(NOTIFYICONDATAW& nid, const String16& str)
+				{
+					sl_size n = str.getLength() << 1;
+					if (n > sizeof(nid.szInfoTitle)) {
+						n = sizeof(nid.szInfoTitle);
+					}
+					if (n) {
+						Base::copyMemory(nid.szInfoTitle, str.getData(), n);
+						return sl_true;
+					}
+					return sl_false;
+				}
+
+				void notify_NI(const SystemTrayIconNotifyParam& param) override
+				{
+					NOTIFYICONDATAW nid;
+					if (!(prepareNID(nid))) {
+						return;
+					}
+					nid.uID = m_id;
+					nid.uFlags = NIF_INFO;
+					nid.uTimeout = param.timeout;
+					setInfo(nid, param.message);
+					setInfoTitle(nid, param.title);
+					if (param.iconType == NotifyIcon::Error) {
+						nid.dwInfoFlags = NIIF_ERROR;
+					} else if (param.iconType == NotifyIcon::Warning) {
+						nid.dwInfoFlags = NIIF_WARNING;
+					} else if (param.iconType == NotifyIcon::Information) {
+						nid.dwInfoFlags = NIIF_INFO;
+					} else {
+						nid.dwInfoFlags = NIIF_NONE;
+						Ref<Bitmap> icon = param.icon;
+						if (icon.isNotNull()) {
+							sl_uint32 w, h;
+							if (param.flagLargeIcon) {
+								w = GetSystemMetrics(SM_CXICON);
+								h = GetSystemMetrics(SM_CYICON);
+							} else {
+								w = GetSystemMetrics(SM_CXSMICON);
+								h = GetSystemMetrics(SM_CYSMICON);
+							}
+							if (icon->getWidth() != w || icon->getHeight() != h) {
+								Ref<Image> image = icon->toImage();
+								if (image.isNotNull()) {
+									icon = image->stretch(w, h);
+								}
+							}
+						}
+						nid.hBalloonIcon = createIcon(param.iconName, icon);
+						if (nid.hBalloonIcon) {
+							nid.dwInfoFlags = NIIF_USER;
+						}
+					}
+					if (param.flagLargeIcon) {
+						nid.dwInfoFlags |= NIIF_LARGE_ICON;
+					}
+					if (!(param.flagSound)) {
+						nid.dwInfoFlags |= NIIF_NOSOUND;
+					}
+					Shell_NotifyIconW(NIM_MODIFY, &nid);
 				}
 
 				void setIcon_NI(const Ref<Bitmap>& icon, const String& name) override
@@ -270,6 +354,18 @@ namespace slib
 						action = UIAction::RightButtonDown;
 						flagNotify = sl_true;
 						break;
+					case NIN_BALLOONSHOW:
+						dispatchShowBalloon();
+						return;
+					case NIN_BALLOONHIDE:
+						dispatchHideBalloon();
+						return;
+					case NIN_BALLOONUSERCLICK:
+						dispatchClickBalloon();
+						return;
+					case NIN_BALLOONTIMEOUT:
+						dispatchBalloonTimeout();
+						return;
 					default:
 						return;
 					}
@@ -313,7 +409,7 @@ namespace slib
 							((SystemTrayIconImpl*)(instance.get()))->onMessage(LOWORD(lParam), (short)(LOWORD(wParam)), (short)(HIWORD(wParam)));
 						}
 					}
-					return 1;
+					return 0;
 				}
 
 			};

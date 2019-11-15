@@ -48,6 +48,11 @@ namespace slib
 		Function<void(SystemTrayIcon*, UIEvent*)> onKeySelect;
 		Function<void(SystemTrayIcon*, UIEvent*)> onEvent;
 		
+		Function<void(SystemTrayIcon*)> onShowBalloon;
+		Function<void(SystemTrayIcon*)> onHideBalloon;
+		Function<void(SystemTrayIcon*)> onClickBalloon;
+		Function<void(SystemTrayIcon*)> onBalloonTimeout;
+
 	public:
 		SystemTrayIconParam();
 		
@@ -93,7 +98,7 @@ namespace slib
 			Warning = 2,
 			Error = 3
 		};
-		virtual void notify(const SystemTrayIconNotifyParam& param);
+		void notify(const SystemTrayIconNotifyParam& param);
 		
 		void notify(const String& title, const String& message);
 		
@@ -112,6 +117,14 @@ namespace slib
 		
 		void dispatchEvent(UIEvent* ev);
 
+		void dispatchShowBalloon();
+
+		void dispatchHideBalloon();
+
+		void dispatchClickBalloon();
+
+		void dispatchBalloonTimeout();
+
 	protected:
 		AtomicRef<Bitmap> m_icon;
 		AtomicString m_iconName;
@@ -124,6 +137,11 @@ namespace slib
 		Function<void(SystemTrayIcon*, UIEvent*)> m_onKeySelect;
 		Function<void(SystemTrayIcon*, UIEvent*)> m_onEvent;
 		
+		Function<void(SystemTrayIcon*)> m_onShowBalloon;
+		Function<void(SystemTrayIcon*)> m_onHideBalloon;
+		Function<void(SystemTrayIcon*)> m_onClickBalloon;
+		Function<void(SystemTrayIcon*)> m_onBalloonTimeout;
+
 	protected:
 		void _init(const SystemTrayIconParam& param);
 		
@@ -133,7 +151,9 @@ namespace slib
 		virtual void setToolTip_NI(const String& toolTip) = 0;
 				
 		virtual void setMenu_NI(const Ref<Menu>& menu) = 0;
-				
+		
+		virtual void notify_NI(const SystemTrayIconNotifyParam& param);
+		
 	};
 
 	class SLIB_EXPORT SystemTrayIconNotifyParam
@@ -145,6 +165,10 @@ namespace slib
 		SystemTrayIcon::NotifyIcon iconType;
 		String iconName;
 		Ref<Bitmap> icon;
+
+		sl_uint32 timeout; // In milliseconds (not used on Windows Vista and later)
+		sl_bool flagSound;
+		sl_bool flagLargeIcon;
 		
 	public:
 		SystemTrayIconNotifyParam();
