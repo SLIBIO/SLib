@@ -97,6 +97,9 @@ namespace slib
 
 	Time Apple::getTimeFromNSDate(NSDate* date)
 	{
+		if (date == nil) {
+			return Time::zero();
+		}
 		Time time;
 		time.setSecondsCountf([date timeIntervalSince1970]);
 		return time;
