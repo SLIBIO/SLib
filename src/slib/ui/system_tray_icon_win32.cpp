@@ -73,7 +73,7 @@ namespace slib
 						Shell_NotifyIconW(NIM_DELETE, &nid);
 					}
 					if (m_hIcon) {
-						DeleteObject(m_hIcon);
+						DestroyIcon(m_hIcon);
 					}
 					InstanceMap* map = GetInstanceMap();
 					if (map) {
@@ -98,7 +98,8 @@ namespace slib
 
 					static sl_int32 uId = 0x1000;
 					nid.uID = (UINT)((sl_uint16)(Base::interlockedIncrement32(&uId)));
-					nid.hIcon = createIcon(param.iconName, param.icon);
+					sl_bool flagLoadedIcon = sl_false;
+					nid.hIcon = createIcon(param.iconName, param.icon, flagLoadedIcon);
 					nid.uFlags = NIF_MESSAGE;
 					nid.uCallbackMessage = SLIB_UI_MESSAGE_SYSTEM_TRAY_ICON;
 					if (nid.hIcon) {
@@ -113,7 +114,9 @@ namespace slib
 						Ref<SystemTrayIconImpl> ret = new SystemTrayIconImpl;
 						if (ret.isNotNull()) {
 							ret->m_id = nid.uID;
-							ret->m_hIcon = nid.hIcon;
+							if (!flagLoadedIcon) {
+								ret->m_hIcon = nid.hIcon;
+							}
 							ret->_init(param);
 							map->put(nid.uID, ret);
 							return ret;
@@ -123,8 +126,9 @@ namespace slib
 				}
 
 			public:
-				static HICON createIcon(const String16& name, const Ref<Bitmap>& bitmap)
+				static HICON createIcon(const String16& name, const Ref<Bitmap>& bitmap, sl_bool& flagLoadIcon)
 				{
+					flagLoadIcon = sl_false;
 					Win32_UI_Shared* shared = Win32_UI_Shared::get();
 					if (!shared) {
 						return sl_null;
@@ -132,12 +136,14 @@ namespace slib
 					if (name.isNotEmpty()) {
 						HICON hIcon = LoadIconW(shared->hInstance, (LPCWSTR)(name.getData()));
 						if (hIcon) {
+							flagLoadIcon = sl_true;
 							return hIcon;
 						}
 						sl_int32 res = 0;
 						if (name.parseInt32(10, &res)) {
 							hIcon = LoadIconW(shared->hInstance, MAKEINTRESOURCEW(res));
 							if (hIcon) {
+								flagLoadIcon = sl_true;
 								return hIcon;
 							}
 						}
@@ -220,11 +226,14 @@ namespace slib
 					if (!(prepareNID(nid))) {
 						return;
 					}
+
 					nid.uID = m_id;
 					nid.uFlags = NIF_INFO;
 					nid.uTimeout = param.timeout;
 					setInfo(nid, param.message);
 					setInfoTitle(nid, param.title);
+
+					sl_bool flagLoadedIcon = sl_false;
 					if (param.iconType == NotifyIcon::Error) {
 						nid.dwInfoFlags = NIIF_ERROR;
 					} else if (param.iconType == NotifyIcon::Warning) {
@@ -250,7 +259,7 @@ namespace slib
 								}
 							}
 						}
-						nid.hBalloonIcon = createIcon(param.iconName, icon);
+						nid.hBalloonIcon = nid.hIcon = createIcon(param.iconName, icon, flagLoadedIcon);
 						if (nid.hBalloonIcon) {
 							nid.dwInfoFlags = NIIF_USER;
 						}
@@ -262,6 +271,9 @@ namespace slib
 						nid.dwInfoFlags |= NIIF_NOSOUND;
 					}
 					Shell_NotifyIconW(NIM_MODIFY, &nid);
+					if (!flagLoadedIcon && nid.hBalloonIcon) {
+						DestroyIcon(nid.hBalloonIcon);
+					}
 				}
 
 				void setIcon_NI(const Ref<Bitmap>& icon, const String& name) override
@@ -269,13 +281,18 @@ namespace slib
 					NOTIFYICONDATAW nid;
 					if (prepareNID(nid)) {
 						nid.uID = m_id;
-						nid.hIcon = createIcon(name, icon);
+						sl_bool flagLoadedIcon = sl_false;
+						nid.hIcon = createIcon(name, icon, flagLoadedIcon);
 						nid.uFlags = NIF_ICON;
 						if (Shell_NotifyIconW(NIM_MODIFY, &nid)) {
 							if (m_hIcon) {
-								DeleteObject(m_hIcon);
+								DestroyIcon(m_hIcon);
 							}
-							m_hIcon = nid.hIcon;
+							if (flagLoadedIcon) {
+								m_hIcon = sl_null;
+							} else {
+								m_hIcon = nid.hIcon;
+							}
 						}
 					}					
 				}
