@@ -20,6 +20,8 @@
 *   THE SOFTWARE.
 */
 
+#define NTDDI_VERSION NTDDI_WIN7
+
 #include "slib/core/definition.h"
 
 #if defined(SLIB_UI_IS_WIN32)
@@ -85,15 +87,16 @@ namespace slib
 					if (!map) {
 						return sl_null;
 					}
+
+					priv::ui_core::g_wndProc_SystemTrayIcon = &messageProc;
+
 					NOTIFYICONDATAW nid;
 					if (!(prepareNID(nid))) {
 						return sl_null;
 					}
 
-					priv::ui_core::g_wndProc_SystemTrayIcon = &messageProc;
-
 					static sl_int32 uId = 0x1000;
-					nid.uID = (UINT)(Base::interlockedIncrement32(&uId));
+					nid.uID = (UINT)((sl_uint16)(Base::interlockedIncrement32(&uId)));
 					nid.hIcon = createIcon(param.iconName, param.icon);
 					nid.uFlags = NIF_MESSAGE;
 					nid.uCallbackMessage = SLIB_UI_MESSAGE_SYSTEM_TRAY_ICON;
@@ -101,9 +104,11 @@ namespace slib
 						nid.uFlags |= NIF_ICON;
 					}
 					if (setTip(nid, param.toolTip)) {
-						nid.uFlags |= NIF_TIP;
+						nid.uFlags |= NIF_TIP | NIF_SHOWTIP;
 					}
 					if (Shell_NotifyIconW(NIM_ADD, &nid)) {
+						nid.uVersion = 4;
+						Shell_NotifyIconW(NIM_SETVERSION, &nid);
 						Ref<SystemTrayIconImpl> ret = new SystemTrayIconImpl;
 						if (ret.isNotNull()) {
 							ret->m_id = nid.uID;
@@ -151,11 +156,11 @@ namespace slib
 						if (ver >= SLIB_MAKE_DWORD(6, 0, 0, 6)) {
 							size = sizeof(nid);
 						} else if (ver >= SLIB_MAKE_DWORD(6, 0, 0, 0)) {
-							size = NOTIFYICONDATA_V3_SIZE;
+							size = NOTIFYICONDATAW_V3_SIZE;
 						} else if (ver >= SLIB_MAKE_DWORD(5, 0, 0, 0)) {
-							size = NOTIFYICONDATA_V2_SIZE;
+							size = NOTIFYICONDATAW_V2_SIZE;
 						} else {
-							size = NOTIFYICONDATA_V1_SIZE;
+							size = NOTIFYICONDATAW_V1_SIZE;
 						}
 					}
 					nid.cbSize = size;
@@ -169,7 +174,7 @@ namespace slib
 						n = sizeof(nid.szTip);
 					}
 					if (n) {
-						Base::copyString2((sl_char16*)(nid.szTip), toolTip.getData(), n);
+						Base::copyMemory(nid.szTip, toolTip.getData(), n);
 						return sl_true;
 					}
 					return sl_false;
@@ -206,14 +211,17 @@ namespace slib
 				{
 				}
 
-				void onMessage(LPARAM lParam)
+				void onMessage(sl_uint32 msg, sl_int32 x, sl_int32 y)
 				{
-					sl_bool flagAction = sl_false;
+					Win32_UI_Shared* shared = Win32_UI_Shared::get();
+					if (!shared) {
+						return;
+					}
+					sl_bool flagNotify = sl_false;
 					UIAction action;
-					switch (lParam) {
+					switch (msg) {
 					case WM_LBUTTONDOWN:
 						action = UIAction::LeftButtonDown;
-						flagAction = sl_true;
 						break;
 					case WM_LBUTTONUP:
 						action = UIAction::LeftButtonUp;
@@ -223,7 +231,6 @@ namespace slib
 						break;
 					case WM_RBUTTONDOWN:
 						action = UIAction::RightButtonDown;
-						flagAction = sl_true;
 						break;
 					case WM_RBUTTONUP:
 						action = UIAction::RightButtonUp;
@@ -233,7 +240,6 @@ namespace slib
 						break;
 					case WM_MBUTTONDOWN:
 						action = UIAction::MiddleButtonDown;
-						flagAction = sl_true;
 						break;
 					case WM_MBUTTONUP:
 						action = UIAction::MiddleButtonUp;
@@ -251,27 +257,49 @@ namespace slib
 						} else {
 							action = UIAction::MouseMove;
 						}
+						break;
+					case NIN_SELECT:
+						action = UIAction::LeftButtonDown;
+						flagNotify = sl_true;
+						break;
+					case NIN_KEYSELECT:
+						action = UIAction::KeyDown;
+						flagNotify = sl_true;
+						break;
+					case WM_CONTEXTMENU:
+						action = UIAction::RightButtonDown;
+						flagNotify = sl_true;
+						break;
 					default:
 						return;
 					}
 					Time t;
 					t.setMillisecondsCount(GetMessageTime());
-					POINT pt;
-					GetCursorPos(&pt);
-					sl_ui_posf x = (sl_ui_posf)(pt.x);
-					sl_ui_posf y = (sl_ui_posf)(pt.y);
-					Ref<UIEvent> ev = UIEvent::createMouseEvent(action, x, y, t);
+					Ref<UIEvent> ev;
+					if (action == UIAction::KeyDown) {
+						ev = UIEvent::createKeyEvent(action, Keycode::Enter, 0, t);
+					} else {
+						ev = UIEvent::createMouseEvent(action, (sl_ui_posf)x, (sl_ui_posf)y, t);
+					}
 					if (ev.isNotNull()) {
 						UIPlatform::applyEventModifiers(ev.get());
-						dispatchEvent(ev.get());
-						if (ev->isPreventedDefault()) {
-							return;
-						}
-						if (flagAction) {
-							Ref<Menu> menu = m_menu;
-							if (menu.isNotNull()) {
-								menu->show((sl_ui_pos)(pt.x), (sl_ui_pos)(pt.y));
+						if (flagNotify) {
+							if (action == UIAction::LeftButtonDown) {
+								dispatchClick(ev.get());
+							} else if (action == UIAction::RightButtonDown) {
+								dispatchRightClick(ev.get());
+							} else if (action == UIAction::KeyDown) {
+								dispatchKeySelect(ev.get());
 							}
+							if (!(ev->isPreventedDefault())) {
+								Ref<Menu> menu = m_menu;
+								if (menu.isNotNull()) {
+									SetForegroundWindow(shared->hWndMessage);
+									menu->show((sl_ui_pos)(x), (sl_ui_pos)(y));
+								}
+							}
+						} else {
+							dispatchEvent(ev.get());
 						}
 					}
 				}
@@ -280,12 +308,12 @@ namespace slib
 				{
 					InstanceMap* map = GetInstanceMap();
 					if (map) {
-						Ref<SystemTrayIcon> instance = map->getValue((UINT)wParam);
+						Ref<SystemTrayIcon> instance = map->getValue(HIWORD(lParam));
 						if (instance.isNotNull()) {
-							((SystemTrayIconImpl*)(instance.get()))->onMessage(lParam);
+							((SystemTrayIconImpl*)(instance.get()))->onMessage(LOWORD(lParam), (short)(LOWORD(wParam)), (short)(HIWORD(wParam)));
 						}
 					}
-					return 0;
+					return 1;
 				}
 
 			};

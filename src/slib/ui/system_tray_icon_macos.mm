@@ -121,7 +121,7 @@ namespace slib
 					}
 					m_item.highlightMode = param.flagHighlight;
 					if (@available(macos 10.10, *)) {
-						if (m_onAction.isNotNull() || m_onEvent.isNotNull()) {
+						if (m_onClick.isNotNull() || m_onRightClick.isNotNull() || m_onEvent.isNotNull()) {
 							NSStatusBarButton* button = m_item.button;
 							SLIBSystemTrayIconSubView* subview = [SLIBSystemTrayIconSubView new];
 							subview->m_object = this;
@@ -230,6 +230,18 @@ namespace slib
 					if (ev.isNotNull()) {
 						UIPlatform::applyEventModifiers(ev.get(), event);
 						dispatchEvent(ev.get());
+						if (!(ev->isPreventedDefault())) {
+							switch (action) {
+								case UIAction::LeftButtonDown:
+									dispatchClick(ev.get());
+									break;
+								case UIAction::RightButtonDown:
+									dispatchRightClick(ev.get());
+									break;
+								default:
+									break;
+							}
+						}
 						return ev->getFlags();
 					}
 					return 0;

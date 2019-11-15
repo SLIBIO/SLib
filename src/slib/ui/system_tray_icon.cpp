@@ -154,26 +154,24 @@ namespace slib
 		notify(param);
 	}
 
+	void SystemTrayIcon::dispatchClick(UIEvent* ev)
+	{
+		m_onClick(this, ev);
+	}
+
+	void SystemTrayIcon::dispatchRightClick(UIEvent* ev)
+	{
+		m_onRightClick(this, ev);
+	}
+
+	void SystemTrayIcon::dispatchKeySelect(UIEvent* ev)
+	{
+		m_onKeySelect(this, ev);
+	}
+
 	void SystemTrayIcon::dispatchEvent(UIEvent* ev)
 	{
 		m_onEvent(this, ev);
-		if (ev->isPreventedDefault()) {
-			return;
-		}
-		switch (ev->getAction()) {
-			case UIAction::LeftButtonDown:
-			case UIAction::RightButtonDown:
-			case UIAction::MiddleButtonDown:
-			case UIAction::LeftButtonDoubleClick:
-			case UIAction::RightButtonDoubleClick:
-			case UIAction::MiddleButtonDoubleClick:
-			case UIAction::KeyDown:
-			case UIAction::Unknown:
-				m_onAction(this, ev);
-				break;
-			default:
-				break;
-		}
 	}
 
 	void SystemTrayIcon::_init(const SystemTrayIconParam& param)
@@ -187,7 +185,9 @@ namespace slib
 		m_flagHighlight = param.flagHighlight;
 		m_menu = param.menu;
 		
-		m_onAction = param.onAction;
+		m_onClick = param.onClick;
+		m_onRightClick = param.onRightClick;
+		m_onKeySelect = param.onKeySelect;
 		m_onEvent = param.onEvent;
 	}
 

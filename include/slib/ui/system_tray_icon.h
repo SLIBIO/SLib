@@ -43,7 +43,9 @@ namespace slib
 		sl_bool flagHighlight;
 		Ref<Menu> menu;
 		
-		Function<void(SystemTrayIcon*, UIEvent*)> onAction;
+		Function<void(SystemTrayIcon*, UIEvent*)> onClick;
+		Function<void(SystemTrayIcon*, UIEvent*)> onRightClick;
+		Function<void(SystemTrayIcon*, UIEvent*)> onKeySelect;
 		Function<void(SystemTrayIcon*, UIEvent*)> onEvent;
 		
 	public:
@@ -102,8 +104,14 @@ namespace slib
 		void notify(const String& title, const String& message, NotifyIcon icon);
 
 	public:
-		void dispatchEvent(UIEvent* ev);
+		void dispatchClick(UIEvent* ev);
 		
+		void dispatchRightClick(UIEvent* ev);
+		
+		void dispatchKeySelect(UIEvent* ev);
+		
+		void dispatchEvent(UIEvent* ev);
+
 	protected:
 		AtomicRef<Bitmap> m_icon;
 		AtomicString m_iconName;
@@ -111,7 +119,9 @@ namespace slib
 		sl_bool m_flagHighlight;
 		AtomicRef<Menu> m_menu;
 		
-		Function<void(SystemTrayIcon*, UIEvent*)> m_onAction;
+		Function<void(SystemTrayIcon*, UIEvent*)> m_onClick;
+		Function<void(SystemTrayIcon*, UIEvent*)> m_onRightClick;
+		Function<void(SystemTrayIcon*, UIEvent*)> m_onKeySelect;
 		Function<void(SystemTrayIcon*, UIEvent*)> m_onEvent;
 		
 	protected:
