@@ -4,6 +4,9 @@
 		<string name='cancel'>취소</string>
 		<string name='yes'>예</string>
 		<string name='no'>아니</string>
+		<string name='open'>열기</string>
+		<string name='close'>닫기</string>
+		<string name='reply'>응답</string>
 		<string name='today'>오늘</string>
 		<string name='yesterday'>어제</string>
 		<string name='open_image'>이미지 파일 열기</string>

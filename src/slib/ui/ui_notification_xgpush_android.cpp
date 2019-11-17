@@ -43,7 +43,7 @@ namespace slib
 			static void OnDeviceToken(JNIEnv* env, jobject _this, jstring _token)
 			{
 				String token = Jni::getString(_token);
-				XgPush::getInstance()->dispatchTokenRefresh(token);
+				XgPush::getInstance()->dispatchRefreshToken(token);
 			}
 
 			static void OnReceiveMessage(JNIEnv* env, jobject _this, jboolean flagClicked, jstring title, jstring content, jstring data)
@@ -53,7 +53,7 @@ namespace slib
 				message.content = Jni::getString(content);
 				message.data = Json::parseJson(Jni::getString(data));
 				message.flagClicked = flagClicked ? sl_true : sl_false;
-				XgPush::getInstance()->dispatchNotificationReceived(message);
+				XgPush::getInstance()->dispatchReceiveMessage(message);
 			}
 
 			SLIB_JNI_BEGIN_CLASS(JXgPush, "slib/platform/android/xgpush/XgPush")

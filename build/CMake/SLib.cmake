@@ -423,6 +423,7 @@ if(ANDROID)
   "${SLIB_PATH}/src/slib/ui/ui_animation_android.cpp"
   "${SLIB_PATH}/src/slib/ui/ui_core_android.cpp"
   "${SLIB_PATH}/src/slib/ui/ui_event_android.cpp"
+  "${SLIB_PATH}/src/slib/ui/ui_notification_android.cpp"
   "${SLIB_PATH}/src/slib/ui/ui_notification_fcm_android.cpp"
   "${SLIB_PATH}/src/slib/ui/ui_notification_xgpush_android.cpp"
   "${SLIB_PATH}/src/slib/ui/ui_photo_android.cpp"

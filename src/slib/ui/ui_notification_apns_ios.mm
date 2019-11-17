@@ -50,12 +50,12 @@ namespace slib
 		
 		UIPlatform::registerDidRegisterForRemoteNotifications([&instance](NSData* deviceToken, NSError* error) {
 			String token = String::makeHexString([deviceToken bytes], [deviceToken length]);
-			instance->dispatchTokenRefresh(token);
+			instance->dispatchRefreshToken(token);
 		});
 		UIPlatform::registerDidReceiveRemoteNotificationCallback([&instance](NSDictionary* _userInfo) {
 			PushNotificationMessage message;
 			if (UIPlatform::parseRemoteNotificationInfo(_userInfo, message)) {
-				instance->dispatchNotificationReceived(message);
+				instance->dispatchReceiveMessage(message);
 			}
 		});
 		return instance;

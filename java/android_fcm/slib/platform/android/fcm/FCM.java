@@ -111,7 +111,7 @@ public class FCM {
 
 	private final static int NOTIFICATION_ID = 0x7fffffff;
 	private final static String NOTIFICATION_CHANNEL_ID = "slib_fcm";
-	private final static String NOTIFICATION_CHANNEL_NAME = "Notification";
+	private final static String NOTIFICATION_CHANNEL_NAME = "UserNotification";
 	private final static String NOTIFICATION_INTENT_EXTRA_TITLE = "fcm_title";
 	private final static String NOTIFICATION_INTENT_EXTRA_CONTENT = "fcm_content";
 	private final static String NOTIFICATION_INTENT_EXTRA_DATA = "fcm_data";

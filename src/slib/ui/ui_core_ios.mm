@@ -25,8 +25,8 @@
 #if defined(SLIB_UI_IS_IOS)
 
 #include "slib/ui/core.h"
+
 #include "slib/ui/screen.h"
-#include "slib/ui/platform.h"
 #include "slib/ui/mobile_app.h"
 #include "slib/ui/notification.h"
 
@@ -34,7 +34,8 @@
 #include "slib/core/json.h"
 #include "slib/core/variant.h"
 #include "slib/core/safe_static.h"
-#include "slib/core/platform_apple.h"
+
+#include "slib/ui/platform.h"
 
 @interface SLIBAppDelegate : UIResponder <UIApplicationDelegate>
 	@property (strong, nonatomic) UIWindow *window;
@@ -328,34 +329,21 @@ namespace slib
 	
 	void UIPlatform::registerDidFinishLaunchingCallback(const Function<void(NSDictionary*)>& callback)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(g_callbackDidFinishLaunching)) {
-			return;
-		}
 		g_callbackDidFinishLaunching.add(callback);
 	}
-	
 
 	void UIPlatform::registerDidRegisterForRemoteNotifications(const Function<void(NSData*, NSError*)>& callback)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(g_callbackDidRegisterForRemoteNotifications)) {
-			return;
-		}
 		g_callbackDidRegisterForRemoteNotifications.add(callback);
 	}
 	
 	void UIPlatform::registerDidReceiveRemoteNotificationCallback(const Function<void(NSDictionary*)>& callback)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(g_callbackDidReceiveRemoteNotification)) {
-			return;
-		}
 		g_callbackDidReceiveRemoteNotification.add(callback);
 	}
 	
 	void UIPlatform::registerOpenUrlCallback(const Function<BOOL(NSURL*, NSDictionary*)>& callback)
 	{
-		if (SLIB_SAFE_STATIC_CHECK_FREED(g_callbackOpenURL)) {
-			return;
-		}
 		g_callbackOpenURL.add(callback);
 	}
 	
@@ -483,6 +471,5 @@ using namespace slib::priv::window;
 }
 
 @end
-
 
 #endif

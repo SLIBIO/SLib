@@ -132,6 +132,8 @@ namespace slib
 		
 		static NSString* getKeyEquivalent(const KeycodeAndModifiers& km, NSUInteger& outMask);
 		static void applyEventModifiers(UIEvent* ev, NSEvent* event);
+		
+		static void registerDidFinishLaunchingCallback(const Function<void(NSNotification*)>& callback);
 #	endif
 		
 #elif defined(SLIB_UI_IS_IOS)

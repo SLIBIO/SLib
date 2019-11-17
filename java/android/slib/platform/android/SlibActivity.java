@@ -59,7 +59,8 @@ public class SlibActivity extends Activity {
 
 	public static final int REQUEST_ROLE = 0x000300;
 
-	public static final int REQUEST_INTENT_REMOTE_NOTIFICATION = 0x001000;
+	public static final int REQUEST_INTENT_LOCAL_NOTIFICATION = 0x001000;
+	public static final int REQUEST_INTENT_REMOTE_NOTIFICATION = 0x001001;
 
 	public interface ActivityResultListener {
 		void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data);

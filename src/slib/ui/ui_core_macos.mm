@@ -25,12 +25,14 @@
 #if defined(SLIB_UI_IS_MACOS)
 
 #include "slib/ui/core.h"
+
 #include "slib/ui/screen.h"
 #include "slib/ui/window.h"
-#include "slib/ui/platform.h"
 #include "slib/ui/app.h"
 
 #include "slib/core/safe_static.h"
+
+#include "slib/ui/platform.h"
 
 #include "ui_core_common.h"
 
@@ -44,7 +46,9 @@ namespace slib
 	{
 		namespace ui_core
 		{
-			
+		
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicFunction<void(NSNotification*)>, g_callbackDidFinishLaunching);
+
 			class ScreenImpl : public Screen
 			{
 			public:
@@ -378,6 +382,11 @@ namespace slib
 		});
 	}
 
+	void UIPlatform::registerDidFinishLaunchingCallback(const Function<void(NSNotification*)>& callback)
+	{
+		g_callbackDidFinishLaunching.add(callback);
+	}
+
 	void UIApp::onExistingInstance()
 	{
 		String uid = getUniqueInstanceId();
@@ -432,6 +441,7 @@ using namespace slib::priv::ui_core;
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
 	UIApp::dispatchStartToApp();
+	g_callbackDidFinishLaunching(aNotification);
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification

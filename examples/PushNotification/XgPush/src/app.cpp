@@ -40,13 +40,13 @@ void ExampleXgPushApp::onStart()
 	XgPush::initialize(2200320550, "IJ771W8CH8CR");
 
 	auto push = XgPush::getInstance();
-	push->addTokenRefreshCallback([this](String deviceToken) {
+	push->addOnRefreshToken([this](String deviceToken) {
 		Log("XgToken", deviceToken);
 		txtMyToken->setText(deviceToken);
 		deviceId = (SLIB_UI == SLIB_UI_IOS ? "ios:" : "android:") + deviceToken;
 		addDevice(deviceId);
 	});
-	push->addNotificationReceivedCallback([this](PushNotificationMessage& message) {
+	push->addOnReceiveMessage([this](PushNotificationMessage& message) {
 		if (!(isPaused())) {
 			// When app is foreground, reset badget after 1 second (after XgPush already added badge)
 			Dispatch::setTimeout([]() {

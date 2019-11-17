@@ -54,7 +54,7 @@ namespace slib
 				Ref<FCM> instance = FCM::getInstance();
 				if (instance.isNotNull()) {
 					String token = Jni::getString(_token);
-					instance->dispatchTokenRefresh(token);
+					instance->dispatchRefreshToken(token);
 				}
 			}
 
@@ -97,7 +97,7 @@ namespace slib
 				message.flagClicked = flagClicked;
 				message.flagBackground = flagBackground;
 
-				instance->dispatchNotificationReceived(message);
+				instance->dispatchReceiveMessage(message);
 			}
 
 		}
@@ -108,9 +108,6 @@ namespace slib
 	Ref<FCM> FCM::getInstance()
 	{
 		SLIB_SAFE_STATIC(Ref<FCM>, instance, new FCM)
-		if (SLIB_SAFE_STATIC_CHECK_FREED(instance)) {
-			return sl_null;
-		}
 		return instance;
 	}
 

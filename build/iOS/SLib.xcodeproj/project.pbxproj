@@ -685,6 +685,7 @@
 		26539FA92374BA130064340D /* ui_notification_apns_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26539FA72374BA120064340D /* ui_notification_apns_ios.mm */; };
 		26539FAB2374BA190064340D /* ui_notification_xgpush.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26539FAA2374BA190064340D /* ui_notification_xgpush.cpp */; };
 		26539FB62374BC140064340D /* push_notification.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26539FB52374BC140064340D /* push_notification.cpp */; };
+		2657CE93238021F700402782 /* ui_notification_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2657CE92238021F600402782 /* ui_notification_apple.mm */; };
 		265A934C2303558A00B155A2 /* screen_capture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265A934B2303558A00B155A2 /* screen_capture.cpp */; };
 		265A935623043C3400B155A2 /* global_unique_instance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265A935523043C3400B155A2 /* global_unique_instance.cpp */; };
 		265A935823043CBF00B155A2 /* process.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265A935723043CBE00B155A2 /* process.cpp */; };
@@ -2103,6 +2104,7 @@
 		26539FA72374BA120064340D /* ui_notification_apns_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_notification_apns_ios.mm; sourceTree = "<group>"; };
 		26539FAA2374BA190064340D /* ui_notification_xgpush.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_notification_xgpush.cpp; sourceTree = "<group>"; };
 		26539FB52374BC140064340D /* push_notification.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = push_notification.cpp; sourceTree = "<group>"; };
+		2657CE92238021F600402782 /* ui_notification_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_notification_apple.mm; sourceTree = "<group>"; };
 		265A934B2303558A00B155A2 /* screen_capture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = screen_capture.cpp; sourceTree = "<group>"; };
 		265A935523043C3400B155A2 /* global_unique_instance.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = global_unique_instance.cpp; sourceTree = "<group>"; };
 		265A935723043CBE00B155A2 /* process.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = process.cpp; sourceTree = "<group>"; };
@@ -4289,6 +4291,7 @@
 				A2774E271B1CBBF600538A7B /* ui_event_ios.mm */,
 				2621F7201CCF174B00C4615C /* ui_menu.cpp */,
 				26539FA42374BA040064340D /* ui_notification.cpp */,
+				2657CE92238021F600402782 /* ui_notification_apple.mm */,
 				26539FA72374BA120064340D /* ui_notification_apns_ios.mm */,
 				26539FAA2374BA190064340D /* ui_notification_xgpush.cpp */,
 				26539FA62374BA120064340D /* ui_notification_xgpush_ios.mm */,
@@ -5318,6 +5321,7 @@
 				26D9D8BA1E962976005F7BD3 /* common_dialogs_ios.mm in Sources */,
 				269C2FA1235EDDB600775765 /* charset_ext.cpp in Sources */,
 				26D9D8101E9628E0005F7BD3 /* mutex.cpp in Sources */,
+				2657CE93238021F700402782 /* ui_notification_apple.mm in Sources */,
 				262ED4EA228DEBEE0029F409 /* ecc.cpp in Sources */,
 				26BAE04522267D100085B5AB /* tls.cpp in Sources */,
 				26E1B8C5222ABBE7007C222E /* pngwio.c in Sources */,
