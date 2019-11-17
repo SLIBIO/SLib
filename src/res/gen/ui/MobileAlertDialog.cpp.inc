@@ -11,8 +11,8 @@ namespace slib
 			this->setCenterHorizontal(slib::UIUpdateMode::Init);
 			this->setCenterVertical(slib::UIUpdateMode::Init);
 			this->setMaximumWidth(slib::UIResource::toUiPos(slib::UIResource::dpToPixel(500.0f)), slib::UIUpdateMode::Init);
-			this->setClipping(sl_true, slib::UIUpdateMode::Init);
 			this->setBoundRadius(slib::UIResource::dpToPixel(12.0f), slib::UIUpdateMode::Init);
+			this->setClipping(sl_true, slib::UIUpdateMode::Init);
 			this->setCreatingInstance(sl_false);
 
 			_linear1 = new slib::LinearView;
@@ -27,7 +27,7 @@ namespace slib
 			txtTitle->setHeightWrapping(slib::UIUpdateMode::Init);
 			txtTitle->setAlignParentLeft(slib::UIUpdateMode::Init);
 			txtTitle->setMarginTop(slib::UIResource::toUiPos(slib::UIResource::dpToPixel(10.0f)), slib::UIUpdateMode::Init);
-			txtTitle->setFont(slib::Font::create(txtTitle->getFontFamily(), slib::UIResource::dpToPixel(25.0f), sl_true, sl_false, sl_false), slib::UIUpdateMode::Init);
+			txtTitle->setFont(slib::Font::create(slib::UI::getDefaultFontFamily(), slib::UIResource::dpToPixel(25.0f), sl_true, sl_false, sl_false), slib::UIUpdateMode::Init);
 			txtTitle->setText("Title", slib::UIUpdateMode::Init);
 			txtTitle->setGravity(slib::Alignment::MiddleCenter, slib::UIUpdateMode::Init);
 			txtTitle->setMultiLine(slib::MultiLineMode::WordWrap, slib::UIUpdateMode::Init);
@@ -48,7 +48,7 @@ namespace slib
 			txtContent->setPaddingTop(slib::UIResource::toUiPos(slib::UIResource::dpToPixel(10.0f)), slib::UIUpdateMode::Init);
 			txtContent->setPaddingRight(slib::UIResource::toUiPos(slib::UIResource::dpToPixel(10.0f)), slib::UIUpdateMode::Init);
 			txtContent->setPaddingBottom(slib::UIResource::toUiPos(slib::UIResource::dpToPixel(10.0f)), slib::UIUpdateMode::Init);
-			txtContent->setFont(slib::Font::create(txtContent->getFontFamily(), slib::UIResource::dpToPixel(20.0f), sl_false, sl_false, sl_false), slib::UIUpdateMode::Init);
+			txtContent->setFont(slib::Font::create(slib::UI::getDefaultFontFamily(), slib::UIResource::dpToPixel(20.0f), sl_false, sl_false, sl_false), slib::UIUpdateMode::Init);
 			txtContent->setText("Content", slib::UIUpdateMode::Init);
 			txtContent->setGravity(slib::Alignment::MiddleCenter, slib::UIUpdateMode::Init);
 			txtContent->setMultiLine(slib::MultiLineMode::WordWrap, slib::UIUpdateMode::Init);
@@ -77,7 +77,7 @@ namespace slib
 			btnOK->setPaddingTop(0, slib::UIUpdateMode::Init);
 			btnOK->setPaddingRight(0, slib::UIUpdateMode::Init);
 			btnOK->setPaddingBottom(0, slib::UIUpdateMode::Init);
-			btnOK->setFont(slib::Font::create(btnOK->getFontFamily(), slib::UIResource::dpToPixel(25.0f), sl_false, sl_false, sl_false), slib::UIUpdateMode::Init);
+			btnOK->setFont(slib::Font::create(slib::UI::getDefaultFontFamily(), slib::UIResource::dpToPixel(25.0f), sl_false, sl_false, sl_false), slib::UIUpdateMode::Init);
 			btnOK->setText(string::ok::get(), slib::UIUpdateMode::Init);
 			_linear2->addChild(btnOK, slib::UIUpdateMode::Init);
 
@@ -97,7 +97,7 @@ namespace slib
 			btnYes->setPaddingTop(0, slib::UIUpdateMode::Init);
 			btnYes->setPaddingRight(0, slib::UIUpdateMode::Init);
 			btnYes->setPaddingBottom(0, slib::UIUpdateMode::Init);
-			btnYes->setFont(slib::Font::create(btnYes->getFontFamily(), slib::UIResource::dpToPixel(25.0f), sl_false, sl_false, sl_false), slib::UIUpdateMode::Init);
+			btnYes->setFont(slib::Font::create(slib::UI::getDefaultFontFamily(), slib::UIResource::dpToPixel(25.0f), sl_false, sl_false, sl_false), slib::UIUpdateMode::Init);
 			btnYes->setText(string::yes::get(), slib::UIUpdateMode::Init);
 			_linear2->addChild(btnYes, slib::UIUpdateMode::Init);
 
@@ -117,7 +117,7 @@ namespace slib
 			btnNo->setPaddingTop(0, slib::UIUpdateMode::Init);
 			btnNo->setPaddingRight(0, slib::UIUpdateMode::Init);
 			btnNo->setPaddingBottom(0, slib::UIUpdateMode::Init);
-			btnNo->setFont(slib::Font::create(btnNo->getFontFamily(), slib::UIResource::dpToPixel(25.0f), sl_false, sl_false, sl_false), slib::UIUpdateMode::Init);
+			btnNo->setFont(slib::Font::create(slib::UI::getDefaultFontFamily(), slib::UIResource::dpToPixel(25.0f), sl_false, sl_false, sl_false), slib::UIUpdateMode::Init);
 			btnNo->setText(string::no::get(), slib::UIUpdateMode::Init);
 			_linear2->addChild(btnNo, slib::UIUpdateMode::Init);
 
@@ -137,7 +137,7 @@ namespace slib
 			btnCancel->setPaddingTop(0, slib::UIUpdateMode::Init);
 			btnCancel->setPaddingRight(0, slib::UIUpdateMode::Init);
 			btnCancel->setPaddingBottom(0, slib::UIUpdateMode::Init);
-			btnCancel->setFont(slib::Font::create(btnCancel->getFontFamily(), slib::UIResource::dpToPixel(25.0f), sl_false, sl_false, sl_false), slib::UIUpdateMode::Init);
+			btnCancel->setFont(slib::Font::create(slib::UI::getDefaultFontFamily(), slib::UIResource::dpToPixel(25.0f), sl_false, sl_false, sl_false), slib::UIUpdateMode::Init);
 			btnCancel->setText(string::cancel::get(), slib::UIUpdateMode::Init);
 			_linear2->addChild(btnCancel, slib::UIUpdateMode::Init);
 

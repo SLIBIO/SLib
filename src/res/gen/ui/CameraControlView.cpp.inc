@@ -17,9 +17,9 @@ namespace slib
 			btnShutter->setCenterHorizontal(slib::UIUpdateMode::Init);
 			btnShutter->setAlignParentBottom(slib::UIUpdateMode::Init);
 			btnShutter->setMarginBottom(slib::UIResource::toUiPos(slib::UIResource::dpToPixel(40.0f)), slib::UIUpdateMode::Init);
-			btnShutter->setClipping(sl_true, slib::UIUpdateMode::Init);
 			btnShutter->setBackground(slib::Drawable::createColorDrawable(slib::Color(224, 224, 224, 255)), slib::UIUpdateMode::Init);
 			btnShutter->setBoundShape(slib::BoundShape::Ellipse, slib::UIUpdateMode::Init);
+			btnShutter->setClipping(sl_true, slib::UIUpdateMode::Init);
 			btnShutter->setCreatingNativeWidget(sl_false);
 			m_contentView->addChild(btnShutter, slib::UIUpdateMode::Init);
 
