@@ -68,6 +68,10 @@ public class UiWindow extends FrameLayout implements IView, ViewTreeObserver.OnG
 	public void setInstance(long instance) { this.mViewInstance = instance; }
 	public Rect getUIFrame() { return new Rect(mLeft, mTop, mRight, mBottom); }
 	public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
+	private boolean mStopPropagation = false;
+	public boolean isStopPropagation() { return mStopPropagation; }
+	public void setStopPropagation(boolean flag) { mStopPropagation = flag; }
+	public boolean dispatchSuperTouchEvent(MotionEvent ev) { return super.dispatchTouchEvent(ev); }
 
 	public UiGestureDetector gestureDetector;
 
@@ -79,6 +83,7 @@ public class UiWindow extends FrameLayout implements IView, ViewTreeObserver.OnG
 			((SlibActivity) context).onCreateWindow(this);
 		}
 		setFocusableInTouchMode(true);
+		setClickable(true);
 	}
 
 	static UiWindow create(Activity activity,
@@ -544,13 +549,13 @@ public class UiWindow extends FrameLayout implements IView, ViewTreeObserver.OnG
 	}
 
 	@Override
-	public boolean dispatchTouchEvent(MotionEvent ev) {
+	public boolean dispatchTouchEvent(MotionEvent event) {
 		if (gestureDetector != null) {
-			gestureDetector.onTouchEvent(ev);
-			super.dispatchTouchEvent(ev);
+			gestureDetector.onTouchEvent(event);
+			UiView.dispatchEventTouch(this, event);
 			return true;
 		} else {
-			return super.dispatchTouchEvent(ev);
+			return UiView.dispatchEventTouch(this, event);
 		}
 	}
 
@@ -582,14 +587,5 @@ public class UiWindow extends FrameLayout implements IView, ViewTreeObserver.OnG
 		}
 		return false;
 	};
-
-	@SuppressLint("ClickableViewAccessibility")
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		if (!(UiView.onEventTouch(this, event))) {
-			super.onTouchEvent(event);
-		}
-		return true;
-	}
 
 }

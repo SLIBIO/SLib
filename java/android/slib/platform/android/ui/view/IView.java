@@ -23,6 +23,7 @@
 package slib.platform.android.ui.view;
 
 import android.graphics.Rect;
+import android.view.MotionEvent;
 
 public interface IView {
 
@@ -33,5 +34,11 @@ public interface IView {
     Rect getUIFrame();
 
     void setUIFrame(int left, int top, int right, int bottom);
+
+    boolean isStopPropagation();
+
+    void setStopPropagation(boolean flag);
+
+    boolean dispatchSuperTouchEvent(MotionEvent ev);
 
 }

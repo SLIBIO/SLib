@@ -44,6 +44,10 @@ public class UiScrollView extends ScrollView implements IView {
 			((UiScrollContentView)mContent).setupTiles(this);
 		}
 	}
+	private boolean mStopPropagation = false;
+	public boolean isStopPropagation() { return mStopPropagation; }
+	public void setStopPropagation(boolean flag) { mStopPropagation = flag; }
+	public boolean dispatchSuperTouchEvent(MotionEvent ev) { return super.dispatchTouchEvent(ev); }
 
 	UiGestureDetector gestureDetector;
 
@@ -257,12 +261,17 @@ public class UiScrollView extends ScrollView implements IView {
 	}
 
 	@Override
-	public boolean dispatchTouchEvent(MotionEvent ev) {
-		if (gestureDetector != null) {
-			gestureDetector.onTouchEvent(ev);
+	public boolean dispatchTouchEvent(MotionEvent event) {
+		if (checkLock(event)) {
+			return UiView.dispatchEventTouch(this, event);
 		}
-		UiView.onEventTouch(this, ev, true, true);
-		return super.dispatchTouchEvent(ev);
+		if (gestureDetector != null) {
+			gestureDetector.onTouchEvent(event);
+			UiView.dispatchEventTouch(this, event);
+			return true;
+		} else {
+			return UiView.dispatchEventTouch(this, event);
+		}
 	}
 
 	void scrollToPage(int velocity) {

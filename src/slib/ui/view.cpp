@@ -73,8 +73,7 @@ namespace slib
 		m_flagPressed(sl_false),
 		m_flagHover(sl_false),
 		m_flagLockScroll(sl_false),
-		m_flagCaptureMouseEvents(sl_false),
-		m_flagCaptureTouchEvents(sl_false),
+		m_flagCaptureEvents(sl_false),
 	
 		m_attachMode(UIAttachMode::AttachAlways),
 		m_visibility(Visibility::Visible),
@@ -2075,9 +2074,7 @@ namespace slib
 			ListElements< Ref<View> > children(getChildren());
 			for (sl_size i = 0; i < children.count; i++) {
 				Ref<View>& child = children[i];
-				if (child->isPressedState()) {
-					child->cancelPressedState();
-				}
+				child->cancelPressedState();
 			}
 		}
 	}
@@ -2121,24 +2118,14 @@ namespace slib
 		}
 	}
 	
-	sl_bool View::isCapturingMouseEvents()
+	sl_bool View::isCapturingEvents()
 	{
-		return m_flagCaptureMouseEvents;
+		return m_flagCaptureEvents;
 	}
 
-	void View::setCapturingMouseEvents(sl_bool flag)
+	void View::setCapturingEvents(sl_bool flag)
 	{
-		m_flagCaptureMouseEvents = flag;
-	}
-
-	sl_bool View::isCapturingTouchEvents()
-	{
-		return m_flagCaptureTouchEvents;
-	}
-
-	void View::setCapturingTouchEvents(sl_bool flag)
-	{
-		m_flagCaptureTouchEvents = flag;
+		m_flagCaptureEvents = flag;
 	}
 
 	Ref<Cursor> View::getCursor()
@@ -8277,7 +8264,7 @@ namespace slib
 		UIAction action = ev->getAction();
 		
 		// pass event to children
-		if (!m_flagCaptureMouseEvents && !(ev->getFlags() & UIEventFlags::NotDispatchToChildren)) {
+		if (!m_flagCaptureEvents && !(ev->getFlags() & UIEventFlags::NotDispatchToChildren)) {
 			Ref<View> scrollBars[2];
 			_getScrollBars(scrollBars);
 			Ref<ChildAttributes>& childAttrs = m_childAttrs;
@@ -8318,7 +8305,7 @@ namespace slib
 		}
 		
 		if (ev->isStoppedPropagation()) {
-			if (m_flagCaptureMouseEvents) {
+			if (m_flagCaptureEvents) {
 				ev->addFlag(UIEventFlags::Captured);
 			}
 			return;
@@ -8346,7 +8333,7 @@ namespace slib
 		
 		_processEventForStateAndClick(ev);
 		
-		if (m_flagCaptureMouseEvents) {
+		if (m_flagCaptureEvents) {
 			ev->addFlag(UIEventFlags::Captured);
 			ev->stopPropagation();
 		}
@@ -8500,7 +8487,7 @@ namespace slib
 		UIAction action = ev->getAction();
 		
 		// pass event to children
-		if (!m_flagCaptureTouchEvents && !(ev->getFlags() & UIEventFlags::NotDispatchToChildren)) {
+		if (!m_flagCaptureEvents && !(ev->getFlags() & UIEventFlags::NotDispatchToChildren)) {
 			Ref<View> scrollBars[2];
 			_getScrollBars(scrollBars);
 			Ref<ChildAttributes>& childAttrs = m_childAttrs;
@@ -8526,7 +8513,7 @@ namespace slib
 		}
 
 		if (ev->isStoppedPropagation()) {
-			if (m_flagCaptureTouchEvents) {
+			if (m_flagCaptureEvents) {
 				ev->addFlag(UIEventFlags::Captured);
 			}
 			return;
@@ -8561,7 +8548,7 @@ namespace slib
 			_processContentScrollingEvents(ev);
 		}
 
-		if (m_flagCaptureTouchEvents) {
+		if (m_flagCaptureEvents) {
 			ev->addFlag(UIEventFlags::Captured);
 			ev->stopPropagation();
 		}
@@ -9339,7 +9326,7 @@ namespace slib
 				if (d0 > UI::dpToPixel(5)) {
 					cancelPressedStateOfChildren();
 					if (d1 < d0) {
-						setCapturingTouchEvents(sl_true);
+						setCapturingEvents(sl_true);
 						Ref<View> parent = getParent();
 						if (parent.isNotNull()) {
 							parent->setLockScroll(sl_true);
@@ -9347,7 +9334,7 @@ namespace slib
 					}
 				}
 			} else {
-				setCapturingTouchEvents(sl_false);
+				setCapturingEvents(sl_false);
 				if (action != UIAction::TouchBegin) {
 					Ref<View> parent = getParent();
 					if (parent.isNotNull()) {
@@ -9891,9 +9878,9 @@ namespace slib
 				
 				Ref<View> capture;
 				{
-					Ref<View> v = view->getParent();
+					Ref<View> v = view;
 					while (v.isNotNull()) {
-						if (v->isCapturingMouseEvents()) {
+						if (v->isCapturingEvents()) {
 							capture = v;
 						}
 						v = v->getParent();
@@ -9940,75 +9927,90 @@ namespace slib
 		Ref<View> view = getView();
 		
 		if (view.isNotNull()) {
-		
-			if (ev->getFlags() & UIEventFlags::DispatchToParent) {
-				
-				Ref<View> capture;
-				{
-					Ref<View> v = view->getParent();
-					while (v.isNotNull()) {
-						if (v->isCapturingTouchEvents()) {
-							capture = v;
-						}
-						v = v->getParent();
-					}
-				}
 			
+			Ref<View> capture;
+			{
+				Ref<View> v = view;
+				while (v.isNotNull()) {
+					if (v->isCapturingEvents()) {
+						capture = v;
+					}
+					v = v->getParent();
+				}
+			}
+			
+			do {
+				
+				sl_bool flagDispatchToParent = ev->getFlags() & UIEventFlags::DispatchToParent;
+				
 				if (capture.isNull() || view == capture) {
 					view->dispatchTouchEvent(ev);
 					if (ev->isStoppedPropagation()) {
-						return;
+						break;
 					}
 				}
 				
-				UIPoint pt = ev->getPoint();
-				Array<TouchPoint> arrPts = ev->getTouchPoints();
-				sl_size nPts = arrPts.getCount();
-				TouchPoint* pts;
+				if (flagDispatchToParent) {
+										
+					UIPoint pt = ev->getPoint();
+					Array<TouchPoint> arrPts = ev->getTouchPoints();
+					sl_size nPts = arrPts.getCount();
+					TouchPoint* pts;
 
-				Ref<View> child = view;
-				view = view->getParent();
-				
-				if (view.isNotNull()) {
-					if (nPts > 0) {
-						arrPts = arrPts.duplicate();
-						if (arrPts.isNull()) {
-							return;
-						}
-					}
-					pts = arrPts.getData();
-				} else {
-					return;
-				}
-				for (;;) {
-					pt = child->convertCoordinateToParent(pt);
-					for (sl_size i = 0; i < nPts; i++) {
-						pts[i].point = child->convertCoordinateToParent(pts[i].point);
-					}
-					if (capture.isNull() || view == capture) {
-						if (!(view->isNativeWidget())) {
-							ev->setPoint(pt);
-							ev->setTouchPoints(arrPts);
-							ev->addFlag(UIEventFlags::NotDispatchToChildren);
-							view->dispatchTouchEvent(ev);
-							if (ev->isStoppedPropagation()) {
+					Ref<View> child = view;
+					Ref<View> current = view->getParent();
+					
+					if (current.isNotNull()) {
+						if (nPts > 0) {
+							arrPts = arrPts.duplicate();
+							if (arrPts.isNull()) {
 								return;
 							}
 						}
-						if (capture == view) {
-							return;
+						pts = arrPts.getData();
+						for (;;) {
+							pt = child->convertCoordinateToParent(pt);
+							for (sl_size i = 0; i < nPts; i++) {
+								pts[i].point = child->convertCoordinateToParent(pts[i].point);
+							}
+							if (capture.isNull() || current == capture) {
+								if (!(current->isNativeWidget())) {
+									ev->setPoint(pt);
+									ev->setTouchPoints(arrPts);
+									ev->addFlag(UIEventFlags::NotDispatchToChildren);
+									current->dispatchTouchEvent(ev);
+									if (ev->isStoppedPropagation()) {
+										break;
+									}
+								}
+								if (capture == current) {
+									break;
+								}
+							}
+							child = current;
+							current = current->getParent();
+							if (current.isNull()) {
+								break;
+							}
 						}
 					}
-					child = view;
-					view = view->getParent();
-					if (view.isNull()) {
-						return;
-					}
 				}
-			} else {
-				view->dispatchTouchEvent(ev);
+				
+			} while (0);
+			
+			if (IsInstanceOf<ScrollView>(view)) {
+				UIAction action = ev->getAction();
+				if (action == UIAction::TouchMove) {
+					if (capture.isNotNull() && capture.isNotNull() && capture != view) {
+						setLockScroll(view.get(), sl_true);
+					}
+				} else {
+					setLockScroll(view.get(), sl_false);
+				}
 			}
+			
 		}
+		
 	}
 
 	void ViewInstance::onMouseWheelEvent(UIEvent* ev)

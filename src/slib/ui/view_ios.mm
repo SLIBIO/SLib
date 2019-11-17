@@ -674,6 +674,9 @@ using ::UIEvent;
 			if (!(view->isEnabled())) {
 				return nil;
 			}
+			if (view->isCapturingEvents()) {
+				return self;
+			}
 			Function<sl_bool(const UIPoint&)> hitTestCapture(view->getCapturingChildInstanceEvents());
 			if (hitTestCapture.isNotNull()) {
 				CGFloat f = UIPlatform::getGlobalScaleFactor();

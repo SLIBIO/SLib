@@ -124,7 +124,7 @@ namespace slib
 				Ref<View> parent = view->getParent();
 				while (parent.isNotNull()) {
 					Function<sl_bool(const UIPoint&)> hitTestCapture(parent->getCapturingChildInstanceEvents());
-					if (hitTestCapture.isNotNull()) {
+					if (parent->isCapturingEvents() || hitTestCapture.isNotNull()) {
 						if (CaptureChildInstanceEvents(parent.get(), uMsg)) {
 							return sl_true;
 						}
@@ -138,7 +138,7 @@ namespace slib
 								pt.x = (short)(lParam & 0xffff);
 								pt.y = (short)((lParam >> 16) & 0xffff);
 								ScreenToClient(hWnd, &pt);
-								if (hitTestCapture(UIPoint((sl_ui_pos)(pt.x), (sl_ui_pos)(pt.y)))) {
+								if (parent->isCapturingEvents() || hitTestCapture(UIPoint((sl_ui_pos)(pt.x), (sl_ui_pos)(pt.y)))) {
 									LPARAM lParam = POINTTOPOINTS(pt);
 									instance->processWindowMessage(uMsg, 0, lParam);
 									return sl_true;

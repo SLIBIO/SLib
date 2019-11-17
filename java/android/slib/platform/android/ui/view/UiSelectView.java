@@ -29,6 +29,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -47,6 +48,10 @@ public class UiSelectView extends Spinner implements IView {
 	private int mLeft, mTop, mRight, mBottom;
 	public Rect getUIFrame() { return new Rect(mLeft, mTop, mRight, mBottom); }
 	public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
+	private boolean mStopPropagation = false;
+	public boolean isStopPropagation() { return mStopPropagation; }
+	public void setStopPropagation(boolean flag) { mStopPropagation = flag; }
+	public boolean dispatchSuperTouchEvent(MotionEvent ev) { return super.dispatchTouchEvent(ev); }
 
 	public static UiSelectView _create(Context context)
 	{

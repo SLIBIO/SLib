@@ -162,6 +162,9 @@ namespace slib
 						if (!(view->isEnabled())) {
 							return 1;
 						}
+						if (view->isCapturingEvents()) {
+							return 1;
+						}
 						Function<sl_bool(const UIPoint&)> hitTestCapture(view->getCapturingChildInstanceEvents());
 						if (hitTestCapture.isNotNull()) {
 							if (hitTestCapture(UIPoint((sl_ui_pos)x, (sl_ui_pos)y))) {

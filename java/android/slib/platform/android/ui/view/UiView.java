@@ -413,6 +413,10 @@ public class UiView {
 				if (((UiScrollView)view).gestureDetector == null) {
 					((UiScrollView)view).gestureDetector = new UiGestureDetector(view.getContext(), new ViewGestureListener((IView)view));
 				}
+			} else if (view instanceof UiHorizontalScrollView) {
+				if (((UiHorizontalScrollView)view).gestureDetector == null) {
+					((UiHorizontalScrollView)view).gestureDetector = new UiGestureDetector(view.getContext(), new ViewGestureListener((IView)view));
+				}
 			} else if (view instanceof UiWindow) {
 				if (((UiWindow)view).gestureDetector == null) {
 					((UiWindow)view).gestureDetector = new UiGestureDetector(view.getContext(), new ViewGestureListener((IView)view));
@@ -466,7 +470,12 @@ public class UiView {
 
 	private static native int nativeOnTouchEvent(long instance, int action, UiTouchPoint[] pts, long time, boolean flagDispatchToParent, boolean flagNotDispatchToChildren);
 
-	public static boolean onEventTouch(IView view, MotionEvent event, boolean flagDispatchToParent, boolean flagNotDispatchToChildren) {
+	public static boolean dispatchEventTouch(IView view, MotionEvent event) {
+		view.setStopPropagation(false);
+		boolean bRet = view.dispatchSuperTouchEvent(event);
+		if (view.isStopPropagation()) {
+			return bRet;
+		}
 		long instance = view.getInstance();
 		if (instance != 0) {
 			int action = 0;
@@ -487,7 +496,7 @@ public class UiView {
 				action = 0x0304;
 				break;
 			default:
-				return false;
+				return bRet;
 			}
 			int n = event.getPointerCount();
 			if (n > 0) {
@@ -520,22 +529,24 @@ public class UiView {
 					pt.pointerId = event.getPointerId(i);
 					pts[i] = pt;
 				}
-				int ret = nativeOnTouchEvent(instance, action, pts, event.getEventTime(), flagDispatchToParent, flagNotDispatchToChildren);
+				int ret = nativeOnTouchEvent(instance, action, pts, event.getEventTime(), false, false);
 				if ((ret & 0x4000) == 0) {
 					// Keep Keyboard
 					// UiWindow.dismissKeyboard((View)view, event);
 				}
-				if ((ret & 0x0001) != 0) {
-					// Prevent Default
-					return true;
+				if ((ret & 0x0002) != 0) {
+					// Stop Propagation
+					ViewParent parent = ((View)view).getParent();
+					while (parent != null) {
+						if (parent instanceof IView) {
+							((IView)parent).setStopPropagation(true);
+						}
+						parent = parent.getParent();
+					}
 				}
 			}
 		}
-		return false;
-	}
-
-	public static boolean onEventTouch(IView view, MotionEvent event) {
-		return onEventTouch(view, event, true, false);
+		return bRet;
 	}
 
 	private static native void nativeOnSetFocus(long instance);

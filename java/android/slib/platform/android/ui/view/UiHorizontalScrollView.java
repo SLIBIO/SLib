@@ -40,6 +40,10 @@ public class UiHorizontalScrollView extends HorizontalScrollView implements IVie
 	private int mLeft, mTop, mRight, mBottom;
 	public Rect getUIFrame() { return new Rect(mLeft, mTop, mRight, mBottom); }
 	public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
+	private boolean mStopPropagation = false;
+	public boolean isStopPropagation() { return mStopPropagation; }
+	public void setStopPropagation(boolean flag) { mStopPropagation = flag; }
+	public boolean dispatchSuperTouchEvent(MotionEvent ev) { return super.dispatchTouchEvent(ev); }
 
 	boolean mPaging = false;
 	int mPageWidth = 0;
@@ -51,6 +55,8 @@ public class UiHorizontalScrollView extends HorizontalScrollView implements IVie
 	boolean flagInitedContent = false;
 	int initScrollX = 0;
 	int initScrollY = 0;
+
+	UiGestureDetector gestureDetector;
 
 	public void _scrollTo(int x, int y) {
 		try {
@@ -152,6 +158,20 @@ public class UiHorizontalScrollView extends HorizontalScrollView implements IVie
 			return false;
 		}
 		return super.onInterceptTouchEvent(ev);
+	}
+
+	@Override
+	public boolean dispatchTouchEvent(MotionEvent event) {
+		if (checkLock(event)) {
+			return UiView.dispatchEventTouch(this, event);
+		}
+		if (gestureDetector != null) {
+			gestureDetector.onTouchEvent(event);
+			UiView.dispatchEventTouch(this, event);
+			return true;
+		} else {
+			return UiView.dispatchEventTouch(this, event);
+		}
 	}
 
 	void scrollToPage(int velocity) {

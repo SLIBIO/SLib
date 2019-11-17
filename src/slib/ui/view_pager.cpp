@@ -24,6 +24,7 @@
 
 #include "slib/core/timer.h"
 #include "slib/ui/core.h"
+#include "slib/core/log.h"
 
 namespace slib
 {
@@ -282,8 +283,7 @@ namespace slib
 		Point pos = ev->getPoint();
 		
 		if (action != UIAction::LeftButtonDrag && action != UIAction::TouchMove) {
-			setCapturingTouchEvents(sl_false);
-			setCapturingMouseEvents(sl_false);
+			setCapturingEvents(sl_false);
 			if (action != UIAction::LeftButtonDown || action != UIAction::TouchBegin) {
 				Ref<View> parent = getParent();
 				if (parent.isNotNull()) {
@@ -299,17 +299,13 @@ namespace slib
 			m_offsetPagesMouseDown = m_offsetPages;
 			m_timer.setNull();
 		} else if (action == UIAction::LeftButtonDrag || action == UIAction::TouchMove) {
-			if (m_flagMouseDown) {
+			if (m_flagMouseDown && !(isLockScroll())) {
 				sl_real dx = Math::abs(pos.x - m_posMouseDown.x);
 				if (dx > 5 * dimUnit) {
 					cancelPressedStateOfChildren();
 					sl_real dy = Math::abs(pos.y - m_posMouseDown.y);
 					if (dy < dx) {
-						if (action == UIAction::TouchMove) {
-							setCapturingTouchEvents(sl_true);
-						} else {
-							setCapturingMouseEvents(sl_true);
-						}
+						setCapturingEvents(sl_true);
 						Ref<View> parent = getParent();
 						if (parent.isNotNull()) {
 							parent->setLockScroll(sl_true);
@@ -367,8 +363,7 @@ namespace slib
 				}
 			}
 		} else if (action == UIAction::LeftButtonUp || action == UIAction::TouchEnd || action == UIAction::TouchCancel) {
-			if (m_flagMouseDown) {
-				m_flagMouseDown = sl_false;
+			if (m_flagMouseDown && !(isLockScroll())) {
 				sl_real v = 0;
 				m_motionTracker.getVelocity(&v, sl_null);
 				sl_real t = dimUnit * 10;
@@ -394,8 +389,11 @@ namespace slib
 						_selectPage(sl_true, m_indexCurrent);
 					}
 				}
-				m_motionTracker.clearMovements();
+			} else {
+				_selectPage(sl_true, m_indexCurrent);
 			}
+			m_flagMouseDown = sl_false;
+			m_motionTracker.clearMovements();
 		}
 	}
 	

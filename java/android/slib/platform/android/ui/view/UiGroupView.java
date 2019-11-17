@@ -40,11 +40,16 @@ public class UiGroupView extends AbsoluteLayout implements IView {
 	private int mLeft, mTop, mRight, mBottom;
 	public Rect getUIFrame() { return new Rect(mLeft, mTop, mRight, mBottom); }
 	public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
+	private boolean mStopPropagation = false;
+	public boolean isStopPropagation() { return mStopPropagation; }
+	public void setStopPropagation(boolean flag) { mStopPropagation = flag; }
+	public boolean dispatchSuperTouchEvent(MotionEvent ev) { return super.dispatchTouchEvent(ev); }
 
 	UiGestureDetector gestureDetector;
 
 	public UiGroupView(Context context) {
 		super(context);
+		setClickable(true);
 	}
 
 	@Override
@@ -75,24 +80,15 @@ public class UiGroupView extends AbsoluteLayout implements IView {
 		}
 		return false;
 	};
-	
-	@SuppressLint("ClickableViewAccessibility")
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		if (!(UiView.onEventTouch(this, event))) {
-			super.onTouchEvent(event);
-		}
-		return true;
-	}
 
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent event) {
 		if (gestureDetector != null) {
 			gestureDetector.onTouchEvent(event);
-			super.dispatchTouchEvent(event);
+			UiView.dispatchEventTouch(this, event);
 			return true;
 		} else {
-			return super.dispatchTouchEvent(event);
+			return UiView.dispatchEventTouch(this, event);
 		}
 	}
 

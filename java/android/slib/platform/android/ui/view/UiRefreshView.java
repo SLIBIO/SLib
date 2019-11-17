@@ -25,6 +25,8 @@ package slib.platform.android.ui.view;
 import android.content.Context;
 import android.graphics.Rect;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import android.view.MotionEvent;
 import android.view.View;
 
 import slib.platform.android.Logger;
@@ -38,6 +40,10 @@ public class UiRefreshView extends SwipeRefreshLayout implements IView {
 	private int mLeft, mTop, mRight, mBottom;
 	public Rect getUIFrame() { return new Rect(mLeft, mTop, mRight, mBottom); }
 	public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
+	private boolean mStopPropagation = false;
+	public boolean isStopPropagation() { return mStopPropagation; }
+	public void setStopPropagation(boolean flag) { mStopPropagation = flag; }
+	public boolean dispatchSuperTouchEvent(MotionEvent ev) { return super.dispatchTouchEvent(ev); }
 
 	public static View _create(Context context) {
 		try {

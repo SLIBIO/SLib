@@ -308,15 +308,11 @@ namespace slib
 		
 		virtual void setLockScroll(sl_bool flagLock);
 		
-		sl_bool isCapturingMouseEvents();
+		sl_bool isCapturingEvents();
 		
-		void setCapturingMouseEvents(sl_bool flag);
+		void setCapturingEvents(sl_bool flag);
 		
-		sl_bool isCapturingTouchEvents();
-		
-		void setCapturingTouchEvents(sl_bool flag);
 
-		
 		Ref<Cursor> getCursor();
 		
 		void setCursor(const Ref<Cursor>& cursor);
@@ -1478,8 +1474,7 @@ namespace slib
 		sl_bool m_flagPressed : 1;
 		sl_bool m_flagHover : 1;
 		sl_bool m_flagLockScroll: 1;
-		sl_bool m_flagCaptureMouseEvents: 1;
-		sl_bool m_flagCaptureTouchEvents: 1;
+		sl_bool m_flagCaptureEvents: 1;
 		
 		AtomicString m_id;
 		UIAttachMode m_attachMode;
