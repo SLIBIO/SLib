@@ -327,10 +327,12 @@ namespace slib
 						if (flagMe) {
 							if (ev->getX() > label->getLeft()) {
 								setPressedState(sl_true);
+								invalidate();
 							}
 						} else {
 							if (ev->getX() < label->getFrame().right) {
 								setPressedState(sl_true);
+								invalidate();
 							}
 						}
 						m_flagTrySelect = sl_true;
@@ -338,7 +340,7 @@ namespace slib
 						UIPoint pt = convertCoordinateToScreen(ev->getPoint());
 						Dispatch::setTimeout([this, ref, pt]() {
 							ObjectLocker lock(this);
-							if (m_flagTrySelect) {
+							if (m_flagTrySelect && isPressedState()) {
 								m_flagTrySelect = sl_false;
 								popupMenu(pt);
 							}
@@ -346,6 +348,7 @@ namespace slib
 					} else if (action == UIAction::TouchEnd || action == UIAction::TouchCancel) {
 						m_flagTrySelect = sl_false;
 						setPressedState(sl_false);
+						invalidate();
 					}
 					ev->preventDefault();
 				}
