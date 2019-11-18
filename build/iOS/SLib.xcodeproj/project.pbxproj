@@ -674,6 +674,9 @@
 		2639196A21CD4605008B335B /* sds.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639196421CD4605008B335B /* sds.c */; };
 		2639196B21CD4605008B335B /* hiredis.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639196521CD4605008B335B /* hiredis.c */; };
 		2639196E21CD469E008B335B /* redis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639196C21CD469B008B335B /* redis.cpp */; };
+		263D4762238305FF00DAC43F /* wechat_sdk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263D4761238305FF00DAC43F /* wechat_sdk.cpp */; };
+		263D47642383060500DAC43F /* wechat_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 263D47632383060400DAC43F /* wechat_ios.mm */; };
+		263D476823830ED500DAC43F /* wechat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263D476723830ED500DAC43F /* wechat.cpp */; };
 		2644BD0823638FFB001B9842 /* grid_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2644BD0723638FFA001B9842 /* grid_view.cpp */; };
 		2644BD0E2364BE5B001B9842 /* oauth_server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2644BD0D2364BE5B001B9842 /* oauth_server.cpp */; };
 		264DF0EE22455E3B007DB734 /* chat_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264DF0ED22455E3B007DB734 /* chat_view.cpp */; };
@@ -2085,6 +2088,9 @@
 		2639196421CD4605008B335B /* sds.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sds.c; path = ../../external/src/hiredis/sds.c; sourceTree = "<group>"; };
 		2639196521CD4605008B335B /* hiredis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hiredis.c; path = ../../external/src/hiredis/hiredis.c; sourceTree = "<group>"; };
 		2639196C21CD469B008B335B /* redis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis.cpp; sourceTree = "<group>"; };
+		263D4761238305FF00DAC43F /* wechat_sdk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wechat_sdk.cpp; sourceTree = "<group>"; };
+		263D47632383060400DAC43F /* wechat_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = wechat_ios.mm; sourceTree = "<group>"; };
+		263D476723830ED500DAC43F /* wechat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wechat.cpp; sourceTree = "<group>"; };
 		2640CB6D1DC27BC7006376AC /* font_atlas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = font_atlas.cpp; sourceTree = "<group>"; };
 		2644BD0723638FFA001B9842 /* grid_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = grid_view.cpp; sourceTree = "<group>"; };
 		2644BD0D2364BE5B001B9842 /* oauth_server.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = oauth_server.cpp; sourceTree = "<group>"; };
@@ -3960,6 +3966,9 @@
 				26E1B85522283BD3007C222E /* pinterest.cpp */,
 				263051CE225CA20B00A6609E /* pinterest_ui.cpp */,
 				260B73F7220D872600858EEA /* twitter.cpp */,
+				263D476723830ED500DAC43F /* wechat.cpp */,
+				263D4761238305FF00DAC43F /* wechat_sdk.cpp */,
+				263D47632383060400DAC43F /* wechat_ios.mm */,
 			);
 			path = social;
 			sourceTree = "<group>";
@@ -5420,6 +5429,7 @@
 				26D9D8D61E962976005F7BD3 /* split_view.cpp in Sources */,
 				26C795C82215FC7C0053C5A1 /* layouts.cpp in Sources */,
 				26D9D8251E9628E0005F7BD3 /* quaternion.cpp in Sources */,
+				263D4762238305FF00DAC43F /* wechat_sdk.cpp in Sources */,
 				26D9D8841E96295A005F7BD3 /* audio_recorder_ios.mm in Sources */,
 				26D9D8261E9628E0005F7BD3 /* hash.cpp in Sources */,
 				26D9D8271E9628E0005F7BD3 /* parse.cpp in Sources */,
@@ -5472,6 +5482,7 @@
 				26BAE02F2223CEB80085B5AB /* openssl.cpp in Sources */,
 				26E1B8D8222ABCDD007C222E /* jcmaster.c in Sources */,
 				26D9D8CB1E962976005F7BD3 /* picker_view_ios.mm in Sources */,
+				263D476823830ED500DAC43F /* wechat.cpp in Sources */,
 				2628EAD121C184D400D8CD00 /* regex.cpp in Sources */,
 				26D9D8A41E962962005F7BD3 /* socket_event.cpp in Sources */,
 				26D9D8691E96294F005F7BD3 /* drawable.cpp in Sources */,
@@ -5495,6 +5506,7 @@
 				26F53F9E22E1EBD50031D485 /* date_picker.cpp in Sources */,
 				26D9D88C1E96295A005F7BD3 /* media_player.cpp in Sources */,
 				26E1B8CA222ABC01007C222E /* filter_neon_intrinsics.c in Sources */,
+				263D47642383060500DAC43F /* wechat_ios.mm in Sources */,
 				26D9D87C1E96295A005F7BD3 /* audio_data.cpp in Sources */,
 				26E1B8DA222ABCDD007C222E /* jcparam.c in Sources */,
 				26D9D8341E9628E0005F7BD3 /* string.cpp in Sources */,

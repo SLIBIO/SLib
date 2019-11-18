@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -20,23 +20,24 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_SOCIAL_HEADER
-#define CHECKHEADER_SLIB_SOCIAL_HEADER
+#include "slib/social/wechat.h"
 
-#include "social/contact.h"
+namespace slib
+{
+	
+#if !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_ANDROID)
+	void WechatSDK::initialize(const String& appId, const String& universalLink)
+	{
+	}
 
-#include "social/oauth.h"
-#include "social/oauth_server.h"
-
-#include "social/facebook.h"
-#include "social/instagram.h"
-#include "social/twitter.h"
-#include "social/linkedin.h"
-#include "social/pinterest.h"
-#include "social/ebay.h"
-#include "social/etsy.h"
-#include "social/wechat.h"
-
-#include "social/paypal.h"
-
+	void WechatSDK::pay(const WechatPaymentRequest& req)
+	{
+	}
 #endif
+	
+	void WechatSDK::initialize(const String& appId)
+	{
+		initialize(appId, String::null());
+	}
+
+}
