@@ -24,7 +24,6 @@
 
 #include "slib/core/timer.h"
 #include "slib/ui/core.h"
-#include "slib/core/log.h"
 
 namespace slib
 {

@@ -137,6 +137,7 @@ int main(int argc, const char * argv[])
 				UI::quitApp();
 			};
 			doc->simulateLayoutInWindow(layoutName, param);
+			UIApp::activate();
 			UI::runApp();
 		} else {
 			Println("Not supported file: %s", path);
