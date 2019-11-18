@@ -149,6 +149,15 @@ namespace slib
 		Base::zeroMemory(this, sizeof(TimeComponents));
 	}
 	
+	void TimeComponents::clearTime() noexcept
+	{
+		hour = 0;
+		minute = 0;
+		second = 0;
+		milliseconds = 0;
+		microseconds = 0;
+	}
+
 
 	Time::Time(sl_int32 year, sl_int32 month, sl_int32 date, const TimeZone& zone) noexcept
 	{

@@ -201,6 +201,9 @@ namespace slib
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(TimeComponents)
 		
+	public:
+		void clearTime() noexcept;
+		
 	};
 	
 	class SLIB_EXPORT Time
