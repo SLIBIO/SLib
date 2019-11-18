@@ -65,9 +65,7 @@ namespace slib
 				{
 					Ref<CollectionView> view = m_collectionView;
 					if (view.isNotNull()) {
-						if (view->m_lockCountLayouting == 0) {
-							dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), CollectionView, _layout, view.get(), sl_null, sl_false));
-						}
+						view->_requestLayout();
 					}
 				}
 				
@@ -156,8 +154,10 @@ namespace slib
 		m_flagCuttingOverflowItems = sl_false;
 		
 		m_flagRefreshItems = sl_true;
-		m_lockCountLayouting = 0;
 		m_lastScrollY = 0;
+
+		m_idLayoutRequest = 0;
+		m_idLayoutComplete = -1;
 	}
 
 	CollectionView::~CollectionView()
@@ -214,7 +214,13 @@ namespace slib
 				columns.add_NoLock(adapters[i], 0);
 			}
 		}
-		runOnDrawingThread(SLIB_BIND_WEAKREF(void(), CollectionView, _layout, this, columns, sl_false));
+		m_columns = columns;
+		if (isDrawingThread()) {
+			Base::interlockedIncrement32(&m_idLayoutRequest);
+			_doLayout();
+		} else {
+			_requestLayout();
+		}
 	}
 	
 	void CollectionView::setAdapter(const Ref<ViewAdapter>& adapter)
@@ -249,7 +255,7 @@ namespace slib
 	void CollectionView::refreshItems()
 	{
 		m_flagRefreshItems = sl_true;
-		runOnDrawingThread(SLIB_BIND_WEAKREF(void(), CollectionView, _layout, this, sl_null, sl_false));
+		_requestLayout();
 	}
 
 	sl_ui_len CollectionView::getColumnHeight(sl_uint32 index)
@@ -279,17 +285,18 @@ namespace slib
 		if (Math::isAlmostZero(y - (sl_scroll_pos)m_lastScrollY)) {
 			return;
 		}
-		dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), CollectionView, _layout, this, sl_null, sl_true));
+		_requestLayout();
 	}
 	
 	void CollectionView::onResize(sl_ui_len x, sl_ui_len y)
 	{
-		runOnDrawingThread(SLIB_BIND_WEAKREF(void(), CollectionView, _layout, this, sl_null, sl_false));
+		_requestLayout();
 	}
 	
 	void CollectionView::onAttach()
 	{
-		dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), CollectionView, _layout, this, sl_null, sl_false), 10);
+		scrollTo(0, 0);
+		_requestLayout();
 	}
 	
 	Ref<View> CollectionView::_getView(ViewAdapter* adapter, sl_uint64 index, View* original)
@@ -310,7 +317,107 @@ namespace slib
 		}
 		return sl_null;
 	}
+
+	void CollectionView::_requestLayout()
+	{
+		Base::interlockedIncrement32(&m_idLayoutRequest);
+		dispatchToDrawingThread(SLIB_FUNCTION_WEAKREF(CollectionView, _doLayout, this));
+	}
+
+	void CollectionView::_doLayout()
+	{
+		MutexLocker lock(&m_lockLayout);
+		while (m_idLayoutComplete != m_idLayoutRequest) {
+			m_idLayoutComplete = m_idLayoutRequest;
+			_layout();
+		}
+	}
+
+	void CollectionView::_layout()
+	{
+		List<Column> columnsNew = m_columns;
+		Column* columns;
+		sl_uint32 nColumns;
+		
+		if (columnsNew != m_columnsCurrent) {
+			m_columnsCurrent = columnsNew;
+			columns = columnsNew.getData();
+			nColumns = (sl_uint32)(columnsNew.getCount());
+			m_contentView->removeAllChildren();
+		} else {
+			columns = m_columnsCurrent.getData();
+			nColumns = (sl_uint32)(m_columnsCurrent.getCount());
+		}
+		
+		sl_ui_pos widthCollectionView = getBounds().getWidth();
+		sl_ui_pos heightCollectionView = getHeight();
+		
+		if (widthCollectionView <= 0 || heightCollectionView <= 0) {
+			return;
+		}
+		
+		sl_bool flagRefresh = sl_false;
+		if (m_flagRefreshItems) {
+			flagRefresh = sl_true;
+			m_flagRefreshItems = sl_false;
+		}
+				
+		if (!nColumns) {
+			setContentHeight(0, UIUpdateMode::Redraw);
+			return;
+		}
+		
+		sl_ui_pos scrollY = (sl_ui_pos)(getScrollY());
+
+		sl_ui_len maxHeight = 0;
+		sl_ui_len minHeight = 0;
+		sl_ui_pos x = 0;
+		
+		{
+			for (sl_uint32 i = 0; i < nColumns; i++) {
+				sl_ui_len width = columns[i].width;
+				if (!width) {
+					width = widthCollectionView / nColumns;
+					x = (i * widthCollectionView) / nColumns;
+				}
+				_layoutColumn(columns + i, flagRefresh, x, width);
+				sl_ui_len height = (sl_ui_len)(columns[i].contentHeight);
+				if (height > maxHeight) {
+					maxHeight = height;
+				}
+				if (i == 0 || height < minHeight) {
+					minHeight = height;
+				}
+				x += width;
+			}
+		}
+		
+		if (m_flagCuttingOverflowItems) {
+			View* contentView = m_contentView.get();
+			for (sl_uint32 i = 0; i < nColumns; i++) {
+				Column& col = columns[i];
+				if (col.contentHeight > minHeight) {
+					HashMapNode< sl_uint32, Ref<View> >* node = col.viewsVisible.getFirstNode();
+					while (node) {
+						HashMapNode< sl_uint32, Ref<View> >* next = node->next;
+						View* view = node->value.get();
+						if (view->getTop() + view->getLayoutHeight() > minHeight) {
+							col.viewsVisible.removeAt(node);
+							contentView->removeChild(view, UIUpdateMode::None);
+						}
+						node = next;
+					}
+				}
+			}
+			setContentSize(x, minHeight, UIUpdateMode::Redraw);
+		} else {
+			setContentSize(x, maxHeight, UIUpdateMode::Redraw);
+		}
+		
+		m_lastScrollY = scrollY;
 	
+	}
+
 	void CollectionView::_layoutColumn(Column* column, sl_bool flagRefresh, sl_ui_len x, sl_ui_len width)
 	{
 		View* contentView = m_contentView.get();
@@ -486,108 +593,6 @@ namespace slib
 
 	}
 
-	void CollectionView::_layout(const List<Column>& columnsNew, sl_bool fromScroll)
-	{
-		if (!(isDrawingThread())) {
-			return;
-		}
-
-		MutexLocker lock(&m_lockLayout);
-		
-		Column* columns;
-		sl_uint32 nColumns;
-		if (columnsNew.isNotNull()) {
-			m_columns = columnsNew;
-			m_columnsCurrent = columnsNew;
-			columns = columnsNew.getData();
-			nColumns = (sl_uint32)(columnsNew.getCount());
-			m_contentView->removeAllChildren();
-		} else {
-			columns = m_columnsCurrent.getData();
-			nColumns = (sl_uint32)(m_columnsCurrent.getCount());
-		}
-		
-		sl_ui_pos widthCollectionView = getBounds().getWidth();
-		sl_ui_pos heightCollectionView = getHeight();
-		
-		if (widthCollectionView <= 0 || heightCollectionView <= 0) {
-			return;
-		}
-		
-		sl_bool flagRefresh = sl_false;
-		if (m_flagRefreshItems) {
-			flagRefresh = sl_true;
-			m_flagRefreshItems = sl_false;
-		}
-		
-		Base::interlockedIncrement32(&m_lockCountLayouting);
-		
-		do {
-			sl_ui_pos scrollY = (sl_ui_pos)(getScrollY());
-			if (fromScroll) {
-				if (Math::isAlmostZero(scrollY - m_lastScrollY)) {
-					break;
-				}
-			}
-
-			if (!nColumns) {
-				setContentHeight(0, UIUpdateMode::Redraw);
-				break;
-			}
-			
-			sl_ui_len maxHeight = 0;
-			sl_ui_len minHeight = 0;
-			sl_ui_pos x = 0;
-			
-			{
-				for (sl_uint32 i = 0; i < nColumns; i++) {
-					sl_ui_len width = columns[i].width;
-					if (!width) {
-						width = widthCollectionView / nColumns;
-						x = (i * widthCollectionView) / nColumns;
-					}
-					_layoutColumn(columns + i, flagRefresh, x, width);
-					sl_ui_len height = (sl_ui_len)(columns[i].contentHeight);
-					if (height > maxHeight) {
-						maxHeight = height;
-					}
-					if (i == 0 || height < minHeight) {
-						minHeight = height;
-					}
-					x += width;
-				}
-			}
-			
-			if (m_flagCuttingOverflowItems) {
-				View* contentView = m_contentView.get();
-				for (sl_uint32 i = 0; i < nColumns; i++) {
-					Column& col = columns[i];
-					if (col.contentHeight > minHeight) {
-						HashMapNode< sl_uint32, Ref<View> >* node = col.viewsVisible.getFirstNode();
-						while (node) {
-							HashMapNode< sl_uint32, Ref<View> >* next = node->next;
-							View* view = node->value.get();
-							if (view->getTop() + view->getLayoutHeight() > minHeight) {
-								col.viewsVisible.removeAt(node);
-								contentView->removeChild(view, UIUpdateMode::None);
-							}
-							node = next;
-						}
-					}
-				}
-				setContentSize(x, minHeight, UIUpdateMode::Redraw);
-			} else {
-				setContentSize(x, maxHeight, UIUpdateMode::Redraw);
-			}
-			
-			m_lastScrollY = scrollY;
-			
-		} while (0);
-		
-		Base::interlockedDecrement32(&m_lockCountLayouting);
-		
-	}
-	
 	void CollectionView::_updateItemLayout(const Ref<View>& itemView, sl_ui_pos x, sl_ui_len widthColumn, sl_ui_len heightColumn)
 	{
 		Ref<LayoutAttributes>& layoutAttrs = itemView->m_layoutAttrs;

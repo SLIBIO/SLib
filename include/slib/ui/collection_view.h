@@ -84,9 +84,13 @@ namespace slib
 	protected:
 		Ref<View> _getView(ViewAdapter* adapter, sl_uint64 index, View* original);
 		
-		void _layoutColumn(priv::collection_view::Column* column, sl_bool flagRefresh, sl_ui_len x, sl_ui_len width);
+		void _requestLayout();
 		
-		void _layout(const List<priv::collection_view::Column>& columns, sl_bool fromScroll);
+		void _doLayout();
+		
+		void _layout();
+		
+		void _layoutColumn(priv::collection_view::Column* column, sl_bool flagRefresh, sl_ui_len x, sl_ui_len width);
 		
 		void _updateItemLayout(const Ref<View>& itemView, sl_ui_pos x, sl_ui_len widthList, sl_ui_len heightList);
 		
@@ -99,7 +103,9 @@ namespace slib
 		sl_bool m_flagRefreshItems;
 		
 		Mutex m_lockLayout;
-		sl_int32 m_lockCountLayouting;
+		sl_int32 m_idLayoutRequest;
+		sl_int32 m_idLayoutComplete;
+		
 		sl_ui_pos m_lastScrollY;
 
 		friend class priv::collection_view::ContentView;
