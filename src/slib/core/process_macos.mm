@@ -74,13 +74,19 @@ namespace slib
 
 	sl_bool Process::run(const String& pathExecutable, const String* strArguments, sl_uint32 nArguments)
 	{
-		NSMutableArray* arguments = [NSMutableArray array];
-		for (sl_uint32 i = 0; i < nArguments; i++) {
-			[arguments addObject:(Apple::getNSStringFromString(strArguments[i]))];
-		}
-		NSTask* task = [NSTask launchedTaskWithLaunchPath:(Apple::getNSStringFromString(pathExecutable)) arguments:arguments];
-		if (task != nil) {
-			return sl_true;
+		@try {
+			NSMutableArray* arguments = [NSMutableArray array];
+			for (sl_uint32 i = 0; i < nArguments; i++) {
+				[arguments addObject:(Apple::getNSStringFromString(strArguments[i]))];
+			}
+			NSTask* task = [NSTask launchedTaskWithLaunchPath:(Apple::getNSStringFromString(pathExecutable)) arguments:arguments];
+			if (task != nil) {
+				return sl_true;
+			}
+		} @catch (NSException* e) {
+#ifdef SLIB_DEBUG
+			NSLog(@"Error at run process: %s\n%@", pathExecutable.getData(), e.debugDescription);
+#endif
 		}
 		return sl_false;
 	}
