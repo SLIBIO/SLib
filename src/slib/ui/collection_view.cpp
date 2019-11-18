@@ -289,7 +289,7 @@ namespace slib
 	
 	void CollectionView::onAttach()
 	{
-		dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), CollectionView, _layout, this, sl_null, sl_false));
+		dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), CollectionView, _layout, this, sl_null, sl_false), 10);
 	}
 	
 	Ref<View> CollectionView::_getView(ViewAdapter* adapter, sl_uint64 index, View* original)
