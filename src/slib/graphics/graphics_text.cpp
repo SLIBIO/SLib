@@ -172,6 +172,47 @@ namespace slib
 	{
 	}
 
+	namespace priv
+	{
+		namespace text_word
+		{
+			static sl_bool checkURL(const String16& text, String16& url)
+			{
+				SLIB_STATIC_STRING16(http, "http://")
+				SLIB_STATIC_STRING16(https, "https://")
+				SLIB_STATIC_STRING16(www, "www.")
+				if (text.startsWith(http) && text.getLength() > http.getLength()) {
+					url = text;
+					return sl_true;
+				}
+				if (text.startsWith(https) && text.getLength() > https.getLength()) {
+					url = text;
+					return sl_true;
+				}
+				if (text.startsWith(www) && text.getLength() > www.getLength()) {
+					sl_reg len = text.indexOf('/');
+					if (len < 0) {
+						len = text.getLength();
+					}
+					sl_reg indexDotDot = text.indexOf("..");
+					if (indexDotDot >= 0 && indexDotDot < len) {
+						return sl_false;
+					}
+					sl_char16* sz = text.getData();
+					for (sl_reg i = 0; i < len; i++) {
+						sl_char16 ch = sz[i];
+						if (!(SLIB_CHAR_IS_ALNUM(ch) || ch == '-' || ch == '_' || ch == '.')) {
+							return sl_false;
+						}
+					}
+					url = http + text;
+					return sl_true;
+				}
+				return sl_false;
+			}
+		}
+	}
+
 	Ref<TextWordItem> TextWordItem::create(const String16& text, const Ref<TextStyle>& style, sl_bool flagEnabledHyperlinksInPlainText) noexcept
 	{
 		if (style.isNotNull()) {
@@ -180,13 +221,12 @@ namespace slib
 				ret->m_text = text;
 				ret->m_style = style;
 				if (flagEnabledHyperlinksInPlainText) {
-					SLIB_STATIC_STRING16(http, "http://")
-					SLIB_STATIC_STRING16(https, "https://")
-					if ((text.startsWith(http) && text.getLength() > http.getLength()) || (text.startsWith(https) && text.getLength() > https.getLength())) {
+					String16 url;
+					if (priv::text_word::checkURL(text, url)) {
 						Ref<TextStyle> styleNew = style->duplicate();
 						if (styleNew.isNotNull()) {
 							styleNew->flagLink = sl_true;
-							styleNew->href = text;
+							styleNew->href = url;
 							ret->m_style = styleNew;
 						}
 					}
