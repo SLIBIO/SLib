@@ -102,6 +102,8 @@ namespace slib
 		virtual Ptr<IRenderViewInstance> getRenderViewInstance();
 		
 	public:
+		void dispatchDraw(Canvas* canvas) override;
+		
 		void dispatchMouseEvent(UIEvent* ev) override;
 		
 		void dispatchTouchEvent(UIEvent* ev) override;
@@ -115,6 +117,10 @@ namespace slib
 		void dispatchSwipe(GestureEvent* ev) override;
 
 	private:
+		void _processPostedCallbacks();
+
+		void _processPostedCallbacksNoLock();
+
 		void _dispatchMouseEvent(const Ref<UIEvent>& ev);
 		
 		void _dispatchTouchEvent(const Ref<UIEvent>& ev);
@@ -137,6 +143,8 @@ namespace slib
 
 		sl_bool m_flagDebugTextVisible;
 		sl_bool m_flagDebugTextVisibleOnRelease;
+		
+		Mutex m_lockRender;
 		
 	};
 	

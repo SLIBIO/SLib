@@ -195,21 +195,21 @@ namespace slib
 		if (isNativeWidget()) {
 			return Thread::getCurrentThreadUniqueId() == m_lastRenderingThreadId;
 		} else {
-			return View::isDrawingThread();
+			return ViewGroup::isDrawingThread();
 		}
 	}
 
 	void RenderView::dispatchToDrawingThread(const Function<void()>& callback, sl_uint32 delayMillis)
 	{
+		if (delayMillis) {
+			Dispatch::setTimeout(SLIB_BIND_WEAKREF(void(), RenderView, dispatchToDrawingThread, this, callback, 0), delayMillis);
+			return;
+		}
+		m_queuePostedCallbacks.push(callback);
 		if (isNativeWidget()) {
-			if (delayMillis) {
-				Dispatch::setTimeout(SLIB_BIND_WEAKREF(void(), RenderView, dispatchToDrawingThread, this, callback, 0), delayMillis);
-			} else {
-				m_queuePostedCallbacks.push(callback);
-				requestRender();
-			}
+			requestRender();
 		} else {
-			View::dispatchToDrawingThread(callback, delayMillis);
+			ViewGroup::dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), RenderView, _processPostedCallbacks, this), 0);
 		}
 	}
 
@@ -223,7 +223,7 @@ namespace slib
 				requestRender();
 			}
 		} else {
-			View::runOnDrawingThread(callback);
+			dispatchToDrawingThread(callback);
 		}
 	}
 
@@ -275,7 +275,7 @@ namespace slib
 				}
 			}
 		} else {
-			View::onDrawBackground(canvas);
+			ViewGroup::onDrawBackground(canvas);
 		}
 	}
 
@@ -295,6 +295,8 @@ namespace slib
 
 	void RenderView::dispatchFrame(RenderEngine* engine)
 	{
+		MutexLocker lock(&m_lockRender);
+		
 		if (!engine) {
 			return;
 		}
@@ -305,14 +307,8 @@ namespace slib
 			priv::render_view::AnimationLoopImpl* l = static_cast<priv::render_view::AnimationLoopImpl*>(m_animationLoop.get());
 			l->runStep();
 		}
+		_processPostedCallbacksNoLock();
 		
-		sl_size n = m_queuePostedCallbacks.getCount();
-		Function<void()> callback;
-		while (n > 0 && m_queuePostedCallbacks.pop(&callback)) {
-			callback();
-			n--;
-		}
-
 		engine->beginScene();
 		
 		// clear
@@ -346,6 +342,13 @@ namespace slib
 		
 	}
 
+	void RenderView::dispatchDraw(Canvas* canvas)
+	{
+		MutexLocker lock(&m_lockRender);
+		_processPostedCallbacksNoLock();
+		ViewGroup::dispatchDraw(canvas);
+	}
+
 	void RenderView::dispatchMouseEvent(UIEvent* ev)
 	{
 		if (m_flagDispatchEventsToRenderingThread) {
@@ -355,7 +358,7 @@ namespace slib
 				return;
 			}
 		}
-		View::dispatchMouseEvent(ev);
+		ViewGroup::dispatchMouseEvent(ev);
 	}
 
 	void RenderView::dispatchTouchEvent(UIEvent* ev)
@@ -367,7 +370,7 @@ namespace slib
 				return;
 			}
 		}
-		View::dispatchTouchEvent(ev);
+		ViewGroup::dispatchTouchEvent(ev);
 	}
 
 	void RenderView::dispatchMouseWheelEvent(UIEvent* ev)
@@ -379,7 +382,7 @@ namespace slib
 				return;
 			}
 		}
-		View::dispatchMouseWheelEvent(ev);
+		ViewGroup::dispatchMouseWheelEvent(ev);
 	}
 
 	void RenderView::dispatchKeyEvent(UIEvent* ev)
@@ -391,7 +394,7 @@ namespace slib
 				return;
 			}
 		}
-		View::dispatchKeyEvent(ev);
+		ViewGroup::dispatchKeyEvent(ev);
 	}
 
 	void RenderView::dispatchSetCursor(UIEvent* ev)
@@ -403,7 +406,7 @@ namespace slib
 				return;
 			}
 		}
-		View::dispatchSetCursor(ev);
+		ViewGroup::dispatchSetCursor(ev);
 	}
 
 	void RenderView::dispatchSwipe(GestureEvent* ev)
@@ -415,37 +418,53 @@ namespace slib
 				return;
 			}
 		}
-		View::dispatchSwipe(ev);
+		ViewGroup::dispatchSwipe(ev);
+	}
+
+	void RenderView::_processPostedCallbacks()
+	{
+		MutexLocker lock(&m_lockRender);
+		_processPostedCallbacksNoLock();
+	}
+
+	void RenderView::_processPostedCallbacksNoLock()
+	{
+		sl_size n = m_queuePostedCallbacks.getCount();
+		Function<void()> callback;
+		while (n > 0 && m_queuePostedCallbacks.pop(&callback)) {
+			callback();
+			n--;
+		}
 	}
 
 	void RenderView::_dispatchMouseEvent(const Ref<UIEvent>& ev)
 	{
-		View::dispatchMouseEvent(ev.get());
+		ViewGroup::dispatchMouseEvent(ev.get());
 	}
 
 	void RenderView::_dispatchTouchEvent(const Ref<UIEvent>& ev)
 	{
-		View::dispatchTouchEvent(ev.get());
+		ViewGroup::dispatchTouchEvent(ev.get());
 	}
 
 	void RenderView::_dispatchMouseWheelEvent(const Ref<UIEvent>& ev)
 	{
-		View::dispatchMouseWheelEvent(ev.get());
+		ViewGroup::dispatchMouseWheelEvent(ev.get());
 	}
 
 	void RenderView::_dispatchKeyEvent(const Ref<UIEvent>& ev)
 	{
-		View::dispatchKeyEvent(ev.get());
+		ViewGroup::dispatchKeyEvent(ev.get());
 	}
 
 	void RenderView::_dispatchSetCursor(const Ref<UIEvent>& ev)
 	{
-		View::dispatchSetCursor(ev.get());
+		ViewGroup::dispatchSetCursor(ev.get());
 	}
 
 	void RenderView::_dispatchSwipe(const Ref<GestureEvent>& ev)
 	{
-		View::dispatchSwipe(ev.get());
+		ViewGroup::dispatchSwipe(ev.get());
 	}
 
 #if !defined(SLIB_UI)
