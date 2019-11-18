@@ -20,9 +20,11 @@
  *   THE SOFTWARE.
  */
 
-#include "slib/social/facebook.h"
+#include "slib/core/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_IOS)
+
+#include "slib/social/facebook.h"
 
 #include "slib/ui/core.h"
 #include "slib/ui/platform.h"
