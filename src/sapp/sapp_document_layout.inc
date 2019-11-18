@@ -3454,19 +3454,19 @@ namespace slib
 							params->sbDefineInit->add(String::format("%s%s->setColumnWidth(%d, %s, slib::UIUpdateMode::Init);%n", strTab, name, iCol, col.width.getAccessString()));
 						}
 					}
-					if (col.minWidth.flagDefined) {
-						if (col.minWidth.isNeededOnLayoutFunction()) {
-							params->sbDefineLayout->add(String::format("%s%s->setColumnMinimumWidth(%d, %s, slib::UIUpdateMode::None);%n", strTab, name, iCol, col.minWidth.getAccessString()));
-						} else {
-							params->sbDefineInit->add(String::format("%s%s->setColumnMinimumWidth(%d, %s, slib::UIUpdateMode::Init);%n", strTab, name, iCol, col.minWidth.getAccessString()));
-						}
+				}
+				if (col.minWidth.flagDefined) {
+					if (col.minWidth.isNeededOnLayoutFunction()) {
+						params->sbDefineLayout->add(String::format("%s%s->setColumnMinimumWidth(%d, %s, slib::UIUpdateMode::None);%n", strTab, name, iCol, col.minWidth.getAccessString()));
+					} else {
+						params->sbDefineInit->add(String::format("%s%s->setColumnMinimumWidth(%d, %s, slib::UIUpdateMode::Init);%n", strTab, name, iCol, col.minWidth.getAccessString()));
 					}
-					if (col.maxWidth.flagDefined) {
-						if (col.maxWidth.isNeededOnLayoutFunction()) {
-							params->sbDefineLayout->add(String::format("%s%s->setColumnMaximumWidth(%d, %s, slib::UIUpdateMode::None);%n", strTab, name, iCol, col.maxWidth.getAccessString()));
-						} else {
-							params->sbDefineInit->add(String::format("%s%s->setColumnMaximumWidth(%d, %s, slib::UIUpdateMode::Init);%n", strTab, name, iCol, col.maxWidth.getAccessString()));
-						}
+				}
+				if (col.maxWidth.flagDefined) {
+					if (col.maxWidth.isNeededOnLayoutFunction()) {
+						params->sbDefineLayout->add(String::format("%s%s->setColumnMaximumWidth(%d, %s, slib::UIUpdateMode::None);%n", strTab, name, iCol, col.maxWidth.getAccessString()));
+					} else {
+						params->sbDefineInit->add(String::format("%s%s->setColumnMaximumWidth(%d, %s, slib::UIUpdateMode::Init);%n", strTab, name, iCol, col.maxWidth.getAccessString()));
 					}
 				}
 			}
@@ -3486,19 +3486,19 @@ namespace slib
 							params->sbDefineInit->add(String::format("%s%s->setRowHeight(%d, %s, slib::UIUpdateMode::Init);%n", strTab, name, iRow, row.height.getAccessString()));
 						}
 					}
-					if (row.minHeight.flagDefined) {
-						if (row.minHeight.isNeededOnLayoutFunction()) {
-							params->sbDefineLayout->add(String::format("%s%s->setRowMinimumHeight(%d, %s, slib::UIUpdateMode::None);%n", strTab, name, iRow, row.minHeight.getAccessString()));
-						} else {
-							params->sbDefineInit->add(String::format("%s%s->setRowMinimumHeight(%d, %s, slib::UIUpdateMode::Init);%n", strTab, name, iRow, row.minHeight.getAccessString()));
-						}
+				}
+				if (row.minHeight.flagDefined) {
+					if (row.minHeight.isNeededOnLayoutFunction()) {
+						params->sbDefineLayout->add(String::format("%s%s->setRowMinimumHeight(%d, %s, slib::UIUpdateMode::None);%n", strTab, name, iRow, row.minHeight.getAccessString()));
+					} else {
+						params->sbDefineInit->add(String::format("%s%s->setRowMinimumHeight(%d, %s, slib::UIUpdateMode::Init);%n", strTab, name, iRow, row.minHeight.getAccessString()));
 					}
-					if (row.maxHeight.flagDefined) {
-						if (row.maxHeight.isNeededOnLayoutFunction()) {
-							params->sbDefineLayout->add(String::format("%s%s->setRowMaximumHeight(%d, %s, slib::UIUpdateMode::None);%n", strTab, name, iRow, row.maxHeight.getAccessString()));
-						} else {
-							params->sbDefineInit->add(String::format("%s%s->setRowMaximumHeight(%d, %s, slib::UIUpdateMode::Init);%n", strTab, name, iRow, row.maxHeight.getAccessString()));
-						}
+				}
+				if (row.maxHeight.flagDefined) {
+					if (row.maxHeight.isNeededOnLayoutFunction()) {
+						params->sbDefineLayout->add(String::format("%s%s->setRowMaximumHeight(%d, %s, slib::UIUpdateMode::None);%n", strTab, name, iRow, row.maxHeight.getAccessString()));
+					} else {
+						params->sbDefineInit->add(String::format("%s%s->setRowMaximumHeight(%d, %s, slib::UIUpdateMode::Init);%n", strTab, name, iRow, row.maxHeight.getAccessString()));
 					}
 				}
 			}
