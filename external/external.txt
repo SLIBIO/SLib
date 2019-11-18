@@ -23,6 +23,7 @@ FFmpeg 4.1.1
 libmysqlclient 8.0
 FacebookSDK(iOS) 5.0.1
 XGPush(iOS) 3.3.7
+WeChat(iOS) 1.8.6.1
 
 # Headers
 gl

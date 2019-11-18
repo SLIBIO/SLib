@@ -17,3 +17,6 @@
 [submodule "external/bin/XgPush"]
 	path = external/bin/XgPush
 	url = https://github.com/SLIBIO/SLibExternalBin_XgPush
+[submodule "external/bin/WeChat"]
+	path = external/bin/WeChat
+	url = https://github.com/SLIBIO/SLibExternalBin_WeChat.git
