@@ -30,6 +30,10 @@
 #include "slib/core/string_buffer.h"
 #include "slib/core/log.h"
 
+#ifdef SLIB_PLATFORM_IS_WIN32
+#include <windows.h>
+#endif
+
 namespace slib
 {
 
@@ -123,7 +127,7 @@ namespace slib
 	void Application::run(int argc, const char* argv[])
 	{
 		List<String> list;
-		for (int i = 1; i < argc; i++) {
+		for (int i = 0; i < argc; i++) {
 			list.add(argv[i]);
 		}
 		m_arguments = list;
@@ -133,6 +137,11 @@ namespace slib
 
 	void Application::run()
 	{
+#ifdef SLIB_PLATFORM_IS_WIN32
+		String commandLine = GetCommandLineW();
+		m_commandLine = commandLine;
+		m_arguments = breakCommandLine(commandLine);
+#endif
 		doRun();
 	}
 
