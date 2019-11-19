@@ -22,7 +22,11 @@
 #import <WebKit/WebKit.h>
 #endif
 
+#ifdef BUCK
 #import <FBSDKCoreKit/FBSDKGraphRequestConnection.h>
+#else
+#import "FBSDKGraphRequestConnection.h"
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -168,7 +172,7 @@ FOUNDATION_EXPORT FBSDKAppEventName FBSDKAppEventNameFindLocation;
 FOUNDATION_EXPORT FBSDKAppEventName FBSDKAppEventNameSchedule;
 
 /** The subsequent subscriptions after the start of a paid subscription for a product or service you offer. */
-FOUNDATION_EXPORT FBSDKAppEventName FBSDKAppEventNameSubscriptionHeartbeat;
+FOUNDATION_EXPORT FBSDKAppEventName FBSDKAppEventNameSubscriptionHeartbeat __attribute((deprecated("This attribute is no longer used.")));
 
 /** The start of a free trial of a product or service you offer (example: trial subscription). */
 FOUNDATION_EXPORT FBSDKAppEventName FBSDKAppEventNameStartTrial;

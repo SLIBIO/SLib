@@ -18,8 +18,13 @@
 
 #import <Foundation/Foundation.h>
 
-#import <FBSDKCoreKit/FBSDKCopying.h>
-#import <FBSDKShareKit/FBSDKShareMessengerActionButton.h>
+#ifdef BUCK
+#import <FBSDKCoreKit/FBSDKCoreKit.h>
+#else
+@import FBSDKCoreKit;
+#endif
+
+#import "FBSDKShareMessengerActionButton.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -29,6 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
  https://developers.facebook.com/docs/messenger-platform/send-messages/template/generic for more details.
  */
 NS_SWIFT_NAME(ShareMessengerGenericTemplateElement)
+DEPRECATED_FOR_MESSENGER
 @interface FBSDKShareMessengerGenericTemplateElement : NSObject <FBSDKCopying, NSSecureCoding>
 
 /**

@@ -18,10 +18,13 @@
 
 #import <UIKit/UIKit.h>
 
-#import <FBSDKCoreKit/FBSDKButton.h>
+#ifdef BUCK
+#import <FBSDKCoreKit/FBSDKCoreKit.h>
+#else
+@import FBSDKCoreKit;
+#endif
 
-#import <FBSDKLoginKit/FBSDKLoginManager.h>
-
+#import "FBSDKLoginManager.h"
 #import "FBSDKTooltipView.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -71,7 +74,8 @@ NS_SWIFT_NAME(FBLoginButton)
 /**
   Gets or sets the login behavior to use
  */
-@property (assign, nonatomic) FBSDKLoginBehavior loginBehavior;
+@property (assign, nonatomic) FBSDKLoginBehavior loginBehavior
+DEPRECATED_MSG_ATTRIBUTE("All login flows utilize the browser. This will be removed in the next major release");
 
 /*!
  @abstract The permissions to request.

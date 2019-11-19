@@ -21,7 +21,7 @@ FFmpeg 4.1.1
 	openh264 8.1.0
 	kvazaar 1.2.0
 libmysqlclient 8.0
-FacebookSDK(iOS) 5.0.1
+FacebookSDK(iOS) 5.11.0
 XGPush(iOS) 3.3.7
 WeChat(iOS) 1.8.6.1
 

@@ -18,7 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import <FBSDKShareKit/FBSDKShareMessengerActionButton.h>
+#import "FBSDKShareMessengerActionButton.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -31,6 +31,7 @@ typedef NS_ENUM(NSUInteger, FBSDKShareMessengerURLActionButtonWebviewHeightRatio
 /**
  A model for a Messenger share URL action button.
  */
+DEPRECATED_FOR_MESSENGER
 NS_SWIFT_NAME(ShareMessengerURLActionButton)
 @interface FBSDKShareMessengerURLActionButton : NSObject <FBSDKShareMessengerActionButton>
 
