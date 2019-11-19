@@ -311,28 +311,59 @@ namespace slib
 										if (i + 4 < n) {
 											i++;
 											sl_uint16 t = 0;
-											for (int k = 0; k < 4; k++) {
-												ch = sz[i];
-												sl_uint16 h = SLIB_CHAR_HEX_TO_INT(ch);
-												if (h < 16) {
-													t = (t << 4) | h;
-													i++;
-												} else {
-													flagError = sl_true;
-													break;
+											{
+												for (int k = 0; k < 4; k++) {
+													ch = sz[i];
+													sl_uint16 h = SLIB_CHAR_HEX_TO_INT(ch);
+													if (h < 16) {
+														t = (t << 4) | h;
+														i++;
+													} else {
+														flagError = sl_true;
+														break;
+													}
 												}
 											}
 											if (!flagError) {
 												if (sizeof(CT) == 1) {
-													sl_char8 u[3];
-													sl_size nu = Charsets::utf16ToUtf8((sl_char16*)&t, 1, u, 3);
-													if (nu > 0) {
-														for (sl_size iu = 0; iu < nu - 1; iu++) {
-															buf[len++] = (CT)(u[iu]);
+													if (t >= 0xD800 && t < 0xDC00) {
+														if (i + 5 < n) {
+															if (sz[i] == '\\' && sz[i + 1] == 'u') {
+																i += 2;
+																sl_uint16 t2 = 0;
+																for (int k = 0; k < 4; k++) {
+																	ch = sz[i];
+																	sl_uint16 h = SLIB_CHAR_HEX_TO_INT(ch);
+																	if (h < 16) {
+																		t2 = (t2 << 4) | h;
+																		i++;
+																	} else {
+																		flagError = sl_true;
+																		break;
+																	}
+																}
+																if (!flagError) {
+																	sl_char8 u[6];
+																	sl_char16 a[] = {t, t2};
+																	sl_size nu = Charsets::utf16ToUtf8(a, 2, u, 6);
+																	if (nu > 0) {
+																		for (sl_size iu = 0; iu < nu - 1; iu++) {
+																			buf[len++] = (CT)(u[iu]);
+																		}
+																		ch = (CT)(u[nu - 1]);
+																	}
+																}
+															}
 														}
-														ch = (CT)(u[nu - 1]);
 													} else {
-														flagError = sl_true;
+														sl_char8 u[3];
+														sl_size nu = Charsets::utf16ToUtf8((sl_char16*)&t, 1, u, 3);
+														if (nu > 0) {
+															for (sl_size iu = 0; iu < nu - 1; iu++) {
+																buf[len++] = (CT)(u[iu]);
+															}
+															ch = (CT)(u[nu - 1]);
+														}
 													}
 												} else {
 													ch = (CT)t;
