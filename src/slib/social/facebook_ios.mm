@@ -31,6 +31,7 @@
 
 #include "slib/core/safe_static.h"
 
+#define BUCK
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 #import <FBSDKLoginKit/FBSDKLoginKit.h>
 #import <FBSDKShareKit/FBSDKShareKit.h>
@@ -116,8 +117,12 @@ namespace slib
 	{
 		UIPlatform::registerDidFinishLaunchingCallback([](NSDictionary* launchOptions) {
 			@try {
+				[FBSDKApplicationDelegate initializeSDK:launchOptions];
 				[[FBSDKApplicationDelegate sharedInstance] application:([UIApplication sharedApplication]) didFinishLaunchingWithOptions:launchOptions];
-			} @catch (NSException*) {				
+			} @catch (NSException* e) {
+#ifdef SLIB_DEBUG
+				NSLog(@"Facebook Error: %@", e.debugDescription);
+#endif
 			}
 		});
 		UIPlatform::registerOpenUrlCallback([](NSURL* url, NSDictionary* options) {
@@ -127,7 +132,10 @@ namespace slib
 															sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey]
 																   annotation:options[UIApplicationOpenURLOptionsAnnotationKey]
 						];
-			} @catch(NSException*) {
+			} @catch(NSException* e) {
+#ifdef SLIB_DEBUG
+				NSLog(@"Facebook Error: %@", e.debugDescription);
+#endif
 				return NO;
 			}
 		});
