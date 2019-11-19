@@ -9,9 +9,6 @@ ext {
     ANDROIDX_VERSION = "1.0.0"
     FIREBASE_MESSAGING_VERSION = "20.0.0"
     PLAY_SERVICE_VERSION = "18.3.0"
-
-    FACEBOOK_VERSION = "5.0.1"
-    XGPUSH_VERSION = "4.3.5-release"
 }
 
 buildscript {

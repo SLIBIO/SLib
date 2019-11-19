@@ -27,7 +27,7 @@ dependencies {
 
     implementation project(':slib')
 
-    compileOnly "com.tencent.xinge:xinge:$XGPUSH_VERSION"
+    compileOnly "com.tencent.xinge:xinge:4.3.5-release"
 }
 
 rootProject.ext.setLibraryOutput(this, "slib_xgpush", "slib_xgpush")
