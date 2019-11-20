@@ -141,7 +141,7 @@ namespace slib
 	{
 		if (@available(macos 10.15, *)) {
 			sl_bool bRet = sl_false;
-			CFArrayRef list = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
+			CFArrayRef list = CGWindowListCopyWindowInfo(kCGWindowListOptionAll, kCGNullWindowID);
 			if (list) {
 				sl_uint32 n = (sl_uint32)(CFArrayGetCount(list));
 				for (sl_uint32 i = 0; i < n; i++) {
@@ -171,7 +171,14 @@ namespace slib
 
 	void ScreenCapture::openSystemPreferencesForScreenRecording()
 	{
-		[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture"]];
+		if (@available(macos 10.15, *)) {
+			static sl_bool flagInit = sl_true;
+			if (flagInit) {
+				flagInit = sl_false;
+				takeScreenshot();
+			}
+			[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture"]];
+		}
 	}
 
 }
