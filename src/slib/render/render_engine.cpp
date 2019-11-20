@@ -120,7 +120,6 @@ namespace slib
 		
 		m_nCountDrawnElementsOnLastScene = 0;
 		m_nCountDrawnPrimitivesOnLastScene = 0;
-		m_timeLastDebugText.setZero();
 	}
 	
 	RenderEngine::~RenderEngine()

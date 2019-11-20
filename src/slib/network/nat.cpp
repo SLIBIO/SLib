@@ -230,7 +230,6 @@ namespace slib
 	NatTablePort::NatTablePort()
 	{
 		flagActive = sl_false;
-		timeLastAccess.setZero();
 	}
 	
 

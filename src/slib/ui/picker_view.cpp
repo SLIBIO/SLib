@@ -54,7 +54,6 @@ namespace slib
 		m_linesHalfCount = 2;
 		m_flagCircular = sl_false;
 		m_yOffset = 0;
-		m_timeFlowFrameBefore.setZero();
 
 		m_speedFlow = 0;
 	}

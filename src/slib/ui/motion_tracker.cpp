@@ -50,7 +50,6 @@ namespace slib
 			degree = MAX_DEGREE;
 		}
 		m_degree = degree;
-		m_lastTime.setZero();
 		m_topHistory = 0;
 		m_nHistory = 0;
 		m_flagRefreshTrack = sl_true;

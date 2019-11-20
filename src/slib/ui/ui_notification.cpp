@@ -123,7 +123,6 @@ namespace slib
 		flagGroupSummary = sl_false;
 		
 		flagSound = sl_true;
-		color.setZero();
 
 		flagActionButton = sl_false;
 		flagReplyButton = sl_false;
@@ -131,11 +130,8 @@ namespace slib
 		flagOnlyAlertOnce = sl_false;
 		priority = 0;
 
-		deliveryTime.setZero();
 		deliveryInterval = 0;
 		flagRepeat = sl_false;
-
-		actualDeliveryTime.setZero();
 
 		flagRemove = sl_true;
 	}

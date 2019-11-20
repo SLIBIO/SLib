@@ -82,9 +82,6 @@ namespace slib
 	OAuthTokenPayload::OAuthTokenPayload()
 	{
 		grantType = OAuthGrantType::None;
-		accessTokenExpirationTime.setZero();
-		refreshTokenExpirationTime.setZero();
-		authorizationCodeExpirationTime.setZero();
 		codeChallengeMethod = OAuthCodeChallengeMethod::Plain;
 	}
 
