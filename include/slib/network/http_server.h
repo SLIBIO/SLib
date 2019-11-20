@@ -315,6 +315,8 @@ namespace slib
 		Function<Variant(HttpServerContext*)> onPreRequest;
 		Function<void(HttpServerContext*)> onPostRequest;
 
+		sl_bool flagAutoStart;
+		
 	public:
 		HttpServerParam();
 		
@@ -340,6 +342,8 @@ namespace slib
 		static Ref<HttpServer> create(const HttpServerParam& param);
 		
 	public:
+		sl_bool start();
+		
 		void release();
 		
 		sl_bool isRunning();
@@ -405,6 +409,7 @@ namespace slib
 	protected:
 		AtomicRef<AsyncIoLoop> m_ioLoop;
 		AtomicRef<ThreadPool> m_threadPool;
+		sl_bool m_flagReleased;
 		sl_bool m_flagRunning;
 		
 		CHashMap< HttpServerConnection*, Ref<HttpServerConnection> > m_connections;

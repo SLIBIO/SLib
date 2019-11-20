@@ -1005,6 +1005,8 @@ namespace slib
 		cacheControlMaxAge = 600;
 		
 		flagLogDebug = sl_false;
+		
+		flagAutoStart = sl_true;
 	}
 
 	void HttpServerParam::setJson(const Json& conf)
@@ -1065,41 +1067,13 @@ namespace slib
 
 	HttpServer::HttpServer()
 	{
-		m_flagRunning = sl_true;
+		m_flagRunning = sl_false;
+		m_flagReleased = sl_false;
 	}
 
 	HttpServer::~HttpServer()
 	{
 		release();
-	}
-
-	sl_bool HttpServer::_init(const HttpServerParam& param)
-	{
-		Ref<AsyncIoLoop> ioLoop = AsyncIoLoop::create(sl_false);
-		
-		if (ioLoop.isNotNull()) {
-			
-			Ref<ThreadPool> threadPool = ThreadPool::create();
-			
-			if (threadPool.isNotNull()) {
-				
-				threadPool->setMaximumThreadsCount(param.maxThreadsCount);
-				
-				m_ioLoop = ioLoop;
-				m_threadPool = threadPool;
-				m_param = param;
-				if (param.port) {
-					if (! (addHttpBinding(param.addressBind, param.port))) {
-						return sl_false;
-					}
-				}
-				
-				ioLoop->start();
-
-				return sl_true;
-			}
-		}
-		return sl_false;
 	}
 
 	Ref<HttpServer> HttpServer::create(const HttpServerParam& param)
@@ -1113,14 +1087,58 @@ namespace slib
 		return sl_null;
 	}
 
+	sl_bool HttpServer::_init(const HttpServerParam& param)
+	{
+		m_param = param;
+		Ref<AsyncIoLoop> ioLoop = AsyncIoLoop::create(sl_false);
+		if (ioLoop.isNull()) {
+			return sl_false;
+		}
+		m_ioLoop = ioLoop;
+		if (param.port) {
+			if (!(addHttpBinding(param.addressBind, param.port))) {
+				return sl_false;
+			}
+		}
+		if (param.flagAutoStart) {
+			if (!(start())) {
+				return sl_false;
+			}
+		}
+		return sl_true;
+	}
+
+	sl_bool HttpServer::start()
+	{
+		ObjectLocker lock(this);
+		if (m_flagReleased) {
+			return sl_false;
+		}
+		if (m_flagRunning) {
+			return sl_true;
+		}
+		Ref<AsyncIoLoop> loop = m_ioLoop;
+		if (loop.isNotNull()) {
+			Ref<ThreadPool> threadPool = ThreadPool::create();
+			if (threadPool.isNotNull()) {
+				threadPool->setMaximumThreadsCount(m_param.maxThreadsCount);
+				m_threadPool = threadPool;
+				loop->start();
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+
 	void HttpServer::release()
 	{
 		ObjectLocker lock(this);
 		
-		if (!m_flagRunning) {
+		if (m_flagReleased) {
 			return;
 		}
 		
+		m_flagReleased = sl_true;
 		m_flagRunning = sl_false;
 		
 		{
@@ -1141,7 +1159,6 @@ namespace slib
 			threadPool->release();
 			m_threadPool.setNull();
 		}
-		
 		m_connections.removeAll();
 	}
 
