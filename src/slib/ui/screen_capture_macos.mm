@@ -172,11 +172,6 @@ namespace slib
 	void ScreenCapture::openSystemPreferencesForScreenRecording()
 	{
 		if (@available(macos 10.15, *)) {
-			static sl_bool flagInit = sl_true;
-			if (flagInit) {
-				flagInit = sl_false;
-				takeScreenshot();
-			}
 			[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture"]];
 		}
 	}
