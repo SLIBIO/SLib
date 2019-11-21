@@ -51,7 +51,7 @@ namespace slib
 		if (format == AudioFormat::None) {
 			return 0;
 		}
-		return ((AudioFormats::getBitsPerSample(format) * count) + 7) >> 3;
+		return ((AudioFormatHelper::getBitsPerSample(format) * count) + 7) >> 3;
 	}
 
 	sl_size AudioData::getTotalSize() const
@@ -59,51 +59,51 @@ namespace slib
 		if (format == AudioFormat::None) {
 			return 0;
 		}
-		if (AudioFormats::isNonInterleaved(format)) {
-			return getSizeForChannel() * AudioFormats::getChannelsCount(format);
+		if (AudioFormatHelper::isNonInterleaved(format)) {
+			return getSizeForChannel() * AudioFormatHelper::getChannelsCount(format);
 		} else {
-			return ((AudioFormats::getBitsPerSample(format) * AudioFormats::getChannelsCount(format) * count) + 7) >> 3;
+			return ((AudioFormatHelper::getBitsPerSample(format) * AudioFormatHelper::getChannelsCount(format) * count) + 7) >> 3;
 		}
 	}
 
 	sl_uint32 AudioData::getChannelBuffers(AudioChannelBuffer* buffers) const
 	{
-		sl_uint32 nChannels = AudioFormats::getChannelsCount(format);
+		sl_uint32 nChannels = AudioFormatHelper::getChannelsCount(format);
 		if (nChannels == 1) {
 			if (buffers) {
 				buffers[0].count = count;
-				buffers[0].stride = AudioFormats::getBytesPerSample(format);
+				buffers[0].stride = AudioFormatHelper::getBytesPerSample(format);
 				buffers[0].data = data;
 				buffers[0].ref = ref;
 			}
 			return 1;
 		} else if (nChannels == 2) {
 			if (buffers) {
-				if (AudioFormats::isNonInterleaved(format)) {
+				if (AudioFormatHelper::isNonInterleaved(format)) {
 					buffers[0].count = count;
-					buffers[0].stride = AudioFormats::getBytesPerSample(format);
+					buffers[0].stride = AudioFormatHelper::getBytesPerSample(format);
 					buffers[0].data = data;
 					buffers[0].ref = ref;
 					if (data1) {
 						buffers[1].count = count;
-						buffers[1].stride = AudioFormats::getBytesPerSample(format);
+						buffers[1].stride = AudioFormatHelper::getBytesPerSample(format);
 						buffers[1].data = data1;
 						buffers[1].ref = ref1;
 					} else {
 						buffers[1].count = count;
-						buffers[1].stride = AudioFormats::getBytesPerSample(format);
+						buffers[1].stride = AudioFormatHelper::getBytesPerSample(format);
 						buffers[1].data = (sl_uint8*)data + getSizeForChannel();
 						buffers[1].ref = ref;
 					}
 				} else {
 					buffers[0].count = count;
-					buffers[0].stride = AudioFormats::getBytesPerSample(format) * 2;
+					buffers[0].stride = AudioFormatHelper::getBytesPerSample(format) * 2;
 					buffers[0].data = data;
 					buffers[0].ref = ref;
 					
 					buffers[1].count = count;
-					buffers[1].stride = AudioFormats::getBytesPerSample(format) * 2;
-					buffers[1].data = (sl_uint8*)data + AudioFormats::getBytesPerSample(format);
+					buffers[1].stride = AudioFormatHelper::getBytesPerSample(format) * 2;
+					buffers[1].data = (sl_uint8*)data + AudioFormatHelper::getBytesPerSample(format);
 					buffers[1].ref = ref;
 				}
 			}
@@ -219,8 +219,8 @@ namespace slib
 				IN_TYPE _in1;
 				OUT_TYPE _out;
 				OUT_TYPE _out1;
-				sl_uint32 nChannels_in = AudioFormats::getChannelsCount(format_in);
-				sl_uint32 nChannels_out = AudioFormats::getChannelsCount(format_out);
+				sl_uint32 nChannels_in = AudioFormatHelper::getChannelsCount(format_in);
+				sl_uint32 nChannels_out = AudioFormatHelper::getChannelsCount(format_out);
 				if (nChannels_in == 1) {
 					if (nChannels_out == 1) {
 						for (sl_size i = 0; i < count; i++) {
@@ -229,7 +229,7 @@ namespace slib
 							OUT_PROC::writeSample(data_out, _out);
 						}
 					} else if (nChannels_out == 2) {
-						if (AudioFormats::isNonInterleaved(format_out)) {
+						if (AudioFormatHelper::isNonInterleaved(format_out)) {
 							for (sl_size i = 0; i < count; i++) {
 								_in = IN_PROC::readSample(data_in);
 								AudioUtil::convertSample(_in, _out);
@@ -246,7 +246,7 @@ namespace slib
 						}
 					}
 				} else if (nChannels_in == 2) {
-					if (AudioFormats::isNonInterleaved(format_in)) {
+					if (AudioFormatHelper::isNonInterleaved(format_in)) {
 						if (nChannels_out == 1) {
 							for (sl_size i = 0; i < count; i++) {
 								_in = IN_PROC::readSample(data_in);
@@ -256,7 +256,7 @@ namespace slib
 								OUT_PROC::writeSample(data_out, _out);
 							}
 						} else if (nChannels_out == 2) {
-							if (AudioFormats::isNonInterleaved(format_out)) {
+							if (AudioFormatHelper::isNonInterleaved(format_out)) {
 								for (sl_size i = 0; i < count; i++) {
 									_in = IN_PROC::readSample(data_in);
 									AudioUtil::convertSample(_in, _out);
@@ -286,7 +286,7 @@ namespace slib
 								OUT_PROC::writeSample(data_out, _out);
 							}
 						} else if (nChannels_out == 2) {
-							if (AudioFormats::isNonInterleaved(format_out)) {
+							if (AudioFormatHelper::isNonInterleaved(format_out)) {
 								for (sl_size i = 0; i < count; i++) {
 									_in = IN_PROC::readSample(data_in);
 									AudioUtil::convertSample(_in, _out);
@@ -314,7 +314,7 @@ namespace slib
 			template<class IN_PROC, class IN_TYPE>
 			void CopySamples_Step1(sl_size count, AudioFormat format_in, sl_uint8* data_in, sl_uint8* data_in1, AudioFormat format_out, sl_uint8* data_out, sl_uint8* data_out1)
 			{
-				switch (AudioFormats::getSampleType(format_out)) {
+				switch (AudioFormatHelper::getSampleType(format_out)) {
 					case AudioSampleType::Int8:
 						CopySamples_Step2<IN_PROC, IN_TYPE, AUDIO_INT8_PROC, sl_int8>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
 						break;
@@ -366,7 +366,7 @@ namespace slib
 
 			void CopySamples(sl_size count, AudioFormat format_in, sl_uint8* data_in, sl_uint8* data_in1, AudioFormat format_out, sl_uint8* data_out, sl_uint8* data_out1)
 			{
-				switch (AudioFormats::getSampleType(format_in)) {
+				switch (AudioFormatHelper::getSampleType(format_in)) {
 					case AudioSampleType::Int8:
 						CopySamples_Step1<AUDIO_INT8_PROC, sl_int8>(count, format_in, data_in, data_in1, format_out, data_out, data_out1);
 						break;
@@ -438,23 +438,23 @@ namespace slib
 		
 		sl_uint8* data_in = (sl_uint8*)data;
 		sl_uint8* data_in1 = (sl_uint8*)data1;
-		if (AudioFormats::isNonInterleaved(format) && !data_in1) {
+		if (AudioFormatHelper::isNonInterleaved(format) && !data_in1) {
 			data_in1 = data_in + getSizeForChannel();
 		}
 		
 		sl_uint8* data_out = (sl_uint8*)(other.data);
 		sl_uint8* data_out1 = (sl_uint8*)(other.data1);
-		if (AudioFormats::isNonInterleaved(other.format) && !data_out1) {
+		if (AudioFormatHelper::isNonInterleaved(other.format) && !data_out1) {
 			data_out1 = data_out + other.getSizeForChannel();
 		}
 		
 		if (format == other.format) {
-			if (AudioFormats::isNonInterleaved(format)) {
-				sl_size n = (countSamples * AudioFormats::getBitsPerSample(format) + 7) >> 3;
+			if (AudioFormatHelper::isNonInterleaved(format)) {
+				sl_size n = (countSamples * AudioFormatHelper::getBitsPerSample(format) + 7) >> 3;
 				Base::copyMemory(data_out, data_in, n);
 				Base::copyMemory(data_out1, data_in1, n);
 			} else {
-				sl_size n = (countSamples * AudioFormats::getBitsPerSample(format) * AudioFormats::getChannelsCount(format) + 7) >> 3;
+				sl_size n = (countSamples * AudioFormatHelper::getBitsPerSample(format) * AudioFormatHelper::getChannelsCount(format) + 7) >> 3;
 				Base::copyMemory(data_out, data_in, n);
 			}
 			return;

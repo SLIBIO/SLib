@@ -175,7 +175,7 @@ namespace slib
 							AudioData audio;
 							audio.count = input.count;
 							
-							sl_bool flagFloat = AudioFormats::isFloat(input.format);
+							sl_bool flagFloat = AudioFormatHelper::isFloat(input.format);
 							
 							if (flagFloat) {
 								if (m_nChannels == 2) {
@@ -346,7 +346,7 @@ namespace slib
 					AudioData audio;
 					audio.count = output.count;
 					
-					sl_bool flagFloat = AudioFormats::isFloat(output.format);
+					sl_bool flagFloat = AudioFormatHelper::isFloat(output.format);
 					
 					if (flagFloat) {
 						if (m_nChannels == 2) {

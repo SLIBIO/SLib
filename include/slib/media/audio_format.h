@@ -94,7 +94,7 @@ namespace slib
 	};
 	
 	
-	class SLIB_EXPORT AudioFormats
+	class SLIB_EXPORT AudioFormatHelper
 	{
 	public:
 		static AudioSampleType getSampleType(AudioFormat format);
