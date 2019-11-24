@@ -28,6 +28,21 @@
 namespace slib
 {
 
+	class SLIB_EXPORT SQLiteParam
+	{
+	public:
+		String path;
+		sl_bool flagCreate;
+		sl_bool flagReadonly;
+		String encryptionKey;
+		
+	public:
+		SQLiteParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(SQLiteParam)
+		
+	};
+
 	class SLIB_EXPORT SQLiteDatabase : public Database
 	{
 		SLIB_DECLARE_OBJECT
@@ -38,8 +53,13 @@ namespace slib
 		~SQLiteDatabase();
 
 	public:
-		static Ref<SQLiteDatabase> connect(const String& filePath, sl_bool flagCreate = sl_true, sl_bool flagReadonly = sl_false);
+		static Ref<SQLiteDatabase> connect(const SQLiteParam& param);
 
+		static Ref<SQLiteDatabase> connect(const String& filePath);
+
+	public:
+		sl_bool isTableExisting(const String& name);
+		
 	};
 
 }
