@@ -27,7 +27,6 @@
 #include "slib/graphics/util.h"
 #include "slib/core/charset.h"
 #include "slib/core/xml.h"
-#include "slib/core/string_buffer.h"
 #include "slib/math/calculator.h"
 #include "slib/device/device.h"
 
@@ -968,7 +967,8 @@ namespace slib
 								break;
 							}
 						}
-						XmlString face = XmlStringBuffer::join(SLIB_UNICODE(" "), elements.list, indexSize + 1);
+						SLIB_STATIC_STRING16(strSpace, " ")
+						XmlString face = XmlString::join(elements.list, indexSize + 1, strSpace);
 						if (face.isNotEmpty()) {
 							flagDefineFamilyName = sl_true;
 							attrFamilyName = face;

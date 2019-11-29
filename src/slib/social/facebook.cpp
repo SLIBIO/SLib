@@ -166,7 +166,7 @@ namespace slib
 	
 	void Facebook::getUser(const String& personId, const List<String>& fields, const Function<void(FacebookResult&, FacebookUser&)>& onComplete)
 	{
-		getUser(personId, StringBuffer::join(",", fields), onComplete);
+		getUser(personId, String::join(fields, ","), onComplete);
 	}
 	
 	void Facebook::getUser(const String& personId, const Function<void(FacebookResult&, FacebookUser&)>& onComplete)

@@ -27,7 +27,6 @@
 #include "slib/device/device.h"
 
 #include "slib/social/contact.h"
-#include "slib/core/string_buffer.h"
 #include "slib/core/safe_static.h"
 #include "slib/core/platform_android.h"
 
@@ -478,8 +477,8 @@ namespace slib
 				JContact::familyName.set(jcontact.get(), contact.familyName);
 				JContact::nameSuffix.set(jcontact.get(), contact.nameSuffix);
 				JContact::nickname.set(jcontact.get(), contact.nickname);
-				JContact::phoneNumbers.set(jcontact.get(), StringBuffer::join(",", contact.phoneNumbers));
-				JContact::emails.set(jcontact.get(), StringBuffer::join(",", contact.emails));
+				JContact::phoneNumbers.set(jcontact.get(), String::join(contact.phoneNumbers, ","));
+				JContact::emails.set(jcontact.get(), String::join(contact.emails, ","));
 				return JContact::addContact.callBoolean(sl_null, jactivity, jcontact.get());
 			}
 		}

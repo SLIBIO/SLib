@@ -694,7 +694,7 @@ namespace slib
 		if (payload.refreshToken.isNotEmpty()) {
 			params.add_NoLock("refresh_token", payload.refreshToken);
 		}
-		params.add_NoLock("scope", StringBuffer::join(" ", payload.scopes));
+		params.add_NoLock("scope", String::join(payload.scopes, " "));
 		return Move(params);
 	}
 
@@ -831,7 +831,7 @@ namespace slib
 		jwt.payload.putItem(g_field_clientId, payload.clientId);
 		jwt.payload.putItem(g_field_user, payload.user);
 		if (payload.scopes.isNotEmpty()) {
-			jwt.payload.putItem(g_field_scope, StringBuffer::join(g_string_space, payload.scopes));
+			jwt.payload.putItem(g_field_scope, String::join(payload.scopes, g_string_space));
 		}
 		return encrypt(jwt);
 	}

@@ -798,6 +798,24 @@ namespace slib
 		List<String16> split(const String16& pattern) const noexcept;
 		List<String16> split(const sl_char16* pattern) const noexcept;
 		
+		/**
+		 * Join all strings in the list
+		 */
+		static String16 join(const String16* strings, sl_size count, const String16& delimiter) noexcept;
+		static String16 join(const String16* strings, sl_size count) noexcept;
+		static String16 join(const List<String16>& list, sl_size startIndex, sl_size count, const String16& delimiter) noexcept;
+		static String16 join(const List<String16>& list, sl_size startIndex, sl_size count) noexcept;
+		static String16 join(const List<String16>& list, sl_size startIndex, const String16& delimiter) noexcept;
+		static String16 join(const List<String16>& list, sl_size startIndex) noexcept;
+		static String16 join(const List<String16>& list, const String16& delimiter) noexcept;
+		static String16 join(const List<String16>& list) noexcept;
+		template <class... ARGS>
+		static String16 join(const String16& s, ARGS&&... args) noexcept
+		{
+			String16 params[] = {s, Forward<ARGS>(args)...};
+			return join(params, 1 + sizeof...(args));
+		}
+
 	public:
 		/**
 		 * Convert string to a 32 bit integer of the specified radix.

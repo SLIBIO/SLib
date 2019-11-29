@@ -162,7 +162,7 @@ namespace slib
 	
 	void Linkedin::getUser(const String& userId, const List<String>& fields, const Function<void(LinkedinResult&, LinkedinUser&)>& onComplete)
 	{
-		getUser(userId, StringBuffer::join(",", fields), onComplete);
+		getUser(userId, String::join(fields, ","), onComplete);
 	}
 	
 	void Linkedin::getUser(const String& userId, const Function<void(LinkedinResult&, LinkedinUser&)>& onComplete)

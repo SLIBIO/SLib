@@ -162,7 +162,7 @@ namespace slib
 					p->onLoginResult(result);
 				}
 				p->onLoginResult = param.onComplete;
-				String scopes = StringBuffer::join(",", param.authorization.scopes);
+				String scopes = String::join(param.authorization.scopes, ",");
 				JniLocal<jstring> jscopes = Jni::getJniString(scopes);
 				JFacebook::login.call(sl_null, jactivity, jscopes.get());
 				return;

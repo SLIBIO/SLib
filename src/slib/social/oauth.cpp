@@ -713,7 +713,7 @@ namespace slib
 		if (listScopes.isNull()) {
 			listScopes = m_defaultScopes;
 		}
-		String scope = StringBuffer::join(" ", listScopes).trim();
+		String scope = String::join(listScopes, " ").trim();
 		if (scope.isNotEmpty()) {
 			params.put_NoLock("scope", scope);
 		}
@@ -815,7 +815,7 @@ namespace slib
 			params.put_NoLock("code_verifier", codeVerifier);
 		}
 		if (scopes.isNotNull()) {
-			String s = StringBuffer::join(" ", scopes).trim();
+			String s = String::join(scopes, " ").trim();
 			if (s.isNotEmpty()) {
 				params.put_NoLock("scope", s);
 			}
@@ -843,7 +843,7 @@ namespace slib
 		HashMap<String, Variant> params;
 		params.put_NoLock("grant_type", "client_credentials");
 		if (scopes.isNotNull()) {
-			String s = StringBuffer::join(" ", scopes).trim();
+			String s = String::join(scopes, " ").trim();
 			if (s.isNotEmpty()) {
 				params.put_NoLock("scope", s);
 			}
@@ -863,7 +863,7 @@ namespace slib
 		params.put_NoLock("username", username);
 		params.put_NoLock("password", password);
 		if (scopes.isNotNull()) {
-			String s = StringBuffer::join(" ", scopes).trim();
+			String s = String::join(scopes, " ").trim();
 			if (s.isNotEmpty()) {
 				params.put_NoLock("scope", s);
 			}
@@ -882,7 +882,7 @@ namespace slib
 		params.put_NoLock("grant_type", "refresh_token");
 		params.put_NoLock("refresh_token", refreshToken);
 		if (scopes.isNotNull()) {
-			String s = StringBuffer::join(" ", scopes).trim();
+			String s = String::join(scopes, " ").trim();
 			if (s.isNotEmpty()) {
 				params.put_NoLock("scope", s);
 			}

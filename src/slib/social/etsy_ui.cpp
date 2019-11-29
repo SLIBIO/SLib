@@ -37,7 +37,7 @@ namespace slib
 		HashMap<String, Variant> requestTokenParams;
 		requestTokenParams.putAll_NoLock(_param.authorization.customParameters);
 		if (_param.scopes.isNotEmpty()) {
-			requestTokenParams.put_NoLock("scope", StringBuffer::join(" ", _param.scopes));
+			requestTokenParams.put_NoLock("scope", String::join(_param.scopes, " "));
 		} else {
 			requestTokenParams.put_NoLock("scope", "listings_r");
 		}

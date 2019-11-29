@@ -85,12 +85,7 @@ namespace slib
 		 * Merge all items and returns it as memory.
 		 */
 		Memory mergeToMemory() const noexcept;
-		
-		/**
-		 * Join all strings in the list
-		 */
-		static String join(const String& delimiter, const List<String>& list, sl_size startIndex = 0, sl_size count = SLIB_SIZE_MAX);
-		
+
 	private:
 		LinkedQueue<StringData> m_queue;
 		sl_size m_len;
@@ -158,12 +153,7 @@ namespace slib
 		 * Merge all items and returns it as memory.
 		 */
 		Memory mergeToMemory() const noexcept;
-		
-		/**
-		 * Join all strings in the list
-		 */
-		static String16 join(const String16& delimiter, const List<String16>& list, sl_size startIndex = 0, sl_size count = SLIB_SIZE_MAX);
-		
+				
 	private:
 		LinkedQueue<StringData> m_queue;
 		sl_size m_len;

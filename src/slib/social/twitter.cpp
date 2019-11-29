@@ -205,7 +205,7 @@ namespace slib
 					VariantHashMap map;
 					map.put("status", param.status);
 					if (param.mediaIds.isNotEmpty()) {
-						map.put("media_ids", StringBuffer::join(",", param.mediaIds));
+						map.put("media_ids", String::join(param.mediaIds, ","));
 					}
 					rp.setFormData(map);
 					rp.onComplete = [param](UrlRequest* request) {

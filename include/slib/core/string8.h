@@ -811,6 +811,24 @@ namespace slib
 		List<String> split(const String& pattern) const noexcept;
 		List<String> split(const sl_char8* pattern) const noexcept;
 		
+		/**
+		 * Join all strings in the list
+		 */
+		static String join(const String* strings, sl_size count, const String& delimiter) noexcept;
+		static String join(const String* strings, sl_size count) noexcept;
+		static String join(const List<String>& list, sl_size startIndex, sl_size count, const String& delimiter) noexcept;
+		static String join(const List<String>& list, sl_size startIndex, sl_size count) noexcept;
+		static String join(const List<String>& list, sl_size startIndex, const String& delimiter) noexcept;
+		static String join(const List<String>& list, sl_size startIndex) noexcept;
+		static String join(const List<String>& list, const String& delimiter) noexcept;
+		static String join(const List<String>& list) noexcept;
+		template <class... ARGS>
+		static String join(const String& s, ARGS&&... args) noexcept
+		{
+			String params[] = {s, Forward<ARGS>(args)...};
+			return join(params, 1 + sizeof...(args));
+		}
+		
 	public:
 		/**
 		 * Convert the string (`str`) to a 32 bit integer of the specified radix.

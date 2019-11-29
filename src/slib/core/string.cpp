@@ -6169,6 +6169,200 @@ namespace slib
 		return s.split(pattern);
 	}
 
+	String String::join(const String* strings, sl_size count, const String& delimiter) noexcept
+	{
+		if (!count) {
+			return sl_null;
+		}
+		if (count == 1) {
+			return strings[0];
+		}
+		StringBuffer buf;
+		for (sl_size i = 0; i < count; i++) {
+			if (i) {
+				buf.add(delimiter);
+			}
+			buf.add(strings[i]);
+		}
+		return buf.merge();
+	}
+
+	String16 String16::join(const String16* strings, sl_size count, const String16& delimiter) noexcept
+	{
+		if (!count) {
+			return sl_null;
+		}
+		if (count == 1) {
+			return strings[0];
+		}
+		StringBuffer16 buf;
+		for (sl_size i = 0; i < count; i++) {
+			if (i) {
+				buf.add(delimiter);
+			}
+			buf.add(strings[i]);
+		}
+		return buf.merge();
+	}
+
+	String String::join(const String* strings, sl_size count) noexcept
+	{
+		if (!count) {
+			return sl_null;
+		}
+		if (count == 1) {
+			return strings[0];
+		}
+		StringBuffer buf;
+		for (sl_size i = 0; i < count; i++) {
+			buf.add(strings[i]);
+		}
+		return buf.merge();
+	}
+
+	String16 String16::join(const String16* strings, sl_size count) noexcept
+	{
+		if (!count) {
+			return sl_null;
+		}
+		if (count == 1) {
+			return strings[0];
+		}
+		StringBuffer16 buf;
+		for (sl_size i = 0; i < count; i++) {
+			buf.add(strings[i]);
+		}
+		return buf.merge();
+	}
+
+	String String::join(const List<String>& list, sl_size startIndex, sl_size count, const String& delimiter) noexcept
+	{
+		if (count == 0) {
+			return sl_null;
+		}
+		ListLocker<String> items(list);
+		if (startIndex >= items.count) {
+			return sl_null;
+		}
+		sl_size limit = items.count - startIndex;
+		if (count > limit) {
+			count = limit;
+		}
+		return join(items.data + startIndex, count, delimiter);
+	}
+
+	String16 String16::join(const List<String16>& list, sl_size startIndex, sl_size count, const String16& delimiter) noexcept
+	{
+		if (count == 0) {
+			return sl_null;
+		}
+		ListLocker<String16> items(list);
+		if (startIndex >= items.count) {
+			return sl_null;
+		}
+		sl_size limit = items.count - startIndex;
+		if (count > limit) {
+			count = limit;
+		}
+		return join(items.data + startIndex, count, delimiter);
+	}
+
+	String String::join(const List<String>& list, sl_size startIndex, sl_size count) noexcept
+	{
+		if (count == 0) {
+			return sl_null;
+		}
+		ListLocker<String> items(list);
+		if (startIndex >= items.count) {
+			return sl_null;
+		}
+		sl_size limit = items.count - startIndex;
+		if (count > limit) {
+			count = limit;
+		}
+		return join(items.data + startIndex, count);
+	}
+
+	String16 String16::join(const List<String16>& list, sl_size startIndex, sl_size count) noexcept
+	{
+		if (count == 0) {
+			return sl_null;
+		}
+		ListLocker<String16> items(list);
+		if (startIndex >= items.count) {
+			return sl_null;
+		}
+		sl_size limit = items.count - startIndex;
+		if (count > limit) {
+			count = limit;
+		}
+		return join(items.data + startIndex, count);
+	}
+
+	String String::join(const List<String>& list, sl_size startIndex, const String& delimiter) noexcept
+	{
+		ListLocker<String> items(list);
+		if (startIndex >= items.count) {
+			return sl_null;
+		}
+		sl_size count = items.count - startIndex;
+		return join(items.data + startIndex, count, delimiter);
+	}
+
+	String16 String16::join(const List<String16>& list, sl_size startIndex, const String16& delimiter) noexcept
+	{
+		ListLocker<String16> items(list);
+		if (startIndex >= items.count) {
+			return sl_null;
+		}
+		sl_size count = items.count - startIndex;
+		return join(items.data + startIndex, count, delimiter);
+	}
+
+	String String::join(const List<String>& list, sl_size startIndex) noexcept
+	{
+		ListLocker<String> items(list);
+		if (startIndex >= items.count) {
+			return sl_null;
+		}
+		sl_size count = items.count - startIndex;
+		return join(items.data + startIndex, count);
+	}
+
+	String16 String16::join(const List<String16>& list, sl_size startIndex) noexcept
+	{
+		ListLocker<String16> items(list);
+		if (startIndex >= items.count) {
+			return sl_null;
+		}
+		sl_size count = items.count - startIndex;
+		return join(items.data + startIndex, count);
+	}
+
+	String String::join(const List<String>& list, const String& delimiter) noexcept
+	{
+		ListLocker<String> items(list);
+		return join(items.data, items.count, delimiter);
+	}
+
+	String16 String16::join(const List<String16>& list, const String16& delimiter) noexcept
+	{
+		ListLocker<String16> items(list);
+		return join(items.data, items.count, delimiter);
+	}
+
+	String String::join(const List<String>& list) noexcept
+	{
+		ListLocker<String> items(list);
+		return join(items.data, items.count);
+	}
+
+	String16 String16::join(const List<String16>& list) noexcept
+	{
+		ListLocker<String16> items(list);
+		return join(items.data, items.count);
+	}
+
 /**********************************************************
 					String Conversion
 **********************************************************/
