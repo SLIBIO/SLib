@@ -33,6 +33,18 @@ namespace slib
 		flagCancel = sl_false;
 	}
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(WechatLoginResponse)
+
+	WechatLoginResponse::WechatLoginResponse()
+	{
+	}
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(WechatLoginParam)
+
+	WechatLoginParam::WechatLoginParam()
+	{
+	}
+
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(WechatPaymentOrder)
 
 	WechatPaymentOrder::WechatPaymentOrder()

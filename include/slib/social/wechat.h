@@ -45,6 +45,30 @@ namespace slib
 
 	};
 
+	class SLIB_EXPORT WechatLoginResponse : public WechatAppResponse
+	{
+	public:
+		String code;
+		
+	public:
+		WechatLoginResponse();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(WechatLoginResponse)
+
+	};
+
+	class SLIB_EXPORT WechatLoginParam
+	{
+	public:
+		Function<void(WechatLoginResponse&)> onComplete;
+		
+	public:
+		WechatLoginParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(WechatLoginParam)
+
+	};
+
 	class SLIB_EXPORT WechatPaymentOrder
 	{
 	public:
@@ -91,6 +115,10 @@ namespace slib
 		static void initialize(const String& appId);
 		
 	public:
+		static void login(const WechatLoginParam& param);
+		
+		static void login(const Function<void(WechatLoginResponse& result)>& onComplete);
+
 		static void pay(const WechatPaymentRequest& req);
 		
 	};

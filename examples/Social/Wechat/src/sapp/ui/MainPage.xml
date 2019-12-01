@@ -1,0 +1,31 @@
+<sapp>
+	<layout
+		type='page'
+		background='white'
+		>
+		
+		<linear
+			alignCenter='true'
+			>
+
+			<button
+				name='btnLogin'
+				style='button'
+				text='Login'
+				/>
+
+		</linear>
+
+ 	</layout>
+
+	<style
+		name='button'
+		fontSize='6%sw'
+		boundRadius='2%sw'
+		width='35%sw'
+		shadowOpacity='0.5'
+		shadowRadius='1%sw'
+		background='white'
+		/>
+
+</sapp>
