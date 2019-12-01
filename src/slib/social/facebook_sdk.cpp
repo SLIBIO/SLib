@@ -38,6 +38,9 @@ namespace slib
 		Ref<Facebook> instance = Facebook::getInstance();
 		if (instance.isNotNull()) {
 			instance->login(param);
+		} else {
+			FacebookLoginResult result;
+			param.onComplete(result);
 		}
 	}
 	
