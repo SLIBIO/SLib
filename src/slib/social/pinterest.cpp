@@ -101,7 +101,23 @@ namespace slib
 		g_instance = create(param);
 	}
 	
-	void Pinterest::initialize(const String& redirectUri, const String& appId, const String& appSecret)
+	void Pinterest::initialize()
+	{
+		PinterestParam param;
+		param.preferenceName = "pinterest";
+		initialize(param);
+	}
+	
+	Ref<Pinterest> Pinterest::create(const String& appId, const String& appSecret, const String& redirectUri)
+	{
+		PinterestParam param;
+		param.clientId = appId;
+		param.clientSecret = appSecret;
+		param.redirectUri = redirectUri;
+		return create(param);
+	}
+	
+	void Pinterest::initialize(const String& appId, const String& appSecret, const String& redirectUri)
 	{
 		PinterestParam param;
 		param.preferenceName = "pinterest";
@@ -109,6 +125,23 @@ namespace slib
 		param.clientSecret = appSecret;
 		param.redirectUri = redirectUri;
 		initialize(param);
+	}
+	
+	Ref<Pinterest> Pinterest::create(const String& appId, const String& redirectUri)
+	{
+		return create(appId, String::null(), redirectUri);
+	}
+	
+	void Pinterest::initialize(const String& appId, const String& redirectUri)
+	{
+		initialize(appId, String::null(), redirectUri);
+	}
+	
+	Ref<Pinterest> Pinterest::createWithAccessToken(const String& accessToken)
+	{
+		PinterestParam param;
+		param.accessToken.token = accessToken;
+		return create(param);
 	}
 	
 	Ref<Pinterest> Pinterest::getInstance()

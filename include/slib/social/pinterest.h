@@ -67,9 +67,9 @@ namespace slib
 		
 	};
 	
-	typedef OAuthLoginResult PinterestLoginResult;
-	
 	typedef OAuthApiResult PinterestResult;
+	
+	typedef OAuthLoginResult PinterestLoginResult;
 	
 	class SLIB_EXPORT PinterestLoginParam: public OAuthLoginParam
 	{
@@ -160,8 +160,18 @@ namespace slib
 		
 		static void initialize(const PinterestParam& param);
 		
-		static void initialize(const String& redirectUrl, const String& appId, const String& appSecret = String::null());
+		static void initialize();
+		
+		static Ref<Pinterest> create(const String& appId, const String& appSecret, const String& redirectUrl);
 
+		static void initialize(const String& appId, const String& appSecret, const String& redirectUrl);
+		
+		static Ref<Pinterest> create(const String& appId, const String& redirectUrl);
+
+		static void initialize(const String& appId, const String& redirectUrl);
+		
+		static Ref<Pinterest> createWithAccessToken(const String& accessToken);
+		
 		static Ref<Pinterest> getInstance();
 		
 	public:

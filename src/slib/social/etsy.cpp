@@ -96,7 +96,7 @@ namespace slib
 	{
 		return new Etsy(param);
 	}
-	
+
 	void Etsy::initialize(const EtsyParam& param)
 	{
 		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
@@ -105,7 +105,23 @@ namespace slib
 		g_instance = create(param);
 	}
 	
-	void Etsy::initialize(const String& callbackUrl, const String& consumerKey, const String& consumerSecret)
+	void Etsy::initialize()
+	{
+		EtsyParam param;
+		param.preferenceName = "etsy";
+		initialize(param);
+	}
+	
+	Ref<Etsy> Etsy::create(const String& consumerKey, const String& consumerSecret, const String& callbackUrl)
+	{
+		EtsyParam param;
+		param.consumerKey = consumerKey;
+		param.consumerSecret = consumerSecret;
+		param.callbackUrl = callbackUrl;
+		return create(param);
+	}
+	
+	void Etsy::initialize(const String& consumerKey, const String& consumerSecret, const String& callbackUrl)
 	{
 		EtsyParam param;
 		param.preferenceName = "etsy";
@@ -113,6 +129,14 @@ namespace slib
 		param.consumerSecret = consumerSecret;
 		param.callbackUrl = callbackUrl;
 		initialize(param);
+	}
+	
+	Ref<Etsy> Etsy::createWithAccessToken(const String& token, const String tokenSecret)
+	{
+		EtsyParam param;
+		param.accessToken.token = token;
+		param.accessToken.secret = tokenSecret;
+		return create(param);
 	}
 	
 	Ref<Etsy> Etsy::getInstance()

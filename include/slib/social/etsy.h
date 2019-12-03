@@ -111,8 +111,14 @@ namespace slib
 		
 		static void initialize(const EtsyParam& param);
 		
-		static void initialize(const String& callbackUrl, const String& consumerKey, const String& consumerSecret);
-
+		static void initialize();
+		
+		static Ref<Etsy> create(const String& consumerKey, const String& consumerSecret, const String& callbackUrl);
+		
+		static void initialize(const String& consumerKey, const String& consumerSecret, const String& callbackUrl);
+		
+		static Ref<Etsy> createWithAccessToken(const String& token, const String tokenSecret);
+		
 		static Ref<Etsy> getInstance();
 
 	public:

@@ -100,7 +100,23 @@ namespace slib
 		g_instance = create(param);
 	}
 	
-	void Twitter::initialize(const String& callbackUrl, const String& consumerKey, const String& consumerSecret)
+	void Twitter::initialize()
+	{
+		TwitterParam param;
+		param.preferenceName = "twitter";
+		initialize(param);
+	}
+	
+	Ref<Twitter> Twitter::create(const String& consumerKey, const String& consumerSecret, const String& callbackUrl)
+	{
+		TwitterParam param;
+		param.consumerKey = consumerKey;
+		param.consumerSecret = consumerSecret;
+		param.callbackUrl = callbackUrl;
+		return create(param);
+	}
+	
+	void Twitter::initialize(const String& consumerKey, const String& consumerSecret, const String& callbackUrl)
 	{
 		TwitterParam param;
 		param.preferenceName = "twitter";
@@ -108,6 +124,14 @@ namespace slib
 		param.consumerSecret = consumerSecret;
 		param.callbackUrl = callbackUrl;
 		initialize(param);
+	}
+	
+	Ref<Twitter> Twitter::createWithAccessToken(const String& token, const String tokenSecret)
+	{
+		TwitterParam param;
+		param.accessToken.token = token;
+		param.accessToken.secret = tokenSecret;
+		return create(param);
 	}
 	
 	Ref<Twitter> Twitter::getInstance()

@@ -103,7 +103,7 @@ namespace slib
 	{
 		return new Facebook(param);
 	}
-		
+	
 	void Facebook::initialize(const FacebookParam& param)
 	{
 		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
@@ -112,7 +112,23 @@ namespace slib
 		g_instance = create(param);
 	}
 	
-	void Facebook::initialize(const String& redirectUri, const String& appId, const String& appSecret)
+	void Facebook::initialize()
+	{
+		FacebookParam param;
+		param.preferenceName = "facebook";
+		initialize(param);
+	}
+	
+	Ref<Facebook> Facebook::create(const String& appId, const String& appSecret, const String& redirectUri)
+	{
+		FacebookParam param;
+		param.clientId = appId;
+		param.clientSecret = appSecret;
+		param.redirectUri = redirectUri;
+		return create(param);
+	}
+	
+	void Facebook::initialize(const String& appId, const String& appSecret, const String& redirectUri)
 	{
 		FacebookParam param;
 		param.preferenceName = "facebook";
@@ -120,6 +136,23 @@ namespace slib
 		param.clientSecret = appSecret;
 		param.redirectUri = redirectUri;
 		initialize(param);
+	}
+	
+	Ref<Facebook> Facebook::create(const String& appId, const String& redirectUri)
+	{
+		return create(appId, String::null(), redirectUri);
+	}
+	
+	void Facebook::initialize(const String& appId, const String& redirectUri)
+	{
+		initialize(appId, String::null(), redirectUri);
+	}
+	
+	Ref<Facebook> Facebook::createWithAccessToken(const String& accessToken)
+	{
+		FacebookParam param;
+		param.accessToken.token = accessToken;
+		return create(param);
 	}
 	
 	Ref<Facebook> Facebook::getInstance()

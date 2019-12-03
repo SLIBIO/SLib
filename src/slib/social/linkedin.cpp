@@ -32,15 +32,15 @@ namespace slib
 	{
 		namespace linkedin
 		{
-			SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Linkedin>, g_instance)
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<LinkedIn>, g_instance)
 		}
 	}
 	
 	using namespace priv::linkedin;
 	
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(LinkedinUser)
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(LinkedInUser)
 	
-	SLIB_DEFINE_JSON(LinkedinUser)
+	SLIB_DEFINE_JSON(LinkedInUser)
 	{
 		if (isFromJson) {
 			this->json = json;
@@ -58,11 +58,11 @@ namespace slib
 		}
 	}
 	
-	LinkedinUser::LinkedinUser()
+	LinkedInUser::LinkedInUser()
 	{
 	}
 	
-	String LinkedinUser::getNameFromLocalized(const Json& localizedName)
+	String LinkedInUser::getNameFromLocalized(const Json& localizedName)
 	{
 		Json name = localizedName["localized"];
 		if (name.isNotNull()) {
@@ -77,9 +77,9 @@ namespace slib
 	}
 
 	
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(LinkedinParam)
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(LinkedInParam)
 	
-	LinkedinParam::LinkedinParam()
+	LinkedInParam::LinkedInParam()
 	{
 		authorizeUrl = "https://www.linkedin.com/oauth/v2/authorization";
 		accessTokenUrl = "https://www.linkedin.com/oauth/v2/accessToken";
@@ -88,22 +88,22 @@ namespace slib
 		flagSupportImplicitGrantType = sl_false;
 	}
 	
-	SLIB_DEFINE_OBJECT(Linkedin, OAuth2)
+	SLIB_DEFINE_OBJECT(LinkedIn, OAuth2)
 	
-	Linkedin::Linkedin(const LinkedinParam& param) : OAuth2(param)
+	LinkedIn::LinkedIn(const LinkedInParam& param) : OAuth2(param)
 	{
 	}
 	
-	Linkedin::~Linkedin()
+	LinkedIn::~LinkedIn()
 	{
 	}
 	
-	Ref<Linkedin> Linkedin::create(const LinkedinParam& param)
+	Ref<LinkedIn> LinkedIn::create(const LinkedInParam& param)
 	{
-		return new Linkedin(param);
+		return new LinkedIn(param);
 	}
-		
-	void Linkedin::initialize(const LinkedinParam& param)
+	
+	void LinkedIn::initialize(const LinkedInParam& param)
 	{
 		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
 			return;
@@ -111,9 +111,25 @@ namespace slib
 		g_instance = create(param);
 	}
 	
-	void Linkedin::initialize(const String& redirectUri, const String& clientId, const String& clientSecret)
+	void LinkedIn::initialize()
 	{
-		LinkedinParam param;
+		LinkedInParam param;
+		param.preferenceName = "linkedin";
+		initialize(param);
+	}
+	
+	Ref<LinkedIn> LinkedIn::create(const String& clientId, const String& clientSecret, const String& redirectUri)
+	{
+		LinkedInParam param;
+		param.clientId = clientId;
+		param.clientSecret = clientSecret;
+		param.redirectUri = redirectUri;
+		return create(param);
+	}
+	
+	void LinkedIn::initialize(const String& clientId, const String& clientSecret, const String& redirectUri)
+	{
+		LinkedInParam param;
 		param.preferenceName = "linkedin";
 		param.clientId = clientId;
 		param.clientSecret = clientSecret;
@@ -121,7 +137,14 @@ namespace slib
 		initialize(param);
 	}
 	
-	Ref<Linkedin> Linkedin::getInstance()
+	Ref<LinkedIn> LinkedIn::createWithAccessToken(const String& accessKey)
+	{
+		LinkedInParam param;
+		param.accessToken.token = accessKey;
+		return create(param);
+	}
+	
+	Ref<LinkedIn> LinkedIn::getInstance()
 	{
 		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
 			return sl_null;
@@ -129,12 +152,12 @@ namespace slib
 		return g_instance;
 	}
 	
-	String Linkedin::getRequestUrl(const String& path)
+	String LinkedIn::getRequestUrl(const String& path)
 	{
 		return "https://api.linkedin.com/v2/" + path;
 	}
 	
-	void Linkedin::getUser(const String& userId, const String& fields, const Function<void(LinkedinResult&, LinkedinUser&)>& onComplete)
+	void LinkedIn::getUser(const String& userId, const String& fields, const Function<void(LinkedInResult&, LinkedInUser&)>& onComplete)
 	{
 		UrlRequestParam rp;
 		if (userId.isNotEmpty()) {
@@ -148,8 +171,8 @@ namespace slib
 		}
 		rp.requestHeaders.put_NoLock("X-RestLi-Protocol-Version", "2.0.0");
 		rp.onComplete = [onComplete](UrlRequest* request) {
-			LinkedinResult result(request);
-			LinkedinUser user;
+			LinkedInResult result(request);
+			LinkedInUser user;
 			if (!(request->isError())) {
 				FromJson(result.response, user);
 				result.flagSuccess = user.id.isNotEmpty();
@@ -160,37 +183,37 @@ namespace slib
 		UrlRequest::send(rp);
 	}
 	
-	void Linkedin::getUser(const String& userId, const List<String>& fields, const Function<void(LinkedinResult&, LinkedinUser&)>& onComplete)
+	void LinkedIn::getUser(const String& userId, const List<String>& fields, const Function<void(LinkedInResult&, LinkedInUser&)>& onComplete)
 	{
 		getUser(userId, String::join(fields, ","), onComplete);
 	}
 	
-	void Linkedin::getUser(const String& userId, const Function<void(LinkedinResult&, LinkedinUser&)>& onComplete)
+	void LinkedIn::getUser(const String& userId, const Function<void(LinkedInResult&, LinkedInUser&)>& onComplete)
 	{
 		getUser(userId, String::null(), onComplete);
 	}
 	
 	
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(LinkedinShareResult)
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(LinkedInShareResult)
 	
-	LinkedinShareResult::LinkedinShareResult(UrlRequest* request): LinkedinResult(request)
+	LinkedInShareResult::LinkedInShareResult(UrlRequest* request): LinkedInResult(request)
 	{
 	}
 	
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(LinkedinShareParam)
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(LinkedInShareParam)
 	
-	LinkedinShareParam::LinkedinShareParam()
+	LinkedInShareParam::LinkedInShareParam()
 	{
 	}
 	
-	void Linkedin::share(const LinkedinShareParam& param)
+	void LinkedIn::share(const LinkedInShareParam& param)
 	{
 		auto linkedin = ToRef(this);
-		getUser(sl_null, [linkedin, param](LinkedinResult& result, LinkedinUser& user) {
+		getUser(sl_null, [linkedin, param](LinkedInResult& result, LinkedInUser& user) {
 			if (user.id.isEmpty()) {
-				LogError("Linkedin Share", "%s", result.response);
-				LinkedinShareResult r(sl_null);
-				*((LinkedinResult*)&r) = result;
+				LogError("LinkedIn Share", "%s", result.response);
+				LinkedInShareResult r(sl_null);
+				*((LinkedInResult*)&r) = result;
 				param.onComplete(r);
 				return;
 			}
@@ -224,10 +247,10 @@ namespace slib
 			}
 			rp.setJsonData(json);
 			rp.onComplete = [param](UrlRequest* request) {
-				LinkedinShareResult result(request);
+				LinkedInShareResult result(request);
 				String id = result.response["id"].getString();
 				if (id.isEmpty()) {
-					LogError("Linkedin Share", "%s", result.response);
+					LogError("LinkedIn Share", "%s", result.response);
 					param.onComplete(result);
 					return;
 				}

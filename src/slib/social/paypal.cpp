@@ -118,26 +118,32 @@ namespace slib
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(PayPalParam)
 	
-	PayPalParam::PayPalParam()
+	PayPalParam::PayPalParam(sl_bool flagSandbox)
 	{
-		flagSandbox = sl_false;
-		
+		setSandbox(flagSandbox);
 		flagUseBasicAuthorizationForAccessToken = sl_true;
 	}
 	
+	sl_bool PayPalParam::isSandbox() const
+	{
+		return m_flagSandbox;
+	}
+
+	void PayPalParam::setSandbox(sl_bool flag)
+	{
+		m_flagSandbox = flag;
+		if (flag) {
+			accessTokenUrl = "https://api.sandbox.paypal.com/v1/oauth2/token";
+		} else {
+			accessTokenUrl = "https://api.paypal.com/v1/oauth2/token";
+		}
+	}
 	
 	SLIB_DEFINE_OBJECT(PayPal, OAuth2)
 	
 	PayPal::PayPal(const PayPalParam& param) : OAuth2(param)
 	{
-		m_flagSandbox = param.flagSandbox;
-		if (m_accessTokenUrl.isNull()) {
-			if (param.flagSandbox) {
-				m_accessTokenUrl = "https://api.sandbox.paypal.com/v1/oauth2/token";
-			} else {
-				m_accessTokenUrl = "https://api.paypal.com/v1/oauth2/token";
-			}
-		}
+		m_flagSandbox = param.isSandbox();
 	}
 	
 	PayPal::~PayPal()
@@ -157,10 +163,37 @@ namespace slib
 		g_instance = create(param);
 	}
 	
+	void PayPal::initialize()
+	{
+		PayPalParam param(sl_false);
+		initialize(param);
+	}
+	
+	void PayPal::initializeSandbox()
+	{
+		PayPalParam param(sl_true);
+		initialize(param);
+	}
+	
+	Ref<PayPal> PayPal::create(const String& clientId, const String& clientSecret)
+	{
+		PayPalParam param(sl_false);
+		param.clientId = clientId;
+		param.clientSecret = clientSecret;
+		return create(param);
+	}
+
+	Ref<PayPal> PayPal::createSandbox(const String& clientId, const String& clientSecret)
+	{
+		PayPalParam param(sl_true);
+		param.clientId = clientId;
+		param.clientSecret = clientSecret;
+		return create(param);
+	}
+
 	void PayPal::initialize(const String& clientId, const String& clientSecret)
 	{
-		PayPalParam param;
-		param.flagSandbox = sl_false;
+		PayPalParam param(sl_false);
 		param.clientId = clientId;
 		param.clientSecret = clientSecret;
 		initialize(param);
@@ -168,21 +201,26 @@ namespace slib
 	
 	void PayPal::initializeSandbox(const String& clientId, const String& clientSecret)
 	{
-		PayPalParam param;
-		param.flagSandbox = sl_true;
+		PayPalParam param(sl_true);
 		param.clientId = clientId;
 		param.clientSecret = clientSecret;
 		initialize(param);
 	}
 	
-	void PayPal::initializeWithAccessToken(const String& accessToken, sl_bool flagSandbox)
+	Ref<PayPal> PayPal::createWithAccessToken(const String& accessToken)
 	{
-		PayPalParam param;
-		param.flagSandbox = flagSandbox;
+		PayPalParam param(sl_false);
 		param.accessToken.token = accessToken;
-		initialize(param);
+		return create(param);
 	}
 	
+	Ref<PayPal> PayPal::createSandboxWithAccessToken(const String& accessToken)
+	{
+		PayPalParam param(sl_true);
+		param.accessToken.token = accessToken;
+		return create(param);
+	}
+
 	Ref<PayPal> PayPal::getInstance()
 	{
 		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {

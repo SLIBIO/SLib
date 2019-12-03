@@ -142,12 +142,17 @@ namespace slib
 	class SLIB_EXPORT PayPalParam : public OAuthParam
 	{
 	public:
-		sl_bool flagSandbox;
-		
-	public:
-		PayPalParam();
+		PayPalParam(sl_bool flagSandbox = sl_false);
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(PayPalParam)
+		
+	public:
+		sl_bool isSandbox() const;
+		
+		void setSandbox(sl_bool flag);
+		
+	private:
+		sl_bool m_flagSandbox;
 		
 	};
 	
@@ -165,11 +170,21 @@ namespace slib
 		
 		static void initialize(const PayPalParam& param);
 		
+		static void initialize();
+		
+		static void initializeSandbox();
+		
+		static Ref<PayPal> create(const String& clientId, const String& clientSecret);
+		
+		static Ref<PayPal> createSandbox(const String& clientId, const String& clientSecret);
+		
 		static void initialize(const String& clientId, const String& clientSecret);
 		
 		static void initializeSandbox(const String& clientId, const String& clientSecret);
+		
+		static Ref<PayPal> createWithAccessToken(const String& accessToken);
 
-		static void initializeWithAccessToken(const String& accessToken, sl_bool flagSandbox = sl_false);
+		static Ref<PayPal> createSandboxWithAccessToken(const String& accessToken);
 
 		static Ref<PayPal> getInstance();
 		

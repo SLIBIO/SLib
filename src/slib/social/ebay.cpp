@@ -104,19 +104,29 @@ namespace slib
 
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(EbayParam)
 	
-	EbayParam::EbayParam(sl_bool _flagProduction)
+	EbayParam::EbayParam(sl_bool flagSandbox)
 	{
-		flagProduction = _flagProduction;
-		if (_flagProduction) {
-			authorizeUrl = "https://auth.ebay.com/oauth2/authorize";
-			accessTokenUrl = "https://api.ebay.com/identity/v1/oauth2/token";
-		} else {
-			authorizeUrl = "https://auth.sandbox.ebay.com/oauth2/authorize";
-			accessTokenUrl = "https://api.sandbox.ebay.com/identity/v1/oauth2/token";
-		}
+		setSandbox(flagSandbox);
 		defaultScopes.add_NoLock("https://api.ebay.com/oauth/api_scope");
 	}
-	
+
+	sl_bool EbayParam::isSandbox() const
+	{
+		return m_flagSandbox;
+	}
+
+	void EbayParam::setSandbox(sl_bool flag)
+	{
+		m_flagSandbox = flag;
+		if (flag) {
+			authorizeUrl = "https://auth.sandbox.ebay.com/oauth2/authorize";
+			accessTokenUrl = "https://api.sandbox.ebay.com/identity/v1/oauth2/token";
+		} else {
+			authorizeUrl = "https://auth.ebay.com/oauth2/authorize";
+			accessTokenUrl = "https://api.ebay.com/identity/v1/oauth2/token";
+		}
+	}
+
 	void EbayParam::setRedirectUrl(const String& ruName, const String& _loginRedirectUri)
 	{
 		redirectUri = ruName;
@@ -127,7 +137,7 @@ namespace slib
 	
 	Ebay::Ebay(const EbayParam& param) : OAuth2(param)
 	{
-		m_flagProduction = param.flagProduction;
+		m_flagSandbox = param.isSandbox();
 	}
 	
 	Ebay::~Ebay()
@@ -138,7 +148,7 @@ namespace slib
 	{
 		return new Ebay(param);
 	}
-	
+
 	void Ebay::initialize(const EbayParam& param)
 	{
 		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
@@ -146,17 +156,93 @@ namespace slib
 		}
 		g_instance = create(param);
 	}
-	
-	void Ebay::initialize(sl_bool flagProduction, const String& ruName, const String& redirectUri, const String& appId, const String& appSecret)
+
+	void Ebay::initialize()
 	{
-		EbayParam param(flagProduction);
+		EbayParam param(sl_false);
+		param.preferenceName = "ebay";
+		initialize(param);
+	}
+
+	void Ebay::initializeSandbox()
+	{
+		EbayParam param(sl_true);
+		param.preferenceName = "ebay";
+		initialize(param);
+	}
+
+	Ref<Ebay> Ebay::create(const String& appId, const String& appSecret, const String& ruName, const String& loginRedirectUri)
+	{
+		EbayParam param(sl_false);
+		param.clientId = appId;
+		param.clientSecret = appSecret;
+		param.setRedirectUrl(ruName, loginRedirectUri);
+		return create(param);
+	}
+
+	Ref<Ebay> Ebay::createSandbox(const String& appId, const String& appSecret, const String& ruName, const String& loginRedirectUri)
+	{
+		EbayParam param(sl_true);
+		param.clientId = appId;
+		param.clientSecret = appSecret;
+		param.setRedirectUrl(ruName, loginRedirectUri);
+		return create(param);
+	}
+
+	void Ebay::initialize(const String& appId, const String& appSecret, const String& ruName, const String& loginRedirectUri)
+	{
+		EbayParam param(sl_false);
 		param.preferenceName = "ebay";
 		param.clientId = appId;
 		param.clientSecret = appSecret;
-		param.setRedirectUrl(ruName, redirectUri);
+		param.setRedirectUrl(ruName, loginRedirectUri);
 		initialize(param);
 	}
-	
+
+	void Ebay::initializeSandbox(const String& appId, const String& appSecret, const String& ruName, const String& loginRedirectUri)
+	{
+		EbayParam param(sl_true);
+		param.preferenceName = "ebay_sandbox";
+		param.clientId = appId;
+		param.clientSecret = appSecret;
+		param.setRedirectUrl(ruName, loginRedirectUri);
+		initialize(param);
+	}
+
+	Ref<Ebay> Ebay::create(const String& appId, const String& ruName, const String& loginRedirectUri)
+	{
+		return create(appId, String::null(), ruName, loginRedirectUri);
+	}
+
+	Ref<Ebay> Ebay::createSandbox(const String& appId, const String& ruName, const String& loginRedirectUri)
+	{
+		return createSandbox(appId, String::null(), ruName, loginRedirectUri);
+	}
+
+	void Ebay::initialize(const String& appId, const String& ruName, const String& loginRedirectUri)
+	{
+		initialize(appId, String::null(), ruName, loginRedirectUri);
+	}
+
+	void Ebay::initializeSandbox(const String& appId, const String& ruName, const String& loginRedirectUri)
+	{
+		initializeSandbox(appId, String::null(), ruName, loginRedirectUri);
+	}
+
+	Ref<Ebay> Ebay::createWithAccessToken(const String& accessToken)
+	{
+		EbayParam param(sl_false);
+		param.accessToken.token = accessToken;
+		return create(param);
+	}
+
+	Ref<Ebay> Ebay::createSandboxWithAccessToken(const String& accessToken)
+	{
+		EbayParam param(sl_true);
+		param.accessToken.token = accessToken;
+		return create(param);
+	}
+
 	Ref<Ebay> Ebay::getInstance()
 	{
 		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
@@ -167,10 +253,10 @@ namespace slib
 	
 	String Ebay::getRequestUrl(const String& path)
 	{
-		if (m_flagProduction) {
-			return "https://api.ebay.com/" + path;
-		} else {
+		if (m_flagSandbox) {
 			return "https://api.sandbox.ebay.com/" + path;
+		} else {
+			return "https://api.ebay.com/" + path;
 		}
 	}
 	

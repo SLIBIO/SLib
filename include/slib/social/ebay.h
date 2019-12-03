@@ -48,8 +48,6 @@ namespace slib
 
 	};
 	
-	typedef OAuthLoginResult EbayLoginResult;
-	
 	class SLIB_EXPORT EbayResult
 	{
 	public:
@@ -64,20 +62,26 @@ namespace slib
 		
 	};
 	
+	typedef OAuthLoginResult EbayLoginResult;
+	
 	typedef OAuthLoginParam EbayLoginParam;
 	
 	class SLIB_EXPORT EbayParam : public OAuthParam
 	{
 	public:
-		sl_bool flagProduction;
-		
-	public:
-		EbayParam(sl_bool flagProduction);
+		EbayParam(sl_bool flagSandbox = sl_false);
 
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(EbayParam)
 		
 	public:
+		sl_bool isSandbox() const;
+		
+		void setSandbox(sl_bool flag);
+		
 		void setRedirectUrl(const String& ruName, const String& loginRedirectUri);
+		
+	private:
+		sl_bool m_flagSandbox;
 		
 	};
 	
@@ -95,8 +99,30 @@ namespace slib
 		
 		static void initialize(const EbayParam& param);
 		
-		static void initialize(sl_bool flagProduction, const String& ruName, const String& redirectUri, const String& appId, const String& appSecret = String::null());
+		static void initialize();
+		
+		static void initializeSandbox();
 
+		static Ref<Ebay> create(const String& appId, const String& appSecret, const String& ruName, const String& loginRedirectUri);
+		
+		static Ref<Ebay> createSandbox(const String& appId, const String& appSecret, const String& ruName, const String& loginRedirectUri);
+
+		static void initialize(const String& appId, const String& appSecret, const String& ruName, const String& loginRedirectUri);
+		
+		static void initializeSandbox(const String& appId, const String& appSecret, const String& ruName, const String& loginRedirectUri);
+		
+		static Ref<Ebay> create(const String& appId, const String& ruName, const String& loginRedirectUri);
+		
+		static Ref<Ebay> createSandbox(const String& appId, const String& ruName, const String& loginRedirectUri);
+		
+		static void initialize(const String& appId, const String& ruName, const String& loginRedirectUri);
+		
+		static void initializeSandbox(const String& appId, const String& ruName, const String& loginRedirectUri);
+		
+		static Ref<Ebay> createWithAccessToken(const String& accessToken);
+		
+		static Ref<Ebay> createSandboxWithAccessToken(const String& accessToken);
+		
 		static Ref<Ebay> getInstance();
 		
 	public:
@@ -107,7 +133,7 @@ namespace slib
 		void getUser(const Function<void(EbayResult&, EbayUser&)>& onComplete);
 		
 	protected:
-		sl_bool m_flagProduction;
+		sl_bool m_flagSandbox;
 		
 	};
 	

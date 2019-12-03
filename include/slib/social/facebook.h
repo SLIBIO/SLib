@@ -57,9 +57,9 @@ namespace slib
 		
 	};
 	
-	typedef OAuthLoginResult FacebookLoginResult;
-	
 	typedef OAuthApiResult FacebookResult;
+	
+	typedef OAuthLoginResult FacebookLoginResult;
 	
 	typedef OAuthLoginParam FacebookLoginParam;
 	
@@ -135,8 +135,18 @@ namespace slib
 		
 		static void initialize(const FacebookParam& param);
 		
-		static void initialize(const String& redirectUrl, const String& appId, const String& appSecret = String::null());
+		static void initialize();
+		
+		static Ref<Facebook> create(const String& appId, const String& appSecret, const String& redirectUrl);
 
+		static void initialize(const String& appId, const String& appSecret, const String& redirectUrl);
+		
+		static Ref<Facebook> create(const String& appId, const String& redirectUrl);
+		
+		static void initialize(const String& appId, const String& redirectUrl);
+		
+		static Ref<Facebook> createWithAccessToken(const String& accessToken);
+		
 		static Ref<Facebook> getInstance();
 		
 	public:

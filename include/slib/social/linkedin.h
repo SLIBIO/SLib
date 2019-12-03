@@ -30,7 +30,7 @@
 namespace slib
 {
 	
-	class SLIB_EXPORT LinkedinUser
+	class SLIB_EXPORT LinkedInUser
 	{
 	public:
 		String id;
@@ -40,9 +40,9 @@ namespace slib
 		Json json;
 		
 	public:
-		LinkedinUser();
+		LinkedInUser();
 		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(LinkedinUser)
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(LinkedInUser)
 		
 		SLIB_DECLARE_JSON
 		
@@ -51,23 +51,23 @@ namespace slib
 		
 	};
 	
-	typedef OAuthLoginResult LinkedinLoginResult;
+	typedef OAuthApiResult LinkedInResult;
 	
-	typedef OAuthApiResult LinkedinResult;
+	typedef OAuthLoginResult LinkedInLoginResult;
 	
-	class SLIB_EXPORT LinkedinLoginParam: public OAuthLoginParam
+	class SLIB_EXPORT LinkedInLoginParam: public OAuthLoginParam
 	{
 	public:
-		LinkedinLoginParam();
+		LinkedInLoginParam();
 		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(LinkedinLoginParam)
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(LinkedInLoginParam)
 		
 	public:
 		void addScopeForSharing();
 		
 	};
 	
-	class SLIB_EXPORT LinkedinResolveUserUrlParam
+	class SLIB_EXPORT LinkedInResolveUserUrlParam
 	{
 	public:
 		OAuthWebRedirectDialogOptions dialogOptions;
@@ -76,22 +76,22 @@ namespace slib
 		Function<void(const String& url)> onComplete;
 		
 	public:
-		LinkedinResolveUserUrlParam();
+		LinkedInResolveUserUrlParam();
 		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(LinkedinResolveUserUrlParam)
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(LinkedInResolveUserUrlParam)
 		
 	};
 	
-	class SLIB_EXPORT LinkedinShareResult : public LinkedinResult
+	class SLIB_EXPORT LinkedInShareResult : public LinkedInResult
 	{
 	public:
-		LinkedinShareResult(UrlRequest* request);
+		LinkedInShareResult(UrlRequest* request);
 		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(LinkedinShareResult)
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(LinkedInShareResult)
 		
 	};
 	
-	class SLIB_EXPORT LinkedinShareParam
+	class SLIB_EXPORT LinkedInShareParam
 	{
 	public:
 		String text;
@@ -99,57 +99,63 @@ namespace slib
 		String contentDescription;
 		List<String> contentEntities;
 		
-		Function<void(LinkedinShareResult& result)> onComplete;
+		Function<void(LinkedInShareResult& result)> onComplete;
 		
 	public:
-		LinkedinShareParam();
+		LinkedInShareParam();
 		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(LinkedinShareParam)
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(LinkedInShareParam)
 		
 	};
 	
-	class SLIB_EXPORT LinkedinParam : public OAuthParam
+	class SLIB_EXPORT LinkedInParam : public OAuthParam
 	{
 	public:
-		LinkedinParam();
+		LinkedInParam();
 		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(LinkedinParam)
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(LinkedInParam)
 		
 	};
 	
-	class Linkedin : public OAuth2
+	class LinkedIn : public OAuth2
 	{
 		SLIB_DECLARE_OBJECT
 		
 	protected:
-		Linkedin(const LinkedinParam& param);
+		LinkedIn(const LinkedInParam& param);
 		
-		~Linkedin();
-		
-	public:
-		static Ref<Linkedin> create(const LinkedinParam& param);
-		
-		static void initialize(const LinkedinParam& param);
-		
-		static void initialize(const String& redirectUri, const String& clientId, const String& clientSecret);
-
-		static Ref<Linkedin> getInstance();
+		~LinkedIn();
 		
 	public:
-		static void resolveUserUrl(const LinkedinResolveUserUrlParam& param);
+		static Ref<LinkedIn> create(const LinkedInParam& param);
+		
+		static void initialize(const LinkedInParam& param);
+		
+		static void initialize();
+		
+		static Ref<LinkedIn> create(const String& clientId, const String& clientSecret, const String& redirectUri);
+		
+		static void initialize(const String& clientId, const String& clientSecret, const String& redirectUri);
+		
+		static Ref<LinkedIn> createWithAccessToken(const String& accessToken);
+		
+		static Ref<LinkedIn> getInstance();
+		
+	public:
+		static void resolveUserUrl(const LinkedInResolveUserUrlParam& param);
 		
 		static void resolveUserUrl(const Function<void(const String& url)>& onComplete);
 		
 	public:
 		static String getRequestUrl(const String& path);
 		
-		void getUser(const String& userId, const String& fields, const Function<void(LinkedinResult&, LinkedinUser&)>& onComplete);
+		void getUser(const String& userId, const String& fields, const Function<void(LinkedInResult&, LinkedInUser&)>& onComplete);
 		
-		void getUser(const String& userId, const List<String>& fields, const Function<void(LinkedinResult&, LinkedinUser&)>& onComplete);
+		void getUser(const String& userId, const List<String>& fields, const Function<void(LinkedInResult&, LinkedInUser&)>& onComplete);
 
-		void getUser(const String& userId, const Function<void(LinkedinResult&, LinkedinUser&)>& onComplete);
+		void getUser(const String& userId, const Function<void(LinkedInResult&, LinkedInUser&)>& onComplete);
 
-		void share(const LinkedinShareParam& param);
+		void share(const LinkedInShareParam& param);
 		
 	};
 	

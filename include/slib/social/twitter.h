@@ -121,8 +121,14 @@ namespace slib
 		
 		static void initialize(const TwitterParam& param);
 		
-		static void initialize(const String& callbackUrl, const String& consumerKey, const String& consumerSecret);
+		static void initialize();
+		
+		static Ref<Twitter> create(const String& consumerKey, const String& consumerSecret, const String& callbackUrl);
 
+		static void initialize(const String& consumerKey, const String& consumerSecret, const String& callbackUrl);
+		
+		static Ref<Twitter> createWithAccessToken(const String& token, const String tokenSecret);
+		
 		static Ref<Twitter> getInstance();
 
 	public:
