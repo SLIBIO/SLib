@@ -22,45 +22,166 @@
 
 #include "slib/social/wechat.h"
 
+#include "slib/core/safe_static.h"
+
 namespace slib
 {
 
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(WechatAppResponse)
+	namespace priv
+	{
+		namespace wechat
+		{
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<WeChat>, g_instance)
+		}
+	}
 
-	WechatAppResponse::WechatAppResponse()
+	using namespace priv::wechat;
+
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(WeChatUser)
+
+	SLIB_DEFINE_JSON_MEMBERS(WeChatUser, openid, nickname, sex, province, city, country, headimgurl, privilege, unionid)
+
+	WeChatUser::WeChatUser()
+	{
+	}
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(WeChatAppResult)
+
+	WeChatAppResult::WeChatAppResult()
 	{
 		flagSuccess = sl_false;
 		flagCancel = sl_false;
 	}
 
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(WechatLoginResponse)
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(WeChatPaymentOrder)
 
-	WechatLoginResponse::WechatLoginResponse()
+	WeChatPaymentOrder::WeChatPaymentOrder()
 	{
 	}
 
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(WechatLoginParam)
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(WeChatPaymentResult)
 
-	WechatLoginParam::WechatLoginParam()
+	WeChatPaymentResult::WeChatPaymentResult()
 	{
 	}
 
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(WechatPaymentOrder)
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(WeChatPaymentRequest)
 
-	WechatPaymentOrder::WechatPaymentOrder()
+	WeChatPaymentRequest::WeChatPaymentRequest()
 	{
 	}
 
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(WechatPaymentResponse)
 
-	WechatPaymentResponse::WechatPaymentResponse()
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(WeChatParam)
+
+	WeChatParam::WeChatParam()
 	{
+		authorizeUrl = "https://open.weixin.qq.com/connect/qrconnect";
+		accessTokenUrl = "https://api.weixin.qq.com/sns/oauth2/access_token";
+		accessTokenMethod = HttpMethod::GET;
+		defaultScopes.add_NoLock("snsapi_login");
+		flagSupportImplicitGrantType = sl_false;
+		clientIdFieldName = "app_id";
+		clientSecretFieldName = "secret";
 	}
 
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(WechatPaymentRequest)
 
-	WechatPaymentRequest::WechatPaymentRequest()
+	SLIB_DEFINE_OBJECT(WeChat, OAuth2)
+	
+	WeChat::WeChat(const WeChatParam& param) : OAuth2(param)
 	{
+	}
+	
+	WeChat::~WeChat()
+	{
+	}
+	
+	Ref<WeChat> WeChat::create(const WeChatParam& param)
+	{
+		return new WeChat(param);
+	}
+	
+	void WeChat::initialize(const WeChatParam& param)
+	{
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
+			return;
+		}
+		g_instance = create(param);
+	}
+	
+	void WeChat::initialize()
+	{
+		WeChatParam param;
+		param.preferenceName = "wechat";
+		initialize(param);
+	}
+	
+	Ref<WeChat> WeChat::create(const String& appId, const String& appSecret, const String& redirectUri)
+	{
+		WeChatParam param;
+		param.clientId = appId;
+		param.clientSecret = appSecret;
+		param.redirectUri = redirectUri;
+		return create(param);
+	}
+	
+	void WeChat::initialize(const String& appId, const String& appSecret, const String& redirectUri)
+	{
+		WeChatParam param;
+		param.preferenceName = "wechat";
+		param.clientId = appId;
+		param.clientSecret = appSecret;
+		param.redirectUri = redirectUri;
+		initialize(param);
+	}
+	
+	Ref<WeChat> WeChat::create(const String& appId, const String& redirectUri)
+	{
+		return create(appId, String::null(), redirectUri);
+	}
+	
+	void WeChat::initialize(const String& appId, const String& redirectUri)
+	{
+		initialize(appId, String::null(), redirectUri);
+	}
+	
+	Ref<WeChat> WeChat::createWithAccessToken(const String& accessToken)
+	{
+		WeChatParam param;
+		param.accessToken.token = accessToken;
+		return create(param);
+	}
+	
+	Ref<WeChat> WeChat::getInstance()
+	{
+		if (SLIB_SAFE_STATIC_CHECK_FREED(g_instance)) {
+			return sl_null;
+		}
+		return g_instance;
+	}
+
+	String WeChat::getRequestUrl(const String& path)
+	{
+		return "https://api.weixin.qq.com/" + path;
+	}
+	
+	void WeChat::getUser(const Function<void(WeChatResult&, WeChatUser&)>& onComplete)
+	{
+		UrlRequestParam rp;
+		SLIB_STATIC_STRING(pathUserInfo, "sns/userinfo")
+		rp.url = getRequestUrl(pathUserInfo);
+		rp.onComplete = [onComplete](UrlRequest* request) {
+			WeChatResult result(request);
+			WeChatUser user;
+			if (!(request->isError())) {
+				FromJson(result.response, user);
+				result.flagSuccess = user.unionid.isNotEmpty();
+			}
+			onComplete(result, user);
+		};
+		authorizeRequest(rp);
+		UrlRequest::send(rp);
 	}
 
 }

@@ -33,7 +33,7 @@
 
 #import "wechat/iOS/WXApi.h"
 
-@interface SLIBWechatSDKDelegate : NSObject<WXApiDelegate>
+@interface SLIBWeChatSDKDelegate : NSObject<WXApiDelegate>
 {
 }
 @end
@@ -49,15 +49,15 @@ namespace slib
 			class StaticContext
 			{
 			public:
-				SLIBWechatSDKDelegate* delegate;
+				SLIBWeChatSDKDelegate* delegate;
 				Mutex lock;
-				Function<void(WechatLoginResponse&)> callbackLogin;
-				Function<void(WechatPaymentResponse&)> callbackPay;
+				Function<void(WeChatLoginResult&)> callbackLogin;
+				Function<void(WeChatPaymentResult&)> callbackPay;
 				
 			public:
 				StaticContext()
 				{
-					SLIBWechatSDKDelegate* delegate = [SLIBWechatSDKDelegate new];
+					SLIBWeChatSDKDelegate* delegate = [SLIBWeChatSDKDelegate new];
 					this->delegate = delegate;
 					UIPlatform::registerOpenUrlCallback([delegate](NSURL* url, NSDictionary*) {
 						return [WXApi handleOpenURL:url delegate:delegate];
@@ -65,37 +65,37 @@ namespace slib
 				}
 				
 			public:
-				void setLoginCallback(const Function<void(WechatLoginResponse&)>& callback)
+				void setLoginCallback(const Function<void(WeChatLoginResult&)>& callback)
 				{
 					MutexLocker locker(&lock);
 					if (callbackPay.isNotNull()) {
-						WechatLoginResponse response;
-						callbackLogin(response);
+						WeChatLoginResult result;
+						callbackLogin(result);
 					}
 					callbackLogin = callback;
 				}
 				
-				void onLoginResponse(WechatLoginResponse& response)
+				void onLoginResult(WeChatLoginResult& result)
 				{
 					MutexLocker locker(&lock);
-					callbackLogin(response);
+					callbackLogin(result);
 					callbackLogin.setNull();
 				}
 				
-				void setPayCallback(const Function<void(WechatPaymentResponse&)>& callback)
+				void setPayCallback(const Function<void(WeChatPaymentResult&)>& callback)
 				{
 					MutexLocker locker(&lock);
 					if (callbackPay.isNotNull()) {
-						WechatPaymentResponse response;
-						callbackPay(response);
+						WeChatPaymentResult result;
+						callbackPay(result);
 					}
 					callbackPay = callback;
 				}
 				
-				void onPayResponse(WechatPaymentResponse& response)
+				void onPayResult(WeChatPaymentResult& result)
 				{
 					MutexLocker locker(&lock);
-					callbackPay(response);
+					callbackPay(result);
 					callbackPay.setNull();
 				}
 				
@@ -108,16 +108,16 @@ namespace slib
 	
 	using namespace priv::wechat_ios;
 	
-	void WechatSDK::initialize(const String& appId, const String& universalLink)
+	void WeChatSDK::initialize(const String& appId, const String& universalLink)
 	{
 		GetStaticContext();
 		[WXApi registerApp:Apple::getNSStringFromString(appId) universalLink:Apple::getNSStringFromString(universalLink)];
 	}
 
-	void WechatSDK::login(const WechatLoginParam& param)
+	void WeChatSDK::login(const WeChatLoginParam& param)
 	{
 		if (!(UI::isUiThread())) {
-			void (*f)(const WechatLoginParam&) = &WechatSDK::login;
+			void (*f)(const WeChatLoginParam&) = &WeChatSDK::login;
 			UI::dispatchToUiThread(Function<void()>::bind(f, param));
 			return;
 		}
@@ -129,16 +129,16 @@ namespace slib
 		req.state = [NSString stringWithFormat:@"%d", (int)(Time::now().toInt())];
 		[WXApi sendReq:req completion:^(BOOL success) {
 			if (!success) {
-				WechatLoginResponse response;
-				GetStaticContext()->onLoginResponse(response);
+				WeChatLoginResult result;
+				GetStaticContext()->onLoginResult(result);
 			}
 		}];
 	}
 
-	void WechatSDK::pay(const WechatPaymentRequest& param)
+	void WeChatSDK::pay(const WeChatPaymentRequest& param)
 	{
 		if (!(UI::isUiThread())) {
-			UI::dispatchToUiThread(Function<void()>::bind(&WechatSDK::pay, param));
+			UI::dispatchToUiThread(Function<void()>::bind(&WeChatSDK::pay, param));
 			return;
 		}
 		
@@ -153,8 +153,8 @@ namespace slib
 		req.sign = Apple::getNSStringFromString(param.sign);
 		[WXApi sendReq:req completion:^(BOOL success) {
 			if (!success) {
-				WechatPaymentResponse response;
-				GetStaticContext()->onPayResponse(response);
+				WeChatPaymentResult result;
+				GetStaticContext()->onPayResult(result);
 			}
 		}];
 	}
@@ -164,39 +164,39 @@ namespace slib
 using namespace slib;
 using namespace slib::priv::wechat_ios;
 
-@implementation SLIBWechatSDKDelegate
+@implementation SLIBWeChatSDKDelegate
 
 -(void)onResp:(BaseResp*)resp
 {
 	if ([resp isKindOfClass:[SendAuthResp class]]) {
-		SendAuthResp* loginResponse = (SendAuthResp*)resp;
-		WechatLoginResponse response;
-		switch(loginResponse.errCode){
+		SendAuthResp* response = (SendAuthResp*)resp;
+		WeChatLoginResult result;
+		switch(response.errCode){
 			case WXSuccess:
-				response.flagSuccess = sl_true;
+				result.flagSuccess = sl_true;
 				break;
 			case WXErrCodeUserCancel:
-				response.flagCancel = sl_true;
+				result.flagCancel = sl_true;
 			default:
 				break;
 		}
-		response.code = Apple::getStringFromNSString(loginResponse.code);
-		response.error = Apple::getStringFromNSString(loginResponse.errStr);
-		GetStaticContext()->onLoginResponse(response);
+		result.code = Apple::getStringFromNSString(response.code);
+		result.error = Apple::getStringFromNSString(response.errStr);
+		GetStaticContext()->onLoginResult(result);
 	} else if ([resp isKindOfClass:[PayResp class]]) {
-		PayResp* paymentResponse = (PayResp*)resp;
-		WechatPaymentResponse response;
-		switch(paymentResponse.errCode){
+		PayResp* response = (PayResp*)resp;
+		WeChatPaymentResult result;
+		switch(response.errCode){
 			case WXSuccess:
-				response.flagSuccess = sl_true;
+				result.flagSuccess = sl_true;
 				break;
 			case WXErrCodeUserCancel:
-				response.flagCancel = sl_true;
+				result.flagCancel = sl_true;
 			default:
 				break;
 		}
-		response.error = Apple::getStringFromNSString(paymentResponse.errStr);
-		GetStaticContext()->onPayResponse(response);
+		result.error = Apple::getStringFromNSString(response.errStr);
+		GetStaticContext()->onPayResult(result);
 	}
 }
 

@@ -25,13 +25,36 @@
 
 #include "definition.h"
 
-#include "../core/string.h"
-#include "../core/function.h"
+#include "oauth.h"
 
 namespace slib
 {
 
-	class SLIB_EXPORT WechatAppResponse
+	class SLIB_EXPORT WeChatUser
+	{
+	public:
+		String openid;
+		String nickname;
+		sl_uint32 sex;
+		String province;
+		String city;
+		String country;
+		String headimgurl;
+		List<String> privilege;
+		String unionid;
+
+		Json json;
+		
+	public:
+		WeChatUser();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(WeChatUser)
+		
+		SLIB_DECLARE_JSON
+		
+	};
+
+	class SLIB_EXPORT WeChatAppResult
 	{
 	public:
 		sl_bool flagSuccess;
@@ -39,37 +62,19 @@ namespace slib
 		String error;
 
 	public:
-		WechatAppResponse();
+		WeChatAppResult();
 		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(WechatAppResponse)
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(WeChatAppResult)
 
 	};
 
-	class SLIB_EXPORT WechatLoginResponse : public WechatAppResponse
-	{
-	public:
-		String code;
-		
-	public:
-		WechatLoginResponse();
-		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(WechatLoginResponse)
+	typedef OAuthApiResult WeChatResult;
 
-	};
+	typedef OAuthLoginResult WeChatLoginResult;
 
-	class SLIB_EXPORT WechatLoginParam
-	{
-	public:
-		Function<void(WechatLoginResponse&)> onComplete;
-		
-	public:
-		WechatLoginParam();
-		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(WechatLoginParam)
+	typedef OAuthLoginParam WeChatLoginParam;
 
-	};
-
-	class SLIB_EXPORT WechatPaymentOrder
+	class SLIB_EXPORT WeChatPaymentOrder
 	{
 	public:
 		String partnerId;
@@ -80,46 +85,88 @@ namespace slib
 		String sign;
 		
 	public:
-		WechatPaymentOrder();
+		WeChatPaymentOrder();
 		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(WechatPaymentOrder)
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(WeChatPaymentOrder)
 		
 	};
 
-	class SLIB_EXPORT WechatPaymentResponse : public WechatAppResponse
+	class SLIB_EXPORT WeChatPaymentResult : public WeChatAppResult
 	{
 	public:
-		WechatPaymentResponse();
+		WeChatPaymentResult();
 		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(WechatPaymentResponse)
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(WeChatPaymentResult)
 
 	};
 
-	class SLIB_EXPORT WechatPaymentRequest : public WechatPaymentOrder
+	class SLIB_EXPORT WeChatPaymentRequest : public WeChatPaymentOrder
 	{
 	public:
-		Function<void(WechatPaymentResponse&)> onComplete;
+		Function<void(WeChatPaymentResult&)> onComplete;
 		
 	public:
-		WechatPaymentRequest();
+		WeChatPaymentRequest();
 		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(WechatPaymentRequest)
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(WeChatPaymentRequest)
 		
 	};
 
-	class SLIB_EXPORT WechatSDK
+	class SLIB_EXPORT WeChatParam : public OAuthParam
+	{
+	public:
+		WeChatParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(WeChatParam)
+		
+	};
+
+	class WeChat : public OAuth2
+	{
+		SLIB_DECLARE_OBJECT
+		
+	protected:
+		WeChat(const WeChatParam& param);
+		
+		~WeChat();
+		
+	public:
+		static Ref<WeChat> create(const WeChatParam& param);
+		
+		static void initialize(const WeChatParam& param);
+		
+		static void initialize();
+		
+		static Ref<WeChat> create(const String& appId, const String& appSecret, const String& redirectUrl);
+
+		static void initialize(const String& appId, const String& appSecret, const String& redirectUrl);
+		
+		static Ref<WeChat> create(const String& appId, const String& redirectUrl);
+		
+		static void initialize(const String& appId, const String& redirectUrl);
+		
+		static Ref<WeChat> createWithAccessToken(const String& accessToken);
+		
+		static Ref<WeChat> getInstance();
+
+	public:
+		String getRequestUrl(const String& path);
+		
+		void getUser(const Function<void(WeChatResult&, WeChatUser&)>& onComplete);
+
+	};
+
+	class SLIB_EXPORT WeChatSDK
 	{
 	public:
 		static void initialize(const String& appId, const String& universalURL);
 		
-		static void initialize(const String& appId);
-		
 	public:
-		static void login(const WechatLoginParam& param);
+		static void login(const WeChatLoginParam& param);
 		
-		static void login(const Function<void(WechatLoginResponse& result)>& onComplete);
+		static void login(const Function<void(WeChatLoginResult& result)>& onComplete);
 
-		static void pay(const WechatPaymentRequest& req);
+		static void pay(const WeChatPaymentRequest& req);
 		
 	};
 	

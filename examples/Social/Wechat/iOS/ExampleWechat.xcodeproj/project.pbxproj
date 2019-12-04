@@ -37,6 +37,7 @@
 /* Begin PBXFileReference section */
 		26147239239453DD00F7CD0C /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		2614723B239453E700F7CD0C /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		261EB5F523970ABD00630C06 /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		2639171521C943F9008B335B /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		263918B921C94584008B335B /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		263918BB21C9458B008B335B /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
@@ -117,6 +118,7 @@
 		268256A721E658200079600F /* cpp */ = {
 			isa = PBXGroup;
 			children = (
+				261EB5F523970ABD00630C06 /* config.h */,
 				268256A821E658200079600F /* app.cpp */,
 				268256A921E658200079600F /* app.h */,
 				268256AC21E658200079600F /* MainPage.cpp */,
@@ -429,7 +431,7 @@
 					"-force_load",
 					"$(SLIB_PATH)/external/bin/WeChat/iOS/libWeChatSDK.a",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.slib.example.wechat;
+				PRODUCT_BUNDLE_IDENTIFIER = com.joycore.schuker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
@@ -454,7 +456,7 @@
 					"-force_load",
 					"$(SLIB_PATH)/external/bin/WeChat/iOS/libWeChatSDK.a",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.slib.example.wechat;
+				PRODUCT_BUNDLE_IDENTIFIER = com.joycore.schuker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 			};

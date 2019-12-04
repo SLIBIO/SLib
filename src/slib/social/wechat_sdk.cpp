@@ -26,31 +26,26 @@ namespace slib
 {
 	
 #if !defined(SLIB_PLATFORM_IS_IOS) && !defined(SLIB_PLATFORM_IS_ANDROID)
-	void WechatSDK::initialize(const String& appId, const String& universalLink)
+	void WeChatSDK::initialize(const String& appId, const String& universalLink)
 	{
 	}
 
-	void WechatSDK::login(const WechatLoginParam& param)
+	void WeChatSDK::login(const WeChatLoginParam& param)
 	{
-		WechatLoginResponse response;
-		param.onComplete(response);
+		WeChatLoginResult result;
+		param.onComplete(result);
 	}
 
-	void WechatSDK::pay(const WechatPaymentRequest& req)
+	void WeChatSDK::pay(const WeChatPaymentRequest& req)
 	{
-		WechatPaymentResponse response;
-		req.onComplete(response);
+		WeChatPaymentResult result;
+		req.onComplete(result);
 	}
 #endif
 	
-	void WechatSDK::initialize(const String& appId)
+	void WeChatSDK::login(const Function<void(WeChatLoginResult& result)>& onComplete)
 	{
-		initialize(appId, String::null());
-	}
-
-	void WechatSDK::login(const Function<void(WechatLoginResponse& result)>& onComplete)
-	{
-		WechatLoginParam param;
+		WeChatLoginParam param;
 		param.onComplete = onComplete;
 		login(param);
 	}

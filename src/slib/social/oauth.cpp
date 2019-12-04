@@ -586,6 +586,10 @@ namespace slib
 		accessTokenMethod = HttpMethod::POST;
 		flagUseBasicAuthorizationForAccessToken = sl_false;
 		flagSupportImplicitGrantType = sl_true;
+		SLIB_STATIC_STRING(strClientId,  "client_id")
+		clientIdFieldName = strClientId;
+		SLIB_STATIC_STRING(strClientSecret,  "client_secret")
+		clientSecretFieldName = strClientSecret;
 		flagLoggingErrors = sl_true;
 	}
 	
@@ -610,6 +614,8 @@ namespace slib
 		m_loginRedirectUri = param.loginRedirectUri;
 		m_defaultScopes = param.defaultScopes;
 		m_flagSupportImplicitGrantType = param.flagSupportImplicitGrantType;
+		m_clientIdFieldName = param.clientIdFieldName;
+		m_clientSecretFieldName = param.clientSecretFieldName;
 		
 		m_flagLogErrors = param.flagLoggingErrors;
 	}
@@ -698,9 +704,9 @@ namespace slib
 			params.put_NoLock("response_type", "code");
 		}
 		if (param.clientId.isNotEmpty()) {
-			params.put_NoLock("client_id", param.clientId);
+			params.put_NoLock(m_clientIdFieldName, param.clientId);
 		} else {
-			params.put_NoLock("client_id", m_clientId);
+			params.put_NoLock(m_clientIdFieldName, m_clientId);
 		}
 		String redirectUri = param.redirectUri;
 		if (redirectUri.isEmpty()) {
@@ -777,8 +783,8 @@ namespace slib
 		if (m_flagUseBasicAuthorizationForAccessToken) {
 			rp.requestHeaders.put_NoLock("Authorization", "Basic " + Base64::encode(m_clientId + ":" + m_clientSecret));
 		} else {
-			params.put_NoLock("client_id", m_clientId);
-			params.put_NoLock("client_secret", m_clientSecret);
+			params.put_NoLock(m_clientIdFieldName, m_clientId);
+			params.put_NoLock(m_clientSecretFieldName, m_clientSecret);
 		}
 		if (rp.method == HttpMethod::POST) {
 			rp.setFormData(params);

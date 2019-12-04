@@ -487,6 +487,8 @@ namespace slib
 		String loginRedirectUri;
 		List<String> defaultScopes;
 		sl_bool flagSupportImplicitGrantType;
+		String clientIdFieldName;
+		String clientSecretFieldName;
 		
 		String preferenceName;
 		
@@ -530,7 +532,7 @@ namespace slib
 		
 		void authorizeRequest(UrlRequestParam& param);
 		
-		String getLoginUrl(const OAuthAuthorizationRequestParam& param);
+		virtual String getLoginUrl(const OAuthAuthorizationRequestParam& param);
 
 		String getLoginUrl(OAuthResponseType type, const List<String>& scopes = List<String>::null(), const String& state = String::null());
 
@@ -599,6 +601,8 @@ namespace slib
 		String m_loginRedirectUri;
 		List<String> m_defaultScopes;
 		sl_bool m_flagSupportImplicitGrantType;
+		String m_clientIdFieldName;
+		String m_clientSecretFieldName;
 		
 		sl_bool m_flagLogErrors;
 		
