@@ -96,6 +96,11 @@ namespace slib
 		virtual double getDouble(const String& name, double defaultValue = 0);
 	
 
+		virtual sl_bool getBoolean(sl_uint32 index, sl_bool defaultValue = sl_false);
+
+		virtual sl_bool getBoolean(const String& name, sl_bool defaultValue = sl_false);
+	
+		
 		virtual Time getTime(sl_uint32 index, const Time& defaultValue);
 
 		virtual Time getTime(const String& name, const Time& defaultValue);

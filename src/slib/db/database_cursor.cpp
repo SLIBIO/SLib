@@ -147,6 +147,20 @@ namespace slib
 		return defaultValue;
 	}
 
+	sl_bool DatabaseCursor::getBoolean(sl_uint32 index, sl_bool defaultValue)
+	{
+		return getInt64(index, defaultValue ? 1 : 0) != 0;
+	}
+
+	sl_bool DatabaseCursor::getBoolean(const String& name, sl_bool defaultValue)
+	{
+		sl_int32 index = getColumnIndex(name);
+		if (index >= 0) {
+			return getInt64(index, defaultValue ? 1 : 0) != 0;
+		}
+		return defaultValue;
+	}
+	
 	Time DatabaseCursor::getTime(sl_uint32 index, const Time& defaultValue)
 	{
 		String s = getString(index);
