@@ -628,4 +628,25 @@ namespace slib
 		return Object::isDerivedFrom(type);
 	}
 	
+	namespace priv
+	{
+		namespace json
+		{
+		
+			class SLIB_EXPORT JsonFieldContainer : public StringContainer
+			{
+			public:
+				SLIB_INLINE JsonFieldContainer(sl_char8* _sz, sl_size _len)
+				{
+					sz = _sz;
+					len = _len;
+					hash = 0;
+					type = 0;
+					ref = -1;
+				}
+			};
+		
+		}
+	}
+
 }

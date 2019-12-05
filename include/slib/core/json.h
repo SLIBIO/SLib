@@ -586,9 +586,18 @@ public: \
 	} \
 	void doJson(slib::Json& json, sl_bool isFromJson)
 
-#define SLIB_JSON_ADD_MEMBER(MEMBER_NAME, JSON_NAME) if (isFromJson) slib::FromJson(json.getItem(JSON_NAME), MEMBER_NAME); else json.putItem(JSON_NAME, MEMBER_NAME);
-#define SLIB_JSON_ADD_MEMBER_FROM(MEMBER_NAME, JSON_NAME) if (isFromJson) slib::FromJson(json.getItem(JSON_NAME), MEMBER_NAME);
-#define SLIB_JSON_ADD_MEMBER_TO(MEMBER_NAME, JSON_NAME) if (!isFromJson) json.putItem(JSON_NAME, MEMBER_NAME);
+#define SLIB_JSON_ADD_MEMBER(MEMBER_NAME, JSON_NAME) \
+	{ \
+		static sl_char8 _strJsonField_buf[] = JSON_NAME; \
+		static slib::priv::json::JsonFieldContainer _strJsonField_container(_strJsonField_buf, sizeof(_strJsonField_buf)-1); \
+		static slib::StringContainer* _strJsonField_str = &_strJsonField_container; \
+		static const slib::String& _strJsonField = *(reinterpret_cast<slib::String*>(&_strJsonField_str)); \
+		if (isFromJson) { \
+			slib::FromJson(json.getItem(_strJsonField), MEMBER_NAME); \
+		} else { \
+			json.putItem(_strJsonField, MEMBER_NAME); \
+		} \
+	}
 
 #define PRIV_SLIB_JSON_ADD_MEMBERS0
 #define PRIV_SLIB_JSON_ADD_MEMBERS1(NAME) SLIB_JSON_ADD_MEMBER(NAME, #NAME)
