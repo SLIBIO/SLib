@@ -30,104 +30,8 @@
 namespace slib
 {
 	
-	enum class ContentType
+	class SLIB_EXPORT ContentType
 	{
-		Unknown = 0,
-
-		// text/plain
-		TextPlain,
-		// text/html
-		TextHtml,
-		// text/html; charset=UTF-8
-		TextHtml_Utf8,
-		// text/xml
-		TextXml,
-		// text/css
-		TextCss,
-		// text/javascript
-		TextJavascript,
-		// text/rtf
-		TextRtf,
-		// text/csv
-		TextCsv,
-
-		// image/gif
-		ImageGif,
-		// image/jpeg
-		ImageJpeg,
-		// image/png
-		ImagePng,
-		// image/bmp
-		ImageBmp,
-		// image/tiff
-		ImageTiff,
-
-		// audio/ogg
-		AudioOgg,
-		// audio/opus
-		AudioOpus,
-		// audio/vorbis
-		AudioVorbis,
-		// audio/webm
-		AudioWebm,
-		// audio/mpeg
-		AudioMpeg,
-		// audio/mp4
-		AudioMp4,
-
-		// video/avi
-		VideoAvi,
-		// video/mpeg
-		VideoMpeg,
-		// video/mp4
-		VideoMp4,
-		// video/ogg
-		VideoOgg,
-		// video/quicktime
-		VideoQuicktime,
-		// video/webm
-		VideoWebm,
-		// video/x-flv
-		VideoFlv,
-		// video/x-matroska
-		VideoMatroska,
-
-		// application/octet-stream
-		OctetStream,
-		// application/json
-		Json,
-		// application/pdf
-		Pdf,
-		// application/font-woff
-		FontWOFF,
-		// application/x-font-ttf
-		FontTTF,
-		// application/zip
-		Zip,
-		// application/gzip
-		Gzip,
-		// application/x-shockwave-flash
-		Flash,
-	
-		// application/x-www-form-urlencoded
-		WebForm,
-		// multipart/form-data
-		MultipartFormData,
-
-
-	};
-	
-	class SLIB_EXPORT ContentTypeHelper
-	{
-	public:
-		static String toString(ContentType type);
-
-		static ContentType getFromFileExtension(const String& fileExt);
-		
-		static sl_bool equalsContentTypeExceptParams(const String& type1, const String& type2);
-		
-		static sl_bool equalsContentTypeExceptParams(const String& type1, ContentType type2);
-
 	public:
 		// text/plain
 		static const String& TextPlain;
@@ -209,6 +113,15 @@ namespace slib
 		// multipart/form-data
 		static const String& MultipartFormData;
 	
+	};
+
+	class SLIB_EXPORT ContentTypeHelper
+	{
+	public:
+		static String getFromFileExtension(const String& fileExt);
+		
+		static sl_bool equalsContentTypeExceptParams(const String& type1, const String& type2);
+		
 	};
 
 }

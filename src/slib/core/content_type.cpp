@@ -34,7 +34,7 @@ namespace slib
 			SLIB_STATIC_STRING(g_##name, text); \
 		} \
 	} \
-	const String& ContentTypeHelper::name=priv::content_type::g_##name;
+	const String& ContentType::name=priv::content_type::g_##name;
 
 	DEFINE_CONTENT_TYPE(TextPlain, "text/plain")
 	DEFINE_CONTENT_TYPE(TextHtml, "text/html")
@@ -79,95 +79,6 @@ namespace slib
 	DEFINE_CONTENT_TYPE(WebForm, "application/x-www-form-urlencoded")
 	DEFINE_CONTENT_TYPE(MultipartFormData, "multipart/form-data")
 
-	String ContentTypeHelper::toString(ContentType type)
-	{
-		switch (type) {
-			case ContentType::TextPlain:
-				return priv::content_type::g_TextPlain;
-			case ContentType::TextHtml:
-				return priv::content_type::g_TextHtml;
-			case ContentType::TextHtml_Utf8:
-				return priv::content_type::g_TextHtml_Utf8;
-			case ContentType::TextXml:
-				return priv::content_type::g_TextXml;
-			case ContentType::TextCss:
-				return priv::content_type::g_TextCss;
-			case ContentType::TextJavascript:
-				return priv::content_type::g_TextJavascript;
-			case ContentType::TextRtf:
-				return priv::content_type::g_TextRtf;
-			case ContentType::TextCsv:
-				return priv::content_type::g_TextCsv;
-				
-			case ContentType::ImageGif:
-				return priv::content_type::g_ImageGif;
-			case ContentType::ImageJpeg:
-				return priv::content_type::g_ImageJpeg;
-			case ContentType::ImagePng:
-				return priv::content_type::g_ImagePng;
-			case ContentType::ImageBmp:
-				return priv::content_type::g_ImageBmp;
-			case ContentType::ImageTiff:
-				return priv::content_type::g_ImageTiff;
-				
-			case ContentType::AudioOgg:
-				return priv::content_type::g_AudioOgg;
-			case ContentType::AudioOpus:
-				return priv::content_type::g_AudioOpus;
-			case ContentType::AudioVorbis:
-				return priv::content_type::g_AudioVorbis;
-			case ContentType::AudioWebm:
-				return priv::content_type::g_AudioWebm;
-			case ContentType::AudioMpeg:
-				return priv::content_type::g_AudioMpeg;
-			case ContentType::AudioMp4:
-				return priv::content_type::g_AudioMp4;
-				
-			case ContentType::VideoAvi:
-				return priv::content_type::g_VideoAvi;
-			case ContentType::VideoMpeg:
-				return priv::content_type::g_VideoMpeg;
-			case ContentType::VideoMp4:
-				return priv::content_type::g_VideoMp4;
-			case ContentType::VideoOgg:
-				return priv::content_type::g_VideoOgg;
-			case ContentType::VideoQuicktime:
-				return priv::content_type::g_VideoQuicktime;
-			case ContentType::VideoWebm:
-				return priv::content_type::g_VideoWebm;
-			case ContentType::VideoFlv:
-				return priv::content_type::g_VideoFlv;
-			case ContentType::VideoMatroska:
-				return priv::content_type::g_VideoMatroska;
-				
-			case ContentType::OctetStream:
-				return priv::content_type::g_OctetStream;
-			case ContentType::Json:
-				return priv::content_type::g_Json;
-			case ContentType::Pdf:
-				return priv::content_type::g_Pdf;
-			case ContentType::FontWOFF:
-				return priv::content_type::g_FontWOFF;
-			case ContentType::FontTTF:
-				return priv::content_type::g_FontTTF;
-			case ContentType::Zip:
-				return priv::content_type::g_Zip;
-			case ContentType::Gzip:
-				return priv::content_type::g_Gzip;
-			case ContentType::Flash:
-				return priv::content_type::g_Flash;
-
-			case ContentType::WebForm:
-				return priv::content_type::g_WebForm;
-			case ContentType::MultipartFormData:
-				return priv::content_type::g_MultipartFormData;
-			
-			default:
-				break;
-		}
-		return sl_null;
-	}
-
 	namespace priv
 	{
 		namespace content_type
@@ -175,7 +86,7 @@ namespace slib
 			class Mapping
 			{
 			public:
-				CHashMap<String, ContentType> maps;
+				CHashMap<String, String> maps;
 				
 			public:
 				Mapping()
@@ -232,13 +143,13 @@ namespace slib
 		}
 	}
 
-	ContentType ContentTypeHelper::getFromFileExtension(const String& fileExt)
+	String ContentTypeHelper::getFromFileExtension(const String& fileExt)
 	{
 		SLIB_SAFE_STATIC(priv::content_type::Mapping, t)
 		if (SLIB_SAFE_STATIC_CHECK_FREED(t)) {
-			return ContentType::Unknown;
+			return String::null();
 		}
-		return t.maps.getValue(fileExt.toLower(), ContentType::Unknown);
+		return t.maps.getValue(fileExt.toLower());
 	}
 
 	sl_bool ContentTypeHelper::equalsContentTypeExceptParams(const String& _type1, const String& _type2)
@@ -262,11 +173,6 @@ namespace slib
 			}
 		}
 		return type1.equalsIgnoreCase(type2);
-	}
-
-	sl_bool ContentTypeHelper::equalsContentTypeExceptParams(const String& type1, ContentType type2)
-	{
-		return equalsContentTypeExceptParams(type1, toString(type2));
 	}
 
 }

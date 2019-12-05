@@ -193,12 +193,17 @@ namespace slib
 
 
 #define DEFINE_HTTP_HEADER(name, value) \
-	SLIB_STATIC_STRING(static_##name, value); \
-	const String& HttpHeaders::name = static_##name;
+	namespace priv { \
+		namespace http { \
+			SLIB_STATIC_STRING(static_##name, value); \
+		} \
+	} \
+	const String& HttpHeader::name = priv::http::static_##name;
 
 	DEFINE_HTTP_HEADER(Connection, "Connection")
 	DEFINE_HTTP_HEADER(CacheControl, "Cache-Control")
 	DEFINE_HTTP_HEADER(ContentDisposition, "Content-Disposition")
+	DEFINE_HTTP_HEADER(Authorization, "Authorization")
 
 	DEFINE_HTTP_HEADER(ContentLength, "Content-Length")
 	DEFINE_HTTP_HEADER(ContentType, "Content-Type")
@@ -219,7 +224,7 @@ namespace slib
 	DEFINE_HTTP_HEADER(LastModified, "Last-Modified")
 	DEFINE_HTTP_HEADER(Location, "Location")
 
-	sl_reg HttpHeaders::parseHeaders(HttpHeaderMap& map, const void* _data, sl_size size)
+	sl_reg HttpHeaderHelper::parseHeaders(HttpHeaderMap& map, const void* _data, sl_size size)
 	{
 		const sl_char8* data = (const sl_char8*)_data;
 		sl_size posCurrent = 0;
@@ -280,7 +285,7 @@ namespace slib
 		return posCurrent;
 	}
 
-	void HttpHeaders::splitValue(const String& value, List<String>* list, HttpHeaderValueMap* map, HashMap<String, String>* mapCaseSensitive, sl_char8 delimiter)
+	void HttpHeaderHelper::splitValue(const String& value, List<String>* list, HttpHeaderValueMap* map, HashMap<String, String>* mapCaseSensitive, sl_char8 delimiter)
 	{
 		sl_char8* sz = value.getData();
 		sl_size len = value.getLength();
@@ -414,21 +419,21 @@ namespace slib
 		}
 	}
 
-	List<String> HttpHeaders::splitValueToList(const String& value, sl_char8 delimiter)
+	List<String> HttpHeaderHelper::splitValueToList(const String& value, sl_char8 delimiter)
 	{
 		List<String> list;
 		splitValue(value, &list, sl_null, sl_null, delimiter);
 		return list;
 	}
 	
-	HttpHeaderValueMap HttpHeaders::splitValueToMap(const String& value, sl_char8 delimiter)
+	HttpHeaderValueMap HttpHeaderHelper::splitValueToMap(const String& value, sl_char8 delimiter)
 	{
 		HttpHeaderValueMap map;
 		splitValue(value, sl_null, &map, sl_null, delimiter);
 		return map;
 	}
 	
-	String HttpHeaders::makeSafeValue(const String& value, sl_char8 delimiter)
+	String HttpHeaderHelper::makeSafeValue(const String& value, sl_char8 delimiter)
 	{
 		sl_char8* sz = value.getData();
 		sl_size len = value.getLength();
@@ -457,7 +462,7 @@ namespace slib
 		return s;
 	}
 	
-	String HttpHeaders::mergeValues(const List<String>& list, sl_char8 delimiter)
+	String HttpHeaderHelper::mergeValues(const List<String>& list, sl_char8 delimiter)
 	{
 		StringBuffer sb;
 		ListLocker<String> values(list);
@@ -473,7 +478,7 @@ namespace slib
 		return sb.merge();
 	}
 	
-	String HttpHeaders::mergeValueMap(const HttpHeaderMap& map, sl_char8 delimiter)
+	String HttpHeaderHelper::mergeValueMap(const HttpHeaderMap& map, sl_char8 delimiter)
 	{
 		MutexLocker lock(map.getLocker());
 		StringBuffer sb;
@@ -495,7 +500,7 @@ namespace slib
 		return sb.merge();
 	}
 
-	String HttpHeaders::mergeValueMapCaseSensitive(const HashMap<String, String>& map, sl_char8 delimiter)
+	String HttpHeaderHelper::mergeValueMapCaseSensitive(const HashMap<String, String>& map, sl_char8 delimiter)
 	{
 		MutexLocker lock(map.getLocker());
 		StringBuffer sb;
@@ -548,13 +553,13 @@ namespace slib
 		if (same_site.isNotNull()) {
 			map.put_NoLock(g_setCookie_same_site, same_site);
 		}
-		return HttpHeaders::mergeValueMap(map, ';');
+		return HttpHeaderHelper::mergeValueMap(map, ';');
 	}
 	
 	void HttpCookie::parseHeaderValue(const String& headerValue)
 	{
 		HttpHeaderValueMap map;
-		HttpHeaders::splitValue(headerValue, sl_null, &map, sl_null, ';');
+		HttpHeaderHelper::splitValue(headerValue, sl_null, &map, sl_null, ';');
 		HashMapNode<String, String>* node = map.getFirstNode();
 		if (node) {
 			name = node->key;
@@ -623,17 +628,12 @@ namespace slib
 	
 	String HttpUploadFile::getContentType()
 	{
-		return getHeader(HttpHeaders::ContentType);
-	}
-	
-	void HttpUploadFile::setContentType(const ContentType& contentType)
-	{
-		setHeader(HttpHeaders::ContentType, ContentTypeHelper::toString(contentType));
+		return getHeader(HttpHeader::ContentType);
 	}
 	
 	void HttpUploadFile::setContentType(const String& contentType)
 	{
-		setHeader(HttpHeaders::ContentType, contentType);
+		setHeader(HttpHeader::ContentType, contentType);
 	}
 
 	void* HttpUploadFile::getData()
@@ -788,7 +788,7 @@ namespace slib
 		MapNode<String, String>* nodeEnd;
 		if (m_requestHeaders.getEqualRange(name, &node, &nodeEnd)) {
 			for (;;) {
-				HttpHeaders::splitValue(node->value, &list, sl_null, sl_null);
+				HttpHeaderHelper::splitValue(node->value, &list, sl_null, sl_null);
 				if (node == nodeEnd) {
 					break;
 				}
@@ -800,12 +800,12 @@ namespace slib
 	
 	void HttpRequest::setRequestHeaderValues(const String& name, const List<String>& list)
 	{
-		m_requestHeaders.put_NoLock(name, HttpHeaders::mergeValues(list));
+		m_requestHeaders.put_NoLock(name, HttpHeaderHelper::mergeValues(list));
 	}
 	
 	void HttpRequest::addRequestHeaderValues(const String& name, const List<String>& list)
 	{
-		m_requestHeaders.add_NoLock(name, HttpHeaders::mergeValues(list));
+		m_requestHeaders.add_NoLock(name, HttpHeaderHelper::mergeValues(list));
 	}
 	
 	HttpHeaderValueMap HttpRequest::getRequestHeaderValueMap(const String& name) const
@@ -815,7 +815,7 @@ namespace slib
 		MapNode<String, String>* nodeEnd;
 		if (m_requestHeaders.getEqualRange(name, &node, &nodeEnd)) {
 			for (;;) {
-				HttpHeaders::splitValue(node->value, sl_null, &map, sl_null);
+				HttpHeaderHelper::splitValue(node->value, sl_null, &map, sl_null);
 				if (node == nodeEnd) {
 					break;
 				}
@@ -827,12 +827,12 @@ namespace slib
 
 	void HttpRequest::setRequestHeaderValueMap(const String& name, const HttpHeaderValueMap& map)
 	{
-		m_requestHeaders.put_NoLock(name, HttpHeaders::mergeValueMap(map));
+		m_requestHeaders.put_NoLock(name, HttpHeaderHelper::mergeValueMap(map));
 	}
 	
 	void HttpRequest::addRequestHeaderValueMap(const String& name, const HttpHeaderValueMap& map)
 	{
-		m_requestHeaders.add_NoLock(name, HttpHeaders::mergeValueMap(map));
+		m_requestHeaders.add_NoLock(name, HttpHeaderHelper::mergeValueMap(map));
 	}
 	
 	void HttpRequest::clearRequestHeaders()
@@ -842,7 +842,7 @@ namespace slib
 
 	sl_uint64 HttpRequest::getRequestContentLengthHeader() const
 	{
-		String headerContentLength = getRequestHeader(HttpHeaders::ContentLength);
+		String headerContentLength = getRequestHeader(HttpHeader::ContentLength);
 		if (headerContentLength.isNotEmpty()) {
 			return headerContentLength.parseUint64();
 		}
@@ -851,17 +851,17 @@ namespace slib
 
 	void HttpRequest::setRequestContentLengthHeader(sl_uint64 size)
 	{
-		setRequestHeader(HttpHeaders::ContentLength, String::fromUint64(size));
+		setRequestHeader(HttpHeader::ContentLength, String::fromUint64(size));
 	}
 
 	String HttpRequest::getRequestContentType() const
 	{
-		return getRequestHeader(HttpHeaders::ContentType);
+		return getRequestHeader(HttpHeader::ContentType);
 	}
 
 	String HttpRequest::getRequestContentTypeNoParams() const
 	{
-		String type = getRequestHeader(HttpHeaders::ContentType);
+		String type = getRequestHeader(HttpHeader::ContentType);
 		sl_reg index = type.indexOf(';');
 		if (index >= 0) {
 			type = type.substring(0, index);
@@ -871,24 +871,19 @@ namespace slib
 
 	void HttpRequest::setRequestContentType(const String& type)
 	{
-		setRequestHeader(HttpHeaders::ContentType, type);
-	}
-
-	void HttpRequest::setRequestContentType(ContentType type)
-	{
-		setRequestHeader(HttpHeaders::ContentType, ContentTypeHelper::toString(type));
+		setRequestHeader(HttpHeader::ContentType, type);
 	}
 
 	sl_bool HttpRequest::isRequestMultipartFormData() const
 	{
-		return getRequestContentTypeNoParams().trim().equalsIgnoreCase(ContentTypeHelper::MultipartFormData);
+		return getRequestContentTypeNoParams().trim().equalsIgnoreCase(ContentType::MultipartFormData);
 	}
 	
 	String HttpRequest::getRequestMultipartFormDataBoundary() const
 	{
 		String value = getRequestContentType();
-		HttpHeaderValueMap map = HttpHeaders::splitValueToMap(value, ';');
-		if (map.find_NoLock(ContentTypeHelper::MultipartFormData)) {
+		HttpHeaderValueMap map = HttpHeaderHelper::splitValueToMap(value, ';');
+		if (map.find_NoLock(ContentType::MultipartFormData)) {
 			SLIB_STATIC_STRING(t, "boundary")
 			return map.getValue_NoLock(t);
 		}
@@ -897,22 +892,22 @@ namespace slib
 	
 	String HttpRequest::getRequestContentEncoding() const
 	{
-		return getRequestHeader(HttpHeaders::ContentEncoding);
+		return getRequestHeader(HttpHeader::ContentEncoding);
 	}
 
 	void HttpRequest::setRequestContentEncoding(const String& type)
 	{
-		setRequestHeader(HttpHeaders::ContentEncoding, type);
+		setRequestHeader(HttpHeader::ContentEncoding, type);
 	}
 
 	String HttpRequest::getRequestTransferEncoding() const
 	{
-		return getRequestHeader(HttpHeaders::TransferEncoding);
+		return getRequestHeader(HttpHeader::TransferEncoding);
 	}
 
 	void HttpRequest::setRequestTransferEncoding(const String& type)
 	{
-		setRequestHeader(HttpHeaders::TransferEncoding, type);
+		setRequestHeader(HttpHeader::TransferEncoding, type);
 	}
 
 	sl_bool HttpRequest::isChunkedRequest() const
@@ -926,65 +921,65 @@ namespace slib
 
 	String HttpRequest::getHost() const
 	{
-		return getRequestHeader(HttpHeaders::Host);
+		return getRequestHeader(HttpHeader::Host);
 	}
 
 	void HttpRequest::setHost(const String& type)
 	{
-		setRequestHeader(HttpHeaders::Host, type);
+		setRequestHeader(HttpHeader::Host, type);
 	}
 	
 	sl_bool HttpRequest::isKeepAlive() const
 	{
 		SLIB_STATIC_STRING(str, "Keep-Alive");
-		return getRequestHeader(HttpHeaders::Connection).equalsIgnoreCase(str);
+		return getRequestHeader(HttpHeader::Connection).equalsIgnoreCase(str);
 	}
 	
 	void HttpRequest::setKeepAlive()
 	{
 		SLIB_STATIC_STRING(str, "Keep-Alive");
-		setRequestHeader(HttpHeaders::Connection, str);
+		setRequestHeader(HttpHeader::Connection, str);
 	}
 	
 	String HttpRequest::getRequestRange() const
 	{
-		return getRequestHeader(HttpHeaders::Range);
+		return getRequestHeader(HttpHeader::Range);
 	}
 
 	void HttpRequest::setRequestRange(const String& range)
 	{
-		setRequestHeader(HttpHeaders::Range, range);
+		setRequestHeader(HttpHeader::Range, range);
 	}
 
 	void HttpRequest::setRequestRange(sl_uint64 start, sl_uint64 last)
 	{
-		setRequestHeader(HttpHeaders::Range, String::format("bytes=%d-%d", start, last));
+		setRequestHeader(HttpHeader::Range, String::format("bytes=%d-%d", start, last));
 	}
 
 	void HttpRequest::setRequestRangeFrom(sl_uint64 start)
 	{
-		setRequestHeader(HttpHeaders::Range, String::format("bytes=%d-", start));
+		setRequestHeader(HttpHeader::Range, String::format("bytes=%d-", start));
 	}
 
 	void HttpRequest::setRequestRangeSuffix(sl_uint64 length)
 	{
-		setRequestHeader(HttpHeaders::Range, String::format("bytes=-%d", length));
+		setRequestHeader(HttpHeader::Range, String::format("bytes=-%d", length));
 	}
 
 	String HttpRequest::getRequestOrigin() const
 	{
-		return getRequestHeader(HttpHeaders::Origin);
+		return getRequestHeader(HttpHeader::Origin);
 	}
 
 	void HttpRequest::setRequestOrigin(const String& origin)
 	{
-		setRequestHeader(HttpHeaders::Origin, origin);
+		setRequestHeader(HttpHeader::Origin, origin);
 	}
 	
 	Time HttpRequest::getRequestIfModifiedSince() const
 	{
 		Time time;
-		if (time.parseHttpDate(getRequestHeader(HttpHeaders::IfModifiedSince))) {
+		if (time.parseHttpDate(getRequestHeader(HttpHeader::IfModifiedSince))) {
 			return time;
 		}
 		return Time::zero();
@@ -993,16 +988,16 @@ namespace slib
 	void HttpRequest::setRequestIfModifiedSince(const Time& time)
 	{
 		if (time.isNotZero()) {
-			setRequestHeader(HttpHeaders::IfModifiedSince, time.toHttpDate());
+			setRequestHeader(HttpHeader::IfModifiedSince, time.toHttpDate());
 		} else {
-			removeRequestHeader(HttpHeaders::IfModifiedSince);
+			removeRequestHeader(HttpHeader::IfModifiedSince);
 		}
 	}
 	
 	HttpCacheControlRequest HttpRequest::getRequestCacheControl() const
 	{
 		HttpCacheControlRequest cc;
-		HttpHeaderValueMap map = getRequestHeaderValueMap(HttpHeaders::CacheControl);
+		HttpHeaderValueMap map = getRequestHeaderValueMap(HttpHeader::CacheControl);
 		sl_int32 n;
 		if (map.getValue_NoLock(g_cacheControl_max_age).parseInt32(10, &n)) {
 			cc.max_age = n;
@@ -1053,9 +1048,9 @@ namespace slib
 			map.put_NoLock(g_cacheControl_only_if_cached, sl_null);
 		}
 		if (map.isNotEmpty()) {
-			setRequestHeaderValueMap(HttpHeaders::CacheControl, map);
+			setRequestHeaderValueMap(HttpHeader::CacheControl, map);
 		} else {
-			removeRequestHeader(HttpHeaders::CacheControl);
+			removeRequestHeader(HttpHeader::CacheControl);
 		}
 	}
 	
@@ -1064,9 +1059,9 @@ namespace slib
 		HashMap<String, String> map;
 		MapNode<String, String>* node;
 		MapNode<String, String>* nodeEnd;
-		if (m_requestHeaders.getEqualRange(HttpHeaders::Cookie, &node, &nodeEnd)) {
+		if (m_requestHeaders.getEqualRange(HttpHeader::Cookie, &node, &nodeEnd)) {
 			for (;;) {
-				HttpHeaders::splitValue(node->value, sl_null, sl_null, &map, ';');
+				HttpHeaderHelper::splitValue(node->value, sl_null, sl_null, &map, ';');
 				if (node == nodeEnd) {
 					break;
 				}
@@ -1078,8 +1073,8 @@ namespace slib
 	
 	void HttpRequest::setRequestCookies(const HashMap<String, String>& cookies)
 	{
-		String value = HttpHeaders::mergeValueMapCaseSensitive(cookies);
-		setRequestHeader(HttpHeaders::Cookie, value);
+		String value = HttpHeaderHelper::mergeValueMapCaseSensitive(cookies);
+		setRequestHeader(HttpHeader::Cookie, value);
 	}
 	
 	String HttpRequest::getRequestCookie(const String& cookie) const
@@ -1317,7 +1312,7 @@ namespace slib
 		sl_size i = sizeBoundary + 2;
 		for (;;) {
 			HttpHeaderMap map;
-			sl_reg lenHeader = HttpHeaders::parseHeaders(map, data + i, size - i);
+			sl_reg lenHeader = HttpHeaderHelper::parseHeaders(map, data + i, size - i);
 			if (lenHeader <= 0) {
 				return;
 			}
@@ -1335,8 +1330,8 @@ namespace slib
 					i++;
 				}
 			}
-			String header = map.getValue_NoLock(HttpHeaders::ContentDisposition);
-			HttpHeaderMap fields = HttpHeaders::splitValueToMap(header, ';');
+			String header = map.getValue_NoLock(HttpHeader::ContentDisposition);
+			HttpHeaderMap fields = HttpHeaderHelper::splitValueToMap(header, ';');
 			String name = fields.getValue_NoLock(s1);
 			String fileName = fields.getValue_NoLock(s2);
 			if (fileName.isNull()) {
@@ -1462,7 +1457,7 @@ namespace slib
 		setRequestVersion(String::fromUtf8(data + posStart, posCurrent - posStart));
 		posCurrent += 2;
 
-		sl_reg iRet = HttpHeaders::parseHeaders(m_requestHeaders, data + posCurrent, size - posCurrent);
+		sl_reg iRet = HttpHeaderHelper::parseHeaders(m_requestHeaders, data + posCurrent, size - posCurrent);
 		if (iRet > 0) {
 			return posCurrent + iRet;
 		} else {
@@ -1490,7 +1485,7 @@ namespace slib
 				} else if (IsInstanceOf<HttpUploadFile>(ref)) {
 					HttpUploadFile* file = (HttpUploadFile*)(ref.get());
 					memData = file->getDataMemory();
-					fileName = HttpHeaders::makeSafeValue(file->getFileName());
+					fileName = HttpHeaderHelper::makeSafeValue(file->getFileName());
 					headers = &(file->getHeaders());
 				}
 			} else {
@@ -1531,7 +1526,7 @@ namespace slib
 			}
 			if (headers) {
 				for (auto& header: *headers) {
-					if (header.key.equalsIgnoreCase(HttpHeaders::ContentDisposition)) {
+					if (header.key.equalsIgnoreCase(HttpHeader::ContentDisposition)) {
 						continue;
 					}
 					output.addStatic(header.key.getData(), header.key.getLength());
@@ -1647,7 +1642,7 @@ namespace slib
 		MapNode<String, String>* nodeEnd;
 		if (m_responseHeaders.getEqualRange(name, &node, &nodeEnd)) {
 			for (;;) {
-				HttpHeaders::splitValue(node->value, &list, sl_null, sl_null);
+				HttpHeaderHelper::splitValue(node->value, &list, sl_null, sl_null);
 				if (node == nodeEnd) {
 					break;
 				}
@@ -1659,12 +1654,12 @@ namespace slib
 	
 	void HttpResponse::setResponseHeaderValues(const String& name, const List<String>& list)
 	{
-		m_responseHeaders.put_NoLock(name, HttpHeaders::mergeValues(list));
+		m_responseHeaders.put_NoLock(name, HttpHeaderHelper::mergeValues(list));
 	}
 	
 	void HttpResponse::addResponseHeaderValues(const String& name, const List<String>& list)
 	{
-		m_responseHeaders.add_NoLock(name, HttpHeaders::mergeValues(list));
+		m_responseHeaders.add_NoLock(name, HttpHeaderHelper::mergeValues(list));
 	}
 
 	HttpHeaderValueMap HttpResponse::getResponseHeaderValueMap(const String& name) const
@@ -1674,7 +1669,7 @@ namespace slib
 		MapNode<String, String>* nodeEnd;
 		if (m_responseHeaders.getEqualRange(name, &node, &nodeEnd)) {
 			for (;;) {
-				HttpHeaders::splitValue(node->value, sl_null, &map, sl_null);
+				HttpHeaderHelper::splitValue(node->value, sl_null, &map, sl_null);
 				if (node == nodeEnd) {
 					break;
 				}
@@ -1686,12 +1681,12 @@ namespace slib
 
 	void HttpResponse::setResponseHeaderValueMap(const String& name, const HttpHeaderValueMap& map)
 	{
-		m_responseHeaders.put_NoLock(name, HttpHeaders::mergeValueMap(map));
+		m_responseHeaders.put_NoLock(name, HttpHeaderHelper::mergeValueMap(map));
 	}
 	
 	void HttpResponse::addResponseHeaderValueMap(const String& name, const HttpHeaderValueMap& map)
 	{
-		m_responseHeaders.add_NoLock(name, HttpHeaders::mergeValueMap(map));
+		m_responseHeaders.add_NoLock(name, HttpHeaderHelper::mergeValueMap(map));
 	}
 
 	void HttpResponse::clearResponseHeaders()
@@ -1701,7 +1696,7 @@ namespace slib
 
 	sl_uint64 HttpResponse::getResponseContentLengthHeader() const
 	{
-		String headerContentLength = getResponseHeader(HttpHeaders::ContentLength);
+		String headerContentLength = getResponseHeader(HttpHeader::ContentLength);
 		if (headerContentLength.isNotEmpty()) {
 			return headerContentLength.parseUint64();
 		}
@@ -1710,42 +1705,37 @@ namespace slib
 
 	void HttpResponse::setResponseContentLengthHeader(sl_uint64 size)
 	{
-		setResponseHeader(HttpHeaders::ContentLength, String::fromUint64(size));
+		setResponseHeader(HttpHeader::ContentLength, String::fromUint64(size));
 	}
 
 	String HttpResponse::getResponseContentType() const
 	{
-		return getResponseHeader(HttpHeaders::ContentType);
+		return getResponseHeader(HttpHeader::ContentType);
 	}
 
 	void HttpResponse::setResponseContentType(const String& type)
 	{
-		setResponseHeader(HttpHeaders::ContentType, type);
-	}
-
-	void HttpResponse::setResponseContentType(ContentType type)
-	{
-		setResponseHeader(HttpHeaders::ContentType, ContentTypeHelper::toString(type));
+		setResponseHeader(HttpHeader::ContentType, type);
 	}
 
 	String HttpResponse::getResponseContentEncoding() const
 	{
-		return getResponseHeader(HttpHeaders::ContentEncoding);
+		return getResponseHeader(HttpHeader::ContentEncoding);
 	}
 
 	void HttpResponse::setResponseContentEncoding(const String& type)
 	{
-		setResponseHeader(HttpHeaders::ContentEncoding, type);
+		setResponseHeader(HttpHeader::ContentEncoding, type);
 	}
 
 	String HttpResponse::getResponseTransferEncoding() const
 	{
-		return getResponseHeader(HttpHeaders::TransferEncoding);
+		return getResponseHeader(HttpHeader::TransferEncoding);
 	}
 
 	void HttpResponse::setResponseTransferEncoding(const String& type)
 	{
-		setResponseHeader(HttpHeaders::TransferEncoding, type);
+		setResponseHeader(HttpHeader::TransferEncoding, type);
 	}
 
 	sl_bool HttpResponse::isChunkedResponse() const
@@ -1759,7 +1749,7 @@ namespace slib
 	
 	sl_bool HttpResponse::isAttachmentResponse() const
 	{
-		String value = getResponseHeader(HttpHeaders::ContentDisposition);
+		String value = getResponseHeader(HttpHeader::ContentDisposition);
 		if (value.startsWith("attachment")) {
 			return sl_true;
 		}
@@ -1768,7 +1758,7 @@ namespace slib
 	
 	String HttpResponse::getResponseAttachmentFileName() const
 	{
-		HttpHeaderValueMap map = getResponseHeaderValueMap(HttpHeaders::ContentDisposition);
+		HttpHeaderValueMap map = getResponseHeaderValueMap(HttpHeader::ContentDisposition);
 		SLIB_STATIC_STRING(s, "filename")
 		return map.getValue_NoLock(s);
 	}
@@ -1776,81 +1766,81 @@ namespace slib
 	void HttpResponse::setResponseInline()
 	{
 		SLIB_STATIC_STRING(s, "inline")
-		setResponseHeader(HttpHeaders::ContentDisposition, s);
+		setResponseHeader(HttpHeader::ContentDisposition, s);
 	}
 	
 	void HttpResponse::setResponseAttachment(const String& fileName)
 	{
 		if (fileName.isEmpty()) {
 			SLIB_STATIC_STRING(s, "attachment")
-			setResponseHeader(HttpHeaders::ContentDisposition, s);
+			setResponseHeader(HttpHeader::ContentDisposition, s);
 		} else {
-			setResponseHeader(HttpHeaders::ContentDisposition, String::format("attachment; filename=\"%s\"", fileName));
+			setResponseHeader(HttpHeader::ContentDisposition, String::format("attachment; filename=\"%s\"", fileName));
 		}
 	}
 	
 	String HttpResponse::getResponseContentRange() const
 	{
-		return getResponseHeader(HttpHeaders::ContentRange);
+		return getResponseHeader(HttpHeader::ContentRange);
 	}
 
 	void HttpResponse::setResponseContentRange(const String& range)
 	{
-		setResponseHeader(HttpHeaders::ContentRange, range);
+		setResponseHeader(HttpHeader::ContentRange, range);
 	}
 
 	void HttpResponse::setResponseContentRange(sl_uint64 start, sl_uint64 last, sl_uint64 total)
 	{
-		setResponseHeader(HttpHeaders::ContentRange, String::format("bytes %d-%d/%d", start, last, total));
+		setResponseHeader(HttpHeader::ContentRange, String::format("bytes %d-%d/%d", start, last, total));
 	}
 
 	void HttpResponse::setResponseContentRangeUnknownTotal(sl_uint64 start, sl_uint64 last)
 	{
-		setResponseHeader(HttpHeaders::ContentRange, String::format("bytes %d-%d/*", start, last));
+		setResponseHeader(HttpHeader::ContentRange, String::format("bytes %d-%d/*", start, last));
 	}
 
 	void HttpResponse::setResponseContentRangeUnsatisfied(sl_uint64 total)
 	{
-		setResponseHeader(HttpHeaders::ContentRange, String::format("bytes */%d", total));
+		setResponseHeader(HttpHeader::ContentRange, String::format("bytes */%d", total));
 	}
 
 	String HttpResponse::getResponseAcceptRanges() const
 	{
-		return getResponseHeader(HttpHeaders::AcceptRanges);
+		return getResponseHeader(HttpHeader::AcceptRanges);
 	}
 
 	void HttpResponse::setResponseAcceptRanges(sl_bool flagAcceptRanges)
 	{
 		if (flagAcceptRanges) {
 			SLIB_STATIC_STRING(s, "bytes")
-			setResponseHeader(HttpHeaders::AcceptRanges, s);
+			setResponseHeader(HttpHeader::AcceptRanges, s);
 		} else {
 			SLIB_STATIC_STRING(s, "none")
-			setResponseHeader(HttpHeaders::AcceptRanges, s);
+			setResponseHeader(HttpHeader::AcceptRanges, s);
 		}
 	}
 
 	void HttpResponse::setResponseAcceptRangesIfNotDefined(sl_bool flagAcceptRanges)
 	{
-		if (!(containsResponseHeader(HttpHeaders::AcceptRanges))) {
+		if (!(containsResponseHeader(HttpHeader::AcceptRanges))) {
 			setResponseAcceptRanges(flagAcceptRanges);
 		}
 	}
 
 	String HttpResponse::getResponseAccessControlAllowOrigin() const
 	{
-		return getResponseHeader(HttpHeaders::AccessControlAllowOrigin);
+		return getResponseHeader(HttpHeader::AccessControlAllowOrigin);
 	}
 
 	void HttpResponse::setResponseAccessControlAllowOrigin(const String& origin)
 	{
-		setResponseHeader(HttpHeaders::AccessControlAllowOrigin, origin);
+		setResponseHeader(HttpHeader::AccessControlAllowOrigin, origin);
 	}
 	
 	Time HttpResponse::getResponseLastModified() const
 	{
 		Time time;
-		if (time.parseHttpDate(getResponseHeader(HttpHeaders::LastModified))) {
+		if (time.parseHttpDate(getResponseHeader(HttpHeader::LastModified))) {
 			return time;
 		}
 		return Time::zero();
@@ -1859,16 +1849,16 @@ namespace slib
 	void HttpResponse::setResponseLastModified(const Time& time)
 	{
 		if (time.isNotZero()) {
-			setResponseHeader(HttpHeaders::LastModified, time.toHttpDate());
+			setResponseHeader(HttpHeader::LastModified, time.toHttpDate());
 		} else {
-			removeResponseHeader(HttpHeaders::LastModified);
+			removeResponseHeader(HttpHeader::LastModified);
 		}
 	}
 	
 	HttpCacheControlResponse HttpResponse::getResponseCacheControl() const
 	{
 		HttpCacheControlResponse cc;
-		HttpHeaderValueMap map = getResponseHeaderValueMap(HttpHeaders::CacheControl);
+		HttpHeaderValueMap map = getResponseHeaderValueMap(HttpHeader::CacheControl);
 		sl_int32 n;
 		if (map.find_NoLock(g_cacheControl_must_revalidate)) {
 			cc.must_revalidate = sl_true;
@@ -1949,16 +1939,16 @@ namespace slib
 			map.put_NoLock(g_cacheControl_stale_if_error, String::fromInt32(cc.stale_if_error));
 		}
 		if (map.isNotEmpty()) {
-			setResponseHeaderValueMap(HttpHeaders::CacheControl, map);
+			setResponseHeaderValueMap(HttpHeader::CacheControl, map);
 		} else {
-			removeResponseHeader(HttpHeaders::CacheControl);
+			removeResponseHeader(HttpHeader::CacheControl);
 		}
 	}
 
 	List<HttpCookie> HttpResponse::getResponseCookies() const
 	{
 		List<HttpCookie> list;
-		ListElements<String> values(getResponseHeaderValues(HttpHeaders::SetCookie));
+		ListElements<String> values(getResponseHeaderValues(HttpHeader::SetCookie));
 		for (sl_size i = 0; i < values.count; i++) {
 			HttpCookie cookie;
 			cookie.parseHeaderValue(values[i]);
@@ -1969,18 +1959,18 @@ namespace slib
 	
 	void HttpResponse::setResponseCookies(const List<HttpCookie>& _cookies)
 	{
-		m_responseHeaders.removeItems_NoLock(HttpHeaders::SetCookie);
+		m_responseHeaders.removeItems_NoLock(HttpHeader::SetCookie);
 		ListLocker<HttpCookie> cookies(_cookies);
 		for (sl_size i = 0; i < cookies.count; i++) {
 			HttpCookie& cookie = cookies[i];
-			m_responseHeaders.add_NoLock(HttpHeaders::SetCookie, cookie.toHeaderValue());
+			m_responseHeaders.add_NoLock(HttpHeader::SetCookie, cookie.toHeaderValue());
 		}
 	}
 	
 	HashMap<String, HttpCookie> HttpResponse::getResponseCookieMap() const
 	{
 		HashMap<String, HttpCookie> map;
-		ListElements<String> values(getResponseHeaderValues(HttpHeaders::SetCookie));
+		ListElements<String> values(getResponseHeaderValues(HttpHeader::SetCookie));
 		for (sl_size i = 0; i < values.count; i++) {
 			HttpCookie cookie;
 			cookie.parseHeaderValue(values[i]);
@@ -1991,10 +1981,10 @@ namespace slib
 	
 	void HttpResponse::setResponseCookieMap(const HashMap<String, HttpCookie>& map)
 	{
-		m_responseHeaders.removeItems_NoLock(HttpHeaders::SetCookie);
+		m_responseHeaders.removeItems_NoLock(HttpHeader::SetCookie);
 		MutexLocker lock(map.getLocker());
 		for (auto& item : map) {
-			m_responseHeaders.add_NoLock(HttpHeaders::SetCookie, item.value.toHeaderValue());
+			m_responseHeaders.add_NoLock(HttpHeader::SetCookie, item.value.toHeaderValue());
 		}
 	}
 	
@@ -2021,22 +2011,22 @@ namespace slib
 	
 	void HttpResponse::addResponseCookie(const HttpCookie& cookie)
 	{
-		m_responseHeaders.add_NoLock(HttpHeaders::SetCookie, cookie.toHeaderValue());
+		m_responseHeaders.add_NoLock(HttpHeader::SetCookie, cookie.toHeaderValue());
 	}
 
 	String HttpResponse::getResponseRedirectLocation()
 	{
-		return getResponseHeader(HttpHeaders::Location);
+		return getResponseHeader(HttpHeader::Location);
 	}
 
 	void HttpResponse::setResponseRedirectLocation(const String& location)
 	{
-		setResponseHeader(HttpHeaders::Location, location);
+		setResponseHeader(HttpHeader::Location, location);
 	}
 
 	void HttpResponse::setResponseRedirect(const String& location, HttpStatus status)
 	{
-		setResponseHeader(HttpHeaders::Location, location);
+		setResponseHeader(HttpHeader::Location, location);
 		setResponseCode(status);
 	}
 	
@@ -2128,7 +2118,7 @@ namespace slib
 		setResponseMessage(String::fromUtf8(data + posStart, posCurrent - posStart));
 		posCurrent += 2;
 
-		sl_reg iRet = HttpHeaders::parseHeaders(m_responseHeaders, data + posCurrent, size - posCurrent);
+		sl_reg iRet = HttpHeaderHelper::parseHeaders(m_responseHeaders, data + posCurrent, size - posCurrent);
 		if (iRet > 0) {
 			return posCurrent + iRet;
 		} else {

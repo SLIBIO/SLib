@@ -736,7 +736,7 @@ namespace slib
 
 	String OAuthServer::getAccessToken(HttpServerContext* context)
 	{
-		String auth = getParameter(context, "Authorization");
+		String auth = getParameter(context, HttpHeader::Authorization);
 		if (auth.startsWith("Bearer ")) {
 			return auth.substring(7);
 		}

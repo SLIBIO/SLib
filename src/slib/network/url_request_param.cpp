@@ -42,14 +42,9 @@ namespace slib
 		dispatcher = UrlRequest::getDefaultDispatcher();
 	}
 	
-	void UrlRequestParam::setContentType(const ContentType& contentType)
-	{
-		requestHeaders.put_NoLock(HttpHeaders::ContentType, ContentTypeHelper::toString(contentType));
-	}
-	
 	void UrlRequestParam::setContentType(const String& contentType)
 	{
-		requestHeaders.put_NoLock(HttpHeaders::ContentType, contentType);
+		requestHeaders.put_NoLock(HttpHeader::ContentType, contentType);
 	}
 	
 	void UrlRequestParam::setRequestBodyAsMemory(const Memory &mem)
@@ -83,13 +78,13 @@ namespace slib
 				Ref<Referable> obj = varBody.getObject();
 				if (obj.isNotNull()) {
 					if (CMap<String, Variant>* map = CastInstance< CMap<String, Variant> >(obj.get())) {
-						if (ContentTypeHelper::equalsContentTypeExceptParams(requestHeaders.getValue(HttpHeaders::ContentType), ContentType::Json)) {
+						if (ContentTypeHelper::equalsContentTypeExceptParams(requestHeaders.getValue(HttpHeader::ContentType), ContentType::Json)) {
 							requestBody = varBody.toJsonString().toMemory();
 						} else {
 							setFormData(Map<String, Variant>(map));
 						}
 					} else if (CHashMap<String, Variant>* hashMap = CastInstance< CHashMap<String, Variant> >(obj.get())) {
-						if (ContentTypeHelper::equalsContentTypeExceptParams(requestHeaders.getValue(HttpHeaders::ContentType), ContentType::Json)) {
+						if (ContentTypeHelper::equalsContentTypeExceptParams(requestHeaders.getValue(HttpHeader::ContentType), ContentType::Json)) {
 							requestBody = varBody.toJsonString().toMemory();
 						} else {
 							setFormData(HashMap<String, Variant>(hashMap));

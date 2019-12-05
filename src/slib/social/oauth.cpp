@@ -294,12 +294,12 @@ namespace slib
 		}
 		
 		if (param.method == HttpMethod::POST) {
-			String type = param.requestHeaders.getValue(HttpHeaders::ContentType);
+			String type = param.requestHeaders.getValue(HttpHeader::ContentType);
 			sl_reg index = type.indexOf(';');
 			if (index >= 0) {
 				type = type.substring(0, index);
 			}
-			if (!(type.trim().equalsIgnoreCase(ContentTypeHelper::MultipartFormData))) {
+			if (!(type.trim().equalsIgnoreCase(ContentType::MultipartFormData))) {
 				if (param.requestBody.isNotNull()) {
 					for (auto& item : HttpRequest::parseFormUrlEncoded(param.requestBody.getData(), param.requestBody.getSize())) {
 						parameters.add_NoLock(item.key, item.value);
@@ -309,7 +309,7 @@ namespace slib
 		}
 		
 		String authorization = generateAuthorization(param.method, param.url, parameters, nonce, timestamp, token, tokenSecret, callbackUrl);
-		param.requestHeaders.add_NoLock("Authorization", authorization);
+		param.requestHeaders.add_NoLock(HttpHeader::Authorization, authorization);
 	}
 	
 	void OAuth1::authorizeRequest(UrlRequestParam& param)
@@ -681,7 +681,7 @@ namespace slib
 	void OAuth2::authorizeRequest(UrlRequestParam& param, const OAuthAccessToken& token)
 	{
 		if (token.tokenType.isEmpty() || token.tokenType.equalsIgnoreCase("bearer")) {
-			param.requestHeaders.put_NoLock("Authorization", "Bearer " + token.token);
+			param.requestHeaders.put_NoLock(HttpHeader::Authorization, "Bearer " + token.token);
 		}
 	}
 	
@@ -781,7 +781,7 @@ namespace slib
 		rp.method = m_accessTokenMethod;
 		rp.url = m_accessTokenUrl;
 		if (m_flagUseBasicAuthorizationForAccessToken) {
-			rp.requestHeaders.put_NoLock("Authorization", "Basic " + Base64::encode(m_clientId + ":" + m_clientSecret));
+			rp.requestHeaders.put_NoLock(HttpHeader::Authorization, "Basic " + Base64::encode(m_clientId + ":" + m_clientSecret));
 		} else {
 			params.put_NoLock(m_clientIdFieldName, m_clientId);
 			params.put_NoLock(m_clientSecretFieldName, m_clientSecret);

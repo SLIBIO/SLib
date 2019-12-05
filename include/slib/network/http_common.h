@@ -155,15 +155,15 @@ namespace slib
 		
 	};
 	
-	
-	class SLIB_EXPORT HttpHeaders
+	class SLIB_EXPORT HttpHeader
 	{
 	public:
 		// General Headers
 		static const String& Connection;
 		static const String& CacheControl;
 		static const String& ContentDisposition;
-		
+		static const String& Authorization;
+
 		// Entity Headers
 		static const String& ContentLength;
 		static const String& ContentType;
@@ -185,7 +185,11 @@ namespace slib
 		static const String& ContentRange;
 		static const String& LastModified;
 		static const String& Location;
+		
+	};
 
+	class SLIB_EXPORT HttpHeaderHelper
+	{
 	public:
 		
 		/*
@@ -295,8 +299,6 @@ namespace slib
 		
 		String getContentType();
 		
-		void setContentType(const ContentType& contentType);
-		
 		void setContentType(const String& contentType);
 		
 		void* getData();
@@ -388,9 +390,7 @@ namespace slib
 		String getRequestContentTypeNoParams() const;
 		
 		void setRequestContentType(const String& type);
-		
-		void setRequestContentType(ContentType type);
-		
+				
 		sl_bool isRequestMultipartFormData() const;
 		
 		String getRequestMultipartFormDataBoundary() const;
@@ -585,9 +585,7 @@ namespace slib
 		String getResponseContentType() const;
 		
 		void setResponseContentType(const String& type);
-		
-		void setResponseContentType(ContentType type);
-		
+				
 		String getResponseContentEncoding() const;
 		
 		void setResponseContentEncoding(const String& type);
