@@ -61,9 +61,7 @@ namespace slib
 	public:
 		XgPushSendParam();
 		
-		XgPushSendParam(const XgPushSendParam& other) = default;
-		
-		XgPushSendParam& operator=(const XgPushSendParam& other) = default;
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(XgPushSendParam)
 		
 	};
 	
