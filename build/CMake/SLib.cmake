@@ -294,6 +294,10 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/geo/globe.cpp"
  "${SLIB_PATH}/src/slib/geo/latlon.cpp"
  
+ "${SLIB_PATH}/src/slib/service/chat.cpp"
+ "${SLIB_PATH}/src/slib/service/chat_client.cpp"
+ "${SLIB_PATH}/src/slib/service/chat_sqlite.cpp"
+ "${SLIB_PATH}/src/slib/service/fcm_service.cpp"
  "${SLIB_PATH}/src/slib/service/ginger.cpp"
  "${SLIB_PATH}/src/slib/service/push_notification.cpp"
  "${SLIB_PATH}/src/slib/service/web_service.cpp"
@@ -370,6 +374,7 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/ui/ui_event.cpp"
  "${SLIB_PATH}/src/slib/ui/ui_menu.cpp"
  "${SLIB_PATH}/src/slib/ui/ui_notification.cpp"
+ "${SLIB_PATH}/src/slib/ui/ui_notification_fcm.cpp"
  "${SLIB_PATH}/src/slib/ui/ui_notification_xgpush.cpp"
  "${SLIB_PATH}/src/slib/ui/ui_photo.cpp"
  "${SLIB_PATH}/src/slib/ui/ui_platform.cpp"

@@ -20,6 +20,33 @@
  *   THE SOFTWARE.
  */
 
-#pragma once
+#include "slib/ui/notification.h"
 
-#define FCM_SERVICE_LEGACY_KEY "YOUR_FCM_LEGACY_SERVICE_KEY"
+namespace slib
+{
+
+	SLIB_DEFINE_OBJECT(FCM, PushNotificationClient)
+	
+	FCM::FCM()
+	{
+	}
+	
+	FCM::~FCM()
+	{
+	}
+	
+#if !defined(SLIB_UI_IS_ANDROID) && !defined(SLIB_UI_IS_IOS)
+	Ref<FCM> FCM::getInstance()
+	{
+		return sl_null;
+	}
+#endif
+
+#if !defined(SLIB_UI_IS_ANDROID)
+	void FCM::onStart()
+	{
+	}
+#endif
+	
+}
+

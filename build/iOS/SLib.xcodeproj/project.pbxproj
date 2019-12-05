@@ -531,6 +531,9 @@
 		2614D10D237A6556001C52F0 /* device_contacts_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2614D10C237A6556001C52F0 /* device_contacts_ios.mm */; };
 		261E7F422353AA6100ACE4E8 /* string_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 261E7F402353AA6100ACE4E8 /* string_buffer.cpp */; };
 		261E7F432353AA6100ACE4E8 /* string_param.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 261E7F412353AA6100ACE4E8 /* string_param.cpp */; };
+		261EB5FD2397FF5700630C06 /* ui_notification_fcm_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 261EB5FC2397FF5700630C06 /* ui_notification_fcm_ios.mm */; };
+		261EB6032398137B00630C06 /* ui_notification_fcm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 261EB6022398137B00630C06 /* ui_notification_fcm.cpp */; };
+		261EB60B23982A4400630C06 /* fcm_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 261EB60A23982A4400630C06 /* fcm_service.cpp */; };
 		2628EAD121C184D400D8CD00 /* regex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2628EAD021C184D400D8CD00 /* regex.cpp */; };
 		2628EAE021C410C100D8CD00 /* base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2628EADF21C410C000D8CD00 /* base64.cpp */; };
 		2628EAE321C410CF00D8CD00 /* jwt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2628EAE221C410CF00D8CD00 /* jwt.cpp */; };
@@ -677,9 +680,12 @@
 		263D4762238305FF00DAC43F /* wechat_sdk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263D4761238305FF00DAC43F /* wechat_sdk.cpp */; };
 		263D47642383060500DAC43F /* wechat_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 263D47632383060400DAC43F /* wechat_ios.mm */; };
 		263D476823830ED500DAC43F /* wechat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263D476723830ED500DAC43F /* wechat.cpp */; };
+		263D47832386AE5600DAC43F /* chat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263D47822386AE5600DAC43F /* chat.cpp */; };
+		263D47892386B16F00DAC43F /* chat_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263D47882386B16F00DAC43F /* chat_view.cpp */; };
+		263D478D2386E1CB00DAC43F /* chat_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263D478C2386E1CB00DAC43F /* chat_client.cpp */; };
+		263D479123872AD800DAC43F /* chat_sqlite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263D479023872AD800DAC43F /* chat_sqlite.cpp */; };
 		2644BD0823638FFB001B9842 /* grid_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2644BD0723638FFA001B9842 /* grid_view.cpp */; };
 		2644BD0E2364BE5B001B9842 /* oauth_server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2644BD0D2364BE5B001B9842 /* oauth_server.cpp */; };
-		264DF0EE22455E3B007DB734 /* chat_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264DF0ED22455E3B007DB734 /* chat_view.cpp */; };
 		26539F8E2374B8F60064340D /* ginger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26539F8A2374B8F50064340D /* ginger.cpp */; };
 		26539F902374B8F60064340D /* web_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26539F8C2374B8F50064340D /* web_service.cpp */; };
 		26539F912374B8F60064340D /* xgpush_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26539F8D2374B8F50064340D /* xgpush_service.cpp */; };
@@ -1780,6 +1786,9 @@
 		261B4C841DB10149000A385A /* transition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = transition.cpp; sourceTree = "<group>"; };
 		261E7F402353AA6100ACE4E8 /* string_buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = string_buffer.cpp; sourceTree = "<group>"; };
 		261E7F412353AA6100ACE4E8 /* string_param.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = string_param.cpp; sourceTree = "<group>"; };
+		261EB5FC2397FF5700630C06 /* ui_notification_fcm_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_notification_fcm_ios.mm; sourceTree = "<group>"; };
+		261EB6022398137B00630C06 /* ui_notification_fcm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_notification_fcm.cpp; sourceTree = "<group>"; };
+		261EB60A23982A4400630C06 /* fcm_service.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fcm_service.cpp; sourceTree = "<group>"; };
 		2621F7201CCF174B00C4615C /* ui_menu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_menu.cpp; sourceTree = "<group>"; };
 		2628EAD021C184D400D8CD00 /* regex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = regex.cpp; sourceTree = "<group>"; };
 		2628EADF21C410C000D8CD00 /* base64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = base64.cpp; sourceTree = "<group>"; };
@@ -2091,6 +2100,10 @@
 		263D4761238305FF00DAC43F /* wechat_sdk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wechat_sdk.cpp; sourceTree = "<group>"; };
 		263D47632383060400DAC43F /* wechat_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = wechat_ios.mm; sourceTree = "<group>"; };
 		263D476723830ED500DAC43F /* wechat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wechat.cpp; sourceTree = "<group>"; };
+		263D47822386AE5600DAC43F /* chat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat.cpp; sourceTree = "<group>"; };
+		263D47882386B16F00DAC43F /* chat_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_view.cpp; sourceTree = "<group>"; };
+		263D478C2386E1CB00DAC43F /* chat_client.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_client.cpp; sourceTree = "<group>"; };
+		263D479023872AD800DAC43F /* chat_sqlite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_sqlite.cpp; sourceTree = "<group>"; };
 		2640CB6D1DC27BC7006376AC /* font_atlas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = font_atlas.cpp; sourceTree = "<group>"; };
 		2644BD0723638FFA001B9842 /* grid_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = grid_view.cpp; sourceTree = "<group>"; };
 		2644BD0D2364BE5B001B9842 /* oauth_server.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = oauth_server.cpp; sourceTree = "<group>"; };
@@ -2100,7 +2113,6 @@
 		2648D54D1D098AE800819E09 /* ui_platform.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_platform.cpp; sourceTree = "<group>"; };
 		2649C23A1CBBD7BF003E7561 /* common_dialogs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = common_dialogs.cpp; sourceTree = "<group>"; };
 		2649C23C1CBBD7D4003E7561 /* common_dialogs_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = common_dialogs_ios.mm; sourceTree = "<group>"; };
-		264DF0ED22455E3B007DB734 /* chat_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_view.cpp; sourceTree = "<group>"; };
 		265335901E2E96A900199C76 /* ui_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_animation.cpp; sourceTree = "<group>"; };
 		26539F8A2374B8F50064340D /* ginger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ginger.cpp; sourceTree = "<group>"; };
 		26539F8C2374B8F50064340D /* web_service.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = web_service.cpp; sourceTree = "<group>"; };
@@ -3865,6 +3877,10 @@
 		26539F892374B8F50064340D /* service */ = {
 			isa = PBXGroup;
 			children = (
+				263D47822386AE5600DAC43F /* chat.cpp */,
+				263D478C2386E1CB00DAC43F /* chat_client.cpp */,
+				263D479023872AD800DAC43F /* chat_sqlite.cpp */,
+				261EB60A23982A4400630C06 /* fcm_service.cpp */,
 				26539F8A2374B8F50064340D /* ginger.cpp */,
 				26539FB52374BC140064340D /* push_notification.cpp */,
 				26539F8C2374B8F50064340D /* web_service.cpp */,
@@ -4239,7 +4255,7 @@
 			children = (
 				266DD4311C118FF200D47AB0 /* button.cpp */,
 				26A9B7611C172BCC004C9B0E /* camera_view.cpp */,
-				264DF0ED22455E3B007DB734 /* chat_view.cpp */,
+				263D47882386B16F00DAC43F /* chat_view.cpp */,
 				266DD4351C11901A00D47AB0 /* check_box.cpp */,
 				2674666F2318556700DE8715 /* chromium.cpp */,
 				26C7959B221538D90053C5A1 /* clipboard.cpp */,
@@ -4302,6 +4318,8 @@
 				26539FA42374BA040064340D /* ui_notification.cpp */,
 				2657CE92238021F600402782 /* ui_notification_apple.mm */,
 				26539FA72374BA120064340D /* ui_notification_apns_ios.mm */,
+				261EB6022398137B00630C06 /* ui_notification_fcm.cpp */,
+				261EB5FC2397FF5700630C06 /* ui_notification_fcm_ios.mm */,
 				26539FAA2374BA190064340D /* ui_notification_xgpush.cpp */,
 				26539FA62374BA120064340D /* ui_notification_xgpush_ios.mm */,
 				26635CA0226706FD005E4BA6 /* ui_photo.cpp */,
@@ -5230,6 +5248,7 @@
 				26C795CB2215FC7C0053C5A1 /* colors.cpp in Sources */,
 				26D9D7FD1E9628E0005F7BD3 /* transform2d.cpp in Sources */,
 				26D9D7FE1E9628E0005F7BD3 /* triangle.cpp in Sources */,
+				261EB5FD2397FF5700630C06 /* ui_notification_fcm_ios.mm in Sources */,
 				26E1B8D7222ABCDD007C222E /* jcmarker.c in Sources */,
 				26D9D8991E962962005F7BD3 /* ip_address.cpp in Sources */,
 				26D9D8651E96294F005F7BD3 /* brush.cpp in Sources */,
@@ -5307,7 +5326,6 @@
 				26E1B8AB222ABBDC007C222E /* adler32.c in Sources */,
 				26D9D88A1E96295A005F7BD3 /* codec_opus.cpp in Sources */,
 				26D9D86A1E96294F005F7BD3 /* drawable_quartz.mm in Sources */,
-				264DF0EE22455E3B007DB734 /* chat_view.cpp in Sources */,
 				26D9D80C1E9628E0005F7BD3 /* matrix4.cpp in Sources */,
 				26D9D8D01E962976005F7BD3 /* scroll_bar.cpp in Sources */,
 				26E1B8DD222ABCDD007C222E /* jctrans.c in Sources */,
@@ -5363,6 +5381,7 @@
 				26D9D8B91E962976005F7BD3 /* common_dialogs.cpp in Sources */,
 				26DA4B50223C22DE00706393 /* media_player_ffmpeg.cpp in Sources */,
 				26D9D8C21E962976005F7BD3 /* linear_view.cpp in Sources */,
+				263D47892386B16F00DAC43F /* chat_view.cpp in Sources */,
 				26D9D8E21E962976005F7BD3 /* ui_event.cpp in Sources */,
 				265A935E2304783200B155A2 /* console.cpp in Sources */,
 				26BAE01A221FFC830085B5AB /* facebook_sdk.cpp in Sources */,
@@ -5447,6 +5466,7 @@
 				26D9D8801E96295A005F7BD3 /* audio_player_ios.mm in Sources */,
 				26BB17D821F4E45C0089C7EC /* view_pager.cpp in Sources */,
 				26D9D82A1E9628E0005F7BD3 /* asset.cpp in Sources */,
+				261EB6032398137B00630C06 /* ui_notification_fcm.cpp in Sources */,
 				26E1B8B5222ABBDC007C222E /* inflate.c in Sources */,
 				2614D10D237A6556001C52F0 /* device_contacts_ios.mm in Sources */,
 				26E1B8CC222ABC05007C222E /* intel_init.c in Sources */,
@@ -5493,6 +5513,7 @@
 				26D9D82F1E9628E0005F7BD3 /* time.cpp in Sources */,
 				26E1B8E6222ABCDD007C222E /* jdhuff.c in Sources */,
 				26D9D8301E9628E0005F7BD3 /* resource.cpp in Sources */,
+				263D47832386AE5600DAC43F /* chat.cpp in Sources */,
 				26539FAB2374BA190064340D /* ui_notification_xgpush.cpp in Sources */,
 				26E1B8C1222ABBE7007C222E /* pngrtran.c in Sources */,
 				26D9D8DE1E962976005F7BD3 /* ui_core.cpp in Sources */,
@@ -5502,9 +5523,11 @@
 				260B73EF220CAD1C00858EEA /* oauth.cpp in Sources */,
 				26E1B8D2222ABCDD007C222E /* jccolor.c in Sources */,
 				26D9D8861E96295A005F7BD3 /* audio_util.cpp in Sources */,
+				261EB60B23982A4400630C06 /* fcm_service.cpp in Sources */,
 				26E1B8EF222ABCDD007C222E /* jerror.c in Sources */,
 				26F53F9E22E1EBD50031D485 /* date_picker.cpp in Sources */,
 				26D9D88C1E96295A005F7BD3 /* media_player.cpp in Sources */,
+				263D479123872AD800DAC43F /* chat_sqlite.cpp in Sources */,
 				26E1B8CA222ABC01007C222E /* filter_neon_intrinsics.c in Sources */,
 				263D47642383060500DAC43F /* wechat_ios.mm in Sources */,
 				26D9D87C1E96295A005F7BD3 /* audio_data.cpp in Sources */,
@@ -5576,6 +5599,7 @@
 				26D9D8BD1E962976005F7BD3 /* edit_view_ios.mm in Sources */,
 				26E1B8D9222ABCDD007C222E /* jcomapi.c in Sources */,
 				26D9D8441E9628E0005F7BD3 /* vector3.cpp in Sources */,
+				263D478D2386E1CB00DAC43F /* chat_client.cpp in Sources */,
 				26D9D86D1E96294F005F7BD3 /* font_freetype.cpp in Sources */,
 				26D9D8451E9628E0005F7BD3 /* line_segment.cpp in Sources */,
 				262D59B02325996700F85780 /* noto_emoji.cpp in Sources */,

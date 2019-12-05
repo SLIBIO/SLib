@@ -527,6 +527,8 @@
 		260B73F6220D7DF600858EEA /* oauth.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260B73F4220D7DF600858EEA /* oauth.cpp */; };
 		260B73FA220D872F00858EEA /* twitter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260B73F9220D872F00858EEA /* twitter.cpp */; };
 		260B73FE220DCB1D00858EEA /* oauth_ui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260B73FD220DCB1D00858EEA /* oauth_ui.cpp */; };
+		2614723623944E6D00F7CD0C /* wechat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2614723523944E6D00F7CD0C /* wechat.cpp */; };
+		2614723823944E7300F7CD0C /* wechat_sdk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2614723723944E7300F7CD0C /* wechat_sdk.cpp */; };
 		2628EACC21C1059800D8CD00 /* web_view_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2628EACB21C1059700D8CD00 /* web_view_apple.mm */; };
 		2628EACE21C157A800D8CD00 /* regex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2628EACD21C157A800D8CD00 /* regex.cpp */; };
 		2628EAE621C410E500D8CD00 /* base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2628EAE521C410E500D8CD00 /* base64.cpp */; };
@@ -842,6 +844,10 @@
 		2639193F21CD23DF008B335B /* sds.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639193521CD23DF008B335B /* sds.c */; };
 		2639194121CD23DF008B335B /* hiredis.c in Sources */ = {isa = PBXBuildFile; fileRef = 2639193621CD23DF008B335B /* hiredis.c */; };
 		2639194421CD2510008B335B /* redis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2639194321CD2510008B335B /* redis.cpp */; };
+		263D477F2386AE2F00DAC43F /* chat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263D477E2386AE2F00DAC43F /* chat.cpp */; };
+		263D47872386B13D00DAC43F /* chat_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263D47862386B13D00DAC43F /* chat_view.cpp */; };
+		263D478B2386E1BD00DAC43F /* chat_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263D478A2386E1BD00DAC43F /* chat_client.cpp */; };
+		263D478F23872AD200DAC43F /* chat_sqlite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 263D478E23872AD100DAC43F /* chat_sqlite.cpp */; };
 		2644BD062361898E001B9842 /* grid_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2644BD052361898E001B9842 /* grid_view.cpp */; };
 		2644BD0C2364BE43001B9842 /* oauth_server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2644BD0B2364BE42001B9842 /* oauth_server.cpp */; };
 		264AF11721AED0C0004E58CB /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF10921AECFA4004E58CB /* main.cpp */; };
@@ -851,7 +857,6 @@
 		264AF13E21B05AAE004E58CB /* sapp_resources.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF12F21B05AAE004E58CB /* sapp_resources.cpp */; };
 		264AF14021B05AAE004E58CB /* sapp_util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF13121B05AAE004E58CB /* sapp_util.cpp */; };
 		264AF14221B05AAE004E58CB /* sapp_values.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264AF13321B05AAE004E58CB /* sapp_values.cpp */; };
-		264DF0F022455E46007DB734 /* chat_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264DF0EF22455E46007DB734 /* chat_view.cpp */; };
 		26539F972374B9090064340D /* ginger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26539F932374B9090064340D /* ginger.cpp */; };
 		26539F9B2374B9090064340D /* web_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26539F952374B9090064340D /* web_service.cpp */; };
 		26539F9D2374B9090064340D /* xgpush_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26539F962374B9090064340D /* xgpush_service.cpp */; };
@@ -2112,6 +2117,8 @@
 		260B73FD220DCB1D00858EEA /* oauth_ui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = oauth_ui.cpp; path = social/oauth_ui.cpp; sourceTree = "<group>"; };
 		260CB16A230F103500597B56 /* button_macos.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = button_macos.h; sourceTree = "<group>"; };
 		260D8CD120CBDC7C0013B34E /* libyasm.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libyasm.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		2614723523944E6D00F7CD0C /* wechat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = wechat.cpp; path = social/wechat.cpp; sourceTree = "<group>"; };
+		2614723723944E7300F7CD0C /* wechat_sdk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = wechat_sdk.cpp; path = social/wechat_sdk.cpp; sourceTree = "<group>"; };
 		2620412A1C88A95E00AF48F2 /* object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = object.cpp; sourceTree = "<group>"; };
 		2620412C1C88AE3B00AF48F2 /* list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list.cpp; sourceTree = "<group>"; };
 		2626C12E1E15AA55004E150C /* collection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = collection.cpp; sourceTree = "<group>"; };
@@ -2430,6 +2437,10 @@
 		2639193521CD23DF008B335B /* sds.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sds.c; path = ../../external/src/hiredis/sds.c; sourceTree = "<group>"; };
 		2639193621CD23DF008B335B /* hiredis.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hiredis.c; path = ../../external/src/hiredis/hiredis.c; sourceTree = "<group>"; };
 		2639194321CD2510008B335B /* redis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis.cpp; sourceTree = "<group>"; };
+		263D477E2386AE2F00DAC43F /* chat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat.cpp; sourceTree = "<group>"; };
+		263D47862386B13D00DAC43F /* chat_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_view.cpp; sourceTree = "<group>"; };
+		263D478A2386E1BD00DAC43F /* chat_client.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_client.cpp; sourceTree = "<group>"; };
+		263D478E23872AD100DAC43F /* chat_sqlite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_sqlite.cpp; sourceTree = "<group>"; };
 		2640BC381CAA65EF004AA780 /* xml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = xml.cpp; sourceTree = "<group>"; };
 		2644BD052361898E001B9842 /* grid_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = grid_view.cpp; sourceTree = "<group>"; };
 		2644BD0B2364BE42001B9842 /* oauth_server.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = oauth_server.cpp; path = social/oauth_server.cpp; sourceTree = "<group>"; };
@@ -2470,7 +2481,6 @@
 		264AF17421B40019004E58CB /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
 		264AF17621B40025004E58CB /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		264AF17821B4003D004E58CB /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
-		264DF0EF22455E46007DB734 /* chat_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_view.cpp; sourceTree = "<group>"; };
 		2650D3912320694C00B0CF2C /* collection_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = collection_view.cpp; sourceTree = "<group>"; };
 		2653358E1E2E8A5A00199C76 /* ui_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_animation.cpp; sourceTree = "<group>"; };
 		26539F932374B9090064340D /* ginger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ginger.cpp; sourceTree = "<group>"; };
@@ -4234,6 +4244,8 @@
 				26E1B857222841AB007C222E /* pinterest.cpp */,
 				263051D0225CA21700A6609E /* pinterest_ui.cpp */,
 				260B73F9220D872F00858EEA /* twitter.cpp */,
+				2614723523944E6D00F7CD0C /* wechat.cpp */,
+				2614723723944E7300F7CD0C /* wechat_sdk.cpp */,
 			);
 			name = social;
 			sourceTree = "<group>";
@@ -4708,6 +4720,9 @@
 		26539F922374B9090064340D /* service */ = {
 			isa = PBXGroup;
 			children = (
+				263D477E2386AE2F00DAC43F /* chat.cpp */,
+				263D478A2386E1BD00DAC43F /* chat_client.cpp */,
+				263D478E23872AD100DAC43F /* chat_sqlite.cpp */,
 				26539F932374B9090064340D /* ginger.cpp */,
 				26539FB22374BC0E0064340D /* push_notification.cpp */,
 				26539F952374B9090064340D /* web_service.cpp */,
@@ -4824,7 +4839,7 @@
 				260CB16A230F103500597B56 /* button_macos.h */,
 				266DD4ED1C11940A00D47AB0 /* button_macos.mm */,
 				2688DD861C16FBDF00973672 /* camera_view.cpp */,
-				264DF0EF22455E46007DB734 /* chat_view.cpp */,
+				263D47862386B13D00DAC43F /* chat_view.cpp */,
 				266DD4F21C11940A00D47AB0 /* check_box.cpp */,
 				266DD4F31C11940A00D47AB0 /* check_box_macos.mm */,
 				267464A4231718D500DE8715 /* chromium.cpp */,
@@ -6936,6 +6951,7 @@
 				26E1B887222ABAB2007C222E /* jcmarker.c in Sources */,
 				26D9D9851E964675005F7BD3 /* audio_recorder_macos.mm in Sources */,
 				26D9D8FB1E9645CE005F7BD3 /* atomic.cpp in Sources */,
+				263D478B2386E1BD00DAC43F /* chat_client.cpp in Sources */,
 				26D9D9AF1E964683005F7BD3 /* render_engine.cpp in Sources */,
 				26E1B866222A8250007C222E /* inffast.c in Sources */,
 				26E1B86F222ABA51007C222E /* pngmem.c in Sources */,
@@ -6951,6 +6967,7 @@
 				26C1B64220D51D1D00E36539 /* graphics_path.cpp in Sources */,
 				26D9D8FE1E9645CE005F7BD3 /* base.cpp in Sources */,
 				269308662368DE7E00C9C7F9 /* openssl_crypto.cpp in Sources */,
+				263D478F23872AD200DAC43F /* chat_sqlite.cpp in Sources */,
 				26D9D9971E96467B005F7BD3 /* icmp.cpp in Sources */,
 				26BAE00E221C90020085B5AB /* etsy_ui.cpp in Sources */,
 				26D9D9AB1E964683005F7BD3 /* opengl_gles.cpp in Sources */,
@@ -6986,7 +7003,6 @@
 				26D9D9071E9645CE005F7BD3 /* thread_apple.mm in Sources */,
 				26D9D9081E9645CE005F7BD3 /* async.cpp in Sources */,
 				26E1B87B222ABA55007C222E /* filter_sse2_intrinsics.c in Sources */,
-				264DF0F022455E46007DB734 /* chat_view.cpp in Sources */,
 				26E1B860222A8250007C222E /* deflate.c in Sources */,
 				267B9D69225D14640057DF2A /* instagram.cpp in Sources */,
 				26E1B886222ABAB2007C222E /* jcmainct.c in Sources */,
@@ -7109,8 +7125,10 @@
 				26D9D91A1E9645CE005F7BD3 /* setting.cpp in Sources */,
 				26E1B86C222ABA51007C222E /* png.c in Sources */,
 				26A39D8920EFBCBB004707C9 /* calculator.cpp in Sources */,
+				263D477F2386AE2F00DAC43F /* chat.cpp in Sources */,
 				26539F972374B9090064340D /* ginger.cpp in Sources */,
 				26539FB02374BA310064340D /* ui_notification.cpp in Sources */,
+				2614723823944E7300F7CD0C /* wechat_sdk.cpp in Sources */,
 				26D9D9911E964675005F7BD3 /* video_frame.cpp in Sources */,
 				26ACB3F82209872C0093FF3F /* device_id_macos.mm in Sources */,
 				26635CA322670708005E4BA6 /* ui_photo.cpp in Sources */,
@@ -7163,6 +7181,7 @@
 				26E1B895222ABAB2007C222E /* jddctmgr.c in Sources */,
 				26D9D97E1E964675005F7BD3 /* audio_player.cpp in Sources */,
 				26D9D9B41E96468D005F7BD3 /* button.cpp in Sources */,
+				2614723623944E6D00F7CD0C /* wechat.cpp in Sources */,
 				2628EACE21C157A800D8CD00 /* regex.cpp in Sources */,
 				26D9D9681E96466A005F7BD3 /* color.cpp in Sources */,
 				26D9D9981E96467B005F7BD3 /* ip_address.cpp in Sources */,
@@ -7265,6 +7284,7 @@
 				26D9D9DC1E96468D005F7BD3 /* ui_animation.cpp in Sources */,
 				26D9D93E1E9645CE005F7BD3 /* memory.cpp in Sources */,
 				26E1B85C22291D54007C222E /* ebay.cpp in Sources */,
+				263D47872386B13D00DAC43F /* chat_view.cpp in Sources */,
 				26E1B89B222ABAB2007C222E /* jdmerge.c in Sources */,
 				26E1B899222ABAB2007C222E /* jdmarker.c in Sources */,
 				26D9D93F1E9645CE005F7BD3 /* transform3d.cpp in Sources */,

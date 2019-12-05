@@ -22,6 +22,8 @@
 
 #include "app.h"
 
+#include "config.h"
+
 SLIB_DEFINE_APPLICATION(ExampleFCMApp, MobileApp)
 
 ExampleFCMApp::ExampleFCMApp()
@@ -36,12 +38,12 @@ void ExampleFCMApp::onStart()
 	
 	UI::setBadgeNumber(0);
 
-	auto push = APNs::getInstance();
+	auto push = FCM::getInstance();
 	push->addOnRefreshToken([this](String deviceToken) {
 		Log("FCM", deviceToken);
 		txtMyToken->setText(deviceToken);
-		deviceId = (SLIB_UI == SLIB_UI_IOS ? "ios:" : "android:") + deviceToken;
-		addDevice(deviceId);
+		deviceId = deviceToken;
+		addDevice(deviceToken);
 	});
 	push->addOnReceiveMessage([this](PushNotificationMessage& message) {
 		if (!(isPaused())) {
@@ -72,14 +74,10 @@ void ExampleFCMApp::addDevice(const String& device)
 	if (selectReceiver->getValues().contains(device)) {
 		return;
 	}
-	List<String> deviceParams = device.split(":");
-	if (deviceParams.getCount() != 2) {
-		return;
-	}
-	selectReceiver->addItem(device, deviceParams[0].toUpper() + " " + deviceParams[1]);
+	selectReceiver->addItem(device, device);
 }
 
-#define BROADCAST_PORT 38541
+#define BROADCAST_PORT 45231
 
 // broadcast device token over LAN, so that devices can list the other device tokens in the same LAN
 void ExampleFCMApp::startBroadcast()
@@ -91,7 +89,8 @@ void ExampleFCMApp::startBroadcast()
 		timerSendBroadcast = Timer::start([this, socket](Timer*) {
 			if (deviceId.isNotEmpty()) {
 				SocketAddress address(IPv4Address(IPv4Address::Broadcast), BROADCAST_PORT);
-				socket->sendTo(address, deviceId.getData(), (sl_uint32)(deviceId.getLength()));
+				sl_int32 n = socket->sendTo(address, deviceId.getData(), (sl_uint32)(deviceId.getLength()));
+				n = n;
 			}
 		}, 1000);
 		threadReceiveBroadcast = Thread::start([this, socket]() {
@@ -112,6 +111,31 @@ void ExampleFCMApp::startBroadcast()
 
 void ExampleFCMApp::onClickSend(View*)
 {
+	String receiver = selectReceiver->getSelectedValue();
+	if (receiver.isEmpty()) {
+		return;
+	}
+	FCM_SendParam param;
+	param.legacyServerKey = FCM_SERVICE_LEGACY_KEY;
+	param.receiverDeviceToken = receiver;
+	param.message.title = "FCM";
+	param.message.content = txtSendingMessage->getText();
+	param.message.data = Json({
+		JsonItem("message", param.message.content),
+		JsonItem("time", Time::now()),
+		JsonItem("list", Json({
+			"string1", "string2", "string3"
+		}))
+	});
+	param.message.badge = 1;
+	param.callback = [](FCM_ServiceSendResponse& response) {
+		if (response.flagSuccess) {
+			UI::showAlert(String::format("Success: %s", response.success));
+		} else {
+			UI::showAlert(String::format("Error: %s", response.request->getResponseContentAsString()));
+		}
+	};
+	FCM_Service::sendNotification(param);
 }
 
 void ExampleFCMApp::initUI()

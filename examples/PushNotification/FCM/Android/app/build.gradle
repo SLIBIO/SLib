@@ -39,4 +39,9 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation ':slib@aar'
+    implementation ':slib_fcm@aar'
+    implementation ':ShortcutBadger@aar'
+    implementation 'com.google.firebase:firebase-messaging:20.0.0'
 }
+
+apply plugin: 'com.google.gms.google-services'

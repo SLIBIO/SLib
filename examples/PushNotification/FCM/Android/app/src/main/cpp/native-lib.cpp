@@ -1,6 +1,6 @@
 #include <slib/core/platform_android.h>
 
-#include "app.h"
+#include "../../../../../src/app.h"
 
 JNIEXPORT jint JNI_OnLoad(JavaVM* jvm, void* reserved)
 {

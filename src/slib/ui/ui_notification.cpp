@@ -341,27 +341,5 @@ namespace slib
 	}
 #endif
 	
-	
-	SLIB_DEFINE_OBJECT(FCM, PushNotificationClient)
-	
-	FCM::FCM()
-	{
-	}
-	
-	FCM::~FCM()
-	{
-	}
-	
-#if !defined(SLIB_UI_IS_ANDROID)
-	Ref<FCM> FCM::getInstance()
-	{
-		return sl_null;
-	}
-
-	void FCM::onStart()
-	{
-	}
-#endif
-	
 }
 
