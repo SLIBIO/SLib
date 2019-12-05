@@ -1894,6 +1894,19 @@ namespace slib
 		return 0;
 	}
 
+	Variant Variant::getElement_NoLock(sl_size index) const noexcept
+	{
+		Ref<Referable> obj(getObject());
+		if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) {
+			return p1->getValueAt_NoLock(index);
+		} else if (CList< Map<String, Variant> >* p2 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {
+			return p2->getValueAt_NoLock(index);
+		} else if (CList< HashMap<String, Variant> >* p3 = CastInstance< CList< HashMap<String, Variant> > >(obj._ptr)) {
+			return p2->getValueAt_NoLock(index);
+		}
+		return sl_null;
+	}
+
 	Variant Variant::getElement(sl_size index) const noexcept
 	{
 		Ref<Referable> obj(getObject());
@@ -1905,6 +1918,19 @@ namespace slib
 			return p2->getValueAt(index);
 		}
 		return sl_null;
+	}
+
+	sl_bool Variant::setElement_NoLock(sl_size index, const Variant& value) noexcept
+	{
+		Ref<Referable> obj(getObject());
+		if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) {
+			return p1->setAt_NoLock(index, value);
+		} else if (CList< Map<String, Variant> >* p2 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {
+			return p2->setAt_NoLock(index, value.getVariantMap());
+		} else if (CList< HashMap<String, Variant> >* p3 = CastInstance< CList< HashMap<String, Variant> > >(obj._ptr)) {
+			return p3->setAt_NoLock(index, value.getVariantHashMap());
+		}
+		return sl_false;
 	}
 
 	sl_bool Variant::setElement(sl_size index, const Variant& value) noexcept
@@ -1920,6 +1946,27 @@ namespace slib
 		return sl_false;
 	}
 	
+	sl_bool Variant::addElement_NoLock(const Variant& value) noexcept
+	{
+		Ref<Referable> obj(getObject());
+		if (obj.isNotNull()) {
+			if (CList<Variant>* p1 = CastInstance< CList<Variant> >(obj._ptr)) {
+				return p1->add_NoLock(value);
+			} else if (CList< Map<String, Variant> >* p2 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {
+				return p2->add_NoLock(value.getVariantMap());
+			} else if (CList< HashMap<String, Variant> >* p3 = CastInstance< CList< HashMap<String, Variant> > >(obj._ptr)) {
+				return p3->add_NoLock(value.getVariantHashMap());
+			}
+		} else {
+			VariantList list = VariantList::createFromElement(value);
+			if (list.isNotNull()) {
+				set(list);
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+
 #define VARIANT_ADD_ELEMENT \
 	{ \
 		Ref<Referable> obj(getObject());\
@@ -1962,6 +2009,17 @@ namespace slib
 		VARIANT_ADD_ELEMENT
 	}
 
+	Variant Variant::getItem_NoLock(const String& key) const noexcept
+	{
+		Ref<Referable> obj(getObject());
+		if (CMap<String, Variant>* p1 = CastInstance< CMap<String, Variant> >(obj._ptr)) {
+			return p1->getValue_NoLock(key);
+		} else if (CHashMap<String, Variant>* p2 = CastInstance< CHashMap<String, Variant> >(obj._ptr)) {
+			return p2->getValue_NoLock(key);
+		}
+		return sl_null;
+	}
+
 	Variant Variant::getItem(const String& key) const noexcept
 	{
 		Ref<Referable> obj(getObject());
@@ -1973,45 +2031,82 @@ namespace slib
 		return sl_null;
 	}
 	
+	sl_bool Variant::putItem_NoLock(const String& key, const Variant& value) noexcept
+	{
+		if (value.isUndefined()) {
+			return removeItem_NoLock(key);
+		}
+		Ref<Referable> obj(getObject());
+		if (obj.isNotNull()) {
+			if (CMap<String, Variant>* p1 = CastInstance< CMap<String, Variant> >(obj._ptr)) {
+				return p1->put_NoLock(key, value);
+			} else if (CHashMap<String, Variant>* p2 = CastInstance< CHashMap<String, Variant> >(obj._ptr)) {
+				return p2->put_NoLock(key, value);
+			}
+		} else {
+			VariantHashMap map = VariantHashMap::create();
+			if (map.isNotNull()) {
+				if (map.put_NoLock(key, value)) {
+					set(map);
+					return sl_true;
+				}
+			}
+		}
+		return sl_false;
+	}
+
 #define VAIRANT_PUT_ITEM \
 	if (value.isUndefined()) { \
 		return removeItem(key); \
 	} \
-	{\
-		Ref<Referable> obj(getObject());\
-		if (obj.isNotNull()) {\
-			if (CMap<String, Variant>* p1 = CastInstance< CMap<String, Variant> >(obj._ptr)) {\
-				return p1->put(key, value);\
-			} else if (CHashMap<String, Variant>* p2 = CastInstance< CHashMap<String, Variant> >(obj._ptr)) {\
-				return p2->put(key, value);\
-			}\
-			return sl_false;\
-		}\
-	}\
-	{\
-		SpinLocker lock(SpinLockPoolForVariant::get(this));\
-		Ref<Referable> obj(getObject());\
-		if (obj.isNotNull()) {\
-			lock.unlock();\
-			if (CMap<String, Variant>* p1 = CastInstance< CMap<String, Variant> >(obj._ptr)) {\
-				return p1->put(key, value);\
-			} else if (CHashMap<String, Variant>* p2 = CastInstance< CHashMap<String, Variant> >(obj._ptr)) {\
-				return p2->put(key, value);\
-			}\
-			return sl_false;\
-		}\
-		VariantHashMap map = VariantHashMap::create();\
-		if (map.isNotNull()) {\
-			set(map);\
-			lock.unlock();\
-			return map.put(key, value);\
-		}\
-	}\
+	{ \
+		Ref<Referable> obj(getObject()); \
+		if (obj.isNotNull()) { \
+			if (CMap<String, Variant>* p1 = CastInstance< CMap<String, Variant> >(obj._ptr)) { \
+				return p1->put(key, value); \
+			} else if (CHashMap<String, Variant>* p2 = CastInstance< CHashMap<String, Variant> >(obj._ptr)) { \
+				return p2->put(key, value); \
+			} \
+			return sl_false; \
+		} \
+	} \
+	{ \
+		SpinLocker lock(SpinLockPoolForVariant::get(this)); \
+		Ref<Referable> obj(getObject()); \
+		if (obj.isNotNull()) { \
+			lock.unlock(); \
+			if (CMap<String, Variant>* p1 = CastInstance< CMap<String, Variant> >(obj._ptr)) { \
+				return p1->put(key, value); \
+			} else if (CHashMap<String, Variant>* p2 = CastInstance< CHashMap<String, Variant> >(obj._ptr)) { \
+				return p2->put(key, value); \
+			} \
+			return sl_false; \
+		} \
+		VariantHashMap map = VariantHashMap::create(); \
+		if (map.isNotNull()) { \
+			set(map); \
+			lock.unlock(); \
+			return map.put(key, value); \
+		} \
+	} \
 	return sl_false;
 
 	sl_bool Variant::putItem(const String& key, const Variant& value) noexcept
 	{
 		VAIRANT_PUT_ITEM
+	}
+
+	sl_bool Variant::removeItem_NoLock(const String& key) noexcept
+	{
+		Ref<Referable> obj(getObject());
+		if (obj.isNotNull()) {
+			if (CMap<String, Variant>* p1 = CastInstance< CMap<String, Variant> >(obj._ptr)) {
+				return p1->remove_NoLock(key);
+			} else if (CHashMap<String, Variant>* p2 = CastInstance< CHashMap<String, Variant> >(obj._ptr)) {
+				return p2->remove_NoLock(key);
+			}
+		}
+		return sl_false;
 	}
 
 	sl_bool Variant::removeItem(const String& key) noexcept

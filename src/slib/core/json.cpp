@@ -810,32 +810,32 @@ namespace slib
 	
 	Json Json::getElement(sl_size index) const
 	{
-		return Variant::getElement(index);
+		return Variant::getElement_NoLock(index);
 	}
 	
 	sl_bool Json::setElement(sl_size index, const Json& value)
 	{
-		return Variant::setElement(index, value);
+		return Variant::setElement_NoLock(index, value);
 	}
 	
 	sl_bool Json::addElement(const Json& value)
 	{
-		return Variant::addElement(value);
+		return Variant::addElement_NoLock(value);
 	}
 	
 	Json Json::getItem(const String& key) const
 	{
-		return Variant::getItem(key);
+		return Variant::getItem_NoLock(key);
 	}
 	
 	sl_bool Json::putItem(const String& key, const Json& value)
 	{
-		return Variant::putItem(key, value);
+		return Variant::putItem_NoLock(key, value);
 	}
 	
 	sl_bool Json::removeItem(const String& key)
 	{
-		return Variant::removeItem(key);
+		return Variant::removeItem_NoLock(key);
 	}
 	
 	void Json::merge(const Json& other)
@@ -852,7 +852,7 @@ namespace slib
 			if (CHashMap<String, Json>* p = CastInstance< CHashMap<String, Json> >(obj._ptr)) {
 				Ref<Referable> objOther(other.getObject());
 				if (CHashMap<String, Json>* pOther = CastInstance< CHashMap<String, Json> >(objOther._ptr)) {
-					p->putAll(*pOther);
+					p->putAll_NoLock(*pOther);
 				}
 				return;
 			}
@@ -861,7 +861,7 @@ namespace slib
 			if (CList<Json>* p = CastInstance< CList<Json> >(obj._ptr)) {
 				Ref<Referable> objOther(other.getObject());
 				if (CList<Json>* pOther = CastInstance< CList<Json> >(objOther._ptr)) {
-					p->addAll(pOther);
+					p->addAll_NoLock(pOther);
 				}
 				return;
 			}
@@ -870,12 +870,12 @@ namespace slib
 	
 	Json Json::operator[](sl_size list_index) const
 	{
-		return (*(static_cast<const Variant*>(this)))[list_index];
+		return getElement(list_index);
 	}
 	
 	Json Json::operator[](const String& map_key) const
 	{
-		return (*(static_cast<const Variant*>(this)))[map_key];
+		return getItem(map_key);
 	}
 	
 	

@@ -472,15 +472,27 @@ namespace slib
 
 		sl_size getElementsCount() const noexcept;
 
+		Variant getElement_NoLock(sl_size index) const noexcept;
+		
 		Variant getElement(sl_size index) const noexcept;
+	
+		sl_bool setElement_NoLock(sl_size index, const Variant& value) noexcept;
 	
 		sl_bool setElement(sl_size index, const Variant& value) noexcept;
 	
+		sl_bool addElement_NoLock(const Variant& value) noexcept;
+	
 		sl_bool addElement(const Variant& value) noexcept;
 	
+		Variant getItem_NoLock(const String& key) const noexcept;
+	
 		Variant getItem(const String& key) const noexcept;
+
+		sl_bool putItem_NoLock(const String& key, const Variant& value) noexcept;
 	
 		sl_bool putItem(const String& key, const Variant& value) noexcept;
+
+		sl_bool removeItem_NoLock(const String& key) noexcept;
 		
 		sl_bool removeItem(const String& key) noexcept;
 	
