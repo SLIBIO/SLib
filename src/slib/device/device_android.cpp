@@ -81,7 +81,6 @@ namespace slib
 
 			SLIB_JNI_BEGIN_CLASS(JContact, "slib/platform/android/device/Contact")
 				SLIB_JNI_NEW(init, "()V");
-				SLIB_JNI_LONG_FIELD(id);
 				SLIB_JNI_STRING_FIELD(namePrefix);
 				SLIB_JNI_STRING_FIELD(givenName);
 				SLIB_JNI_STRING_FIELD(middleName);
