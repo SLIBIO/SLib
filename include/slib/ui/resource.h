@@ -351,10 +351,10 @@ namespace slib
 	class CameraView;
 	class QRCodeScanner;
 	class Drawer;
-	class ChatView;
 	class RefreshView;
 	class CollectionView;
 	class GridView;
+	class ChatView;
 
 }
 

@@ -34,7 +34,6 @@ namespace slib
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(ChatViewItem)
 	
 	ChatViewItem::ChatViewItem()
-	 : flagMe(sl_false), time(Time::zero())
 	{
 	}
 	
@@ -256,8 +255,8 @@ namespace slib
 					flagMe = item.flagMe;
 					userIcon = item.userIcon;
 					userName = item.userName;
-					time = item.time;
-					message = item.message;
+					time = item.message.time;
+					message = item.message.text;
 					
 					Layout layout(font, flagShowDate, params.chatWidth, params.userIconSize);
 					
@@ -390,7 +389,7 @@ namespace slib
 						view->chatView = chatView;
 						view->font = font;
 						view->params = params;
-						view->flagShowDate = index <= 0 || item.time.getDateOnly() != list[index - 1].time.getDateOnly();
+						view->flagShowDate = index <= 0 || item.message.time.getDateOnly() != list[index - 1].message.time.getDateOnly();
 						view->setData(item);
 					}
 				}
@@ -405,8 +404,8 @@ namespace slib
 					ListLocker<ChatViewItem> list(m_list);
 					if (index < list.count) {
 						ChatViewItem& item = list[index];
-						sl_bool flagShowDate = index <= 0 || item.time.getDateOnly() != list[index - 1].time.getDateOnly();
-						return ChatItemView::measureHeight(font, item.message, flagShowDate, params.chatWidth, params.userIconSize);
+						sl_bool flagShowDate = index <= 0 || item.message.time.getDateOnly() != list[index - 1].message.time.getDateOnly();
+						return ChatItemView::measureHeight(font, item.message.text, flagShowDate, params.chatWidth, params.userIconSize);
 					}
 					return 0;
 				}

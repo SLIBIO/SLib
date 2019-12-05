@@ -27,6 +27,8 @@
 
 #include "list_view.h"
 
+#include "../service/chat.h"
+
 namespace slib
 {
 	
@@ -37,8 +39,7 @@ namespace slib
 		Ref<Drawable> userIcon;
 		String userName;
 		sl_bool flagMe;
-		String message;
-		Time time;
+		ChatMessage message;
 	
 	public:
 		ChatViewItem();

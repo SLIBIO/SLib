@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -20,17 +20,64 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_SERVICE_HEADER
-#define CHECKHEADER_SLIB_SERVICE_HEADER
+#ifndef CHECKHEADER_SLIB_SERVICE_CHAT_CLIENT
+#define CHECKHEADER_SLIB_SERVICE_CHAT_CLIENT
 
-#include "service/web.h"
-#include "service/ginger.h"
+#include "definition.h"
 
-#include "service/push_notification.h"
-#include "service/fcm.h"
-#include "service/xgpush.h"
+#include "chat.h"
 
-#include "service/chat.h"
-#include "service/chat_client.h"
+namespace slib
+{
+
+	class ListView;
+	class ChatView;
+
+	class SLIB_EXPORT ChatClientParam
+	{
+	public:
+		String myId;
+		Ref<ListView> roomsView;
+		Ref<ChatView> chatView;
+		Ref<ChatClientDatabase> database;
+		Ref<ChatClientService> service;
+		
+	};
+
+	class SLIB_EXPORT ChatClient : public Object
+	{
+		SLIB_DECLARE_OBJECT
+		
+	protected:
+		ChatClient();
+		
+		~ChatClient();
+
+	public:
+		static Ref<ChatClient> create(const ChatClientParam& param);
+		
+	public:
+		void selectRoom(const String& roomId);
+		
+		void sendMessage(const String& receiverId, const String& message);
+		
+	public:
+		void dispatchReceiveMessage(const String& roomId, ChatMessage& message);
+		
+	protected:
+		sl_bool initialize(const ChatClientParam& param);
+		
+	protected:
+		String m_myId;
+		Ref<ListView> m_roomsView;
+		Ref<ChatView> m_chatView;
+		Ref<ChatClientDatabase> m_database;
+		Ref<ChatClientService> m_service;
+		
+		String m_currentRoomId;
+		
+	};
+
+}
 
 #endif

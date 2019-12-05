@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -20,17 +20,53 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_SERVICE_HEADER
-#define CHECKHEADER_SLIB_SERVICE_HEADER
+#include "slib/service/chat_client.h"
 
-#include "service/web.h"
-#include "service/ginger.h"
+#include "slib/ui/chat_view.h"
 
-#include "service/push_notification.h"
-#include "service/fcm.h"
-#include "service/xgpush.h"
+namespace slib
+{
+	
+	SLIB_DEFINE_OBJECT(ChatClient, Object)
 
-#include "service/chat.h"
-#include "service/chat_client.h"
+	ChatClient::ChatClient()
+	{
+	}
 
-#endif
+	ChatClient::~ChatClient()
+	{
+	}
+
+	Ref<ChatClient> ChatClient::create(const ChatClientParam& param)
+	{
+		if (param.myId.isEmpty() || param.chatView.isNull() || param.database.isNull()) {
+			return sl_null;
+		}
+		Ref<ChatClient> ret = new ChatClient;
+		if (ret->initialize(param)) {
+			return ret;
+		}
+		return sl_null;
+	}
+
+	sl_bool ChatClient::initialize(const ChatClientParam& param)
+	{
+		m_myId = param.myId;
+		m_roomsView = param.roomsView;
+		m_chatView = param.chatView;
+		m_database = param.database;
+		m_service = param.service;
+		return sl_true;
+	}
+
+	void ChatClient::sendMessage(const String& receiverId, const String& message)
+	{
+		
+	}
+
+	void ChatClient::dispatchReceiveMessage(const String& roomId, ChatMessage& message)
+	{
+		
+	}
+
+}

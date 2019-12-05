@@ -4708,13 +4708,13 @@ namespace slib
 						item.userName = "Customer";
 						item.userIcon = iconCustomer;
 						item.flagMe = sl_false;
-						item.message = String::format("Chat Message %d", i);
+						item.message.text = String::format("Chat Message %d", i);
 					} else {
 						item.userIcon = iconMe;
 						item.flagMe = sl_true;
-						item.message = String::format("Welcome to this message %d. This is the test message for multi-line wrapping.", i);
+						item.message.text = String::format("Welcome to this message %d. This is the test message for multi-line wrapping.", i);
 					}
-					item.time = Time::now() - Time::withMinutes((1000 - i) * 30);
+					item.message.time = Time::now() - Time::withMinutes((1000 - i) * 30);
 					items.add_NoLock(item);
 				}
 				view->setItems(items);
