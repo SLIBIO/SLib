@@ -58,7 +58,9 @@ namespace slib
 		static Ref<SQLiteDatabase> connect(const String& filePath);
 
 	public:
-		sl_bool isTableExisting(const String& name);
+		virtual sl_bool isTableExisting(const String& name) = 0;
+		
+		virtual sl_uint64 getLastInsertRowId() = 0;
 		
 	};
 

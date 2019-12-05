@@ -726,6 +726,17 @@ namespace slib
 					}
 					return error;
 				}
+				
+				sl_bool isTableExisting(const String& name) override
+				{
+					return getValueForQueryResult("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='" + name + "';").getUint32() > 0;
+				}
+				
+				sl_uint64 getLastInsertRowId() override
+				{
+					return (sl_uint64)(sqlite3_last_insert_rowid(m_db));
+				}
+				
 			};
 
 		}
@@ -759,11 +770,6 @@ namespace slib
 		SQLiteParam param;
 		param.path = path;
 		return priv::sqlite::DatabaseImpl::connect(param);
-	}
-
-	sl_bool SQLiteDatabase::isTableExisting(const String& name)
-	{
-		return getValueForQueryResult("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='" + name + "';").getUint32() > 0;
 	}
 
 }
