@@ -1408,6 +1408,7 @@
 		26E1B8A9222ABAB2007C222E /* jquant2.c in Sources */ = {isa = PBXBuildFile; fileRef = 2605069C20CFB01400032B2C /* jquant2.c */; };
 		26E1B8AA222ABAB2007C222E /* jutils.c in Sources */ = {isa = PBXBuildFile; fileRef = 260506A720CFB01400032B2C /* jutils.c */; };
 		26E44AE92321832000A88D93 /* collection_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2650D3912320694C00B0CF2C /* collection_view.cpp */; };
+		26EA2061239A90E2008218D7 /* ui_notification_fcm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26EA2060239A90E2008218D7 /* ui_notification_fcm.cpp */; };
 		26F2F8D91EC2E0EB0074C29E /* red_black_tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F2F8D81EC2E0EB0074C29E /* red_black_tree.cpp */; };
 		26F53F7E22DB4F6D0031D485 /* date_picker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F53F7C22DB4F6C0031D485 /* date_picker.cpp */; };
 		26F53F7F22DB4F6D0031D485 /* date_picker_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26F53F7D22DB4F6D0031D485 /* date_picker_macos.mm */; };
@@ -2901,6 +2902,7 @@
 		26E376DE1C98739200B178E6 /* matrix3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix3.cpp; sourceTree = "<group>"; };
 		26E376E01C987F6200B178E6 /* matrix4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix4.cpp; sourceTree = "<group>"; };
 		26E63F441E337B2300F50E8A /* ui_animation_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_animation_apple.mm; sourceTree = "<group>"; };
+		26EA2060239A90E2008218D7 /* ui_notification_fcm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_notification_fcm.cpp; sourceTree = "<group>"; };
 		26F2F8D81EC2E0EB0074C29E /* red_black_tree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = red_black_tree.cpp; sourceTree = "<group>"; };
 		26F53F7C22DB4F6C0031D485 /* date_picker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = date_picker.cpp; sourceTree = "<group>"; };
 		26F53F7D22DB4F6D0031D485 /* date_picker_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = date_picker_macos.mm; sourceTree = "<group>"; };
@@ -4912,6 +4914,7 @@
 				264A5D7D1CB6C9C800FB0B08 /* ui_menu_macos.mm */,
 				26539FAF2374BA310064340D /* ui_notification.cpp */,
 				26F5C77D237EEDFC009F3EEF /* ui_notification_apple.mm */,
+				26EA2060239A90E2008218D7 /* ui_notification_fcm.cpp */,
 				26539FAC2374BA2A0064340D /* ui_notification_xgpush.cpp */,
 				26635CA222670708005E4BA6 /* ui_photo.cpp */,
 				2648D57F1D0999F700819E09 /* ui_platform.cpp */,
@@ -7173,6 +7176,7 @@
 				26D9D9BC1E96468D005F7BD3 /* cursor_macos.mm in Sources */,
 				26D9D9DB1E96468D005F7BD3 /* tree_view.cpp in Sources */,
 				26D9D9261E9645CE005F7BD3 /* file.cpp in Sources */,
+				26EA2061239A90E2008218D7 /* ui_notification_fcm.cpp in Sources */,
 				26E1B890222ABAB2007C222E /* jdarith.c in Sources */,
 				26D9D9DA1E96468D005F7BD3 /* transition.cpp in Sources */,
 				26E1B862222A8250007C222E /* gzlib.c in Sources */,

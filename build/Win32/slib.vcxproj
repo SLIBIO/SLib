@@ -338,6 +338,10 @@
     <ClCompile Include="..\..\src\slib\render\render_resource.cpp" />
     <ClCompile Include="..\..\src\slib\render\texture.cpp" />
     <ClCompile Include="..\..\src\slib\render\vertex_buffer.cpp" />
+    <ClCompile Include="..\..\src\slib\service\chat.cpp" />
+    <ClCompile Include="..\..\src\slib\service\chat_client.cpp" />
+    <ClCompile Include="..\..\src\slib\service\chat_sqlite.cpp" />
+    <ClCompile Include="..\..\src\slib\service\fcm_service.cpp" />
     <ClCompile Include="..\..\src\slib\service\ginger.cpp" />
     <ClCompile Include="..\..\src\slib\service\push_notification.cpp" />
     <ClCompile Include="..\..\src\slib\service\web_service.cpp" />
@@ -437,6 +441,7 @@
     <ClCompile Include="..\..\src\slib\ui\ui_menu.cpp" />
     <ClCompile Include="..\..\src\slib\ui\ui_menu_win32.cpp" />
     <ClCompile Include="..\..\src\slib\ui\ui_notification.cpp" />
+    <ClCompile Include="..\..\src\slib\ui\ui_notification_fcm.cpp" />
     <ClCompile Include="..\..\src\slib\ui\ui_notification_xgpush.cpp" />
     <ClCompile Include="..\..\src\slib\ui\ui_photo.cpp" />
     <ClCompile Include="..\..\src\slib\ui\ui_platform.cpp" />

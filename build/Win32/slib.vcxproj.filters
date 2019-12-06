@@ -1172,9 +1172,6 @@
     <ClCompile Include="..\..\src\slib\media\media_player_ffmpeg.cpp">
       <Filter>src\media</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\slib\ui\chat_view.cpp">
-      <Filter>src\ui</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\slib\social\paypal.cpp">
       <Filter>src\social</Filter>
     </ClCompile>
@@ -1338,6 +1335,24 @@
       <Filter>src\ui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\slib\ui\system_tray_icon_win32.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\service\chat.cpp">
+      <Filter>src\service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\ui\chat_view.cpp">
+      <Filter>src\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\service\chat_client.cpp">
+      <Filter>src\service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\service\chat_sqlite.cpp">
+      <Filter>src\service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\service\fcm_service.cpp">
+      <Filter>src\service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\ui\ui_notification_fcm.cpp">
       <Filter>src\ui</Filter>
     </ClCompile>
   </ItemGroup>

@@ -173,7 +173,7 @@ namespace slib
 				List<ChatMessage> getMessages(const String& roomId, sl_bool flagFrom, sl_uint64 base, sl_uint32 countLimit)
 				{
 					if (roomId.isEmpty()) {
-						return sl_false;
+						return sl_null;
 					}
 					String tableName = getRoomTableName(roomId);
 					ObjectLocker lock(this);
