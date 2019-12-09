@@ -27,7 +27,6 @@
 
 #include "../core/object.h"
 #include "../core/string.h"
-#include "../core/string_param.h"
 #include "../math/size.h"
 
 #define SLIB_FONT_SIZE_PRECISION_MULTIPLIER 10

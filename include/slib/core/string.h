@@ -43,6 +43,8 @@
 #include "string8.h"
 #include "string16.h"
 
+#include "string_param.h"
+
 namespace slib
 {
 

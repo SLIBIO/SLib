@@ -23,7 +23,8 @@
 #ifndef CHECKHEADER_SLIB_CORE_STRING_PARAM
 #define CHECKHEADER_SLIB_CORE_STRING_PARAM
 
-#include "string.h"
+#include "string8.h"
+#include "string16.h"
 
 #ifdef SLIB_SUPPORT_STD_TYPES
 #include <string>
@@ -158,9 +159,9 @@ namespace slib
 		
 		String16 getString16() const noexcept;
 		
-		const sl_char8* getSz8(const sl_char8* def = sl_null) const noexcept;
+		sl_char8* getSz8(const sl_char8* def = sl_null) const noexcept;
 		
-		const sl_char16* getSz16(const sl_char16* def = sl_null) const noexcept;
+		sl_char16* getSz16(const sl_char16* def = sl_null) const noexcept;
 		
 		void setString(const String& value) noexcept;
 		
@@ -193,6 +194,8 @@ namespace slib
 	public:
 		static void _free(StringType type, sl_size value) noexcept;
 		
+		friend class StringParamData;
+		friend class StringParamData16;
 	};
 	
 	sl_bool operator==(const StringParam& v1, const StringParam& v2) noexcept;
@@ -219,6 +222,32 @@ namespace slib
 	{
 	public:
 		sl_size operator()(const StringParam &a) const noexcept;
+	};
+
+	class SLIB_EXPORT StringParamData
+	{
+	public:
+		sl_char8* data;
+		String string;
+		
+	public:
+		StringParamData(const StringParam& param) noexcept;
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(StringParamData)
+		
+	};
+
+	class SLIB_EXPORT StringParamData16
+	{
+	public:
+		sl_char16* data;
+		String16 string;
+		
+	public:
+		StringParamData16(const StringParam& param) noexcept;
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(StringParamData16)
+		
 	};
 	
 }

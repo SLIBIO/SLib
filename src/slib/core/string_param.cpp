@@ -22,7 +22,7 @@
 
 #define SLIB_SUPPORT_STD_TYPES
 
-#include "slib/core/string_param.h"
+#include "slib/core/string.h"
 
 #define PTR_VAR(TYPE, x) ((TYPE*)((void*)(&(x))))
 #define REF_VAR(TYPE, x) (*PTR_VAR(TYPE, x))
@@ -601,30 +601,30 @@ namespace slib
 		return getString16(String16::null());
 	}
 
-	const sl_char8* StringParam::getSz8(const sl_char8* def) const noexcept
+	sl_char8* StringParam::getSz8(const sl_char8* def) const noexcept
 	{
 		switch (_type) {
 			case StringType::String8:
 				return REF_VAR(String const, _value).getData();
 			case StringType::Sz8:
-				return REF_VAR(sl_char8 const* const, _value);
+				return REF_VAR(sl_char8* const, _value);
 			default:
 				break;
 		}
-		return def;
+		return (sl_char8*)def;
 	}
 
-	const sl_char16* StringParam::getSz16(const sl_char16* def) const noexcept
+	sl_char16* StringParam::getSz16(const sl_char16* def) const noexcept
 	{
 		switch (_type) {
 			case StringType::String16:
 				return REF_VAR(String16 const, _value).getData();
 			case StringType::Sz16:
-				return REF_VAR(sl_char16 const* const, _value);
+				return REF_VAR(sl_char16* const, _value);
 			default:
 				break;
 		}
-		return def;
+		return (sl_char16*)def;
 	}
 
 	void StringParam::setString(const String& value) noexcept
@@ -821,6 +821,57 @@ namespace slib
 	sl_size Hash<StringParam>::operator()(const StringParam& a) const noexcept
 	{
 		return a.getHashCode();
+	}
+
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(StringParamData)
+
+	StringParamData::StringParamData(const StringParam& param) noexcept
+	{
+		switch (param._type) {
+			case StringType::String8:
+				data = REF_VAR(String const, param._value).getData();
+				break;
+			case StringType::Sz8:
+				data = REF_VAR(sl_char8* const, param._value);
+				break;
+			case StringType::String16:
+				string = REF_VAR(String16 const, param._value);
+				data = string.getData();
+				break;
+			case StringType::Sz16:
+				string = REF_VAR(sl_char16* const, param._value);
+				data = string.getData();
+				break;
+			default:
+				data = sl_null;
+				break;
+		}
+	}
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(StringParamData16)
+
+	StringParamData16::StringParamData16(const StringParam& param) noexcept
+	{
+		switch (param._type) {
+			case StringType::String8:
+				string = REF_VAR(String const, param._value);
+				data = string.getData();
+				break;
+			case StringType::Sz8:
+				string = REF_VAR(sl_char8* const, param._value);
+				data = string.getData();
+				break;
+			case StringType::String16:
+				data = REF_VAR(String16 const, param._value).getData();
+				break;
+			case StringType::Sz16:
+				data = REF_VAR(sl_char16* const, param._value);
+				break;
+			default:
+				data = sl_null;
+				break;
+		}
 	}
 
 }

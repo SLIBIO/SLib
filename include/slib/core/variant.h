@@ -28,7 +28,6 @@
 #include "ref.h"
 #include "time.h"
 #include "string.h"
-#include "string_param.h"
 #include "nullable.h"
 #include "list.h"
 #include "map.h"
