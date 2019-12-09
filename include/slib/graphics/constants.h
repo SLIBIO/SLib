@@ -67,7 +67,7 @@ namespace slib
 		Alternate = 1
 	};
 
-	class Alignment
+	class SLIB_EXPORT Alignment
 	{
 	public:
 		int value;
