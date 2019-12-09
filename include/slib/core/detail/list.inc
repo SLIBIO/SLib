@@ -3470,6 +3470,14 @@ namespace slib
 
 
 	template <class T>
+	SLIB_INLINE ListLocker<T>::ListLocker(List<T>&& _list) noexcept
+	 : ObjectLocker(_list.ref._ptr), list(Move(_list))
+	{
+		data = _list.getData();
+		count = _list.getCount();
+	}
+
+	template <class T>
 	SLIB_INLINE ListLocker<T>::ListLocker(const List<T>& _list) noexcept
 	 : ObjectLocker(_list.ref._ptr), list(_list)
 	{
@@ -3478,11 +3486,19 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE ListLocker<T>::ListLocker(const CList<T>& list) noexcept
-	 : ObjectLocker(&list)
+	SLIB_INLINE ListLocker<T>::ListLocker(const CList<T>& _list) noexcept
+	 : ObjectLocker(&_list)
 	{
-		data = list.getData();
-		count = list.getCount();
+		data = _list.getData();
+		count = _list.getCount();
+	}
+
+	template <class T>
+	SLIB_INLINE ListLocker<T>::ListLocker(const ListParam<T>& _list) noexcept
+	 : ObjectLocker(_list.getObject()), list(_list._getList())
+	{
+		data = _list.getData();
+		count = _list.getCount();
 	}
 
 	template <class T>
@@ -3492,21 +3508,29 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE T& ListLocker<T>::operator[](sl_reg index) noexcept
+	SLIB_INLINE T& ListLocker<T>::operator[](sl_reg index) const noexcept
 	{
 		return data[index];
 	}
 
 	template <class T>
-	SLIB_INLINE T* ListLocker<T>::begin() noexcept
+	SLIB_INLINE T* ListLocker<T>::begin() const noexcept
 	{
 		return data;
 	}
 
 	template <class T>
-	SLIB_INLINE T* ListLocker<T>::end() noexcept
+	SLIB_INLINE T* ListLocker<T>::end() const noexcept
 	{
 		return data + count;
+	}
+
+	template <class T>
+	SLIB_INLINE ListElements<T>::ListElements(List<T>&& _list) noexcept
+	 : list(Move(_list))
+	{
+		data = _list.getData();
+		count = _list.getCount();
 	}
 
 	template <class T>
@@ -3518,28 +3542,324 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE ListElements<T>::ListElements(const CList<T>& list) noexcept
+	SLIB_INLINE ListElements<T>::ListElements(const CList<T>& _list) noexcept
 	{
-		data = list.getData();
-		count = list.getCount();
+		data = _list.getData();
+		count = _list.getCount();
 	}
 
 	template <class T>
-	SLIB_INLINE T& ListElements<T>::operator[](sl_reg index) noexcept
+	SLIB_INLINE ListElements<T>::ListElements(const ListParam<T>& _list) noexcept
+	 : list(_list._getList())
+	{
+		data = _list.getData();
+		count = _list.getCount();
+	}
+
+	template <class T>
+	SLIB_INLINE T& ListElements<T>::operator[](sl_reg index) const noexcept
 	{
 		return data[index];
 	}
 
 	template <class T>
-	SLIB_INLINE T* ListElements<T>::begin() noexcept
+	SLIB_INLINE T* ListElements<T>::begin() const noexcept
 	{
 		return data;
 	}
 
 	template <class T>
-	SLIB_INLINE T* ListElements<T>::end() noexcept
+	SLIB_INLINE T* ListElements<T>::end() const noexcept
 	{
 		return data + count;
+	}
+
+
+	template <class T>
+	SLIB_INLINE ListParam<T>::ListParam() noexcept: m_data(0), m_count(0)
+	{		
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>::ListParam(sl_null_t) noexcept: m_data(0), m_count(0)
+	{
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>::ListParam(ListParam<T>&& other) noexcept
+	{
+		m_data = other.m_data;
+		m_count = other.m_count;
+		other.m_data = sl_null;
+		other.m_count = 0;
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>::ListParam(const ListParam<T>& other) noexcept
+	{
+		m_count = other.m_count;
+		if (m_count == TYPE_LIST) {
+			new (reinterpret_cast<List<T>*>(&m_data)) List<T>(*(reinterpret_cast<const List<T>*>(&(other.m_data))));
+		} else {
+			m_data = other.m_data;
+		}
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>::ListParam(List<T>&& _list) noexcept
+	{
+		m_count = TYPE_LIST;
+		new (reinterpret_cast<List<T>*>(&m_data)) List<T>(Move(_list));
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>::ListParam(const List<T>& _list) noexcept
+	{
+		m_count = TYPE_LIST;
+		new (reinterpret_cast<List<T>*>(&m_data)) List<T>(_list);
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>::ListParam(const CList<T>& _list) noexcept
+	{
+		m_count = TYPE_OBJECT;
+		m_data = (void*)(&_list);
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>::ListParam(const T* _data, sl_size _count) noexcept
+	{
+		if (_data && _count) {
+			m_count = _count & SLIB_SIZE_MASK_NO_SIGN_BITS;
+			m_data = (void*)_data;
+		} else {
+			m_count = 0;
+			m_data = sl_null;
+		}
+	}
+
+	template <class T>
+	template <sl_size N>
+	SLIB_INLINE ListParam<T>::ListParam(T(&_data)[N]) noexcept
+	{
+		m_count = N & SLIB_SIZE_MASK_NO_SIGN_BITS;
+		m_data = (void*)_data;
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>::ListParam(const ListLocker<T>& _list) noexcept
+	{
+		m_count = _list.count & SLIB_SIZE_MASK_NO_SIGN_BITS;
+		m_data = (void*)(_list.data);
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>::ListParam(const ListElements<T>& _list) noexcept
+	{
+		m_count = _list.count & SLIB_SIZE_MASK_NO_SIGN_BITS;
+		m_data = (void*)(_list.data);
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>::~ListParam()
+	{
+		_free();
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(sl_null_t) noexcept
+	{
+		_free();
+		m_data = sl_null;
+		m_count = 0;
+		return *this;
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(ListParam<T>&& other) noexcept
+	{
+		m_data = other.m_data;
+		m_count = other.m_count;
+		other.m_data = sl_null;
+		other.m_count = 0;
+		return *this;
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(const ListParam<T>& other) noexcept
+	{
+		_free();
+		m_count = other.m_count;
+		if (m_count == TYPE_LIST) {
+			new (reinterpret_cast<List<T>*>(&m_data)) List<T>(*(reinterpret_cast<const List<T>*>(&(other.m_data))));
+		} else {
+			m_data = other.m_data;
+		}
+		return *this;
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(List<T>&& _list) noexcept
+	{
+		_free();
+		m_count = TYPE_LIST;
+		new (reinterpret_cast<List<T>*>(&m_data)) List<T>(Move(_list));
+		return *this;
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(const List<T>& _list) noexcept
+	{
+		_free();
+		m_count = TYPE_LIST;
+		new (reinterpret_cast<List<T>*>(&m_data)) List<T>(_list);
+		return *this;
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(const CList<T>& _list) noexcept
+	{
+		_free();
+		m_count = TYPE_OBJECT;
+		m_data = (void*)(&_list);
+		return *this;
+	}
+
+	template <class T>
+	template <sl_size N>
+	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(T(&_data)[N]) noexcept
+	{
+		_free();
+		m_count = N & SLIB_SIZE_MASK_NO_SIGN_BITS;
+		m_data = (void*)_data;
+		return *this;
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(const ListLocker<T>& _list) noexcept
+	{
+		_free();
+		m_count = _list.count & SLIB_SIZE_MASK_NO_SIGN_BITS;
+		m_data = (void*)(_list.data);
+		return *this;
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(const ListElements<T>& _list) noexcept
+	{
+		_free();
+		m_count = _list.count & SLIB_SIZE_MASK_NO_SIGN_BITS;
+		m_data = (void*)(_list.data);
+		return *this;
+	}
+
+	template <class T>
+	SLIB_INLINE T& ListParam<T>::operator[](sl_reg index) const noexcept
+	{
+		return (getData())[index];
+	}
+
+	template <class T>
+	SLIB_INLINE void ListParam<T>::setNull() noexcept
+	{
+		_free();
+		m_data = sl_null;
+		m_count = 0;
+	}
+
+	template <class T>
+	SLIB_INLINE sl_size ListParam<T>::getCount() const noexcept
+	{
+		if (m_count == TYPE_LIST) {
+			return (reinterpret_cast<const List<T>*>(&m_data))->getCount();
+		} else if (m_count == TYPE_OBJECT) {
+			return ((CList<T>*)m_data)->getCount();
+		} else {
+			return m_count;
+		}
+	}
+
+	template <class T>
+	SLIB_INLINE T* ListParam<T>::getData() const noexcept
+	{
+		if (m_count == TYPE_LIST) {
+			return (reinterpret_cast<const List<T>*>(&m_data))->getData();
+		} else if (m_count == TYPE_OBJECT) {
+			return ((CList<T>*)m_data)->getData();
+		} else {
+			return (T*)m_data;
+		}
+	}
+
+	template <class T>
+	SLIB_INLINE CList<T>* ListParam<T>::getObject() const noexcept
+	{
+		if (m_count == TYPE_LIST) {
+			return (reinterpret_cast<const List<T>*>(&m_data))->ref._ptr;
+		} else if (m_count == TYPE_OBJECT) {
+			return (CList<T>*)m_data;
+		} else {
+			return sl_null;
+		}
+	}
+
+	template <class T>
+	List<T> ListParam<T>::toList() const noexcept
+	{
+		if (m_count == TYPE_LIST) {
+			return *(reinterpret_cast<const List<T>*>(&m_data));
+		} else if (m_count == TYPE_OBJECT) {
+			return ((CList<T>*)m_data)->duplicate();
+		} else {
+			return List<T>::create((T*)m_data, m_count);
+		}
+	}
+
+	template <class T>
+	template <class... ARGS>
+	sl_bool ListParam<T>::add(ARGS&&... args) noexcept
+	{
+		if (m_count == TYPE_LIST) {
+			return (reinterpret_cast<List<T>*>(&m_data))->add_NoLock(Forward<ARGS>(args)...);
+		} else if (m_count == TYPE_OBJECT) {
+			return ((CList<T>*)m_data)->add_NoLock(Forward<ARGS>(args)...);
+		} else {
+			if (m_count) {
+				return sl_false;
+			}
+			m_count = TYPE_LIST;
+			return (reinterpret_cast<List<T>*>(&m_data))->add_NoLock(Forward<ARGS>(args)...);
+		}
+	}
+
+	template <class T>
+	SLIB_INLINE const List<T>& ListParam<T>::_getList() const noexcept
+	{
+		if (m_count == TYPE_LIST) {
+			return *(reinterpret_cast<const List<T>*>(&m_data));
+		} else {
+			return List<T>::null();
+		}
+	}
+
+	template <class T>
+	SLIB_INLINE void ListParam<T>::_free() noexcept
+	{
+		if (m_count == TYPE_LIST) {
+			(*(reinterpret_cast<List<T>*>(&m_data))).List<T>::~List();
+		}
+	}
+
+	template <class T>
+	SLIB_INLINE T* ListParam<T>::begin() const noexcept
+	{
+		return getData();
+	}
+
+	template <class T>
+	SLIB_INLINE T* ListParam<T>::end() const noexcept
+	{
+		return getData() + getCount();
 	}
 
 }

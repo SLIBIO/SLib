@@ -40,10 +40,14 @@
 
 #ifdef SLIB_ARCH_IS_64BIT
 #define SLIB_SIZE_MAX		SLIB_UINT64_MAX
+#define SLIB_SIZE_TEST_SIGN_BIT SLIB_UINT64(0x8000000000000000)
+#define SLIB_SIZE_MASK_NO_SIGN_BITS SLIB_UINT64(0x7FFFFFFFFFFFFFFF)
 #define SLIB_REG_MAX		SLIB_INT64_MAX
 #define SLIB_REG_MIN		SLIB_INT64_MIN
 #else
 #define SLIB_SIZE_MAX		SLIB_UINT32_MAX
+#define SLIB_SIZE_TEST_SIGN_BIT 0x80000000
+#define SLIB_SIZE_MASK_NO_SIGN_BITS 0x7FFFFFFF
 #define SLIB_REG_MAX		SLIB_INT32_MAX
 #define SLIB_REG_MIN		SLIB_INT32_MIN
 #endif
@@ -138,8 +142,19 @@ public: \
 	SLIB_MEMBERS_OF_PRIMITIVE_WRAPPER(CLASS, int, VALUE) \
 	SLIB_INLINE constexpr CLASS() : VALUE(0) {} \
 	SLIB_INLINE CLASS& operator|=(int _value) { VALUE |= _value; return *this; } \
-	SLIB_INLINE CLASS& operator&=(int _value) { VALUE &= _value; return *this; }
+	SLIB_INLINE CLASS& operator&=(int _value) { VALUE &= _value; return *this; } \
+	SLIB_INLINE static const CLASS& none() { return *((CLASS*)(void*)(&(slib::priv::flags::g_flagsNone))); }
 
+	namespace slib
+	{
+		namespace priv
+		{
+			namespace flags
+			{
+				extern int g_flagsNone;
+			}
+		}
+	}
 
 #define SLIB_PROPERTY(TYPE, NAME) \
 protected: \

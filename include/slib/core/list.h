@@ -868,7 +868,10 @@ namespace slib
 
 	};
 	
-	
+
+	template <class T>
+	class ListParam;
+
 	template <class T>
 	class SLIB_EXPORT ListLocker : public ObjectLocker
 	{
@@ -878,23 +881,27 @@ namespace slib
 		List<T> list;
 
 	public:
+		ListLocker(List<T>&& list) noexcept;
+
 		ListLocker(const List<T>& list) noexcept;
 
 		ListLocker(const CList<T>& list) noexcept;
 
+		ListLocker(const ListParam<T>& list) noexcept;
+
 		~ListLocker() noexcept;
 
 	public:
-		T& operator[](sl_reg index) noexcept;
+		T& operator[](sl_reg index) const noexcept;
 
 		// range-based for loop
-		T* begin() noexcept;
+		T* begin() const noexcept;
 
-		T* end() noexcept;
+		T* end() const noexcept;
 
 	};
 	
-	
+
 	template <class T>
 	class SLIB_EXPORT ListElements
 	{
@@ -904,17 +911,110 @@ namespace slib
 		List<T> list;
 
 	public:
+		ListElements(List<T>&& list) noexcept;
+
 		ListElements(const List<T>& list) noexcept;
 
 		ListElements(const CList<T>& list) noexcept;
 
+		ListElements(const ListParam<T>& list) noexcept;
+
 	public:
-		T& operator[](sl_reg index) noexcept;
+		T& operator[](sl_reg index) const noexcept;
 
 		// range-based for loop
-		T* begin() noexcept;
+		T* begin() const noexcept;
 
-		T* end() noexcept;
+		T* end() const noexcept;
+
+	};
+	
+	template <class T>
+	class SLIB_EXPORT ListParam
+	{
+	private:
+		void* m_data;
+		sl_size m_count;
+
+	public:
+		ListParam() noexcept;
+
+		ListParam(sl_null_t) noexcept;
+
+		ListParam(ListParam&& other) noexcept;
+
+		ListParam(const ListParam& other) noexcept;
+
+		ListParam(List<T>&& list) noexcept;
+
+		ListParam(const List<T>& list) noexcept;
+
+		ListParam(const CList<T>& list) noexcept;
+
+		ListParam(const T* data, sl_size count) noexcept;
+		
+		template <sl_size N>
+		ListParam(T(&)[N]) noexcept;
+
+		ListParam(const ListLocker<T>& list) noexcept;
+
+		ListParam(const ListElements<T>& list) noexcept;
+
+		~ListParam();
+
+	public:
+		ListParam& operator=(sl_null_t) noexcept;
+
+		ListParam& operator=(ListParam&& other) noexcept;
+
+		ListParam& operator=(const ListParam& other) noexcept;
+		
+		ListParam& operator=(List<T>&& list) noexcept;
+
+		ListParam& operator=(const List<T>& list) noexcept;
+
+		ListParam& operator=(const CList<T>& list) noexcept;
+
+		template <sl_size N>
+		ListParam& operator=(T(&)[N]) noexcept;
+		
+		ListParam& operator=(const ListLocker<T>& list) noexcept;
+
+		ListParam& operator=(const ListElements<T>& list) noexcept;
+
+		T& operator[](sl_reg index) const noexcept;
+
+	public:
+		void setNull() noexcept;
+
+		sl_size getCount() const noexcept;
+
+		T* getData() const noexcept;
+
+		CList<T>* getObject() const noexcept;
+
+		List<T> toList() const noexcept;
+
+		template <class... ARGS>
+		sl_bool add(ARGS&&... args) noexcept;
+
+		// range-based for loop
+		T* begin() const noexcept;
+
+		T* end() const noexcept;
+
+	private:
+		const List<T>& _getList() const noexcept;
+
+		void _free() noexcept;
+
+		enum TYPE : sl_size {
+			TYPE_LIST = (sl_size)-1,
+			TYPE_OBJECT = (sl_size)-2
+		};
+
+		friend class ListLocker<T>;
+		friend class ListElements<T>;
 
 	};
 	
