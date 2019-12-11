@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="io.slib.example.wechat">
+          package="com.joycore.schuker">
 
     <application
         android:label="@string/app_name"
@@ -9,6 +9,7 @@
         android:theme="@style/AppTheme"
         android:allowBackup="true"
         android:supportsRtl="true">
+
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTask"
@@ -20,6 +21,14 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.joycore.schuker.wxapi.WXEntryActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            />
+
     </application>
 
 </manifest>

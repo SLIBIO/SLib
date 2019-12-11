@@ -21,6 +21,7 @@ dependencies {
     compileOnly project(':slib_call')
     compileOnly project(':slib_facebook')
     compileOnly project(':slib_xgpush')
+    compileOnly project(':slib_wechat')
 }
 
 tasks.all { task ->

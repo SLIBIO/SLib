@@ -1355,5 +1355,11 @@
     <ClCompile Include="..\..\src\slib\ui\ui_notification_fcm.cpp">
       <Filter>src\ui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\wechat.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\wechat_sdk.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

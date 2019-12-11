@@ -13,7 +13,6 @@ set (SOURCE_FILES
 	"${CMAKE_CURRENT_LIST_DIR}/../../src/gen/strings.cpp"
 
 	"${CMAKE_CURRENT_LIST_DIR}/../../src/cpp/app.cpp"
-	"${CMAKE_CURRENT_LIST_DIR}/../../src/cpp/LaunchScreen.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/../../src/cpp/MainPage.cpp"
 )
 

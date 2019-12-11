@@ -1,0 +1,33 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion rootProject.ext.SDK_VERSION
+    
+    defaultConfig {
+        minSdkVersion rootProject.ext.MIN_SDK_VERSION
+        targetSdkVersion rootProject.ext.SDK_VERSION
+        versionCode rootProject.ext.VERSION_CODE
+        versionName rootProject.ext.VERSION_NAME
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    sourceSets {
+        main.java.srcDirs += '../../../java/android_wechat'
+        main.manifest.srcFile 'src/main/AndroidManifest.xml'
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation project(':slib')
+
+    compileOnly 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:5.5.8'
+}
+
+rootProject.ext.setLibraryOutput(this, "slib_wechat", "slib_wechat")

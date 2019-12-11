@@ -322,6 +322,8 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/social/pinterest.cpp"
  "${SLIB_PATH}/src/slib/social/pinterest_ui.cpp"
  "${SLIB_PATH}/src/slib/social/twitter.cpp"
+ "${SLIB_PATH}/src/slib/social/wechat.cpp"
+ "${SLIB_PATH}/src/slib/social/wechat_sdk.cpp"
 
  "${SLIB_PATH}/src/slib/ui/button.cpp"
  "${SLIB_PATH}/src/slib/ui/camera_view.cpp"
@@ -417,6 +419,7 @@ if(ANDROID)
 
   "${SLIB_PATH}/src/slib/social/facebook_android.cpp"
   "${SLIB_PATH}/src/slib/social/instagram_android.cpp"
+  "${SLIB_PATH}/src/slib/social/wechat_android.cpp"
 
   "${SLIB_PATH}/src/slib/ui/clipboard_android.cpp"
   "${SLIB_PATH}/src/slib/ui/common_dialogs_android.cpp"

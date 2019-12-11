@@ -1,4 +1,4 @@
-package io.slib.example.wechat;
+package com.joycore.schuker;
 
 import android.os.Bundle;
 

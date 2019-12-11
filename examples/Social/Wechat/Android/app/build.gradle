@@ -11,7 +11,7 @@ project.afterEvaluate {
 android {
     compileSdkVersion 29
     defaultConfig {
-        applicationId "io.slib.example.wechat"
+        applicationId "com.joycore.schuker"
         minSdkVersion 16
         targetSdkVersion 29
         versionCode 1
@@ -47,4 +47,6 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation ':slib@aar'
+    implementation ':slib_wechat@aar'
+    implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:5.5.8'
 }
