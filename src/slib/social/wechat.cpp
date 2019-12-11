@@ -82,7 +82,7 @@ namespace slib
 		accessTokenMethod = HttpMethod::GET;
 		defaultScopes.add_NoLock("snsapi_login");
 		flagSupportImplicitGrantType = sl_false;
-		clientIdFieldName = "app_id";
+		clientIdFieldName = "appid";
 		clientSecretFieldName = "secret";
 	}
 
@@ -161,16 +161,31 @@ namespace slib
 		return g_instance;
 	}
 
+	String WeChat::getOpenId()
+	{
+		return m_currentOpenId;
+	}
+
+	void WeChat::authorizeRequest(UrlRequestParam& param, const OAuthAccessToken& token)
+	{
+		param.parameters.put_NoLock("access_token", token.token);
+	}
+	
 	String WeChat::getRequestUrl(const String& path)
 	{
 		return "https://api.weixin.qq.com/" + path;
 	}
 	
-	void WeChat::getUser(const Function<void(WeChatResult&, WeChatUser&)>& onComplete)
+	void WeChat::getUser(const String& openId, const Function<void(WeChatResult&, WeChatUser&)>& onComplete)
 	{
 		UrlRequestParam rp;
 		SLIB_STATIC_STRING(pathUserInfo, "sns/userinfo")
 		rp.url = getRequestUrl(pathUserInfo);
+		if (openId.isNotEmpty()) {
+			rp.parameters.put_NoLock("openid", openId);
+		} else {
+			rp.parameters.put_NoLock("openid", m_currentOpenId);
+		}
 		rp.onComplete = [onComplete](UrlRequest* request) {
 			WeChatResult result(request);
 			WeChatUser user;
@@ -182,6 +197,16 @@ namespace slib
 		};
 		authorizeRequest(rp);
 		UrlRequest::send(rp);
+	}
+
+	void WeChat::getUser(const Function<void(WeChatResult&, WeChatUser&)>& onComplete)
+	{
+		getUser(String::null(), onComplete);
+	}
+
+	void WeChat::onCompleteRequestAccessToken(OAuthAccessTokenResult& result)
+	{
+		m_currentOpenId = result.response["openid"].getString();
 	}
 
 }

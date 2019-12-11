@@ -586,6 +586,8 @@ namespace slib
 		
 		void restore();
 		
+		virtual void onCompleteRequestAccessToken(OAuthAccessTokenResult& result);
+		
 	public:
 		String m_clientId;
 		String m_clientSecret;

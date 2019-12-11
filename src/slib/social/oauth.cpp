@@ -801,6 +801,7 @@ namespace slib
 			}
 			if (result.flagSuccess) {
 				thiz->setAccessToken(result.accessToken);
+				thiz->onCompleteRequestAccessToken(result);
 			}
 			onComplete(result);
 		};
@@ -963,6 +964,10 @@ namespace slib
 			FromJson(value, accessToken);
 			m_accessToken = MakeShared<OAuthAccessToken>(accessToken);
 		}
+	}
+
+	void OAuth2::onCompleteRequestAccessToken(OAuthAccessTokenResult& result)
+	{
 	}
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(OAuthApiResult)

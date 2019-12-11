@@ -150,10 +150,23 @@ namespace slib
 		static Ref<WeChat> getInstance();
 
 	public:
+		String getOpenId();
+		
+		void authorizeRequest(UrlRequestParam& param, const OAuthAccessToken& token) override;
+		using OAuth2::authorizeRequest;
+
 		String getRequestUrl(const String& path);
+		
+		void getUser(const String& openId, const Function<void(WeChatResult&, WeChatUser&)>& onComplete);
 		
 		void getUser(const Function<void(WeChatResult&, WeChatUser&)>& onComplete);
 
+	protected:
+		void onCompleteRequestAccessToken(OAuthAccessTokenResult& result) override;
+		
+	protected:
+		String m_currentOpenId;
+		
 	};
 
 	class SLIB_EXPORT WeChatSDK

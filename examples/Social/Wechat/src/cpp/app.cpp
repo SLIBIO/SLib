@@ -21,5 +21,4 @@ void ExampleWechatApp::onStart()
 	WeChatSDK::initialize(WECHAT_APP_ID, WECHAT_UNIVERSAL_LINK);
 	
 	WeChat::initialize(WECHAT_APP_ID, WECHAT_APP_SECRET, WECHAT_UNIVERSAL_LINK);
-	Log("Wechat", "%s", WeChat::getInstance()->getLoginUrl());
 }
