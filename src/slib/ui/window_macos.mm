@@ -433,6 +433,9 @@ namespace slib
 						sl_bool f2 = flag ? sl_true : sl_false;
 						if (f1 != f2) {
 							[window zoom:nil];
+							UI::dispatchToUiThread([window]() {
+								[window invalidateShadow];
+							}, 100);
 						}
 					}
 				}
