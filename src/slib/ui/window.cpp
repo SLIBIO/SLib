@@ -133,6 +133,7 @@ namespace slib
 		m_frame.bottom = 400;
 		
 		m_backgroundColor = Color::zero();
+		m_flagDefaultBackgroundColor = sl_true;
 		
 		m_alpha = 1.0;
 		
@@ -572,9 +573,11 @@ namespace slib
 		Ref<WindowInstance> instance = m_instance;
 		if (instance.isNotNull()) {
 			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setBackgroundColor, color)
+			m_flagDefaultBackgroundColor = sl_false;
 			m_backgroundColor = color;
 			instance->setBackgroundColor(color);
 		} else {
+			m_flagDefaultBackgroundColor = sl_false;
 			m_backgroundColor = color;
 		}
 	}
@@ -1264,7 +1267,9 @@ namespace slib
 				window->setKeepWindow(sl_true);
 			}
 			
-			window->setBackgroundColor(m_backgroundColor);
+			if (!m_flagDefaultBackgroundColor) {
+				window->setBackgroundColor(m_backgroundColor);
+			}
 			
 			window->setCloseButtonEnabled(m_flagCloseButtonEnabled);
 			window->setMinimizeButtonEnabled(m_flagMinimizeButtonEnabled);

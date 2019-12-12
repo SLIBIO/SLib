@@ -458,6 +458,7 @@ namespace slib
 		UIRect m_frame;
 		AtomicString m_title;
 		Color m_backgroundColor;
+		sl_bool m_flagDefaultBackgroundColor;
 		
 		sl_real m_alpha;
 		UISize m_clientSizeRequested;

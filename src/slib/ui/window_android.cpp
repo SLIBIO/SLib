@@ -243,15 +243,12 @@ namespace slib
 				{
 				}
 
-				void setBackgroundColor(const Color& _color) override
+				void setBackgroundColor(const Color& color) override
 				{
 					JniGlobal<jobject> _jwindow(m_window);
 					jobject jwindow = _jwindow;
 					if (jwindow) {
-						Color color = _color;
-						if (color.isNotZero()) {
-							JWindow::setBackgroundColor.call(jwindow, color.getARGB());
-						}
+						JWindow::setBackgroundColor.call(jwindow, color.getARGB());
 					}
 				}
 

@@ -158,7 +158,7 @@ namespace slib
 							if (param.flagShowTitleBar){
 								styleMask = NSTitledWindowMask | NSClosableWindowMask;
 							} else {
-								styleMask = NSClosableWindowMask;
+								styleMask = NSClosableWindowMask | NSMiniaturizableWindowMask;
 							}
 						}
 						
@@ -374,12 +374,7 @@ namespace slib
 				{
 					NSWindow* window = m_window;
 					if (window != nil) {
-						NSColor* color;
-						if (_color.isZero()) {
-							color = [NSColor windowBackgroundColor];
-						} else {
-							color = GraphicsPlatform::getNSColorFromColor(_color);
-						}
+						NSColor* color = GraphicsPlatform::getNSColorFromColor(_color);
 						[window setBackgroundColor:color];
 					}
 				}
@@ -502,6 +497,12 @@ namespace slib
 					NSWindow* window = m_window;
 					if (window != nil) {
 						NSUInteger style = [window styleMask];
+						if (style & NSBorderlessWindowMask) {
+							return;
+						}
+						if (!(style & NSTitledWindowMask)) {
+							return;
+						}
 						sl_bool f1 = (style & NSMiniaturizableWindowMask) ? sl_true : sl_false;
 						sl_bool f2 = flag ? sl_true : sl_false;
 						if (f1 != f2) {
