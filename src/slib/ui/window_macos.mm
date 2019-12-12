@@ -502,12 +502,6 @@ namespace slib
 					NSWindow* window = m_window;
 					if (window != nil) {
 						NSUInteger style = [window styleMask];
-						if (style & NSBorderlessWindowMask) {
-							return;
-						}
-						if (!(style & NSTitledWindowMask)) {
-							return;
-						}
 						sl_bool f1 = (style & NSMiniaturizableWindowMask) ? sl_true : sl_false;
 						sl_bool f2 = flag ? sl_true : sl_false;
 						if (f1 != f2) {
