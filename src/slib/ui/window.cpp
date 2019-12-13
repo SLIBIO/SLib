@@ -1312,7 +1312,7 @@ namespace slib
 			dispatchResize(sizeClient.x, sizeClient.y);
 #endif
 #if defined(SLIB_UI_IS_WIN32)
-			if (m_flagDialog) {
+			if (m_flagDialog || m_flagBorderless || m_flagFullScreenOnCreate || !m_flagShowTitleBar) {
 				UISize sizeClient = getClientSize();
 				dispatchResize(sizeClient.x, sizeClient.y);
 			}
