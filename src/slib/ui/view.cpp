@@ -7454,20 +7454,20 @@ namespace slib
 	{
 		UIRect rc(0, 0, m_frame.getWidth(), m_frame.getHeight());
 		if (pen.isNotNull()) {
+			if (isInstance()) {
+#ifndef SLIB_PLATFORM_IS_WIN32
+				rc.right -= 1;
+#endif
+#ifdef SLIB_PLATFORM_IS_APPLE
+				rc.top += 1;
+#else
+				rc.bottom -= 1;
+#endif
+				rc.fixSizeError();
+			}
 			switch (getBoundShape()) {
 				case BoundShape::Rectangle:
 					{
-						if (isInstance()) {
-#ifndef SLIB_PLATFORM_IS_WIN32
-							rc.right -= 1;
-#endif
-#ifdef SLIB_PLATFORM_IS_APPLE
-							rc.top += 1;
-#else
-							rc.bottom -= 1;
-#endif
-						}
-						rc.fixSizeError();
 						sl_bool flagAntiAlias = canvas->isAntiAlias();
 						canvas->setAntiAlias(sl_false);
 						canvas->drawRectangle(rc, pen);
@@ -7475,19 +7475,9 @@ namespace slib
 						break;
 					}
 				case BoundShape::RoundRect:
-					rc.left += 1;
-					rc.top += 1;
-					rc.right -= 2;
-					rc.bottom -= 2;
-					rc.fixSizeError();
 					canvas->drawRoundRect(rc, getBoundRadius(), pen);
 					break;
 				case BoundShape::Ellipse:
-					rc.left += 1;
-					rc.top += 1;
-					rc.right -= 2;
-					rc.bottom -= 2;
-					rc.fixSizeError();
 					canvas->drawEllipse(rc, pen);
 					break;
 				case BoundShape::Path:
