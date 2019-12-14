@@ -65,12 +65,6 @@ namespace slib
 		 */
 		sl_bool addStatic(const sl_char8* buf, sl_size length) noexcept;
 
-		template <sl_size N>
-		SLIB_INLINE sl_bool addStatic(sl_char8(&buf)[N]) noexcept
-		{
-			return addStatic(buf, N);
-		}
-		
 		/**
 		 * Add all string items in buf to the current object and then clear buf.
 		 */
@@ -138,12 +132,6 @@ namespace slib
 		 * Add string pointed by buf to the queue.
 		 */
 		sl_bool addStatic(const sl_char16* buf, sl_size length) noexcept;
-
-		template <sl_size N>
-		SLIB_INLINE sl_bool addStatic(sl_char16(&buf)[N]) noexcept
-		{
-			return addStatic(buf, N);
-		}
 
 		/**
 		 * Add all string items in buf to the current object and then clear buf.
