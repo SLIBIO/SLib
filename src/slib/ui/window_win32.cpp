@@ -56,6 +56,7 @@ namespace slib
 				HWND m_handle;
 
 				sl_bool m_flagBorderless;
+				sl_bool m_flagFullscreen;
 				sl_bool m_flagResizable;
 
 				sl_bool m_flagMinimized;
@@ -71,6 +72,7 @@ namespace slib
 				{
 					m_handle = sl_null;
 					m_flagBorderless = sl_false;
+					m_flagFullscreen = sl_false;
 					m_flagResizable = sl_false;
 
 					m_flagMinimized = sl_false;
@@ -163,7 +165,8 @@ namespace slib
 					m_handle = hWnd;
 					m_flagDestroyOnRelease = flagDestroyOnRelease;
 					if (pParam) {
-						m_flagBorderless = pParam->flagBorderless || pParam->flagFullScreen;
+						m_flagBorderless = pParam->flagBorderless;
+						m_flagFullscreen = pParam->flagFullScreen;
 					}
 					Ref<ViewInstance> content = UIPlatform::createViewInstance(hWnd, sl_false);
 					if (content.isNotNull()) {
@@ -442,7 +445,7 @@ namespace slib
 
 				void setCloseButtonEnabled(sl_bool flag) override
 				{
-					if (m_flagBorderless) {
+					if (m_flagBorderless || m_flagFullscreen) {
 						return;
 					}
 					HWND hWnd = m_handle;
@@ -460,7 +463,7 @@ namespace slib
 
 				void setMinimizeButtonEnabled(sl_bool flag) override
 				{
-					if (m_flagBorderless) {
+					if (m_flagBorderless || m_flagFullscreen) {
 						return;
 					}
 					Windows::setWindowStyle(m_handle, WS_MINIMIZEBOX, flag);
@@ -468,7 +471,7 @@ namespace slib
 
 				void setMaximizeButtonEnabled(sl_bool flag) override
 				{
-					if (m_flagBorderless) {
+					if (m_flagBorderless || m_flagFullscreen) {
 						return;
 					}
 					Windows::setWindowStyle(m_handle, WS_MAXIMIZEBOX, flag);
@@ -477,7 +480,7 @@ namespace slib
 				void setResizable(sl_bool flag) override
 				{
 					m_flagResizable = flag;
-					if (m_flagBorderless) {
+					if (m_flagBorderless || m_flagFullscreen) {
 						return;
 					}
 					Windows::setWindowStyle(m_handle, WS_THICKFRAME, flag);
@@ -837,6 +840,22 @@ namespace slib
 									if (y <= rc.top) {
 										return HTTOP;
 									}
+								}
+							}
+							break;
+						}
+					case WM_GETMINMAXINFO:
+						{
+							if (window->m_flagBorderless) {
+								MINMAXINFO* mmi = (MINMAXINFO*)lParam;
+								HMONITOR hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+								if (hMonitor) {
+									MONITORINFO mi;
+									Base::zeroMemory(&mi, sizeof(mi));
+									mi.cbSize = sizeof(mi);
+									GetMonitorInfoW(hMonitor, &mi);
+									mmi->ptMaxSize.y = mi.rcWork.bottom - mi.rcWork.top;
+									return 0;
 								}
 							}
 							break;
