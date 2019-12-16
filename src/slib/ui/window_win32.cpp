@@ -55,6 +55,9 @@ namespace slib
 			public:
 				HWND m_handle;
 
+				sl_bool m_flagBorderless;
+				sl_bool m_flagResizable;
+
 				sl_bool m_flagMinimized;
 				sl_bool m_flagMaximized;
 
@@ -66,6 +69,10 @@ namespace slib
 			public:
 				Win32_WindowInstance()
 				{
+					m_handle = sl_null;
+					m_flagBorderless = sl_false;
+					m_flagResizable = sl_false;
+
 					m_flagMinimized = sl_false;
 					m_flagMaximized = sl_false;
 
@@ -78,27 +85,19 @@ namespace slib
 				}
 
 			public:
-				static Ref<Win32_WindowInstance> create(HWND hWnd, sl_bool flagDestroyOnRelease)
+				static Ref<Win32_WindowInstance> create(HWND hWnd, const WindowInstanceParam* pParam, sl_bool flagDestroyOnRelease)
 				{
-					Ref<Win32_WindowInstance> ret;
 					if (hWnd) {
-						ret = new Win32_WindowInstance();
+						Ref<Win32_WindowInstance> ret = new Win32_WindowInstance();
 						if (ret.isNotNull()) {
-							ret->m_handle = hWnd;
-							ret->m_flagDestroyOnRelease = flagDestroyOnRelease;
-							Ref<ViewInstance> content = UIPlatform::createViewInstance(hWnd, sl_false);
-							if (content.isNotNull()) {
-								content->setWindowContent(sl_true);
-							}
-							ret->m_viewContent = content;
-							UIPlatform::registerWindowInstance(hWnd, ret.get());
+							ret->initialize(hWnd, pParam, flagDestroyOnRelease);
 							return ret;
 						}
 						if (flagDestroyOnRelease) {
 							PostMessageW(hWnd, SLIB_UI_MESSAGE_CLOSE, 0, 0);
 						}
 					}
-					return ret;
+					return sl_null;
 				}
 
 				static HWND createHandle(const WindowInstanceParam& param)
@@ -122,7 +121,7 @@ namespace slib
 						DWORD style = WS_CLIPCHILDREN;
 						DWORD styleEx = WS_EX_CONTROLPARENT;
 						if (param.flagBorderless || param.flagFullScreen) {
-							style |= WS_POPUP;
+							style |= WS_POPUP;							
 						} else {
 							if (param.flagShowTitleBar){
 								if (param.flagDialog) {
@@ -157,6 +156,21 @@ namespace slib
 							NULL);						
 					}
 					return hWnd;
+				}
+
+				void initialize(HWND hWnd, const WindowInstanceParam* pParam, sl_bool flagDestroyOnRelease)
+				{
+					m_handle = hWnd;
+					m_flagDestroyOnRelease = flagDestroyOnRelease;
+					if (pParam) {
+						m_flagBorderless = pParam->flagBorderless || pParam->flagFullScreen;
+					}
+					Ref<ViewInstance> content = UIPlatform::createViewInstance(hWnd, sl_false);
+					if (content.isNotNull()) {
+						content->setWindowContent(sl_true);
+						m_viewContent = content;
+					}
+					UIPlatform::registerWindowInstance(hWnd, this);
 				}
 
 				void close() override
@@ -428,6 +442,9 @@ namespace slib
 
 				void setCloseButtonEnabled(sl_bool flag) override
 				{
+					if (m_flagBorderless) {
+						return;
+					}
 					HWND hWnd = m_handle;
 					if (hWnd) {
 						LONG old = GetClassLongW(hWnd, GCL_STYLE);
@@ -443,16 +460,26 @@ namespace slib
 
 				void setMinimizeButtonEnabled(sl_bool flag) override
 				{
+					if (m_flagBorderless) {
+						return;
+					}
 					Windows::setWindowStyle(m_handle, WS_MINIMIZEBOX, flag);
 				}
 
 				void setMaximizeButtonEnabled(sl_bool flag) override
 				{
+					if (m_flagBorderless) {
+						return;
+					}
 					Windows::setWindowStyle(m_handle, WS_MAXIMIZEBOX, flag);
 				}
 
 				void setResizable(sl_bool flag) override
 				{
+					m_flagResizable = flag;
+					if (m_flagBorderless) {
+						return;
+					}
 					Windows::setWindowStyle(m_handle, WS_THICKFRAME, flag);
 				}
 
@@ -748,7 +775,6 @@ namespace slib
 							}
 							break;
 						}
-						break;
 					case WM_MOVE:
 						{
 							window->onMove();
@@ -774,6 +800,47 @@ namespace slib
 							}
 							return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 						}
+					case WM_NCHITTEST:
+						{
+							if (window->m_flagBorderless) {
+								if (window->m_flagResizable) {
+									short x = (short)(lParam & 0xFFFF);
+									short y = (short)((lParam >> 16) & 0xFFFF);
+									RECT rc;
+									GetWindowRect(hWnd, &rc);
+#define BORDER_SIZE 2
+									rc.left += BORDER_SIZE;
+									rc.top += BORDER_SIZE;
+									rc.right -= BORDER_SIZE;
+									rc.bottom -= BORDER_SIZE;
+									if (x >= rc.right) {
+										if (y >= rc.bottom) {
+											return HTBOTTOMRIGHT;
+										}
+										if (y <= rc.top) {
+											return HTTOPRIGHT;
+										}
+										return HTRIGHT;
+									}
+									if (x <= rc.left) {
+										if (y >= rc.bottom) {
+											return HTBOTTOMLEFT;
+										}
+										if (y <= rc.top) {
+											return HTTOPLEFT;
+										}
+										return HTLEFT;
+									}
+									if (y >= rc.bottom) {
+										return HTBOTTOM;
+									}
+									if (y <= rc.top) {
+										return HTTOP;
+									}
+								}
+							}
+							break;
+						}
 					}
 				}
 				return priv::view::ViewInstanceProc(hWnd, uMsg, wParam, lParam);
@@ -788,7 +855,7 @@ namespace slib
 	{
 		HWND hWnd = Win32_WindowInstance::createHandle(param);
 		if (hWnd) {
-			return Win32_WindowInstance::create(hWnd, sl_true);
+			return Win32_WindowInstance::create(hWnd, &param, sl_true);
 		}
 		return sl_null;
 	}
@@ -812,7 +879,7 @@ namespace slib
 		if (ret.isNotNull()) {
 			return ret;
 		}
-		return Win32_WindowInstance::create(hWnd, flagDestroyOnRelease);
+		return Win32_WindowInstance::create(hWnd, sl_null, flagDestroyOnRelease);
 	}
 
 	void UIPlatform::registerWindowInstance(HWND hWnd, WindowInstance* instance)
