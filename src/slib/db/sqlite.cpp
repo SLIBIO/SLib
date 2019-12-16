@@ -79,6 +79,8 @@ namespace slib
 				DatabaseImpl()
 				{
 					m_db = sl_null;
+					
+					m_dialect = DatabaseDialect::SQLite;
 				}
 
 				~DatabaseImpl()
@@ -88,7 +90,7 @@ namespace slib
 					}
 				}
 
-				static Ref<DatabaseImpl> connect(const SQLiteParam& param)
+				static Ref<DatabaseImpl> open(const SQLiteParam& param)
 				{
 					Ref<DatabaseImpl> ret = new DatabaseImpl;
 					if (ret.isNotNull()) {
@@ -166,11 +168,11 @@ namespace slib
 							MIO::writeUint32LE(header + 8, custom->io.encryptIV[2]);
 							MIO::writeUint32LE(header + 12, custom->io.encryptIV[3]);
 							(vfs->xRandomness)(vfs, 32, header + 16);
-							char check[80];
-							Base::copyMemory(check, header, 48);
-							Base::copyMemory(check + 48, m_encryptionKey, 32);
+							char check[48];
+							Base::copyMemory(check, header, 16);
+							Base::copyMemory(check + 16, m_encryptionKey, 32);
 							char h[32];
-							SHA256::hash(check, 80, h);
+							SHA256::hash(check, 48, h);
 							Base::copyMemory(header + 48, h, 32);
 							iRet = (file->pMethods->xWrite)(file, header, ENCRYPTION_PREFIX_SIZE, 0);
 							if (iRet != SQLITE_OK) {
@@ -189,11 +191,11 @@ namespace slib
 								file->pMethods = sl_null;
 								return iRet;
 							}
-							char check[80];
-							Base::copyMemory(check, header, 48);
-							Base::copyMemory(check + 48, m_encryptionKey, 32);
+							char check[48];
+							Base::copyMemory(check, header, 16);
+							Base::copyMemory(check + 16, m_encryptionKey, 32);
 							char h[32];
-							SHA256::hash(check, 80, h);
+							SHA256::hash(check, 48, h);
 							if (!(Base::equalsMemory(h, header + 48, 32))) {
 								file->pMethods = sl_null;
 								return SQLITE_AUTH;
@@ -703,7 +705,7 @@ namespace slib
 					}
 				};
 
-				Ref<DatabaseStatement> prepareStatement(const String& sql) override
+				Ref<DatabaseStatement> _prepareStatement(const String& sql) override
 				{
 					ObjectLocker lock(this);
 					Ref<DatabaseStatement> ret;
@@ -726,12 +728,34 @@ namespace slib
 					}
 					return error;
 				}
-				
-				sl_bool isTableExisting(const String& name) override
+
+				sl_bool isDatabaseExisting(const String& name) override
 				{
-					return getValueForQueryResult("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='" + name + "';").getUint32() > 0;
+					return sl_false;
 				}
 				
+				List<String> getDatabases() override
+				{
+					return sl_null;
+				}
+
+				sl_bool isTableExisting(const String& name) override
+				{
+					return getValue("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name LIKE '" + name + "';").getUint32() > 0;
+				}
+				
+				List<String> getTables() override
+				{
+					List<String> ret;
+					Ref<DatabaseCursor> cursor = query("SELECT name FROM sqlite_master WHERE type='table';");
+					if (cursor.isNotNull()) {
+						while (cursor->moveNext()) {
+							ret.add_NoLock(cursor->getString(0));
+						}
+					}
+					return ret;
+				}
+
 				sl_uint64 getLastInsertRowId() override
 				{
 					return (sl_uint64)(sqlite3_last_insert_rowid(m_db));
@@ -760,16 +784,16 @@ namespace slib
 	{
 	}
 
-	Ref<SQLiteDatabase> SQLiteDatabase::connect(const SQLiteParam& param)
+	Ref<SQLiteDatabase> SQLiteDatabase::open(const SQLiteParam& param)
 	{
-		return priv::sqlite::DatabaseImpl::connect(param);
+		return priv::sqlite::DatabaseImpl::open(param);
 	}
 
-	Ref<SQLiteDatabase> SQLiteDatabase::connect(const String& path)
+	Ref<SQLiteDatabase> SQLiteDatabase::open(const String& path)
 	{
 		SQLiteParam param;
 		param.path = path;
-		return priv::sqlite::DatabaseImpl::connect(param);
+		return priv::sqlite::DatabaseImpl::open(param);
 	}
 
 }

@@ -66,7 +66,7 @@ namespace slib
 			public:
 				SLIB_INLINE LibraryInitializer()
 				{
-					::mysql_library_init(0, sl_null, sl_null);
+					mysql_library_init(0, sl_null, sl_null);
 				}
 			};
 
@@ -79,7 +79,7 @@ namespace slib
 
 				~ThreadManager()
 				{
-					::mysql_thread_end();
+					mysql_thread_end();
 				}
 			};
 
@@ -91,12 +91,13 @@ namespace slib
 			public:
 				DatabaseImpl()
 				{
-					m_mysql = sl_null;
+					m_mysql = sl_null;					
+					m_dialect = DatabaseDialect::MySQL;
 				}
 
 				~DatabaseImpl()
 				{
-					::mysql_close(m_mysql);
+					mysql_close(m_mysql);
 				}
 
 			public:
@@ -106,7 +107,7 @@ namespace slib
 
 					initThread();
 
-					MYSQL* mysql = ::mysql_init(sl_null);
+					MYSQL* mysql = mysql_init(sl_null);
 
 					if (mysql) {
 
@@ -120,15 +121,15 @@ namespace slib
 							flags |= CLIENT_MULTI_STATEMENTS;
 						}
 
-						if (::mysql_real_connect(mysql, host.getData(), user.getData(), password.getData(), db.getData(), param.port, sl_null, flags)) {
+						if (mysql_real_connect(mysql, host.getData(), user.getData(), password.getData(), db.getData(), param.port, sl_null, flags)) {
 
-							::mysql_set_character_set(mysql, "utf8");
-							::mysql_autocommit(mysql, 1);
+							mysql_set_character_set(mysql, "utf8");
+							mysql_autocommit(mysql, 1);
 
 							my_bool flagReconnect = param.flagAutoReconnect ? 1 : 0;
-							::mysql_options(mysql, MYSQL_OPT_RECONNECT, &flagReconnect);
+							mysql_options(mysql, MYSQL_OPT_RECONNECT, &flagReconnect);
 							my_bool flagReportTruncation = 1;
-							::mysql_options(mysql, MYSQL_REPORT_DATA_TRUNCATION, &flagReportTruncation);
+							mysql_options(mysql, MYSQL_REPORT_DATA_TRUNCATION, &flagReportTruncation);
 
 							ret = new DatabaseImpl;
 							if (ret.isNotNull()) {
@@ -137,10 +138,10 @@ namespace slib
 							}
 
 						} else {
-							outErrorMessage = ::mysql_error(mysql);
+							outErrorMessage = mysql_error(mysql);
 							LogError(TAG, outErrorMessage);
 						}
-						::mysql_close(mysql);
+						mysql_close(mysql);
 					}
 					return ret;
 				}
@@ -149,7 +150,7 @@ namespace slib
 				{
 					initThread();
 					ObjectLocker lock(this);
-					if (0 == ::mysql_ping(m_mysql)) {			
+					if (0 == mysql_ping(m_mysql)) {
 						return sl_true;
 					}
 					return sl_false;
@@ -159,7 +160,7 @@ namespace slib
 				{
 					initThread();
 					ObjectLocker lock(this);
-					if (0 == ::mysql_real_query(m_mysql, sql.getData(), (sl_uint32)(sql.getLength()))) {
+					if (0 == mysql_real_query(m_mysql, sql.getData(), (sl_uint32)(sql.getLength()))) {
 						sl_int64 ret = 0;
 						for (;;) {
 							MYSQL_RES* result = mysql_store_result(m_mysql);
@@ -206,8 +207,8 @@ namespace slib
 						m_db = db;
 						m_result = result;
 
-						sl_uint32 cols = (sl_uint32)(::mysql_num_fields(result));
-						m_fields = ::mysql_fetch_fields(result);
+						sl_uint32 cols = (sl_uint32)(mysql_num_fields(result));
+						m_fields = mysql_fetch_fields(result);
 						for (sl_uint32 i = 0; i < cols; i++) {
 							m_listColumnNames.add_NoLock(m_fields[i].name);
 							m_mapColumnIndexes.put_NoLock(m_fields[i].name, i);
@@ -223,7 +224,7 @@ namespace slib
 
 					~CursorImpl()
 					{
-						::mysql_free_result(m_result);
+						mysql_free_result(m_result);
 						m_db->unlock();
 					}
 
@@ -299,8 +300,8 @@ namespace slib
 
 					sl_bool moveNext() override
 					{
-						m_row = ::mysql_fetch_row(m_result);
-						m_lengths = ::mysql_fetch_lengths(m_result);
+						m_row = mysql_fetch_row(m_result);
+						m_lengths = mysql_fetch_lengths(m_result);
 						if (m_row) {
 							return sl_true;
 						}
@@ -313,13 +314,13 @@ namespace slib
 					initThread();
 					ObjectLocker lock(this);
 					if (0 == mysql_real_query(m_mysql, sql.getData(), (sl_uint32)(sql.getLength()))) {
-						MYSQL_RES* res = ::mysql_use_result(m_mysql);
+						MYSQL_RES* res = mysql_use_result(m_mysql);
 						if (res) {
 							Ref<DatabaseCursor> ret = new CursorImpl(this, res);
 							if (ret.isNotNull()) {
 								return ret;
 							}
-							::mysql_free_result(res);
+							mysql_free_result(res);
 						}
 					}
 					return sl_null;
@@ -394,8 +395,8 @@ namespace slib
 						m_statement = statement;
 
 						m_resultMetadata = resultMetadata;
-						sl_uint32 cols = (sl_uint32)(::mysql_num_fields(resultMetadata));
-						m_fields = ::mysql_fetch_fields(resultMetadata);
+						sl_uint32 cols = (sl_uint32)(mysql_num_fields(resultMetadata));
+						m_fields = mysql_fetch_fields(resultMetadata);
 						m_bind = bind;
 						m_fds = fds;
 
@@ -411,8 +412,8 @@ namespace slib
 
 					~StatementCursor()
 					{
-						::mysql_free_result(m_resultMetadata);
-						::mysql_stmt_free_result(m_statement);
+						mysql_free_result(m_resultMetadata);
+						mysql_stmt_free_result(m_statement);
 						Base::freeMemory(m_fds);
 						Base::freeMemory(m_bind);
 						m_db->unlock();
@@ -860,7 +861,7 @@ namespace slib
 
 					sl_bool moveNext() override
 					{
-						int iRet = ::mysql_stmt_fetch(m_statement);
+						int iRet = mysql_stmt_fetch(m_statement);
 						if (iRet == 0 || iRet == MYSQL_DATA_TRUNCATED) {
 							return sl_true;
 						}
@@ -902,16 +903,16 @@ namespace slib
 					{
 						ObjectLocker lock(m_db.get());
 						close();
-						MYSQL_STMT* statement = ::mysql_stmt_init(m_mysql);
+						MYSQL_STMT* statement = mysql_stmt_init(m_mysql);
 						if (statement) {
-							if (0 == ::mysql_stmt_prepare(statement, m_sql.getData(), (sl_uint32)(m_sql.getLength()))) {
+							if (0 == mysql_stmt_prepare(statement, m_sql.getData(), (sl_uint32)(m_sql.getLength()))) {
 								m_statement = statement;
 								return sl_true;
 							}
 							if (isLoggingErrors()) {
-								LogError(TAG, "Prepare Error: %s, SQL:%s", ::mysql_stmt_error(statement), m_sql);
+								LogError(TAG, "Prepare Error: %s, SQL:%s", mysql_stmt_error(statement), m_sql);
 							}
-							::mysql_stmt_close(statement);
+							mysql_stmt_close(statement);
 						}
 						return sl_false;
 					}
@@ -920,14 +921,14 @@ namespace slib
 					{
 						ObjectLocker lock(m_db.get());
 						if (m_statement) {
-							::mysql_stmt_close(m_statement);
+							mysql_stmt_close(m_statement);
 							m_statement = sl_null;
 						}
 					}
 
 					sl_bool _bind(const Variant* params, sl_uint32 nParams)
 					{
-						sl_uint32 n = (sl_uint32)(::mysql_stmt_param_count(m_statement));
+						sl_uint32 n = (sl_uint32)(mysql_stmt_param_count(m_statement));
 						if (n == nParams) {
 							if (n > 0) {
 								SLIB_SCOPED_BUFFER(MYSQL_BIND, 32, bind, n);
@@ -1005,11 +1006,11 @@ namespace slib
 											}
 										}
 									}
-									if (0 == ::mysql_stmt_bind_param(m_statement, bind)) {
+									if (0 == mysql_stmt_bind_param(m_statement, bind)) {
 										return sl_true;
 									} else {
 										if (isLoggingErrors()) {
-											LogError(TAG, "Bind Error: %s", ::mysql_stmt_error(m_statement));
+											LogError(TAG, "Bind Error: %s", mysql_stmt_error(m_statement));
 										}
 									}
 								} else {
@@ -1036,25 +1037,25 @@ namespace slib
 							}
 						}
 						if (_bind(params, nParams)) {
-							if (0 == ::mysql_stmt_execute(m_statement)) {
+							if (0 == mysql_stmt_execute(m_statement)) {
 								return sl_true;
 							} else {
-								int err = ::mysql_stmt_errno(m_statement);
+								int err = mysql_stmt_errno(m_statement);
 								if (err == CR_SERVER_LOST || err == CR_SERVER_GONE_ERROR) {
 									if (prepare()) {
 										if (_bind(params, nParams)) {
-											if (0 == ::mysql_stmt_execute(m_statement)) {
+											if (0 == mysql_stmt_execute(m_statement)) {
 												return sl_true;
 											} else {
 												if (isLoggingErrors()) {
-													LogError(TAG, "Execute Statement Error: %s, SQL:%s", ::mysql_stmt_error(m_statement), m_sql);
+													LogError(TAG, "Execute Statement Error: %s, SQL:%s", mysql_stmt_error(m_statement), m_sql);
 												}
 											}
 										}
 									}
 								} else {
 									if (isLoggingErrors()) {
-										LogError(TAG, "Execute Statement Error: %s, SQL:%s", ::mysql_stmt_error(m_statement), m_sql);
+										LogError(TAG, "Execute Statement Error: %s, SQL:%s", mysql_stmt_error(m_statement), m_sql);
 									}
 								}
 							}
@@ -1067,7 +1068,7 @@ namespace slib
 						initThread();
 						ObjectLocker lock(m_db.get());
 						if (_execute(params, nParams)) {
-							return ::mysql_stmt_affected_rows(m_statement);
+							return mysql_stmt_affected_rows(m_statement);
 						}
 						return -1;
 					}
@@ -1078,10 +1079,10 @@ namespace slib
 						ObjectLocker lock(m_db.get());
 						Ref<DatabaseCursor> ret;
 						if (_execute(params, nParams)) {
-							MYSQL_RES* resultMetadata = ::mysql_stmt_result_metadata(m_statement);
+							MYSQL_RES* resultMetadata = mysql_stmt_result_metadata(m_statement);
 							if (resultMetadata) {
-								sl_uint32 nFields = (sl_uint32)(::mysql_num_fields(resultMetadata));
-								MYSQL_FIELD* fields = ::mysql_fetch_fields(resultMetadata);
+								sl_uint32 nFields = (sl_uint32)(mysql_num_fields(resultMetadata));
+								MYSQL_FIELD* fields = mysql_fetch_fields(resultMetadata);
 								MYSQL_BIND* bind = (MYSQL_BIND*)(Base::createMemory(sizeof(MYSQL_BIND)*nFields));
 								if (bind) {
 									FieldDesc* fds = (FieldDesc*)(Base::createMemory(sizeof(FieldDesc)*nFields));
@@ -1154,7 +1155,7 @@ namespace slib
 												break;
 											}
 										}
-										if (0 == ::mysql_stmt_bind_result(m_statement, bind)) {
+										if (0 == mysql_stmt_bind_result(m_statement, bind)) {
 											ret = new StatementCursor(m_db.get(), this, m_statement, resultMetadata, bind, fds);
 											if (ret.isNotNull()) {
 												return ret;
@@ -1164,7 +1165,7 @@ namespace slib
 									}
 									Base::freeMemory(bind);
 								}
-								::mysql_free_result(resultMetadata);
+								mysql_free_result(resultMetadata);
 							}
 						}
 						return ret;
@@ -1172,7 +1173,7 @@ namespace slib
 
 				};
 
-				Ref<DatabaseStatement> prepareStatement(const String& sql) override
+				Ref<DatabaseStatement> _prepareStatement(const String& sql) override
 				{
 					initThread();
 					ObjectLocker lock(this);
@@ -1187,12 +1188,86 @@ namespace slib
 
 				String getErrorMessage() override
 				{
-					String error = ::mysql_error(m_mysql);
+					String error = mysql_error(m_mysql);
 					if (error.isEmpty()) {
 						return sl_null;
 					}
 					return error;
 				}
+				
+				sl_bool isDatabaseExisting(const String& name) override
+				{
+					if (name.isEmpty()) {
+						return sl_false;
+					}
+					sl_bool bRet = sl_false;
+					MYSQL_RES* res = mysql_list_dbs(m_mysql, name.getData());
+					if (res) {
+						MYSQL_ROW row = mysql_fetch_row(res);
+						if (row) {
+							bRet = sl_true;
+						}
+						mysql_free_result(res);
+					}
+					return bRet;
+				}
+				
+				List<String> getDatabases() override
+				{
+					List<String> ret;
+					MYSQL_RES* res = mysql_list_dbs(m_mysql, sl_null);
+					if (res) {
+						for (;;) {
+							MYSQL_ROW row = mysql_fetch_row(res);
+							if (!row) {
+								break;
+							}
+							ret.add_NoLock(row[0]);
+						}
+						mysql_free_result(res);
+					}
+					return ret;
+				}
+
+				sl_bool isTableExisting(const String& name) override
+				{
+					if (name.isEmpty()) {
+						return sl_false;
+					}
+					sl_bool bRet = sl_false;
+					MYSQL_RES* res = mysql_list_tables(m_mysql, name.getData());
+					if (res) {
+						MYSQL_ROW row = mysql_fetch_row(res);
+						if (row) {
+							bRet = sl_true;
+						}
+						mysql_free_result(res);
+					}
+					return bRet;
+				}
+				
+				List<String> getTables() override
+				{
+					List<String> ret;
+					MYSQL_RES* res = mysql_list_tables(m_mysql, sl_null);
+					if (res) {
+						for (;;) {
+							MYSQL_ROW row = mysql_fetch_row(res);
+							if (!row) {
+								break;
+							}
+							ret.add_NoLock(row[0]);
+						}
+						mysql_free_result(res);
+					}
+					return ret;
+				}
+				
+				sl_uint64 getLastInsertRowId() override
+				{
+					return (sl_uint64)(mysql_insert_id(m_mysql));
+				}
+				
 			};
 
 		}
@@ -1218,14 +1293,14 @@ namespace slib
 			SLIB_STATIC_STRING(name, "_SLIB_MYSQL")
 			Ref<Referable> ref = thread->getAttachedObject(name);
 			if (ref.isNull()) {
-				::mysql_thread_init();
+				mysql_thread_init();
 				ref = new ThreadManager;
 				if (ref.isNotNull()) {
 					thread->attachObject(name, ref.get());
 				}
 			}
 		} else {
-			::mysql_thread_init();
+			mysql_thread_init();
 		}
 	}
 

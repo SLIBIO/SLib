@@ -1361,5 +1361,11 @@
     <ClCompile Include="..\..\src\slib\social\wechat_sdk.cpp">
       <Filter>src\social</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\db\database_sql.cpp">
+      <Filter>src\db</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\db\database_expression.cpp">
+      <Filter>src\db</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

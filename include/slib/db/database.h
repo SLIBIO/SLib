@@ -25,189 +25,12 @@
 
 #include "definition.h"
 
-#include "../core/object.h"
-#include "../core/variant.h"
+#include "sql.h"
+#include "cursor.h"
+#include "statement.h"
 
 namespace slib
 {
-	
-	class Database;
-	
-	class SLIB_EXPORT DatabaseCursor : public Object
-	{
-		SLIB_DECLARE_OBJECT
-	
-	public:
-		DatabaseCursor();
-	
-		~DatabaseCursor();
-	
-	public:
-		Ref<Database> getDatabase();
-	
-		virtual sl_uint32 getColumnsCount() = 0;
-	
-		virtual String getColumnName(sl_uint32 index) = 0;
-
-		// returns -1 when the column name not found
-		virtual sl_int32 getColumnIndex(const String& name) = 0;
-	
-
-		virtual HashMap<String, Variant> getRow() = 0;
-	
-
-		virtual Variant getValue(sl_uint32 index);
-
-		virtual Variant getValue(const String& name);
-	
-
-		virtual String getString(sl_uint32 index) = 0;
-
-		virtual String getString(const String& name);
-	
-
-		virtual sl_int64 getInt64(sl_uint32 index, sl_int64 defaultValue = 0);
-
-		virtual sl_int64 getInt64(const String& name, sl_int64 defaultValue = 0);
-	
-
-		virtual sl_uint64 getUint64(sl_uint32 index, sl_uint64 defaultValue = 0);
-
-		virtual sl_uint64 getUint64(const String& name, sl_uint64 defaultValue = 0);
-	
-
-		virtual sl_int32 getInt32(sl_uint32 index, sl_int32 defaultValue = 0);
-
-		virtual sl_int32 getInt32(const String& name, sl_int32 defaultValue = 0);
-	
-
-		virtual sl_uint32 getUint32(sl_uint32 index, sl_uint32 defaultValue = 0);
-
-		virtual sl_uint32 getUint32(const String& name, sl_uint32 defaultValue = 0);
-	
-
-		virtual float getFloat(sl_uint32 index, float defaultValue = 0);
-
-		virtual float getFloat(const String& name, float defaultValue = 0);
-	
-
-		virtual double getDouble(sl_uint32 index, double defaultValue = 0);
-
-		virtual double getDouble(const String& name, double defaultValue = 0);
-	
-
-		virtual sl_bool getBoolean(sl_uint32 index, sl_bool defaultValue = sl_false);
-
-		virtual sl_bool getBoolean(const String& name, sl_bool defaultValue = sl_false);
-	
-		
-		virtual Time getTime(sl_uint32 index, const Time& defaultValue);
-
-		virtual Time getTime(const String& name, const Time& defaultValue);
-	
-		Time getTime(sl_uint32 index);
-
-		Time getTime(const String& name);
-	
-
-		virtual Memory getBlob(sl_uint32 index) = 0;
-
-		virtual Memory getBlob(const String& name);
-	
-
-		virtual sl_bool moveNext() = 0;
-	
-	protected:
-		Ref<Database> m_db;
-
-	};
-	
-	class SLIB_EXPORT DatabaseStatement : public Object
-	{
-		SLIB_DECLARE_OBJECT
-
-	public:
-		DatabaseStatement();
-
-		~DatabaseStatement();
-
-	public:
-		Ref<Database> getDatabase();
-
-		virtual sl_int64 executeBy(const Variant* params = sl_null, sl_uint32 nParams = 0) = 0;
-
-		SLIB_INLINE sl_int64 execute()
-		{
-			return executeBy();
-		}
-
-		template <class... ARGS>
-		SLIB_INLINE sl_int64 execute(ARGS&&... args)
-		{
-			Variant params[] = {Forward<ARGS>(args)...};
-			return executeBy(params, sizeof...(args));
-		}
-
-		virtual Ref<DatabaseCursor> queryBy(const Variant* params = sl_null, sl_uint32 nParams = 0) = 0;
-	
-		SLIB_INLINE Ref<DatabaseCursor> query()
-		{
-			return queryBy();
-		}
-
-		template <class... ARGS>
-		SLIB_INLINE Ref<DatabaseCursor> query(ARGS&&... args)
-		{
-			Variant params[] = {Forward<ARGS>(args)...};
-			return queryBy(params, sizeof...(args));
-		}
-	
-		virtual List< HashMap<String, Variant> > getListForQueryResultBy(const Variant* params = sl_null, sl_uint32 nParams = 0);
-
-		SLIB_INLINE List< HashMap<String, Variant> > getListForQueryResult()
-		{
-			return getListForQueryResultBy();
-		}
-
-		template <class... ARGS>
-		SLIB_INLINE List< HashMap<String, Variant> > getListForQueryResult(ARGS&&... args)
-		{
-			Variant params[] = {Forward<ARGS>(args)...};
-			return getListForQueryResultBy(params, sizeof...(args));
-		}
-
-		virtual HashMap<String, Variant> getRecordForQueryResultBy(const Variant* params = sl_null, sl_uint32 nParams = 0);
-
-		SLIB_INLINE HashMap<String, Variant> getRecordForQueryResult()
-		{
-			return getRecordForQueryResultBy();
-		}
-
-		template <class... ARGS>
-		SLIB_INLINE HashMap<String, Variant> getRecordForQueryResult(ARGS&&... args)
-		{
-			Variant params[] = {Forward<ARGS>(args)...};
-			return getRecordForQueryResultBy(params, sizeof...(args));
-		}
-
-		virtual Variant getValueForQueryResultBy(const Variant* params = sl_null, sl_uint32 nParams = 0);
-
-		SLIB_INLINE Variant getValueForQueryResult()
-		{
-			return getValueForQueryResultBy();
-		}
-
-		template <class... ARGS>
-		SLIB_INLINE Variant getValueForQueryResult(ARGS&&... args)
-		{
-			Variant params[] = {Forward<ARGS>(args)...};
-			return getValueForQueryResultBy(params, sizeof...(args));
-		}
-
-	protected:
-		Ref<Database> m_db;
-
-	};
 	
 	class SLIB_EXPORT Database : public Object
 	{
@@ -219,62 +42,98 @@ namespace slib
 		~Database();
 
 	public:
-		virtual Ref<DatabaseStatement> prepareStatement(const String& sql) = 0;
-	
-		virtual String getErrorMessage() = 0;
+		Ref<DatabaseStatement> prepareStatement(const String& sql);
 		
-		sl_int64 execute(const String& sql);
-
-		Ref<DatabaseCursor> query(const String& sql);
-
+		Ref<DatabaseStatement> prepareStatement(const SqlBuilder& builder);
+		
 		sl_int64 executeBy(const String& sql, const Variant* params, sl_uint32 nParams);
 		
-		Ref<DatabaseCursor> queryBy(const String& sql, const Variant* params, sl_uint32 nParams);
+		template <class T>
+		SLIB_INLINE sl_int64 executeBy(const SqlBuilder& builder, const T& _params)
+		{
+			DatabaseParametersLocker<T> params(_params, builder.parameters);
+			return executeBy(builder.toString(), params.data, params.count);
+		}
 
-		List< HashMap<String, Variant> > getListForQueryResult(const String& sql);
-
-		HashMap<String, Variant> getRecordForQueryResult(const String& sql);
-
-		Variant getValueForQueryResult(const String& sql);
-	
-		List< HashMap<String, Variant> > getListForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams);
-
-		HashMap<String, Variant> getRecordForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams);
-
-		Variant getValueForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams);
-	
+		sl_int64 execute(const String& sql);
+		
 		template <class... ARGS>
 		SLIB_INLINE sl_int64 execute(const String& sql, ARGS&&... args)
 		{
 			Variant params[] = {Forward<ARGS>(args)...};
 			return executeBy(sql, params, sizeof...(args));
 		}
+		
+		Ref<DatabaseCursor> queryBy(const String& sql, const Variant* params, sl_uint32 nParams);
+		
+		template <class T>
+		SLIB_INLINE Ref<DatabaseCursor> queryBy(const SqlBuilder& builder, const T& _params)
+		{
+			DatabaseParametersLocker<T> params(_params, builder.parameters);
+			return queryBy(builder.toString(), params.data, params.count);
+		}
+
+		Ref<DatabaseCursor> query(const String& sql);
+		
 		template <class... ARGS>
 		SLIB_INLINE Ref<DatabaseCursor> query(const String& sql, ARGS&&... args)
 		{
 			Variant params[] = {Forward<ARGS>(args)...};
 			return queryBy(sql, params, sizeof...(args));
 		}
-				
-		template <class... ARGS>
-		SLIB_INLINE List< HashMap<String, Variant> > getListForQueryResult(const String& sql, ARGS&&... args)
+		
+		List< HashMap<String, Variant> > getRecordsBy(const String& sql, const Variant* params, sl_uint32 nParams);
+		
+		template <class T>
+		SLIB_INLINE List< HashMap<String, Variant> > getRecordsBy(const SqlBuilder& builder, const T& _params)
 		{
-			Variant params[] = {Forward<ARGS>(args)...};
-			return getListForQueryResultBy(sql, params, sizeof...(args));
+			DatabaseParametersLocker<T> params(_params, builder.parameters);
+			return getRecordsBy(builder.toString(), params.data, params.count);
 		}
+
+		List< HashMap<String, Variant> > getRecords(const String& sql);
 		
 		template <class... ARGS>
-		SLIB_INLINE HashMap<String, Variant> getRecordForQueryResult(const String& sql, ARGS&&... args)
+		SLIB_INLINE List< HashMap<String, Variant> > getRecords(const String& sql, ARGS&&... args)
 		{
 			Variant params[] = {Forward<ARGS>(args)...};
-			return getRecordForQueryResultBy(sql, params, sizeof...(args));
+			return getRecordsBy(sql, params, sizeof...(args));
 		}
 		
+		HashMap<String, Variant> getRecordBy(const String& sql, const Variant* params, sl_uint32 nParams);
+		
+		template <class T>
+		SLIB_INLINE HashMap<String, Variant> getRecordBy(const SqlBuilder& builder, const T& _params)
+		{
+			DatabaseParametersLocker<T> params(_params, builder.parameters);
+			return getRecordBy(builder.toString(), params.data, params.count);
+		}
+
+		HashMap<String, Variant> getRecord(const String& sql);
+		
 		template <class... ARGS>
-		SLIB_INLINE Variant getValueForQueryResult(const String& sql, ARGS&&... args)
+		SLIB_INLINE HashMap<String, Variant> getRecord(const String& sql, ARGS&&... args)
 		{
 			Variant params[] = {Forward<ARGS>(args)...};
-			return getValueForQueryResultBy(sql, params, sizeof...(args));
+			return getRecordBy(sql, params, sizeof...(args));
+		}
+		
+		Variant getValueBy(const String& sql, const Variant* params, sl_uint32 nParams);
+		
+		template <class T>
+		SLIB_INLINE Variant getValueBy(const SqlBuilder& builder, const T& _params)
+		{
+			DatabaseParametersLocker<T> params(_params, builder.parameters);
+			return getValueBy(builder.toString(), params.data, params.count);
+		}
+		
+		Variant getValue(const String& sql);
+		
+		template <class... ARGS>
+		SLIB_INLINE Variant getValue(const String& sql, ARGS&&... args)
+		{
+			Variant params[] = {Forward<ARGS>(args)...};
+			return getValueBy(sql, params, sizeof...(args));
 		}
 
 		sl_bool isLoggingSQL();
@@ -285,14 +144,56 @@ namespace slib
 		
 		void setLoggingErrors(sl_bool flag);
 		
-	protected:
-		virtual sl_int64 _execute(const String& sql);
 		
-		virtual Ref<DatabaseCursor> _query(const String& sql);
+		DatabaseDialect getDialect();
+		
+		
+		virtual String getErrorMessage() = 0;
+		
+		virtual sl_bool isDatabaseExisting(const String& name) = 0;
+		
+		virtual List<String> getDatabases() = 0;
+
+		virtual sl_bool isTableExisting(const String& name) = 0;
+		
+		virtual List<String> getTables() = 0;
+		
+		virtual sl_uint64 getLastInsertRowId() = 0;
+		
+		
+		sl_bool createTable(const DatabaseCreateTableParam& param);
+
+		sl_bool createTable(const DatabaseIdentifier& table, const ListParam<DatabaseColumnDefinition>& columns, DatabaseFlags flags = 0);
+
+		sl_bool dropTable(const DatabaseIdentifier& table, DatabaseFlags flags = 0);
+
+		sl_bool createIndex(const DatabaseCreateIndexParam& param);
+
+		sl_bool createIndex(const DatabaseIdentifier& index, const String& table, const ListParam<DatabaseIndexColumn>& columns, DatabaseFlags flags = 0);
+		
+		sl_bool dropIndex(const DatabaseIdentifier& index, const String& table, DatabaseFlags flags = 0);
+		
+		
+		Ref<DatabaseStatement> prepareInsert(const DatabaseIdentifier& table, const ListParam<String>& columns);
+
+		Ref<DatabaseStatement> prepareUpdate(const DatabaseIdentifier& table, const ListParam<String>& columns, const DatabaseExpression& where);
+		
+		sl_bool startTransaction();
+		
+		sl_bool commitTransaction();
+		
+		sl_bool rollbackTransaction();
+
+	protected:
+		virtual Ref<DatabaseStatement> _prepareStatement(const String& sql) = 0;
 		
 		virtual sl_int64 _executeBy(const String& sql, const Variant* params, sl_uint32 nParams);
 		
+		virtual sl_int64 _execute(const String& sql);
+		
 		virtual Ref<DatabaseCursor> _queryBy(const String& sql, const Variant* params, sl_uint32 nParams);
+		
+		virtual Ref<DatabaseCursor> _query(const String& sql);
 		
 		void _logSQL(const String& sql);
 		
@@ -305,7 +206,9 @@ namespace slib
 	protected:
 		sl_bool m_flagLogSQL;
 		sl_bool m_flagLogErrors;
-	
+		
+		DatabaseDialect m_dialect;
+		
 	};
 
 }

@@ -40,7 +40,17 @@ namespace slib
 		return m_db;
 	}
 
-	List< HashMap<String, Variant> > DatabaseStatement::getListForQueryResultBy(const Variant* params, sl_uint32 nParams)
+	List<String> DatabaseStatement::getParameterNames()
+	{
+		return m_names;
+	}
+
+	void DatabaseStatement::setParameterNames(const ListParam<String>& names)
+	{
+		m_names = names.toList();
+	}
+
+	List< HashMap<String, Variant> > DatabaseStatement::getRecordsBy(const Variant* params, sl_uint32 nParams)
 	{
 		List< HashMap<String, Variant> > ret;
 		Ref<DatabaseCursor> cursor = queryBy(params, nParams);
@@ -52,7 +62,7 @@ namespace slib
 		return ret;
 	}
 
-	HashMap<String, Variant> DatabaseStatement::getRecordForQueryResultBy(const Variant* params, sl_uint32 nParams)
+	HashMap<String, Variant> DatabaseStatement::getRecordBy(const Variant* params, sl_uint32 nParams)
 	{
 		HashMap<String, Variant> ret;
 		Ref<DatabaseCursor> cursor = queryBy(params, nParams);
@@ -64,7 +74,7 @@ namespace slib
 		return sl_null;
 	}
 
-	Variant DatabaseStatement::getValueForQueryResultBy(const Variant* params, sl_uint32 nParams)
+	Variant DatabaseStatement::getValueBy(const Variant* params, sl_uint32 nParams)
 	{
 		Ref<DatabaseCursor> cursor = queryBy(params, nParams);
 		if (cursor.isNotNull()) {

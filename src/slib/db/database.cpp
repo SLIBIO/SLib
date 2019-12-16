@@ -22,6 +22,7 @@
 
 #include "slib/db/database.h"
 
+#include "slib/core/string_buffer.h"
 #include "slib/core/log.h"
 
 namespace slib
@@ -33,15 +34,71 @@ namespace slib
 	{
 		m_flagLogSQL = sl_false;
 		m_flagLogErrors = sl_true;
+		m_dialect = DatabaseDialect::Generic;
 	}
 
 	Database::~Database()
 	{
 	}
 	
+	sl_int64 Database::_executeBy(const String& sql, const Variant* params, sl_uint32 nParams)
+	{
+		Ref<DatabaseStatement> statement = prepareStatement(sql);
+		if (statement.isNotNull()) {
+			return statement->executeBy(params, nParams);
+		}
+		return -1;
+	}
+
 	sl_int64 Database::_execute(const String& sql)
 	{
-		return executeBy(sql, sl_null, 0);
+		return _executeBy(sql, sl_null, 0);
+	}
+
+	Ref<DatabaseCursor> Database::_queryBy(const String& sql, const Variant* params, sl_uint32 nParams)
+	{
+		Ref<DatabaseStatement> statement = prepareStatement(sql);
+		if (statement.isNotNull()) {
+			return statement->queryBy(params, nParams);
+		}
+		return sl_null;
+	}
+
+	Ref<DatabaseCursor> Database::_query(const String& sql)
+	{
+		return _queryBy(sql, sl_null, 0);
+	}
+
+	Ref<DatabaseStatement> Database::prepareStatement(const String& sql)
+	{
+		Ref<DatabaseStatement> ret = _prepareStatement(sql);
+		if (ret.isNotNull()) {
+			_logSQL(sql);
+		} else {
+			_logError(sql);
+		}
+		return ret;
+	}
+
+	Ref<DatabaseStatement> Database::prepareStatement(const SqlBuilder& builder)
+	{
+		Ref<DatabaseStatement> ret = prepareStatement(builder.toString());
+		if (ret.isNotNull()) {
+			ret->setParameterNames(builder.parameters);
+			return ret;
+		}
+		return sl_null;
+	}
+
+	sl_int64 Database::executeBy(const String& sql, const Variant* params, sl_uint32 nParams)
+	{
+		sl_int64 ret = _executeBy(sql, params, nParams);
+		if (ret < 0) {
+			_logError(sql, params, nParams);
+		} else {
+			_logSQL(sql, params, nParams);
+		}
+		return ret;
 	}
 
 	sl_int64 Database::execute(const String& sql)
@@ -55,51 +112,6 @@ namespace slib
 		return ret;
 	}
 	
-	Ref<DatabaseCursor> Database::_query(const String& sql)
-	{
-		return queryBy(sql, sl_null, 0);
-	}
-	
-	Ref<DatabaseCursor> Database::query(const String& sql)
-	{
-		Ref<DatabaseCursor> ret = queryBy(sql, sl_null, 0);
-		if (ret.isNull()) {
-			_logError(sql);
-		} else {
-			_logSQL(sql);
-		}
-		return ret;
-	}
-	
-	sl_int64 Database::_executeBy(const String& sql, const Variant* params, sl_uint32 nParams)
-	{
-		Ref<DatabaseStatement> statement = prepareStatement(sql);
-		if (statement.isNotNull()) {
-			return statement->executeBy(params, nParams);
-		}
-		return -1;
-	}
-
-	sl_int64 Database::executeBy(const String& sql, const Variant* params, sl_uint32 nParams)
-	{
-		sl_int64 ret = _executeBy(sql, params, nParams);
-		if (ret < 0) {
-			_logError(sql, params, nParams);
-		} else {
-			_logSQL(sql, params, nParams);
-		}
-		return ret;
-	}
-	
-	Ref<DatabaseCursor> Database::_queryBy(const String& sql, const Variant* params, sl_uint32 nParams)
-	{
-		Ref<DatabaseStatement> statement = prepareStatement(sql);
-		if (statement.isNotNull()) {
-			return statement->queryBy(params, nParams);
-		}
-		return sl_null;
-	}
-
 	Ref<DatabaseCursor> Database::queryBy(const String& sql, const Variant* params, sl_uint32 nParams)
 	{
 		Ref<DatabaseCursor> ret = _queryBy(sql, params, nParams);
@@ -111,42 +123,18 @@ namespace slib
 		return ret;
 	}
 
-	List< HashMap<String, Variant> > Database::getListForQueryResult(const String& sql)
+	Ref<DatabaseCursor> Database::query(const String& sql)
 	{
-		Ref<DatabaseCursor> cursor = query(sql);
-		if (cursor.isNotNull()) {
-			List< HashMap<String, Variant> > ret;
-			while (cursor->moveNext()) {
-				ret.add_NoLock(cursor->getRow());
-			}
-			return ret;
+		Ref<DatabaseCursor> ret = _query(sql);
+		if (ret.isNull()) {
+			_logError(sql);
+		} else {
+			_logSQL(sql);
 		}
-		return sl_null;
+		return ret;
 	}
 	
-	HashMap<String, Variant> Database::getRecordForQueryResult(const String& sql)
-	{
-		Ref<DatabaseCursor> cursor = query(sql);
-		if (cursor.isNotNull()) {
-			if (cursor->moveNext()) {
-				return cursor->getRow();
-			}
-		}
-		return sl_null;
-	}
-	
-	Variant Database::getValueForQueryResult(const String& sql)
-	{
-		Ref<DatabaseCursor> cursor = query(sql);
-		if (cursor.isNotNull()) {
-			if (cursor->moveNext()) {
-				return cursor->getValue(0);
-			}
-		}
-		return sl_null;
-	}
-	
-	List< HashMap<String, Variant> > Database::getListForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams)
+	List< HashMap<String, Variant> > Database::getRecordsBy(const String& sql, const Variant* params, sl_uint32 nParams)
 	{
 		Ref<DatabaseCursor> cursor = queryBy(sql, params, nParams);
 		if (cursor.isNotNull()) {
@@ -159,7 +147,20 @@ namespace slib
 		return sl_null;
 	}
 
-	HashMap<String, Variant> Database::getRecordForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams)
+	List< HashMap<String, Variant> > Database::getRecords(const String& sql)
+	{
+		Ref<DatabaseCursor> cursor = query(sql);
+		if (cursor.isNotNull()) {
+			List< HashMap<String, Variant> > ret;
+			while (cursor->moveNext()) {
+				ret.add_NoLock(cursor->getRow());
+			}
+			return ret;
+		}
+		return sl_null;
+	}
+	
+	HashMap<String, Variant> Database::getRecordBy(const String& sql, const Variant* params, sl_uint32 nParams)
 	{
 		Ref<DatabaseCursor> cursor = queryBy(sql, params, nParams);
 		if (cursor.isNotNull()) {
@@ -170,7 +171,18 @@ namespace slib
 		return sl_null;
 	}
 
-	Variant Database::getValueForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams)
+	HashMap<String, Variant> Database::getRecord(const String& sql)
+	{
+		Ref<DatabaseCursor> cursor = query(sql);
+		if (cursor.isNotNull()) {
+			if (cursor->moveNext()) {
+				return cursor->getRow();
+			}
+		}
+		return sl_null;
+	}
+	
+	Variant Database::getValueBy(const String& sql, const Variant* params, sl_uint32 nParams)
 	{
 		Ref<DatabaseCursor> cursor = queryBy(sql, params, nParams);
 		if (cursor.isNotNull()) {
@@ -181,6 +193,17 @@ namespace slib
 		return sl_null;
 	}
 
+	Variant Database::getValue(const String& sql)
+	{
+		Ref<DatabaseCursor> cursor = query(sql);
+		if (cursor.isNotNull()) {
+			if (cursor->moveNext()) {
+				return cursor->getValue(0);
+			}
+		}
+		return sl_null;
+	}
+	
 	sl_bool Database::isLoggingSQL()
 	{
 		return m_flagLogSQL;
@@ -200,7 +223,115 @@ namespace slib
 	{
 		m_flagLogErrors = flag;
 	}
-	
+
+	DatabaseDialect Database::getDialect()
+	{
+		return m_dialect;
+	}
+
+	sl_bool Database::createTable(const DatabaseCreateTableParam& param)
+	{
+		SqlBuilder builder(m_dialect);
+		builder.generateCreateTable(param);
+		String sql = builder.toString();
+		if (sql.isEmpty()) {
+			return sl_false;
+		}
+		return execute(sql) >= 0;
+	}
+
+	sl_bool Database::createTable(const DatabaseIdentifier& table, const ListParam<DatabaseColumnDefinition>& columns, DatabaseFlags flags)
+	{
+		DatabaseCreateTableParam param;
+		param.table = table;
+		param.columns = columns;
+		param.flags = flags;
+		return createTable(param);
+	}
+
+	sl_bool Database::dropTable(const DatabaseIdentifier& table, DatabaseFlags flags)
+	{
+		SqlBuilder builder(m_dialect);
+		builder.generateDropTable(table, flags);
+		String sql = builder.toString();
+		if (sql.isEmpty()) {
+			return sl_false;
+		}
+		return execute(sql) >= 0;
+	}
+
+	sl_bool Database::createIndex(const DatabaseCreateIndexParam& param)
+	{
+		SqlBuilder builder(m_dialect);
+		builder.generateCreateIndex(param);
+		String sql = builder.toString();
+		if (sql.isEmpty()) {
+			return sl_false;
+		}
+		return execute(sql) >= 0;
+	}
+
+	sl_bool Database::createIndex(const DatabaseIdentifier& index, const String& table, const ListParam<DatabaseIndexColumn>& columns, DatabaseFlags flags)
+	{
+		DatabaseCreateIndexParam param;
+		param.index = index;
+		param.table = table;
+		param.columns = columns;
+		param.flags = flags;
+		return createIndex(param);
+	}
+
+	sl_bool Database::dropIndex(const DatabaseIdentifier& index, const String& table, DatabaseFlags flags)
+	{
+		SqlBuilder builder(m_dialect);
+		builder.generateDropIndex(index, table, flags);
+		String sql = builder.toString();
+		if (sql.isEmpty()) {
+			return sl_false;
+		}
+		return execute(sql) >= 0;
+	}
+
+	Ref<DatabaseStatement> Database::prepareInsert(const DatabaseIdentifier& table, const ListParam<String>& columns)
+	{
+		SqlBuilder builder(m_dialect);
+		builder.generateInsert(table, columns);
+		String sql = builder.toString();
+		if (sql.isEmpty()) {
+			return sl_null;
+		}
+		return prepareStatement(sql);
+	}
+
+	Ref<DatabaseStatement> Database::prepareUpdate(const DatabaseIdentifier& table, const ListParam<String>& columns, const DatabaseExpression& where)
+	{
+		SqlBuilder builder(m_dialect);
+		builder.generateUpdate(table, columns, where);
+		String sql = builder.toString();
+		if (sql.isEmpty()) {
+			return sl_null;
+		}
+		return prepareStatement(sql);
+	}
+
+	sl_bool Database::startTransaction()
+	{
+		SLIB_STATIC_STRING(s, "BEGIN")
+		return execute(s) >= 0;
+	}
+
+	sl_bool Database::commitTransaction()
+	{
+		SLIB_STATIC_STRING(s, "COMMIT")
+		return execute(s) >= 0;
+	}
+
+	sl_bool Database::rollbackTransaction()
+	{
+		SLIB_STATIC_STRING(s, "ROLLBACK")
+		return execute(s) >= 0;
+	}
+
 	void Database::_logSQL(const String& sql)
 	{
 		if (m_flagLogSQL) {

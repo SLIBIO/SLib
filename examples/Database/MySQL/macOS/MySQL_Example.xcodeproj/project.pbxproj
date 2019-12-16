@@ -9,17 +9,23 @@
 /* Begin PBXBuildFile section */
 		265BF19B2172481E0073F7B8 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 265BF19A2172481E0073F7B8 /* Cocoa.framework */; };
 		26DA4B55223EA10E00706393 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26DA4B54223EA10E00706393 /* main.cpp */; };
+		26EA206C239B7B25008218D7 /* libcrypto.1.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 26EA2067239B7B09008218D7 /* libcrypto.1.0.0.dylib */; };
+		26EA206D239B7B25008218D7 /* libmysqlclient.21.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 26EA2068239B7B09008218D7 /* libmysqlclient.21.dylib */; };
+		26EA206E239B7B25008218D7 /* libssl.1.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 26EA2066239B7B09008218D7 /* libssl.1.0.0.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		263BCA531EA6891E005C75F4 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 16;
 			files = (
+				26EA206C239B7B25008218D7 /* libcrypto.1.0.0.dylib in CopyFiles */,
+				26EA206D239B7B25008218D7 /* libmysqlclient.21.dylib in CopyFiles */,
+				26EA206E239B7B25008218D7 /* libssl.1.0.0.dylib in CopyFiles */,
 			);
-			runOnlyForDeploymentPostprocessing = 1;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -27,7 +33,9 @@
 		263BCA551EA6891E005C75F4 /* MySQL_Example */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MySQL_Example; sourceTree = BUILT_PRODUCTS_DIR; };
 		265BF19A2172481E0073F7B8 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		26DA4B54223EA10E00706393 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../main.cpp; sourceTree = "<group>"; };
-		26DA4B56223ED0AB00706393 /* libmysqlclient.21.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmysqlclient.21.dylib; path = ../../../../external/bin/libmysqlclient/macOS/libmysqlclient.21.dylib; sourceTree = "<group>"; };
+		26EA2066239B7B09008218D7 /* libssl.1.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.1.0.0.dylib; path = ../../../../external/bin/libmysqlclient/macOS/libssl.1.0.0.dylib; sourceTree = "<group>"; };
+		26EA2067239B7B09008218D7 /* libcrypto.1.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.1.0.0.dylib; path = ../../../../external/bin/libmysqlclient/macOS/libcrypto.1.0.0.dylib; sourceTree = "<group>"; };
+		26EA2068239B7B09008218D7 /* libmysqlclient.21.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmysqlclient.21.dylib; path = ../../../../external/bin/libmysqlclient/macOS/libmysqlclient.21.dylib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,7 +53,9 @@
 		263BCA4C1EA6891E005C75F4 = {
 			isa = PBXGroup;
 			children = (
-				26DA4B56223ED0AB00706393 /* libmysqlclient.21.dylib */,
+				26EA2067239B7B09008218D7 /* libcrypto.1.0.0.dylib */,
+				26EA2068239B7B09008218D7 /* libmysqlclient.21.dylib */,
+				26EA2066239B7B09008218D7 /* libssl.1.0.0.dylib */,
 				26DA4B54223EA10E00706393 /* main.cpp */,
 				263BCA561EA6891E005C75F4 /* Products */,
 				263BCA611EA68ADD005C75F4 /* Frameworks */,

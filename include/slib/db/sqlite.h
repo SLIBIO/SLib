@@ -35,7 +35,7 @@ namespace slib
 		sl_bool flagCreate;
 		sl_bool flagReadonly;
 		String encryptionKey;
-		
+				
 	public:
 		SQLiteParam();
 		
@@ -53,14 +53,9 @@ namespace slib
 		~SQLiteDatabase();
 
 	public:
-		static Ref<SQLiteDatabase> connect(const SQLiteParam& param);
+		static Ref<SQLiteDatabase> open(const SQLiteParam& param);
 
-		static Ref<SQLiteDatabase> connect(const String& filePath);
-
-	public:
-		virtual sl_bool isTableExisting(const String& name) = 0;
-		
-		virtual sl_uint64 getLastInsertRowId() = 0;
+		static Ref<SQLiteDatabase> open(const String& filePath);
 		
 	};
 

@@ -6,11 +6,14 @@ int main(int argc, const char * argv[])
 {
 	SQLiteParam param;
 	param.path = System::getHomeDirectory() + "/test.sqlite";
-	Ref<SQLiteDatabase> db = SQLiteDatabase::connect(param);
+	Ref<SQLiteDatabase> db = SQLiteDatabase::open(param);
 	if (db.isNull()) {
 		Println("Cannot connect to database file.");
 		return 1;
 	}
+	
+	Println("book table existing: %s", db->isTableExisting("book"));
+	Println("Tables=%s", Json(db->getTables()));
 	
 	db->execute(
 		R"sql(
@@ -29,7 +32,7 @@ int main(int argc, const char * argv[])
 		db->execute("INSERT INTO book (title, abstract) VALUES(?, ?)", title, abstract);
 	}
 	
-	for (auto& row : db->getListForQueryResult("SELECT * from book")) {
+	for (auto& row : db->getRecords("SELECT * from book")) {
 		String title = row["title"].getString();
 		String abstract = row["abstract"].getString();
 		Println("Title: %s, Abstract: %s", title, abstract);

@@ -282,6 +282,8 @@ set (SLIB_EXTRA_FILES
  
  "${SLIB_PATH}/src/slib/db/database.cpp"
  "${SLIB_PATH}/src/slib/db/database_cursor.cpp"
+ "${SLIB_PATH}/src/slib/db/database_expression.cpp"
+ "${SLIB_PATH}/src/slib/db/database_sql.cpp"
  "${SLIB_PATH}/src/slib/db/database_statement.cpp"
  "${SLIB_PATH}/src/slib/db/mysql.cpp"
  "${SLIB_PATH}/src/slib/db/redis.cpp"

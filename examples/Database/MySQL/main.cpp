@@ -16,6 +16,12 @@ int main(int argc, const char * argv[])
 		return -1;
 	}
 	
+	Println("test database existing: %s", db->isDatabaseExisting("test"));
+	Println("Databases=%s", Json(db->getDatabases()));
+
+	Println("book table existing: %s", db->isTableExisting("book"));
+	Println("Tables=%s", Json(db->getTables()));
+	
 	db->execute(
 		R"sql(
 			DROP TABLE IF EXISTS book;

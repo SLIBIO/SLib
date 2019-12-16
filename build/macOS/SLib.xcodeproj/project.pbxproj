@@ -1409,6 +1409,8 @@
 		26E1B8AA222ABAB2007C222E /* jutils.c in Sources */ = {isa = PBXBuildFile; fileRef = 260506A720CFB01400032B2C /* jutils.c */; };
 		26E44AE92321832000A88D93 /* collection_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2650D3912320694C00B0CF2C /* collection_view.cpp */; };
 		26EA2061239A90E2008218D7 /* ui_notification_fcm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26EA2060239A90E2008218D7 /* ui_notification_fcm.cpp */; };
+		26EA207123A2BF75008218D7 /* database_sql.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26EA206F23A2BF75008218D7 /* database_sql.cpp */; };
+		26EA207223A2BF75008218D7 /* database_expression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26EA207023A2BF75008218D7 /* database_expression.cpp */; };
 		26F2F8D91EC2E0EB0074C29E /* red_black_tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F2F8D81EC2E0EB0074C29E /* red_black_tree.cpp */; };
 		26F53F7E22DB4F6D0031D485 /* date_picker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F53F7C22DB4F6C0031D485 /* date_picker.cpp */; };
 		26F53F7F22DB4F6D0031D485 /* date_picker_macos.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26F53F7D22DB4F6D0031D485 /* date_picker_macos.mm */; };
@@ -2903,6 +2905,8 @@
 		26E376E01C987F6200B178E6 /* matrix4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix4.cpp; sourceTree = "<group>"; };
 		26E63F441E337B2300F50E8A /* ui_animation_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_animation_apple.mm; sourceTree = "<group>"; };
 		26EA2060239A90E2008218D7 /* ui_notification_fcm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_notification_fcm.cpp; sourceTree = "<group>"; };
+		26EA206F23A2BF75008218D7 /* database_sql.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database_sql.cpp; sourceTree = "<group>"; };
+		26EA207023A2BF75008218D7 /* database_expression.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database_expression.cpp; sourceTree = "<group>"; };
 		26F2F8D81EC2E0EB0074C29E /* red_black_tree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = red_black_tree.cpp; sourceTree = "<group>"; };
 		26F53F7C22DB4F6C0031D485 /* date_picker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = date_picker.cpp; sourceTree = "<group>"; };
 		26F53F7D22DB4F6D0031D485 /* date_picker_macos.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = date_picker_macos.mm; sourceTree = "<group>"; };
@@ -5398,6 +5402,8 @@
 			isa = PBXGroup;
 			children = (
 				265EBF1F1C23041600AD81D9 /* database_cursor.cpp */,
+				26EA207023A2BF75008218D7 /* database_expression.cpp */,
+				26EA206F23A2BF75008218D7 /* database_sql.cpp */,
 				265EBF201C23041600AD81D9 /* database_statement.cpp */,
 				265EBF211C23041600AD81D9 /* database.cpp */,
 				265EBF221C23041600AD81D9 /* mysql.cpp */,
@@ -6986,6 +6992,7 @@
 				26E1B879222ABA51007C222E /* pngwtran.c in Sources */,
 				26E1B864222A8250007C222E /* gzwrite.c in Sources */,
 				265A93522304298600B155A2 /* global_unique_instance.cpp in Sources */,
+				26EA207123A2BF75008218D7 /* database_sql.cpp in Sources */,
 				26C1B63F20D51D1D00E36539 /* font.cpp in Sources */,
 				26D9D9021E9645CE005F7BD3 /* list.cpp in Sources */,
 				26D9D9031E9645CE005F7BD3 /* system_unix.cpp in Sources */,
@@ -7058,6 +7065,7 @@
 				265A936A2304832300B155A2 /* console.cpp in Sources */,
 				26D9D9741E96466A005F7BD3 /* graphics_util.cpp in Sources */,
 				26D9D90F1E9645CE005F7BD3 /* mutex.cpp in Sources */,
+				26EA207223A2BF75008218D7 /* database_expression.cpp in Sources */,
 				262D59AA232587AF00F85780 /* noto_emoji_png.cpp in Sources */,
 				26FD9030235DE31600574068 /* charset_ext.cpp in Sources */,
 				26D9D9E41E96468D005F7BD3 /* ui_event_macos.mm in Sources */,
