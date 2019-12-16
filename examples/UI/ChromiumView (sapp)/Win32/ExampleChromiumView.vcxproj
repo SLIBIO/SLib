@@ -75,6 +75,7 @@
     <LibraryPath>$(SLIB_PATH)/lib/Win32/$(Configuration)-$(Platform);$(SLIB_PATH)/external/bin/libcef/Win32/$(Platform);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)build\$(Platform)-$(Configuration)\</OutDir>
     <IntDir>build\intermediate\$(Platform)-$(Configuration)\</IntDir>
+    <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -82,6 +83,7 @@
     <LibraryPath>$(SLIB_PATH)/lib/Win32/$(Configuration)-$(Platform);$(SLIB_PATH)/external/bin/libcef/Win32/$(Platform);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)build\$(Platform)-$(Configuration)\</OutDir>
     <IntDir>build\intermediate\$(Platform)-$(Configuration)\</IntDir>
+    <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -89,6 +91,7 @@
     <LibraryPath>$(SLIB_PATH)/lib/Win32/$(Configuration)-$(Platform);$(SLIB_PATH)/external/bin/libcef/Win32/$(Platform);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)build\$(Platform)-$(Configuration)\</OutDir>
     <IntDir>build\intermediate\$(Platform)-$(Configuration)\</IntDir>
+    <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -96,6 +99,7 @@
     <LibraryPath>$(SLIB_PATH)/lib/Win32/$(Configuration)-$(Platform);$(SLIB_PATH)/external/bin/libcef/Win32/$(Platform);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)build\$(Platform)-$(Configuration)\</OutDir>
     <IntDir>build\intermediate\$(Platform)-$(Configuration)\</IntDir>
+    <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -110,6 +114,15 @@
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>slib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <CustomBuildStep>
+      <Command>echo "Building sapp application"</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>sapp.output;%(Outputs)</Outputs>
+    </CustomBuildStep>
+    <PreBuildEvent>
+      <Command>"$(SLIB_PATH)/tool/bin/sapp" gen "$(ProjectDir)../sapp"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -124,6 +137,15 @@
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>slib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <CustomBuildStep>
+      <Command>echo "Building sapp application"</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>sapp.output;%(Outputs)</Outputs>
+    </CustomBuildStep>
+    <PreBuildEvent>
+      <Command>"$(SLIB_PATH)/tool/bin/sapp" gen "$(ProjectDir)../sapp"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -142,6 +164,15 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>slib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <CustomBuildStep>
+      <Command>echo "Building sapp application"</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>sapp.output;%(Outputs)</Outputs>
+    </CustomBuildStep>
+    <PreBuildEvent>
+      <Command>"$(SLIB_PATH)/tool/bin/sapp" gen "$(ProjectDir)../sapp"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -160,6 +191,15 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>slib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <CustomBuildStep>
+      <Command>echo "Building sapp application"</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>sapp.output;%(Outputs)</Outputs>
+    </CustomBuildStep>
+    <PreBuildEvent>
+      <Command>"$(SLIB_PATH)/tool/bin/sapp" gen "$(ProjectDir)../sapp"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\gen\colors.cpp" />
