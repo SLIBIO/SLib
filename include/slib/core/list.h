@@ -188,6 +188,14 @@ namespace slib
 		
 		sl_bool adjustCapacity(sl_size newCount) noexcept;
 		
+		sl_bool growCapacity_NoLock(sl_size newCount) noexcept;
+		
+		sl_bool growCapacity(sl_size newCount) noexcept;
+		
+		sl_bool shrinkCapacity_NoLock() noexcept;
+		
+		sl_bool shrinkCapacity() noexcept;
+		
 		sl_bool shrinkToFit_NoLock() noexcept;
 		
 		sl_bool shrinkToFit() noexcept;

@@ -32,6 +32,10 @@ namespace slib
 			
 			sl_bool adjustCapacity(void* pData, sl_size elementSize, sl_size* pCapacity, sl_size* pCount, sl_size newCount) noexcept;		
 
+			sl_bool growCapacity(void* pData, sl_size elementSize, sl_size* pCapacity, sl_size newCount) noexcept;		
+
+			sl_bool shrinkCapacity(void* pData, sl_size elementSize, sl_size* pCapacity, sl_size newCount) noexcept;		
+
 		}
 	}
 
@@ -605,6 +609,32 @@ namespace slib
 	}
 
 	template <class T>
+	SLIB_INLINE sl_bool CList<T>::growCapacity_NoLock(sl_size newCount) noexcept
+	{
+		return priv::list::growCapacity(reinterpret_cast<void*>(&m_data), sizeof(T), &m_capacity, newCount);
+	}
+
+	template <class T>
+	SLIB_INLINE sl_bool CList<T>::growCapacity(sl_size newCount) noexcept
+	{
+		ObjectLocker lock(this);
+		return priv::list::growCapacity(reinterpret_cast<void*>(&m_data), sizeof(T), &m_capacity, newCount);
+	}
+	
+	template <class T>
+	SLIB_INLINE sl_bool CList<T>::shrinkCapacity_NoLock() noexcept
+	{
+		return priv::list::shrinkCapacity(reinterpret_cast<void*>(&m_data), sizeof(T), &m_capacity, m_count);
+	}
+	
+	template <class T>
+	SLIB_INLINE sl_bool CList<T>::shrinkCapacity() noexcept
+	{
+		ObjectLocker lock(this);
+		return priv::list::shrinkCapacity(reinterpret_cast<void*>(&m_data), sizeof(T), &m_capacity, m_count);
+	}
+	
+	template <class T>
 	SLIB_INLINE sl_bool CList<T>::shrinkToFit_NoLock() noexcept
 	{
 		return priv::list::setCapacity(reinterpret_cast<void*>(&m_data), sizeof(T), &m_capacity, &m_count, m_count);
@@ -626,7 +656,7 @@ namespace slib
 			index = oldCount;
 		}
 		sl_size newCount = oldCount + 1;
-		if (adjustCapacity_NoLock(newCount)) {
+		if (growCapacity_NoLock(newCount)) {
 			T* data = m_data + index;
 			if (index < oldCount) {
 				Base::moveMemory(data + 1, data, (oldCount - index) * sizeof(T));
@@ -658,7 +688,7 @@ namespace slib
 			index = oldCount;
 		}
 		sl_size newCount = oldCount + nValues;
-		if (adjustCapacity_NoLock(newCount)) {
+		if (growCapacity_NoLock(newCount)) {
 			T* data = m_data + index;
 			if (index < oldCount) {
 				Base::moveMemory(data + nValues, data, (oldCount - index) * sizeof(T));
@@ -692,7 +722,7 @@ namespace slib
 			index = oldCount;
 		}
 		sl_size newCount = oldCount + nValues;
-		if (adjustCapacity_NoLock(newCount)) {
+		if (growCapacity_NoLock(newCount)) {
 			T* data = m_data + index;
 			if (index < oldCount) {
 				Base::moveMemory(data + nValues, data, (oldCount - index) * sizeof(T));
@@ -749,7 +779,7 @@ namespace slib
 	{
 		sl_size oldCount = m_count;
 		sl_size newCount = oldCount + 1;
-		if (adjustCapacity_NoLock(newCount)) {
+		if (growCapacity_NoLock(newCount)) {
 			new (m_data + oldCount) T(Forward<ARGS>(args)...);
 			m_count = newCount;
 			return sl_true;
@@ -774,7 +804,7 @@ namespace slib
 		}
 		sl_size oldCount = m_count;
 		sl_size newCount = oldCount + nValues;
-		if (adjustCapacity_NoLock(newCount)) {
+		if (growCapacity_NoLock(newCount)) {
 			ArrayTraits<T>::copy_construct(m_data + oldCount, values, nValues);
 			m_count = newCount;
 			return sl_true;
@@ -801,7 +831,7 @@ namespace slib
 		}
 		sl_size oldCount = m_count;
 		sl_size newCount = oldCount + nValues;
-		if (adjustCapacity_NoLock(newCount)) {
+		if (growCapacity_NoLock(newCount)) {
 			T* data = m_data + oldCount;
 			for (sl_size i = 0; i < nValues; i++) {
 				new (data + i) T(value);
@@ -883,9 +913,8 @@ namespace slib
 			if (index + 1 < count) {
 				Base::moveMemory(m, m+1, (count - index - 1) * sizeof(T));
 			}
-			count--;
-			m_count = count;
-			adjustCapacity_NoLock(count);
+			m_count = count - 1;
+			shrinkCapacity_NoLock();
 			return sl_true;
 		}
 		return sl_false;
@@ -911,9 +940,8 @@ namespace slib
 			if (index + nValues < count) {
 				Base::moveMemory(dst, dst + nValues, (count - index - nValues) * sizeof(T));
 			}
-			count -= nValues;
-			m_count = count;
-			adjustCapacity_NoLock(count);
+			m_count = count - nValues;
+			shrinkCapacity_NoLock();
 			return nValues;
 		}
 		return 0;
@@ -939,9 +967,8 @@ namespace slib
 					if (i + 1 < count) {
 						Base::moveMemory(data + i, data + i + 1, (count - i - 1) * sizeof(T));
 					}
-					count--;
-					m_count = count;
-					adjustCapacity_NoLock(count);
+					m_count = count - 1;
+					shrinkCapacity_NoLock();
 					return sl_true;
 				}
 			}
@@ -1002,9 +1029,8 @@ namespace slib
 					if (i + 1 < count) {
 						Base::moveMemory(data + i, data + i + 1, (count - i - 1) * sizeof(T));
 					}
-					count--;
-					m_count = count;
-					adjustCapacity_NoLock(count);
+					m_count = count - 1;
+					shrinkCapacity_NoLock();
 					return sl_true;
 				}
 			}
@@ -1100,7 +1126,7 @@ namespace slib
 			count--;
 			Base::moveMemory(data, data + 1, count * sizeof(T));
 			m_count = count;
-			adjustCapacity_NoLock(count);
+			shrinkCapacity_NoLock();
 			return sl_true;
 		}
 		return sl_false;
@@ -1126,7 +1152,7 @@ namespace slib
 			count -= nElements;
 			Base::moveMemory(data, data + nElements, count * sizeof(T));
 			m_count = count;
-			adjustCapacity_NoLock(count);
+			shrinkCapacity_NoLock();
 			return nElements;
 		}
 		return 0;
@@ -1149,9 +1175,8 @@ namespace slib
 				*_out = Move(*data);
 			}
 			data->~T();
-			count--;
-			m_count = count;
-			adjustCapacity_NoLock(count);
+			m_count = count - 1;
+			shrinkCapacity_NoLock();
 			return sl_true;
 		}
 		return sl_false;
@@ -1173,9 +1198,8 @@ namespace slib
 				nElements = count;
 			}
 			ArrayTraits<T>::free(m_data + count - nElements, nElements);
-			count -= nElements;
-			m_count = count;
-			adjustCapacity_NoLock(count);
+			m_count = count - nElements;
+			shrinkCapacity_NoLock();
 			return nElements;
 		}
 		return 0;
@@ -3598,7 +3622,7 @@ namespace slib
 	SLIB_INLINE ListParam<T>::ListParam(const ListParam<T>& other) noexcept
 	{
 		m_count = other.m_count;
-		if (m_count == TYPE_LIST) {
+		if (m_count == (sl_size)TYPE_LIST) {
 			new (reinterpret_cast<List<T>*>(&m_data)) List<T>(*(reinterpret_cast<const List<T>*>(&(other.m_data))));
 		} else {
 			m_data = other.m_data;
@@ -3690,7 +3714,7 @@ namespace slib
 	{
 		_free();
 		m_count = other.m_count;
-		if (m_count == TYPE_LIST) {
+		if (m_count == (sl_size)TYPE_LIST) {
 			new (reinterpret_cast<List<T>*>(&m_data)) List<T>(*(reinterpret_cast<const List<T>*>(&(other.m_data))));
 		} else {
 			m_data = other.m_data;
@@ -3770,9 +3794,9 @@ namespace slib
 	template <class T>
 	SLIB_INLINE sl_size ListParam<T>::getCount() const noexcept
 	{
-		if (m_count == TYPE_LIST) {
+		if (m_count == (sl_size)TYPE_LIST) {
 			return (reinterpret_cast<const List<T>*>(&m_data))->getCount();
-		} else if (m_count == TYPE_OBJECT) {
+		} else if (m_count == (sl_size)TYPE_OBJECT) {
 			return ((CList<T>*)m_data)->getCount();
 		} else {
 			return m_count;
@@ -3782,9 +3806,9 @@ namespace slib
 	template <class T>
 	SLIB_INLINE T* ListParam<T>::getData() const noexcept
 	{
-		if (m_count == TYPE_LIST) {
+		if (m_count == (sl_size)TYPE_LIST) {
 			return (reinterpret_cast<const List<T>*>(&m_data))->getData();
-		} else if (m_count == TYPE_OBJECT) {
+		} else if (m_count == (sl_size)TYPE_OBJECT) {
 			return ((CList<T>*)m_data)->getData();
 		} else {
 			return (T*)m_data;
@@ -3794,9 +3818,9 @@ namespace slib
 	template <class T>
 	SLIB_INLINE CList<T>* ListParam<T>::getObject() const noexcept
 	{
-		if (m_count == TYPE_LIST) {
+		if (m_count == (sl_size)TYPE_LIST) {
 			return (reinterpret_cast<const List<T>*>(&m_data))->ref._ptr;
-		} else if (m_count == TYPE_OBJECT) {
+		} else if (m_count == (sl_size)TYPE_OBJECT) {
 			return (CList<T>*)m_data;
 		} else {
 			return sl_null;
@@ -3806,9 +3830,9 @@ namespace slib
 	template <class T>
 	List<T> ListParam<T>::toList() const noexcept
 	{
-		if (m_count == TYPE_LIST) {
+		if (m_count == (sl_size)TYPE_LIST) {
 			return *(reinterpret_cast<const List<T>*>(&m_data));
-		} else if (m_count == TYPE_OBJECT) {
+		} else if (m_count == (sl_size)TYPE_OBJECT) {
 			return ((CList<T>*)m_data)->duplicate();
 		} else {
 			return List<T>::create((T*)m_data, m_count);
@@ -3819,15 +3843,15 @@ namespace slib
 	template <class... ARGS>
 	sl_bool ListParam<T>::add(ARGS&&... args) noexcept
 	{
-		if (m_count == TYPE_LIST) {
+		if (m_count == (sl_size)TYPE_LIST) {
 			return (reinterpret_cast<List<T>*>(&m_data))->add_NoLock(Forward<ARGS>(args)...);
-		} else if (m_count == TYPE_OBJECT) {
+		} else if (m_count == (sl_size)TYPE_OBJECT) {
 			return ((CList<T>*)m_data)->add_NoLock(Forward<ARGS>(args)...);
 		} else {
 			if (m_count) {
 				return sl_false;
 			}
-			m_count = TYPE_LIST;
+			m_count = (sl_size)TYPE_LIST;
 			return (reinterpret_cast<List<T>*>(&m_data))->add_NoLock(Forward<ARGS>(args)...);
 		}
 	}
@@ -3835,7 +3859,7 @@ namespace slib
 	template <class T>
 	SLIB_INLINE const List<T>& ListParam<T>::_getList() const noexcept
 	{
-		if (m_count == TYPE_LIST) {
+		if (m_count == (sl_size)TYPE_LIST) {
 			return *(reinterpret_cast<const List<T>*>(&m_data));
 		} else {
 			return List<T>::null();
@@ -3845,7 +3869,7 @@ namespace slib
 	template <class T>
 	SLIB_INLINE void ListParam<T>::_free() noexcept
 	{
-		if (m_count == TYPE_LIST) {
+		if (m_count == (sl_size)TYPE_LIST) {
 			(*(reinterpret_cast<List<T>*>(&m_data))).List<T>::~List();
 		}
 	}

@@ -96,7 +96,52 @@ namespace slib
 						}
 					}
 				}
-				
+				return sl_true;
+			}
+			
+			sl_bool growCapacity(void* _pData, sl_size elementSize, sl_size* pCapacity, sl_size count) noexcept
+			{
+				if (*pCapacity < count) {
+					void** pData = reinterpret_cast<void**>(_pData);
+					sl_size newCapacity = *pCapacity * 3 / 2 + 1;
+					if (newCapacity < count) {
+						newCapacity = count;
+					}
+					if (newCapacity < PRIV_SLIB_LIST_CAPACITY_MIN) {
+						newCapacity = PRIV_SLIB_LIST_CAPACITY_MIN;
+					}
+					void* newData;
+					if (*pData) {
+						newData = Base::reallocMemory(*pData, newCapacity * elementSize);
+					} else {
+						newData = Base::createMemory(newCapacity * elementSize);
+					}
+					if (newData) {
+						*pData = newData;
+						*pCapacity = newCapacity;
+					} else {
+						return sl_false;
+					}
+				}
+				return sl_true;
+			}
+			
+			sl_bool shrinkCapacity(void* _pData, sl_size elementSize, sl_size* pCapacity, sl_size count) noexcept
+			{
+				if (*pCapacity > PRIV_SLIB_LIST_CAPACITY_MIN && count < *pCapacity / 2) {
+					void** pData = reinterpret_cast<void**>(_pData);
+					sl_size newCapacity = count * 3 / 2 + 1;
+					if (newCapacity < PRIV_SLIB_LIST_CAPACITY_MIN) {
+						newCapacity = PRIV_SLIB_LIST_CAPACITY_MIN;
+					}
+					if (newCapacity < *pCapacity) {
+						void* newData = Base::reallocMemory(*pData, newCapacity * elementSize);
+						if (newData) {
+							*pData = newData;
+							*pCapacity = newCapacity;
+						}
+					}
+				}
 				return sl_true;
 			}
 			
