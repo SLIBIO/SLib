@@ -22,11 +22,16 @@
 
 #include "slib/service/chat_client.h"
 
-#include "slib/ui/chat_view.h"
-
 namespace slib
 {
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(ChatClientParam)
+
+	ChatClientParam::ChatClientParam()
+	{
+	}
 	
+
 	SLIB_DEFINE_OBJECT(ChatClient, Object)
 
 	ChatClient::ChatClient()

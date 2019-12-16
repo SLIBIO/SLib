@@ -39,12 +39,11 @@ namespace slib
 				Ref<DatabaseStatement> smtGetMessagesFrom;
 				Ref<DatabaseStatement> smtGetMessagesTo;
 
-				sl_uint64 maxMessageId;
+				ChatRoom data;
 				
 			public:
 				Room()
 				{
-					maxMessageId = 0;
 				}
 
 			};
@@ -59,6 +58,9 @@ namespace slib
 				HashMap<sl_uint64, String> m_mapSenderIndexAndId;
 				
 				Ref<DatabaseStatement> m_smtInsertSenderId;
+				Ref<DatabaseStatement> m_smtGetContacts;
+				Ref<DatabaseStatement> m_smtGetContact;
+				Ref<DatabaseStatement> m_smtAddContact;
 
 			public:
 				static Ref<DatabaseImpl> create(const String& dbPath, const String& encryptionKey)
@@ -68,7 +70,7 @@ namespace slib
 						SQLiteParam param;
 						param.path = dbPath;
 						param.encryptionKey = encryptionKey;
-						Ref<SQLiteDatabase> db = SQLiteDatabase::connect(param);
+						Ref<SQLiteDatabase> db = SQLiteDatabase::open(param);
 						if (db.isNotNull()) {
 							ret->m_db = db;
 							if (ret->initialize()) {
@@ -92,6 +94,8 @@ namespace slib
 							}
 						}
 					} else {
+						StringParam p;
+						
 						if (m_db->execute("CREATE TABLE IF NOT EXISTS t_sender_index (f_sender_id TEXT NOT NULL UNIQUE);") < 0) {
 							return sl_false;
 						}
@@ -101,6 +105,56 @@ namespace slib
 						return sl_false;
 					}
 					return sl_true;
+				}
+				
+				List<ChatContact> getContacts() override
+				{
+					return sl_null;
+				}
+				
+				sl_bool getContact(const String& userId, ChatContact& outContact) override
+				{
+					return sl_false;
+				}
+				
+				sl_bool addContact(const ChatContact& contact) override
+				{
+					return sl_false;
+				}
+				
+				void updateContact(const ChatContact& contact) override
+				{
+					
+				}
+				
+				void removeContact(const String& userId) override
+				{
+					
+				}
+				
+				List<ChatRoom> getRooms() override
+				{
+					return sl_null;
+				}
+				
+				sl_bool getRoom(const String& roomId, ChatRoom& outRoom) override
+				{
+					return sl_false;
+				}
+				
+				sl_bool addRoom(const ChatRoom& room) override
+				{
+					return sl_false;
+				}
+				
+				void updateRoom(const ChatRoom& room) override
+				{
+					
+				}
+				
+				void removeRoom(const String& roomId) override
+				{
+					
 				}
 				
 				static String getRoomTableName(const String& roomId)
@@ -125,7 +179,6 @@ namespace slib
 							}
 						}
 						room = new Room;
-						room->maxMessageId = m_db->getValueForQueryResult("SELECT COUNT(f_msg_id) FROM " + tableName).getUint64();
 						room->smtInsertMessage = m_db->prepareStatement("INSERT INTO " + tableName + "(f_sender_index, f_msg_id, f_time, f_type, f_encrypted, f_inlined, f_text, f_content) VALUES (?,?,?,?,?,?,?,?)");
 						if (room->smtInsertMessage.isNull()) {
 							return sl_null;
@@ -162,9 +215,6 @@ namespace slib
 						m_mapSenderIndexAndId.put_NoLock(senderIndex, message.senderId);
 					}
 					if (room->smtInsertMessage->execute(senderIndex, message.messageId, message.time, (int)(message.contentType), message.flagEncrypted, message.flagInlined, message.text, message.content) > 0) {
-						if (room->maxMessageId < message.messageId) {
-							room->maxMessageId = message.messageId;
-						}
 						return sl_true;
 					}
 					return sl_false;
@@ -216,16 +266,6 @@ namespace slib
 				List<ChatMessage> getMessagesTo(const String& roomId, sl_uint64 end, sl_uint32 countLimit) override
 				{
 					return getMessages(roomId, sl_false, end, countLimit);
-				}
-
-				sl_uint64 getMaxMessageId(const String& roomId) override
-				{
-					ObjectLocker lock(this);
-					Ref<Room> room = m_mapRooms.getValue_NoLock(roomId);
-					if (room.isNull()) {
-						return 0;
-					}
-					return room->maxMessageId;
 				}
 
 			};

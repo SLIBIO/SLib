@@ -118,17 +118,23 @@ namespace slib
 	}
 
 
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(ChatRoom)
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(ChatContact)
 
-	ChatRoom::ChatRoom()
+	SLIB_DEFINE_JSON_MEMBERS(ChatContact, userId, name, iconData, data)
+
+	ChatContact::ChatContact()
 	{
 	}
 
 
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(ChatContact)
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(ChatRoom)
 
-	ChatContact::ChatContact()
+	SLIB_DEFINE_JSON_MEMBERS(ChatRoom, roomId, title, iconData, members, lastMessageId, lastReadMessageId)
+
+	ChatRoom::ChatRoom()
 	{
+		lastMessageId = 0;
+		lastReadMessageId = 0;
 	}
 
 
@@ -145,21 +151,33 @@ namespace slib
 	{
 	}
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(ChatServiceMessagesResponse)
+
+	ChatServiceMessagesResponse::ChatServiceMessagesResponse()
+	{
+	}
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(ChatServiceContactResponse)
+
+	ChatServiceContactResponse::ChatServiceContactResponse()
+	{
+	}
+
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(ChatServiceContactsResponse)
 
 	ChatServiceContactsResponse::ChatServiceContactsResponse()
 	{
 	}
 
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(ChatServiceRoomsResponse)
-
-	ChatServiceRoomsResponse::ChatServiceRoomsResponse()
-	{
-	}
-
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(ChatServiceRoomResponse)
 
 	ChatServiceRoomResponse::ChatServiceRoomResponse()
+	{
+	}
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(ChatServiceRoomsResponse)
+
+	ChatServiceRoomsResponse::ChatServiceRoomsResponse()
 	{
 	}
 

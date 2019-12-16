@@ -27,11 +27,10 @@
 
 #include "chat.h"
 
+#include "../ui/chat_view.h"
+
 namespace slib
 {
-
-	class ListView;
-	class ChatView;
 
 	class SLIB_EXPORT ChatClientParam
 	{
@@ -41,6 +40,11 @@ namespace slib
 		Ref<ChatView> chatView;
 		Ref<ChatClientDatabase> database;
 		Ref<ChatClientService> service;
+		
+	public:
+		ChatClientParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(ChatClientParam)
 		
 	};
 
