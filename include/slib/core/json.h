@@ -601,22 +601,22 @@ public: \
 
 #define SLIB_JSON_ADD_MEMBER_FROM(MEMBER_NAME, JSON_NAME) \
 	{ \
-		static sl_char8 _strJsonField_buf[] = JSON_NAME; \
-		static slib::priv::json::JsonFieldContainer _strJsonField_container(_strJsonField_buf, sizeof(_strJsonField_buf)-1); \
-		static slib::StringContainer* _strJsonField_str = &_strJsonField_container; \
-		static const slib::String& _strJsonField = *(reinterpret_cast<slib::String*>(&_strJsonField_str)); \
 		if (isFromJson) { \
+			static sl_char8 _strJsonField_buf[] = JSON_NAME; \
+			static slib::priv::json::JsonFieldContainer _strJsonField_container(_strJsonField_buf, sizeof(_strJsonField_buf)-1); \
+			static slib::StringContainer* _strJsonField_str = &_strJsonField_container; \
+			static const slib::String& _strJsonField = *(reinterpret_cast<slib::String*>(&_strJsonField_str)); \
 			slib::FromJson(json.getItem(_strJsonField), MEMBER_NAME); \
 		} \
 	}
 
 #define SLIB_JSON_ADD_MEMBER_TO(MEMBER_NAME, JSON_NAME) \
 	{ \
-		static sl_char8 _strJsonField_buf[] = JSON_NAME; \
-		static slib::priv::json::JsonFieldContainer _strJsonField_container(_strJsonField_buf, sizeof(_strJsonField_buf)-1); \
-		static slib::StringContainer* _strJsonField_str = &_strJsonField_container; \
-		static const slib::String& _strJsonField = *(reinterpret_cast<slib::String*>(&_strJsonField_str)); \
 		if (!isFromJson) { \
+			static sl_char8 _strJsonField_buf[] = JSON_NAME; \
+			static slib::priv::json::JsonFieldContainer _strJsonField_container(_strJsonField_buf, sizeof(_strJsonField_buf)-1); \
+			static slib::StringContainer* _strJsonField_str = &_strJsonField_container; \
+			static const slib::String& _strJsonField = *(reinterpret_cast<slib::String*>(&_strJsonField_str)); \
 			json.putItem(_strJsonField, MEMBER_NAME); \
 		} \
 	}
