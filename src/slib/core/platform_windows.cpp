@@ -334,7 +334,7 @@ namespace slib
 				si.fMask = SIF_POS | SIF_PAGE | SIF_RANGE;
 				GetScrollInfo(hWnd, SB_VERT, &si);
 
-				si.nPos += delta * (int)nWheel / WHEEL_DELTA;
+				si.nPos -= delta * (int)nWheel / WHEEL_DELTA;
 				if (si.nPos < si.nMin) {
 					si.nPos = si.nMin;
 				}
