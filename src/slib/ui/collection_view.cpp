@@ -594,6 +594,9 @@ namespace slib
 
 	void CollectionView::_updateItemLayout(const Ref<View>& itemView, sl_ui_pos x, sl_ui_len widthColumn, sl_ui_len heightColumn)
 	{
+		itemView->setPressedState(sl_false, UIUpdateMode::None);
+		itemView->setHoverState(sl_false, UIUpdateMode::None);
+
 		Ref<LayoutAttributes>& layoutAttrs = itemView->m_layoutAttrs;
 		if (layoutAttrs.isNotNull()) {
 			layoutAttrs->flagInvalidLayoutInParent = sl_true;

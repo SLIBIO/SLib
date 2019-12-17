@@ -79,7 +79,9 @@ namespace slib
 				{
 					Ref<ListView> lv = m_listView;
 					if (lv.isNotNull()) {
-						lv->_layoutItemViews(sl_true, sl_false, sl_false);
+						if (!(lv->getChildrenCount())) {
+							lv->_layoutItemViews(sl_true, sl_false, sl_false);
+						}
 					}
 					ViewGroup::dispatchDraw(canvas);
 				}
@@ -954,6 +956,8 @@ namespace slib
 	sl_ui_len ListView::_updateItemLayout(const Ref<View>& itemView, sl_ui_len widthList, sl_ui_len heightList)
 	{
 		if (itemView.isNotNull()) {
+			itemView->setPressedState(sl_false, UIUpdateMode::None);
+			itemView->setHoverState(sl_false, UIUpdateMode::None);
 			Ref<LayoutAttributes>& layoutAttrs = itemView->m_layoutAttrs;
 			if (layoutAttrs.isNotNull()) {
 				layoutAttrs->flagInvalidLayoutInParent = sl_true;
