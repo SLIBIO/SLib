@@ -206,6 +206,7 @@ namespace slib
 		if (listWidth.count && adapters.count != listWidth.count) {
 			return;
 		}
+		scrollTo(0, 0);
 		List<Column> columns;
 		for (sl_size i = 0; i < adapters.count; i++) {
 			if (listWidth.count) {
@@ -295,8 +296,6 @@ namespace slib
 	
 	void CollectionView::onAttach()
 	{
-		scrollTo(0, 0);
-		_requestLayout();
 	}
 	
 	Ref<View> CollectionView::_getView(ViewAdapter* adapter, sl_uint64 index, View* original)
