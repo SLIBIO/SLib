@@ -221,6 +221,9 @@ namespace slib
 				ret->m_style = style;
 				if (flagEnabledHyperlinksInPlainText) {
 					String16 url;
+					if (text.indexOf("https://") >= 0) {
+						url.setNull();
+					}
 					if (priv::text_word::checkURL(text, url)) {
 						Ref<TextStyle> styleNew = style->duplicate();
 						if (styleNew.isNotNull()) {
@@ -591,7 +594,7 @@ namespace slib
 			if (ch >= 0x80 && Emoji::isEmoji(ch)) {
 				flagEmoji = sl_true;
 			}
-			if (SLIB_CHAR_IS_WHITE_SPACE(ch) || flagEmoji) {
+			if (ch == ' ' || ch == 0xA0 || ch == '\t' || ch == '\r' || ch == '\n' || flagEmoji) {
 				if (startWord < pos) {
 					Ref<TextWordItem> item = TextWordItem::create(String16(sz + startWord, pos - startWord), style, flagEnabledHyperlinksInPlainText);
 					if (item.isNotNull()) {
@@ -599,7 +602,7 @@ namespace slib
 						m_positionLength += pos - startWord;
 					}
 				}
-				if (ch == ' ') {
+				if (ch == ' ' || ch == 0xA0 /*nbsp*/ ) {
 					Ref<TextSpaceItem> item = TextSpaceItem::create(style);
 					if (item.isNotNull()) {
 						m_items.add_NoLock(item);
