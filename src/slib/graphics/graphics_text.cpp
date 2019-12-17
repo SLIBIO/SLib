@@ -438,11 +438,13 @@ namespace slib
 	{
 		Ref<Font> font = getFont();
 		if (font.isNotNull()) {
-			sl_real h = font->getFontHeight();
-			return Size(h * 0.3f, h);
-		} else {
-			return Size::zero();
+			FontMetrics fm;
+			if (font->getFontMetrics(fm)) {
+				sl_real h = fm.ascent + fm.descent;
+				return Size(h * 0.3f, h);
+			}
 		}
+		return Size::zero();
 	}
 
 
@@ -473,10 +475,13 @@ namespace slib
 	{
 		Ref<Font> font = getFont();
 		if (font.isNotNull()) {
-			return font->getFontHeight();
-		} else {
-			return 0;
+			FontMetrics fm;
+			if (font->getFontMetrics(fm)) {
+				sl_real h = fm.ascent + fm.descent;
+				return h;
+			}
 		}
+		return 0;
 	}
 
 
