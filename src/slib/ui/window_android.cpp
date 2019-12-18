@@ -252,24 +252,6 @@ namespace slib
 					}
 				}
 
-				sl_bool isMinimized() override
-				{
-					return sl_false;
-				}
-
-				void setMinimized(sl_bool flag) override
-				{
-				}
-
-				sl_bool isMaximized() override
-				{
-					return sl_false;
-				}
-
-				void setMaximized(sl_bool flag) override
-				{
-				}
-
 				void setVisible(sl_bool flag) override
 				{
 					JniGlobal<jobject> _jwindow(m_window);
@@ -288,22 +270,6 @@ namespace slib
 					}
 				}
 
-				void setCloseButtonEnabled(sl_bool flag) override
-				{
-				}
-
-				void setMinimizeButtonEnabled(sl_bool flag) override
-				{
-				}
-
-				void setMaximizeButtonEnabled(sl_bool flag) override
-				{
-				}
-
-				void setResizable(sl_bool flag) override
-				{
-				}
-
 				void setAlpha(sl_real alpha) override
 				{
 					JniGlobal<jobject> _jwindow(m_window);
@@ -311,10 +277,6 @@ namespace slib
 					if (jwindow) {
 						JWindow::setAlpha.call(jwindow, (jfloat)alpha);
 					}
-				}
-
-				void setTransparent(sl_bool flag) override
-				{
 				}
 
 				UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen) override

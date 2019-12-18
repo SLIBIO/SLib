@@ -106,7 +106,7 @@ namespace slib
 						return;
 					}
 					if (window->getWindowInstance().isNotNull()) {
-						if (window->isCenterScreenOnCreate()) {
+						if (window->isCenterScreen()) {
 							UISize sizeWindowNew = window->getWindowSizeFromClientSize(sizeNew);
 							UIRect frame = window->getFrame();
 							frame.left -= (sizeWindowNew.x - frame.getWidth()) / 2;
@@ -147,12 +147,20 @@ namespace slib
 		m_flagVisible = sl_true;
 		m_flagMinimized = sl_false;
 		m_flagMaximized = sl_false;
-		
+		m_flagFullScreen =
+#if defined(SLIB_PLATFORM_IS_MOBILE)
+			sl_true;
+#else
+			sl_false;
+#endif
+
 		m_flagAlwaysOnTop = sl_false;
 		m_flagCloseButtonEnabled = sl_true;
 		m_flagMinimizeButtonEnabled = sl_false;
 		m_flagMaximizeButtonEnabled = sl_false;
+		m_flagFullScreenButtonEnabled = sl_false;
 		m_flagResizable = sl_false;
+		m_flagLayered = sl_false;
 		m_flagTransparent = sl_false;
 		
 		m_flagModal = sl_false;
@@ -160,13 +168,7 @@ namespace slib
 		m_flagDialog = sl_false;
 		m_flagBorderless = sl_false;
 		m_flagShowTitleBar = sl_true;
-		m_flagFullScreenOnCreate = 
-#if defined(SLIB_PLATFORM_IS_MOBILE)
-			sl_true;
-#else
-			sl_false;
-#endif
-		m_flagCenterScreenOnCreate = sl_false;
+		m_flagCenterScreen = sl_false;
 		m_flagWidthWrapping = sl_false;
 		m_flagHeightWrapping = sl_false;
 		m_flagCloseOnOK = sl_false;
@@ -582,11 +584,29 @@ namespace slib
 		}
 	}
 
-	sl_bool Window::isMinimized()
+	void Window::resetBackgroundColor()
 	{
 		Ref<WindowInstance> instance = m_instance;
 		if (instance.isNotNull()) {
-			m_flagMinimized = instance->isMinimized();
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::resetBackgroundColor)
+			m_flagDefaultBackgroundColor = sl_true;
+			m_backgroundColor.setZero();
+			instance->resetBackgroundColor();
+		} else {
+			m_flagDefaultBackgroundColor = sl_true;
+			m_backgroundColor.setZero();
+		}
+	}
+
+	sl_bool Window::isMinimized()
+	{
+		if (UI::isUiThread()) {
+			Ref<WindowInstance> instance = m_instance;
+			if (instance.isNotNull()) {
+				sl_bool f = m_flagMinimized;
+				instance->isMinimized(f);
+				m_flagMinimized = f;
+			}
 		}
 		return m_flagMinimized;
 	}
@@ -605,9 +625,13 @@ namespace slib
 
 	sl_bool Window::isMaximized()
 	{
-		Ref<WindowInstance> instance = m_instance;
-		if (instance.isNotNull()) {
-			m_flagMaximized = instance->isMaximized();
+		if (UI::isUiThread()) {
+			Ref<WindowInstance> instance = m_instance;
+			if (instance.isNotNull()) {
+				sl_bool f = m_flagMaximized;
+				instance->isMaximized(f);
+				m_flagMaximized = f;
+			}
 		}
 		return m_flagMaximized;
 	}
@@ -621,6 +645,31 @@ namespace slib
 			instance->setMaximized(flag);
 		} else {
 			m_flagMaximized = flag;
+		}
+	}
+
+	sl_bool Window::isFullScreen()
+	{
+		if (UI::isUiThread()) {
+			Ref<WindowInstance> instance = m_instance;
+			if (instance.isNotNull()) {
+				sl_bool f = m_flagFullScreen;
+				instance->isFullScreen(f);
+				m_flagFullScreen = f;
+			}
+		}
+		return m_flagFullScreen;
+	}
+
+	void Window::setFullScreen(sl_bool flag)
+	{
+		Ref<WindowInstance> instance = m_instance;
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setFullScreen, flag)
+			m_flagFullScreen = flag;
+			instance->setFullScreen(flag);
+		} else {
+			m_flagFullScreen = flag;
 		}
 	}
 
@@ -709,6 +758,23 @@ namespace slib
 		}
 	}
 
+	sl_bool Window::isFullScreenButtonEnabled()
+	{
+		return m_flagFullScreenButtonEnabled;
+	}
+
+	void Window::setFullScreenButtonEnabled(sl_bool flag)
+	{
+		Ref<WindowInstance> instance = m_instance;
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setFullScreenButtonEnabled, flag)
+			m_flagFullScreenButtonEnabled = flag;
+			instance->setFullScreenButtonEnabled(flag);
+		} else {
+			m_flagFullScreenButtonEnabled = flag;
+		}
+	}
+
 	sl_bool Window::isResizable()
 	{
 		return m_flagResizable;
@@ -723,6 +789,23 @@ namespace slib
 			instance->setResizable(flag);
 		} else {
 			m_flagResizable = flag;
+		}
+	}
+
+	sl_bool Window::isLayered()
+	{
+		return m_flagLayered;
+	}
+
+	void Window::setLayered(sl_bool flag)
+	{
+		Ref<WindowInstance> instance = m_instance;
+		if (instance.isNotNull()) {
+			SLIB_VIEW_RUN_ON_UI_THREAD(&Window::setLayered, flag)
+			m_flagLayered = flag;
+			instance->setLayered(flag);
+		} else {
+			m_flagLayered = flag;
 		}
 	}
 
@@ -1077,24 +1160,14 @@ namespace slib
 		m_flagShowTitleBar = flag;
 	}
 
-	sl_bool Window::isFullScreenOnCreate()
+	sl_bool Window::isCenterScreen()
 	{
-		return m_flagFullScreenOnCreate;
+		return m_flagCenterScreen;
 	}
 
-	void Window::setFullScreenOnCreate(sl_bool flag)
+	void Window::setCenterScreen(sl_bool flag)
 	{
-		m_flagFullScreenOnCreate = flag;
-	}
-
-	sl_bool Window::isCenterScreenOnCreate()
-	{
-		return m_flagCenterScreenOnCreate;
-	}
-
-	void Window::setCenterScreenOnCreate(sl_bool flag)
-	{
-		m_flagCenterScreenOnCreate = flag;
+		m_flagCenterScreen = flag;
 	}
 	
 	sl_bool Window::isCloseOnOK()
@@ -1190,9 +1263,6 @@ namespace slib
 	{
 		// save current window's properties
 		getFrame();
-		isMaximized();
-		isMinimized();
-		
 		Ref<View> view = m_viewContent;
 		if (view.isNotNull()) {
 			view->_removeParent();
@@ -1239,8 +1309,8 @@ namespace slib
 		param.screen = m_screen;
 		param.menu = m_menu;
 		param.flagBorderless = m_flagBorderless;
-		param.flagFullScreen = m_flagFullScreenOnCreate;
-		param.flagCenterScreen = m_flagCenterScreenOnCreate;
+		param.flagFullScreen = m_flagFullScreen;
+		param.flagCenterScreen = m_flagCenterScreen;
 		param.flagDialog = m_flagDialog;
 		param.flagModal = m_flagModal;
 		param.flagSheet = m_flagSheet;
@@ -1274,7 +1344,9 @@ namespace slib
 			window->setCloseButtonEnabled(m_flagCloseButtonEnabled);
 			window->setMinimizeButtonEnabled(m_flagMinimizeButtonEnabled);
 			window->setMaximizeButtonEnabled(m_flagMaximizeButtonEnabled);
+			window->setFullScreenButtonEnabled(m_flagFullScreenButtonEnabled);
 			window->setResizable(m_flagResizable);
+			window->setLayered(m_flagLayered);
 			window->setAlpha(m_alpha);
 			window->setTransparent(m_flagTransparent);
 			
@@ -1312,7 +1384,7 @@ namespace slib
 			dispatchResize(sizeClient.x, sizeClient.y);
 #endif
 #if defined(SLIB_UI_IS_WIN32)
-			if (m_flagDialog || m_flagBorderless || m_flagFullScreenOnCreate || !m_flagShowTitleBar) {
+			if (m_flagDialog || m_flagBorderless || m_flagFullScreen || !m_flagShowTitleBar) {
 				UISize sizeClient = getClientSize();
 				dispatchResize(sizeClient.x, sizeClient.y);
 			}
@@ -1343,6 +1415,7 @@ namespace slib
 					contentViewInstance->setOpaque(view.get(), view->isOpaque());
 					contentViewInstance->setDrawing(view.get(), view->isDrawing());
 					view->_attach(contentViewInstance);
+					instance->onAttachedContentView();
 				}
 			}
 		}
@@ -1520,6 +1593,7 @@ namespace slib
 
 	void Window::dispatchMinimize()
 	{
+		m_flagMinimized = sl_true;
 		SLIB_INVOKE_EVENT_HANDLER(Minimize)
 	}
 
@@ -1527,6 +1601,7 @@ namespace slib
 
 	void Window::dispatchDeminimize()
 	{
+		m_flagMinimized = sl_false;
 		SLIB_INVOKE_EVENT_HANDLER(Deminimize)
 	}
 
@@ -1534,8 +1609,8 @@ namespace slib
 
 	void Window::dispatchMaximize()
 	{
+		m_flagMaximized = sl_true;
 		_refreshSize(getClientSize());
-		
 		SLIB_INVOKE_EVENT_HANDLER(Maximize)
 	}
 	
@@ -1543,9 +1618,27 @@ namespace slib
 
 	void Window::dispatchDemaximize()
 	{
+		m_flagMaximized = sl_false;
 		_refreshSize(getClientSize());
-		
 		SLIB_INVOKE_EVENT_HANDLER(Demaximize)
+	}
+
+	SLIB_DEFINE_EVENT_HANDLER(Window, EnterFullScreen)
+
+	void Window::dispatchEnterFullScreen()
+	{
+		m_flagFullScreen = sl_true;
+		_refreshSize(getClientSize());
+		SLIB_INVOKE_EVENT_HANDLER(EnterFullScreen)
+	}
+
+	SLIB_DEFINE_EVENT_HANDLER(Window, ExitFullScreen)
+
+	void Window::dispatchExitFullScreen()
+	{
+		m_flagFullScreen = sl_false;
+		_refreshSize(getClientSize());
+		SLIB_INVOKE_EVENT_HANDLER(ExitFullScreen)
 	}
 
 	SLIB_DEFINE_EVENT_HANDLER(Window, OK, UIEvent* ev)
@@ -1720,6 +1813,75 @@ namespace slib
 	{
 	}
 
+	void WindowInstance::resetBackgroundColor()
+	{
+		setBackgroundColor(Color::zero());
+	}
+
+	void WindowInstance::isMinimized(sl_bool& _out)
+	{
+	}
+
+	void WindowInstance::setMinimized(sl_bool flag)
+	{
+	}
+
+	void WindowInstance::isMaximized(sl_bool& _out)
+	{
+	}
+
+	void WindowInstance::setMaximized(sl_bool flag)
+	{
+	}
+
+	void WindowInstance::isFullScreen(sl_bool& _out)
+	{
+	}
+
+	void WindowInstance::setFullScreen(sl_bool flag)
+	{
+	}
+
+	void WindowInstance::setVisible(sl_bool flag)
+	{
+	}
+
+	void WindowInstance::setAlwaysOnTop(sl_bool flag)
+	{
+	}
+
+	void WindowInstance::setCloseButtonEnabled(sl_bool flag)
+	{
+	}
+
+	void WindowInstance::setMinimizeButtonEnabled(sl_bool flag)
+	{
+	}
+
+	void WindowInstance::setMaximizeButtonEnabled(sl_bool flag)
+	{
+	}
+
+	void WindowInstance::setFullScreenButtonEnabled(sl_bool flag)
+	{
+	}
+
+	void WindowInstance::setResizable(sl_bool flag)
+	{
+	}
+
+	void WindowInstance::setLayered(sl_bool flag)
+	{
+	}
+
+	void WindowInstance::setAlpha(sl_real alpha)
+	{
+	}
+
+	void WindowInstance::setTransparent(sl_bool flag)
+	{
+	}
+
 	sl_bool WindowInstance::doModal()
 	{
 		return sl_false;
@@ -1811,6 +1973,26 @@ namespace slib
 		if (window.isNotNull()) {
 			window->dispatchDemaximize();
 		}
+	}
+
+	void WindowInstance::onEnterFullScreen()
+	{
+		Ref<Window> window = getWindow();
+		if (window.isNotNull()) {
+			window->dispatchEnterFullScreen();
+		}
+	}
+
+	void WindowInstance::onExitFullScreen()
+	{
+		Ref<Window> window = getWindow();
+		if (window.isNotNull()) {
+			window->dispatchExitFullScreen();
+		}
+	}
+
+	void WindowInstance::onAttachedContentView()
+	{
 	}
 
 }

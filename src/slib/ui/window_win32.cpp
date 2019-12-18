@@ -57,7 +57,10 @@ namespace slib
 
 				sl_bool m_flagBorderless;
 				sl_bool m_flagFullscreen;
+
 				sl_bool m_flagResizable;
+				sl_bool m_flagLayered;
+				sl_uint8 m_alpha;
 
 				sl_bool m_flagMinimized;
 				sl_bool m_flagMaximized;
@@ -71,9 +74,13 @@ namespace slib
 				Win32_WindowInstance()
 				{
 					m_handle = sl_null;
+
 					m_flagBorderless = sl_false;
 					m_flagFullscreen = sl_false;
+
 					m_flagResizable = sl_false;
+					m_flagLayered = sl_false;
+					m_alpha = 255;
 
 					m_flagMinimized = sl_false;
 					m_flagMaximized = sl_false;
@@ -123,9 +130,9 @@ namespace slib
 						DWORD style = WS_CLIPCHILDREN;
 						DWORD styleEx = WS_EX_CONTROLPARENT;
 						if (param.flagBorderless || param.flagFullScreen) {
-							style |= WS_POPUP;							
+							style |= WS_POPUP;
 						} else {
-							if (param.flagShowTitleBar){
+							if (param.flagShowTitleBar) {
 								if (param.flagDialog) {
 									style |= (WS_POPUP | WS_SYSMENU | WS_CAPTION | WS_BORDER);
 									styleEx |= WS_EX_DLGMODALFRAME;
@@ -155,7 +162,7 @@ namespace slib
 							hParent, // parent
 							UIPlatform::getMenuHandle(param.menu), // menu
 							hInst,
-							NULL);						
+							NULL);
 					}
 					return hWnd;
 				}
@@ -272,6 +279,7 @@ namespace slib
 							(int)(frame.left), (int)(frame.top),
 							(int)(frame.getWidth()), (int)(frame.getHeight()),
 							SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+						applyRegion(hWnd, frame.getWidth(), frame.getHeight());
 					}
 				}
 
@@ -344,25 +352,22 @@ namespace slib
 						UI::dispatchToUiThreadUrgently(SLIB_BIND_WEAKREF(void(), WindowInstance, setBackgroundColor, this, color));
 						return;
 					}
-					HWND hWnd = m_handle;
-					if (hWnd) {
-						m_backgroundColor = color;
-						InvalidateRect(hWnd, NULL, TRUE);
+					if (m_flagLayered) {
+						redrawLayered();
+					} else {
+						HWND hWnd = m_handle;
+						if (hWnd) {
+							m_backgroundColor = color;
+							InvalidateRect(hWnd, NULL, TRUE);
+						}
 					}
 				}
 
-				sl_bool isMinimized() override
+				void isMinimized(sl_bool& _out) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						BOOL flag = IsIconic(hWnd);
-						if (flag) {
-							return sl_true;
-						} else {
-							return sl_false;
-						}
-					} else {
-						return sl_false;
+						_out = IsIconic(hWnd) ? sl_true : sl_false;
 					}
 				}
 
@@ -382,18 +387,11 @@ namespace slib
 					}
 				}
 
-				sl_bool isMaximized() override
+				void isMaximized(sl_bool& _out) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						BOOL flag = IsZoomed(hWnd);
-						if (flag) {
-							return sl_true;
-						} else {
-							return sl_false;
-						}
-					} else {
-						return sl_false;
+						_out = IsZoomed(hWnd) ? sl_true : sl_false;
 					}
 				}
 
@@ -486,22 +484,42 @@ namespace slib
 					Windows::setWindowStyle(m_handle, WS_THICKFRAME, flag);
 				}
 
-				void setAlpha(sl_real _alpha) override
+				void setLayered(sl_bool flag) override
 				{
 					HWND hWnd = m_handle;
 					if (hWnd) {
-						sl_real alpha = _alpha * 255;
-						if (alpha < 0) {
-							alpha = 0;
+						if (m_flagLayered == flag) {
+							return;
 						}
-						if (alpha > 255) {
-							alpha = 255;
+						m_flagLayered = flag;
+						Windows::setWindowExStyle(hWnd, WS_EX_LAYERED, flag);
+						Ref<ViewInstance> instance = m_viewContent;
+						if (instance.isNotNull()) {
+							((Win32_ViewInstance*)(instance.get()))->setLayered(flag);
 						}
-						int a = (int)alpha;
-						Windows::setWindowExStyle(hWnd, WS_EX_LAYERED, a < 255);
-						if (a < 255) {
-							SetLayeredWindowAttributes(hWnd, 0, a, LWA_ALPHA);
+					}
+				}
+
+				void setAlpha(sl_real _alpha) override
+				{
+					if (m_flagLayered) {
+						return;
+					}
+					HWND hWnd = m_handle;
+					if (hWnd) {
+						int a = (int)(_alpha * 255);
+						if (a < 0) {
+							a = 0;
 						}
+						if (a > 255) {
+							a = 255;
+						}
+						if (m_alpha == (sl_uint8)a) {
+							return;
+						}
+						m_alpha = (sl_uint8)a;
+						Windows::setWindowExStyle(hWnd, WS_EX_LAYERED, m_alpha < 255);
+						SetLayeredWindowAttributes(hWnd, 0, m_alpha, LWA_ALPHA);
 						RedrawWindow(hWnd,
 							NULL,
 							NULL,
@@ -663,8 +681,61 @@ namespace slib
 					return sl_true;
 				}
 
-			};
+				void redrawLayered()
+				{
+					Ref<ViewInstance> instance = m_viewContent;
+					if (instance.isNotNull()) {
+						((Win32_ViewInstance*)(instance.get()))->onDrawLayered();
+					}
+				}
 
+				void onResize(HWND hWnd, sl_ui_pos width, sl_ui_pos height)
+				{
+					applyRegion(hWnd);
+					WindowInstance::onResize(width, height);
+				}
+
+				void onAttachedContentView() override
+				{
+					HWND hWnd = m_handle;
+					if (hWnd) {
+						applyRegion(hWnd);
+					}
+				}
+
+				void applyRegion(HWND hWnd)
+				{
+					RECT rc;
+					GetWindowRect(hWnd, &rc);
+					applyRegion(hWnd, (sl_ui_pos)(rc.right - rc.left), (sl_ui_pos)(rc.bottom - rc.top));
+				}
+
+				void applyRegion(HWND hWnd, sl_ui_pos width, sl_ui_pos height)
+				{
+					Ref<ViewInstance> vi = getContentView();
+					if (vi.isNotNull()) {
+						Ref<View> view = vi->getView();
+						if (view.isNotNull()) {
+							BoundShape shape = view->getBoundShape();
+							if (shape == BoundShape::Ellipse) {
+								HRGN hRgn = CreateEllipticRgn(0, 0, (int)width, (int)height);
+								if (hRgn) {
+									SetWindowRgn(hWnd, hRgn, TRUE);
+									DeleteObject(hRgn);
+								}
+							} else if (shape == BoundShape::RoundRect) {
+								Size radius = view->getBoundRadius();
+								HRGN hRgn = CreateRoundRectRgn(0, 0, (int)width, (int)height, (int)(radius.x), (int)(radius.y));
+								if (hRgn) {
+									SetWindowRgn(hWnd, hRgn, TRUE);
+									DeleteObject(hRgn);
+								}
+							}
+						}
+					}
+				}
+
+			};
 
 			LRESULT CALLBACK WindowInstanceProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			{
@@ -707,7 +778,7 @@ namespace slib
 							if (wParam == SIZE_MAXIMIZED) {
 								window->m_flagMaximized = sl_true;
 								window->onMaximize();
-								window->onResize((sl_ui_pos)width, (sl_ui_pos)height);
+								window->onResize(hWnd, (sl_ui_pos)width, (sl_ui_pos)height);
 							} else if (wParam == SIZE_MINIMIZED) {
 								window->m_flagMinimized = sl_true;
 								window->onMinimize();
@@ -718,9 +789,9 @@ namespace slib
 								} else if (window->m_flagMaximized) {
 									window->m_flagMaximized = sl_false;
 									window->onDemaximize();
-									window->onResize((sl_ui_pos)width, (sl_ui_pos)height);
+									window->onResize(hWnd, (sl_ui_pos)width, (sl_ui_pos)height);
 								} else {
-									window->onResize((sl_ui_pos)width, (sl_ui_pos)height);
+									window->onResize(hWnd, (sl_ui_pos)width, (sl_ui_pos)height);
 								}
 							}
 							break;
@@ -783,26 +854,6 @@ namespace slib
 							window->onMove();
 							break;
 						}
-					case WM_ERASEBKGND:
-						{
-							Ref<ViewInstance> contentInst = window->getContentView();
-							if (contentInst.isNotNull()) {
-								return TRUE;
-							}
-							HDC hDC = (HDC)(wParam);
-							Color color = window->m_backgroundColor;
-							if (color.a != 0) {
-								HBRUSH hBrush = CreateSolidBrush(GraphicsPlatform::getColorRef(color));
-								if (hBrush) {
-									RECT rect;
-									GetClientRect(hWnd, &rect);
-									FillRect(hDC, &rect, hBrush);
-									DeleteObject(hBrush);
-									return TRUE;
-								}
-							}
-							return DefWindowProcW(hWnd, uMsg, wParam, lParam);
-						}
 					case WM_NCHITTEST:
 						{
 							if (window->m_flagBorderless) {
@@ -811,7 +862,7 @@ namespace slib
 									short y = (short)((lParam >> 16) & 0xFFFF);
 									RECT rc;
 									GetWindowRect(hWnd, &rc);
-#define BORDER_SIZE 2
+#define BORDER_SIZE 4
 									rc.left += BORDER_SIZE;
 									rc.top += BORDER_SIZE;
 									rc.right -= BORDER_SIZE;
@@ -859,7 +910,7 @@ namespace slib
 								}
 							}
 							break;
-						}
+						}					
 					}
 				}
 				return priv::view::ViewInstanceProc(hWnd, uMsg, wParam, lParam);

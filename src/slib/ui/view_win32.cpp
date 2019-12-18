@@ -194,6 +194,7 @@ namespace slib
 	{
 		m_handle = NULL;
 		m_flagGenericView = sl_false;
+
 		m_flagDestroyOnRelease = sl_false;
 		m_actionMouseCapture = UIAction::MouseMove;
 	}
@@ -325,6 +326,11 @@ namespace slib
 			UI::dispatchToUiThreadUrgently(Function<void()>::bindWeakRef(this, func, sl_null));
 			return;
 		}
+		if (m_layered.isNotNull()) {
+			m_layered->flagInvalidated = sl_true;
+			UI::dispatchToUiThreadUrgently(SLIB_FUNCTION_WEAKREF(Win32_ViewInstance, updateLayered, this));
+			return;
+		}
 		HWND hWnd = m_handle;
 		if (hWnd) {
 			InvalidateRect(hWnd, NULL, TRUE);
@@ -336,6 +342,11 @@ namespace slib
 		if (!(UI::isUiThread()) || g_flagDuringPaint) {
 			void (ViewInstance::*func)(View*, const UIRect&) = &ViewInstance::invalidate;
 			UI::dispatchToUiThreadUrgently(Function<void()>::bindWeakRef(this, func, sl_null, rect));
+			return;
+		}
+		if (m_layered.isNotNull()) {
+			m_layered->flagInvalidated = sl_true;
+			UI::dispatchToUiThreadUrgently(SLIB_FUNCTION_WEAKREF(Win32_ViewInstance, updateLayered, this));
 			return;
 		}
 		HWND hWnd = m_handle;
@@ -366,6 +377,9 @@ namespace slib
 				, uFlags
 			);
 		}
+		if (m_layered.isNotNull()) {
+			onDrawLayered();
+		}
 	}
 
 	void Win32_ViewInstance::setTransform(View* view, const Matrix3 &transform)
@@ -385,6 +399,9 @@ namespace slib
 				, (int)(m_frame.getWidth()), (int)(m_frame.getHeight())
 				, uFlags
 			);
+		}
+		if (m_layered.isNotNull()) {
+			onDrawLayered();
 		}
 	}
 
@@ -533,6 +550,180 @@ namespace slib
 		}
 	}
 
+	void Win32_ViewInstance::setLayered(sl_bool flagLayered)
+	{
+		if (flagLayered) {
+			if (m_layered.isNull()) {
+				m_layered = new Win32_LayeredViewContext;
+			}
+			if (m_layered.isNotNull()) {
+				onDrawLayered();
+			}
+		} else {
+			m_layered.setNull();
+		}
+	}
+
+	void Win32_ViewInstance::updateLayered()
+	{
+		if (m_layered.isNotNull()) {
+			if (m_layered->flagInvalidated) {
+				m_layered->flagInvalidated = sl_false;
+				onDrawLayered();
+			}
+		}
+	}
+
+	void Win32_ViewInstance::onPaint(Canvas* canvas)
+	{
+		Ref<View> view = m_view;
+		if (view.isNull()) {
+			return;
+		}
+
+		static Ref<Bitmap> bitmap;
+		static Ref<Canvas> canvasBitmap;
+		UIRect rc = canvas->getInvalidatedRect();
+		UISize size = rc.getSize();
+		if (size.x < 1) {
+			return;
+		}
+		if (size.y < 1) {
+			return;
+		}
+		UISize screenSize = UI::getScreenSize();
+		if (size.x > screenSize.x) {
+			size.x = screenSize.x;
+		}
+		if (size.y > screenSize.y) {
+			size.y = screenSize.y;
+		}
+
+		sl_uint32 widthBitmap = (sl_uint32)(size.x);
+		sl_uint32 heightBitmap = (sl_uint32)(size.y);
+		if (bitmap.isNull() || canvasBitmap.isNull() || bitmap->getWidth() < widthBitmap || bitmap->getHeight() < heightBitmap) {
+			bitmap = Bitmap::create(widthBitmap, heightBitmap);
+			if (bitmap.isNull()) {
+				return;
+			}
+			canvasBitmap = bitmap->getCanvas();
+			if (canvasBitmap.isNull()) {
+				return;
+			}
+			canvasBitmap->setAntiAlias(sl_false);
+		}
+
+		Color colorBack(0);		
+		do {
+			if (view->isOpaque()) {
+				break;
+			}
+			if (m_flagWindowContent) {
+				Ref<Window> window = view->getWindow();
+				if (window.isNull()) {
+					return;
+				}
+				colorBack = window->getBackgroundColor();
+				if (colorBack.a == 255) {
+					break;
+				}
+			}
+			Color c = GetDefaultBackColor();
+			c.blend_PA_NPA(colorBack);
+			colorBack = c;
+		} while (0);
+		rc.setSize(size);
+		if (colorBack.isNotZero()) {
+			bitmap->resetPixels(0, 0, widthBitmap, heightBitmap, colorBack);
+		} else {
+			bitmap->resetPixels(0, 0, widthBitmap, 1, Color::White);
+		}
+		canvasBitmap->setInvalidatedRect(rc);
+		CanvasStateScope scope(canvasBitmap.get());
+		canvasBitmap->translate(-(sl_real)(rc.left), -(sl_real)(rc.top));
+		view->dispatchDraw(canvasBitmap.get());
+		canvasBitmap->translate((sl_real)(rc.left), (sl_real)(rc.top));
+		canvas->draw(rc, bitmap, Rectangle(0, 0, (sl_real)(size.x), (sl_real)(size.y)));
+	}
+
+	void Win32_ViewInstance::onPaint()
+	{
+		HWND hWnd = m_handle;
+		if (!hWnd) {
+			return;
+		}
+		PAINTSTRUCT ps;
+		HDC hDC = BeginPaint(hWnd, &ps);
+		if (!hDC) {
+			return;
+		}
+		if (ps.rcPaint.right > ps.rcPaint.left && ps.rcPaint.bottom > ps.rcPaint.top) {
+			Gdiplus::Graphics graphics(hDC);
+			RECT rect;
+			GetClientRect(hWnd, &rect);
+			Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, &graphics, rect.right, rect.bottom, sl_false);
+			if (canvas.isNotNull()) {
+				canvas->setAntiAlias(sl_false);
+				canvas->setInvalidatedRect(Rectangle((sl_real)(ps.rcPaint.left), (sl_real)(ps.rcPaint.top), (sl_real)(ps.rcPaint.right), (sl_real)(ps.rcPaint.bottom)));
+				g_flagDuringPaint = sl_true;
+				onPaint(canvas.get());
+				g_flagDuringPaint = sl_false;
+			}
+		}
+		EndPaint(hWnd, &ps);
+	}
+
+	void Win32_ViewInstance::onDrawLayered()
+	{
+		if (m_layered.isNull()) {
+			return;
+		}
+
+		HWND hWnd = m_handle;
+		if (!hWnd) {
+			return;
+		}
+
+		RECT rc;
+		GetWindowRect(hWnd, &rc);
+		sl_uint32 width = (sl_uint32)(rc.right - rc.left);
+		sl_uint32 height = (sl_uint32)(rc.bottom - rc.top);
+		if (width < 1 || height < 1) {
+			return;
+		}
+
+		if (!(m_layered->prepare(width, height))) {
+			return;
+		}
+
+		Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, m_layered->graphicsCache, width, height, sl_false);
+		if (canvas.isNotNull()) {
+			canvas->setAntiAlias(sl_false);
+			m_layered->graphicsCache->Clear(Gdiplus::Color(0));
+			canvas->setInvalidatedRect(Rectangle(0, 0, (sl_real)(width), (sl_real)(height)));
+			Ref<View> view = getView();
+			if (view.isNotNull()) {
+				view->dispatchDraw(canvas.get());
+			}
+		}
+
+		m_layered->sync(0, 0, width, height);
+
+		BLENDFUNCTION bf;
+		bf.AlphaFormat = AC_SRC_ALPHA;
+		bf.SourceConstantAlpha = 255;
+		bf.BlendFlags = 0;
+		bf.BlendOp = AC_SRC_OVER;
+		POINT ptSrc;
+		ptSrc.x = 0;
+		ptSrc.y = 0;
+		SIZE size;
+		size.cx = (LONG)width;
+		size.cy = (LONG)height;
+
+		UpdateLayeredWindow(hWnd, NULL, NULL, &size, m_layered->hdcCache, &ptSrc, 0, &bf, ULW_ALPHA);
+	}
+
 	sl_bool Win32_ViewInstance::onEventKey(sl_bool flagDown, WPARAM wParam, LPARAM lParam)
 	{
 		HWND hWnd = m_handle;
@@ -664,23 +855,7 @@ namespace slib
 
 			case WM_PAINT:
 				{
-					PAINTSTRUCT ps;
-					HDC hDC = BeginPaint(hWnd, &ps);
-					if (hDC) {
-						if (ps.rcPaint.right > ps.rcPaint.left && ps.rcPaint.bottom > ps.rcPaint.top) {
-							Gdiplus::Graphics graphics(hDC);
-							RECT rect;
-							GetClientRect(hWnd, &rect);
-							Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, &graphics, rect.right, rect.bottom, sl_false);
-							if (canvas.isNotNull()) {
-								canvas->setInvalidatedRect(Rectangle((sl_real)(ps.rcPaint.left), (sl_real)(ps.rcPaint.top), (sl_real)(ps.rcPaint.right), (sl_real)(ps.rcPaint.bottom)));
-								g_flagDuringPaint = sl_true;
-								onDraw(canvas.get());
-								g_flagDuringPaint = sl_false;
-							}
-						}
-						EndPaint(hWnd, &ps);
-					}
+					onPaint();
 					return 0;
 				}
 			case WM_LBUTTONDOWN:
@@ -964,6 +1139,131 @@ namespace slib
 
 	void Win32_ViewInstance::processPostControlColor(UINT msg, HDC hDC, HBRUSH& result)
 	{
+	}
+
+	Win32_LayeredViewContext::Win32_LayeredViewContext()
+	{
+		flagInvalidated = sl_false;
+
+		hdcCache = NULL;
+		hbmCache = NULL;
+		hbmOld = NULL;
+		graphicsCache = sl_null;
+		bitmapCache = sl_null;
+		widthCache = 0;
+		heightCache = 0;
+	}
+
+	Win32_LayeredViewContext::~Win32_LayeredViewContext()
+	{
+		clear();
+	}
+
+	sl_bool Win32_LayeredViewContext::prepare(sl_uint32 width, sl_uint32 height)
+	{
+		if (!width || !height) {
+			return sl_false;
+		}
+		if (widthCache >= width && heightCache >= height) {
+			return sl_true;
+		}
+		clear();
+		width = ((width - 1) | 0xFF) + 1;
+		height = ((height - 1) | 0xFF) + 1;
+		sl_uint32 sx = (sl_uint32)(GetSystemMetrics(SM_CXSCREEN));
+		sl_uint32 sy = (sl_uint32)(GetSystemMetrics(SM_CYSCREEN));
+		if (width > sx) {
+			width = sx;
+		}
+		if (height > sy) {
+			height = sy;
+		}
+		HDC hdcScreen = GetDC(HWND_DESKTOP);
+		if (!hdcScreen) {
+			return sl_false;
+		}
+		sl_bool bRet = sl_false;
+		Gdiplus::Bitmap* bitmap = new Gdiplus::Bitmap((int)width, (int)height, PixelFormat32bppARGB);
+		if (bitmap) {
+			Gdiplus::Graphics* graphics = new Gdiplus::Graphics(bitmap);
+			if (graphics) {
+				HDC hdc = CreateCompatibleDC(hdcScreen);
+				if (hdc) {
+					HBITMAP hbm = CreateCompatibleBitmap(hdcScreen, (int)width, (int)height);
+					if (hbm) {
+						hbmOld = SelectObject(hdc, hbm);
+						hbmCache = hbm;
+						hdcCache = hdc;
+						graphicsCache = graphics;
+						graphics = NULL;
+						bitmapCache = bitmap;
+						bitmap = NULL;
+						widthCache = width;
+						heightCache = height;
+						bRet = sl_true;
+					} else {
+						DeleteDC(hdc);
+					}
+				}
+				if (graphics) {
+					delete graphics;
+				}
+			}
+			if (bitmap) {
+				delete bitmap;
+			}
+		}
+		return bRet;
+	}
+
+	void Win32_LayeredViewContext::clear()
+	{
+		if (hdcCache) {
+			if (hbmOld) {
+				SelectObject(hdcCache, hbmOld);
+			}
+			DeleteDC(hdcCache);
+			hdcCache = NULL;
+		}
+		hbmOld = NULL;
+		if (hbmCache) {
+			DeleteObject(hbmCache);
+			hbmCache = NULL;
+		}
+		if (graphicsCache) {
+			delete graphicsCache;
+			graphicsCache = sl_null;
+		}
+		if (bitmapCache) {
+			delete bitmapCache;
+			bitmapCache = sl_null;
+		}
+		widthCache = 0;
+		heightCache = 0;
+	}
+
+	void Win32_LayeredViewContext::sync(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
+	{
+		if (bitmapCache && hdcCache) {
+			Gdiplus::Rect rc;
+			rc.X = (int)x;
+			rc.Y = (int)y;
+			rc.Width = (int)width;
+			rc.Height = (int)height;
+			Gdiplus::BitmapData data;
+			if (bitmapCache->LockBits(&rc, Gdiplus::ImageLockModeRead, PixelFormat32bppARGB, &data) == Gdiplus::Ok) {
+				BITMAPINFOHEADER bih;
+				Base::zeroMemory(&bih, sizeof(bih));
+				bih.biSize = sizeof(bih);
+				bih.biBitCount = 32;
+				bih.biCompression = BI_RGB;
+				bih.biWidth = data.Stride >> 2;
+				bih.biHeight = height;
+				bih.biPlanes = 1;
+				StretchDIBits(hdcCache, 0, 0, width, height, 0, height - 1, width, -(int)(height), data.Scan0, (BITMAPINFO*)&bih, DIB_RGB_COLORS, SRCCOPY);
+				bitmapCache->UnlockBits(&data);
+			}
+		}
 	}
 
 	Ref<ViewInstance> View::createGenericInstance(ViewInstance* parent)

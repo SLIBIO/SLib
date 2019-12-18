@@ -152,7 +152,7 @@ namespace slib
 						
 					} else {
 						
-						if (param.flagBorderless || param.flagFullScreen) {
+						if (param.flagBorderless) {
 							styleMask = NSBorderlessWindowMask;
 						} else {
 							if (param.flagShowTitleBar){
@@ -161,7 +161,7 @@ namespace slib
 								styleMask = NSClosableWindowMask | NSMiniaturizableWindowMask;
 							}
 						}
-						
+
 						screen = UIPlatform::getScreenHandle(param.screen.get());
 						
 						UIRect screenFrame;
@@ -177,7 +177,9 @@ namespace slib
 							}
 						}
 						
-						_getNSRect(rect, param.calculateRegion(screenFrame), screenFrame.getHeight());
+						WindowInstanceParam _param(param);
+						_param.flagFullScreen = sl_false;
+						_getNSRect(rect, _param.calculateRegion(screenFrame), screenFrame.getHeight());
 						
 						rect = [NSWindow contentRectForFrameRect:rect styleMask:styleMask];
 					}
@@ -215,6 +217,14 @@ namespace slib
 										w->m_flagSheet = sl_false;
 									}
 								}];
+							}
+
+							if (param.flagFullScreen) {
+								window.animationBehavior = NSWindowAnimationBehaviorNone;
+								UI::dispatchToUiThread([window]() {
+									window.collectionBehavior = NSWindowCollectionBehaviorFullScreenPrimary;
+									[window toggleFullScreen: nil];
+								});
 							}
 							return ret;
 						}
@@ -379,18 +389,19 @@ namespace slib
 					}
 				}
 				
-				sl_bool isMinimized() override
+				void resetBackgroundColor() override
 				{
 					NSWindow* window = m_window;
 					if (window != nil) {
-						BOOL flag = [window isMiniaturized];
-						if (flag) {
-							return sl_true;
-						} else {
-							return sl_false;
-						}
-					} else {
-						return sl_false;
+						[window setBackgroundColor:[NSColor windowBackgroundColor]];
+					}
+				}
+				
+				void isMinimized(sl_bool& _out) override
+				{
+					NSWindow* window = m_window;
+					if (window != nil) {
+						_out = [window isMiniaturized] ? sl_true : sl_false;
 					}
 				}
 				
@@ -410,18 +421,11 @@ namespace slib
 					}
 				}
 				
-				sl_bool isMaximized() override
+				void isMaximized(sl_bool& _out) override
 				{
 					NSWindow* window = m_window;
 					if (window != nil) {
-						BOOL flag = [window isZoomed];
-						if (flag) {
-							return sl_true;
-						} else {
-							return sl_false;
-						}
-					} else {
-						return sl_false;
+						_out = [window isZoomed] ? sl_true : sl_false;
 					}
 				}
 				
@@ -436,6 +440,29 @@ namespace slib
 							UI::dispatchToUiThread([window]() {
 								[window invalidateShadow];
 							}, 100);
+						}
+					}
+				}
+				
+				void isFullScreen(sl_bool& _out) override
+				{
+					NSWindow* window = m_window;
+					if (window != nil) {
+						_out = (window.styleMask & NSWindowStyleMaskFullScreen) ? sl_true : sl_false;
+					}
+				}
+				
+				void setFullScreen(sl_bool flag) override
+				{
+					NSWindow* window = m_window;
+					if (window != nil) {
+						sl_bool f1 = (window.styleMask & NSWindowStyleMaskFullScreen) ? sl_true : sl_false;
+						sl_bool f2 = flag ? sl_true : sl_false;
+						if (f1 != f2) {
+							[window toggleFullScreen:nil];
+							if (flag) {
+								setFullScreenButtonEnabled(sl_true);
+							}
 						}
 					}
 				}
@@ -476,9 +503,6 @@ namespace slib
 					NSWindow* window = m_window;
 					if (window != nil) {
 						NSUInteger style = [window styleMask];
-						if (style & NSBorderlessWindowMask) {
-							return;
-						}
 						if (!(style & NSTitledWindowMask)) {
 							return;
 						}
@@ -500,9 +524,6 @@ namespace slib
 					NSWindow* window = m_window;
 					if (window != nil) {
 						NSUInteger style = [window styleMask];
-						if (style & NSBorderlessWindowMask) {
-							return;
-						}
 						if (!(style & NSTitledWindowMask)) {
 							return;
 						}
@@ -521,17 +542,20 @@ namespace slib
 				
 				void setMaximizeButtonEnabled(sl_bool flag) override
 				{
+				}
+				
+				void setFullScreenButtonEnabled(sl_bool flag) override
+				{
 					NSWindow* window = m_window;
 					if (window != nil) {
-						NSUInteger style = [window styleMask];
-						if (style & NSBorderlessWindowMask) {
-							return;
+						NSWindowCollectionBehavior behavior;
+						if (flag || (window.styleMask & NSWindowStyleMaskFullScreen)) {
+							behavior = NSWindowCollectionBehaviorFullScreenPrimary;
+						} else {
+							behavior = NSWindowCollectionBehaviorFullScreenAuxiliary;
 						}
-						NSButton* buttonZoom = [window standardWindowButton:NSWindowZoomButton];
-						sl_bool f1 = [buttonZoom isEnabled] ? sl_true : sl_false;
-						sl_bool f2 = flag ? sl_true : sl_false;
-						if (f1 != f2) {
-							[buttonZoom setEnabled:flag];
+						if (behavior != window.collectionBehavior) {
+							window.collectionBehavior = behavior;
 						}
 					}
 				}
@@ -541,9 +565,6 @@ namespace slib
 					NSWindow* window = m_window;
 					if (window != nil) {
 						NSUInteger style = [window styleMask];
-						if (style & NSBorderlessWindowMask) {
-							return;
-						}
 						sl_bool f1 = (style & NSResizableWindowMask) ? sl_true : sl_false;
 						sl_bool f2 = flag ? sl_true : sl_false;
 						if (f1 != f2) {
@@ -551,9 +572,6 @@ namespace slib
 								style = style | NSResizableWindowMask;
 							} else {
 								style = style & (~NSResizableWindowMask);
-								if (style == 0) {
-									style = NSClosableWindowMask;
-								}
 							}
 							[window setStyleMask:style];
 						}
@@ -1002,7 +1020,7 @@ using namespace slib::priv::window;
 {
 	Ref<macOS_WindowInstance> window = m_window;
 	if (window.isNotNull()) {
-		window->onMaximize();
+		window->onEnterFullScreen();
 	}
 }
 
@@ -1010,7 +1028,7 @@ using namespace slib::priv::window;
 {
 	Ref<macOS_WindowInstance> window = m_window;
 	if (window.isNotNull()) {
-		window->onDemaximize();
+		window->onExitFullScreen();
 	}
 }
 
@@ -1056,12 +1074,12 @@ using namespace slib::priv::window;
 		if (m_handleLastHitMouse != hit) {
 			if (m_handleLastHitMouse != nil) {
 				if ([m_handleLastHitMouse isKindOfClass:[SLIBViewHandle class]]) {
-					[m_handleLastHitMouse mouseExited:event];
+					[(SLIBViewHandle*)m_handleLastHitMouse onMouseExited:event];
 				}
 			}
 			if (hit != nil) {
 				if ([hit isKindOfClass:[SLIBViewHandle class]]) {
-					[hit mouseEntered:event];
+					[(SLIBViewHandle*)hit onMouseEntered:event];
 				}
 			}
 			m_handleLastHitMouse = hit;

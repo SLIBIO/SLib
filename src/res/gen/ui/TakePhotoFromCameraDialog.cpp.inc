@@ -9,7 +9,7 @@ namespace slib
 			this->setTitle(string::take_photo::get());
 			this->setClientWidth(500);
 			this->setClientHeight(500);
-			this->setCenterScreenOnCreate(sl_true);
+			this->setCenterScreen(sl_true);
 			m_contentView->setBackground(slib::Drawable::createColorDrawable(slib::Color(0, 0, 0, 255)), slib::UIUpdateMode::Init);
 
 		}

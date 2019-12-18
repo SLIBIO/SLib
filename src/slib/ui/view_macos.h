@@ -41,6 +41,10 @@
 {
 	@public slib::WeakRef<slib::macOS_ViewInstance> m_viewInstance;
 }
+
+-(void)onMouseEntered:(NSEvent *)theEvent;
+-(void)onMouseExited:(NSEvent *)theEvent;
+
 @end
 
 #define MACOS_VIEW_DEFINE_ON_FOCUS \

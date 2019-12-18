@@ -666,7 +666,7 @@ namespace slib
 		if (layout->layoutType == SAppLayoutType::Window) {
 			m_simulationContentView = getContentView();
 		} else {
-			setCenterScreenOnCreate(sl_true);
+			setCenterScreen(sl_true);
 			setResizable(sl_true);
 			viewContent = new ViewGroup;
 			m_simulationContentView = viewContent;

@@ -11,7 +11,7 @@ void QRCodeExampleApp::onStart()
 	UI::setAvailableScreenOrientationsLandscape();
 #ifdef SLIB_PLATFORM_IS_DESKTOP
 	getMainWindow()->setSize(800, 450);
-	getMainWindow()->setCenterScreenOnCreate(sl_true);
+	getMainWindow()->setCenterScreen(sl_true);
 #endif
 	
 	Ref<HorizontalLinearView> linear1 = new HorizontalLinearView;

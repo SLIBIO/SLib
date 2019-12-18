@@ -1119,7 +1119,7 @@ namespace slib
 		return sl_false; \
 	}
 	
-#define LAYOUT_CONTROL_GENERIC_ATTR(NAME, SETFUNC) \
+#define _LAYOUT_CONTROL_GENERIC_ATTR(NAME, SETFUNC, STR_PARAMS, ...) \
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
 		if (!(attr->NAME.parse(str))) { \
@@ -1128,35 +1128,18 @@ namespace slib
 		} \
 	} else if (op == OP_GENERATE_CPP) { \
 		if (attr->NAME.flagDefined) { \
-			params->sbDefineInit->add(String::format("%s%s->" #SETFUNC "(%s);%n", strTab, name, attr->NAME.getAccessString())); \
+			params->sbDefineInit->add(String::format("%s%s->" #SETFUNC "(%s" STR_PARAMS ");%n", strTab, name, attr->NAME.getAccessString())); \
 		} \
 	} else if (op == OP_SIMULATE) { \
 		if (!flagOnLayout) { \
 			if (attr->NAME.flagDefined) { \
-				view->SETFUNC(attr->NAME.value); \
+				view->SETFUNC(attr->NAME.value, ##__VA_ARGS__); \
 			} \
 		} \
 	}
 
-#define LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(NAME, SETFUNC) \
-	if (op == OP_PARSE) { \
-		String str = resourceItem->getXmlAttribute(#NAME); \
-		if (!(attr->NAME.parse(str))) { \
-			_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
-			return sl_false; \
-		} \
-	} else if (op == OP_GENERATE_CPP) { \
-		if (attr->NAME.flagDefined) { \
-			params->sbDefineInit->add(String::format("%s%s->" #SETFUNC "(%s, slib::UIUpdateMode::Init);%n", strTab, name, attr->NAME.getAccessString())); \
-		} \
-	} else if (op == OP_SIMULATE) { \
-		if (!flagOnLayout) { \
-			if (attr->NAME.flagDefined) { \
-				view->SETFUNC(attr->NAME.value, UIUpdateMode::Init); \
-			} \
-		} \
-	}
-
+#define LAYOUT_CONTROL_GENERIC_ATTR(NAME, SETFUNC) _LAYOUT_CONTROL_GENERIC_ATTR(NAME, SETFUNC, "")
+#define LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(NAME, SETFUNC) _LAYOUT_CONTROL_GENERIC_ATTR(NAME, SETFUNC, ", slib::UIUpdateMode::Init", UIUpdateMode::Init)
 
 #define LAYOUT_CONTROL_NOPARAM_ATTR(NAME, SETFUNC) \
 	if (op == OP_PARSE) { \
@@ -1176,8 +1159,8 @@ namespace slib
 			} \
 		} \
 	}
-	
-#define _LAYOUT_CONTROL_DIMENSION_ATTR(NAME, SETFUNC, CHECKFUNC, TYPE) \
+
+#define _LAYOUT_CONTROL_DIMENSION_ATTR_COMMON(NAME, SETFUNC, CHECKFUNC, TYPE, STR_PARAMS, ...) \
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
 		if (!(attr->NAME.parse(str, this))) { \
@@ -1194,7 +1177,7 @@ namespace slib
 				if (attr->NAME.isNeededOnLayoutFunction()) { \
 					params->sbDefineLayout->add(String::format("%s%s->" #SETFUNC "(%s);%n", strTab, name, attr->NAME.getAccessString())); \
 				} else { \
-					params->sbDefineInit->add(String::format("%s%s->" #SETFUNC "(%s);%n", strTab, name, attr->NAME.getAccessString())); \
+					params->sbDefineInit->add(String::format("%s%s->" #SETFUNC "(%s" STR_PARAMS ");%n", strTab, name, attr->NAME.getAccessString())); \
 				} \
 			} \
 		} \
@@ -1208,36 +1191,9 @@ namespace slib
 		} \
 	}
 
-#define _LAYOUT_CONTROL_DIMENSION_ATTR_NOREDRAW(NAME, SETFUNC, CHECKFUNC, TYPE) \
-	if (op == OP_PARSE) { \
-		String str = resourceItem->getXmlAttribute(#NAME); \
-		if (!(attr->NAME.parse(str, this))) { \
-			_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
-			return sl_false; \
-		} \
-		if (!(attr->NAME.CHECKFUNC())) { \
-			_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
-			return sl_false; \
-		} \
-	} else if (op == OP_GENERATE_CPP) { \
-		if (attr->NAME.flagDefined) { \
-			if (!(SAppDimensionValue::isRelativeUnit(attr->NAME.unit))) { \
-				if (attr->NAME.isNeededOnLayoutFunction()) { \
-					params->sbDefineLayout->add(String::format("%s%s->" #SETFUNC "(%s);%n", strTab, name, attr->NAME.getAccessString())); \
-				} else { \
-					params->sbDefineInit->add(String::format("%s%s->" #SETFUNC "(%s, slib::UIUpdateMode::Init);%n", strTab, name, attr->NAME.getAccessString())); \
-				} \
-			} \
-		} \
-	} else if (op == OP_SIMULATE) { \
-		if (flagOnLayout) { \
-			if (attr->NAME.flagDefined) { \
-				if (!(SAppDimensionValue::isRelativeUnit(attr->NAME.unit))) { \
-					view->SETFUNC(_getDimension##TYPE##Value(attr->NAME)); \
-				} \
-			} \
-		} \
-	}
+#define _LAYOUT_CONTROL_DIMENSION_ATTR(NAME, SETFUNC, CHECKFUNC, TYPE) _LAYOUT_CONTROL_DIMENSION_ATTR_COMMON(NAME, SETFUNC, CHECKFUNC, TYPE, "")
+
+#define _LAYOUT_CONTROL_DIMENSION_ATTR_NOREDRAW(NAME, SETFUNC, CHECKFUNC, TYPE) _LAYOUT_CONTROL_DIMENSION_ATTR_COMMON(NAME, SETFUNC, CHECKFUNC, TYPE, ", slib::UIUpdateMode::Init", UIUpdateMode::Init)
 
 #define LAYOUT_CONTROL_INT_DIMENSION_ATTR(NAME, SETFUNC, CHECKFUNC) _LAYOUT_CONTROL_DIMENSION_ATTR(NAME, SETFUNC, CHECKFUNC, Int)
 #define LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(NAME, SETFUNC, CHECKFUNC) _LAYOUT_CONTROL_DIMENSION_ATTR_NOREDRAW(NAME, SETFUNC, CHECKFUNC, Int)
@@ -1318,8 +1274,7 @@ namespace slib
 		} \
 	}
 
-
-#define LAYOUT_CONTROL_STRING_ATTR(NAME, SETFUNC) \
+#define _LAYOUT_CONTROL_STRING_ATTR(NAME, SETFUNC, STR_PARAMS, ...) \
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
 		if (!(attr->NAME.parse(str))) { \
@@ -1332,7 +1287,7 @@ namespace slib
 			if (!(_getStringAccessString(resource->name, attr->NAME, element, _accessString))) { \
 				return sl_false; \
 			} \
-			params->sbDefineInit->add(String::format("%s%s->" #SETFUNC "(%s);%n", strTab, name, _accessString)); \
+			params->sbDefineInit->add(String::format("%s%s->" #SETFUNC "(%s" STR_PARAMS ");%n", strTab, name, _accessString)); \
 		} \
 	} else if (op == OP_SIMULATE) { \
 		if (!flagOnLayout) { \
@@ -1341,38 +1296,14 @@ namespace slib
 				if (!(_getStringValue(resource->name, attr->NAME, element, _stringValue))) { \
 					return sl_false; \
 				} \
-				view->SETFUNC(_stringValue); \
+				view->SETFUNC(_stringValue, ##__VA_ARGS__); \
 			} \
 		} \
 	}
 
+#define LAYOUT_CONTROL_STRING_ATTR(NAME, SETFUNC) _LAYOUT_CONTROL_STRING_ATTR(NAME, SETFUNC, "")
 
-#define LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(NAME, SETFUNC) \
-	if (op == OP_PARSE) { \
-		String str = resourceItem->getXmlAttribute(#NAME); \
-		if (!(attr->NAME.parse(str))) { \
-			_logError(element, g_str_error_resource_layout_attribute_invalid.arg(#NAME, str)); \
-			return sl_false; \
-		} \
-	} else if (op == OP_GENERATE_CPP) { \
-		if (attr->NAME.flagDefined) { \
-			String _accessString; \
-			if (!(_getStringAccessString(resource->name, attr->NAME, element, _accessString))) { \
-				return sl_false; \
-			} \
-			params->sbDefineInit->add(String::format("%s%s->" #SETFUNC "(%s, slib::UIUpdateMode::Init);%n", strTab, name, _accessString)); \
-		} \
-	} else if (op == OP_SIMULATE) { \
-		if (!flagOnLayout) { \
-			if (attr->NAME.flagDefined) { \
-				String _stringValue; \
-				if (!(_getStringValue(resource->name, attr->NAME, element, _stringValue))) { \
-					return sl_false; \
-				} \
-				view->SETFUNC(_stringValue); \
-			} \
-		} \
-	}
+#define LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(NAME, SETFUNC) _LAYOUT_CONTROL_STRING_ATTR(NAME, SETFUNC, ", slib::UIUpdateMode::Init", UIUpdateMode::Init)
 
 
 #define LAYOUT_CONTROL_DRAWABLE_ATTR(NAME, SETFUNC) \
@@ -1403,7 +1334,7 @@ namespace slib
 	}
 
 
-#define LAYOUT_CONTROL_COLOR_ATTR(NAME, SETFUNC) \
+#define _LAYOUT_CONTROL_COLOR_ATTR(NAME, SETFUNC, STR_PARAMS, ...) \
 	if (op == OP_PARSE) { \
 		String str = resourceItem->getXmlAttribute(#NAME); \
 		if (!(attr->NAME.parse(str))) { \
@@ -1416,19 +1347,24 @@ namespace slib
 			if (!(_getColorAccessString(resource->name, attr->NAME, element, _accessString))) { \
 				return sl_false; \
 			} \
-			params->sbDefineInit->add(String::format("%s%s->" #SETFUNC "(%s, slib::UIUpdateMode::Init);%n", strTab, name, _accessString)); \
+			params->sbDefineInit->add(String::format("%s%s->" #SETFUNC "(%s" STR_PARAMS ");%n", strTab, name, _accessString)); \
 		} \
 	} else if (op == OP_SIMULATE) { \
-		if (flagOnLayout) { \
+		if (!flagOnLayout) { \
 			if (attr->NAME.flagDefined) { \
 				Color _colorValue; \
 				if (!(_getColorValue(resource->name, attr->NAME, element, _colorValue))) { \
 					return sl_false; \
 				} \
-				view->SETFUNC(_colorValue); \
+				view->SETFUNC(_colorValue, ##__VA_ARGS__); \
 			} \
 		} \
 	}
+
+#define LAYOUT_CONTROL_COLOR_ATTR(NAME, SETFUNC) _LAYOUT_CONTROL_COLOR_ATTR(NAME, SETFUNC, "")
+
+#define LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(NAME, SETFUNC) _LAYOUT_CONTROL_COLOR_ATTR(NAME, SETFUNC, ", slib::UIUpdateMode::Init", UIUpdateMode::Init)
+
 
 #define LAYOUT_CONTROL_FONT_ATTR(NAME, SETFUNC) \
 	if (op == OP_PARSE) { \
@@ -1634,21 +1570,37 @@ namespace slib
 		LAYOUT_CONTROL_GENERIC_ATTR(closeButton, setCloseButtonEnabled)
 		LAYOUT_CONTROL_GENERIC_ATTR(minimizeButton, setMinimizeButtonEnabled)
 		LAYOUT_CONTROL_GENERIC_ATTR(maximizeButton, setMaximizeButtonEnabled)
+		LAYOUT_CONTROL_GENERIC_ATTR(fullScreenButton, setFullScreenButtonEnabled)
 		LAYOUT_CONTROL_GENERIC_ATTR(resizable, setResizable)
+		LAYOUT_CONTROL_GENERIC_ATTR(layered, setLayered)
 		LAYOUT_CONTROL_GENERIC_ATTR(alpha, setAlpha)
 		LAYOUT_CONTROL_GENERIC_ATTR(transparent, setTransparent)
-		
+		LAYOUT_CONTROL_COLOR_ATTR(backgroundColor, setBackgroundColor)
+
 		LAYOUT_CONTROL_GENERIC_ATTR(modal, setModal)
 		LAYOUT_CONTROL_GENERIC_ATTR(dialog, setDialog)
 		LAYOUT_CONTROL_GENERIC_ATTR(borderless, setBorderless)
 		LAYOUT_CONTROL_GENERIC_ATTR(titleBar, setTitleBarVisible)
-		LAYOUT_CONTROL_GENERIC_ATTR(fullScreen, setFullScreenOnCreate)
-		LAYOUT_CONTROL_GENERIC_ATTR(centerScreen, setCenterScreenOnCreate)
+		LAYOUT_CONTROL_GENERIC_ATTR(fullScreen, setFullScreen)
+		LAYOUT_CONTROL_GENERIC_ATTR(centerScreen, setCenterScreen)
 		
 		params->name = "m_contentView";
 		if (!(_processLayoutResourceControl_View(params))) {
 			params->resourceItem->attrsView->resetLayout();
 			return sl_false;
+		}
+		
+		if (op == OP_PARSE) {
+			if (!(attr->backgroundColor.flagDefined)) {
+				if (resourceItem->attrsView.isNotNull()) {
+					if (resourceItem->attrsView->background.flagDefined && resourceItem->attrsView->background.flagColor) {
+						attr->backgroundColor.flagDefined = sl_true;
+						attr->backgroundColor.color = resourceItem->attrsView->background.color;
+						attr->backgroundColor.resourceName = resourceItem->attrsView->background.resourceName;
+						resourceItem->attrsView->background.flagDefined = sl_false;
+					}
+				}
+			}
 		}
 		
 	}
@@ -2212,7 +2164,7 @@ namespace slib
 				} else {
 					LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(borderWidth, setBorderWidth, checkScalarSize)
 				}
-				LAYOUT_CONTROL_COLOR_ATTR(borderColor, setBorderColor)
+				LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(borderColor, setBorderColor)
 				LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(borderStyle, setBorderStyle)
 				if (!(attr->borderWidth.flagDefined)) {
 					if (attr->borderColor.flagDefined || attr->borderStyle.flagDefined) {
@@ -2239,12 +2191,12 @@ namespace slib
 							}
 						} else {
 							LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(borderWidth, setBorderWidth, checkScalarSize)
-							LAYOUT_CONTROL_COLOR_ATTR(borderColor, setBorderColor)
+							LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(borderColor, setBorderColor)
 							LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(borderStyle, setBorderStyle)
 						}
 					}
 				} else {
-					LAYOUT_CONTROL_COLOR_ATTR(borderColor, setBorderColor)
+					LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(borderColor, setBorderColor)
 					LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(borderStyle, setBorderStyle)
 				}
 			} else if (op == OP_SIMULATE) {
@@ -2265,12 +2217,12 @@ namespace slib
 							}
 						} else {
 							LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(borderWidth, setBorderWidth, checkScalarSize)
-							LAYOUT_CONTROL_COLOR_ATTR(borderColor, setBorderColor)
+							LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(borderColor, setBorderColor)
 							LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(borderStyle, setBorderStyle)
 						}
 					}
 				} else {
-					LAYOUT_CONTROL_COLOR_ATTR(borderColor, setBorderColor)
+					LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(borderColor, setBorderColor)
 					LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(borderStyle, setBorderStyle)
 				}
 			}
@@ -2278,7 +2230,7 @@ namespace slib
 		
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(drawing, setDrawing)
 
-		if (flagView) {
+		{
 			if (flagRoot) {
 				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(boundRadius, setBoundRadius, checkForRootViewScalarSize)
 				LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(boundRadiusX, setBoundRadiusX, checkForRootViewScalarSize)
@@ -2323,7 +2275,7 @@ namespace slib
 		LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(shadowRadius, setShadowRadius, checkScalarSize)
 		LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(shadowOffsetX, setShadowOffsetX, checkScalarSize)
 		LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(shadowOffsetY, setShadowOffsetY, checkScalarSize)
-		LAYOUT_CONTROL_COLOR_ATTR(shadowColor, setShadowColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(shadowColor, setShadowColor)
 
 		if (op == OP_PARSE) {
 			LAYOUT_CONTROL_PARSE_ATTR(attr->, scrolling)
@@ -2516,7 +2468,7 @@ namespace slib
 		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(text, setText)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(multiLine, setMultiLine)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(defaultButton, setDefaultButton)
-		LAYOUT_CONTROL_COLOR_ATTR(textColor, setTextColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(textColor, setTextColor)
 		LAYOUT_CONTROL_DRAWABLE_ATTR(icon, setIcon)
 		
 		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(iconWidth, setIconWidth, checkScalarSize)
@@ -2598,7 +2550,7 @@ namespace slib
 			}
 		}
 		
-		LAYOUT_CONTROL_COLOR_ATTR(colorOverlay, setColorOverlay)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(colorOverlay, setColorOverlay)
 
 		String strStates[] = {"Normal", "Hover", "Pressed", "Disabled"};
 		ButtonState states[] = {ButtonState::Normal, ButtonState::Hover, ButtonState::Pressed, ButtonState::Disabled};
@@ -2795,7 +2747,7 @@ namespace slib
 		
 		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(text, setText)
 		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(hyperText, setHyperText)
-		LAYOUT_CONTROL_COLOR_ATTR(textColor, setTextColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(textColor, setTextColor)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(gravity, setGravity)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(multiLine, setMultiLine)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(ellipsize, setEllipsize)
@@ -2835,7 +2787,7 @@ namespace slib
 			}
 		}
 		
-		LAYOUT_CONTROL_COLOR_ATTR(lineColor, setLineColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(lineColor, setLineColor)
 		LAYOUT_CONTROL_FLOAT_DIMENSION_ATTR_NOREDRAW(thickness, setLineThickness, checkScalarSize)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(lineStyle, setLineStyle)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(gravity, setGravity)
@@ -2906,10 +2858,10 @@ namespace slib
 		
 		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(text, setText)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(gravity, setGravity)
-		LAYOUT_CONTROL_COLOR_ATTR(textColor, setTextColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(textColor, setTextColor)
 		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(hintText, setHintText)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(hintGravity, setHintGravity)
-		LAYOUT_CONTROL_COLOR_ATTR(hintTextColor, setHintTextColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(hintTextColor, setHintTextColor)
 		LAYOUT_CONTROL_FONT_ATTR(hintFont, setHintFont)
 		if (op == OP_PARSE) {
 			if (attr->hintFont.isDefined()) {
@@ -3042,7 +2994,7 @@ namespace slib
 			}
 		}
 		
-		LAYOUT_CONTROL_COLOR_ATTR(textColor, setTextColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(textColor, setTextColor)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(gravity, setGravity)
 
 		LAYOUT_CONTROL_SET_NATIVE_WIDGET
@@ -3746,9 +3698,9 @@ namespace slib
 		LAYOUT_CONTROL_DRAWABLE_ATTR(tabBackground, setTabBackground)
 		LAYOUT_CONTROL_DRAWABLE_ATTR(selectedTabBackground, setSelectedTabBackground)
 		LAYOUT_CONTROL_DRAWABLE_ATTR(hoverTabBackground, setHoverTabBackground)
-		LAYOUT_CONTROL_COLOR_ATTR(labelColor, setLabelColor)
-		LAYOUT_CONTROL_COLOR_ATTR(selectedLabelColor, setSelectedLabelColor)
-		LAYOUT_CONTROL_COLOR_ATTR(hoverLabelColor, setHoverLabelColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(labelColor, setLabelColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(selectedLabelColor, setSelectedLabelColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(hoverLabelColor, setHoverLabelColor)
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(tabAlign, setTabAlignment)
 		
 		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(tabPaddingLeft, setTabPaddingLeft, checkPosition)
@@ -3959,10 +3911,10 @@ namespace slib
 		LAYOUT_CONTROL_DRAWABLE_ATTR(closedIcon, setClosedItemIcon)
 		LAYOUT_CONTROL_DRAWABLE_ATTR(collapsedIcon, setCollapsedIcon)
 		LAYOUT_CONTROL_DRAWABLE_ATTR(expandedIcon, setExpandedIcon)
-		LAYOUT_CONTROL_COLOR_ATTR(selectedBackgroundColor, setSelectedItemBackgroundColor)
-		LAYOUT_CONTROL_COLOR_ATTR(textColor, setItemTextColor)
-		LAYOUT_CONTROL_COLOR_ATTR(hoverTextColor, setHoverItemTextColor)
-		LAYOUT_CONTROL_COLOR_ATTR(selectedTextColor, setSelectedItemTextColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(selectedBackgroundColor, setSelectedItemBackgroundColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(textColor, setItemTextColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(hoverTextColor, setHoverItemTextColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(selectedTextColor, setSelectedItemTextColor)
 		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(itemHeight, setItemHeight, checkScalarSize)
 		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(itemPadding, setItemPadding, checkPosition)
 		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(itemIndent, setItemIndent, checkPosition)
@@ -3981,7 +3933,7 @@ namespace slib
 		LAYOUT_CONTROL_GENERIC_ATTR_NOREDRAW(orientation, setOrientation)
 		LAYOUT_CONTROL_INT_DIMENSION_ATTR_NOREDRAW(dividerWidth, setDividerWidth, checkScalarSize)
 		LAYOUT_CONTROL_DRAWABLE_ATTR(dividerBackground, setDividerBackground)
-		LAYOUT_CONTROL_COLOR_ATTR(dividerColor, setDividerColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(dividerColor, setDividerColor)
 		LAYOUT_CONTROL_INT_DIMENSION_ATTR(cursorMargin, setCursorMargin, checkScalarSize)
 		
 		sl_bool flagRelayoutOnInit = sl_false;
@@ -4346,9 +4298,9 @@ namespace slib
 		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(textOn, setTextOn)
 		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(leftText, setLeftText)
 		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(rightText, setRightText)
-		LAYOUT_CONTROL_COLOR_ATTR(textColor, setTextColor)
-		LAYOUT_CONTROL_COLOR_ATTR(textColorOff, setTextColorOff)
-		LAYOUT_CONTROL_COLOR_ATTR(textColorOn, setTextColorOn)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(textColor, setTextColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(textColorOff, setTextColorOff)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(textColorOn, setTextColorOn)
 
 		LAYOUT_CONTROL_DRAWABLE_ATTR(thumb, setThumb)
 		LAYOUT_CONTROL_DRAWABLE_ATTR(thumbOff, setThumbOff)
@@ -4379,7 +4331,7 @@ namespace slib
 	{
 		LAYOUT_CONTROL_PROCESS_SUPER(View)
 		
-		LAYOUT_CONTROL_COLOR_ATTR(textColor, setTextColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(textColor, setTextColor)
 		
 		LAYOUT_CONTROL_SET_NATIVE_WIDGET
 		
@@ -4691,11 +4643,11 @@ namespace slib
 		
 		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(dateFormat, setDateFormat)
 		LAYOUT_CONTROL_STRING_ATTR_NOREDRAW(timeFormat, setTimeFormat)
-		LAYOUT_CONTROL_COLOR_ATTR(receivedChatBackColor, setReceivedChatBackColor)
-		LAYOUT_CONTROL_COLOR_ATTR(receivedChatTextColor, setReceivedChatTextColor)
-		LAYOUT_CONTROL_COLOR_ATTR(sentChatBackColor, setSentChatBackColor)
-		LAYOUT_CONTROL_COLOR_ATTR(sentChatTextColor, setSentChatTextColor)
-		LAYOUT_CONTROL_COLOR_ATTR(dateTextColor, setDateTextColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(receivedChatBackColor, setReceivedChatBackColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(receivedChatTextColor, setReceivedChatTextColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(sentChatBackColor, setSentChatBackColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(sentChatTextColor, setSentChatTextColor)
+		LAYOUT_CONTROL_COLOR_ATTR_NOREDRAW(dateTextColor, setDateTextColor)
 
 		if (op == OP_SIMULATE) {
 			if (!flagOnLayout) {

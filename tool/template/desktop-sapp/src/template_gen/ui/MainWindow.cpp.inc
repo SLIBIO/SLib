@@ -9,7 +9,7 @@ namespace sapp
 			this->setTitle("Hello");
 			this->setClientWidth(400);
 			this->setClientHeight(300);
-			this->setCenterScreenOnCreate(sl_true);
+			this->setCenterScreen(sl_true);
 
 			_linear1 = new slib::LinearView;
 			_linear1->setWidthWrapping(slib::UIUpdateMode::Init);

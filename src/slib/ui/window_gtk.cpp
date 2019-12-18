@@ -508,9 +508,9 @@ namespace slib
 					}
 				}
 				
-				sl_bool isMinimized() override
+				void isMinimized(sl_bool& _out) override
 				{
-					return m_flagMinimized;
+					_out = m_flagMinimized;
 				}
 				
 				void setMinimized(sl_bool flag) override
@@ -533,9 +533,9 @@ namespace slib
 					}
 				}
 				
-				sl_bool isMaximized() override
+				void isMaximized(sl_bool& _out) override
 				{
-					return m_flagMaximized;
+					_out = m_flagMaximized;
 				}
 				
 				void setMaximized(sl_bool flag) override

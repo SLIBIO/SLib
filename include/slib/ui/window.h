@@ -115,14 +115,11 @@ namespace slib
 		
 		virtual void setParent(const Ref<Window>& parent);
 		
-		
 		Ref<Screen> getScreen();
 		
 		void setScreen(const Ref<Screen>& screen);
 
-		
 		const Ref<View>& getContentView();
-		
 		
 		Ref<Menu> getMenu();
 		
@@ -132,7 +129,6 @@ namespace slib
 		sl_bool isActive();
 		
 		virtual void activate();
-		
 
 		UIRect getFrame();
 		
@@ -200,26 +196,29 @@ namespace slib
 		
 		virtual void setTitle(const String& title);
 		
-		
 		Color getBackgroundColor();
 		
 		virtual void setBackgroundColor(const Color& color);
+		
+		// set to default
+		virtual void resetBackgroundColor();
 		
 		
 		sl_bool isMinimized();
 		
 		virtual void setMinimized(sl_bool flag);
 		
-		
 		sl_bool isMaximized();
 		
 		virtual void setMaximized(sl_bool flag);
 		
+		sl_bool isFullScreen();
+		
+		virtual void setFullScreen(sl_bool flag);
 		
 		sl_bool isVisible();
 		
 		virtual void setVisible(sl_bool flag);
-		
 		
 		sl_bool isAlwaysOnTop();
 		
@@ -230,26 +229,30 @@ namespace slib
 		
 		virtual void setCloseButtonEnabled(sl_bool flag);
 		
-		
 		sl_bool isMinimizeButtonEnabled();
 		
 		virtual void setMinimizeButtonEnabled(sl_bool flag);
-		
 		
 		sl_bool isMaximizeButtonEnabled();
 		
 		virtual void setMaximizeButtonEnabled(sl_bool flag);
 		
+		sl_bool isFullScreenButtonEnabled();
+		
+		virtual void setFullScreenButtonEnabled(sl_bool flag);
 		
 		sl_bool isResizable();
 		
 		virtual void setResizable(sl_bool flag);
 		
+
+		sl_bool isLayered();
+		
+		void setLayered(sl_bool flag);
 		
 		sl_real getAlpha();
 		
 		virtual void setAlpha(sl_real alpha);
-		
 		
 		sl_bool isTransparent();
 		
@@ -328,37 +331,33 @@ namespace slib
 		
 		sl_bool isModal();
 		
+		// Call before creating window
 		void setModal(sl_bool flag);
-		
 		
 		sl_bool isSheet();
 		
+		// Call before creating window
 		void setSheet(sl_bool flag);
 		
-
 		sl_bool isDialog();
 		
+		// Call before creating window
 		void setDialog(sl_bool flag);
-		
 		
 		sl_bool isBorderless();
 		
+		// Call before creating window
 		void setBorderless(sl_bool flag);
-		
 		
 		sl_bool isTitleBarVisible();
 		
+		// Call before creating window
 		void setTitleBarVisible(sl_bool flag);
 
+		sl_bool isCenterScreen();
 		
-		sl_bool isFullScreenOnCreate();
-		
-		void setFullScreenOnCreate(sl_bool flag);
-		
-		
-		sl_bool isCenterScreenOnCreate();
-		
-		void setCenterScreenOnCreate(sl_bool flag);
+		// Call before creating window
+		void setCenterScreen(sl_bool flag);
 		
 		
 		sl_bool isCloseOnOK();
@@ -420,6 +419,8 @@ namespace slib
 		SLIB_DECLARE_EVENT_HANDLER(Window, Deminimize)
 		SLIB_DECLARE_EVENT_HANDLER(Window, Maximize)
 		SLIB_DECLARE_EVENT_HANDLER(Window, Demaximize)
+		SLIB_DECLARE_EVENT_HANDLER(Window, EnterFullScreen)
+		SLIB_DECLARE_EVENT_HANDLER(Window, ExitFullScreen)
 		SLIB_DECLARE_EVENT_HANDLER(Window, OK, UIEvent* ev)
 		SLIB_DECLARE_EVENT_HANDLER(Window, Cancel, UIEvent* ev)
 
@@ -471,12 +472,15 @@ namespace slib
 		sl_bool m_flagVisible : 1;
 		sl_bool m_flagMinimized : 1;
 		sl_bool m_flagMaximized : 1;
-		
+		sl_bool m_flagFullScreen : 1;
+
 		sl_bool m_flagAlwaysOnTop : 1;
 		sl_bool m_flagCloseButtonEnabled : 1;
 		sl_bool m_flagMinimizeButtonEnabled : 1;
 		sl_bool m_flagMaximizeButtonEnabled : 1;
+		sl_bool m_flagFullScreenButtonEnabled : 1;
 		sl_bool m_flagResizable : 1;
+		sl_bool m_flagLayered: 1;
 		sl_bool m_flagTransparent : 1;
 		
 		sl_bool m_flagModal : 1;
@@ -484,8 +488,7 @@ namespace slib
 		sl_bool m_flagDialog : 1;
 		sl_bool m_flagBorderless: 1;
 		sl_bool m_flagShowTitleBar : 1;
-		sl_bool m_flagFullScreenOnCreate : 1;
-		sl_bool m_flagCenterScreenOnCreate : 1;
+		sl_bool m_flagCenterScreen : 1;
 		sl_bool m_flagWidthWrapping : 1;
 		sl_bool m_flagHeightWrapping : 1;
 		sl_bool m_flagCloseOnOK : 1;
@@ -556,32 +559,40 @@ namespace slib
 		
 		virtual void setBackgroundColor(const Color& color) = 0;
 
+		virtual void resetBackgroundColor();
 		
-		virtual sl_bool isMinimized() = 0;
+		virtual void isMinimized(sl_bool& _out);
 		
-		virtual void setMinimized(sl_bool flag) = 0;
+		virtual void setMinimized(sl_bool flag);
+		
+		virtual void isMaximized(sl_bool& _out);
+		
+		virtual void setMaximized(sl_bool flag);
+		
+		virtual void isFullScreen(sl_bool& _out);
+		
+		virtual void setFullScreen(sl_bool flag);
 		
 		
-		virtual sl_bool isMaximized() = 0;
-		
-		virtual void setMaximized(sl_bool flag) = 0;
-		
-		
-		virtual void setVisible(sl_bool flag) = 0;
+		virtual void setVisible(sl_bool flag);
 
-		virtual void setAlwaysOnTop(sl_bool flag) = 0;
+		virtual void setAlwaysOnTop(sl_bool flag);
 		
-		virtual void setCloseButtonEnabled(sl_bool flag) = 0;
+		virtual void setCloseButtonEnabled(sl_bool flag);
 		
-		virtual void setMinimizeButtonEnabled(sl_bool flag) = 0;
+		virtual void setMinimizeButtonEnabled(sl_bool flag);
 		
-		virtual void setMaximizeButtonEnabled(sl_bool flag) = 0;
+		virtual void setMaximizeButtonEnabled(sl_bool flag);
 		
-		virtual void setResizable(sl_bool flag) = 0;
+		virtual void setFullScreenButtonEnabled(sl_bool flag);
 		
-		virtual void setAlpha(sl_real alpha) = 0;
+		virtual void setResizable(sl_bool flag);
 		
-		virtual void setTransparent(sl_bool flag) = 0;
+		virtual void setLayered(sl_bool flag);
+		
+		virtual void setAlpha(sl_real alpha);
+		
+		virtual void setTransparent(sl_bool flag);
 
 		
 		virtual UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen) = 0;
@@ -625,7 +636,14 @@ namespace slib
 		void onMaximize();
 		
 		void onDemaximize();
-
+		
+		void onEnterFullScreen();
+		
+		void onExitFullScreen();
+		
+	public:
+		virtual void onAttachedContentView();
+		
 	private:
 		AtomicWeakRef<Window> m_window;
 		sl_bool m_flagKeepWindow;

@@ -34,6 +34,8 @@
 namespace slib
 {
 
+	class Win32_LayeredViewContext;
+
 	class Win32_ViewInstance : public ViewInstance
 	{
 		SLIB_DECLARE_OBJECT
@@ -149,7 +151,17 @@ namespace slib
 	public:
 		void setText(const String16& text);
 
+		void setLayered(sl_bool flagLayered);
+
+		void updateLayered();
+
 	public:
+		void onPaint(Canvas* canvas);
+
+		void onPaint();
+
+		void onDrawLayered();
+
 		sl_bool onEventKey(sl_bool flagDown, WPARAM wParam, LPARAM lParam);
 
 		sl_bool onEventMouse(UIAction action, WPARAM wParam, LPARAM lParam);
@@ -164,6 +176,7 @@ namespace slib
 		HWND m_handle;
 		sl_bool m_flagGenericView;
 		sl_bool m_flagDestroyOnRelease;
+
 		UIAction m_actionMouseCapture;
 		
 		UIRect m_frame;
@@ -171,6 +184,35 @@ namespace slib
 
 		String16 m_text;
 		Ref<Font> m_font;
+
+		Ref<Win32_LayeredViewContext> m_layered;
+
+	};
+
+	class Win32_LayeredViewContext : public Referable
+	{
+	public:
+		sl_bool flagInvalidated;
+
+		HDC hdcCache;
+		HBITMAP hbmCache;
+		HGDIOBJ hbmOld;
+		Gdiplus::Graphics* graphicsCache;
+		Gdiplus::Bitmap* bitmapCache;
+		sl_uint32 widthCache;
+		sl_uint32 heightCache;
+
+	public:
+		Win32_LayeredViewContext();
+
+		~Win32_LayeredViewContext();
+
+	public:
+		sl_bool prepare(sl_uint32 width, sl_uint32 height);
+
+		void clear();
+
+		void sync(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height);
 
 	};
 

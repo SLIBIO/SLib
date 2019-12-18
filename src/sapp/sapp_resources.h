@@ -216,10 +216,13 @@ namespace slib
 		SAppBooleanValue closeButton;
 		SAppBooleanValue minimizeButton;
 		SAppBooleanValue maximizeButton;
+		SAppBooleanValue fullScreenButton;
 		SAppBooleanValue resizable;
+		SAppBooleanValue layered;
 		SAppFloatValue alpha;
 		SAppBooleanValue transparent;
-		
+		SAppColorValue backgroundColor;
+
 		SAppBooleanValue modal;
 		SAppBooleanValue dialog;
 		SAppBooleanValue borderless;

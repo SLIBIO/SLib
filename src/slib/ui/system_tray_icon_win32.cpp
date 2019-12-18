@@ -417,7 +417,7 @@ namespace slib
 					}
 				}
 
-				static LRESULT messageProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+				static LRESULT WINAPI messageProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				{
 					InstanceMap* map = GetInstanceMap();
 					if (map) {

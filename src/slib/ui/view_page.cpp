@@ -398,14 +398,14 @@ namespace slib
 			window->setClientSize(contentWidth, contentHeight);
 			if (!width || !height) {
 				if (isWidthFilling() && isHeightFilling()) {
-					window->setFullScreenOnCreate(sl_true);
+					window->setFullScreen(sl_true);
 				}
 			}
 			window->addView(this, UIUpdateMode::Init);
 			window->setParent(parent);
 			window->setDialog(sl_true);
 			if (isCenterVertical() && isCenterHorizontal()) {
-				window->setCenterScreenOnCreate(sl_true);
+				window->setCenterScreen(sl_true);
 			} else {
 				window->setLeft(getLeft());
 				window->setTop(getTop());

@@ -399,25 +399,42 @@ namespace slib
 	
 	void macOS_ViewInstance::onDraw(NSRect rcDirty)
 	{
-		NSView* handle = m_handle;
-		
-		if (handle != nil) {
-			
-			NSGraphicsContext* graphics = [NSGraphicsContext currentContext];
-			
-			if (graphics != nil) {
-				
-				CGContextRef context = (CGContextRef)([graphics graphicsPort]);
-				
-				NSRect rectBound = [handle bounds];
-				Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, context, (sl_uint32)(rectBound.size.width), (sl_uint32)(rectBound.size.height));
-				if (canvas.isNotNull()) {
-					canvas->setInvalidatedRect(Rectangle((sl_real)(rcDirty.origin.x), (sl_real)(rcDirty.origin.y), (sl_real)(rcDirty.origin.x + rcDirty.size.width), (sl_real)(rcDirty.origin.y + rcDirty.size.height)));
-					ViewInstance::onDraw(canvas.get());
-				}
-				
-			}
+		Ref<View> view = getView();
+		if (view.isNull()) {
+			return;
 		}
+		NSView* handle = m_handle;
+		if (handle == nil) {
+			return;
+		}
+		NSGraphicsContext* graphics = [NSGraphicsContext currentContext];
+		if (graphics == nil) {
+			return;
+		}
+		
+		CGContextRef context = (CGContextRef)([graphics graphicsPort]);
+		NSRect rectBound = [handle bounds];
+		Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, context, (sl_uint32)(rectBound.size.width), (sl_uint32)(rectBound.size.height));
+		if (canvas.isNull()) {
+			return;
+		}
+		
+		canvas->setInvalidatedRect(Rectangle((sl_real)(rcDirty.origin.x), (sl_real)(rcDirty.origin.y), (sl_real)(rcDirty.origin.x + rcDirty.size.width), (sl_real)(rcDirty.origin.y + rcDirty.size.height)));
+		
+		sl_real alpha = view->getAlpha();
+		Ref<View> parent = view->getParent();
+		while (parent.isNotNull()) {
+			alpha *= parent->getAlpha();
+			parent = parent->getParent();
+		}
+		if (alpha < 0.005f) {
+			return;
+		}
+		if (alpha < 0.995f) {
+			canvas->setAlpha(alpha);
+		}
+		
+		view->dispatchDraw(canvas.get());		
 	}
 
 	UIEventFlags macOS_ViewInstance::onEventKey(sl_bool flagDown, NSEvent* event)
@@ -840,6 +857,14 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 	[[self nextResponder] mouseMoved:theEvent];
 }
 
+-(void)onMouseEntered:(NSEvent *)theEvent
+{
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		instance->onEventMouse(UIAction::MouseEnter, theEvent);
+	}
+}
+
 - (void)mouseEntered:(NSEvent *)theEvent
 {
 	Ref<macOS_ViewInstance> instance = m_viewInstance;
@@ -850,6 +875,14 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 		}
 	}
 	[[self nextResponder] mouseEntered:theEvent];
+}
+
+-(void)onMouseExited:(NSEvent *)theEvent
+{
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		instance->onEventMouse(UIAction::MouseLeave, theEvent);
+	}
 }
 
 - (void)mouseExited:(NSEvent *)theEvent

@@ -2074,7 +2074,15 @@ namespace slib
 			ListElements< Ref<View> > children(getChildren());
 			for (sl_size i = 0; i < children.count; i++) {
 				Ref<View>& child = children[i];
-				child->cancelPressedState();
+				if (child->isVisible()) {
+					if (child->isPressedState()) {
+						Ref<UIEvent> ev = UIEvent::createTouchEvent(UIAction::TouchCancel, TouchPoint(0, 0), Time::now());
+						if (ev.isNotNull()) {
+							child->dispatchTouchEvent(ev.get());
+						}
+					}
+					child->cancelPressedState();
+				}
 			}
 		}
 	}
@@ -9726,101 +9734,11 @@ namespace slib
 	{
 	}
 	
-	namespace priv
-	{
-		namespace view
-		{
-			Color GetDefaultBackColor();
-		}
-	}
-
 	void ViewInstance::onDraw(Canvas* canvas)
 	{
 		Ref<View> view = getView();
 		if (view.isNotNull()) {
-#if defined(SLIB_UI_IS_MACOS)
-			sl_real alpha = view->getAlpha();
-			Ref<View> parent = view->getParent();
-			while (parent.isNotNull()) {
-				alpha *= parent->getAlpha();
-				parent = parent->getParent();
-			}
-			if (alpha < 0.005f) {
-				return;
-			}
-			if (alpha < 0.995f) {
-				canvas->setAlpha(alpha);
-			}
-#endif
-#if defined(SLIB_UI_IS_WIN32)
-			{
-				static Ref<Bitmap> bitmap;
-				static Ref<Canvas> canvasBitmap;
-				UIRect rc = canvas->getInvalidatedRect();
-				UISize size = rc.getSize();
-				if (size.x < 1) {
-					return;
-				}
-				if (size.y < 1) {
-					return;
-				}
-				UISize screenSize = UI::getScreenSize();
-				if (size.x > screenSize.x) {
-					size.x = screenSize.x;
-				}
-				if (size.y > screenSize.y) {
-					size.y = screenSize.y;
-				}
-				sl_uint32 widthBitmap = (sl_uint32)(size.x);
-				sl_uint32 heightBitmap = (sl_uint32)(size.y);
-				if (bitmap.isNull() || canvasBitmap.isNull() || bitmap->getWidth() < widthBitmap || bitmap->getHeight() < heightBitmap) {
-					bitmap = Bitmap::create(widthBitmap, heightBitmap);
-					if (bitmap.isNull()) {
-						return;
-					}
-					canvasBitmap = bitmap->getCanvas();
-					if (canvasBitmap.isNull()) {
-						return;
-					}
-				}
-				Color colorClear = Color::zero();
-				do {
-					if (view->isOpaque()) {
-						break;
-					}
-					Color color = view->getBackgroundColor();
-					if (color.a == 255) {
-						break;
-					}
-					Ref<Window> window = view->getWindow();
-					if (window.isNotNull() && window->getContentView() == view) {
-						colorClear = window->getBackgroundColor();
-						if (colorClear.a < 255) {
-							Color c = priv::view::GetDefaultBackColor();
-							c.blend_PA_NPA(colorClear);
-							colorClear = c;
-						}
-						break;
-					} else {
-						colorClear = priv::view::GetDefaultBackColor();
-					}
-				} while (0);
-				rc.setSize(size);
-				if (colorClear.isNotZero()) {
-					bitmap->resetPixels(0, 0, widthBitmap, heightBitmap, colorClear);
-				} else {
-					bitmap->resetPixels(0, 0, widthBitmap, 1, Color::White);
-				}
-				canvasBitmap->setInvalidatedRect(rc);
-				CanvasStateScope scope(canvasBitmap.get());
-				canvasBitmap->translate(-(sl_real)(rc.left), -(sl_real)(rc.top));
-				view->dispatchDraw(canvasBitmap.get());
-				canvasBitmap->translate((sl_real)(rc.left), (sl_real)(rc.top));
-				canvas->draw(rc, bitmap, Rectangle(0, 0, (sl_real)(size.x), (sl_real)(size.y)));
-			}
-#else
 			view->dispatchDraw(canvas);
-#endif
 		}
 	}
 
