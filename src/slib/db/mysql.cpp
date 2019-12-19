@@ -156,11 +156,12 @@ namespace slib
 					return sl_false;
 				}
 
-				sl_int64 _execute(const String& sql) override
+				sl_int64 _execute(const StringParam& _sql) override
 				{
+					StringParamData sql(_sql);
 					initThread();
 					ObjectLocker lock(this);
-					if (0 == mysql_real_query(m_mysql, sql.getData(), (sl_uint32)(sql.getLength()))) {
+					if (0 == mysql_real_query(m_mysql, sql.data, (sl_uint32)(_sql.getLength()))) {
 						sl_int64 ret = 0;
 						for (;;) {
 							MYSQL_RES* result = mysql_store_result(m_mysql);
@@ -309,11 +310,12 @@ namespace slib
 					}
 				};
 
-				Ref<DatabaseCursor> _query(const String& sql) override
+				Ref<DatabaseCursor> _query(const StringParam& _sql) override
 				{
+					StringParamData sql(_sql);
 					initThread();
 					ObjectLocker lock(this);
-					if (0 == mysql_real_query(m_mysql, sql.getData(), (sl_uint32)(sql.getLength()))) {
+					if (0 == mysql_real_query(m_mysql, sql.data, (sl_uint32)(_sql.getLength()))) {
 						MYSQL_RES* res = mysql_use_result(m_mysql);
 						if (res) {
 							Ref<DatabaseCursor> ret = new CursorImpl(this, res);
@@ -909,9 +911,6 @@ namespace slib
 								m_statement = statement;
 								return sl_true;
 							}
-							if (isLoggingErrors()) {
-								LogError(TAG, "Prepare Error: %s, SQL:%s", mysql_stmt_error(statement), m_sql);
-							}
 							mysql_stmt_close(statement);
 						}
 						return sl_false;
@@ -1173,11 +1172,11 @@ namespace slib
 
 				};
 
-				Ref<DatabaseStatement> _prepareStatement(const String& sql) override
+				Ref<DatabaseStatement> _prepareStatement(const StringParam& sql) override
 				{
 					initThread();
 					ObjectLocker lock(this);
-					Ref<StatementImpl> ret = new StatementImpl(this, sql);
+					Ref<StatementImpl> ret = new StatementImpl(this, sql.getString());
 					if (ret.isNotNull()) {
 						if (ret->prepare()) {
 							return ret;
@@ -1195,13 +1194,12 @@ namespace slib
 					return error;
 				}
 				
-				sl_bool isDatabaseExisting(const String& name) override
+				sl_bool isDatabaseExisting(const StringParam& _name) override
 				{
-					if (name.isEmpty()) {
-						return sl_false;
-					}
+					initThread();
+					StringParamData name(_name);
 					sl_bool bRet = sl_false;
-					MYSQL_RES* res = mysql_list_dbs(m_mysql, name.getData());
+					MYSQL_RES* res = mysql_list_dbs(m_mysql, name.data);
 					if (res) {
 						MYSQL_ROW row = mysql_fetch_row(res);
 						if (row) {
@@ -1214,6 +1212,7 @@ namespace slib
 				
 				List<String> getDatabases() override
 				{
+					initThread();
 					List<String> ret;
 					MYSQL_RES* res = mysql_list_dbs(m_mysql, sl_null);
 					if (res) {
@@ -1229,13 +1228,12 @@ namespace slib
 					return ret;
 				}
 
-				sl_bool isTableExisting(const String& name) override
+				sl_bool isTableExisting(const StringParam& _name) override
 				{
-					if (name.isEmpty()) {
-						return sl_false;
-					}
+					initThread();
+					StringParamData name(_name);
 					sl_bool bRet = sl_false;
-					MYSQL_RES* res = mysql_list_tables(m_mysql, name.getData());
+					MYSQL_RES* res = mysql_list_tables(m_mysql, name.data);
 					if (res) {
 						MYSQL_ROW row = mysql_fetch_row(res);
 						if (row) {
@@ -1248,6 +1246,7 @@ namespace slib
 				
 				List<String> getTables() override
 				{
+					initThread();
 					List<String> ret;
 					MYSQL_RES* res = mysql_list_tables(m_mysql, sl_null);
 					if (res) {

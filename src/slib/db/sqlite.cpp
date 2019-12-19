@@ -24,6 +24,7 @@
 
 #include "slib/db/sqlite.h"
 
+#include "slib/db/sql.h"
 #include "slib/core/file.h"
 #include "slib/core/log.h"
 #include "slib/core/scoped.h"
@@ -308,10 +309,11 @@ namespace slib
 					}
 				}
 				
-				sl_int64 _execute(const String& sql) override
+				sl_int64 _execute(const StringParam& _sql) override
 				{
+					StringParamData sql(_sql);
 					ObjectLocker lock(this);
-					if (SQLITE_OK == sqlite3_exec(m_db, sql.getData(), 0, 0, sl_null)) {
+					if (SQLITE_OK == sqlite3_exec(m_db, sql.data, 0, 0, sl_null)) {
 						return sqlite3_changes(m_db);
 					}
 					return -1;
@@ -705,12 +707,13 @@ namespace slib
 					}
 				};
 
-				Ref<DatabaseStatement> _prepareStatement(const String& sql) override
+				Ref<DatabaseStatement> _prepareStatement(const StringParam& _sql) override
 				{
+					StringParamData sql(_sql);
 					ObjectLocker lock(this);
 					Ref<DatabaseStatement> ret;
 					sqlite3_stmt* statement = sl_null;
-					if (SQLITE_OK == sqlite3_prepare_v2(m_db, sql.getData(), -1, &statement, sl_null)) {
+					if (SQLITE_OK == sqlite3_prepare_v2(m_db, sql.data, -1, &statement, sl_null)) {
 						ret = new StatementImpl(this, statement);
 						if (ret.isNotNull()) {
 							return ret;
@@ -729,7 +732,7 @@ namespace slib
 					return error;
 				}
 
-				sl_bool isDatabaseExisting(const String& name) override
+				sl_bool isDatabaseExisting(const StringParam& name) override
 				{
 					return sl_false;
 				}
@@ -739,15 +742,20 @@ namespace slib
 					return sl_null;
 				}
 
-				sl_bool isTableExisting(const String& name) override
+				sl_bool isTableExisting(const StringParam& _name) override
 				{
-					return getValue("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name LIKE '" + name + "';").getUint32() > 0;
+					SqlBuilder builder(m_dialect);
+					SLIB_STATIC_STRING(s, "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name LIKE ")
+					builder.append(s);
+					StringParamData name(_name);
+					builder.appendIdentifier(name.data, _name.getLength());
+					return getValue(builder.toString()).getUint32() > 0;
 				}
 				
 				List<String> getTables() override
 				{
 					List<String> ret;
-					Ref<DatabaseCursor> cursor = query("SELECT name FROM sqlite_master WHERE type='table';");
+					Ref<DatabaseCursor> cursor = query("SELECT name FROM sqlite_master WHERE type='table'");
 					if (cursor.isNotNull()) {
 						while (cursor->moveNext()) {
 							ret.add_NoLock(cursor->getString(0));

@@ -30,7 +30,19 @@ namespace slib
 
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DatabaseColumn)
 
+	DatabaseColumn::DatabaseColumn()
+	{
+	}
+	
+	DatabaseColumn::DatabaseColumn(const char* _name): name(_name)
+	{
+	}
+
 	DatabaseColumn::DatabaseColumn(const String& _name): name(_name)
+	{
+	}
+
+	DatabaseColumn::DatabaseColumn(const DatabaseExpression& _expression): expression(_expression)
 	{
 	}
 
@@ -40,11 +52,15 @@ namespace slib
 	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DatabaseColumnExpression)
 
-	DatabaseColumnExpression::DatabaseColumnExpression(const DatabaseExpression& expression): DatabaseColumn(sl_null, expression)
+	DatabaseColumnExpression::DatabaseColumnExpression(const DatabaseExpression& expression): DatabaseColumn(expression)
 	{
 	}
 
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DatabaseColumnIdentifier)
+
+	DatabaseColumnIdentifier::DatabaseColumnIdentifier(const char* name): DatabaseColumn(name)
+	{
+	}
 
 	DatabaseColumnIdentifier::DatabaseColumnIdentifier(const String& name): DatabaseColumn(name)
 	{
@@ -196,6 +212,10 @@ namespace slib
 	{
 	}
 
+	DatabaseQuerySource::DatabaseQuerySource(const char* _name): name(_name)
+	{
+	}
+
 	DatabaseQuerySource::DatabaseQuerySource(const String& _name): name(_name)
 	{
 	}
@@ -208,6 +228,129 @@ namespace slib
 	{
 	}
 
+	DatabaseQuerySource::DatabaseQuerySource(const String& _name, const DatabaseQuery& _query): name(_name), query(MakeShared<DatabaseQuery>(_query))
+	{
+	}
+
+	DatabaseQuerySource::DatabaseQuerySource(const String& _name, const DatabaseExpression& _expression): name(_name), expression(_expression)
+	{
+	}
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DatabaseQueryJoin)
+
+	DatabaseQueryJoin::DatabaseQueryJoin(): type(DatabaseJoinType::Inner)
+	{
+	}
+
+	DatabaseQueryJoin::DatabaseQueryJoin(const String& name, const DatabaseExpression& _on): DatabaseQuerySource(name), type(DatabaseJoinType::Inner), on(_on)
+	{
+	}
+
+	DatabaseQueryJoin::DatabaseQueryJoin(const DatabaseIdentifier& table, const DatabaseExpression& _on): DatabaseQuerySource(table), type(DatabaseJoinType::Inner), on(_on)
+	{
+	}
+
+	DatabaseQueryJoin::DatabaseQueryJoin(const String& name, const DatabaseIdentifier& table, const DatabaseExpression& _on): DatabaseQuerySource(name, table), type(DatabaseJoinType::Inner), on(_on)
+	{
+	}
+
+	DatabaseQueryJoin::DatabaseQueryJoin(DatabaseJoinType _type, const String& name, const DatabaseExpression& _on): DatabaseQuerySource(name), type(_type), on(_on)
+	{
+	}
+
+	DatabaseQueryJoin::DatabaseQueryJoin(DatabaseJoinType _type, const DatabaseIdentifier& table, const DatabaseExpression& _on): DatabaseQuerySource(table), type(_type), on(_on)
+	{
+	}
+
+	DatabaseQueryJoin::DatabaseQueryJoin(DatabaseJoinType _type, const String& name, const DatabaseIdentifier& table, const DatabaseExpression& _on): DatabaseQuerySource(name, table), type(_type), on(_on)
+	{
+	}
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DatabaseQueryGroupBy)
+
+	DatabaseQueryGroupBy::DatabaseQueryGroupBy()
+	{
+	}
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DatabaseQueryOrder)
+
+	DatabaseQueryOrder::DatabaseQueryOrder(): type(DatabaseOrderType::Default)
+	{
+	}
+
+	DatabaseQueryOrder::DatabaseQueryOrder(const char* columnName): column(columnName), type(DatabaseOrderType::Default)
+	{
+	}
+
+	DatabaseQueryOrder::DatabaseQueryOrder(const char* columnName, DatabaseOrderType _type): column(columnName), type(_type)
+	{
+	}
+
+	DatabaseQueryOrder::DatabaseQueryOrder(const String& columnName): column(columnName), type(DatabaseOrderType::Default)
+	{
+	}
+
+	DatabaseQueryOrder::DatabaseQueryOrder(const String& columnName, DatabaseOrderType _type): column(columnName), type(_type)
+	{
+	}
+
+	DatabaseQueryOrder::DatabaseQueryOrder(const DatabaseExpression& expression): column(expression), type(DatabaseOrderType::Default)
+	{
+	}
+
+	DatabaseQueryOrder::DatabaseQueryOrder(const DatabaseExpression& expression, DatabaseOrderType _type): column(expression), type(_type)
+	{
+	}
+
+	DatabaseQueryOrder::DatabaseQueryOrder(const DatabaseColumn& _column): column(_column), type(DatabaseOrderType::Default)
+	{
+	}
+
+	DatabaseQueryOrder::DatabaseQueryOrder(const DatabaseColumn& _column, DatabaseOrderType _type): column(_column), type(_type)
+	{
+	}
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DatabaseQuery)
+
+	DatabaseQuery::DatabaseQuery()
+	{
+		distinct = sl_false;
+		limit = 0;
+		offset = 0;
+		limitOfCombined = 0;
+		offsetOfCombined = 0;
+	}
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DatabaseQueryWith)
+
+	DatabaseQueryWith::DatabaseQueryWith()
+	{
+	}
+
+	DatabaseQueryWith::DatabaseQueryWith(const String& _name, const DatabaseQuery& _query): name(_name), query(_query)
+	{
+	}
+
+	DatabaseQueryWith::DatabaseQueryWith(const String& _name, const ListParam<String>& _columns, const DatabaseQuery& _query): name(_name), columns(_columns), query(_query)
+	{
+	}
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DatabaseQueryCombine)
+
+	DatabaseQueryCombine::DatabaseQueryCombine(): type(DatabaseCombineType::UnionAll)
+	{
+	}
+
+	DatabaseQueryCombine::DatabaseQueryCombine(const DatabaseQuery& _query): type(DatabaseCombineType::UnionAll), query(_query)
+	{
+		
+	}
+
+	DatabaseQueryCombine::DatabaseQueryCombine(DatabaseCombineType _type, const DatabaseQuery& _query): type(_type), query(_query)
+	{
+	}
+
+
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DatabaseCreateTableParam)
 
 	DatabaseCreateTableParam::DatabaseCreateTableParam()
@@ -218,6 +361,13 @@ namespace slib
 
 	DatabaseCreateIndexParam::DatabaseCreateIndexParam()
 	{
+	}
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DatabaseSelectParam)
+
+	DatabaseSelectParam::DatabaseSelectParam()
+	{
+		withRecursive = sl_false;
 	}
 
 
@@ -234,14 +384,14 @@ namespace slib
 		buf.add(str);
 	}
 
-	void SqlBuilder::appendStatic(const char* sz, sl_uint32 len)
+	void SqlBuilder::appendStatic(const char* sz, sl_size len)
 	{
 		buf.addStatic(sz, len);
 	}
 
 	void SqlBuilder::appendParameter(const String& name)
 	{
-		buf.addStatic("?", 1);
+		appendStatic("?", 1);
 		parameters.add_NoLock(name);
 	}
 
@@ -254,11 +404,14 @@ namespace slib
 	{
 		switch (dialect) {
 			case DatabaseDialect::MySQL:
-				buf.addStatic("`", 1);
+				appendStatic("`", 1);
+				break;
 			case DatabaseDialect::MSSQL:
-				buf.addStatic("[", 1);
+				appendStatic("[", 1);
+				break;
 			default:
-				buf.addStatic("\"", 1);
+				appendStatic("\"", 1);
+				break;
 		}
 	}
 
@@ -266,18 +419,28 @@ namespace slib
 	{
 		switch (dialect) {
 			case DatabaseDialect::MySQL:
-				buf.addStatic("`", 1);
+				appendStatic("`", 1);
+				break;
 			case DatabaseDialect::MSSQL:
-				buf.addStatic("]", 1);
+				appendStatic("]", 1);
+				break;
 			default:
-				buf.addStatic("\"", 1);
+				appendStatic("\"", 1);
+				break;
 		}
 	}
 	
 	void SqlBuilder::appendIdentifier(const String& name)
 	{
 		appendIdentifierPrefix();
-		buf.add(name);
+		append(name);
+		appendIdentifierSuffix();
+	}
+
+	void SqlBuilder::appendIdentifier(const char* name, sl_size len)
+	{
+		appendIdentifierPrefix();
+		appendStatic(name, len);
 		appendIdentifierSuffix();
 	}
 
@@ -285,13 +448,17 @@ namespace slib
 	{
 		if (identifier.schema.isNotEmpty()) {
 			appendIdentifierPrefix();
-			buf.add(identifier.schema);
+			append(identifier.schema);
 			appendIdentifierSuffix();
-			buf.addStatic(".", 1);
+			appendStatic(".", 1);
 		}
-		appendIdentifierPrefix();
-		buf.add(identifier.name);
-		appendIdentifierSuffix();
+		if (identifier.name.equals("*")) {
+			appendStatic("*", 1);
+		} else {
+			appendIdentifierPrefix();
+			append(identifier.name);
+			appendIdentifierSuffix();
+		}
 	}
 
 	void SqlBuilder::generateCreateTable(const DatabaseCreateTableParam& param)
@@ -300,20 +467,20 @@ namespace slib
 		if (param.table.name.isEmpty() || !(columns.count)) {
 			return;
 		}
-		buf.addStatic("CREATE", 6);
+		appendStatic("CREATE", 6);
 		if (param.flags & DatabaseFlags::Temp) {
-			buf.addStatic(" TEMPORARY", 10);
+			appendStatic(" TEMPORARY", 10);
 		}
-		buf.addStatic(" TABLE ", 7);
+		appendStatic(" TABLE ", 7);
 		if (param.flags & DatabaseFlags::IfNotExists) {
-			buf.addStatic("IF NOT EXISTS ", 14);
+			appendStatic("IF NOT EXISTS ", 14);
 		}
 		appendIdentifier(param.table);
-		buf.addStatic(" (", 2);
+		appendStatic(" (", 2);
 		{
 			for (sl_size i = 0; i < columns.count; i++) {
 				if (i) {
-					buf.addStatic(", ", 2);
+					appendStatic(", ", 2);
 				}
 				appendColumnDefinition(columns[i]);
 			}
@@ -321,14 +488,14 @@ namespace slib
 		{
 			ListLocker<DatabaseTableConstraint> constraints(param.constraints);
 			for (sl_size i = 0; i < constraints.count; i++) {
-				buf.addStatic(", ", 2);
+				appendStatic(", ", 2);
 				appendTableConstraint(constraints[i]);
 			}
 		}
-		buf.addStatic(")", 1);
+		appendStatic(")", 1);
 		if (param.flags & DatabaseFlags::WithoutRowId) {
 			if (dialect == DatabaseDialect::SQLite) {
-				buf.addStatic(" WITHOUT ROWID", 14);
+				appendStatic(" WITHOUT ROWID", 14);
 			}
 		}
 	}
@@ -345,19 +512,19 @@ namespace slib
 	void SqlBuilder::generateDropTable(const DatabaseIdentifier& table, DatabaseFlags flags)
 	{
 		if ((flags & DatabaseFlags::Temp) && dialect == DatabaseDialect::MySQL) {
-			buf.addStatic("DROP TEMPORARY TABLE ", 21);
+			appendStatic("DROP TEMPORARY TABLE ", 21);
 		} else {
-			buf.addStatic("DROP TABLE ", 11);
+			appendStatic("DROP TABLE ", 11);
 		}
 		if (flags & DatabaseFlags::IfExists) {
-			buf.addStatic("IF EXISTS ", 10);
+			appendStatic("IF EXISTS ", 10);
 		}
 		appendIdentifier(table);
 		if (dialect != DatabaseDialect::SQLite) {
 			if (flags & DatabaseFlags::Cascade) {
-				buf.addStatic(" CASCADE", 8);
+				appendStatic(" CASCADE", 8);
 			} else if (flags & DatabaseFlags::Restrict) {
-				buf.addStatic(" RESTRICT", 9);
+				appendStatic(" RESTRICT", 9);
 			}
 		}
 	}
@@ -368,29 +535,29 @@ namespace slib
 		if (param.index.name.isEmpty() || param.table.isEmpty() || !(columns.count)) {
 			return;
 		}
-		buf.addStatic("CREATE", 6);
+		appendStatic("CREATE", 6);
 		if (param.flags & DatabaseFlags::Unique) {
-			buf.addStatic(" UNIQUE", 7);
+			appendStatic(" UNIQUE", 7);
 		}
-		buf.addStatic(" INDEX ", 7);
+		appendStatic(" INDEX ", 7);
 		if (param.flags & DatabaseFlags::IfNotExists) {
 			if (dialect != DatabaseDialect::MySQL) {
-				buf.addStatic("IF NOT EXISTS ", 14);
+				appendStatic("IF NOT EXISTS ", 14);
 			}
 		}
 		appendIdentifier(param.index);
-		buf.addStatic(" ON ", 4);
+		appendStatic(" ON ", 4);
 		appendIdentifier(param.table);
-		buf.addStatic(" (", 2);
+		appendStatic(" (", 2);
 		{
 			for (sl_size i = 0; i < columns.count; i++) {
 				if (i) {
-					buf.addStatic(", ", 2);
+					appendStatic(", ", 2);
 				}
 				appendIndexColumn(columns[i]);
 			}
 		}
-		buf.addStatic(")", 1);
+		appendStatic(")", 1);
 	}
 
 	void SqlBuilder::generateCreateIndex(const DatabaseIdentifier& index, const String& table, const ListParam<DatabaseIndexColumn>& columns, DatabaseFlags flags)
@@ -405,21 +572,21 @@ namespace slib
 
 	void SqlBuilder::generateDropIndex(const DatabaseIdentifier& index, const String& table, DatabaseFlags flags)
 	{
-		buf.addStatic("DROP INDEX ", 11);
+		appendStatic("DROP INDEX ", 11);
 		if (flags & DatabaseFlags::IfExists) {
 			if (dialect != DatabaseDialect::MySQL) {
-				buf.addStatic("IF EXISTS ", 10);
+				appendStatic("IF EXISTS ", 10);
 			}
 		}
 		appendIdentifier(index);
 		if (dialect == DatabaseDialect::MySQL) {
-			buf.addStatic(" ON ", 4);
+			appendStatic(" ON ", 4);
 			appendIdentifier(table);
 		} else if (dialect == DatabaseDialect::PostgreSQL) {
 			if (flags & DatabaseFlags::Cascade) {
-				buf.addStatic(" CASCADE", 8);
+				appendStatic(" CASCADE", 8);
 			} else if (flags & DatabaseFlags::Restrict) {
-				buf.addStatic(" RESTRICT", 9);
+				appendStatic(" RESTRICT", 9);
 			}
 		}
 	}
@@ -430,31 +597,31 @@ namespace slib
 		if (columns.count < 1) {
 			return;
 		}
-		buf.addStatic("INSERT INTO ", 12);
+		appendStatic("INSERT INTO ", 12);
 		appendIdentifier(table);
-		buf.addStatic(" (", 2);
+		appendStatic(" (", 2);
 		{
 			for (sl_size i = 0; i < columns.count; i++) {
 				if (i) {
-					buf.addStatic(", ", 2);
+					appendStatic(", ", 2);
 				}
 				appendIdentifier(columns[i].name);
 			}
 		}
-		buf.addStatic(") VALUES (", 10);
+		appendStatic(") VALUES (", 10);
 		{
 			for (sl_size i = 0; i < columns.count; i++) {
 				if (i) {
-					buf.addStatic(", ", 2);
+					appendStatic(", ", 2);
 				}
 				if (columns[i].expression.isNotNull()) {
 					columns[i].expression.appendTo(*this, sl_false);
 				} else {
-					buf.addStatic("?", 1);
+					appendStatic("?", 1);
 				}
 			}
 		}
-		buf.addStatic(")", 1);
+		appendStatic(")", 1);
 	}
 
 	void SqlBuilder::generateInsert(const DatabaseIdentifier& table, const ListParam<String>& _columns)
@@ -463,27 +630,27 @@ namespace slib
 		if (columns.count < 1) {
 			return;
 		}
-		buf.addStatic("INSERT INTO ", 12);
+		appendStatic("INSERT INTO ", 12);
 		appendIdentifier(table);
-		buf.addStatic(" (", 2);
+		appendStatic(" (", 2);
 		{
 			for (sl_size i = 0; i < columns.count; i++) {
 				if (i) {
-					buf.addStatic(", ", 2);
+					appendStatic(", ", 2);
 				}
 				appendIdentifier(columns[i]);
 			}
 		}
-		buf.addStatic(") VALUES (", 10);
+		appendStatic(") VALUES (", 10);
 		{
 			for (sl_size i = 0; i < columns.count; i++) {
 				if (i) {
-					buf.addStatic(", ", 2);
+					appendStatic(", ", 2);
 				}
-				buf.addStatic("?", 1);
+				appendStatic("?", 1);
 			}
 		}
-		buf.addStatic(")", 1);
+		appendStatic(")", 1);
 	}
 
 	void SqlBuilder::generateUpdate(const DatabaseIdentifier& table, const ListParam<DatabaseColumn>& _columns, const DatabaseExpression& where)
@@ -492,25 +659,25 @@ namespace slib
 		if (columns.count < 1) {
 			return;
 		}
-		buf.addStatic("UPDATE ", 7);
+		appendStatic("UPDATE ", 7);
 		appendIdentifier(table);
-		buf.addStatic(" SET ", 5);
+		appendStatic(" SET ", 5);
 		{
 			for (sl_size i = 0; i < columns.count; i++) {
 				if (i) {
-					buf.addStatic(", ", 2);
+					appendStatic(", ", 2);
 				}
 				appendIdentifier(columns[i].name);
-				buf.addStatic("=", 1);
+				appendStatic("=", 1);
 				if (columns[i].expression.isNotNull()) {
 					columns[i].expression.appendTo(*this, sl_false);
 				} else {
-					buf.addStatic("?", 1);
+					appendStatic("?", 1);
 				}
 			}
 		}
 		if (where.isNotNull()) {
-			buf.addStatic(" WHERE ", 7);
+			appendStatic(" WHERE ", 7);
 			where.appendTo(*this, sl_false);
 		}
 	}
@@ -521,34 +688,62 @@ namespace slib
 		if (columns.count < 1) {
 			return;
 		}
-		buf.addStatic("UPDATE ", 7);
+		appendStatic("UPDATE ", 7);
 		appendIdentifier(table);
-		buf.addStatic(" SET ", 5);
+		appendStatic(" SET ", 5);
 		{
 			for (sl_size i = 0; i < columns.count; i++) {
 				if (i) {
-					buf.addStatic(", ", 2);
+					appendStatic(", ", 2);
 				}
 				appendIdentifier(columns[i]);
-				buf.addStatic("=?", 2);
+				appendStatic("=?", 2);
 			}
 		}
 		if (where.isNotNull()) {
-			buf.addStatic(" WHERE ", 7);
+			appendStatic(" WHERE ", 7);
 			where.appendTo(*this, sl_false);
 		}
 	}
 
 	void SqlBuilder::generateDelete(const DatabaseIdentifier& table, const DatabaseExpression& where)
 	{
-		buf.addStatic("DELETE FROM ", 12);
+		appendStatic("DELETE FROM ", 12);
 		appendIdentifier(table);
 		if (where.isNotNull()) {
-			buf.addStatic(" WHERE ", 7);
+			appendStatic(" WHERE ", 7);
 			where.appendTo(*this, sl_false);
 		}
 	}
 
+	void SqlBuilder::generateSelect(const DatabaseSelectParam& param)
+	{
+		ListElements<DatabaseQueryWith> withs(param.withs);
+		if (withs.count) {
+			appendStatic("WITH ", 5);
+			if (param.withRecursive) {
+				appendStatic("RECURSIVE ", 10);
+			}
+			for (sl_size i = 0; i < withs.count; i++) {
+				if (i) {
+					appendStatic(", ", 2);
+				}
+				appendSelectWithClause(withs[i]);
+			}
+			appendStatic(" ", 1);
+		}
+		appendQuery(param);
+	}
+	
+	void SqlBuilder::generateSelect(const DatabaseIdentifier& table, const DatabaseExpression& where)
+	{
+		appendStatic("SELECT * FROM ", 14);
+		appendIdentifier(table);
+		if (where.isNotNull()) {
+			appendStatic(" WHERE ", 7);
+			where.appendTo(*this, sl_false);
+		}
+	}
 
 #define DEFINE_COLUMN_TYPE_NAME_WITH_LENGTH(TYPE) \
 	if (type.length) { \
@@ -558,7 +753,7 @@ namespace slib
 		break; \
 	} else { \
 		static char s[] = TYPE; \
-		buf.addStatic(s, sizeof(s)-1); \
+		appendStatic(s, sizeof(s)-1); \
 		return; \
 	}
 
@@ -571,7 +766,7 @@ namespace slib
 		break; \
 	} else { \
 		static char s[] = TYPE; \
-		buf.addStatic(s, sizeof(s)-1); \
+		appendStatic(s, sizeof(s)-1); \
 		return; \
 	}
 
@@ -582,7 +777,7 @@ namespace slib
 		break; \
 	} else { \
 		static char s[] = TYPE; \
-		buf.addStatic(s, sizeof(s)-1); \
+		appendStatic(s, sizeof(s)-1); \
 		return; \
 	}
 
@@ -596,7 +791,7 @@ namespace slib
 		break; \
 	} else { \
 		static char s[] = TYPE; \
-		buf.addStatic(s, sizeof(s)-1); \
+		appendStatic(s, sizeof(s)-1); \
 		return; \
 	}
 
@@ -611,14 +806,14 @@ namespace slib
 		break; \
 	} else { \
 		static char s[] = TYPE; \
-		buf.addStatic(s, sizeof(s)-1); \
+		appendStatic(s, sizeof(s)-1); \
 		return; \
 	}
 
 	void SqlBuilder::appendColumnTypeName(const DatabaseColumnTypeDefinition& type, const DatabaseColumnFlags& flags)
 	{
 		if (type.rawType.isNotEmpty()) {
-			buf.add(type.rawType);
+			append(type.rawType);
 			return;
 		}
 		const String* pStrType = sl_null;
@@ -634,7 +829,7 @@ namespace slib
 				case DatabaseColumnType::SMALLSERIAL:
 				case DatabaseColumnType::SERIAL:
 				case DatabaseColumnType::BIGSERIAL:
-					buf.addStatic("INTEGER", 7);
+					appendStatic("INTEGER", 7);
 					return;
 				case DatabaseColumnType::BOOLEAN:
 				case DatabaseColumnType::DECIMAL:
@@ -643,12 +838,12 @@ namespace slib
 				case DatabaseColumnType::DATETIME:
 				case DatabaseColumnType::TIME:
 				case DatabaseColumnType::TIMESTAMP:
-					buf.addStatic("NUMERIC", 7);
+					appendStatic("NUMERIC", 7);
 					return;
 				case DatabaseColumnType::FLOAT:
 				case DatabaseColumnType::REAL:
 				case DatabaseColumnType::DOUBLE:
-					buf.addStatic("REAL", 4);
+					appendStatic("REAL", 4);
 					return;
 				case DatabaseColumnType::CHAR:
 				case DatabaseColumnType::NCHAR:
@@ -658,7 +853,7 @@ namespace slib
 				case DatabaseColumnType::TEXT:
 				case DatabaseColumnType::MEDIUMTEXT:
 				case DatabaseColumnType::LONGTEXT:
-					buf.addStatic("TEXT", 4);
+					appendStatic("TEXT", 4);
 					return;
 				case DatabaseColumnType::BINARY:
 				case DatabaseColumnType::VARBINARY:
@@ -666,45 +861,45 @@ namespace slib
 				case DatabaseColumnType::BLOB:
 				case DatabaseColumnType::MEDIUMBLOB:
 				case DatabaseColumnType::LONGBLOB:
-					buf.addStatic("BLOB", 4);
+					appendStatic("BLOB", 4);
 					return;
 			}
 		} else if (dialect == DatabaseDialect::PostgreSQL) {
 			switch (type.type) {
 				case DatabaseColumnType::BOOLEAN:
-					buf.addStatic("boolean", 7);
+					appendStatic("boolean", 7);
 					return;
 				case DatabaseColumnType::TINYINT:
 				case DatabaseColumnType::SMALLINT:
 					if (flags & DatabaseColumnFlags::AutoIncrement) {
-						buf.addStatic("smallserial", 11);
+						appendStatic("smallserial", 11);
 					} else {
-						buf.addStatic("smallint", 8);
+						appendStatic("smallint", 8);
 					}
 					return;
 				case DatabaseColumnType::MEDIUMINT:
 				case DatabaseColumnType::INTEGER:
 					if (flags & DatabaseColumnFlags::AutoIncrement) {
-						buf.addStatic("serial", 6);
+						appendStatic("serial", 6);
 					} else {
-						buf.addStatic("integer", 7);
+						appendStatic("integer", 7);
 					}
 					return;
 				case DatabaseColumnType::BIGINT:
 					if (flags & DatabaseColumnFlags::AutoIncrement) {
-						buf.addStatic("bigserial", 9);
+						appendStatic("bigserial", 9);
 					} else {
-						buf.addStatic("bigint", 6);
+						appendStatic("bigint", 6);
 					}
 					return;
 				case DatabaseColumnType::SMALLSERIAL:
-					buf.addStatic("smallserial", 11);
+					appendStatic("smallserial", 11);
 					return;
 				case DatabaseColumnType::SERIAL:
-					buf.addStatic("serial", 6);
+					appendStatic("serial", 6);
 					return;
 				case DatabaseColumnType::BIGSERIAL:
-					buf.addStatic("bigserial", 9);
+					appendStatic("bigserial", 9);
 					return;
 				case DatabaseColumnType::DECIMAL:
 					DEFINE_COLUMN_TYPE_NAME_WITH_LENGTH_AND_SCALE("decimal")
@@ -713,13 +908,13 @@ namespace slib
 				case DatabaseColumnType::FLOAT:
 					DEFINE_COLUMN_TYPE_NAME_WITH_LENGTH("float")
 				case DatabaseColumnType::REAL:
-					buf.addStatic("real", 4);
+					appendStatic("real", 4);
 					return;
 				case DatabaseColumnType::DOUBLE:
-					buf.addStatic("double precision", 16);
+					appendStatic("double precision", 16);
 					return;
 				case DatabaseColumnType::DATE:
-					buf.addStatic("date", 4);
+					appendStatic("date", 4);
 					return;
 				case DatabaseColumnType::DATETIME:
 				case DatabaseColumnType::TIMESTAMP:
@@ -731,7 +926,7 @@ namespace slib
 						}
 						break;
 					} else {
-						buf.addStatic("timestamp", 9);
+						appendStatic("timestamp", 9);
 						return;
 					}
 				case DatabaseColumnType::TIME:
@@ -743,7 +938,7 @@ namespace slib
 						}
 						break;
 					} else {
-						buf.addStatic("time", 4);
+						appendStatic("time", 4);
 						return;
 					}
 				case DatabaseColumnType::CHAR:
@@ -758,19 +953,19 @@ namespace slib
 				case DatabaseColumnType::BLOB:
 				case DatabaseColumnType::MEDIUMBLOB:
 				case DatabaseColumnType::LONGBLOB:
-					buf.addStatic("bytea", 5);
+					appendStatic("bytea", 5);
 					return;
 				case DatabaseColumnType::TINYTEXT:
 				case DatabaseColumnType::TEXT:
 				case DatabaseColumnType::MEDIUMTEXT:
 				case DatabaseColumnType::LONGTEXT:
-					buf.addStatic("text", 4);
+					appendStatic("text", 4);
 					return;
 			}
 		} else if (dialect == DatabaseDialect::MySQL) {
 			switch (type.type) {
 				case DatabaseColumnType::BOOLEAN:
-					buf.addStatic("BOOLEAN", 7);
+					appendStatic("BOOLEAN", 7);
 					return;
 				case DatabaseColumnType::TINYINT:
 					DEFINE_COLUMN_TYPE_RETURN_MYSQL("TINYINT")
@@ -793,22 +988,22 @@ namespace slib
 				case DatabaseColumnType::FLOAT:
 					DEFINE_COLUMN_TYPE_NAME_WITH_LENGTH_AND_SCALE_MYSQL("FLOAT")
 				case DatabaseColumnType::REAL:
-					buf.addStatic("REAL", 4);
+					appendStatic("REAL", 4);
 					return;
 				case DatabaseColumnType::DOUBLE:
-					buf.addStatic("DOUBLE", 6);
+					appendStatic("DOUBLE", 6);
 					return;
 				case DatabaseColumnType::DATE:
-					buf.addStatic("DATE", 4);
+					appendStatic("DATE", 4);
 					return;
 				case DatabaseColumnType::DATETIME:
-					buf.addStatic("DATETIME", 8);
+					appendStatic("DATETIME", 8);
 					return;
 				case DatabaseColumnType::TIMESTAMP:
-					buf.addStatic("TIMESTAMP", 9);
+					appendStatic("TIMESTAMP", 9);
 					return;
 				case DatabaseColumnType::TIME:
-					buf.addStatic("TIME", 4);
+					appendStatic("TIME", 4);
 					return;
 				case DatabaseColumnType::CHAR:
 					DEFINE_COLUMN_TYPE_NAME_WITH_LENGTH("CHARACTER")
@@ -823,32 +1018,32 @@ namespace slib
 				case DatabaseColumnType::VARBINARY:
 					DEFINE_COLUMN_TYPE_NAME_WITH_LENGTH("VARBINARY")
 				case DatabaseColumnType::TINYBLOB:
-					buf.addStatic("TINYBLOB", 8);
+					appendStatic("TINYBLOB", 8);
 					return;
 				case DatabaseColumnType::BLOB:
 					DEFINE_COLUMN_TYPE_NAME_WITH_LENGTH("BLOB")
 				case DatabaseColumnType::MEDIUMBLOB:
-					buf.addStatic("MEDIUMBLOB", 10);
+					appendStatic("MEDIUMBLOB", 10);
 					return;
 				case DatabaseColumnType::LONGBLOB:
-					buf.addStatic("LONGBLOB", 8);
+					appendStatic("LONGBLOB", 8);
 					return;
 				case DatabaseColumnType::TINYTEXT:
-					buf.addStatic("TINYTEXT", 8);
+					appendStatic("TINYTEXT", 8);
 					return;
 				case DatabaseColumnType::TEXT:
 					DEFINE_COLUMN_TYPE_NAME_WITH_LENGTH("TEXT")
 				case DatabaseColumnType::MEDIUMTEXT:
-					buf.addStatic("MEDIUMTEXT", 10);
+					appendStatic("MEDIUMTEXT", 10);
 					return;
 				case DatabaseColumnType::LONGTEXT:
-					buf.addStatic("LONGTEXT", 8);
+					appendStatic("LONGTEXT", 8);
 					return;
 			}
 		} else {
 			switch (type.type) {
 				case DatabaseColumnType::BOOLEAN:
-					buf.addStatic("BOOLEAN", 7);
+					appendStatic("BOOLEAN", 7);
 					return;
 				case DatabaseColumnType::TINYINT:
 				case DatabaseColumnType::SMALLSERIAL:
@@ -856,11 +1051,11 @@ namespace slib
 				case DatabaseColumnType::MEDIUMINT:
 				case DatabaseColumnType::SERIAL:
 				case DatabaseColumnType::INTEGER:
-					buf.addStatic("INT", 3);
+					appendStatic("INT", 3);
 					return;
 				case DatabaseColumnType::BIGSERIAL:
 				case DatabaseColumnType::BIGINT:
-					buf.addStatic("BIGINT", 6);
+					appendStatic("BIGINT", 6);
 					return;
 				case DatabaseColumnType::DECIMAL:
 				case DatabaseColumnType::NUMERIC:
@@ -868,15 +1063,15 @@ namespace slib
 				case DatabaseColumnType::FLOAT:
 				case DatabaseColumnType::REAL:
 				case DatabaseColumnType::DOUBLE:
-					buf.addStatic("DOUBLE", 6);
+					appendStatic("DOUBLE", 6);
 					return;
 				case DatabaseColumnType::DATE:
-					buf.addStatic("DATE", 4);
+					appendStatic("DATE", 4);
 					return;
 				case DatabaseColumnType::DATETIME:
 				case DatabaseColumnType::TIMESTAMP:
 				case DatabaseColumnType::TIME:
-					buf.addStatic("DATETIME", 8);
+					appendStatic("DATETIME", 8);
 					return;
 				case DatabaseColumnType::CHAR:
 				case DatabaseColumnType::NCHAR:
@@ -890,36 +1085,36 @@ namespace slib
 				case DatabaseColumnType::BLOB:
 				case DatabaseColumnType::MEDIUMBLOB:
 				case DatabaseColumnType::LONGBLOB:
-					buf.addStatic("BLOB", 4);
+					appendStatic("BLOB", 4);
 					return;
 				case DatabaseColumnType::TINYTEXT:
 				case DatabaseColumnType::TEXT:
 				case DatabaseColumnType::MEDIUMTEXT:
 				case DatabaseColumnType::LONGTEXT:
-					buf.addStatic("TEXT", 4);
+					appendStatic("TEXT", 4);
 					return;
 			}
 		}
-		buf.add(*pStrType);
+		append(*pStrType);
 		if (flagAppendLength) {
-			buf.addStatic("(", 1);
-			buf.add(String::fromUint32(type.length));
+			appendStatic("(", 1);
+			append(String::fromUint32(type.length));
 			if (flagAppendScale && type.scale) {
-				buf.addStatic(",", 1);
-				buf.add(String::fromUint32(type.scale));
+				appendStatic(",", 1);
+				append(String::fromUint32(type.scale));
 			}
-			buf.addStatic(")", 1);
+			appendStatic(")", 1);
 		}
 		if (dialect == DatabaseDialect::MySQL) {
 			if (flags & DatabaseColumnFlags::Unsigned) {
-				buf.addStatic(" UNSIGNED", 9);
+				appendStatic(" UNSIGNED", 9);
 			}
 			if (flags & DatabaseColumnFlags::ZeroFill) {
-				buf.addStatic(" ZEROFILL", 9);
+				appendStatic(" ZEROFILL", 9);
 			}
 		} else if (dialect == DatabaseDialect::PostgreSQL) {
 			if (flags & DatabaseColumnFlags::WithTimeZone) {
-				buf.addStatic(" with time zone", 15);
+				appendStatic(" with time zone", 15);
 			}
 		}
 	}
@@ -930,19 +1125,19 @@ namespace slib
 			case DatabaseReferentialAction::Default:
 				return;
 			case DatabaseReferentialAction::SetNull:
-				buf.addStatic("SET NULL", 8);
+				appendStatic("SET NULL", 8);
 				return;
 			case DatabaseReferentialAction::SetDefault:
-				buf.addStatic("SET DEFAULT", 11);
+				appendStatic("SET DEFAULT", 11);
 				return;
 			case DatabaseReferentialAction::Cascade:
-				buf.addStatic("CASCADE", 7);
+				appendStatic("CASCADE", 7);
 				return;
 			case DatabaseReferentialAction::Restrict:
-				buf.addStatic("RESTRICT", 8);
+				appendStatic("RESTRICT", 8);
 				return;
 			case DatabaseReferentialAction::NoAction:
-				buf.addStatic("NO ACTION", 9);
+				appendStatic("NO ACTION", 9);
 				return;
 		}
 	}
@@ -952,11 +1147,15 @@ namespace slib
 		if (column.expression.isNotNull()) {
 			column.expression.appendTo(*this, sl_true);
 			if (column.name.isNotEmpty()) {
-				buf.addStatic(" AS ", 4);
+				appendStatic(" ", 1);
 				appendIdentifier(column.name);
 			}
 		} else {
-			appendIdentifier(column.name);
+			if (column.name.equals("*")) {
+				appendStatic("*", 1);
+			} else {
+				appendIdentifier(column.name);
+			}
 		}
 	}
 
@@ -971,38 +1170,38 @@ namespace slib
 
 	void SqlBuilder::appendReferenceDefinition(const DatabaseReferenceDefinition& reference)
 	{
-		buf.addStatic("REFERENCES ", 11);
+		appendStatic("REFERENCES ", 11);
 		appendIdentifier(reference.tableName);
 		ListLocker<String> columns(reference.columns);
 		if (columns.count > 0) {
-			buf.addStatic(" (", 2);
+			appendStatic(" (", 2);
 			for (sl_size i = 0; i < columns.count; i++) {
 				if (i) {
-					buf.addStatic(", ", 2);
+					appendStatic(", ", 2);
 				}
 				appendIdentifier(columns[i]);
 			}
-			buf.addStatic(")", 1);
+			appendStatic(")", 1);
 		}
 		switch (reference.match) {
 			case DatabaseReferenceMatch::Simple:
-				buf.addStatic(" MATCH SIMPLE", 13);
+				appendStatic(" MATCH SIMPLE", 13);
 				break;
 			case DatabaseReferenceMatch::Full:
-				buf.addStatic(" MATCH FULL", 11);
+				appendStatic(" MATCH FULL", 11);
 				break;
 			case DatabaseReferenceMatch::Partial:
-				buf.addStatic(" MATCH PARTIAL", 14);
+				appendStatic(" MATCH PARTIAL", 14);
 				break;
 			case DatabaseReferenceMatch::Default:
 				break;
 		}
 		if (reference.onDelete != DatabaseReferentialAction::Default) {
-			buf.addStatic(" ", 1);
+			appendStatic(" ", 1);
 			appendReferentialActionString(reference.onDelete);
 		}
 		if (reference.onUpdate != DatabaseReferentialAction::Default) {
-			buf.addStatic(" ", 1);
+			appendStatic(" ", 1);
 			appendReferentialActionString(reference.onUpdate);
 		}
 	}
@@ -1010,73 +1209,73 @@ namespace slib
 	void SqlBuilder::appendColumnDefinition(const DatabaseColumnDefinition& column)
 	{
 		appendIdentifier(column.name);
-		buf.addStatic(" ", 1);
+		appendStatic(" ", 1);
 		appendColumnTypeName(column.type, column.flags);
 		if (column.collate.isNotEmpty()) {
-			buf.addStatic(" COLLATE ", 9);
-			buf.add(column.collate);
+			appendStatic(" COLLATE ", 9);
+			append(column.collate);
 		}
 		if (column.flags & DatabaseColumnFlags::NotNull) {
-			buf.addStatic(" NOT NULL", 9);
+			appendStatic(" NOT NULL", 9);
 		}
 		if (column.defaultValue.isNotNull()) {
-			buf.addStatic(" DEFAULT ", 9);
+			appendStatic(" DEFAULT ", 9);
 			column.defaultValue.appendTo(*this, sl_true);
 		}
 		if (column.flags & DatabaseColumnFlags::AutoIncrement) {
 			if (dialect == DatabaseDialect::MySQL) {
-				buf.addStatic(" AUTO_INCREMENT", 15);
+				appendStatic(" AUTO_INCREMENT", 15);
 			}
 		}
 		if (column.flags & DatabaseColumnFlags::PrimaryKey) {
-			buf.addStatic(" PRIMARY KEY", 12);
+			appendStatic(" PRIMARY KEY", 12);
 			if (dialect == DatabaseDialect::SQLite) {
 				if (column.flags & DatabaseColumnFlags::Asc) {
-					buf.addStatic(" ASC", 4);
+					appendStatic(" ASC", 4);
 				} else if (column.flags & DatabaseColumnFlags::Desc) {
-					buf.addStatic(" DESC", 5);
+					appendStatic(" DESC", 5);
 				}
 				if (column.flags & DatabaseColumnFlags::AutoIncrement) {
-					buf.addStatic(" AUTOINCREMENT", 14);
+					appendStatic(" AUTOINCREMENT", 14);
 				}
 			}
 		}
 		if (column.flags & DatabaseColumnFlags::Unique) {
-			buf.addStatic(" UNIQUE", 7);
+			appendStatic(" UNIQUE", 7);
 		}
 		if (column.reference.tableName.isNotEmpty()) {
-			buf.addStatic(" ", 1);
+			appendStatic(" ", 1);
 			appendReferenceDefinition(column.reference);
 		}
 	}
 
 	void SqlBuilder::appendTableConstraint(const DatabaseTableConstraint& constraint)
 	{
-		buf.addStatic("CONSTRAINT ", 11);
-		buf.add(constraint.name);
-		buf.addStatic(" ", 1);
+		appendStatic("CONSTRAINT ", 11);
+		append(constraint.name);
+		appendStatic(" ", 1);
 		switch (constraint.type) {
 			case DatabaseConstaintType::PrimaryKey:
-				buf.addStatic(" PRIMARY KEY", 12);
+				appendStatic(" PRIMARY KEY", 12);
 				break;
 			case DatabaseConstaintType::Unique:
-				buf.addStatic(" UNIQUE", 7);
+				appendStatic(" UNIQUE", 7);
 				break;
 			case DatabaseConstaintType::ForeignKey:
-				buf.addStatic(" FOREIGN KEY", 12);
+				appendStatic(" FOREIGN KEY", 12);
 				break;
 		}
-		buf.addStatic(" (", 2);
+		appendStatic(" (", 2);
 		ListLocker<String> columns(constraint.columns);
 		for (sl_size i = 0; i < columns.count; i++) {
 			if (i) {
-				buf.addStatic(", ", 2);
+				appendStatic(", ", 2);
 			}
 			appendIdentifier(columns[i]);
 		}
-		buf.addStatic(")", 1);
+		appendStatic(")", 1);
 		if (constraint.type == DatabaseConstaintType::ForeignKey) {
-			buf.addStatic(" ", 1);
+			appendStatic(" ", 1);
 			appendReferenceDefinition(constraint.reference);
 		}
 	}
@@ -1086,14 +1285,208 @@ namespace slib
 		appendColumnNoAs(column.column);
 		if (column.collate.isNotEmpty()) {
 			if (dialect != DatabaseDialect::MySQL) {
-				buf.addStatic(" COLLATE ", 9);
-				buf.add(column.collate);
+				appendStatic(" COLLATE ", 9);
+				append(column.collate);
 			}
 		}
 		if (column.order == DatabaseOrderType::Asc) {
-			buf.addStatic(" ASC", 4);
+			appendStatic(" ASC", 4);
 		} else if (column.order == DatabaseOrderType::Desc) {
-			buf.addStatic(" DESC", 5);
+			appendStatic(" DESC", 5);
+		}
+	}
+
+	void SqlBuilder::appendSelectWithClause(const DatabaseQueryWith& with)
+	{
+		ListElements<String> columns(with.columns);
+		appendIdentifier(with.name);
+		if (columns.count) {
+			appendStatic("(", 1);
+			for (sl_size i = 0; i < columns.count; i++) {
+				if (i) {
+					appendStatic(", ", 2);
+				}
+				appendIdentifier(columns[i]);
+			}
+			appendStatic(")", 1);
+		}
+		appendStatic(" AS (", 5);
+		appendQuery(with.query);
+		appendStatic(")", 1);
+	}
+
+	void SqlBuilder::appendQuerySource(const DatabaseQuerySource& source)
+	{
+		if (source.query.isNotNull()) {
+			appendStatic("(", 1);
+			appendQuery(*(source.query));
+			appendStatic(")", 1);
+		} else if (source.expression.isNotNull()) {
+			source.expression.appendTo(*this, sl_true);
+		} else {
+			appendIdentifier(source.table);
+		}
+		if (source.name.isNotEmpty()) {
+			appendStatic(" ", 1);
+			appendIdentifier(source.name);
+		}
+	}
+
+	void SqlBuilder::appendQueryJoin(const DatabaseQueryJoin& join)
+	{
+		switch (join.type) {
+			case DatabaseJoinType::Left:
+				appendStatic("LEFT JOIN ", 10);
+				break;
+			case DatabaseJoinType::Right:
+				appendStatic("RIGHT JOIN ", 11);
+				break;
+			case DatabaseJoinType::Inner:
+				appendStatic("INNER JOIN ", 11);
+				break;
+			case DatabaseJoinType::Full:
+				appendStatic("FULL JOIN ", 10);
+				break;
+			default:
+				return;
+		}
+		appendQuerySource(join);
+		if (join.on.isNotNull()) {
+			appendStatic(" ", 1);
+			join.on.appendTo(*this, sl_false);
+		}
+	}
+
+	void SqlBuilder::appendQueryOrder(const DatabaseQueryOrder& order)
+	{
+		appendColumnNoAs(order.column);
+		if (order.collate.isNotEmpty()) {
+			appendStatic(" COLLATE ", 9);
+			append(order.collate);
+		}
+		if (order.type == DatabaseOrderType::Asc) {
+			appendStatic(" ASC", 4);
+		} else if (order.type == DatabaseOrderType::Desc) {
+			appendStatic(" DESC", 5);
+		}
+		if (order.flags & DatabaseFlags::NullsFirst) {
+			appendStatic(" NULLS FIRST", 12);
+		} else if (order.flags & DatabaseFlags::NullsLast) {
+			appendStatic(" NULLS LAST", 11);
+		}
+	}
+
+	void SqlBuilder::appendQuery(const DatabaseQuery& query)
+	{
+		ListElements<DatabaseQueryCombine> combines(query.combines);
+		if (combines.count) {
+			appendStatic("(", 1);
+		}
+		appendStatic("SELECT ", 7);
+		if (query.distinct) {
+			appendStatic("DISTINCT ", 9);
+		}
+		ListElements<DatabaseColumn> columns(query.columns);
+		if (columns.count) {
+			for (sl_size i = 0; i < columns.count; i++) {
+				if (i) {
+					appendStatic(", ", 2);
+				}
+				appendColumn(columns[i]);
+			}
+		} else {
+			appendStatic("*", 1);
+		}
+		appendStatic(" FROM ", 6);
+		appendQuerySource(query.source);
+		ListElements<DatabaseQueryJoin> joins(query.joins);
+		{
+			for (sl_size i = 0; i < joins.count; i++) {
+				appendStatic(" ", 1);
+				appendQueryJoin(joins[i]);
+			}
+		}
+		if (query.where.isNotNull()) {
+			appendStatic(" WHERE ", 7);
+			query.where.appendTo(*this, sl_false);
+		}
+		ListElements<DatabaseColumn> groupByColumns(query.groupBy.columns);
+		if (groupByColumns.count) {
+			appendStatic(" GROUP BY ", 10);
+			for (sl_size i = 0; i < groupByColumns.count; i++) {
+				if (i) {
+					appendStatic(", ", 2);
+				}
+				appendColumnNoAs(groupByColumns[i]);
+			}
+			if (query.groupBy.having.isNotNull()) {
+				appendStatic(" HAVING ", 8);
+				query.groupBy.having.appendTo(*this, sl_false);
+			}
+		}
+		ListElements<DatabaseQueryOrder> orders(query.orders);
+		if (orders.count) {
+			appendStatic(" ORDER BY ", 10);
+			for (sl_size i = 0; i < orders.count; i++) {
+				if (i) {
+					appendStatic(", ", 2);
+				}
+				appendQueryOrder(orders[i]);
+			}
+		}
+		if (query.limit) {
+			appendStatic(" LIMIT ", 7);
+			append(String::fromUint32(query.limit));
+		}
+		if (query.offset) {
+			appendStatic(" OFFSET ", 8);
+			append(String::fromUint32(query.offset));
+		}
+		if (combines.count) {
+			appendStatic(")", 1);
+			for (sl_size i = 0; i < combines.count; i++) {
+				switch(combines[i].type) {
+					case DatabaseCombineType::Union:
+						appendStatic(" UNION ", 7);
+						break;
+					case DatabaseCombineType::UnionAll:
+						appendStatic(" UNION ALL ", 11);
+						break;
+					case DatabaseCombineType::Intersect:
+						appendStatic(" INTERSECT ", 11);
+						break;
+					case DatabaseCombineType::IntersectAll:
+						appendStatic(" INTERSECT ALL ", 15);
+						break;
+					case DatabaseCombineType::Except:
+						appendStatic(" EXCEPT ", 8);
+						break;
+					case DatabaseCombineType::ExcpetAll:
+						appendStatic(" EXCEPT ALL ", 12);
+						break;
+				}
+				appendStatic("(", 1);
+				appendQuery(combines[i].query);
+				appendStatic(")", 1);
+			}
+			ListElements<DatabaseQueryOrder> ordersOfCombined(query.ordersOfCombined);
+			if (ordersOfCombined.count) {
+				appendStatic(" ORDER BY ", 10);
+				for (sl_size i = 0; i < ordersOfCombined.count; i++) {
+					if (i) {
+						appendStatic(", ", 2);
+					}
+					appendQueryOrder(ordersOfCombined[i]);
+				}
+			}
+			if (query.limitOfCombined) {
+				appendStatic(" LIMIT ", 7);
+				append(String::fromUint32(query.limitOfCombined));
+			}
+			if (query.offsetOfCombined) {
+				appendStatic(" OFFSET ", 8);
+				append(String::fromUint32(query.offsetOfCombined));
+			}
 		}
 	}
 

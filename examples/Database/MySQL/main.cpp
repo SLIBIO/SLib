@@ -22,26 +22,27 @@ int main(int argc, const char * argv[])
 	Println("book table existing: %s", db->isTableExisting("book"));
 	Println("Tables=%s", Json(db->getTables()));
 	
-	db->execute(
-		R"sql(
-			DROP TABLE IF EXISTS book;
-			CREATE TABLE book
-			(
-			 no BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-			 title VARCHAR(60),
-			 abstract TEXT,
-			 PRIMARY KEY (no)
-			);
-		)sql"
-	);
-	
-	for (int i = 0; i < 10; i++) {
-		String title = String::format("Book %d", i);
-		String abstract = String::format("Abstract %d", i);
-		db->execute("INSERT INTO book (title, abstract) VALUES(?, ?)", title, abstract);
+	db->dropTable("book", DatabaseFlags::IfExists);
+	{
+		DatabaseColumnDefinition columns[] = {
+			DatabaseColumnDefinition("title", DatabaseColumnType::TEXT),
+			DatabaseColumnDefinition("abstract", DatabaseColumnType::TEXT)
+		};
+		db->createTable("book", columns, DatabaseFlags::IfExists);
 	}
 	
-	for (auto& row : db->getListForQueryResult("SELECT * from book")) {
+	db->startTransaction();
+	for (int i = 0; i < 1000; i++) {
+		String title = String::format("Book %d", i);
+		String abstract = String::format("Abstract %d", i);
+		HashMap<String, String> map;
+		map.put_NoLock("title", title);
+		map.put_NoLock("abstract", abstract);
+		db->insert("book", map);
+	}
+	db->commitTransaction();
+	
+	for (auto& row : db->findRecords("book", DatabaseExpression::null())) {
 		String title = row["title"].getString();
 		String abstract = row["abstract"].getString();
 		Println("Title: %s, Abstract: %s", title, abstract);

@@ -40,7 +40,13 @@ namespace slib
 		DatabaseExpression expression;
 		
 	public:
+		DatabaseColumn();
+		
+		DatabaseColumn(const char* name);
+		
 		DatabaseColumn(const String& name);
+		
+		DatabaseColumn(const DatabaseExpression& expression);
 		
 		DatabaseColumn(const String& name, const DatabaseExpression& expression);
 		
@@ -60,6 +66,8 @@ namespace slib
 	class SLIB_EXPORT DatabaseColumnIdentifier : public DatabaseColumn
 	{
 	public:
+		DatabaseColumnIdentifier(const char* name);
+		
 		DatabaseColumnIdentifier(const String& name);
 		
 		DatabaseColumnIdentifier(const String& name1, const String& name2);
@@ -218,15 +226,22 @@ namespace slib
 		String name;
 		DatabaseIdentifier table;
 		Ptr<DatabaseQuery> query;
+		DatabaseExpression expression;
 		
 	public:
 		DatabaseQuerySource();
+		
+		DatabaseQuerySource(const char* name);
 		
 		DatabaseQuerySource(const String& name);
 		
 		DatabaseQuerySource(const DatabaseIdentifier& table);
 		
 		DatabaseQuerySource(const String& name, const DatabaseIdentifier& table);
+		
+		DatabaseQuerySource(const String& name, const DatabaseQuery& query);
+		
+		DatabaseQuerySource(const String& name, const DatabaseExpression& expression);
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DatabaseQuerySource)
 		
@@ -257,6 +272,19 @@ namespace slib
 		
 	};
 
+	class SLIB_EXPORT DatabaseQueryGroupBy
+	{
+	public:
+		ListParam<DatabaseColumn> columns;
+		DatabaseExpression having;
+		
+	public:
+		DatabaseQueryGroupBy();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DatabaseQueryGroupBy)
+
+	};
+
 	class SLIB_EXPORT DatabaseQueryOrder
 	{
 	public:
@@ -268,30 +296,44 @@ namespace slib
 	public:
 		DatabaseQueryOrder();
 		
+		DatabaseQueryOrder(const char* columnName);
+		
+		DatabaseQueryOrder(const char* columnName, DatabaseOrderType type);
+		
+		DatabaseQueryOrder(const String& columnName);
+		
+		DatabaseQueryOrder(const String& columnName, DatabaseOrderType type);
+		
+		DatabaseQueryOrder(const DatabaseExpression& expression);
+		
+		DatabaseQueryOrder(const DatabaseExpression& expression, DatabaseOrderType type);
+
+		DatabaseQueryOrder(const DatabaseColumn& column);
+
 		DatabaseQueryOrder(const DatabaseColumn& column, DatabaseOrderType type);
 
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DatabaseQueryOrder)
 		
 	};
 
-	class DatabaseQueryWith;
 	class DatabaseQueryCombine;
 
 	class SLIB_EXPORT DatabaseQuery
 	{
 	public:
-		ListParam<DatabaseQueryWith> withs;
 		sl_bool distinct;
-		ListParam<DatabaseIndexColumn> columns;
+		ListParam<DatabaseColumn> columns;
 		DatabaseQuerySource source;
 		ListParam<DatabaseQueryJoin> joins;
-		DatabaseQueryOrder order;
+		DatabaseExpression where;
+		DatabaseQueryGroupBy groupBy;
+		ListParam<DatabaseQueryOrder> orders;
 		sl_uint32 limit;
 		sl_uint32 offset;
 		ListParam<DatabaseQueryCombine> combines;
-		DatabaseQueryOrder orderAll;
-		sl_uint32 limitAll;
-		sl_uint32 offsetAll;
+		ListParam<DatabaseQueryOrder> ordersOfCombined;
+		sl_uint32 limitOfCombined;
+		sl_uint32 offsetOfCombined;
 
 	public:
 		DatabaseQuery();
@@ -299,12 +341,6 @@ namespace slib
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DatabaseQuery)
 		
 	public:
-		template <class... ARGS>
-		void addWith(ARGS&&... args)
-		{
-			withs.add(Forward<ARGS>(args)...);
-		}
-		
 		template <class... ARGS>
 		void addColumn(ARGS&&... args)
 		{
@@ -323,20 +359,17 @@ namespace slib
 			combines.add(Forward<ARGS>(args)...);
 		}
 		
-	};
-
-	class SLIB_EXPORT DatabaseQueryWith
-	{
-	public:
-		String name;
-		sl_bool recursive;
-		ListParam<String> columns;
-		DatabaseQuery query;
+		template <class... ARGS>
+		void addOrder(ARGS&&... args)
+		{
+			orders.add(Forward<ARGS>(args)...);
+		}
 		
-	public:
-		DatabaseQueryWith();
-		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DatabaseQueryWith)
+		template <class... ARGS>
+		void addOrderOfCombined(ARGS&&... args)
+		{
+			ordersOfCombined.add(Forward<ARGS>(args)...);
+		}
 		
 	};
 
@@ -349,7 +382,29 @@ namespace slib
 	public:
 		DatabaseQueryCombine();
 		
+		DatabaseQueryCombine(const DatabaseQuery& query);
+		
+		DatabaseQueryCombine(DatabaseCombineType type, const DatabaseQuery& query);
+
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DatabaseQueryCombine)
+		
+	};
+
+	class SLIB_EXPORT DatabaseQueryWith
+	{
+	public:
+		String name;
+		ListParam<String> columns;
+		DatabaseQuery query;
+		
+	public:
+		DatabaseQueryWith();
+		
+		DatabaseQueryWith(const String& name, const DatabaseQuery& query);
+		
+		DatabaseQueryWith(const String& name, const ListParam<String>& columns, const DatabaseQuery& query);
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DatabaseQueryWith)
 		
 	};
 
@@ -406,9 +461,20 @@ namespace slib
 	class SLIB_EXPORT DatabaseSelectParam : public DatabaseQuery
 	{
 	public:
+		ListParam<DatabaseQueryWith> withs;
+		sl_bool withRecursive;
+		
+	public:
 		DatabaseSelectParam();
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DatabaseSelectParam)
+
+	public:
+		template <class... ARGS>
+		void addWith(ARGS&&... args)
+		{
+			withs.add(Forward<ARGS>(args)...);
+		}
 		
 	};
 
@@ -429,7 +495,7 @@ namespace slib
 	public:
 		void append(const String& str);
 		
-		void appendStatic(const char* sz, sl_uint32 len);
+		void appendStatic(const char* sz, sl_size len);
 		
 		void appendParameter(const String& name);
 		
@@ -441,6 +507,8 @@ namespace slib
 		void appendIdentifierSuffix();
 		
 		void appendIdentifier(const String& name);
+		
+		void appendIdentifier(const char* name, sl_size length);
 		
 		void appendIdentifier(const DatabaseIdentifier& name);
 		
@@ -473,6 +541,10 @@ namespace slib
 		
 		void generateDelete(const DatabaseIdentifier& table, const DatabaseExpression& where);
 		
+		void generateSelect(const DatabaseSelectParam& param);
+		
+		void generateSelect(const DatabaseIdentifier& table, const DatabaseExpression& where);
+		
 
 		void appendColumnTypeName(const DatabaseColumnTypeDefinition& type, const DatabaseColumnFlags& flags);
 		
@@ -489,6 +561,16 @@ namespace slib
 		void appendTableConstraint(const DatabaseTableConstraint& constraint);
 		
 		void appendIndexColumn(const DatabaseIndexColumn& column);
+		
+		void appendSelectWithClause(const DatabaseQueryWith& with);
+		
+		void appendQuerySource(const DatabaseQuerySource& source);
+		
+		void appendQueryJoin(const DatabaseQueryJoin& join);
+		
+		void appendQueryOrder(const DatabaseQueryOrder& order);
+		
+		void appendQuery(const DatabaseQuery& query);
 		
 	};
 
