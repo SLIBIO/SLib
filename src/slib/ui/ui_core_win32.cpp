@@ -453,7 +453,11 @@ namespace slib
 			wc.lpfnWndProc = MessageWindowProc;
 			wc.lpszClassName = L"SLIBMESSAGEHANDLER";
 			m_wndClassForMessage = RegisterClassW(&wc);
-			String16 appId = UIApp::getApp()->getUniqueInstanceId();
+			String16 appId;
+			Ref<UIApp> app = UIApp::getApp();
+			if (app.isNotNull()) {
+				appId = app->getUniqueInstanceId();
+			}
 			hWndMessage = CreateWindowExW(0, (LPCWSTR)((LONG_PTR)m_wndClassForMessage), (LPCWSTR)(appId.getData()), 0, 0, 0, 0, 0, HWND_MESSAGE, 0, hInstance, 0);
 		}
 
