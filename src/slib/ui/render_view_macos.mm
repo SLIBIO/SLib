@@ -175,7 +175,9 @@ namespace slib
 								if (context == nil) {
 									return;
 								}
-								[context setView: handle];
+								dispatch_async(dispatch_get_main_queue(), ^{
+									[context setView: handle];
+								});
 							}
 							if (handle->m_flagUpdate) {
 								[context update];
