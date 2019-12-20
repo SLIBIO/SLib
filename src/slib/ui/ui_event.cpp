@@ -128,22 +128,22 @@ sl_bool UIEvent::is##NAME##Key() const \
 		StringBuffer sb;
 		if (isWindowsKey()) {
 #if defined(SLIB_PLATFORM_IS_APPLE)
-			sb.addStatic("Command+", 8);
+			sb.addStatic("Command+");
 #else
-			sb.addStatic("Win+", 4);
+			sb.addStatic("Win+");
 #endif
 		}
 		if (isControlKey()) {
-			sb.addStatic("Ctrl+", 5);
+			sb.addStatic("Ctrl+");
 		}
 		if (isShiftKey()) {
-			sb.addStatic("Shift+", 6);
+			sb.addStatic("Shift+");
 		}
 		if (isAltKey()) {
 #if defined(SLIB_PLATFORM_IS_APPLE)
-			sb.addStatic("Option+", 8);
+			sb.addStatic("Option+");
 #else
-			sb.addStatic("Alt+", 4);
+			sb.addStatic("Alt+");
 #endif
 		}
 		sb.add(UIEvent::getKeyName(getKeycode(), sl_true));

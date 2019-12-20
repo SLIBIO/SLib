@@ -498,18 +498,15 @@ namespace slib
 			return sl_null;
 		}
 
-		SLIB_STATIC_STRING(t, "/*");
-		String16 query = filePath + t;
+		String16 query = filePath + "/*";
 		WIN32_FIND_DATAW fd;
 		HANDLE handle = FindFirstFileW((LPCWSTR)(query.getData()), &fd);
 		if (handle != INVALID_HANDLE_VALUE) {
 			List<String> ret;
 			BOOL c = TRUE;
-			SLIB_STATIC_STRING(p1, ".");
-			SLIB_STATIC_STRING(p2, "..");
 			while (c) {
 				String str((sl_char16*)(fd.cFileName));
-				if (str != p1 && str != p2) {
+				if (str != "." && str != "..") {
 					ret.add_NoLock(str);
 				}
 				c = FindNextFileW(handle, &fd);

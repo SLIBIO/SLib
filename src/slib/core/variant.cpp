@@ -1341,11 +1341,9 @@ namespace slib
 				return String::fromDouble(REF_VAR(double const, _value));
 			case VariantType::Boolean:
 				if (REF_VAR(sl_bool const, _value)) {
-					SLIB_STATIC_STRING_BY_ARRAY(ret, 't', 'r', 'u', 'e');
-					return ret;
+					SLIB_RETURN_STRING("true")
 				} else {
-					SLIB_STATIC_STRING_BY_ARRAY(ret, 'f', 'a', 'l', 's', 'e');
-					return ret;
+					SLIB_RETURN_STRING("false")
 				}
 			case VariantType::Time:
 				return REF_VAR(Time const, _value).toString();
@@ -1401,11 +1399,9 @@ namespace slib
 				return String16::fromDouble(REF_VAR(double const, _value));
 			case VariantType::Boolean:
 				if (REF_VAR(sl_bool const, _value)) {
-					SLIB_STATIC_STRING16_BY_ARRAY(ret, 't', 'r', 'u', 'e');
-					return ret;
+					SLIB_RETURN_STRING16("true")
 				} else {
-					SLIB_STATIC_STRING16_BY_ARRAY(ret, 'f', 'a', 'l', 's', 'e');
-					return ret;
+					SLIB_RETURN_STRING16("false")
 				}
 			case VariantType::Time:
 				return REF_VAR(Time const, _value).toString();
@@ -2207,13 +2203,13 @@ namespace slib
 				sl_size n = l.count;
 				Variant* lb = l.data;
 				
-				if (!(ret.addStatic("[", 1))) {
+				if (!(ret.addStatic("["))) {
 					return sl_false;
 				}
 				for (sl_size i = 0; i < n; i++) {
 					Variant& v = lb[i];
 					if (i) {
-						if (!(ret.addStatic(", ", 2))) {
+						if (!(ret.addStatic(", "))) {
 							return sl_false;
 						}
 					}
@@ -2221,7 +2217,7 @@ namespace slib
 						return sl_false;
 					}
 				}
-				if (!(ret.addStatic("]", 1))) {
+				if (!(ret.addStatic("]"))) {
 					return sl_false;
 				}
 				return sl_true;
@@ -2230,7 +2226,7 @@ namespace slib
 			static sl_bool getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map) noexcept
 			{
 				MutexLocker lock(map.getLocker());
-				if (!(ret.addStatic("{", 1))) {
+				if (!(ret.addStatic("{"))) {
 					return sl_false;
 				}
 				sl_bool flagFirst = sl_true;
@@ -2238,14 +2234,14 @@ namespace slib
 					Variant& v = pair.value;
 					if (v.isNotUndefined()) {
 						if (!flagFirst) {
-							if (!(ret.addStatic(", ", 2))) {
+							if (!(ret.addStatic(", "))) {
 								return sl_false;
 							}
 						}
 						if (!(ret.add(ParseUtil::applyBackslashEscapes(pair.key)))) {
 							return sl_false;
 						}
-						if (!(ret.addStatic(": ", 2))) {
+						if (!(ret.addStatic(": "))) {
 							return sl_false;
 						}
 						if (!priv::variant::getVariantJsonString(ret, v)) {
@@ -2254,7 +2250,7 @@ namespace slib
 						flagFirst = sl_false;
 					}
 				}
-				if (!(ret.addStatic("}", 1))) {
+				if (!(ret.addStatic("}"))) {
 					return sl_false;
 				}
 				return sl_true;
@@ -2263,7 +2259,7 @@ namespace slib
 			static sl_bool getVariantHashMapJsonString(StringBuffer& ret, const HashMap<String, Variant>& map) noexcept
 			{
 				MutexLocker lock(map.getLocker());
-				if (!(ret.addStatic("{", 1))) {
+				if (!(ret.addStatic("{"))) {
 					return sl_false;
 				}
 				sl_bool flagFirst = sl_true;
@@ -2271,14 +2267,14 @@ namespace slib
 					Variant& v = pair.value;
 					if (v.isNotUndefined()) {
 						if (!flagFirst) {
-							if (!(ret.addStatic(", ", 2))) {
+							if (!(ret.addStatic(", "))) {
 								return sl_false;
 							}
 						}
 						if (!(ret.add(ParseUtil::applyBackslashEscapes(pair.key)))) {
 							return sl_false;
 						}
-						if (!(ret.addStatic(": ", 2))) {
+						if (!(ret.addStatic(": "))) {
 							return sl_false;
 						}
 						if (!priv::variant::getVariantJsonString(ret, v)) {
@@ -2287,7 +2283,7 @@ namespace slib
 						flagFirst = sl_false;
 					}
 				}
-				if (!(ret.addStatic("}", 1))) {
+				if (!(ret.addStatic("}"))) {
 					return sl_false;
 				}
 				return sl_true;
@@ -2299,13 +2295,13 @@ namespace slib
 				sl_size n = l.count;
 				Map<String, Variant>* lb = l.data;
 				
-				if (!(ret.addStatic("[", 1))) {
+				if (!(ret.addStatic("["))) {
 					return sl_false;
 				}
 				for (sl_size i = 0; i < n; i++) {
 					Map<String, Variant>& v = lb[i];
 					if (i) {
-						if (!(ret.addStatic(", ", 2))) {
+						if (!(ret.addStatic(", "))) {
 							return sl_false;
 						}
 					}
@@ -2313,7 +2309,7 @@ namespace slib
 						return sl_false;
 					}
 				}
-				if (!(ret.addStatic("]", 1))) {
+				if (!(ret.addStatic("]"))) {
 					return sl_false;
 				}
 				return sl_true;
@@ -2325,13 +2321,13 @@ namespace slib
 				sl_size n = l.count;
 				HashMap<String, Variant>* lb = l.data;
 				
-				if (!(ret.addStatic("[", 1))) {
+				if (!(ret.addStatic("["))) {
 					return sl_false;
 				}
 				for (sl_size i = 0; i < n; i++) {
 					HashMap<String, Variant>& v = lb[i];
 					if (i) {
-						if (!(ret.addStatic(", ", 2))) {
+						if (!(ret.addStatic(", "))) {
 							return sl_false;
 						}
 					}
@@ -2339,7 +2335,7 @@ namespace slib
 						return sl_false;
 					}
 				}
-				if (!(ret.addStatic("]", 1))) {
+				if (!(ret.addStatic("]"))) {
 					return sl_false;
 				}
 				return sl_true;

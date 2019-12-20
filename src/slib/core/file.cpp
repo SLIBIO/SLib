@@ -666,15 +666,13 @@ namespace slib
 	String FilePathSegments::buildPath()
 	{
 		StringBuffer ret;
-		SLIB_STATIC_STRING(sep, "/");
 		sl_bool flagFirst = sl_true;
 		{
 			for (sl_uint32 i = 0; i < parentLevel; i++) {
 				if (!flagFirst) {
-					ret.add(sep);
+					ret.addStatic("/");
 				}
-				SLIB_STATIC_STRING(p, "..");
-				ret.add(p);
+				ret.addStatic("..");
 				flagFirst = sl_false;
 			}
 		}
@@ -682,7 +680,7 @@ namespace slib
 			ListElements<String> list(segments);
 			for (sl_size i = 0; i < list.count; i++) {
 				if (!flagFirst) {
-					ret.add(sep);
+					ret.addStatic("/");
 				}
 				ret.add(list[i]);
 				flagFirst = sl_false;

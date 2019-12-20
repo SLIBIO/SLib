@@ -38,7 +38,7 @@ namespace slib
 				sl_size len = text.getLength();
 				StringBuffer buf;
 				for (sl_size i = 0; i < len; i++) {
-					buf.addStatic("=", 1);
+					buf.addStatic("=");
 					buf.add(String::fromInt((sl_uint8)(data[i]), 16, 0, sl_true));
 				}
 				return buf.merge();
@@ -61,24 +61,22 @@ namespace slib
 	{
 		StringBuffer buf;
 		{
-			SLIB_STATIC_STRING(s, "BEGIN:VCARD\r\nVERSION:2.1\r\nN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:");
-			buf.add(s);
+			buf.addStatic("BEGIN:VCARD\r\nVERSION:2.1\r\nN;CHARSET=UTF-8;ENCODING=QUOTED-PRINTABLE:");
 			buf.add(EncodeVCardText(familyName));
-			buf.addStatic(";", 1);
+			buf.addStatic(";");
 			buf.add(EncodeVCardText(givenName));
-			buf.addStatic(";", 1);
+			buf.addStatic(";");
 			buf.add(EncodeVCardText(middleName));
-			buf.addStatic(";", 1);
+			buf.addStatic(";");
 			buf.add(EncodeVCardText(namePrefix));
-			buf.addStatic("\r\n", 2);
+			buf.addStatic("\r\n");
 		}
 		{
 			ListElements<String> list(phoneNumbers.getAllValues());
 			for (sl_size i = 0; i < list.count; i++) {
-				SLIB_STATIC_STRING(s, "TEL;CELL:");
-				buf.add(s);
+				buf.addStatic("TEL;CELL:");
 				buf.add(list[i]);
-				buf.addStatic("\r\n", 2);
+				buf.addStatic("\r\n");
 			}
 		}
 		{
@@ -87,7 +85,7 @@ namespace slib
 				SLIB_STATIC_STRING(s, "EMAIL:");
 				buf.add(s);
 				buf.add(list[i]);
-				buf.addStatic("\r\n", 2);
+				buf.addStatic("\r\n");
 			}
 		}
 		{

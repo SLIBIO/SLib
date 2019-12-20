@@ -33,11 +33,11 @@ namespace slib
 		sl_bool flagFirst = sl_true;
 		for (auto& pair : params) {
 			if (!flagFirst) {
-				sb.addStatic("&", 1);
+				sb.addStatic("&");
 			}
 			flagFirst = sl_false;
 			sb.add(Cast<typename MAP::KEY_TYPE, String>()(pair.key));
-			sb.addStatic("=", 1);
+			sb.addStatic("=");
 			sb.add(Url::encodePercent(Cast<typename MAP::VALUE_TYPE, String>()(pair.value)));
 		}
 		return sb.merge();
@@ -50,11 +50,11 @@ namespace slib
 		sl_bool flagFirst = sl_true;
 		for (auto& pair : params) {
 			if (!flagFirst) {
-				sb.addStatic("&", 1);
+				sb.addStatic("&");
 			}
 			flagFirst = sl_false;
 			sb.add(Cast<typename MAP::KEY_TYPE, String>()(pair.key));
-			sb.addStatic("=", 1);
+			sb.addStatic("=");
 			sb.add(Url::encodeForm(Cast<typename MAP::VALUE_TYPE, String>()(pair.value)));
 		}
 		return sb.merge();

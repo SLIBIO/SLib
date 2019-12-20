@@ -109,7 +109,7 @@ namespace slib
 		SLIB_SCOPED_BUFFER(sl_uint8, 1024, buf, nBytesPerComponent);
 		if (buf) {
 			StringBuffer sb;
-			sb.addStatic("04", 2);
+			sb.addStatic("04");
 			if (x.getBytesBE(buf, nBytesPerComponent)) {
 				sb.add(String::makeHexString(buf, nBytesPerComponent, sl_false));
 				if (y.getBytesBE(buf, nBytesPerComponent)) {

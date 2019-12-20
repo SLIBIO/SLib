@@ -592,7 +592,7 @@ namespace slib
 
 	Ref<XmlElement> XmlNodeGroup::findChildElementById(const XmlString& _id) const
 	{
-		SLIB_STATIC_STRING16_BY_ARRAY(name, 'i', 'd');
+		SLIB_STATIC_STRING16(name, "id")
 		return findChildElementByAttribute(name, _id);
 	}
 

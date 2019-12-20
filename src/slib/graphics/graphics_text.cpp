@@ -1306,7 +1306,7 @@ namespace slib
 				
 				void endEllipsize() noexcept
 				{
-					SLIB_STATIC_STRING16_BY_ARRAY(strEllipsis, '.', '.', '.')
+					SLIB_STATIC_STRING16(strEllipsis, "...")
 					CList< Ref<TextItem> >* listItems = &m_lineItems;
 					sl_size nItems = listItems->getCount();
 					Ref<TextItem>* items = listItems->getData();

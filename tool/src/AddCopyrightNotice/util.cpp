@@ -73,11 +73,11 @@ void applyCopyrightNoticeToSourceFile(const String& pathFile, const String& copy
 			} else {
 				out.addStatic(copyrightNotice.getData(), copyrightNotice.getLength());
 			}
-			out.addStatic("\r\n\r\n", 4);
+			out.addStatic("\r\n\r\n");
 		} else {
 			_copyrightNotice = copyrightNotice.replaceAll("\r\n", "\n");
 			out.addStatic(_copyrightNotice.getData(), _copyrightNotice.getLength());
-			out.addStatic("\n\n", 2);
+			out.addStatic("\n\n");
 		}
 		out.addStatic(content, lenContent);
 		mem = out.merge();

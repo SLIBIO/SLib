@@ -236,19 +236,19 @@ namespace slib
 				if (flagFirstParam) {
 					flagFirstParam = sl_false;
 				} else {
-					sbParams.addStatic("&", 1);
+					sbParams.addStatic("&");
 				}
 				sbParams.add(item.key.first);
-				sbParams.addStatic("=", 1);
+				sbParams.addStatic("=");
 				sbParams.add(item.key.second);
 			}
 		}
 		
 		StringBuffer sbSignature;
 		sbSignature.add(method);
-		sbSignature.addStatic("&", 1);
+		sbSignature.addStatic("&");
 		sbSignature.add(Url::encodePercent(url));
-		sbSignature.addStatic("&", 1);
+		sbSignature.addStatic("&");
 		sbSignature.add(Url::encodePercent(sbParams.merge()));
 		String signatureBase = sbSignature.merge();
 		String signKey = Url::encodePercent(m_consumerSecret) + "&";
@@ -262,19 +262,19 @@ namespace slib
 		mapParams.add_NoLock(Pair<String, String>("oauth_signature", signature), sl_true);
 		StringBuffer sbAuthorization;
 		{
-			sbAuthorization.addStatic("OAuth ", 6);
+			sbAuthorization.addStatic("OAuth ");
 			sl_bool flagFirstParam = sl_true;
 			for (auto& item : mapParams) {
 				if (item.key.first.startsWith("oauth_")) {
 					if (flagFirstParam) {
 						flagFirstParam = sl_false;
 					} else {
-						sbAuthorization.addStatic(", ", 2);
+						sbAuthorization.addStatic(", ");
 					}
 					sbAuthorization.add(item.key.first);
-					sbAuthorization.addStatic("=\"", 2);
+					sbAuthorization.addStatic("=\"");
 					sbAuthorization.add(item.key.second);
-					sbAuthorization.addStatic("\"", 1);
+					sbAuthorization.addStatic("\"");
 				}
 			}
 		}

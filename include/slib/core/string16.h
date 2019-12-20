@@ -2102,36 +2102,10 @@ namespace slib
 
 
 #define SLIB_STATIC_STRING16(name, str) \
-		static sl_char16 _static_string_buf_##name[] = SLIB_UNICODE(str); \
-		static slib::StringContainer16 _static_string_container_##name = {(sl_char16*)_static_string_buf_##name, (sizeof(_static_string_buf_##name)/2)-1, 0, 0, -1}; \
+		auto& _static_string_content_##name = SLIB_UNICODE(str); \
+		static slib::StringContainer16 _static_string_container_##name = {(sl_char16*)_static_string_content_##name, (sizeof(_static_string_content_##name)/2)-1, 0, 0, -1}; \
 		static slib::StringContainer16* _static_string_##name = &_static_string_container_##name; \
 		static const slib::String16& name = *(reinterpret_cast<slib::String16*>(&_static_string_##name));
-
-#define SLIB_STATIC_ATOMIC_STRING16(name, str) \
-		static sl_char16 _static_string_buf_##name[] = SLIB_UNICODE(str); \
-		static slib::StringContainer16 _static_string_container_##name = {(sl_char16*)_static_string_buf_##name, (sizeof(_static_string_buf_##name)/2)-1, 0, 0, -1}; \
-		static slib::priv::string::ConstContainer16 _static_string_##name = {reinterpret_cast<slib::StringContainer16*>(&_static_string_container_##name), 0}; \
-		static const slib::AtomicString16& name = *(reinterpret_cast<slib::AtomicString16*>(&_static_string_##name));
-
-#define SLIB_STATIC_STRING16_BY_ARRAY(name, ...) \
-		static sl_char16 _static_string_buf_##name[] = {__VA_ARGS__, 0}; \
-		static slib::StringContainer16 _static_string_container_##name = {_static_string_buf_##name, (sizeof(_static_string_buf_##name)/2)-1, 0, 0, -1}; \
-		static slib::StringContainer16* _static_string_##name = &_static_string_container_##name; \
-		static const slib::String16& name = *(reinterpret_cast<slib::String16*>(&_static_string_##name));
-
-#define SLIB_STATIC_ATOMIC_STRING16_BY_ARRAY(name, ...) \
-		static sl_char16 _static_string_buf_##name[] = {__VA_ARGS__, 0}; \
-		static slib::StringContainer16 _static_string_container_##name = {_static_string_buf_##name, (sizeof(_static_string_buf_##name)/2)-1, 0, 0, -1}; \
-		static slib::priv::string::ConstContainer16 _static_string_##name = {reinterpret_cast<slib::StringContainer16*>(&_static_string_container_##name), 0}; \
-		static const slib::AtomicString16& name = *(reinterpret_cast<slib::AtomicString16*>(&_static_string_##name));
-
-#define SLIB_STATIC_STRING16_NULL(name) \
-		static slib::priv::string::ConstContainer16_Const _static_string_null_##name = {sl_null, 0}; \
-		static const slib::String16& name = *(reinterpret_cast<slib::String16*>(&_static_string_null_##name));
-
-#define SLIB_STATIC_ATOMIC_STRING16_NULL(name) \
-		static slib::priv::string::ConstContainer16 _static_string_null_##name = {sl_null, 0}; \
-		static const slib::AtomicString16& name = *(reinterpret_cast<slib::AtomicString16*>(&_static_string_null_##name));
 
 #define SLIB_RETURN_STRING16(str) { SLIB_STATIC_STRING16(strRetTemp16, str) return strRetTemp16; }
 

@@ -56,7 +56,7 @@ namespace slib
 				StringBuffer commandLine;
 				commandLine.add(FixArgument(pathExecutable));
 				if (nArguments > 0) {
-					commandLine.addStatic(" ", 1);
+					commandLine.addStatic(" ");
 				}
 				for (sl_size i = 0; i < nArguments; i++) {
 					if (i > 0) {

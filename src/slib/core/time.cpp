@@ -1381,15 +1381,15 @@ namespace slib
 		get(d, zone);
 		StringBuffer sb;
 		sb.add(String::fromInt32(d.year, 10, 4));
-		sb.addStatic("-", 1);
+		sb.addStatic("-");
 		sb.add(String::fromInt32(d.month, 10, 2));
-		sb.addStatic("-", 1);
+		sb.addStatic("-");
 		sb.add(String::fromInt32(d.day, 10, 2));
-		sb.addStatic(" ", 1);
+		sb.addStatic(" ");
 		sb.add(String::fromInt32(d.hour, 10, 2));
-		sb.addStatic(":", 1);
+		sb.addStatic(":");
 		sb.add(String::fromInt32(d.minute, 10, 2));
-		sb.addStatic(":", 1);
+		sb.addStatic(":");
 		sb.add(String::fromInt32(d.second, 10, 2));
 		return sb.merge();
 	}
@@ -1418,9 +1418,9 @@ namespace slib
 		get(d, zone);
 		StringBuffer sb;
 		sb.add(String::fromInt32(d.hour, 10, 2));
-		sb.addStatic(":", 1);
+		sb.addStatic(":");
 		sb.add(String::fromInt32(d.minute, 10, 2));
-		sb.addStatic(":", 1);
+		sb.addStatic(":");
 		sb.add(String::fromInt32(d.second, 10, 2));
 		return sb.merge();
 	}

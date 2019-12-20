@@ -454,9 +454,9 @@ namespace slib
 		}
 		if (flagNeedQuot) {
 			StringBuffer sb;
-			sb.addStatic("\"", 1);
+			sb.addStatic("\"");
 			sb.add(s);
-			sb.addStatic("\"", 1);
+			sb.addStatic("\"");
 			s = sb.merge();
 		}
 		return s;
@@ -470,7 +470,7 @@ namespace slib
 			if (values[i].isNotEmpty()) {
 				if (sb.getLength() > 0) {
 					sb.addStatic(&delimiter, 1);
-					sb.addStatic(" ", 1);
+					sb.addStatic(" ");
 				}
 				sb.add(makeSafeValue(values[i], delimiter));
 			}
@@ -486,13 +486,13 @@ namespace slib
 			if (item.key.isNotEmpty()) {
 				if (sb.getLength() > 0) {
 					sb.addStatic(&delimiter, 1);
-					sb.addStatic(" ", 1);
+					sb.addStatic(" ");
 				}
 				if (item.value.isNull()) {
 					sb.add(makeSafeValue(item.key));
 				} else {
 					sb.add(makeSafeValue(item.key));
-					sb.addStatic("=", 1);
+					sb.addStatic("=");
 					sb.add(makeSafeValue(item.value));
 				}
 			}
@@ -508,13 +508,13 @@ namespace slib
 			if (item.key.isNotEmpty()) {
 				if (sb.getLength() > 0) {
 					sb.addStatic(&delimiter, 1);
-					sb.addStatic(" ", 1);
+					sb.addStatic(" ");
 				}
 				if (item.value.isNull()) {
 					sb.add(makeSafeValue(item.key));
 				} else {
 					sb.add(makeSafeValue(item.key));
-					sb.addStatic("=", 1);
+					sb.addStatic("=");
 					sb.add(makeSafeValue(item.value));
 				}
 			}
@@ -1361,31 +1361,31 @@ namespace slib
 		MemoryBuffer msg;
 		String strMethod = m_methodText;
 		msg.addStatic(strMethod.getData(), strMethod.getLength());
-		msg.addStatic(" ", 1);
+		msg.addStatic(" ");
 		String strPath = m_path;
 		if (strPath.isEmpty()) {
-			msg.addStatic("/", 1);
+			msg.addStatic("/");
 		} else {
 			msg.addStatic(strPath.getData(), strPath.getLength());
 		}
 		String strQuery;
 		if (m_query.isNotEmpty()) {
-			msg.addStatic("?", 1);
+			msg.addStatic("?");
 			strQuery = m_query;
 			msg.addStatic(strQuery.getData(), strQuery.getLength());
 		}
-		msg.addStatic(" ", 1);
+		msg.addStatic(" ");
 		String strVersion = m_requestVersion;
 		msg.addStatic(strVersion.getData(), strVersion.getLength());
-		msg.addStatic("\r\n", 2);
+		msg.addStatic("\r\n");
 
 		for (auto& pair : m_requestHeaders) {
 			msg.addStatic(pair.key.getData(), pair.key.getLength());
-			msg.addStatic(": ", 2);
+			msg.addStatic(": ");
 			msg.addStatic(pair.value.getData(), pair.value.getLength());
-			msg.addStatic("\r\n", 2);
+			msg.addStatic("\r\n");
 		}
-		msg.addStatic("\r\n", 2);
+		msg.addStatic("\r\n");
 		return msg.merge();
 	}
 
@@ -1508,9 +1508,9 @@ namespace slib
 				}
 			}
 			
-			output.addStatic("--", 2);
+			output.addStatic("--");
 			output.add(boundary);
-			output.addStatic("\r\n", 2);
+			output.addStatic("\r\n");
 			{
 				static const char s[] = "Content-Disposition: form-data; name=\"";
 				output.addStatic(s, sizeof(s)-1);
@@ -1520,9 +1520,9 @@ namespace slib
 				static const char s[] = "; filename=\"";
 				output.addStatic(s, sizeof(s)-1);
 				output.add(Memory::create(fileName.getData(), fileName.getLength()));
-				output.addStatic("\"\r\n", 3);
+				output.addStatic("\"\r\n");
 			} else {
-				output.addStatic("\"\r\n", 3);
+				output.addStatic("\"\r\n");
 			}
 			if (headers) {
 				for (auto& header: *headers) {
@@ -1530,18 +1530,18 @@ namespace slib
 						continue;
 					}
 					output.addStatic(header.key.getData(), header.key.getLength());
-					output.addStatic(": ", 2);
+					output.addStatic(": ");
 					output.addStatic(header.value.getData(), header.value.getLength());
-					output.addStatic("\r\n", 2);
+					output.addStatic("\r\n");
 				}
 			}
-			output.addStatic("\r\n", 2);
+			output.addStatic("\r\n");
 			output.add(memData);
-			output.addStatic("\r\n", 2);
+			output.addStatic("\r\n");
 		}
-		output.addStatic("--", 2);
+		output.addStatic("--");
 		output.add(boundary);
-		output.addStatic("--\r\n", 4);
+		output.addStatic("--\r\n");
 		return sl_true;
 	}
 
@@ -2035,23 +2035,23 @@ namespace slib
 		MemoryBuffer msg;
 		String strVersion = m_responseVersion;
 		msg.addStatic(strVersion.getData(), strVersion.getLength());
-		msg.addStatic(" ", 1);
+		msg.addStatic(" ");
 		String strCode = String::fromUint32((sl_uint32)m_responseCode);
 		msg.addStatic(strCode.getData(), strCode.getLength());
-		msg.addStatic(" ", 1);
+		msg.addStatic(" ");
 		String strMessage = m_responseMessage;
 		msg.addStatic(strMessage.getData(), strMessage.getLength());
-		msg.addStatic("\r\n", 2);
+		msg.addStatic("\r\n");
 
 		for (auto& pair : m_responseHeaders) {
 			String str = pair.key;
 			msg.addStatic(str.getData(), str.getLength());
-			msg.addStatic(": ", 2);
+			msg.addStatic(": ");
 			str = pair.value;
 			msg.addStatic(str.getData(), str.getLength());
-			msg.addStatic("\r\n", 2);
+			msg.addStatic("\r\n");
 		}
-		msg.addStatic("\r\n", 2);
+		msg.addStatic("\r\n");
 		return msg.merge();
 	}
 

@@ -7927,22 +7927,18 @@ namespace slib
 	String String::fromBoolean(sl_bool value) noexcept
 	{
 		if (value) {
-			SLIB_STATIC_STRING(s, "true");
-			return s;
+			SLIB_RETURN_STRING("true")
 		} else {
-			SLIB_STATIC_STRING(s, "false");
-			return s;
+			SLIB_RETURN_STRING("false")
 		}
 	}
 
 	String16 String16::fromBoolean(sl_bool value) noexcept
 	{
 		if (value) {
-			SLIB_STATIC_STRING16_BY_ARRAY(s, 't', 'r', 'u', 'e');
-			return s;
+			SLIB_RETURN_STRING16("true")
 		} else {
-			SLIB_STATIC_STRING16_BY_ARRAY(s, 'f', 'a', 'l', 's', 'e');
-			return s;
+			SLIB_RETURN_STRING16("false")
 		}
 	}
 

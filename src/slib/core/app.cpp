@@ -408,7 +408,7 @@ Microsoft Specific
 			}
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 			if (s.contains(" ") || s.contains("\t") || s.contains("\r") || s.contains("\n") || s.contains("\"")) {
-				commandLine.addStatic("\"", 1);
+				commandLine.addStatic("\"");
 				ListElements<String> items(s.split("\""));
 				for (sl_size k = 0; k < items.count; k++) {
 					String t = items[k];
@@ -423,13 +423,13 @@ Microsoft Specific
 					}
 					commandLine.add(String('\\', p));
 					if (k < items.count - 1) {
-						commandLine.addStatic("\\\"", 2);
+						commandLine.addStatic("\\\"");
 					}
 				}
-				commandLine.addStatic("\"", 1);
+				commandLine.addStatic("\"");
 			} else {
 				if (s.isEmpty()) {
-					commandLine.addStatic("\"\"", 2);
+					commandLine.addStatic("\"\"");
 				} else {
 					commandLine.add(s);
 				}
@@ -438,12 +438,12 @@ Microsoft Specific
 			if (s.contains(" ") || s.contains("\t") || s.contains("\r") || s.contains("\n") || s.contains("\"") || s.contains("\\")) {
 				s = s.replaceAll("\\", "\\\\");
 				s = s.replaceAll("\"", "\\\"");
-				commandLine.addStatic("\"", 1);
+				commandLine.addStatic("\"");
 				commandLine.add(s);
-				commandLine.addStatic("\"", 1);
+				commandLine.addStatic("\"");
 			} else {
 				if (s.isEmpty()) {
-					commandLine.addStatic("\"\"", 2);
+					commandLine.addStatic("\"\"");
 				} else {
 					commandLine.add(s);
 				}

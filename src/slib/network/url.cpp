@@ -259,23 +259,23 @@ namespace slib
 		StringBuffer buf;
 		if (scheme.isNotNull()) {
 			buf.add(scheme);
-			buf.addStatic("://", 3);
+			buf.addStatic("://");
 		}
 		if (host.isNotNull()) {
 			buf.add(host);
 		}
 		if (path.isNotNull()) {
 			if (!(path.startsWith('/'))) {
-				buf.addStatic("/", 1);
+				buf.addStatic("/");
 			}
 			buf.add(path);
 		}
 		if (query.isNotNull()) {
-			buf.addStatic("?", 1);
+			buf.addStatic("?");
 			buf.add(query);
 		}
 		if (fragment.isNotNull()) {
-			buf.addStatic("#", 1);
+			buf.addStatic("#");
 			buf.add(fragment);
 		}
 		return buf.merge();

@@ -344,13 +344,13 @@ namespace slib
 			template <>
 			Parser<String16, sl_char16>::Parser()
 			{
-				SLIB_STATIC_STRING16_BY_ARRAY(_undefined, 'u', 'n', 'd', 'e', 'f', 'i', 'n', 'e', 'd');
+				SLIB_STATIC_STRING16(_undefined, "undefined");
 				strUndefined = _undefined;
-				SLIB_STATIC_STRING16_BY_ARRAY(_null, 'n', 'u', 'l', 'l');
+				SLIB_STATIC_STRING16(_null, "null");
 				strNull = _null;
-				SLIB_STATIC_STRING16_BY_ARRAY(_true, 't', 'r', 'u', 'e');
+				SLIB_STATIC_STRING16(_true, "true");
 				strTrue = _true;
-				SLIB_STATIC_STRING16_BY_ARRAY(_false, 'f', 'a', 'l', 's', 'e');
+				SLIB_STATIC_STRING16(_false, "false");
 				strFalse = _false;
 			}
 

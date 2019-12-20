@@ -91,7 +91,7 @@ namespace slib
 				{
 					switch (value.getType()) {
 						case VariantType::Null:
-							builder.appendStatic("null", 4);
+							builder.appendStatic("null");
 							break;
 						case VariantType::Int32:
 						case VariantType::Uint32:
@@ -110,7 +110,7 @@ namespace slib
 						case VariantType::Sz16:
 							builder.append(ParseUtil::applyBackslashEscapes(value.getString16(), sl_false));
 						default:
-							builder.appendStatic("null", 4);
+							builder.appendStatic("null");
 							break;
 					}
 				}
@@ -159,7 +159,7 @@ namespace slib
 				{
 					if (name1.isNotEmpty()) {
 						builder.appendIdentifier(name1);
-						builder.appendStatic(".", 1);
+						builder.appendStatic(".");
 					}
 					builder.appendIdentifier(name2);
 				}
@@ -185,9 +185,9 @@ namespace slib
 				void appendTo(SqlBuilder& builder, sl_bool flagParentheses) override
 				{
 					if (flagParentheses && flagSupportParentheses) {
-						builder.appendStatic("(", 1);
+						builder.appendStatic("(");
 						builder.append(expr);
-						builder.appendStatic(")", 1);
+						builder.appendStatic(")");
 					} else {
 						builder.append(expr);
 					}
@@ -230,7 +230,7 @@ namespace slib
 			public:
 				void appendTo(SqlBuilder& builder, sl_bool flagParentheses) override
 				{
-					builder.appendStatic("COUNT(*)", 8);
+					builder.appendStatic("COUNT(*)");
 				}
 				
 			};
@@ -362,14 +362,14 @@ namespace slib
 					}
 					if (flagFunction) {
 						builder.appendStatic(szOp, lenOp);
-						builder.appendStatic("(", 1);
+						builder.appendStatic("(");
 						expr1.appendTo(builder, sl_false);
-						builder.appendStatic(", ", 2);
+						builder.appendStatic(", ");
 						expr2.appendTo(builder, sl_false);
-						builder.appendStatic(")", 1);
+						builder.appendStatic(")");
 					} else {
 						if (flagParentheses) {
-							builder.appendStatic("(", 1);
+							builder.appendStatic("(");
 						}
 						sl_bool flagSubParentheses1 = sl_true;
 						sl_bool flagSubParentheses2 = sl_true;
@@ -414,12 +414,12 @@ namespace slib
 								break;
 						}
 						expr1.appendTo(builder, flagSubParentheses1);
-						builder.appendStatic(" ", 1);
+						builder.appendStatic(" ");
 						builder.appendStatic(szOp, lenOp);
-						builder.appendStatic(" ", 1);
+						builder.appendStatic(" ");
 						expr2.appendTo(builder, flagSubParentheses2);
 						if (flagParentheses) {
-							builder.appendStatic(")", 1);
+							builder.appendStatic(")");
 						}
 					}
 				}
@@ -446,15 +446,15 @@ namespace slib
 				void appendTo(SqlBuilder& builder, sl_bool flagParentheses) override
 				{
 					if (flagParentheses) {
-						builder.appendStatic("(", 1);
+						builder.appendStatic("(");
 					}
 					expr1.appendTo(builder, sl_true);
-					builder.appendStatic(" ", 1);
+					builder.appendStatic(" ");
 					builder.append(op);
-					builder.appendStatic(" ", 1);
+					builder.appendStatic(" ");
 					expr2.appendTo(builder, sl_true);
 					if (flagParentheses) {
-						builder.appendStatic(")", 1);
+						builder.appendStatic(")");
 					}
 				}
 				
@@ -537,12 +537,12 @@ namespace slib
 					}
 					if (flagFunction) {
 						builder.appendStatic(szOp, lenOp);
-						builder.appendStatic("(", 1);
+						builder.appendStatic("(");
 						expr.appendTo(builder, sl_false);
-						builder.appendStatic(")", 1);
+						builder.appendStatic(")");
 					} else {
 						if (flagParentheses) {
-							builder.appendStatic("(", 1);
+							builder.appendStatic("(");
 						}
 						if (flagSuffix) {
 							expr.appendTo(builder, sl_true);
@@ -552,7 +552,7 @@ namespace slib
 							expr.appendTo(builder, sl_true);
 						}
 						if (flagParentheses) {
-							builder.appendStatic(")", 1);
+							builder.appendStatic(")");
 						}
 					}
 				}
@@ -579,19 +579,19 @@ namespace slib
 				void appendTo(SqlBuilder& builder, sl_bool flagParentheses) override
 				{
 					if (flagParentheses) {
-						builder.appendStatic("(", 1);
+						builder.appendStatic("(");
 					}
 					if (flagSuffix) {
 						expr.appendTo(builder, sl_true);
-						builder.appendStatic(" ", 1);
+						builder.appendStatic(" ");
 						builder.append(op);
 					} else {
 						builder.append(op);
-						builder.appendStatic(" ", 1);
+						builder.appendStatic(" ");
 						expr.appendTo(builder, sl_true);
 					}
 					if (flagParentheses) {
-						builder.appendStatic(")", 1);
+						builder.appendStatic(")");
 					}
 				}
 				
@@ -616,15 +616,15 @@ namespace slib
 				void appendTo(SqlBuilder& builder, sl_bool flagParentheses) override
 				{
 					builder.append(name);
-					builder.appendStatic("(", 1);
+					builder.appendStatic("(");
 					ListLocker<DatabaseExpression> items(params);
 					for (sl_size i = 0; i < items.count; i++) {
 						if (i) {
-							builder.appendStatic(", ", 2);
+							builder.appendStatic(", ");
 						}
 						items[i].appendTo(builder, sl_false);
 					}
-					builder.appendStatic(")", 1);
+					builder.appendStatic(")");
 				}
 				
 			};
@@ -646,15 +646,15 @@ namespace slib
 			public:
 				void appendTo(SqlBuilder& builder, sl_bool flagParentheses) override
 				{
-					builder.appendStatic("(", 1);
+					builder.appendStatic("(");
 					ListLocker<DatabaseExpression> items(elements);
 					for (sl_size i = 0; i < items.count; i++) {
 						if (i) {
-							builder.appendStatic(", ", 2);
+							builder.appendStatic(", ");
 						}
 						items[i].appendTo(builder, sl_false);
 					}
-					builder.appendStatic(")", 1);
+					builder.appendStatic(")");
 				}
 				
 			};
@@ -685,26 +685,26 @@ namespace slib
 						return;
 					}
 					if (builder.dialect == DatabaseDialect::MySQL) {
-						builder.appendStatic("CONCAT(", 7);
+						builder.appendStatic("CONCAT(");
 						for (sl_size i = 0; i < items.count; i++) {
 							if (i) {
-								builder.appendStatic(", ", 2);
+								builder.appendStatic(", ");
 							}
 							items[i].appendTo(builder, sl_false);
 						}
-						builder.appendStatic(")", 1);
+						builder.appendStatic(")");
 					} else {
 						if (flagParentheses) {
-							builder.appendStatic("(", 1);
+							builder.appendStatic("(");
 						}
 						for (sl_size i = 0; i < items.count; i++) {
 							if (i) {
-								builder.appendStatic(" || ", 4);
+								builder.appendStatic(" || ");
 							}
 							items[i].appendTo(builder, sl_true);
 						}
 						if (flagParentheses) {
-							builder.appendStatic(")", 1);
+							builder.appendStatic(")");
 						}
 					}
 				}
@@ -737,7 +737,7 @@ namespace slib
 		if (obj) {
 			obj->appendTo(builder, flagParentheses);
 		} else {
-			builder.appendStatic("null", 4);
+			builder.appendStatic("null");
 		}
 	}
 
