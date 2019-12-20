@@ -1,0 +1,97 @@
+<sapp>
+	<layout
+		type='page'
+		background='white'
+		fontSize='20dp'
+		>
+		
+		<linear
+			alignCenter='true'
+			width='fill'
+			height='fill'
+			marginTop='1safeT'
+			marginBottom='1safeB'
+			>
+			
+			<button
+				style='button'
+				text='Back'
+				alignLeft='true'
+				cancel='true'
+				margin='20dp'
+				/>
+
+			<grid
+				width='*'
+				>
+				<column width='wrap' />
+				<column width='*' />
+				<row>
+					<label
+						text='Amount'
+						margin='5dp'
+						alignCenter='true'
+						/>
+					<edit
+						name='txtAmount'
+						width='*'
+						alignCenter='true'
+						keyboard='decimal'
+						margin='5dp'
+						/>
+				</row>
+				<row>
+					<label
+						text='IP Address'
+						margin='5dp'
+						alignCenter='true'
+						/>
+					<edit
+						name='txtIp'
+						width='*'
+						alignCenter='true'
+						margin='5dp'
+						/>
+				</row>
+			</grid>
+
+			<button
+				name='btnOrder'
+				text='Order'
+				style='button'
+				centerHorizontal='true'
+				margin='20dp'
+				fontSize='30dp'
+				/>
+			
+			<textArea
+				name='txtOrder'
+				width='fill'
+				height='*'
+				margin='5dp'
+				/>
+			
+			<button
+				name='btnPay'
+				style='button'
+				text='Pay'
+				centerHorizontal='true'
+				margin='20dp'
+				fontSize='30dp'
+				paddingLeft='30dp'
+				paddingRight='30dp'
+				/>
+
+		</linear>
+
+ 	</layout>
+	
+	<style
+		name='button'
+		background='#008050'
+		boundRadius='5dp'
+		padding='5dp'
+		textColor='white'
+		/>
+
+</sapp>

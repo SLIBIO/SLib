@@ -27,6 +27,8 @@
 
 #include "oauth.h"
 
+#include "../core/xml.h"
+
 namespace slib
 {
 
@@ -80,7 +82,7 @@ namespace slib
 		String partnerId;
 		String prepayId;
 		String package;
-		String nonceStr;
+		String nonce;
 		sl_uint64 timeStamp;
 		String sign;
 		
@@ -100,9 +102,11 @@ namespace slib
 
 	};
 
-	class SLIB_EXPORT WeChatPaymentRequest : public WeChatPaymentOrder
+	class SLIB_EXPORT WeChatPaymentRequest
 	{
 	public:
+		WeChatPaymentOrder order;
+		
 		Function<void(WeChatPaymentResult&)> onComplete;
 		
 	public:
@@ -110,6 +114,58 @@ namespace slib
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(WeChatPaymentRequest)
 		
+	};
+
+	class SLIB_EXPORT WeChatCreateOrderResult
+	{
+	public:
+		sl_bool flagSuccess;
+		
+		UrlRequest* request;
+		Ref<XmlDocument> response;
+		String responseText;
+		
+		String returnCode;
+		String returnMessage;
+		String resultCode;
+		String errorCode;
+		String errorDescription;
+		
+		WeChatPaymentOrder order;
+		
+	public:
+		WeChatCreateOrderResult();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(WeChatCreateOrderResult)
+
+	};
+
+	class SLIB_EXPORT WeChatCreateOrderParam
+	{
+	public:
+		String apiKey; // required		
+		String appId; // required
+		String businessId; // required
+		String orderId; // required
+		sl_uint64 amount; // required, unit: yuan/100
+		String currency;
+		String deviceId;
+		String body; // required
+		String detail;
+		String attach;
+		String ip; // required
+		String notifyUrl; // required
+		String nonce;
+		Time timeStart;
+		Time timeExpire;
+		
+		Function<void(WeChatCreateOrderResult&)> onComplete;
+
+	public:
+		WeChatCreateOrderParam();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(WeChatCreateOrderParam)
+
 	};
 
 	class SLIB_EXPORT WeChatParam : public OAuthParam
@@ -160,6 +216,8 @@ namespace slib
 		void getUser(const String& openId, const Function<void(WeChatResult&, WeChatUser&)>& onComplete);
 		
 		void getUser(const Function<void(WeChatResult&, WeChatUser&)>& onComplete);
+
+		static void createOrder(const WeChatCreateOrderParam& param);
 
 	protected:
 		void onCompleteRequestAccessToken(OAuthAccessTokenResult& result) override;

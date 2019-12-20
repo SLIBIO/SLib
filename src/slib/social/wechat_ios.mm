@@ -145,12 +145,12 @@ namespace slib
 		GetStaticContext()->setPayCallback(param.onComplete);
 		
 		PayReq* req = [PayReq new];
-		req.partnerId = Apple::getNSStringFromString(param.partnerId);
-		req.prepayId = Apple::getNSStringFromString(param.prepayId);
-		req.nonceStr = Apple::getNSStringFromString(param.nonceStr);
-		req.timeStamp = (UInt32)(param.timeStamp);
-		req.package = Apple::getNSStringFromString(param.package);
-		req.sign = Apple::getNSStringFromString(param.sign);
+		req.partnerId = Apple::getNSStringFromString(param.order.partnerId);
+		req.prepayId = Apple::getNSStringFromString(param.order.prepayId);
+		req.nonceStr = Apple::getNSStringFromString(param.order.nonce);
+		req.timeStamp = (UInt32)(param.order.timeStamp);
+		req.package = Apple::getNSStringFromString(param.order.package);
+		req.sign = Apple::getNSStringFromString(param.order.sign);
 		[WXApi sendReq:req completion:^(BOOL success) {
 			if (!success) {
 				WeChatPaymentResult result;

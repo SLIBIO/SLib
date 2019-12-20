@@ -21,6 +21,7 @@
 		268256BB21E658360079600F /* menus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268256B521E658360079600F /* menus.cpp */; };
 		268256BC21E658360079600F /* colors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268256B621E658360079600F /* colors.cpp */; };
 		26B92D6121D4DA80003F6F82 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26B92D6021D4DA80003F6F82 /* UserNotifications.framework */; };
+		26EC71D423AA4738005A9EA3 /* PayPage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26EC71D323AA4738005A9EA3 /* PayPage.cpp */; };
 		26F2DDF0216BDE39007CE8E6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDEF216BDE39007CE8E6 /* UIKit.framework */; };
 		26F2DDF2216BDE44007CE8E6 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDF1216BDE44007CE8E6 /* GLKit.framework */; };
 		26F2DDF4216BDE4D007CE8E6 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDF3216BDE4D007CE8E6 /* OpenGLES.framework */; };
@@ -53,6 +54,8 @@
 		268256B621E658360079600F /* colors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = colors.cpp; path = ../src/gen/colors.cpp; sourceTree = "<group>"; };
 		268256BE21E6590A0079600F /* sapp */ = {isa = PBXFileReference; lastKnownFileType = folder; name = sapp; path = ../src/sapp; sourceTree = "<group>"; };
 		26B92D6021D4DA80003F6F82 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		26EC71D223AA4738005A9EA3 /* PayPage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PayPage.h; sourceTree = "<group>"; };
+		26EC71D323AA4738005A9EA3 /* PayPage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PayPage.cpp; sourceTree = "<group>"; };
 		26F2DDEF216BDE39007CE8E6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		26F2DDF1216BDE44007CE8E6 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		26F2DDF3216BDE4D007CE8E6 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -123,6 +126,8 @@
 				268256A921E658200079600F /* app.h */,
 				268256AC21E658200079600F /* MainPage.cpp */,
 				268256AD21E658200079600F /* MainPage.h */,
+				26EC71D323AA4738005A9EA3 /* PayPage.cpp */,
+				26EC71D223AA4738005A9EA3 /* PayPage.h */,
 			);
 			name = cpp;
 			path = ../src/cpp;
@@ -275,6 +280,7 @@
 				268256B821E658360079600F /* raws.cpp in Sources */,
 				268256BA21E658360079600F /* drawables.cpp in Sources */,
 				268256BC21E658360079600F /* colors.cpp in Sources */,
+				26EC71D423AA4738005A9EA3 /* PayPage.cpp in Sources */,
 				268256AE21E658200079600F /* app.cpp in Sources */,
 				268256B021E658200079600F /* MainPage.cpp in Sources */,
 				268256B721E658360079600F /* strings.cpp in Sources */,

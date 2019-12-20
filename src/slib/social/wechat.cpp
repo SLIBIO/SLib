@@ -22,6 +22,7 @@
 
 #include "slib/social/wechat.h"
 
+#include "slib/crypto/md5.h"
 #include "slib/core/safe_static.h"
 
 namespace slib
@@ -31,7 +32,30 @@ namespace slib
 	{
 		namespace wechat
 		{
+					
 			SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<WeChat>, g_instance)
+		
+			static String GenerateSign(const Map<String, String>& map, const String& apiKey)
+			{
+				StringBuffer buf;
+				sl_bool flagFirst = sl_true;
+				for (auto& item : map) {
+					if (item.value.isNotEmpty()) {
+						if (flagFirst) {
+							flagFirst = sl_false;
+						} else {
+							buf.addStatic("&");
+						}
+						buf.add(item.key);
+						buf.addStatic("=");
+						buf.add(item.value);
+					}
+				}
+				buf.addStatic("&key=");
+				buf.add(apiKey);
+				return String::makeHexString(MD5::hash(buf.merge()), sl_false);
+			}
+		
 		}
 	}
 
@@ -70,6 +94,21 @@ namespace slib
 
 	WeChatPaymentRequest::WeChatPaymentRequest()
 	{
+	}
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(WeChatCreateOrderResult)
+
+	WeChatCreateOrderResult::WeChatCreateOrderResult()
+	{
+		flagSuccess = sl_false;
+		request = sl_null;
+	}
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(WeChatCreateOrderParam)
+
+	WeChatCreateOrderParam::WeChatCreateOrderParam()
+	{
+		amount = 0;
 	}
 
 
@@ -202,6 +241,106 @@ namespace slib
 	void WeChat::getUser(const Function<void(WeChatResult&, WeChatUser&)>& onComplete)
 	{
 		getUser(String::null(), onComplete);
+	}
+
+	void WeChat::createOrder(const WeChatCreateOrderParam& param)
+	{
+		Map<String, String> map;
+		map.put_NoLock("appid", param.appId);
+		map.put_NoLock("mch_id", param.businessId);
+		if (param.deviceId.isNotNull()) {
+			map.put_NoLock("device_info", param.deviceId);
+		}
+		if (param.nonce.isNotEmpty()) {
+			map.put_NoLock("nonce_str", param.nonce);
+		} else {
+			char s[16];
+			Math::randomMemory(s, 16);
+			map.put_NoLock("nonce_str", String::makeHexString(s, 16));
+		}
+		map.put_NoLock("body", param.body);
+		if (param.detail.isNotNull()) {
+			map.put_NoLock("detail", param.detail);
+		}
+		if (param.attach.isNotNull()) {
+			map.put_NoLock("attach", param.attach);
+		}
+		map.put_NoLock("out_trade_no", param.orderId);
+		if (param.currency.isNotEmpty()) {
+			map.put_NoLock("fee_type", param.currency);
+		}
+		map.put_NoLock("total_fee", String::fromUint64(param.amount));
+		map.put_NoLock("spbill_create_ip", param.ip);
+		if (param.timeStart.isNotZero()) {
+			map.put_NoLock("time_start", param.timeStart.format("%04y%02m%02d%02H%02M%02S"));
+		}
+		if (param.timeExpire.isNotZero()) {
+			map.put_NoLock("time_start", param.timeExpire.format("%04y%02m%02d%02H%02M%02S"));
+		}
+		map.put_NoLock("notify_url", param.notifyUrl);
+		map.put_NoLock("trade_type", "APP");
+		String sign = GenerateSign(map, param.apiKey);
+		
+		UrlRequestParam rp;
+		rp.url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
+		rp.method = HttpMethod::POST;
+		StringBuffer buf;
+		buf.addStatic("<xml>");
+		for (auto& item : map) {
+			buf.addStatic("<");
+			buf.add(item.key);
+			buf.addStatic(">");
+			buf.add(item.value);
+			buf.addStatic("</");
+			buf.add(item.key);
+			buf.addStatic(">");
+		}
+		buf.addStatic("<sign>");
+		buf.add(sign);
+		buf.addStatic("</sign>");
+		buf.addStatic("</xml>");
+		rp.setRequestBodyAsString(buf.merge());
+		auto onComplete = param.onComplete;
+		String apiKey = param.apiKey;
+		rp.onComplete = [onComplete, apiKey](UrlRequest* req) {
+			WeChatCreateOrderResult result;
+			result.request = req;
+			result.responseText = req->getResponseContentAsString();
+			if (!(req->isError())) {
+				result.response = Xml::parseXml(result.responseText);
+				if (result.response.isNotNull()) {
+					Ref<XmlElement> root = result.response->getFirstChildElement();
+					if (root.isNotNull()) {
+						result.returnCode = root->getFirstChildElementText("return_code");
+						result.returnMessage = root->getFirstChildElementText("return_msg");
+						if (result.returnCode == "SUCCESS") {
+							result.resultCode = root->getFirstChildElementText("result_code");
+							result.errorCode = root->getFirstChildElementText("err_code");
+							result.errorDescription = root->getFirstChildElementText("err_code_des");
+							if (result.resultCode == "SUCCESS") {
+								result.flagSuccess = sl_true;
+								result.order.partnerId = root->getFirstChildElementText("mch_id");
+								result.order.prepayId = root->getFirstChildElementText("prepay_id");
+								result.order.nonce = root->getFirstChildElementText("nonce_str");
+								result.order.package = "Sign = WXPay";
+								result.order.timeStamp = Time::now().toUnixTime() + 3600 * 8;
+								Map<String, String> map;
+								String appId = root->getFirstChildElementText("appid");
+								map.put_NoLock("appid", appId);
+								map.put_NoLock("partnerid", result.order.partnerId);
+								map.put_NoLock("prepayid", result.order.prepayId);
+								map.put_NoLock("package", result.order.package);
+								map.put_NoLock("noncestr", result.order.nonce);
+								map.put_NoLock("timestamp", String::fromUint64(result.order.timeStamp));
+								result.order.sign = GenerateSign(map, apiKey);
+							}
+						}
+					}
+				}
+			}
+			onComplete(result);
+		};
+		UrlRequest::send(rp);
 	}
 
 	void WeChat::onCompleteRequestAccessToken(OAuthAccessTokenResult& result)

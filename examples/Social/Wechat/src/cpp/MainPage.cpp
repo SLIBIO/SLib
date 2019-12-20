@@ -1,5 +1,7 @@
 #include "MainPage.h"
+
 #include "config.h"
+#include "PayPage.h"
 
 void MainPage::onOpen()
 {
@@ -30,5 +32,9 @@ void MainPage::onOpen()
 				UI::showAlert("Error " + response.error);
 			}
 		});
+	});
+	
+	btnPay->setOnClick([this](View*) {
+		goToPage(new PayPage);
 	});
 }
