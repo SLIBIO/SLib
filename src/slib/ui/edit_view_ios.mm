@@ -412,6 +412,8 @@ namespace slib
 					if (handle != nil) {
 						NSString* value = Apple::getNSStringFromString(text, @"");
 						[handle setText:value];
+						handle.contentInset = UIEdgeInsetsZero;
+						handle.clipsToBounds = YES;
 					}
 				}
 				
