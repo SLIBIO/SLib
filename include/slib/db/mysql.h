@@ -45,6 +45,9 @@ namespace slib
 
 		sl_bool flagAutoReconnect;
 		sl_bool flagMultipleStatements;
+		
+		// Output
+		String error;
 
 	public:
 		MySQL_Param();
@@ -63,9 +66,7 @@ namespace slib
 		~MySQL_Database();
 	
 	public:
-		static Ref<MySQL_Database> connect(const MySQL_Param& param);
-
-		static Ref<MySQL_Database> connect(const MySQL_Param& param, String& outErrorMessage);
+		static Ref<MySQL_Database> connect(MySQL_Param& param);
 	
 	public:
 		virtual sl_bool ping() = 0;
