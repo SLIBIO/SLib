@@ -40,17 +40,20 @@ namespace slib
 			const ConstContainer g_undefined = {0, StringType::Null};
 			const ConstContainer g_null = {(value_t)1, StringType::Null};
 
-			SLIB_INLINE static void copy_param(StringType src_type, value_t src_value, value_t& dst_value) noexcept
+			SLIB_INLINE static void copy_param(StringParam& dst, const StringParam& src) noexcept
 			{
-				switch (src_type) {
+				switch (src._type) {
 					case StringType::String8:
-						new PTR_VAR(String, dst_value) String(REF_VAR(String, src_value));
+						dst._type = StringType::StringRef8;
+						REF_VAR(String*, dst._value) = PTR_VAR(String, src._value);
 						break;
 					case StringType::String16:
-						new PTR_VAR(String16, dst_value) String16(REF_VAR(String16, src_value));
+						dst._type = StringType::StringRef16;
+						REF_VAR(String16*, dst._value) = PTR_VAR(String16, src._value);
 						break;
 					default:
-						dst_value = src_value;
+						dst._type = src._type;
+						dst._value = src._value;
 						break;
 				}
 			}
@@ -86,22 +89,22 @@ namespace slib
 				return equals_element(v1, v2);
 			}
 			
-			SLIB_INLINE static sl_bool equals_element(const String* v1, sl_char8 const* const* v2) noexcept
+			SLIB_INLINE static sl_bool equals_element(const String* v1, const sl_char8* v2) noexcept
 			{
-				return *v1 == *v2;
+				return *v1 == v2;
 			}
 			
-			SLIB_INLINE static sl_bool equals_element(sl_char8 const* const* v2, const String* v1) noexcept
+			SLIB_INLINE static sl_bool equals_element(const sl_char8* v2, const String* v1) noexcept
 			{
 				return equals_element(v1, v2);
 			}
 			
-			SLIB_INLINE static sl_bool equals_element(const String* v1, sl_char16 const* const* v2) noexcept
+			SLIB_INLINE static sl_bool equals_element(const String* v1, const sl_char16* v2) noexcept
 			{
-				return *v1 == *v2;
+				return *v1 == v2;
 			}
 			
-			SLIB_INLINE static sl_bool equals_element(sl_char16 const* const* v2, const String* v1) noexcept
+			SLIB_INLINE static sl_bool equals_element(const sl_char16* v2, const String* v1) noexcept
 			{
 				return equals_element(v1, v2);
 			}
@@ -112,46 +115,46 @@ namespace slib
 				return *v1 == *v2;
 			}
 			
-			SLIB_INLINE static sl_bool equals_element(const String16* v1, sl_char8 const* const* v2) noexcept
+			SLIB_INLINE static sl_bool equals_element(const String16* v1, const sl_char8* v2) noexcept
 			{
-				return *v1 == *v2;
+				return *v1 == v2;
 			}
 			
-			SLIB_INLINE static sl_bool equals_element(sl_char8 const* const* v2, const String16* v1) noexcept
-			{
-				return equals_element(v1, v2);
-			}
-			
-			SLIB_INLINE static sl_bool equals_element(const String16* v1, sl_char16 const* const* v2) noexcept
-			{
-				return *v1 == *v2;
-			}
-			
-			SLIB_INLINE static sl_bool equals_element(sl_char16 const* const* v2, const String16* v1) noexcept
+			SLIB_INLINE static sl_bool equals_element(const sl_char8* v2, const String16* v1) noexcept
 			{
 				return equals_element(v1, v2);
 			}
 			
-			
-			SLIB_INLINE static sl_bool equals_element(sl_char8 const* const* v1, sl_char8 const* const* v2) noexcept
+			SLIB_INLINE static sl_bool equals_element(const String16* v1, const sl_char16* v2) noexcept
 			{
-				return Base::compareString(*v1, *v2) == 0;
+				return *v1 == v2;
 			}
 			
-			SLIB_INLINE static sl_bool equals_element(sl_char8 const* const* v1, sl_char16 const* const* v2) noexcept
-			{
-				return *v1 == String(*v2);
-			}
-			
-			SLIB_INLINE static sl_bool equals_element(sl_char16 const* const* v2, sl_char8 const* const* v1) noexcept
+			SLIB_INLINE static sl_bool equals_element(const sl_char16* v2, const String16* v1) noexcept
 			{
 				return equals_element(v1, v2);
 			}
 			
 			
-			SLIB_INLINE static sl_bool equals_element(sl_char16 const* const* v1, sl_char16 const* const* v2) noexcept
+			SLIB_INLINE static sl_bool equals_element(const sl_char8* v1, const sl_char8* v2) noexcept
 			{
-				return Base::compareString2(*v1, *v2) == 0;
+				return Base::compareString(v1, v2) == 0;
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_char8* v1, const sl_char16* v2) noexcept
+			{
+				return v1 == String(v2);
+			}
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_char16* v2, const sl_char8* v1) noexcept
+			{
+				return equals_element(v1, v2);
+			}
+			
+			
+			SLIB_INLINE static sl_bool equals_element(const sl_char16* v1, const sl_char16* v2) noexcept
+			{
+				return Base::compareString2(v1, v2) == 0;
 			}
 			
 			
@@ -165,11 +168,19 @@ namespace slib
 					case StringType::String16:
 						return equals_element(v1, PTR_VAR(String16 const, v2._value));
 					case StringType::Sz8:
-						return equals_element(v1, PTR_VAR(sl_char8 const* const, v2._value));
+						return equals_element(v1, REF_VAR(sl_char8 const*, v2._value));
 					case StringType::Sz16:
-						return equals_element(v1, PTR_VAR(sl_char16 const* const, v2._value));
-					default:
-						break;
+						return equals_element(v1, REF_VAR(sl_char16 const*, v2._value));
+					case StringType::StringRef8:
+						return equals_element(v1, REF_VAR(String const*, v2._value));
+					case StringType::StringRef16:
+						return equals_element(v1, REF_VAR(String16 const*, v2._value));
+					case StringType::Std8:
+						return equals_element(v1, (sl_char8*)(REF_VAR(std::string const*, v2._value)->c_str()));
+					case StringType::Std16:
+						return equals_element(v1, (sl_char16*)(REF_VAR(std::u16string const*, v2._value)->c_str()));
+					case StringType::Null:
+						return sl_false;
 				}
 				return sl_false;
 			}
@@ -190,22 +201,22 @@ namespace slib
 				return -compare_element(v1, v2);
 			}
 			
-			SLIB_INLINE static sl_compare_result compare_element(const String* v1, sl_char8 const* const* v2) noexcept
+			SLIB_INLINE static sl_compare_result compare_element(const String* v1, const sl_char8* v2) noexcept
 			{
-				return v1->compare(*v2);
+				return v1->compare(v2);
 			}
 			
-			SLIB_INLINE static sl_compare_result compare_element(sl_char8 const* const* v2, const String* v1) noexcept
+			SLIB_INLINE static sl_compare_result compare_element(const sl_char8* v2, const String* v1) noexcept
 			{
 				return -compare_element(v1, v2);
 			}
 			
-			SLIB_INLINE static sl_compare_result compare_element(const String* v1, sl_char16 const* const* v2) noexcept
+			SLIB_INLINE static sl_compare_result compare_element(const String* v1, const sl_char16* v2) noexcept
 			{
-				return v1->compare(*v2);
+				return v1->compare(v2);
 			}
 			
-			SLIB_INLINE static sl_compare_result compare_element(sl_char16 const* const* v2, const String* v1) noexcept
+			SLIB_INLINE static sl_compare_result compare_element(const sl_char16* v2, const String* v1) noexcept
 			{
 				return -compare_element(v1, v2);
 			}
@@ -216,46 +227,46 @@ namespace slib
 				return v1->compare(*v2);
 			}
 			
-			SLIB_INLINE static sl_compare_result compare_element(const String16* v1, sl_char8 const* const* v2) noexcept
+			SLIB_INLINE static sl_compare_result compare_element(const String16* v1, const sl_char8* v2) noexcept
 			{
-				return v1->compare(*v2);
+				return v1->compare(v2);
 			}
 			
-			SLIB_INLINE static sl_compare_result compare_element(sl_char8 const* const* v2, const String16* v1) noexcept
-			{
-				return -compare_element(v1, v2);
-			}
-			
-			SLIB_INLINE static sl_compare_result compare_element(const String16* v1, sl_char16 const* const* v2) noexcept
-			{
-				return v1->compare(*v2);
-			}
-			
-			SLIB_INLINE static sl_compare_result compare_element(sl_char16 const* const* v2, const String16* v1) noexcept
+			SLIB_INLINE static sl_compare_result compare_element(const sl_char8* v2, const String16* v1) noexcept
 			{
 				return -compare_element(v1, v2);
 			}
 			
-			
-			SLIB_INLINE static sl_compare_result compare_element(sl_char8 const* const* v1, sl_char8 const* const* v2) noexcept
+			SLIB_INLINE static sl_compare_result compare_element(const String16* v1, const sl_char16* v2) noexcept
 			{
-				return Base::compareString(*v1, *v2);
+				return v1->compare(v2);
 			}
 			
-			SLIB_INLINE static sl_compare_result compare_element(sl_char8 const* const* v1, sl_char16 const* const* v2) noexcept
-			{
-				return String(*v1).compare(*v2);
-			}
-			
-			SLIB_INLINE static sl_compare_result compare_element(sl_char16 const* const* v2, sl_char8 const* const* v1) noexcept
+			SLIB_INLINE static sl_compare_result compare_element(const sl_char16* v2, const String16* v1) noexcept
 			{
 				return -compare_element(v1, v2);
 			}
 			
 			
-			SLIB_INLINE static sl_compare_result compare_element(sl_char16 const* const* v1, sl_char16 const* const* v2) noexcept
+			SLIB_INLINE static sl_compare_result compare_element(const sl_char8* v1, const sl_char8* v2) noexcept
 			{
-				return Base::compareString2(*v1, *v2) == 0;
+				return Base::compareString(v1, v2);
+			}
+			
+			SLIB_INLINE static sl_compare_result compare_element(const sl_char8* v1, const sl_char16* v2) noexcept
+			{
+				return String(v1).compare(v2);
+			}
+			
+			SLIB_INLINE static sl_compare_result compare_element(const sl_char16* v2, const sl_char8* v1) noexcept
+			{
+				return -compare_element(v1, v2);
+			}
+			
+			
+			SLIB_INLINE static sl_compare_result compare_element(const sl_char16* v1, const sl_char16* v2) noexcept
+			{
+				return Base::compareString2(v1, v2) == 0;
 			}
 			
 			
@@ -269,13 +280,21 @@ namespace slib
 					case StringType::String16:
 						return compare_element(v1, PTR_VAR(String16 const, v2._value));
 					case StringType::Sz8:
-						return compare_element(v1, PTR_VAR(sl_char8 const* const, v2._value));
+						return compare_element(v1, REF_VAR(sl_char8 const*, v2._value));
 					case StringType::Sz16:
-						return compare_element(v1, PTR_VAR(sl_char16 const* const, v2._value));
-					default:
-						break;
+						return compare_element(v1, REF_VAR(sl_char16 const*, v2._value));
+					case StringType::StringRef8:
+						return compare_element(v1, REF_VAR(String const*, v2._value));
+					case StringType::StringRef16:
+						return compare_element(v1, REF_VAR(String16 const*, v2._value));
+					case StringType::Std8:
+						return compare_element(v1, (sl_char8*)(REF_VAR(std::string const*, v2._value)->c_str()));
+					case StringType::Std16:
+						return compare_element(v1, (sl_char16*)(REF_VAR(std::u16string const*, v2._value)->c_str()));
+					case StringType::Null:
+						return 1;
 				}
-				return sl_false;
+				return 1;
 			}
 		}
 	}
@@ -296,8 +315,7 @@ namespace slib
 	
 	StringParam::StringParam(const StringParam& other) noexcept
 	{
-		_type = other._type;
-		copy_param(_type, other._value, _value);
+		copy_param(*this, other);
 	}
 	
 	StringParam::~StringParam() noexcept
@@ -308,8 +326,19 @@ namespace slib
 	StringParam::StringParam(const String& value) noexcept
 	{
 		if (value.isNotNull()) {
+			_type = StringType::StringRef8;
+			REF_VAR(String const*, _value) = &value;
+		} else {
+			_type = StringType::Null;
+			_value = (value_t)1;
+		}
+	}
+
+	StringParam::StringParam(String&& value) noexcept
+	{
+		if (value.isNotNull()) {
 			_type = StringType::String8;
-			new PTR_VAR(String, _value) String(value);
+			new PTR_VAR(String, _value) String(Move(value));
 		} else {
 			_type = StringType::Null;
 			_value = (value_t)1;
@@ -319,8 +348,19 @@ namespace slib
 	StringParam::StringParam(const String16& value) noexcept
 	{
 		if (value.isNotNull()) {
+			_type = StringType::StringRef16;
+			REF_VAR(String16 const*, _value) = &value;
+		} else {
+			_type = StringType::Null;
+			_value = (value_t)1;
+		}
+	}
+
+	StringParam::StringParam(String16&& value) noexcept
+	{
+		if (value.isNotNull()) {
 			_type = StringType::String16;
-			new PTR_VAR(String16, _value) String16(value);
+			new PTR_VAR(String16, _value) String16(Move(value));
 		} else {
 			_type = StringType::Null;
 			_value = (value_t)1;
@@ -332,7 +372,18 @@ namespace slib
 		String value(s);
 		if (value.isNotNull()) {
 			_type = StringType::String8;
-			new PTR_VAR(String, _value) String(value);
+			new PTR_VAR(String, _value) String(Move(value));
+		} else {
+			_type = StringType::Null;
+			_value = (value_t)1;
+		}
+	}
+
+	StringParam::StringParam(AtomicString&& value) noexcept
+	{
+		if (value.isNotNull()) {
+			_type = StringType::String8;
+			new PTR_VAR(String, _value) String(Move(value));
 		} else {
 			_type = StringType::Null;
 			_value = (value_t)1;
@@ -344,7 +395,18 @@ namespace slib
 		String16 value(s);
 		if (value.isNotNull()) {
 			_type = StringType::String16;
-			new PTR_VAR(String16, _value) String16(value);
+			new PTR_VAR(String16, _value) String16(Move(value));
+		} else {
+			_type = StringType::Null;
+			_value = (value_t)1;
+		}
+	}
+
+	StringParam::StringParam(AtomicString16&& value) noexcept
+	{
+		if (value.isNotNull()) {
+			_type = StringType::String16;
+			new PTR_VAR(String16, _value) String16(Move(value));
 		} else {
 			_type = StringType::Null;
 			_value = (value_t)1;
@@ -375,34 +437,14 @@ namespace slib
 	
 	StringParam::StringParam(const std::string& value) noexcept
 	{
-		_type = StringType::String8;
-		new PTR_VAR(String, _value) String(value);
+		_type = StringType::Std8;
+		REF_VAR(std::string const*, _value) = &value;
 	}
 	
 	StringParam::StringParam(const std::u16string& value) noexcept
 	{
-		_type = StringType::String16;
-		new PTR_VAR(String16, _value) String16(value);
-	}
-
-	StringParam StringParam::fromString(const String& value) noexcept
-	{
-		return value;
-	}
-
-	StringParam StringParam::fromString16(const String16& value) noexcept
-	{
-		return value;
-	}
-
-	StringParam StringParam::fromSz8(const sl_char8* value) noexcept
-	{
-		return value;
-	}
-
-	StringParam StringParam::fromSz16(const sl_char16* value) noexcept
-	{
-		return value;
+		_type = StringType::Std16;
+		REF_VAR(std::u16string const*, _value) = &value;
 	}
 
 	StringParam& StringParam::operator=(StringParam&& other) noexcept
@@ -420,8 +462,7 @@ namespace slib
 	{
 		if (this != &other) {
 			free_param(_type, _value);
-			_type = other._type;
-			copy_param(_type, other._value, _value);
+			copy_param(*this, other);
 		}
 		return *this;
 	}
@@ -434,49 +475,139 @@ namespace slib
 	
 	StringParam& StringParam::operator=(const String& value) noexcept
 	{
-		setString(value);
+		if (value.isNotNull()) {
+			free_param(_type, _value);
+			_type = StringType::StringRef8;
+			REF_VAR(String const*, _value) = &value;
+		} else {
+			setNull();
+		}
+		return *this;
+	}
+	
+	StringParam& StringParam::operator=(String&& value) noexcept
+	{
+		if (value.isNotNull()) {
+			free_param(_type, _value);
+			_type = StringType::String8;
+			new PTR_VAR(String, _value) String(Move(value));
+		} else {
+			setNull();
+		}
 		return *this;
 	}
 	
 	StringParam& StringParam::operator=(const String16& value) noexcept
 	{
-		setString16(value);
+		if (value.isNotNull()) {
+			free_param(_type, _value);
+			_type = StringType::StringRef16;
+			REF_VAR(String16 const*, _value) = &value;
+		} else {
+			setNull();
+		}
 		return *this;
 	}
 	
-	StringParam& StringParam::operator=(const AtomicString& value) noexcept
+	StringParam& StringParam::operator=(String16&& value) noexcept
 	{
-		setString(value);
+		if (value.isNotNull()) {
+			free_param(_type, _value);
+			_type = StringType::String16;
+			new PTR_VAR(String16, _value) String16(Move(value));
+		} else {
+			setNull();
+		}
 		return *this;
 	}
 	
-	StringParam& StringParam::operator=(const AtomicString16& value) noexcept
+	StringParam& StringParam::operator=(const AtomicString& s) noexcept
 	{
-		setString16(value);
+		String value(s);
+		if (value.isNotNull()) {
+			free_param(_type, _value);
+			_type = StringType::String8;
+			new PTR_VAR(String, _value) String(Move(value));
+		} else {
+			setNull();
+		}
+		return *this;
+	}
+	
+	StringParam& StringParam::operator=(AtomicString&& value) noexcept
+	{
+		if (value.isNotNull()) {
+			free_param(_type, _value);
+			_type = StringType::String8;
+			new PTR_VAR(String, _value) String(Move(value));
+		} else {
+			setNull();
+		}
+		return *this;
+	}
+	
+	StringParam& StringParam::operator=(const AtomicString16& s) noexcept
+	{
+		String16 value(s);
+		if (value.isNotNull()) {
+			free_param(_type, _value);
+			_type = StringType::String16;
+			new PTR_VAR(String16, _value) String16(Move(value));
+		} else {
+			setNull();
+		}
+		return *this;
+	}
+	
+	StringParam& StringParam::operator=(AtomicString16&& value) noexcept
+	{
+		if (value.isNotNull()) {
+			free_param(_type, _value);
+			_type = StringType::String16;
+			new PTR_VAR(String16, _value) String16(Move(value));
+		} else {
+			setNull();
+		}
 		return *this;
 	}
 	
 	StringParam& StringParam::operator=(const std::string& value) noexcept
 	{
-		setStdString(value);
+		free_param(_type, _value);
+		_type = StringType::Std8;
+		REF_VAR(std::string const*, _value) = &value;
 		return *this;
 	}
 	
 	StringParam& StringParam::operator=(const std::u16string& value) noexcept
 	{
-		setStdString16(value);
+		free_param(_type, _value);
+		_type = StringType::Std16;
+		REF_VAR(std::u16string const*, _value) = &value;
 		return *this;
 	}
 	
-	StringParam& StringParam::operator=(const sl_char8* sz8) noexcept
+	StringParam& StringParam::operator=(const sl_char8* value) noexcept
 	{
-		setSz(sz8);
+		if (value) {
+			free_param(_type, _value);
+			_type = StringType::Sz8;
+			REF_VAR(const sl_char8*, _value) = value;
+		} else {
+			setNull();
+		}
 		return *this;
 	}
 	
-	StringParam& StringParam::operator=(const sl_char16* sz16) noexcept
+	StringParam& StringParam::operator=(const sl_char16* value) noexcept
 	{
-		setSz(sz16);
+		if (value) {
+			free_param(_type, _value);
+			_type = StringType::Sz16;
+			REF_VAR(const sl_char16*, _value) = value;
+		} else {
+			setNull();
+		}
 		return *this;
 	}
 
@@ -498,36 +629,27 @@ namespace slib
 		_value = (value_t)1;
 	}
 
-	sl_size StringParam::getLength() const noexcept
-	{
-		switch (_type) {
-			case StringType::String8:
-				return REF_VAR(String const, _value).getLength();
-			case StringType::String16:
-				return REF_VAR(String16 const, _value).getLength();
-			case StringType::Sz8:
-				return Base::getStringLength(REF_VAR(sl_char8 const* const, _value));
-			case StringType::Sz16:
-				return Base::getStringLength2(REF_VAR(sl_char16 const* const, _value));
-			default:
-				break;
-		}
-		return 0;
-	}
-	
 	sl_bool StringParam::isEmpty() const noexcept
 	{
 		switch (_type) {
 			case StringType::String8:
-				return REF_VAR(String const, _value).isEmpty();
+				return REF_VAR(String, _value).isEmpty();
 			case StringType::String16:
-				return REF_VAR(String16 const, _value).isEmpty();
+				return REF_VAR(String16, _value).isEmpty();
 			case StringType::Sz8:
-				return (REF_VAR(sl_char8 const* const, _value))[0] == 0;
+				return (REF_VAR(sl_char8 const*, _value))[0] == 0;
 			case StringType::Sz16:
-				return (REF_VAR(sl_char16 const* const, _value))[0] == 0;
-			default:
-				break;
+				return (REF_VAR(sl_char16 const*, _value))[0] == 0;
+			case StringType::StringRef8:
+				return REF_VAR(String const*, _value)->isEmpty();
+			case StringType::StringRef16:
+				return REF_VAR(String16 const*, _value)->isEmpty();
+			case StringType::Std8:
+				return REF_VAR(std::string const*, _value)->empty();
+			case StringType::Std16:
+				return REF_VAR(std::u16string const*, _value)->empty();
+			case StringType::Null:
+				return sl_true;
 		}
 		return sl_true;
 	}
@@ -539,12 +661,12 @@ namespace slib
 	
 	sl_bool StringParam::isString8() const noexcept
 	{
-		return _type == StringType::String8;
+		return _type == StringType::String8 || _type == StringType::StringRef8;
 	}
 
 	sl_bool StringParam::isString16() const noexcept
 	{
-		return _type == StringType::String16;
+		return _type == StringType::String16 || _type == StringType::StringRef16;
 	}
 
 	sl_bool StringParam::isSz8() const noexcept
@@ -557,19 +679,37 @@ namespace slib
 		return _type == StringType::Sz16;
 	}
 
+	sl_bool StringParam::isStdString() const noexcept
+	{
+		return _type == StringType::Std8;
+	}
+
+	sl_bool StringParam::isStdString16() const noexcept
+	{
+		return _type == StringType::Std16;
+	}
+
 	String StringParam::getString(const String& def) const noexcept
 	{
 		switch (_type) {
 			case StringType::String8:
-				return REF_VAR(String const, _value);
+				return REF_VAR(String, _value);
 			case StringType::String16:
-				return REF_VAR(String16 const, _value);
+				return REF_VAR(String16, _value);
 			case StringType::Sz8:
-				return REF_VAR(sl_char8 const* const, _value);
+				return REF_VAR(sl_char8 const*, _value);
 			case StringType::Sz16:
-				return REF_VAR(sl_char16 const* const, _value);
-			default:
-				break;
+				return REF_VAR(sl_char16 const*, _value);
+			case StringType::StringRef8:
+				return *REF_VAR(String const*, _value);
+			case StringType::StringRef16:
+				return *REF_VAR(String16 const*, _value);
+			case StringType::Std8:
+				return *REF_VAR(std::string const*, _value);
+			case StringType::Std16:
+				return REF_VAR(std::u16string const*, _value)->c_str();
+			case StringType::Null:
+				return def;
 		}
 		return def;
 	}
@@ -583,15 +723,23 @@ namespace slib
 	{
 		switch (_type) {
 			case StringType::String8:
-				return REF_VAR(String const, _value);
+				return REF_VAR(String, _value);
 			case StringType::String16:
-				return REF_VAR(String16 const, _value);
+				return REF_VAR(String16, _value);
 			case StringType::Sz8:
-				return REF_VAR(sl_char8 const* const, _value);
+				return REF_VAR(sl_char8 const*, _value);
 			case StringType::Sz16:
-				return REF_VAR(sl_char16 const* const, _value);
-			default:
-				break;
+				return REF_VAR(sl_char16 const*, _value);
+			case StringType::StringRef8:
+				return *REF_VAR(String const*, _value);
+			case StringType::StringRef16:
+				return *REF_VAR(String16 const*, _value);
+			case StringType::Std8:
+				return REF_VAR(std::string const*, _value)->c_str();
+			case StringType::Std16:
+				return *REF_VAR(std::u16string const*, _value);
+			case StringType::Null:
+				return def;
 		}
 		return def;
 	}
@@ -601,110 +749,6 @@ namespace slib
 		return getString16(String16::null());
 	}
 
-	sl_char8* StringParam::getSz8(const sl_char8* def) const noexcept
-	{
-		switch (_type) {
-			case StringType::String8:
-				return REF_VAR(String const, _value).getData();
-			case StringType::Sz8:
-				return REF_VAR(sl_char8* const, _value);
-			default:
-				break;
-		}
-		return (sl_char8*)def;
-	}
-
-	sl_char16* StringParam::getSz16(const sl_char16* def) const noexcept
-	{
-		switch (_type) {
-			case StringType::String16:
-				return REF_VAR(String16 const, _value).getData();
-			case StringType::Sz16:
-				return REF_VAR(sl_char16* const, _value);
-			default:
-				break;
-		}
-		return (sl_char16*)def;
-	}
-
-	void StringParam::setString(const String& value) noexcept
-	{
-		if (value.isNotNull()) {
-			free_param(_type, _value);
-			_type = StringType::String8;
-			new PTR_VAR(String, _value) String(value);
-		} else {
-			setNull();
-		}
-	}
-
-	void StringParam::setString16(const String16& value) noexcept
-	{
-		if (value.isNotNull()) {
-			free_param(_type, _value);
-			_type = StringType::String16;
-			new PTR_VAR(String16, _value) String16(value);
-		} else {
-			setNull();
-		}
-	}
-
-	void StringParam::setSz(const sl_char8* value) noexcept
-	{
-		if (value) {
-			free_param(_type, _value);
-			_type = StringType::Sz8;
-			REF_VAR(const sl_char8*, _value) = value;
-		} else {
-			setNull();
-		}
-	}
-
-	void StringParam::setSz(const sl_char16* value) noexcept
-	{
-		if (value) {
-			free_param(_type, _value);
-			_type = StringType::Sz16;
-			REF_VAR(const sl_char16*, _value) = value;
-		} else {
-			setNull();
-		}
-	}
-	
-	std::string StringParam::getStdString(const std::string& def) const noexcept
-	{
-		return getString(def).toStd();
-	}
-	
-	std::string StringParam::getStdString() const noexcept
-	{
-		return getString().toStd();
-	}
-	
-	std::u16string StringParam::getStdString16(const std::u16string& def) const noexcept
-	{
-		return getString16(def).toStd();
-	}
-	
-	std::u16string StringParam::getStdString16() const noexcept
-	{
-		return getString16().toStd();
-	}
-	
-	void StringParam::setStdString(const std::string& value) noexcept
-	{
-		free_param(_type, _value);
-		_type = StringType::String8;
-		new PTR_VAR(String, _value) String(value);
-	}
-	
-	void StringParam::setStdString16(const std::u16string& value) noexcept
-	{
-		free_param(_type, _value);
-		_type = StringType::String16;
-		new PTR_VAR(String16, _value) String16(value);
-	}
-	
 	sl_compare_result StringParam::compare(const StringParam& v2) const noexcept
 	{
 		const StringParam& v1 = *this;
@@ -713,29 +757,43 @@ namespace slib
 			switch (type) {
 				case StringType::Null:
 					return 0;
-				case StringType::Sz8:
-					return Base::compareString(REF_VAR(sl_char8 const* const, v1._value), REF_VAR(sl_char8 const* const, v2._value));
-				case StringType::Sz16:
-					return Base::compareString2(REF_VAR(sl_char16 const* const, v1._value), REF_VAR(sl_char16 const* const, v2._value));
 				case StringType::String8:
-					return REF_VAR(String const, v1._value).compare(REF_VAR(String const, v2._value));
+					return REF_VAR(String, v1._value).compare(REF_VAR(String, v2._value));
 				case StringType::String16:
-					return REF_VAR(String16 const, v1._value).compare(REF_VAR(String16 const, v2._value));
-				default:
-					return ComparePrimitiveValues(v1._value, v2._value);
+					return REF_VAR(String16, v1._value).compare(REF_VAR(String16, v2._value));
+				case StringType::Sz8:
+					return Base::compareString(REF_VAR(sl_char8 const*, v1._value), REF_VAR(sl_char8 const*, v2._value));
+				case StringType::Sz16:
+					return Base::compareString2(REF_VAR(sl_char16 const*, v1._value), REF_VAR(sl_char16 const*, v2._value));
+				case StringType::StringRef8:
+					return REF_VAR(String const*, v1._value)->compare(*REF_VAR(String const*, v2._value));
+				case StringType::StringRef16:
+					return REF_VAR(String16 const*, v1._value)->compare(*REF_VAR(String16 const*, v2._value));
+				case StringType::Std8:
+					return (sl_compare_result)(REF_VAR(std::string const*, v1._value)->compare(*REF_VAR(std::string const*, v2._value)));
+				case StringType::Std16:
+					return (sl_compare_result)(REF_VAR(std::u16string const*, v1._value)->compare(*REF_VAR(std::u16string const*, v2._value)));
 			}
 		} else {
 			switch (type) {
+				case StringType::Null:
+					return -1;
 				case StringType::String8:
-					return compare_param(PTR_VAR(String const, v1._value), v2);
+					return compare_param(PTR_VAR(String, v1._value), v2);
 				case StringType::String16:
-					return compare_param(PTR_VAR(String16 const, v1._value), v2);
+					return compare_param(PTR_VAR(String16, v1._value), v2);
 				case StringType::Sz8:
-					return compare_param(PTR_VAR(sl_char8 const* const, v1._value), v2);
+					return compare_param(REF_VAR(sl_char8 const*, v1._value), v2);
 				case StringType::Sz16:
-					return compare_param(PTR_VAR(sl_char16 const* const, v1._value), v2);
-				default:
-					break;
+					return compare_param(REF_VAR(sl_char16 const*, v1._value), v2);
+				case StringType::StringRef8:
+					return compare_param(REF_VAR(String const*, v1._value), v2);
+				case StringType::StringRef16:
+					return compare_param(REF_VAR(String16 const*, v1._value), v2);
+				case StringType::Std8:
+					return compare_param(REF_VAR(std::string const*, v1._value)->c_str(), v2);
+				case StringType::Std16:
+					return compare_param((sl_char16*)(REF_VAR(std::u16string const*, v1._value)->c_str()), v2);
 			}
 		}
 		return 0;
@@ -749,29 +807,43 @@ namespace slib
 			switch (type) {
 				case StringType::Null:
 					return sl_true;
-				case StringType::Sz8:
-					return Base::compareString(REF_VAR(sl_char8 const* const, v1._value), REF_VAR(sl_char8 const* const, v2._value)) == 0;
-				case StringType::Sz16:
-					return Base::compareString2(REF_VAR(sl_char16 const* const, v1._value), REF_VAR(sl_char16 const* const, v2._value)) == 0;
 				case StringType::String8:
-					return REF_VAR(String const, v1._value) == REF_VAR(String const, v2._value);
+					return REF_VAR(String, v1._value) == REF_VAR(String, v2._value);
 				case StringType::String16:
-					return REF_VAR(String16 const, v1._value) == REF_VAR(String16 const, v2._value);
-				default:
-					return v1._value == v2._value;
+					return REF_VAR(String16, v1._value) == REF_VAR(String16, v2._value);
+				case StringType::Sz8:
+					return Base::compareString(REF_VAR(sl_char8 const*, v1._value), REF_VAR(sl_char8 const*, v2._value)) == 0;
+				case StringType::Sz16:
+					return Base::compareString2(REF_VAR(sl_char16 const*, v1._value), REF_VAR(sl_char16 const*, v2._value)) == 0;
+				case StringType::StringRef8:
+					return REF_VAR(String const*, v1._value)->equals(*REF_VAR(String const*, v2._value));
+				case StringType::StringRef16:
+					return REF_VAR(String16 const*, v1._value)->equals(*REF_VAR(String16 const*, v2._value));
+				case StringType::Std8:
+					return *REF_VAR(std::string const*, v1._value) == *REF_VAR(std::string const*, v2._value);
+				case StringType::Std16:
+					return *REF_VAR(std::u16string const*, v1._value) == *REF_VAR(std::u16string const*, v2._value);
 			}
 		} else {
 			switch (type) {
+				case StringType::Null:
+					return sl_false;
 				case StringType::String8:
-					return equals_param(PTR_VAR(String const, v1._value), v2);
+					return equals_param(PTR_VAR(String, v1._value), v2);
 				case StringType::String16:
-					return equals_param(PTR_VAR(String16 const, v1._value), v2);
+					return equals_param(PTR_VAR(String16, v1._value), v2);
 				case StringType::Sz8:
-					return equals_param(PTR_VAR(sl_char8 const* const, v1._value), v2);
+					return equals_param(REF_VAR(sl_char8 const*, v1._value), v2);
 				case StringType::Sz16:
-					return equals_param(PTR_VAR(sl_char16 const* const, v1._value), v2);
-				default:
-					break;
+					return equals_param(REF_VAR(sl_char16 const*, v1._value), v2);
+				case StringType::StringRef8:
+					return equals_param(REF_VAR(String const*, v1._value), v2);
+				case StringType::StringRef16:
+					return equals_param(REF_VAR(String16 const*, v1._value), v2);
+				case StringType::Std8:
+					return equals_param(REF_VAR(std::string const*, v1._value)->c_str(), v2);
+				case StringType::Std16:
+					return equals_param((sl_char16*)(REF_VAR(std::u16string const*, v1._value)->c_str()), v2);
 			}
 		}
 		return sl_false;
@@ -783,16 +855,20 @@ namespace slib
 		switch (type) {
 			case StringType::Null:
 				return 0;
-			case StringType::Sz8:
-				return getString().getHashCode();
 			case StringType::String8:
-				return REF_VAR(String const, _value).getHashCode();
-			case StringType::Sz16:
-				return getString16().getHashCode();
+				return REF_VAR(String, _value).getHashCode();
 			case StringType::String16:
-				return REF_VAR(String16 const, _value).getHashCode();
-			default:
-				return Rehash((sl_size)_value);
+				return REF_VAR(String16, _value).getHashCode();
+			case StringType::Sz8:
+			case StringType::Std8:
+				return getString().getHashCode();
+			case StringType::Sz16:
+			case StringType::Std16:
+				return getString16().getHashCode();
+			case StringType::StringRef8:
+				return REF_VAR(String const*, _value)->getHashCode();
+			case StringType::StringRef16:
+				return REF_VAR(String16 const*, _value)->getHashCode();
 		}
 		return 0;
 	}
@@ -829,23 +905,43 @@ namespace slib
 	StringParamData::StringParamData(const StringParam& param) noexcept
 	{
 		switch (param._type) {
+			case StringType::Null:
+				data = sl_null;
+				_length = 0;
+				break;
 			case StringType::String8:
-				data = REF_VAR(String const, param._value).getData();
+				data = REF_VAR(String, param._value).getData(_length);
 				break;
 			case StringType::Sz8:
 				data = REF_VAR(sl_char8* const, param._value);
+				_length = SLIB_SIZE_MAX;
 				break;
+			case StringType::StringRef8:
+				data = REF_VAR(String const*, param._value)->getData(_length);
+				break;
+			case StringType::Std8:
+				{
+					const std::string& s = *REF_VAR(std::string const*, param._value);
+					data = (sl_char8*)(s.c_str());
+					_length = (sl_size)(s.length());
+					break;
+				}
 			case StringType::String16:
-				string = REF_VAR(String16 const, param._value);
-				data = string.getData();
-				break;
 			case StringType::Sz16:
-				string = REF_VAR(sl_char16* const, param._value);
-				data = string.getData();
+			case StringType::StringRef16:
+			case StringType::Std16:
+				string = param.getString();
+				data = string.getData(_length);
 				break;
-			default:
-				data = sl_null;
-				break;
+		}
+	}
+
+	sl_size StringParamData::getLength() const noexcept
+	{
+		if (_length & SLIB_SIZE_TEST_SIGN_BIT) {
+			return Base::getStringLength(data);
+		} else {
+			return _length;
 		}
 	}
 
@@ -854,23 +950,43 @@ namespace slib
 	StringParamData16::StringParamData16(const StringParam& param) noexcept
 	{
 		switch (param._type) {
-			case StringType::String8:
-				string = REF_VAR(String const, param._value);
-				data = string.getData();
-				break;
-			case StringType::Sz8:
-				string = REF_VAR(sl_char8* const, param._value);
-				data = string.getData();
+			case StringType::Null:
+				data = sl_null;
+				_length = 0;
 				break;
 			case StringType::String16:
-				data = REF_VAR(String16 const, param._value).getData();
+				data = REF_VAR(String16, param._value).getData(_length);
 				break;
 			case StringType::Sz16:
 				data = REF_VAR(sl_char16* const, param._value);
+				_length = SLIB_SIZE_MAX;
 				break;
-			default:
-				data = sl_null;
+			case StringType::StringRef16:
+				data = REF_VAR(String16 const*, param._value)->getData(_length);
 				break;
+			case StringType::Std16:
+				{
+					const std::u16string& s = *REF_VAR(std::u16string const*, param._value);
+					data = (sl_char16*)(s.c_str());
+					_length = (sl_size)(s.length());
+					break;
+				}
+			case StringType::String8:
+			case StringType::Sz8:
+			case StringType::StringRef8:
+			case StringType::Std8:
+				string = param.getString16();
+				data = string.getData(_length);
+				break;
+		}
+	}
+
+	sl_size StringParamData16::getLength() const noexcept
+	{
+		if (_length & SLIB_SIZE_TEST_SIGN_BIT) {
+			return Base::getStringLength2(data);
+		} else {
+			return _length;
 		}
 	}
 

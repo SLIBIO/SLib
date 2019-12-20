@@ -292,6 +292,11 @@ namespace slib
 		sl_char8* getData() const noexcept;
 		
 		/**
+		 * @return string content and length.
+		 */
+		sl_char8* getData(sl_size& outLength) const noexcept;
+		
+		/**
 		 * @return string length.
 		 */
 		sl_size getLength() const noexcept;

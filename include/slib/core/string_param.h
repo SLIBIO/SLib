@@ -37,10 +37,14 @@ namespace slib
 	enum class StringType
 	{
 		Null = 0,
-		String8 = 8,
-		String16 = 9,
-		Sz8 = 10,
-		Sz16 = 11
+		String8 = 1,
+		String16 = 2,
+		Sz8 = 3,
+		Sz16 = 4,
+		StringRef8 = 5,
+		StringRef16 = 6,
+		Std8 = 7,
+		Std16 = 8
 	};
 	
 	class SLIB_EXPORT StringParam
@@ -63,36 +67,38 @@ namespace slib
 	public:
 		StringParam(const String& value) noexcept;
 		
+		StringParam(String&& value) noexcept;
+		
 		StringParam(const String16& value) noexcept;
+		
+		StringParam(String16&& value) noexcept;
 		
 		StringParam(const AtomicString& value) noexcept;
 		
+		StringParam(AtomicString&& value) noexcept;
+		
 		StringParam(const AtomicString16& value) noexcept;
+		
+		StringParam(AtomicString16&& value) noexcept;
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
 		StringParam(const std::string& value) noexcept;
 		
+		StringParam(std::string&& value) = delete;
+		
 		StringParam(const std::u16string& value) noexcept;
+
+		StringParam(std::u16string&& value) = delete;
 #endif
 		
 		StringParam(const sl_char8* sz8) noexcept;
 		
 		StringParam(const sl_char16* sz16) noexcept;
 		
-		
 	public:
 		static const StringParam& undefined() noexcept;
 		
 		static const StringParam& null() noexcept;
-		
-		
-		static StringParam fromString(const String& value) noexcept;
-		
-		static StringParam fromString16(const String16& value) noexcept;
-		
-		static StringParam fromSz8(const sl_char8* value) noexcept;
-		
-		static StringParam fromSz16(const sl_char16* value) noexcept;
 		
 	public:
 		StringParam& operator=(StringParam&& other) noexcept;
@@ -103,23 +109,34 @@ namespace slib
 		
 		StringParam& operator=(const String& value) noexcept;
 		
+		StringParam& operator=(String&& value) noexcept;
+		
 		StringParam& operator=(const String16& value) noexcept;
 		
+		StringParam& operator=(String16&& value) noexcept;
+
 		StringParam& operator=(const AtomicString& value) noexcept;
 		
+		StringParam& operator=(AtomicString&& value) noexcept;
+		
 		StringParam& operator=(const AtomicString16& value) noexcept;
+		
+		StringParam& operator=(AtomicString16&& value) noexcept;
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
 		StringParam& operator=(const std::string& value) noexcept;
 		
+		StringParam& operator=(std::string&& value) = delete;
+		
 		StringParam& operator=(const std::u16string& value) noexcept;
+		
+		StringParam& operator=(std::u16string&& value) = delete;
 #endif
 		
 		StringParam& operator=(const sl_char8* sz8) noexcept;
 		
 		StringParam& operator=(const sl_char16* sz16) noexcept;
 
-		
 	public:
 		StringType getType() const noexcept;
 		
@@ -136,8 +153,6 @@ namespace slib
 		sl_bool isNotNull() const noexcept;
 		
 		
-		sl_size getLength() const noexcept;
-		
 		sl_bool isEmpty() const noexcept;
 		
 		sl_bool isNotEmpty() const noexcept;
@@ -150,6 +165,12 @@ namespace slib
 		sl_bool isSz8() const noexcept;
 		
 		sl_bool isSz16() const noexcept;
+
+#ifdef SLIB_SUPPORT_STD_TYPES
+		sl_bool isStdString() const noexcept;
+		
+		sl_bool isStdString16() const noexcept;
+#endif
 		
 		String getString(const String& def) const noexcept;
 		
@@ -159,31 +180,6 @@ namespace slib
 		
 		String16 getString16() const noexcept;
 		
-		sl_char8* getSz8(const sl_char8* def = sl_null) const noexcept;
-		
-		sl_char16* getSz16(const sl_char16* def = sl_null) const noexcept;
-		
-		void setString(const String& value) noexcept;
-		
-		void setString16(const String16& value) noexcept;
-		
-		void setSz(const sl_char8* sz8) noexcept;
-		
-		void setSz(const sl_char16* sz16) noexcept;
-		
-#ifdef SLIB_SUPPORT_STD_TYPES
-		std::string getStdString(const std::string& def) const noexcept;
-		
-		std::string getStdString() const noexcept;
-		
-		std::u16string getStdString16(const std::u16string& def) const noexcept;
-		
-		std::u16string getStdString16() const noexcept;
-		
-		void setStdString(const std::string& value) noexcept;
-		
-		void setStdString16(const std::u16string& value) noexcept;
-#endif
 		
 		sl_compare_result compare(const StringParam& other) const noexcept;
 		
@@ -235,6 +231,17 @@ namespace slib
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(StringParamData)
 		
+	public:
+		SLIB_INLINE sl_char8* getData() const noexcept
+		{
+			return data;
+		}
+		
+		sl_size getLength() const noexcept;
+		
+	private:
+		sl_size _length;
+		
 	};
 
 	class SLIB_EXPORT StringParamData16
@@ -248,6 +255,16 @@ namespace slib
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(StringParamData16)
 		
+	public:
+		SLIB_INLINE sl_char16* getData() const noexcept
+		{
+			return data;
+		}
+		
+		sl_size getLength() const noexcept;
+
+	private:
+		sl_size _length;			
 	};
 	
 }

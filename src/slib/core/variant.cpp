@@ -93,30 +93,44 @@ namespace slib
 					case StringType::Null:
 						dst_type = VariantType::Null;
 						dst_value = param._value;
-						break;
+						return;
 					case StringType::String8:
 						dst_type = VariantType::String8;
 						new PTR_VAR(String, dst_value) String(REF_VAR(String, param._value));
-						break;
+						return;
 					case StringType::String16:
 						dst_type = VariantType::String16;
 						new PTR_VAR(String16, dst_value) String16(REF_VAR(String16, param._value));
-						break;
+						return;
 					case StringType::Sz8:
 						dst_type = VariantType::Sz8;
 						dst_value = param._value;
-						break;
+						return;
 					case StringType::Sz16:
 						dst_type = VariantType::Sz16;
 						dst_value = param._value;
-						break;
-					default:
-						dst_type = VariantType::Null;
-						dst_value = 1;
-						break;
+						return;
+					case StringType::StringRef8:
+						dst_type = VariantType::String8;
+						new PTR_VAR(String, dst_value) String(*REF_VAR(String const*, param._value));
+						return;
+					case StringType::StringRef16:
+						dst_type = VariantType::String16;
+						new PTR_VAR(String16, dst_value) String16(*REF_VAR(String16 const*, param._value));
+						return;
+					case StringType::Std8:
+						dst_type = VariantType::String8;
+						new PTR_VAR(String, dst_value) String(*REF_VAR(std::string const*, param._value));
+						return;
+					case StringType::Std16:
+						dst_type = VariantType::String16;
+						new PTR_VAR(String16, dst_value) String16(*REF_VAR(std::u16string const*, param._value));
+						return;
 				}
+				dst_type = VariantType::Null;
+				dst_value = param._value;
 			}
-			
+
 		}
 	}
 	

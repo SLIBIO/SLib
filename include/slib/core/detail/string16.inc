@@ -105,6 +105,17 @@ namespace slib
 		}
 	}
 	
+	SLIB_INLINE sl_char16* String16::getData(sl_size& outLength) const noexcept
+	{
+		if (m_container) {
+			outLength = m_container->len;
+			return m_container->sz;
+		} else {
+			outLength = 0;
+			return (sl_char16*)((void*)(L""));
+		}
+	}
+	
 	SLIB_INLINE sl_size String16::getLength() const noexcept
 	{
 		if (m_container) {
