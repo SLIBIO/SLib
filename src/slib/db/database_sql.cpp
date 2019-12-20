@@ -730,7 +730,7 @@ namespace slib
 				}
 				appendSelectWithClause(withs[i]);
 			}
-			appendStatic(" ", 1);
+			appendStatic(" ");
 		}
 		appendQuery(param);
 	}
