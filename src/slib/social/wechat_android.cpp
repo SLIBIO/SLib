@@ -39,11 +39,14 @@ namespace slib
 		{
 
 			void OnLoginResult(JNIEnv* env, jobject _this, jboolean flagSuccess, jboolean flagCancel, jstring code, jstring errStr);
+			void OnPayResult(JNIEnv* env, jobject _this, jboolean flagSuccess, jboolean flagCancel, jstring errStr);
 			
 			SLIB_JNI_BEGIN_CLASS(JWeChat, "slib/platform/android/wechat/WeChat")
 				SLIB_JNI_STATIC_METHOD(initialize, "initialize", "(Landroid/app/Activity;Ljava/lang/String;)V");
 				SLIB_JNI_STATIC_METHOD(login, "login", "()V");
+				SLIB_JNI_STATIC_METHOD(pay, "pay", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;JLjava/lang/String;)V");
 				SLIB_JNI_NATIVE(nativeOnLoginResult, "nativeOnLoginResult", "(ZZLjava/lang/String;Ljava/lang/String;)V", OnLoginResult);
+				SLIB_JNI_NATIVE(nativeOnPayResult, "nativeOnPayResult", "(ZZLjava/lang/String;)V", OnPayResult);
 			SLIB_JNI_END_CLASS
 
 			class StaticContext
@@ -102,6 +105,15 @@ namespace slib
 				GetStaticContext()->onLoginResult(result);
 			}
 
+			void OnPayResult(JNIEnv* env, jobject _this, jboolean flagSuccess, jboolean flagCancel, jstring errStr)
+			{
+				WeChatPaymentResult result;
+				result.flagSuccess = flagSuccess;
+				result.flagCancel = flagCancel;
+				result.error = Jni::getString(errStr);
+				GetStaticContext()->onPayResult(result);
+			}
+
 		}
 	}
 	
@@ -138,6 +150,14 @@ namespace slib
 		
 		GetStaticContext()->setPayCallback(param.onComplete);
 		
+		JniLocal<jstring> partnerId = Jni::getJniString(param.order.partnerId);
+		JniLocal<jstring> prepayId = Jni::getJniString(param.order.prepayId);
+		JniLocal<jstring> package = Jni::getJniString(param.order.package);
+		JniLocal<jstring> nonce = Jni::getJniString(param.order.nonce);
+		jlong timeStamp = (jlong)(param.order.timeStamp);
+		JniLocal<jstring> sign = Jni::getJniString(param.order.sign);
+
+		JWeChat::pay.call(sl_null, partnerId.get(), prepayId.get(), package.get(), nonce.get(), timeStamp, sign.get());
 	}
 	
 }
