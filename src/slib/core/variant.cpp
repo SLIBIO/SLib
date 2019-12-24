@@ -87,50 +87,6 @@ namespace slib
 				}
 			}
 
-			SLIB_INLINE static void copy_string_param(const StringParam& param, VariantType& dst_type, sl_uint64& dst_value) noexcept
-			{
-				switch (param._type) {
-					case StringType::Null:
-						dst_type = VariantType::Null;
-						dst_value = param._value;
-						return;
-					case StringType::String8:
-						dst_type = VariantType::String8;
-						new PTR_VAR(String, dst_value) String(REF_VAR(String, param._value));
-						return;
-					case StringType::String16:
-						dst_type = VariantType::String16;
-						new PTR_VAR(String16, dst_value) String16(REF_VAR(String16, param._value));
-						return;
-					case StringType::Sz8:
-						dst_type = VariantType::Sz8;
-						dst_value = param._value;
-						return;
-					case StringType::Sz16:
-						dst_type = VariantType::Sz16;
-						dst_value = param._value;
-						return;
-					case StringType::StringRef8:
-						dst_type = VariantType::String8;
-						new PTR_VAR(String, dst_value) String(*REF_VAR(String const*, param._value));
-						return;
-					case StringType::StringRef16:
-						dst_type = VariantType::String16;
-						new PTR_VAR(String16, dst_value) String16(*REF_VAR(String16 const*, param._value));
-						return;
-					case StringType::Std8:
-						dst_type = VariantType::String8;
-						new PTR_VAR(String, dst_value) String(*REF_VAR(std::string const*, param._value));
-						return;
-					case StringType::Std16:
-						dst_type = VariantType::String16;
-						new PTR_VAR(String16, dst_value) String16(*REF_VAR(std::u16string const*, param._value));
-						return;
-				}
-				dst_type = VariantType::Null;
-				dst_value = param._value;
-			}
-
 		}
 	}
 	
@@ -509,21 +465,16 @@ namespace slib
 		}
 	}
 	
-	Variant::Variant(const StringParam& str) noexcept
+	Variant::Variant(const StringParam& str) noexcept: Variant(str.toVariant())
 	{
-		priv::variant::copy_string_param(str, _type, _value);
 	}
 	
-	Variant::Variant(const std::string& value) noexcept
+	Variant::Variant(const std::string& value) noexcept: Variant(String::create(value))
 	{
-		_type = VariantType::String8;
-		new PTR_VAR(String, _value) String(value);
 	}
 	
-	Variant::Variant(const std::u16string& value) noexcept
+	Variant::Variant(const std::u16string& value) noexcept: Variant(String16::create(value))
 	{
-		_type = VariantType::String16;
-		new PTR_VAR(String16, _value) String16(value);
 	}
 
 	Variant::Variant(const Time& value) noexcept
@@ -1352,9 +1303,9 @@ namespace slib
 			case VariantType::String16:
 				return REF_VAR(String16 const, _value);
 			case VariantType::Sz8:
-				return REF_VAR(sl_char8 const* const, _value);
+				return String::create(REF_VAR(sl_char8 const* const, _value));
 			case VariantType::Sz16:
-				return REF_VAR(sl_char16 const* const, _value);
+				return String::create(REF_VAR(sl_char16 const* const, _value));
 			case VariantType::Pointer:
 				return "#" + String::fromPointerValue(REF_VAR(void const* const, _value));
 			case VariantType::Object:
@@ -1410,9 +1361,9 @@ namespace slib
 			case VariantType::String16:
 				return REF_VAR(String16 const, _value);
 			case VariantType::Sz8:
-				return REF_VAR(sl_char8 const* const, _value);
+				return String16::create(REF_VAR(sl_char8 const* const, _value));
 			case VariantType::Sz16:
-				return REF_VAR(sl_char16 const* const, _value);
+				return String16::create(REF_VAR(sl_char16 const* const, _value));
 			case VariantType::Pointer:
 				return "#" + String16::fromPointerValue(REF_VAR(void const* const, _value));
 			case VariantType::Object:
@@ -1484,9 +1435,9 @@ namespace slib
 			case VariantType::String16:
 				return REF_VAR(String16 const, _value);
 			case VariantType::Sz8:
-				return REF_VAR(sl_char8 const* const, _value);
+				return StringParam(REF_VAR(sl_char8 const* const, _value), -1);
 			case VariantType::Sz16:
-				return REF_VAR(sl_char16 const* const, _value);
+				return StringParam(REF_VAR(sl_char16 const* const, _value), -1);
 			case VariantType::Null:
 				break;
 			default:
@@ -1574,19 +1525,9 @@ namespace slib
 		}
 	}
 	
-	std::string Variant::getStdString(const std::string& def) const noexcept
-	{
-		return getString(def).toStd();
-	}
-	
 	std::string Variant::getStdString() const noexcept
 	{
 		return getString().toStd();
-	}
-	
-	std::u16string Variant::getStdString16(const std::u16string& def) const noexcept
-	{
-		return getString16(def).toStd();
 	}
 	
 	std::u16string Variant::getStdString16() const noexcept
@@ -1596,22 +1537,17 @@ namespace slib
 	
 	void Variant::setString(const std::string& value) noexcept
 	{
-		priv::variant::free(_type, _value);
-		_type = VariantType::String8;
-		new PTR_VAR(String, _value) String(value);
+		setString(String::create(value));
 	}
 	
 	void Variant::setString(const std::u16string& value) noexcept
 	{
-		priv::variant::free(_type, _value);
-		_type = VariantType::String16;
-		new PTR_VAR(String16, _value) String16(value);
+		setString(String16::create(value));
 	}
 	
 	void Variant::setString(const StringParam& value) noexcept
 	{
-		priv::variant::free(_type, _value);
-		priv::variant::copy_string_param(value, _type, _value);
+		*this = value.toVariant();
 	}
 
 	sl_bool Variant::isTime() const noexcept
@@ -1641,9 +1577,9 @@ namespace slib
 			case VariantType::String16:
 				return Time(REF_VAR(String16 const, _value));
 			case VariantType::Sz8:
-				return Time(REF_VAR(sl_char8 const* const, _value));
+				return Time(StringParam(REF_VAR(sl_char8 const* const, _value), -1));
 			case VariantType::Sz16:
-				return Time(REF_VAR(sl_char16 const* const, _value));
+				return Time(StringParam(REF_VAR(sl_char16 const* const, _value), -1));
 			default:
 				break;
 		}
@@ -2430,7 +2366,7 @@ namespace slib
 				return ParseUtil::applyBackslashEscapes(getString());
 			case VariantType::String16:
 			case VariantType::Sz16:
-				return ParseUtil::applyBackslashEscapes(getString16());
+				return ParseUtil::applyBackslashEscapes16(getString16());
 			case VariantType::Object:
 			case VariantType::Weak:
 				{
@@ -2769,11 +2705,6 @@ namespace slib
 		_out = getString().toStd();
 	}
 	
-	void Variant::get(std::string& _out, const std::string& def) const noexcept
-	{
-		_out = getString(def).toStd();
-	}
-	
 	void Variant::set(const std::string& _in) noexcept
 	{
 		setString(_in);
@@ -2782,11 +2713,6 @@ namespace slib
 	void Variant::get(std::u16string& _out) const noexcept
 	{
 		_out = getString16().toStd();
-	}
-	
-	void Variant::get(std::u16string& _out, const std::u16string& def) const noexcept
-	{
-		_out = getString16(def).toStd();
 	}
 	
 	void Variant::set(const std::u16string& _in) noexcept
@@ -3155,21 +3081,16 @@ namespace slib
 		}
 	}
 	
-	Atomic<Variant>::Atomic(const std::string& value) noexcept
+	Atomic<Variant>::Atomic(const std::string& value) noexcept: Atomic(String::create(value))
 	{
-		_type = VariantType::String8;
-		new PTR_VAR(String, _value) String(value);
 	}
 	
-	Atomic<Variant>::Atomic(const std::u16string& value) noexcept
+	Atomic<Variant>::Atomic(const std::u16string& value) noexcept: Atomic(String16::create(value))
 	{
-		_type = VariantType::String16;
-		new PTR_VAR(String16, _value) String16(value);
 	}
 	
-	Atomic<Variant>::Atomic(const StringParam& value) noexcept
+	Atomic<Variant>::Atomic(const StringParam& value) noexcept: Atomic(value.toVariant())
 	{
-		priv::variant::copy_string_param(value, _type, _value);
 	}
 
 	Atomic<Variant>::Atomic(const Time& value) noexcept
@@ -3610,22 +3531,10 @@ namespace slib
 		}
 	}
 	
-	std::string Atomic<Variant>::getStdString(const std::string& def) const noexcept
-	{
-		Variant var(*this);
-		return var.getString(def).toStd();
-	}
-	
 	std::string Atomic<Variant>::getStdString() const noexcept
 	{
 		Variant var(*this);
 		return var.getString().toStd();
-	}
-	
-	std::u16string Atomic<Variant>::getStdString16(const std::u16string& def) const noexcept
-	{
-		Variant var(*this);
-		return var.getString16(def).toStd();
 	}
 	
 	std::u16string Atomic<Variant>::getStdString16() const noexcept
@@ -3636,24 +3545,17 @@ namespace slib
 	
 	void Atomic<Variant>::setString(const std::string& value) noexcept
 	{
-		sl_int64 v;
-		new PTR_VAR(String, v) String(value);
-		_replace(VariantType::String8, v);
+		setString(String::create(value));
 	}
 	
 	void Atomic<Variant>::setString(const std::u16string& value) noexcept
 	{
-		sl_int64 v;
-		new PTR_VAR(String16, v) String16(value);
-		_replace(VariantType::String16, v);
+		setString(String16::create(value));
 	}
 
 	void Atomic<Variant>::setString(const StringParam& value) noexcept
 	{
-		VariantType t;
-		sl_uint64 v;
-		priv::variant::copy_string_param(value, t, v);
-		_replace(t, v);
+		*this = value.toVariant();
 	}
 	
 	sl_bool Atomic<Variant>::isTime() const noexcept
@@ -4209,11 +4111,6 @@ namespace slib
 		_out = getString().toStd();
 	}
 	
-	void Atomic<Variant>::get(std::string& _out, const std::string& def) const noexcept
-	{
-		_out = getString(def).toStd();
-	}
-	
 	void Atomic<Variant>::set(const std::string& _in) noexcept
 	{
 		setString(_in);
@@ -4222,11 +4119,6 @@ namespace slib
 	void Atomic<Variant>::get(std::u16string& _out) const noexcept
 	{
 		_out = getString16().toStd();
-	}
-	
-	void Atomic<Variant>::get(std::u16string& _out, const std::u16string& def) const noexcept
-	{
-		_out = getString16(def).toStd();
 	}
 	
 	void Atomic<Variant>::set(const std::u16string& _in) noexcept
@@ -5027,7 +4919,7 @@ namespace slib
 			
 			SLIB_INLINE static sl_bool equals_element(sl_char8 const* const* v1, sl_char16 const* const* v2) noexcept
 			{
-				return *v1 == String(*v2);
+				return String::equals(*v1, -1, *v2, -1);
 			}
 			
 			SLIB_INLINE static sl_bool equals_element(sl_char16 const* const* v2, sl_char8 const* const* v1) noexcept
@@ -5143,7 +5035,7 @@ namespace slib
 			
 			SLIB_INLINE static sl_compare_result compare_element(sl_char8 const* const* v1, sl_char16 const* const* v2) noexcept
 			{
-				return String(*v1).compare(*v2);
+				return String::compare(*v1, -1, *v2, -1);
 			}
 			
 			SLIB_INLINE static sl_compare_result compare_element(sl_char16 const* const* v2, sl_char8 const* const* v1) noexcept

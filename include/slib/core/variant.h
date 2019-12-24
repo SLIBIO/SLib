@@ -376,11 +376,7 @@ namespace slib
 		void setString(const sl_char16* sz16) noexcept;
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
-		std::string getStdString(const std::string& def) const noexcept;
-		
 		std::string getStdString() const noexcept;
-		
-		std::u16string getStdString16(const std::u16string& def) const noexcept;
 		
 		std::u16string getStdString16() const noexcept;
 
@@ -594,11 +590,9 @@ namespace slib
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
 		void get(std::string& _out) const noexcept;
-		void get(std::string& _out, const std::string& def) const noexcept;
 		void set(const std::string& _in) noexcept;
 		
 		void get(std::u16string& _out) const noexcept;
-		void get(std::u16string& _out, const std::u16string& def) const noexcept;
 		void set(const std::u16string& _in) noexcept;
 #endif
 		void get(StringParam& _out) const noexcept;
@@ -967,12 +961,8 @@ namespace slib
 		void setString(const sl_char16* sz16) noexcept;
 	
 #ifdef SLIB_SUPPORT_STD_TYPES
-		std::string getStdString(const std::string& def) const noexcept;
-		
 		std::string getStdString() const noexcept;
-		
-		std::u16string getStdString16(const std::u16string& def) const noexcept;
-		
+				
 		std::u16string getStdString16() const noexcept;
 		
 		void setString(const std::string& value) noexcept;
@@ -1158,11 +1148,9 @@ namespace slib
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
 		void get(std::string& _out) const noexcept;
-		void get(std::string& _out, const std::string& def) const noexcept;
 		void set(const std::string& _in) noexcept;
 		
 		void get(std::u16string& _out) const noexcept;
-		void get(std::u16string& _out, const std::u16string& def) const noexcept;
 		void set(const std::u16string& _in) noexcept;
 #endif
 		

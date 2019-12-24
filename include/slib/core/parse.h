@@ -25,7 +25,7 @@
 
 #include "definition.h"
 
-#include "string.h"
+#include "string_param.h"
 
 #define SLIB_PARSE_ERROR (-1)
 
@@ -56,112 +56,35 @@ namespace slib
 
 	};
 
-	template <class T>
-	sl_bool Parse(const String& str, T* _out) noexcept;
 
 	template <class T>
-	sl_bool Parse(const String16& str, T* _out) noexcept;
-	
-	template <class T>
-	sl_bool Parse(const AtomicString& _str, T* _out) noexcept;
-
-	template <class T>
-	sl_bool Parse(const AtomicString16& _str, T* _out) noexcept;
-	
-	template <class T>
-	sl_bool Parse(const sl_char8* sz, T* _out) noexcept;
-
-	template <class T>
-	sl_bool Parse(const sl_char16* sz, T* _out) noexcept;
-
+	sl_bool Parse(const StringParam& str, T* _out) noexcept;
 
 	template <class T, class ArgType>
-	sl_bool Parse(const String& str, const ArgType& arg, T* _out) noexcept;
-	
-	template <class T, class ArgType>
-	sl_bool Parse(const String16& str, const ArgType& arg, T* _out) noexcept;
-	
-	template <class T, class ArgType>
-	sl_bool Parse(const AtomicString& _str, const ArgType& arg, T* _out) noexcept;
-	
-	template <class T, class ArgType>
-	sl_bool Parse(const AtomicString16& _str, const ArgType& arg, T* _out) noexcept;
-	
-	template <class T, class ArgType>
-	sl_bool Parse(const sl_char8* sz, const ArgType& arg, T* _out) noexcept;
-	
-	template <class T, class ArgType>
-	sl_bool Parse(const sl_char16* sz, const ArgType& arg, T* _out) noexcept;
-
+	sl_bool Parse(const StringParam& str, const ArgType& arg, T* _out) noexcept;
 	
 	template <class T>
-	sl_bool ParseInt(const String& str, T* _out, sl_uint32 radix = 10) noexcept;
-
-	template <class T>
-	sl_bool ParseInt(const String16& str, T* _out, sl_uint32 radix = 10) noexcept;
-
-	template <class T>
-	sl_bool ParseInt(const AtomicString& _str, T* _out, sl_uint32 radix = 10) noexcept;
-
-	template <class T>
-	sl_bool ParseInt(const AtomicString16& _str, T* _out, sl_uint32 radix = 10) noexcept;
-
-	template <class T>
-	sl_bool ParseInt(const sl_char8* sz, T* _out, sl_uint32 radix = 10) noexcept;
-
-	template <class T>
-	sl_bool ParseInt(const sl_char16* sz, T* _out, sl_uint32 radix = 10) noexcept;
+	sl_bool ParseInt(const StringParam& str, T* _out, sl_uint32 radix = 10) noexcept;
 
 
 	class ParseUtil
 	{
 	public:
-		static String applyBackslashEscapes(const String& str, sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false) noexcept;
+		static String applyBackslashEscapes(const StringParam& str, sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false) noexcept;
 
-		static String16 applyBackslashEscapes(const String16& str, sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false) noexcept;
-
-		static String applyBackslashEscapes(const AtomicString& str, sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false) noexcept;
-
-		static String16 applyBackslashEscapes(const AtomicString16& str, sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false) noexcept;
+		static String16 applyBackslashEscapes16(const StringParam& str, sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false) noexcept;
 
 		
-		static String parseBackslashEscapes(const sl_char8* input, sl_size len, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) noexcept;
+		static String parseBackslashEscapes(const StringParam& input, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) noexcept;
 
-		static String16 parseBackslashEscapes(const sl_char16* input, sl_size len, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) noexcept;
-
-		static String parseBackslashEscapes(const String& str, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) noexcept;
-
-		static String16 parseBackslashEscapes(const String16& str, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) noexcept;
-
-		static String parseBackslashEscapes(const AtomicString& str, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) noexcept;
-
-		static String16 parseBackslashEscapes(const AtomicString16& str, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) noexcept;
+		static String16 parseBackslashEscapes16(const StringParam& input, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) noexcept;
 
 		
-		static sl_size countLineNumber(const sl_char8* input, sl_size len, sl_size* columnLast = sl_null) noexcept;
-
-		static sl_size countLineNumber(const sl_char16* input, sl_size len, sl_size* columnLast = sl_null) noexcept;
-
-		static sl_size countLineNumber(const String& str, sl_size pos, sl_size* column = sl_null) noexcept;
-
-		static sl_size countLineNumber(const String16& str, sl_size pos, sl_size* column = sl_null) noexcept;
-
-		static sl_size countLineNumber(const AtomicString& str, sl_size pos, sl_size* column = sl_null) noexcept;
-
-		static sl_size countLineNumber(const AtomicString16& str, sl_size pos, sl_size* column = sl_null) noexcept;
-
+		static sl_size countLineNumber(const StringParam& input, sl_size pos, sl_size* column = sl_null) noexcept;
 		
-		static sl_reg indexOfLine(const sl_char8* input, sl_size len) noexcept;
-		
-		static sl_reg indexOfLine(const sl_char16* input, sl_size len) noexcept;
+		static sl_size countLineNumber(const StringParam& input, sl_size* column = sl_null) noexcept;
 
-		static sl_reg indexOfLine(const String& str, sl_reg start = 0) noexcept;
-		
-		static sl_reg indexOfLine(const String16& str, sl_reg start = 0) noexcept;
-		
-		static sl_reg indexOfLine(const AtomicString& str, sl_reg start = 0) noexcept;
-		
-		static sl_reg indexOfLine(const AtomicString16& str, sl_reg start = 0) noexcept;
+		static sl_reg indexOfLine(const StringParam& input, sl_reg start = 0) noexcept;
 		
 	};
 

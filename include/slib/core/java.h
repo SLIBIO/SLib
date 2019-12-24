@@ -390,7 +390,8 @@ namespace slib
 		static void deleteWeakRef(jobject obj);
 
 		// string
-		static jstring getJniString(const String16& str);
+		static jstring getJniString(const StringParam& str);
+		static jstring getJniString(const sl_char16* str, const sl_size length);
 		static String16 getString(jstring str);
 
 		/*

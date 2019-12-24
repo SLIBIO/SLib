@@ -25,6 +25,8 @@
 
 #include "definition.h"
 
+#include "string8.h"
+
 #include "charset.h"
 #include "memory.h"
 #include "list.h"
@@ -46,7 +48,7 @@ namespace slib
 	typedef Atomic<String> AtomicString;
 	class String16;
 	typedef Atomic<String16> AtomicString16;
-	class StringData;
+	class StringStorage;
 	class Variant;
 	class Locale;
 
@@ -113,21 +115,21 @@ namespace slib
 		String16(sl_char16 ch, sl_size nRepeatCount) noexcept;
 		
 		/**
-		 * Copies the null-terminated character sequence pointed by `str`.
+         * Copies the null-terminated character sequence pointed by `str`.
 		 */
-		String16(const char16_t* str) noexcept;
 		String16(const char* str) noexcept;
 		String16(const wchar_t* str) noexcept;
+		String16(const char16_t* str) noexcept;
 		String16(const char32_t* str) noexcept;
 
 		/**
 		 * Copies the first `length` characters from the array of characters pointed by `str`
 		 */
-		String16(const char16_t* str, sl_reg length) noexcept;
 		String16(const char* str, sl_reg length) noexcept;
 		String16(const wchar_t* str, sl_reg length) noexcept;
+		String16(const char16_t* str, sl_reg length) noexcept;
 		String16(const char32_t* str, sl_reg length) noexcept;
-
+		
 #ifdef SLIB_SUPPORT_STD_TYPES
 		/**
 		 * Initialize from `std::u16string`.
@@ -136,7 +138,9 @@ namespace slib
 		String16(const std::u16string& str) noexcept;
 		String16(std::u16string&& str) noexcept;
 #endif
-		
+
+		String16(const StringParam& str) noexcept;
+
 	public:
 		
 		/**
@@ -145,10 +149,31 @@ namespace slib
 		static String16 allocate(sl_size len) noexcept;
 		
 		/**
+		 * Creates a string from the array of characters pointed by `str`
+		 */
+		static String16 create(const char* str, sl_reg length = -1) noexcept;
+		static String16 create(const wchar_t* str, sl_reg length = -1) noexcept;
+		static String16 create(const char16_t* str, sl_reg length = -1) noexcept;
+		static String16 create(const char32_t* str, sl_reg length = -1) noexcept;
+
+#ifdef SLIB_SUPPORT_STD_TYPES
+		/**
+		 * Initialize from `std::u16string`.
+		 * This does not copy the data of the string, but keep the reference to the original string.
+		 */
+		static String16 create(const std::u16string& str) noexcept;
+		static String16 create(std::u16string&& str) noexcept;
+		static String16 create(const std::string& str) noexcept;
+		static String16 create(const std::wstring& str) noexcept;
+		static String16 create(const std::u32string& str) noexcept;
+#endif
+
+		/**
 		 * Creates a string pointing the `str` as the content, without copying the data.
 		 * `str` should not be freed while the returned string is being used.
 		 */
-		static String16 fromStatic(const sl_char16* str, sl_reg len = -1) noexcept;
+		template <sl_size N> static String16 fromStatic(const sl_char16 (&str)[N]) noexcept;
+		static String16 fromStatic(const sl_char16* str, sl_reg len) noexcept;
 		
 		/**
 		 * Creates a string pointing the `str` as the content, without copying the data.
@@ -240,6 +265,11 @@ namespace slib
 		 * Creates a string copying the characters from text in `mem`, encoded by `charset`.
 		 */
 		static String16 decode(Charset charset, const Memory& mem);
+		
+		/**
+		 * Creates a string representing the variant
+		 */
+		static String from(const Variant& var) noexcept;
 		
 	public:
 		/**
@@ -356,108 +386,51 @@ namespace slib
 		String16& operator=(String16&& other) noexcept;
 		String16& operator=(AtomicString16&& other) noexcept;
 		String16& operator=(sl_null_t) noexcept;
-		String16& operator=(const char* other) noexcept;
-		String16& operator=(const wchar_t* other) noexcept;
-		String16& operator=(const char16_t* other) noexcept;
-		String16& operator=(const char32_t* other) noexcept;
+		String16& operator=(const char* sz) noexcept;
+		String16& operator=(const wchar_t* sz) noexcept;
+		String16& operator=(const char16_t* sz) noexcept;
+		String16& operator=(const char32_t* sz) noexcept;
 #ifdef SLIB_SUPPORT_STD_TYPES
 		String16& operator=(const std::u16string& other) noexcept;
 		String16& operator=(std::u16string&& other) noexcept;
 #endif
-		
-		/**
-		 * Concatenate strings
-		 */
-		String16 operator+(const String16& other) const noexcept;
-		String16 operator+(const String& other) const noexcept;
-		String16 operator+(const AtomicString16& other) const noexcept;
-		String16 operator+(const AtomicString& other) const noexcept;
-		String16 operator+(const sl_char8* other) const noexcept;
-		String16 operator+(const sl_char16* other) const noexcept;
-		String16 operator+(const sl_char32* other) const noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		String16 operator+(const std::u16string& other) const noexcept;
-#endif
-		String16 operator+(sl_int32 other) const noexcept;
-		String16 operator+(sl_uint32 other) const noexcept;
-		String16 operator+(sl_int64 other) const noexcept;
-		String16 operator+(sl_uint64 other) const noexcept;
-		String16 operator+(float other) const noexcept;
-		String16 operator+(double other) const noexcept;
-		String16 operator+(sl_bool other) const noexcept;
-		
-		/**
-		 * Concatenate strings
-		 */
-		friend String16 operator+(const sl_char16* first, const String16& second) noexcept;
-		friend String16 operator+(const sl_char8* first, const String16& second) noexcept;
-		friend String16 operator+(const sl_char32* first, const String16& second) noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		friend String16 operator+(const std::u16string& first, const String16& second) noexcept;
-#endif
-		friend String16 operator+(sl_int32 first, const String16& second) noexcept;
-		friend String16 operator+(sl_uint32 first, const String16& second) noexcept;
-		friend String16 operator+(sl_int64 first, const String16& second) noexcept;
-		friend String16 operator+(sl_uint64 first, const String16& second) noexcept;
-		friend String16 operator+(float first, const String16& second) noexcept;
-		friend String16 operator+(double first, const String16& second) noexcept;
-		friend String16 operator+(sl_bool first, const String16& second) noexcept;
-		
-		/**
-		 * Append to this string
-		 */
-		String16& operator+=(const String16& other) noexcept;
-		String16& operator+=(const String& other) noexcept;
-		String16& operator+=(const AtomicString16& other) noexcept;
-		String16& operator+=(const AtomicString& other) noexcept;
-		String16& operator+=(const sl_char8* other) noexcept;
-		String16& operator+=(const sl_char16* other) noexcept;
-		String16& operator+=(const sl_char32* other) noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		String16& operator+=(const std::u16string& other) noexcept;
-#endif
-		String16& operator+=(sl_int32 other) noexcept;
-		String16& operator+=(sl_uint32 other) noexcept;
-		String16& operator+=(sl_int64 other) noexcept;
-		String16& operator+=(sl_uint64 other) noexcept;
-		String16& operator+=(float other) noexcept;
-		String16& operator+=(double other) noexcept;
-		String16& operator+=(sl_bool other) noexcept;
+		String16& operator=(const StringParam& param) noexcept;
+
+
+	public:
+		static String16 merge(const sl_char16* a1, sl_reg len1, const sl_char16* a2, sl_reg len2) noexcept;
+		static String16 merge(const sl_char16* a1, sl_reg len1, const char* a2, sl_reg len2) noexcept;
+		static String16 merge(const sl_char16* a1, sl_reg len1, const wchar_t* a2, sl_reg len2) noexcept;
+		static String16 merge(const sl_char16* a1, sl_reg len1, const char32_t* a2, sl_reg len2) noexcept;
+		static String16 merge(const char* a1, sl_reg len1, const sl_char16* a2, sl_reg len2) noexcept;
+		static String16 merge(const wchar_t* a1, sl_reg len1, const sl_char16* a2, sl_reg len2) noexcept;
+		static String16 merge(const char32_t* a1, sl_reg len1, const sl_char16* a2, sl_reg len2) noexcept;
+
+		PRIV_SLIB_DECLARE_STRING_OPERATOR2(String16, String16, operator+)
+		PRIV_SLIB_DECLARE_STRING_OPERATOR1(String16&, operator+=,)
 		
 	public:
-		/**
-		 * @returns true if this string is equal to the specified string.
-		 */
-		sl_bool equals(const String16& other) const noexcept;
-		sl_bool equals(const String& other) const noexcept;
-		sl_bool equals(const AtomicString16& other) const noexcept;
-		sl_bool equals(const AtomicString& other) const noexcept;
-		sl_bool equals(const sl_char8* other) const noexcept;
-		sl_bool equals(const sl_char16* other) const noexcept;
-		sl_bool equals(const sl_char32* other) const noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		sl_bool equals(const std::u16string& other) const noexcept;
-#endif
+		static sl_bool equals(const sl_char16* a1, sl_reg len1, const sl_char16* a2, sl_reg len2) noexcept;
+		static sl_bool equals(const sl_char16* a1, sl_reg len1, const char* a2, sl_reg len2) noexcept;
+		static sl_bool equals(const sl_char16* a1, sl_reg len1, const wchar_t* a2, sl_reg len2) noexcept;
+		static sl_bool equals(const sl_char16* a1, sl_reg len1, const char32_t* a2, sl_reg len2) noexcept;
 		
-		/**
-		 * Compares this string to the specified string.
-		 *
-		 * @return signed integral indicating the relation between the strings:
-		 * @return 0: They compare equal.
-		 * @return <0: Either the value of the first character that does not match is lower in the compared string, or all compared characters match but the compared string is shorter.
-		 * @return >0: Either the value of the first character that does not match is greater in the compared string, or all compared characters match but the compared string is longer.
-		 */
-		sl_compare_result compare(const String16& other) const noexcept;
-		sl_compare_result compare(const String& other) const noexcept;
-		sl_compare_result compare(const AtomicString16& other) const noexcept;
-		sl_compare_result compare(const AtomicString& other) const noexcept;
-		sl_compare_result compare(const sl_char8* other) const noexcept;
-		sl_compare_result compare(const sl_char16* other) const noexcept;
-		sl_compare_result compare(const sl_char32* other) const noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		sl_compare_result compare(const std::u16string& other) const noexcept;
-#endif
+		static sl_compare_result compare(const sl_char16* a1, sl_reg len1, const sl_char16* a2, sl_reg len2) noexcept;
+		static sl_compare_result compare(const sl_char16* a1, sl_reg len1, const char* a2, sl_reg len2) noexcept;
+		static sl_compare_result compare(const sl_char16* a1, sl_reg len1, const wchar_t* a2, sl_reg len2) noexcept;
+		static sl_compare_result compare(const sl_char16* a1, sl_reg len1, const char32_t* a2, sl_reg len2) noexcept;
+
+		PRIV_SLIB_DECLARE_STRING_OPERATOR1(sl_bool, equals, const)
+		PRIV_SLIB_DECLARE_STRING_OPERATOR1(sl_compare_result, compare, const)
+
+		PRIV_SLIB_DECLARE_STRING_OPERATOR2(String16, sl_bool, operator==)
+		PRIV_SLIB_DECLARE_STRING_OPERATOR2(String16, sl_bool, operator!=)
+		PRIV_SLIB_DECLARE_STRING_OPERATOR2(String16, sl_bool, operator>=)
+		PRIV_SLIB_DECLARE_STRING_OPERATOR2(String16, sl_bool, operator<=)
+		PRIV_SLIB_DECLARE_STRING_OPERATOR2(String16, sl_bool, operator>)
+		PRIV_SLIB_DECLARE_STRING_OPERATOR2(String16, sl_bool, operator<)
 		
+	public:
 		/**
 		 * Compares this string to the specified string.
 		 * This functions stops searching on the index of `len-1` and returns 0.
@@ -467,12 +440,12 @@ namespace slib
 		 * @return <0: Either the value of the first character that does not match is lower in the compared string, or all compared characters match but the compared string is shorter.
 		 * @return >0: Either the value of the first character that does not match is greater in the compared string, or all compared characters match but the compared string is longer.
 		 */
-		sl_compare_result compare(const String16& other, sl_size len) const noexcept;
+		sl_compare_result compare(const StringParam& other, sl_size len) const noexcept;
 		
 		/**
 		 * @return true if this string is equal to the specified string ignoring the case.
 		 */
-		sl_bool equalsIgnoreCase(const String16& other) const noexcept;
+		sl_bool equalsIgnoreCase(const StringParam& other) const noexcept;
 		
 		/**
 		 * Compares this string to the specified string ignoring the case.
@@ -482,152 +455,7 @@ namespace slib
 		 * @return <0: Either the value of the first character that does not match is lower in the compared string, or all compared characters match but the compared string is shorter.
 		 * @return >0: Either the value of the first character that does not match is greater in the compared string, or all compared characters match but the compared string is longer.
 		 */
-		sl_compare_result compareIgnoreCase(const String16& other) const noexcept;
-		
-	public:
-		/**
-		 * Comparison Operator
-		 */
-		sl_bool operator==(const String16& other) const noexcept;
-		sl_bool operator==(const String& other) const noexcept;
-		sl_bool operator==(const AtomicString16& other) const noexcept;
-		sl_bool operator==(const AtomicString& other) const noexcept;
-		sl_bool operator==(const sl_char8* other) const noexcept;
-		sl_bool operator==(const sl_char16* other) const noexcept;
-		sl_bool operator==(const sl_char32* other) const noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		sl_bool operator==(const std::u16string& other) const noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		friend sl_bool operator==(const sl_char16* first, const String16& second) noexcept;
-		friend sl_bool operator==(const sl_char8* first, const String16& second) noexcept;
-		friend sl_bool operator==(const sl_char32* first, const String16& second) noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		friend sl_bool operator==(const std::u16string& first, const String16& second) noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		sl_bool operator!=(const String16& other) const noexcept;
-		sl_bool operator!=(const String& other) const noexcept;
-		sl_bool operator!=(const AtomicString16& other) const noexcept;
-		sl_bool operator!=(const AtomicString& other) const noexcept;
-		sl_bool operator!=(const sl_char8* other) const noexcept;
-		sl_bool operator!=(const sl_char16* other) const noexcept;
-		sl_bool operator!=(const sl_char32* other) const noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		sl_bool operator!=(const std::u16string& other) const noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		friend sl_bool operator!=(const sl_char16* first, const String16& second) noexcept;
-		friend sl_bool operator!=(const sl_char8* first, const String16& second) noexcept;
-		friend sl_bool operator!=(const sl_char32* first, const String16& second) noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		friend sl_bool operator!=(const std::u16string& first, const String16& second) noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		sl_bool operator>=(const String16& other) const noexcept;
-		sl_bool operator>=(const String& other) const noexcept;
-		sl_bool operator>=(const AtomicString16& other) const noexcept;
-		sl_bool operator>=(const AtomicString& other) const noexcept;
-		sl_bool operator>=(const sl_char8* other) const noexcept;
-		sl_bool operator>=(const sl_char16* other) const noexcept;
-		sl_bool operator>=(const sl_char32* other) const noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		sl_bool operator>=(const std::u16string& other) const noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		friend sl_bool operator>=(const sl_char16* first, const String16& second) noexcept;
-		friend sl_bool operator>=(const sl_char8* first, const String16& second) noexcept;
-		friend sl_bool operator>=(const sl_char32* first, const String16& second) noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		friend sl_bool operator>=(const std::u16string& first, const String16& second) noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		sl_bool operator<=(const String16& other) const noexcept;
-		sl_bool operator<=(const String& other) const noexcept;
-		sl_bool operator<=(const AtomicString16& other) const noexcept;
-		sl_bool operator<=(const AtomicString& other) const noexcept;
-		sl_bool operator<=(const sl_char8* other) const noexcept;
-		sl_bool operator<=(const sl_char16* other) const noexcept;
-		sl_bool operator<=(const sl_char32* other) const noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		sl_bool operator<=(const std::u16string& other) const noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		friend sl_bool operator<=(const sl_char16* first, const String16& second) noexcept;
-		friend sl_bool operator<=(const sl_char8* first, const String16& second) noexcept;
-		friend sl_bool operator<=(const sl_char32* first, const String16& second) noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		friend sl_bool operator<=(const std::u16string& first, const String16& second) noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		sl_bool operator>(const String16& other) const noexcept;
-		sl_bool operator>(const String& other) const noexcept;
-		sl_bool operator>(const AtomicString16& other) const noexcept;
-		sl_bool operator>(const AtomicString& other) const noexcept;
-		sl_bool operator>(const sl_char8* other) const noexcept;
-		sl_bool operator>(const sl_char16* other) const noexcept;
-		sl_bool operator>(const sl_char32* other) const noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		sl_bool operator>(const std::u16string& other) const noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		friend sl_bool operator>(const sl_char16* first, const String16& second) noexcept;
-		friend sl_bool operator>(const sl_char8* first, const String16& second) noexcept;
-		friend sl_bool operator>(const sl_char32* first, const String16& second) noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		friend sl_bool operator>(const std::u16string& first, const String16& second) noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		sl_bool operator<(const String16& other) const noexcept;
-		sl_bool operator<(const String& other) const noexcept;
-		sl_bool operator<(const AtomicString16& other) const noexcept;
-		sl_bool operator<(const AtomicString& other) const noexcept;
-		sl_bool operator<(const sl_char8* other) const noexcept;
-		sl_bool operator<(const sl_char16* other) const noexcept;
-		sl_bool operator<(const sl_char32* other) const noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		sl_bool operator<(const std::u16string& other) const noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		friend sl_bool operator<(const sl_char16* first, const String16& second) noexcept;
-		friend sl_bool operator<(const sl_char8* first, const String16& second) noexcept;
-		friend sl_bool operator<(const sl_char32* first, const String16& second) noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		friend sl_bool operator<(const std::u16string& first, const String16& second) noexcept;
-#endif
+		sl_compare_result compareIgnoreCase(const StringParam& other) const noexcept;
 		
 	public:
 		/**
@@ -653,7 +481,7 @@ namespace slib
 		/**
 		 * Fills Utf8 characters to the provided buffer
 		 */
-		sl_bool getUtf8(StringData& output) const noexcept;
+		sl_bool getUtf8(StringStorage& output) const noexcept;
 		
 		/**
 		 * Converts to Utf8 and Returns a Memory containing the Utf16 characters and null at last
@@ -695,8 +523,7 @@ namespace slib
 		 * @return the index within this string of the first occurrence of the specified string, starting the search at `start` index.
 		 * @return -1 if no occurrence is found.
 		 */
-		sl_reg indexOf(const String16& str, sl_reg start = 0) const noexcept;
-		sl_reg indexOf(const sl_char16* str, sl_reg start = 0) const noexcept;
+		sl_reg indexOf(const StringParam& str, sl_reg start = 0) const noexcept;
 		
 		/**
 		 * @return the index within this string of the last occurrence of the specified character, searching backwards from `start` index.
@@ -708,8 +535,7 @@ namespace slib
 		 * @return the index within this string of the last occurrence of the specified string, searching backwards from `start` index.
 		 * @return -1 if no occurrence is found.
 		 */
-		sl_reg lastIndexOf(const String16& str, sl_reg start = -1) const noexcept;
-		sl_reg lastIndexOf(const sl_char16* str, sl_reg start = -1) const noexcept;
+		sl_reg lastIndexOf(const StringParam& str, sl_reg start = -1) const noexcept;
 		
 		/**
 		 * @return `true` if this string starts with the specified character.
@@ -719,8 +545,7 @@ namespace slib
 		/**
 		 * @return `true` if this string starts with the specified string.
 		 */
-		sl_bool startsWith(const String16& str) const noexcept;
-		sl_bool startsWith(const sl_char16* str) const noexcept;
+		sl_bool startsWith(const StringParam& str) const noexcept;
 		
 		/**
 		 * @return `true` if this string ends with the specified character.
@@ -730,8 +555,7 @@ namespace slib
 		/**
 		 * @return `true` if this string ends with the specified string.
 		 */
-		sl_bool endsWith(const String16& str) const noexcept;
-		sl_bool endsWith(const sl_char16* str) const noexcept;
+		sl_bool endsWith(const StringParam& str) const noexcept;
 		
 		/**
 		 * @return `true` if the specified character occurs within this string.
@@ -741,8 +565,7 @@ namespace slib
 		/**
 		 * @return `true` if the specified substring occurs within this string.
 		 */
-		sl_bool contains(const String16& str) const noexcept;
-		sl_bool contains(const sl_char16* str) const noexcept;
+		sl_bool contains(const StringParam& str) const noexcept;
 		
 		/**
 		 * Converts the characters of this string to uppercase.
@@ -777,10 +600,7 @@ namespace slib
 		/**
 		 * Replaces each substring of this string that matches the given `pattern` with the given `replacement`.
 		 */
-		String16 replaceAll(const String16& pattern, const String16& replacement) const noexcept;
-		String16 replaceAll(const String16& pattern, const sl_char16* replacement) const noexcept;
-		String16 replaceAll(const sl_char16* pattern, const String16& replacement) const noexcept;
-		String16 replaceAll(const sl_char16* pattern, const sl_char16* replacement) const noexcept;
+		String16 replaceAll(const StringParam& pattern, const StringParam& replacement) const noexcept;
 		
 		/**
 		 * Copy this string and then removes whitespaces from both ends of the new string.
@@ -800,26 +620,23 @@ namespace slib
 		/**
 		 * Splits this string into the list of strings by the `pattern` separator.
 		 */
-		List<String16> split(const String16& pattern) const noexcept;
-		List<String16> split(const sl_char16* pattern) const noexcept;
+		List<String16> split(const StringParam& pattern) const noexcept;
 		
 		/**
 		 * Join all strings in the list
 		 */
-		static String16 join(const String16* strings, sl_size count, const String16& delimiter) noexcept;
+		static String16 join(const String16* strings, sl_size count, const StringParam& delimiter) noexcept;
 		static String16 join(const String16* strings, sl_size count) noexcept;
-		static String16 join(const List<String16>& list, sl_size startIndex, sl_size count, const String16& delimiter) noexcept;
-		static String16 join(const List<String16>& list, sl_size startIndex, sl_size count) noexcept;
-		static String16 join(const List<String16>& list, sl_size startIndex, const String16& delimiter) noexcept;
-		static String16 join(const List<String16>& list, sl_size startIndex) noexcept;
-		static String16 join(const List<String16>& list, const String16& delimiter) noexcept;
-		static String16 join(const List<String16>& list) noexcept;
+		static String16 join(const StringParam* strings, sl_size count, const StringParam& delimiter) noexcept;
+		static String16 join(const StringParam* strings, sl_size count) noexcept;
+		static String16 join(const ListParam<String16>& list, sl_size startIndex, sl_size count, const StringParam& delimiter) noexcept;
+		static String16 join(const ListParam<String16>& list, sl_size startIndex, sl_size count) noexcept;
+		static String16 join(const ListParam<String16>& list, sl_size startIndex, const StringParam& delimiter) noexcept;
+		static String16 join(const ListParam<String16>& list, sl_size startIndex) noexcept;
+		static String16 join(const ListParam<String16>& list, const StringParam& delimiter) noexcept;
+		static String16 join(const ListParam<String16>& list) noexcept;
 		template <class... ARGS>
-		static String16 join(const String16& s, ARGS&&... args) noexcept
-		{
-			String16 params[] = {s, Forward<ARGS>(args)...};
-			return join(params, 1 + sizeof...(args));
-		}
+		static String16 join(const StringParam& s, ARGS&&... args) noexcept;
 
 	public:
 		/**
@@ -1241,20 +1058,15 @@ namespace slib
 		 * @param strFormat The buffer containing the format string, this supports the conversion specifiers, length modifiers, and flags.
 		 *
 		 */
-		static String16 format(const String16& strFormat) noexcept;
-		static String16 format(const sl_char16* strFormat) noexcept;
+		static String16 format(const StringParam& strFormat) noexcept;
 		template <class... ARGS>
-		static String16 format(const String16& strFormat, ARGS&&... args) noexcept;
+		static String16 format(const StringParam& strFormat, ARGS&&... args) noexcept;
+		static String16 formatBy(const StringParam& strFormat, const Variant* params, sl_size nParams) noexcept;
+		static String16 formatBy(const StringParam& strFormat, const ListParam<Variant>& params) noexcept;
 		template <class... ARGS>
-		static String16 format(const sl_char16* strFormat, ARGS&&... args) noexcept;
-		static String16 formatBy(const String16& strFormat, const Variant* params, sl_size nParams) noexcept;
-		static String16 formatBy(const sl_char16* strFormat, const Variant* params, sl_size nParams) noexcept;
-		template <class... ARGS>
-		static String16 format(const Locale& locale, const String16& strFormat, ARGS&&... args) noexcept;
-		template <class... ARGS>
-		static String16 format(const Locale& locale, const sl_char16* strFormat, ARGS&&... args) noexcept;
-		static String16 formatBy(const Locale& locale, const String16& strFormat, const Variant* params, sl_size nParams) noexcept;
-		static String16 formatBy(const Locale& locale, const sl_char16* strFormat, const Variant* params, sl_size nParams) noexcept;
+		static String16 format(const Locale& locale, const StringParam& strFormat, ARGS&&... args) noexcept;
+		static String16 formatBy(const Locale& locale, const StringParam& strFormat, const Variant* params, sl_size nParams) noexcept;
+		static String16 formatBy(const Locale& locale, const StringParam& strFormat, const ListParam<Variant>& params) noexcept;
 
 		/**
 		 * Formats the current string which contains conversion specifications with arbitrary list of arguments.
@@ -1263,6 +1075,7 @@ namespace slib
 		template <class... ARGS>
 		String16 arg(ARGS&&... args) const noexcept;
 		String16 argBy(const Variant* params, sl_size nParams) const noexcept;
+		String16 argBy(const ListParam<Variant>& params) const noexcept;
 
 	private:
 		void _replaceContainer(StringContainer16* container) noexcept;
@@ -1314,13 +1127,13 @@ namespace slib
 		Atomic(sl_char16 ch, sl_size nRepeatCount) noexcept;
 		
 		/**
-		 * Copies the null-terminated character sequence pointed by `str`.
+		 * Initialize string from string literal constant
 		 */
-		Atomic(const char* str) noexcept;
-		Atomic(const wchar_t* str) noexcept;
-		Atomic(const char16_t* str) noexcept;
-		Atomic(const char32_t* str) noexcept;
-		
+		Atomic(const char* sz) noexcept;
+		Atomic(const wchar_t* sz) noexcept;
+		Atomic(const char16_t* sz) noexcept;
+		Atomic(const char32_t* sz) noexcept;		
+
 		/**
 		 * Copies the first `length` characters from the array of characters pointed by `str`
 		 */
@@ -1328,7 +1141,7 @@ namespace slib
 		Atomic(const wchar_t* str, sl_reg length) noexcept;
 		Atomic(const char16_t* str, sl_reg length) noexcept;
 		Atomic(const char32_t* str, sl_reg length) noexcept;
-		
+
 #ifdef SLIB_SUPPORT_STD_TYPES
 		/**
 		 * Initialize from `std::u16string`.
@@ -1337,7 +1150,9 @@ namespace slib
 		Atomic(const std::u16string& str) noexcept;
 		Atomic(std::u16string&& str) noexcept;
 #endif
-		
+
+		Atomic(const StringParam& str) noexcept;
+
 	public:
 		/**
 		 * @return null string.
@@ -1413,108 +1228,30 @@ namespace slib
 		AtomicString16& operator=(String16&& other) noexcept;
 		AtomicString16& operator=(AtomicString16&& other) noexcept;
 		AtomicString16& operator=(sl_null_t) noexcept;
-		AtomicString16& operator=(const char* other) noexcept;
-		AtomicString16& operator=(const wchar_t* other) noexcept;
-		AtomicString16& operator=(const char16_t* other) noexcept;
-		AtomicString16& operator=(const char32_t* other) noexcept;
+		AtomicString16& operator=(const char* str) noexcept;
+		AtomicString16& operator=(const wchar_t* str) noexcept;
+		AtomicString16& operator=(const char16_t* str) noexcept;
+		AtomicString16& operator=(const char32_t* str) noexcept;
 #ifdef SLIB_SUPPORT_STD_TYPES
 		AtomicString16& operator=(const std::u16string& other) noexcept;
 		AtomicString16& operator=(std::u16string&& other) noexcept;
 #endif
-		
-		/**
-		 * Concatenate strings
-		 */
-		String16 operator+(const String16& other) const noexcept;
-		String16 operator+(const String& other) const noexcept;
-		String16 operator+(const AtomicString16& other) const noexcept;
-		String16 operator+(const AtomicString& other) const noexcept;
-		String16 operator+(const sl_char8* other) const noexcept;
-		String16 operator+(const sl_char16* other) const noexcept;
-		String16 operator+(const sl_char32* other) const noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		String16 operator+(const std::u16string& other) const noexcept;
-#endif
-		String16 operator+(sl_int32 other) const noexcept;
-		String16 operator+(sl_uint32 other) const noexcept;
-		String16 operator+(sl_int64 other) const noexcept;
-		String16 operator+(sl_uint64 other) const noexcept;
-		String16 operator+(float other) const noexcept;
-		String16 operator+(double other) const noexcept;
-		String16 operator+(sl_bool other) const noexcept;
-		
-		/**
-		 * Concatenate strings
-		 */
-		friend String16 operator+(const sl_char16* first, const AtomicString16& second) noexcept;
-		friend String16 operator+(const sl_char8* first, const AtomicString16& second) noexcept;
-		friend String16 operator+(const sl_char32* first, const AtomicString16& second) noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		friend String16 operator+(const std::u16string& first, const AtomicString16& second) noexcept;
-#endif
-		friend String16 operator+(sl_int32 first, const AtomicString16& second) noexcept;
-		friend String16 operator+(sl_uint32 first, const AtomicString16& second) noexcept;
-		friend String16 operator+(sl_int64 first, const AtomicString16& second) noexcept;
-		friend String16 operator+(sl_uint64 first, const AtomicString16& second) noexcept;
-		friend String16 operator+(float first, const AtomicString16& second) noexcept;
-		friend String16 operator+(double first, const AtomicString16& second) noexcept;
-		friend String16 operator+(sl_bool first, const AtomicString16& second) noexcept;
-		
-		/**
-		 * Append to this string
-		 */
-		AtomicString16& operator+=(const String16& other) noexcept;
-		AtomicString16& operator+=(const String& other) noexcept;
-		AtomicString16& operator+=(const AtomicString16& other) noexcept;
-		AtomicString16& operator+=(const AtomicString& other) noexcept;
-		AtomicString16& operator+=(const sl_char8* other) noexcept;
-		AtomicString16& operator+=(const sl_char16* other) noexcept;
-		AtomicString16& operator+=(const sl_char32* other) noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		AtomicString16& operator+=(const std::u16string& other) noexcept;
-#endif
-		AtomicString16& operator+=(sl_int32 other) noexcept;
-		AtomicString16& operator+=(sl_uint32 other) noexcept;
-		AtomicString16& operator+=(sl_int64 other) noexcept;
-		AtomicString16& operator+=(sl_uint64 other) noexcept;
-		AtomicString16& operator+=(float other) noexcept;
-		AtomicString16& operator+=(double other) noexcept;
-		AtomicString16& operator+=(sl_bool other) noexcept;
-		
+		AtomicString16& operator=(const StringParam& param) noexcept;
+
+		PRIV_SLIB_DECLARE_STRING_OPERATOR2(AtomicString16, String16, operator+)
+		PRIV_SLIB_DECLARE_STRING_OPERATOR1(AtomicString16&, operator+=,)
+
+		PRIV_SLIB_DECLARE_STRING_OPERATOR1(sl_bool, equals, const)
+		PRIV_SLIB_DECLARE_STRING_OPERATOR1(sl_compare_result, compare, const)
+
+		PRIV_SLIB_DECLARE_STRING_OPERATOR2(AtomicString16, sl_bool, operator==)
+		PRIV_SLIB_DECLARE_STRING_OPERATOR2(AtomicString16, sl_bool, operator!=)
+		PRIV_SLIB_DECLARE_STRING_OPERATOR2(AtomicString16, sl_bool, operator>=)
+		PRIV_SLIB_DECLARE_STRING_OPERATOR2(AtomicString16, sl_bool, operator<=)
+		PRIV_SLIB_DECLARE_STRING_OPERATOR2(AtomicString16, sl_bool, operator>)
+		PRIV_SLIB_DECLARE_STRING_OPERATOR2(AtomicString16, sl_bool, operator<)
+
 	public:
-		/**
-		 * @returns true if this string is equal to the specified string.
-		 */
-		sl_bool equals(const String16& other) const noexcept;
-		sl_bool equals(const String& other) const noexcept;
-		sl_bool equals(const AtomicString16& other) const noexcept;
-		sl_bool equals(const AtomicString& other) const noexcept;
-		sl_bool equals(const sl_char8* other) const noexcept;
-		sl_bool equals(const sl_char16* other) const noexcept;
-		sl_bool equals(const sl_char32* other) const noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		sl_bool equals(const std::u16string& other) const noexcept;
-#endif
-		
-		/**
-		 * Compares this string to the specified string.
-		 *
-		 * @return signed integral indicating the relation between the strings:
-		 * @return 0: They compare equal.
-		 * @return <0: Either the value of the first character that does not match is lower in the compared string, or all compared characters match but the compared string is shorter.
-		 * @return >0: Either the value of the first character that does not match is greater in the compared string, or all compared characters match but the compared string is longer.
-		 */
-		sl_compare_result compare(const String16& other) const noexcept;
-		sl_compare_result compare(const String& other) const noexcept;
-		sl_compare_result compare(const AtomicString16& other) const noexcept;
-		sl_compare_result compare(const AtomicString& other) const noexcept;
-		sl_compare_result compare(const sl_char8* other) const noexcept;
-		sl_compare_result compare(const sl_char16* other) const noexcept;
-		sl_compare_result compare(const sl_char32* other) const noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		sl_compare_result compare(const std::u16string& other) const noexcept;
-#endif
-		
 		/**
 		 * Compares this string to the specified string.
 		 * This functions stops searching on the index of `len-1` and returns 0.
@@ -1524,12 +1261,12 @@ namespace slib
 		 * @return <0: Either the value of the first character that does not match is lower in the compared string, or all compared characters match but the compared string is shorter.
 		 * @return >0: Either the value of the first character that does not match is greater in the compared string, or all compared characters match but the compared string is longer.
 		 */
-		sl_compare_result compare(const String16& other, sl_size len) const noexcept;
+		sl_compare_result compare(const StringParam& other, sl_size len) const noexcept;
 		
 		/**
 		 * @return true if this string is equal to the specified string ignoring the case.
 		 */
-		sl_bool equalsIgnoreCase(const String16& other) const noexcept;
+		sl_bool equalsIgnoreCase(const StringParam& other) const noexcept;
 		
 		/**
 		 * Compares this string to the specified string ignoring the case.
@@ -1539,152 +1276,7 @@ namespace slib
 		 * @return <0: Either the value of the first character that does not match is lower in the compared string, or all compared characters match but the compared string is shorter.
 		 * @return >0: Either the value of the first character that does not match is greater in the compared string, or all compared characters match but the compared string is longer.
 		 */
-		sl_compare_result compareIgnoreCase(const String16& other) const noexcept;
-		
-	public:
-		/**
-		 * Comparison Operator
-		 */
-		sl_bool operator==(const String16& other) const noexcept;
-		sl_bool operator==(const String& other) const noexcept;
-		sl_bool operator==(const AtomicString16& other) const noexcept;
-		sl_bool operator==(const AtomicString& other) const noexcept;
-		sl_bool operator==(const sl_char8* other) const noexcept;
-		sl_bool operator==(const sl_char16* other) const noexcept;
-		sl_bool operator==(const sl_char32* other) const noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		sl_bool operator==(const std::u16string& other) const noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		friend sl_bool operator==(const sl_char16* first, const AtomicString16& second) noexcept;
-		friend sl_bool operator==(const sl_char8* first, const AtomicString16& second) noexcept;
-		friend sl_bool operator==(const sl_char32* first, const AtomicString16& second) noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		friend sl_bool operator==(const std::u16string& first, const AtomicString16& second) noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		sl_bool operator!=(const String16& other) const noexcept;
-		sl_bool operator!=(const String& other) const noexcept;
-		sl_bool operator!=(const AtomicString16& other) const noexcept;
-		sl_bool operator!=(const AtomicString& other) const noexcept;
-		sl_bool operator!=(const sl_char8* other) const noexcept;
-		sl_bool operator!=(const sl_char16* other) const noexcept;
-		sl_bool operator!=(const sl_char32* other) const noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		sl_bool operator!=(const std::u16string& other) const noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		friend sl_bool operator!=(const sl_char16* first, const AtomicString16& second) noexcept;
-		friend sl_bool operator!=(const sl_char8* first, const AtomicString16& second) noexcept;
-		friend sl_bool operator!=(const sl_char32* first, const AtomicString16& second) noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		friend sl_bool operator!=(const std::u16string& first, const AtomicString16& second) noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		sl_bool operator>=(const String16& other) const noexcept;
-		sl_bool operator>=(const String& other) const noexcept;
-		sl_bool operator>=(const AtomicString16& other) const noexcept;
-		sl_bool operator>=(const AtomicString& other) const noexcept;
-		sl_bool operator>=(const sl_char8* other) const noexcept;
-		sl_bool operator>=(const sl_char16* other) const noexcept;
-		sl_bool operator>=(const sl_char32* other) const noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		sl_bool operator>=(const std::u16string& other) const noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		friend sl_bool operator>=(const sl_char16* first, const AtomicString16& second) noexcept;
-		friend sl_bool operator>=(const sl_char8* first, const AtomicString16& second) noexcept;
-		friend sl_bool operator>=(const sl_char32* first, const AtomicString16& second) noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		friend sl_bool operator>=(const std::u16string& first, const AtomicString16& second) noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		sl_bool operator<=(const String16& other) const noexcept;
-		sl_bool operator<=(const String& other) const noexcept;
-		sl_bool operator<=(const AtomicString16& other) const noexcept;
-		sl_bool operator<=(const AtomicString& other) const noexcept;
-		sl_bool operator<=(const sl_char8* other) const noexcept;
-		sl_bool operator<=(const sl_char16* other) const noexcept;
-		sl_bool operator<=(const sl_char32* other) const noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		sl_bool operator<=(const std::u16string& other) const noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		friend sl_bool operator<=(const sl_char16* first, const AtomicString16& second) noexcept;
-		friend sl_bool operator<=(const sl_char8* first, const AtomicString16& second) noexcept;
-		friend sl_bool operator<=(const sl_char32* first, const AtomicString16& second) noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		friend sl_bool operator<=(const std::u16string& first, const AtomicString16& second) noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		sl_bool operator>(const String16& other) const noexcept;
-		sl_bool operator>(const String& other) const noexcept;
-		sl_bool operator>(const AtomicString16& other) const noexcept;
-		sl_bool operator>(const AtomicString& other) const noexcept;
-		sl_bool operator>(const sl_char8* other) const noexcept;
-		sl_bool operator>(const sl_char16* other) const noexcept;
-		sl_bool operator>(const sl_char32* other) const noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		sl_bool operator>(const std::u16string& other) const noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		friend sl_bool operator>(const sl_char16* first, const AtomicString16& second) noexcept;
-		friend sl_bool operator>(const sl_char8* first, const AtomicString16& second) noexcept;
-		friend sl_bool operator>(const sl_char32* first, const AtomicString16& second) noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		friend sl_bool operator>(const std::u16string& first, const AtomicString16& second) noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		sl_bool operator<(const String16& other) const noexcept;
-		sl_bool operator<(const String& other) const noexcept;
-		sl_bool operator<(const AtomicString16& other) const noexcept;
-		sl_bool operator<(const AtomicString& other) const noexcept;
-		sl_bool operator<(const sl_char8* other) const noexcept;
-		sl_bool operator<(const sl_char16* other) const noexcept;
-		sl_bool operator<(const sl_char32* other) const noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		sl_bool operator<(const std::u16string& other) const noexcept;
-#endif
-		
-		/**
-		 * Comparison Operator
-		 */
-		friend sl_bool operator<(const sl_char16* first, const AtomicString16& second) noexcept;
-		friend sl_bool operator<(const sl_char8* first, const AtomicString16& second) noexcept;
-		friend sl_bool operator<(const sl_char32* first, const AtomicString16& second) noexcept;
-#ifdef SLIB_SUPPORT_STD_TYPES
-		friend sl_bool operator<(const std::u16string& first, const AtomicString16& second) noexcept;
-#endif
+		sl_compare_result compareIgnoreCase(const StringParam& other) const noexcept;
 		
 	public:
 		/**
@@ -1705,7 +1297,7 @@ namespace slib
 		/**
 		 * Fills Utf8 characters to the provided buffer
 		 */
-		sl_bool getUtf8(StringData& output) const noexcept;
+		sl_bool getUtf8(StringStorage& output) const noexcept;
 		
 		/**
 		 * Converts to Utf8 and Returns a Memory containing the Utf16 characters and null at last
@@ -1747,8 +1339,7 @@ namespace slib
 		 * @return the index within this string of the first occurrence of the specified string, starting the search at `start` index.
 		 * @return -1 if no occurrence is found.
 		 */
-		sl_reg indexOf(const String16& str, sl_reg start = 0) const noexcept;
-		sl_reg indexOf(const sl_char16* str, sl_reg start = 0) const noexcept;
+		sl_reg indexOf(const StringParam& str, sl_reg start = 0) const noexcept;
 		
 		/**
 		 * @return the index within this string of the last occurrence of the specified character, searching backwards from `start` index.
@@ -1760,8 +1351,7 @@ namespace slib
 		 * @return the index within this string of the last occurrence of the specified string, searching backwards from `start` index.
 		 * @return -1 if no occurrence is found.
 		 */
-		sl_reg lastIndexOf(const String16& str, sl_reg start = -1) const noexcept;
-		sl_reg lastIndexOf(const sl_char16* str, sl_reg start = -1) const noexcept;
+		sl_reg lastIndexOf(const StringParam& str, sl_reg start = -1) const noexcept;
 		
 		/**
 		 * @return `true` if this string starts with the specified character.
@@ -1771,8 +1361,7 @@ namespace slib
 		/**
 		 * @return `true` if this string starts with the specified string.
 		 */
-		sl_bool startsWith(const String16& str) const noexcept;
-		sl_bool startsWith(const sl_char16* str) const noexcept;
+		sl_bool startsWith(const StringParam& str) const noexcept;
 		
 		/**
 		 * @return `true` if this string ends with the specified character.
@@ -1782,8 +1371,7 @@ namespace slib
 		/**
 		 * @return `true` if this string ends with the specified string.
 		 */
-		sl_bool endsWith(const String16& str) const noexcept;
-		sl_bool endsWith(const sl_char16* str) const noexcept;
+		sl_bool endsWith(const StringParam& str) const noexcept;
 		
 		/**
 		 * @return `true` if the specified character occurs within this string.
@@ -1793,8 +1381,7 @@ namespace slib
 		/**
 		 * @return `true` if the specified substring occurs within this string.
 		 */
-		sl_bool contains(const String16& str) const noexcept;
-		sl_bool contains(const sl_char16* str) const noexcept;
+		sl_bool contains(const StringParam& str) const noexcept;
 		
 		/**
 		 * Converts the characters of this string to uppercase.
@@ -1819,10 +1406,7 @@ namespace slib
 		/**
 		 * Replaces each substring of this string that matches the given `pattern` with the given `replacement`.
 		 */
-		String16 replaceAll(const String16& pattern, const String16& replacement) const noexcept;
-		String16 replaceAll(const String16& pattern, const sl_char16* replacement) const noexcept;
-		String16 replaceAll(const sl_char16* pattern, const String16& replacement) const noexcept;
-		String16 replaceAll(const sl_char16* pattern, const sl_char16* replacement) const noexcept;
+		String16 replaceAll(const StringParam& pattern, const StringParam& replacement) const noexcept;
 		
 		/**
 		 * Copy this string and then removes whitespaces from both ends of the new string.
@@ -1842,8 +1426,7 @@ namespace slib
 		/**
 		 * Splits this string into the list of strings by the `pattern` separator.
 		 */
-		List<String16> split(const String16& pattern) const noexcept;
-		List<String16> split(const sl_char16* pattern) const noexcept;
+		List<String16> split(const StringParam& pattern) const noexcept;
 		
 	public:
 		/**
@@ -2047,12 +1630,12 @@ namespace slib
 		template <class... ARGS>
 		String16 arg(ARGS&&... args) const noexcept;
 		String16 argBy(const Variant* params, sl_size nParams) const noexcept;
-		
+		String16 argBy(const ListParam<Variant>& params) const noexcept;
+
 	private:
-		StringContainer16* _retainContainer() const noexcept;
-		
+		StringContainer16* _retainContainer() const noexcept;		
 		void _replaceContainer(StringContainer16* other) noexcept;
-		
+
 		friend class String16;
 	};
 	

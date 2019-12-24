@@ -135,7 +135,7 @@ namespace slib
 	{
 		jobject font = GraphicsPlatform::getNativeFont(this);
 		if (font) {	
-			JniLocal<jstring> jtext = Jni::getJniString(text.getString16());
+			JniLocal<jstring> jtext = Jni::getJniString(text);
 			JniLocal<jobject> size = JFont::measureText.callObject(font, jtext.get());
 			Size ret;
 			ret.x = JPointF::x.get(size.get());

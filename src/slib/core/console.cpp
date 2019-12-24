@@ -25,10 +25,10 @@
 namespace slib
 {
 
-	void Console::println(const String& s)
+	void Console::println(const StringParam& s)
 	{
-		SLIB_STATIC_STRING(l, "\n");
-		print(s + l);
+		SLIB_STATIC_STRING(n, "\n")
+		print(s + n);
 	}
 
 #if defined(SLIB_PLATFORM_IS_MOBILE)

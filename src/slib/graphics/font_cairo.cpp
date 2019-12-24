@@ -144,7 +144,7 @@ namespace slib
 
 	Size Font::_measureText_PO(const StringParam& _text)
 	{
-		String text = _text.getString();
+		StringData text(_text);
 		sl_size len = text.getLength();
 		if (len) {
 			StaticContext* context = GetStaticContext();

@@ -24,14 +24,14 @@ namespace slib
 {
 
 	template <class... ARGS>
-	void Log(const String& tag, const String& format, ARGS&&... args)
+	void Log(const StringParam& tag, const StringParam& format, ARGS&&... args)
 	{
 		String content = String::format(format, Forward<ARGS>(args)...);
 		Logger::logGlobal(tag, content);
 	}
 	
 	template <class... ARGS>
-	void LogError(const String& tag, const String& format, ARGS&&... args)
+	void LogError(const StringParam& tag, const StringParam& format, ARGS&&... args)
 	{
 		String content = String::format(format, Forward<ARGS>(args)...);
 		Logger::logGlobalError(tag, content);

@@ -458,14 +458,19 @@ namespace slib
 					}
 				}
 				
-				void onDrawText(const StringParam& _text, sl_real x, sl_real y, const Ref<Font>& _font, const DrawTextParam& param) override
+				void onDrawText(const StringParam& text, sl_real x, sl_real y, const Ref<Font>& _font, const DrawTextParam& param) override
 				{
-					String text = _text.getString();
-					CTFontRef font = GraphicsPlatform::getCoreTextFont(_font.get());
+					NSString* ns_text = Apple::getNSStringFromString(text);
+					if (ns_text == nil) {
+						return;
+					}
+					if (!(ns_text.length)) {
+						return;
+					}
 					
-					if (text.isNotEmpty() && font) {
+					CTFontRef font = GraphicsPlatform::getCoreTextFont(_font.get());
+					if (font) {
 						
-						NSString* ns_text = Apple::getNSStringFromString(text);
 						CFStringRef string = (__bridge CFStringRef)ns_text;
 						
 						SInt32 _underline = _font->isUnderline() ? kCTUnderlineStyleSingle: kCTUnderlineStyleNone;

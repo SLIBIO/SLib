@@ -147,7 +147,7 @@ namespace slib
 #endif
 				UErrorCode err = U_ZERO_ERROR;
 				SLIB_STATIC_STRING(strCodepagePrefix, "cp")
-				String strCodepage = strCodepagePrefix + codepage;
+				String strCodepage = strCodepagePrefix + String::fromUint32(codepage);
 				return ucnv_open(strCodepage.getData(), &err);
 			}
 			

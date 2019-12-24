@@ -174,32 +174,12 @@ namespace slib
 		set(comps, zone);
 	}
 
-	Time::Time(const String& str, const TimeZone& zone) noexcept
+	Time::Time(const StringParam& str) noexcept
 	{
-		setString(str, zone);
+		setString(str, TimeZone::Local);
 	}
 
-	Time::Time(const String16& str, const TimeZone& zone) noexcept
-	{
-		setString(str, zone);
-	}
-
-	Time::Time(const AtomicString& str, const TimeZone& zone) noexcept
-	{
-		setString(str, zone);
-	}
-
-	Time::Time(const AtomicString16& str, const TimeZone& zone) noexcept
-	{
-		setString(str, zone);
-	}
-
-	Time::Time(const sl_char8* str, const TimeZone& zone) noexcept
-	{
-		setString(str, zone);
-	}
-
-	Time::Time(const sl_char16* str, const TimeZone& zone) noexcept
+	Time::Time(const StringParam& str, const TimeZone& zone) noexcept
 	{
 		setString(str, zone);
 	}
@@ -1976,37 +1956,12 @@ namespace slib
 		return format(fmt, TimeZone::Local, locale);
 	}
 
-	String Time::format(const String& fmt, const Locale& locale) const noexcept
+	String Time::format(const StringParam& fmt, const Locale& locale) const noexcept
 	{
 		return String::format(locale, fmt, *this);
 	}
 
-	String Time::format(const AtomicString& fmt, const Locale& locale) const noexcept
-	{
-		return String::format(locale, fmt, *this);
-	}
-
-	String Time::format(const String16& fmt, const Locale& locale) const noexcept
-	{
-		return String16::format(locale, fmt, *this);
-	}
-
-	String Time::format(const AtomicString16& fmt, const Locale& locale) const noexcept
-	{
-		return String16::format(locale, fmt, *this);
-	}
-
-	String Time::format(const sl_char8* fmt, const Locale& locale) const noexcept
-	{
-		return String::format(locale, fmt, *this);
-	}
-
-	String Time::format(const sl_char16* fmt, const Locale& locale) const noexcept
-	{
-		return String16::format(locale, fmt, *this);
-	}
-
-	sl_bool Time::setString(const String& str, const TimeZone& zone) noexcept
+	sl_bool Time::setString(const StringParam& str, const TimeZone& zone) noexcept
 	{
 		if (parse(str, zone)) {
 			return sl_true;
@@ -2016,56 +1971,6 @@ namespace slib
 		}
 	}
 	
-	sl_bool Time::setString(const String16& str, const TimeZone& zone) noexcept
-	{
-		if (parse(str, zone)) {
-			return sl_true;
-		} else {
-			setZero();
-			return sl_false;
-		}
-	}
-	
-	sl_bool Time::setString(const AtomicString& str, const TimeZone& zone) noexcept
-	{
-		if (parse(str, zone)) {
-			return sl_true;
-		} else {
-			setZero();
-			return sl_false;
-		}
-	}
-	
-	sl_bool Time::setString(const AtomicString16& str, const TimeZone& zone) noexcept
-	{
-		if (parse(str, zone)) {
-			return sl_true;
-		} else {
-			setZero();
-			return sl_false;
-		}
-	}
-	
-	sl_bool Time::setString(const sl_char8* str, const TimeZone& zone) noexcept
-	{
-		if (parse(str, zone)) {
-			return sl_true;
-		} else {
-			setZero();
-			return sl_false;
-		}
-	}
-	
-	sl_bool Time::setString(const sl_char16* str, const TimeZone& zone) noexcept
-	{
-		if (parse(str, zone)) {
-			return sl_true;
-		} else {
-			setZero();
-			return sl_false;
-		}
-	}
-
 	namespace priv
 	{
 		namespace time
@@ -2238,37 +2143,7 @@ namespace slib
 		return priv::time::Parse(_out, zone, sz, posBegin, posEnd);
 	}
 
-	Time& Time::operator=(const String& time) noexcept
-	{
-		setString(time);
-		return *this;
-	}
-
-	Time& Time::operator=(const String16& time) noexcept
-	{
-		setString(time);
-		return *this;
-	}
-
-	Time& Time::operator=(const AtomicString& time) noexcept
-	{
-		setString(time);
-		return *this;
-	}
-
-	Time& Time::operator=(const AtomicString16& time) noexcept
-	{
-		setString(time);
-		return *this;
-	}
-
-	Time& Time::operator=(const sl_char8* time) noexcept
-	{
-		setString(time);
-		return *this;
-	}
-
-	Time& Time::operator=(const sl_char16* time) noexcept
+	Time& Time::operator=(const StringParam& time) noexcept
 	{
 		setString(time);
 		return *this;

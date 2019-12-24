@@ -372,8 +372,9 @@ namespace slib
 
 				void onDrawText(const StringParam& _text, sl_real x, sl_real y, const Ref<Font>& font, const DrawTextParam& param) override
 				{
-					String16 text = _text.getString16();
-					if (text.isNotEmpty()) {
+					StringData16 text(_text);
+					sl_size lenText = text.getLength();
+					if (lenText) {
 						Gdiplus::Graphics* graphics = m_graphics;
 						Gdiplus::Font* pf = GraphicsPlatform::getGdiplusFont(font.get());
 						if (pf) {
@@ -393,7 +394,7 @@ namespace slib
 								Gdiplus::GraphicsPath path;
 								Gdiplus::FontFamily family;
 								pf->GetFamily(&family);
-								path.AddString((const WCHAR*)(text.getData()), (INT)(text.getLength()),
+								path.AddString((const WCHAR*)(text.getData()), (INT)(lenText),
 									&family, pf->GetStyle(), pf->GetSize(),
 									Gdiplus::PointF((Gdiplus::REAL)(x), (Gdiplus::REAL)(y + 1)),
 									Gdiplus::StringFormat::GenericTypographic());
@@ -419,7 +420,7 @@ namespace slib
 								graphics->FillPath(&brushText, &path);
 							} else {
 								Gdiplus::SolidBrush brush(Gdiplus::Color((BYTE)a, param.color.r, param.color.g, param.color.b));
-								graphics->DrawString((const WCHAR*)(text.getData()), (INT)(text.getLength()),
+								graphics->DrawString((const WCHAR*)(text.getData()), (INT)(lenText),
 									pf,
 									Gdiplus::PointF((Gdiplus::REAL)(x), (Gdiplus::REAL)(y + 1)),
 									Gdiplus::StringFormat::GenericTypographic(),

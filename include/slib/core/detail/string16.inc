@@ -50,6 +50,12 @@ namespace slib
 		src.m_container = sl_null;
 	}
 	
+	template <sl_size N>
+	SLIB_INLINE String16 String16::fromStatic(const sl_char16 (&str)[N]) noexcept
+	{
+		return fromStatic(str, N - 1);
+	}
+
 	SLIB_INLINE const String16& String16::null() noexcept
 	{
 		return *(reinterpret_cast<String16 const*>(&(priv::string::g_null16)));
@@ -125,6 +131,25 @@ namespace slib
 		}
 	}
 
+	PRIV_SLIB_DEFINE_STRING_OPERATOR2(String16, String16, operator+, PlusOperator, String16, const String16&)
+
+	template <class CHAR, sl_size N>
+	SLIB_INLINE String16& String16::operator+=(CHAR (&other)[N]) noexcept
+	{
+		*this = priv::string::OperatorHelper< String16, priv::string::PlusOperator<String16> >::call(*this, other);
+		return *this;
+	}
+
+	template <class ARG>
+	SLIB_INLINE String16& String16::operator+=(const ARG& other) noexcept
+	{
+		*this = priv::string::OperatorHelper< String16, priv::string::PlusOperator<String16> >::call(*this, other);
+		return *this;
+	}
+
+	PRIV_SLIB_DEFINE_STRING_OPERATOR1(String16, sl_bool, equals, EqualsOperator, String16, const String16&)
+	PRIV_SLIB_DEFINE_STRING_OPERATOR1(String16, sl_compare_result, compare, CompareOperator, String16, const String16&)
+
 
 	SLIB_INLINE AtomicString16::Atomic(AtomicString16&& src) noexcept
 	{
@@ -157,5 +182,26 @@ namespace slib
 	{
 		return m_container != sl_null;
 	}
+
+	PRIV_SLIB_DEFINE_STRING_OPERATOR2(AtomicString16, String16, operator+, PlusOperator, String16, String16)
+
+	template <class CHAR, sl_size N>
+	SLIB_INLINE AtomicString16& AtomicString16::operator+=(CHAR (&other)[N]) noexcept
+	{
+		String16 str(*this);
+		*this = priv::string::OperatorHelper< String16, priv::string::PlusOperator<String16> >::call(str, other);
+		return *this;
+	}
+
+	template <class ARG>
+	SLIB_INLINE AtomicString16& AtomicString16::operator+=(const ARG& other) noexcept
+	{
+		String16 str(*this);
+		*this = priv::string::OperatorHelper< String16, priv::string::PlusOperator<String16> >::call(str, other);
+		return *this;
+	}
+
+	PRIV_SLIB_DEFINE_STRING_OPERATOR1(AtomicString16, sl_bool, equals, EqualsOperator, String16, String16)
+	PRIV_SLIB_DEFINE_STRING_OPERATOR1(AtomicString16, sl_compare_result, compare, CompareOperator, String16, String16)
 
 }

@@ -110,7 +110,7 @@ namespace slib
 				return Ref<SAppMenuResourceItem>::null();
 			}
 		} else {
-			if (name == 'root') {
+			if (name == "root") {
 				_logError(element, g_str_error_resource_menu_name_is_root);
 				return Ref<SAppMenuResourceItem>::null();
 			}

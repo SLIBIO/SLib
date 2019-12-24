@@ -24,28 +24,28 @@ namespace slib
 {
 
 	template <class... ARGS>
-	void Console::print(const String& format, ARGS&&... args)
+	void Console::print(const StringParam& format, ARGS&&... args)
 	{
 		String content = String::format(format, args...);
 		print(content);
 	}
 
 	template <class... ARGS>
-	void Console::println(const String& format, ARGS&&... args)
+	void Console::println(const StringParam& format, ARGS&&... args)
 	{
 		String content = String::format(format, args...);
 		println(content);
 	}
 
 	template <class... ARGS>
-	void Printf(const String& format, ARGS&&... args)
+	void Printf(const StringParam& format, ARGS&&... args)
 	{
 		String content = String::format(format, args...);
 		Console::print(content);
 	}
 
 	template <class... ARGS>
-	void Println(const String& format, ARGS&&... args)
+	void Println(const StringParam& format, ARGS&&... args)
 	{
 		String content = String::format(format, args...);
 		Console::println(content);

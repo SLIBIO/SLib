@@ -45,9 +45,9 @@ namespace slib
 		~Logger();
 
 	public:
-		virtual void log(const String& tag, const String& content) = 0;
+		virtual void log(const StringParam& tag, const StringParam& content) = 0;
 
-		virtual void logError(const String& tag, const String& content);
+		virtual void logError(const StringParam& tag, const StringParam& content);
 	
 	public:
 		static Ref<LoggerSet> global();
@@ -56,9 +56,9 @@ namespace slib
 
 		static Ref<Logger> createFileLogger(const String& fileNameFormat);
 
-		static void logGlobal(const String& tag, const String& content);
+		static void logGlobal(const StringParam& tag, const StringParam& content);
 
-		static void logGlobalError(const String& tag, const String& content);
+		static void logGlobalError(const StringParam& tag, const StringParam& content);
 	
 	};
 	
@@ -72,7 +72,7 @@ namespace slib
 		~FileLogger();
 	
 	public:
-		void log(const String& tag, const String& content) override;
+		void log(const StringParam& tag, const StringParam& content) override;
 	
 		virtual String getFileName();
 		
@@ -109,9 +109,9 @@ namespace slib
 		void setErrorLogger(const Ref<Logger>& logger);
 		
 	public:
-		void log(const String& tag, const String& content) override;
+		void log(const StringParam& tag, const StringParam& content) override;
 
-		void logError(const String& tag, const String& content) override;
+		void logError(const StringParam& tag, const StringParam& content) override;
 
 	protected:
 		CList< Ref<Logger> > m_listLoggers;
@@ -120,10 +120,10 @@ namespace slib
 	};
 
 	template <class... ARGS>
-	void Log(const String& tag, const String& format, ARGS&&... args);
+	void Log(const StringParam& tag, const StringParam& format, ARGS&&... args);
 	
 	template <class... ARGS>
-	void LogError(const String& tag, const String& format, ARGS&&... args);
+	void LogError(const StringParam& tag, const StringParam& format, ARGS&&... args);
 
 	
 }

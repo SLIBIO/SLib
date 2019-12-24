@@ -50,7 +50,7 @@ namespace slib
 		if (arr != nil && arr.count > 0) {
 			NSString* s = arr[0];
 			Locale locale;
-			if (locale.parse(s.UTF8String)) {
+			if (locale.parse(StringParam(s.UTF8String, -1))) {
 				return locale;
 			}
 		}

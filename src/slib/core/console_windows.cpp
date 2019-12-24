@@ -33,9 +33,9 @@
 namespace slib
 {
 
-	void Console::print(const String& _s)
+	void Console::print(const StringParam& _s)
 	{
-		String16 s = _s;
+		StringData16 s = _s;
 #if defined(SLIB_PLATFORM_IS_WIN32)
 		wprintf(L"%s", (LPCWSTR)(s.getData()));
 #endif

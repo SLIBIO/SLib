@@ -59,7 +59,7 @@ namespace slib
 		if (len == 0) {
 			return sl_true;
 		}
-		StringData data;
+		StringStorage data;
 		data.sz8 = str.getData();
 		data.len = len;
 		data.str8 = str;
@@ -76,7 +76,7 @@ namespace slib
 		if (len == 0) {
 			return sl_true;
 		}
-		StringData data;
+		StringStorage data;
 		data.sz16 = str.getData();
 		data.len = len;
 		data.str16 = str;
@@ -87,7 +87,7 @@ namespace slib
 		return sl_false;
 	}
 	
-	sl_bool StringBuffer::add(const StringData& data) noexcept
+	sl_bool StringBuffer::add(const StringStorage& data) noexcept
 	{
 		sl_size len = data.len;
 		if (len == 0) {
@@ -102,7 +102,7 @@ namespace slib
 		return sl_false;
 	}
 	
-	sl_bool StringBuffer16::add(const StringData& data) noexcept
+	sl_bool StringBuffer16::add(const StringStorage& data) noexcept
 	{
 		sl_size len = data.len;
 		if (len == 0) {
@@ -119,7 +119,10 @@ namespace slib
 	
 	sl_bool StringBuffer::addStatic(const sl_char8* buf, sl_size length) noexcept
 	{
-		StringData data;
+		if (!length) {
+			return sl_true;
+		}
+		StringStorage data;
 		data.sz8 = buf;
 		data.len = length;
 		return add(data);
@@ -127,7 +130,10 @@ namespace slib
 
 	sl_bool StringBuffer16::addStatic(const sl_char16* buf, sl_size length) noexcept
 	{
-		StringData data;
+		if (!length) {
+			return sl_true;
+		}
+		StringStorage data;
 		data.sz16 = buf;
 		data.len = length;
 		return add(data);
@@ -164,15 +170,15 @@ namespace slib
 		if (m_queue.getCount() == 0) {
 			return String::getEmpty();
 		}
-		Link<StringData>* front = m_queue.getFront();
+		Link<StringStorage>* front = m_queue.getFront();
 		sl_size total = m_len;
 		String ret = String::allocate(total);
 		if (ret.isNotEmpty()) {
 			sl_char8* buf = (sl_char8*)(ret.getData());
 			sl_size offset = 0;
-			Link<StringData>* item = front;
+			Link<StringStorage>* item = front;
 			while (item) {
-				StringData& s = item->value;
+				StringStorage& s = item->value;
 				sl_size t = s.len;
 				if (offset + t > total) {
 					Base::copyMemory(buf + offset, s.sz8, total - offset);
@@ -191,15 +197,15 @@ namespace slib
 		if (m_queue.getCount() == 0) {
 			return String16::getEmpty();
 		}
-		Link<StringData>* front = m_queue.getFront();
+		Link<StringStorage>* front = m_queue.getFront();
 		sl_size total = m_len;
 		String16 ret = String16::allocate(total);
 		if (ret.isNotEmpty()) {
 			sl_char16* buf = (sl_char16*)(ret.getData());
 			sl_size offset = 0;
-			Link<StringData>* item = front;
+			Link<StringStorage>* item = front;
 			while (item) {
-				StringData& s = item->value;
+				StringStorage& s = item->value;
 				sl_size t = s.len;
 				if (offset + t > total) {
 					Base::copyMemory(buf + offset, s.sz16, (total - offset) << 1);
@@ -218,15 +224,15 @@ namespace slib
 		if (m_queue.getCount() == 0) {
 			return sl_null;
 		}
-		Link<StringData>* front = m_queue.getFront();
+		Link<StringStorage>* front = m_queue.getFront();
 		sl_size total = m_len;
 		Memory ret = Memory::create(total);
 		if (ret.isNotNull()) {
 			sl_char8* buf = (sl_char8*)(ret.getData());
 			sl_size offset = 0;
-			Link<StringData>* item = front;
+			Link<StringStorage>* item = front;
 			while (item) {
-				StringData& s = item->value;
+				StringStorage& s = item->value;
 				sl_size t = s.len;
 				Base::copyMemory(buf + offset, s.sz8, t);
 				offset += t;
@@ -241,15 +247,15 @@ namespace slib
 		if (m_queue.getCount() == 0) {
 			return sl_null;
 		}
-		Link<StringData>* front = m_queue.getFront();
+		Link<StringStorage>* front = m_queue.getFront();
 		sl_size total = m_len;
 		Memory ret = Memory::create(total * 2);
 		if (ret.isNotNull()) {
 			sl_char16* buf = (sl_char16*)(ret.getData());
 			sl_size offset = 0;
-			Link<StringData>* item = front;
+			Link<StringStorage>* item = front;
 			while (item) {
-				StringData& s = item->value;
+				StringStorage& s = item->value;
 				sl_size t = s.len;
 				Base::copyMemory(buf + offset, s.sz16, t * 2);
 				offset += t;

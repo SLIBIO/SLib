@@ -455,7 +455,7 @@ namespace slib
 				void onDrawText(const StringParam& _text, sl_real x, sl_real y, const Ref<Font>& _font, const DrawTextParam& param) override
 				{
 
-					String text = _text.getString();
+					StringData text(_text);
 					sl_size len = text.getLength();
 
 					if (len) {
@@ -502,7 +502,7 @@ namespace slib
 							}
 							
 							if (_font->isStrikeout() || _font->isUnderline()) {
-								sl_real width = _font->measureText(text).x;
+								sl_real width = _font->measureText(StringParam(text.data, len)).x;
 								if (_font->isUnderline()) {
 									sl_real yLine = y;
 									cairo_move_to(m_graphics, 0, yLine);

@@ -157,7 +157,7 @@ namespace slib
 				sl_real fontSize = SLIB_FONT_SIZE_PRECISION_APPLY(font->getSize());
 				sl_bool fontBold = font->isBold();
 				String sig = fontFamily;
-				sig += (int)(fontSize * SLIB_FONT_SIZE_PRECISION_MULTIPLIER);
+				sig += String::fromUint32((sl_uint32)(fontSize * SLIB_FONT_SIZE_PRECISION_MULTIPLIER));
 				if (fontBold) {
 					sig += "B";
 				}
@@ -215,8 +215,9 @@ namespace slib
 		return Size::zero();
 	}
 
-	Size FontAtlas::measureText(const String16& str, sl_bool flagMultiLine)
+	Size FontAtlas::measureText(const StringParam& _str, sl_bool flagMultiLine)
 	{
+		StringData16 str(_str);
 		if (str.isEmpty()) {
 			return Size::zero();
 		}

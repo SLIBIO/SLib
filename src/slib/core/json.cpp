@@ -410,7 +410,12 @@ namespace slib
 				if (first == '"' || first == '\'') {
 					sl_size m = 0;
 					sl_bool f = sl_false;
-					ST str = ParseUtil::parseBackslashEscapes(buf + pos, len - pos, &m, &f);
+					ST str;
+					if (sizeof(CT) == 1) {
+						str = ParseUtil::parseBackslashEscapes(StringParam(buf + pos, len - pos), &m, &f);
+					} else {
+						str = ParseUtil::parseBackslashEscapes16(StringParam(buf + pos, len - pos), &m, &f);
+					}
 					pos += m;
 					if (f) {
 						flagError = sl_true;
@@ -519,7 +524,11 @@ namespace slib
 						} else if (ch == '"' || ch == '\'') {
 							sl_size m = 0;
 							sl_bool f = sl_false;
-							key = ParseUtil::parseBackslashEscapes(buf + pos, len - pos, &m, &f);
+							if (sizeof(CT) == 1) {
+								key = ParseUtil::parseBackslashEscapes(StringParam(buf + pos, len - pos), &m, &f);
+							} else {
+								key = ParseUtil::parseBackslashEscapes16(StringParam(buf + pos, len - pos), &m, &f);
+							}							
 							pos += m;
 							if (f) {
 								flagError = sl_true;
@@ -653,7 +662,7 @@ namespace slib
 				param.flagError = sl_true;
 				param.errorPosition = parser.pos;
 				param.errorMessage = parser.errorMessage;
-				param.errorLine = ParseUtil::countLineNumber(buf, parser.pos, &(param.errorColumn));
+				param.errorLine = ParseUtil::countLineNumber(StringParam(buf, len), parser.pos, &(param.errorColumn));
 				
 				if (param.flagLogError) {
 					LogError("Json", param.getErrorText());

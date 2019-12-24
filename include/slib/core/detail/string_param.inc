@@ -30,7 +30,7 @@ namespace slib
 			struct ConstContainer
 			{
 				sl_size value;
-				StringType type;
+				sl_size length;
 			};
 
 			extern const ConstContainer g_undefined;
@@ -48,29 +48,51 @@ namespace slib
 		return *(reinterpret_cast<StringParam const*>(&(priv::string_param::g_null)));
 	}
 	
-	SLIB_INLINE StringType StringParam::getType() const noexcept
+	template <sl_size N>
+	StringParam StringParam::literal(const sl_char8 (&s)[N]) noexcept
 	{
-		return _type;
+		return StringParam(s, N-1);
 	}
-
+	
+	template <sl_size N>
+	StringParam StringParam::literal(const sl_char16 (&s)[N]) noexcept
+	{
+		return StringParam(s, N-1);
+	}
+	
 	SLIB_INLINE sl_bool StringParam::isUndefined() const noexcept
 	{
-		return _type == StringType::Null && _value == 0;
+		return (!_value) && (!_length);
 	}
 
 	SLIB_INLINE sl_bool StringParam::isNotUndefined() const noexcept
 	{
-		return _type != StringType::Null || _value != 0;
+		return _value || _length;
 	}
 
 	SLIB_INLINE sl_bool StringParam::isNull() const noexcept
 	{
-		return _type == StringType::Null;
+		return !_value;
 	}
 	
 	SLIB_INLINE sl_bool StringParam::isNotNull() const noexcept
 	{
-		return _type != StringType::Null;
+		return _value != 0;
 	}
 	
+
+	template <class... ARGS>
+	String String::join(const StringParam& s, ARGS&&... args) noexcept
+	{
+		StringParam params[] = {s, Forward<ARGS>(args)...};
+		return join(params, 1 + sizeof...(args));
+	}
+
+	template <class... ARGS>
+	String16 String16::join(const StringParam& s, ARGS&&... args) noexcept
+	{
+		StringParam params[] = {s, Forward<ARGS>(args)...};
+		return join(params, 1 + sizeof...(args));
+	}
+
 }

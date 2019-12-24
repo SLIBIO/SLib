@@ -1338,9 +1338,9 @@ namespace slib
 				break;
 		}
 		if (error > SocketError::Unknown) {
-			return String("Unknown System Error: ") + ((sl_uint32)error - (sl_uint32)(SocketError::Unknown));
+			return "Unknown System Error: " + String::fromUint32((sl_uint32)error - (sl_uint32)(SocketError::Unknown));
 		}
-		return String("Not Defined Error: ") + (sl_uint32)error;
+		return "Not Defined Error: " + String::fromUint32((sl_uint32)error);
 	}
 
 	void Socket::clearError()

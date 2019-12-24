@@ -470,7 +470,7 @@ namespace slib
 	{
 	public:
 		// read & write
-		StringData source;
+		StringStorage source;
 
 		sl_uint32 characterSize;
 

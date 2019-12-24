@@ -846,12 +846,24 @@ namespace slib
 		}
 	}
 
-	jstring Jni::getJniString(const String16& str)
+	jstring Jni::getJniString(const StringParam& _str)
 	{
-		if (str.isNotNull()) {
+		if (_str.isNotNull()) {
+			StringData16 str(_str);
 			JNIEnv* env = Jni::getCurrent();
 			if (env) {
-				return env->NewString((jchar*)(str.getData()), str.getLength());
+				return env->NewString((jchar*)(str.data), (jsize)(str.getLength()));
+			}
+		}
+		return sl_null;
+	}
+
+	jstring Jni::getJniString(const sl_char16* str, sl_size length)
+	{
+		if (str) {
+			JNIEnv* env = Jni::getCurrent();
+			if (env) {
+				return env->NewString((jchar*)(str), (jsize)(length));
 			}
 		}
 		return sl_null;

@@ -48,7 +48,7 @@ namespace slib
 	{
 	}
 
-	void Logger::logError(const String& tag, const String& content)
+	void Logger::logError(const StringParam& tag, const StringParam& content)
 	{
 		log(tag, content);
 	}
@@ -57,7 +57,7 @@ namespace slib
 	{
 		namespace log
 		{
-			static String getLineString(const String& tag, const String& content)
+			static String getLineString(const StringParam& tag, const StringParam& content)
 			{
 				return String::format("%s [%s] %s", Time::now(), tag, content);
 			}
@@ -77,7 +77,7 @@ namespace slib
 	{
 	}
 
-	void FileLogger::log(const String& tag, const String& content)
+	void FileLogger::log(const StringParam& tag, const StringParam& content)
 	{
 		String fileName = getFileName();
 		if (fileName.isEmpty()) {
@@ -101,12 +101,16 @@ namespace slib
 		SLIB_INLINE ConsoleLogger() {}
 
 	public:
-		void log(const String& tag, const String& content) override
+		void log(const StringParam& _tag, const StringParam& _content) override
 		{
 #if defined(SLIB_PLATFORM_IS_ANDROID)
+			StringData tag(_tag);
+			StringData content(_content);
 			ObjectLocker lock(this);
 			__android_log_print(ANDROID_LOG_INFO, tag.getData(), "%s", content.getData());
 #elif defined(SLIB_PLATFORM_IS_TIZEN)
+			StringData tag(_tag);
+			StringData content(_content);
 			ObjectLocker lock(this);
 			if (content.isNotEmpty()) {
 				::dlog_print(DLOG_INFO, tag.getData(), "%s", content.getData());
@@ -114,17 +118,21 @@ namespace slib
 				::dlog_print(DLOG_INFO, tag.getData(), " ");
 			}
 #else
-			String s = priv::log::getLineString(tag, content);
+			String s = priv::log::getLineString(_tag, _content);
 			Console::println(s);
 #endif
 		}
 
-		void logError(const String& tag, const String& content) override
+		void logError(const StringParam& _tag, const StringParam& _content) override
 		{
 #if defined(SLIB_PLATFORM_IS_ANDROID)
+			StringData tag(_tag);
+			StringData content(_content);
 			ObjectLocker lock(this);
 			__android_log_print(ANDROID_LOG_ERROR, tag.getData(), "%s", content.getData());
 #elif defined(SLIB_PLATFORM_IS_TIZEN)
+			StringData tag(_tag);
+			StringData content(_content);
 			ObjectLocker lock(this);
 			if (content.isNotEmpty()) {
 				::dlog_print(DLOG_ERROR, tag.getData(), "%s", content.getData());
@@ -132,7 +140,7 @@ namespace slib
 				::dlog_print(DLOG_ERROR, tag.getData(), " ");
 			}
 #else
-			log(tag, content);
+			log(_tag, _content);
 #endif
 		}
 	};
@@ -196,7 +204,7 @@ namespace slib
 	}
 
 
-	void LoggerSet::log(const String& tag, const String& content)
+	void LoggerSet::log(const StringParam& tag, const StringParam& content)
 	{
 		ListLocker< Ref<Logger> > list(m_listLoggers);
 		for (sl_size i = 0; i < list.count; i++) {
@@ -204,7 +212,7 @@ namespace slib
 		}
 	}
 
-	void LoggerSet::logError(const String& tag, const String& content)
+	void LoggerSet::logError(const StringParam& tag, const StringParam& content)
 	{
 		ListLocker< Ref<Logger> > list(m_listErrorLoggers);
 		for (sl_size i = 0; i < list.count; i++) {
@@ -236,7 +244,7 @@ namespace slib
 		return new FileLogger(fileNameFormat);
 	}
 
-	void Logger::logGlobal(const String& tag, const String& content)
+	void Logger::logGlobal(const StringParam& tag, const StringParam& content)
 	{
 		Ref<LoggerSet> log = global();
 		if (log.isNotNull()) {
@@ -244,7 +252,7 @@ namespace slib
 		}
 	}
 
-	void Logger::logGlobalError(const String& tag, const String& content)
+	void Logger::logGlobalError(const StringParam& tag, const StringParam& content)
 	{
 		Ref<LoggerSet> log = global();
 		if (log.isNotNull()) {

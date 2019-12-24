@@ -3639,8 +3639,12 @@ namespace slib
 	template <class T>
 	SLIB_INLINE ListParam<T>::ListParam(const List<T>& _list) noexcept
 	{
-		m_count = TYPE_LIST;
-		new (reinterpret_cast<List<T>*>(&m_data)) List<T>(_list);
+		m_data = (void*)(_list.ref._ptr);
+		if (m_data) {
+			m_count = TYPE_LIST_REF;
+		} else {
+			m_count = 0;
+		}
 	}
 
 	template <class T>
@@ -3735,8 +3739,12 @@ namespace slib
 	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(const List<T>& _list) noexcept
 	{
 		_free();
-		m_count = TYPE_LIST;
-		new (reinterpret_cast<List<T>*>(&m_data)) List<T>(_list);
+		m_data = (void*)(_list.ref._ptr);
+		if (m_data) {
+			m_count = TYPE_LIST_REF;
+		} else {
+			m_count = 0;
+		}
 		return *this;
 	}
 
@@ -3796,7 +3804,7 @@ namespace slib
 	{
 		if (m_count == (sl_size)TYPE_LIST) {
 			return (reinterpret_cast<const List<T>*>(&m_data))->getCount();
-		} else if (m_count == (sl_size)TYPE_OBJECT) {
+		} else if (m_count == (sl_size)TYPE_LIST_REF || m_count == (sl_size)TYPE_OBJECT) {
 			return ((CList<T>*)m_data)->getCount();
 		} else {
 			return m_count;
@@ -3808,7 +3816,7 @@ namespace slib
 	{
 		if (m_count == (sl_size)TYPE_LIST) {
 			return (reinterpret_cast<const List<T>*>(&m_data))->getData();
-		} else if (m_count == (sl_size)TYPE_OBJECT) {
+		} else if (m_count == (sl_size)TYPE_LIST_REF || m_count == (sl_size)TYPE_OBJECT) {
 			return ((CList<T>*)m_data)->getData();
 		} else {
 			return (T*)m_data;
@@ -3820,7 +3828,7 @@ namespace slib
 	{
 		if (m_count == (sl_size)TYPE_LIST) {
 			return (reinterpret_cast<const List<T>*>(&m_data))->ref._ptr;
-		} else if (m_count == (sl_size)TYPE_OBJECT) {
+		} else if (m_count == (sl_size)TYPE_LIST_REF || m_count == (sl_size)TYPE_OBJECT) {
 			return (CList<T>*)m_data;
 		} else {
 			return sl_null;
@@ -3832,6 +3840,8 @@ namespace slib
 	{
 		if (m_count == (sl_size)TYPE_LIST) {
 			return *(reinterpret_cast<const List<T>*>(&m_data));
+		} else if (m_count == (sl_size)TYPE_LIST_REF) {
+			return (CList<T>*)m_data;
 		} else if (m_count == (sl_size)TYPE_OBJECT) {
 			return ((CList<T>*)m_data)->duplicate();
 		} else {
@@ -3845,7 +3855,7 @@ namespace slib
 	{
 		if (m_count == (sl_size)TYPE_LIST) {
 			return (reinterpret_cast<List<T>*>(&m_data))->add_NoLock(Forward<ARGS>(args)...);
-		} else if (m_count == (sl_size)TYPE_OBJECT) {
+		} else if (m_count == (sl_size)TYPE_LIST_REF || m_count == (sl_size)TYPE_OBJECT) {
 			return ((CList<T>*)m_data)->add_NoLock(Forward<ARGS>(args)...);
 		} else {
 			if (m_count) {

@@ -707,9 +707,9 @@ namespace slib
 		m_timeLastDebugText = now;
 		
 		text += " Vertices: ";
-		text += m_nCountDrawnElementsOnLastScene;
+		text += String::fromUint32(m_nCountDrawnElementsOnLastScene);
 		text += " Primitives: ";
-		text += m_nCountDrawnPrimitivesOnLastScene;
+		text += String::fromUint32(m_nCountDrawnPrimitivesOnLastScene);
 		Size size = Size::zero();
 		bitmap->resetPixels(Color(0, 0, 0, 150));
 		{

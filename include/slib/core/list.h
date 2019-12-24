@@ -1018,7 +1018,8 @@ namespace slib
 
 		enum TYPE : sl_size {
 			TYPE_LIST = (sl_size)-1,
-			TYPE_OBJECT = (sl_size)-2
+			TYPE_LIST_REF = (sl_size)-2,
+			TYPE_OBJECT = (sl_size)-3
 		};
 
 		friend class ListLocker<T>;

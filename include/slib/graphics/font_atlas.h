@@ -87,7 +87,7 @@ namespace slib
 
 		Size getFontSize_NoLock(sl_char32 ch);
 
-		Size measureText(const String16& text, sl_bool flagMultiLine = sl_false);
+		Size measureText(const StringParam& text, sl_bool flagMultiLine = sl_false);
 	
 		void removeAll();
 

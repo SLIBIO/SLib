@@ -33,15 +33,15 @@ namespace slib
 	class SLIB_EXPORT Console
 	{
 	public:
-		static void print(const String& s);
+		static void print(const StringParam& s);
 
 		template <class... ARGS>
-		static void print(const String& format, ARGS&&... args);
+		static void print(const StringParam& format, ARGS&&... args);
 	
-		static void println(const String& s);
+		static void println(const StringParam& s);
 
 		template <class... ARGS>
-		static void println(const String& format, ARGS&&... args);
+		static void println(const StringParam& format, ARGS&&... args);
 	
 		static String readLine();
 
@@ -50,10 +50,10 @@ namespace slib
 	};
 	
 	template <class... ARGS>
-	void Printf(const String& format, ARGS&&... args);
+	void Printf(const StringParam& format, ARGS&&... args);
 	
 	template <class... ARGS>
-	void Println(const String& format, ARGS&&... args);
+	void Println(const StringParam& format, ARGS&&... args);
 	
 }
 

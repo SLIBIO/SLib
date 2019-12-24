@@ -151,18 +151,18 @@ namespace slib
 					}
 					
 					if (bufVertexShader) {
-						bufVBHeader.add(SLIB_STRINGIFY(
+						bufVBHeader.addStatic(SLIB_STRINGIFY(
 													   uniform mat3 u_Transform;
 													   attribute vec2 a_Position;
 													   ));
-						bufVBContent.add("void main() {");
-						bufVBContent.add(SLIB_STRINGIFY(
+						bufVBContent.addStatic("void main() {");
+						bufVBContent.addStatic(SLIB_STRINGIFY(
 														gl_Position = vec4((vec3(a_Position, 1.0) * u_Transform).xy, 0.0, 1.0);
 														));
-						bufFBHeader.add(SLIB_STRINGIFY(
+						bufFBHeader.addStatic(SLIB_STRINGIFY(
 													   uniform vec4 u_Color;
 													   ));
-						bufFBContent.add("void main() { vec4 l_Color = u_Color; ");
+						bufFBContent.addStatic("void main() { vec4 l_Color = u_Color; ");
 					}
 					
 					if (param.countClips > 0) {
@@ -234,14 +234,14 @@ namespace slib
 							*(signatures++) = 'T';
 						}
 						if (bufVertexShader) {
-							bufVBHeader.add(SLIB_STRINGIFY(
+							bufVBHeader.addStatic(SLIB_STRINGIFY(
 														   uniform vec4 u_RectSrc;
 														   varying vec2 v_TexCoord;
 														   ));
-							bufVBContent.add(SLIB_STRINGIFY(
+							bufVBContent.addStatic(SLIB_STRINGIFY(
 															v_TexCoord = a_Position * u_RectSrc.zw + u_RectSrc.xy;
 															));
-							bufFBHeader.add(SLIB_STRINGIFY(
+							bufFBHeader.addStatic(SLIB_STRINGIFY(
 														   uniform sampler2D u_Texture;
 														   varying vec2 v_TexCoord;
 														   ));
@@ -252,14 +252,14 @@ namespace slib
 								*(signatures++) = 'F';
 							}
 							if (bufVertexShader) {
-								bufFBHeader.add(SLIB_STRINGIFY(
+								bufFBHeader.addStatic(SLIB_STRINGIFY(
 															   uniform vec4 u_ColorFilterR;
 															   uniform vec4 u_ColorFilterG;
 															   uniform vec4 u_ColorFilterB;
 															   uniform vec4 u_ColorFilterA;
 															   uniform vec4 u_ColorFilterC;
 															   ));
-								bufFBContent.add(SLIB_STRINGIFY(
+								bufFBContent.addStatic(SLIB_STRINGIFY(
 																vec4 color = texture2D(u_Texture, v_TexCoord);
 																color = vec4(dot(color, u_ColorFilterR), dot(color, u_ColorFilterG), dot(color, u_ColorFilterB), dot(color, u_ColorFilterA)) + u_ColorFilterC;
 																color = color * l_Color;
@@ -267,14 +267,14 @@ namespace slib
 							}
 						} else {
 							if (bufVertexShader) {
-								bufFBContent.add(SLIB_STRINGIFY(
+								bufFBContent.addStatic(SLIB_STRINGIFY(
 																vec4 color = texture2D(u_Texture, v_TexCoord) * l_Color;
 																));
 							}
 						}
 					} else {
 						if (bufVertexShader) {
-							bufFBContent.add(SLIB_STRINGIFY(
+							bufFBContent.addStatic(SLIB_STRINGIFY(
 															vec4 color = l_Color;
 															));
 						}
@@ -282,11 +282,11 @@ namespace slib
 					
 					
 					if (bufVertexShader) {
-						bufFBContent.add(SLIB_STRINGIFY(
+						bufFBContent.addStatic(SLIB_STRINGIFY(
 														gl_FragColor = color;
 														));
-						bufVBContent.add("}");
-						bufFBContent.add("}");
+						bufVBContent.addStatic("}");
+						bufFBContent.addStatic("}");
 						bufVertexShader->link(bufVBHeader);
 						bufVertexShader->link(bufVBContent);
 						bufFragmentShader->link(bufFBHeader);
@@ -583,10 +583,10 @@ namespace slib
 
 	Size RenderCanvas::measureText(const Ref<Font>& font, const StringParam& text, sl_bool flagMultiLine)
 	{
-		return measureRenderingText(font, text.getString16(), flagMultiLine);
+		return measureRenderingText(font, text, flagMultiLine);
 	}
 	
-	Size RenderCanvas::measureRenderingText(const Ref<Font>& _font, const String16& text, sl_bool flagMultiLine)
+	Size RenderCanvas::measureRenderingText(const Ref<Font>& _font, const StringParam& text, sl_bool flagMultiLine)
 	{
 		if (text.isEmpty()) {
 			return Size::zero();
@@ -1005,7 +1005,7 @@ namespace slib
 	
 	void RenderCanvas::onDrawText(const StringParam& _text, sl_real x, sl_real y, const Ref<Font>& font, const DrawTextParam& param)
 	{
-		String16 text = _text.getString16();
+		StringData16 text(_text);
 		if (text.isEmpty()) {
 			return;
 		}

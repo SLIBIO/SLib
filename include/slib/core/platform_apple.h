@@ -48,10 +48,8 @@ namespace slib
 	{
 	public:
 #ifdef __OBJC__
-		static NSString* getNSStringFromString(const String& str, NSString* def = @"");
+		static NSString* getNSStringFromString(const StringParam& str, NSString* def = @"");
 
-		static NSString* getNSStringFromString16(const String16& str, NSString* def = @"");
-	
 		static String getStringFromNSString(NSString* str);
 
 		static String16 getString16FromNSString(NSString* str);

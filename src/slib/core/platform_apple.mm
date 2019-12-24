@@ -43,28 +43,23 @@ namespace slib
 	}
 #endif
 
-	NSString* Apple::getNSStringFromString(const String& str, NSString* def)
+	NSString* Apple::getNSStringFromString(const StringParam& str, NSString* def)
 	{
-		String s = str;
-		if (s.isNull()) {
+		if (str.isNull()) {
 			return def;
 		}
-		NSString* ret = [[NSString alloc] initWithUTF8String:s.getData()];
-		if (ret != nil) {
-			return ret;
-		}
-		return def;
-	}
-
-	NSString* Apple::getNSStringFromString16(const String16& str, NSString* def)
-	{
-		String16 s = str;
-		if (s.isNull()) {
-			return def;
-		}
-		NSString* ret = [[NSString alloc] initWithCharacters:(unichar*)s.getData() length:s.getLength()];
-		if (ret != nil) {
-			return ret;
+		if (str.is8()) {
+			StringData s(str);
+			NSString* ret = [[NSString alloc] initWithUTF8String:s.getData()];
+			if (ret != nil) {
+				return ret;
+			}
+		} else {
+			StringData16 s(str);
+			NSString* ret = [[NSString alloc] initWithCharacters:(unichar*)s.getData() length:s.getLength()];
+			if (ret != nil) {
+				return ret;
+			}
 		}
 		return def;
 	}

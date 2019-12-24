@@ -56,9 +56,9 @@ namespace slib
 		sl_bool add(const String& str) noexcept;
 		
 		/**
-		 * Add string represented by StringData struct to the queue.
+		 * Add string represented by StringStorage struct to the queue.
 		 */
-		sl_bool add(const StringData& str) noexcept;
+		sl_bool add(const StringStorage& str) noexcept;
 		
 		/**
 		 * Add string pointed by buf to the queue.
@@ -92,7 +92,7 @@ namespace slib
 		Memory mergeToMemory() const noexcept;
 
 	private:
-		LinkedQueue<StringData> m_queue;
+		LinkedQueue<StringStorage> m_queue;
 		sl_size m_len;
 		
 	};
@@ -130,9 +130,9 @@ namespace slib
 		sl_bool add(const String16& str) noexcept;
 		
 		/**
-		 * Add string represented by StringData struct to the queue.
+		 * Add string represented by StringStorage struct to the queue.
 		 */
-		sl_bool add(const StringData& str) noexcept;
+		sl_bool add(const StringStorage& str) noexcept;
 		
 		/**
 		 * Add string pointed by buf to the queue.
@@ -166,7 +166,7 @@ namespace slib
 		Memory mergeToMemory() const noexcept;
 				
 	private:
-		LinkedQueue<StringData> m_queue;
+		LinkedQueue<StringStorage> m_queue;
 		sl_size m_len;
 		
 	};

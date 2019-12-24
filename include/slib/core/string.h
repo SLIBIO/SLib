@@ -48,7 +48,7 @@
 namespace slib
 {
 
-	class SLIB_EXPORT StringData
+	class SLIB_EXPORT StringStorage
 	{
 	public:
 		union {
@@ -62,9 +62,9 @@ namespace slib
 		String16 str16;
 		
 	public:
-		StringData() noexcept;
+		StringStorage() noexcept;
 		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(StringData)
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(StringStorage)
 		
 	};
 	

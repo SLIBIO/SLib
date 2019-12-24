@@ -67,7 +67,7 @@ namespace slib
 					sl_int32 cols = sqlite3_column_count(statement);
 					for (sl_int32 i = 0; i < cols; i++) {
 						const char* buf = sqlite3_column_name(statement, (int)i);
-						String name(buf);
+						String name = String::create(buf);
 						m_listColumnNames.add_NoLock(name);
 						m_mapColumnIndexes.put_NoLock(name, i);
 					}
@@ -98,7 +98,7 @@ namespace slib
 					return sl_null;
 				}
 
-				sl_int32 getColumnIndex(const String& name) override
+				sl_int32 getColumnIndex(const StringParam& name) override
 				{
 					return m_mapColumnIndexes.getValue_NoLock(name, -1);
 				}
@@ -694,7 +694,7 @@ namespace slib
 				
 				sl_int64 _execute(const StringParam& _sql) override
 				{
-					StringParamData sql(_sql);
+					StringData sql(_sql);
 					ObjectLocker lock(this);
 					if (SQLITE_OK == sqlite3_exec(m_db, sql.data, 0, 0, sl_null)) {
 						return sqlite3_changes(m_db);
@@ -704,7 +704,7 @@ namespace slib
 
 				Ref<DatabaseStatement> _prepareStatement(const StringParam& _sql) override
 				{
-					StringParamData sql(_sql);
+					StringData sql(_sql);
 					ObjectLocker lock(this);
 					Ref<DatabaseStatement> ret;
 					sqlite3_stmt* statement = sl_null;
@@ -720,7 +720,7 @@ namespace slib
 
 				String getErrorMessage() override
 				{
-					String error = sqlite3_errmsg(m_db);
+					String error = String::create(sqlite3_errmsg(m_db));
 					if (error.isEmpty() || error == "not an error") {
 						return sl_null;
 					}
@@ -742,7 +742,7 @@ namespace slib
 					SqlBuilder builder(m_dialect);
 					SLIB_STATIC_STRING(s, "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name LIKE ")
 					builder.append(s);
-					StringParamData name(_name);
+					StringData name(_name);
 					builder.appendIdentifier(name.data, name.getLength());
 					return getValue(builder.toString()).getUint32() > 0;
 				}

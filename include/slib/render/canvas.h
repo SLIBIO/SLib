@@ -117,7 +117,7 @@ namespace slib
 		using Canvas::measureText;
 		Size measureText(const Ref<Font>& font, const StringParam& text, sl_bool flagMultiLine = sl_false) override;
 		
-		static Size measureRenderingText(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine = sl_false);
+		static Size measureRenderingText(const Ref<Font>& font, const StringParam& text, sl_bool flagMultiLine = sl_false);
 		
 		using Canvas::drawLine;
 		void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& pen) override;

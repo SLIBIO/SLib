@@ -27,8 +27,7 @@
 #include "slib/core/charset.h"
 
 #include "slib/core/string.h"
-
-#import <Foundation/Foundation.h>
+#include "slib/core/platform_apple.h"
 
 namespace slib
 {
@@ -117,7 +116,7 @@ namespace slib
 					NSStringEncoding encoding = CFStringConvertEncodingToNSStringEncoding(cf_encoding);
 					NSString* nstr = [[NSString alloc] initWithBytesNoCopy:(void*)data length:size encoding:encoding freeWhenDone:NO];
 					if (nstr != nil) {
-						return [nstr UTF8String];
+						return Apple::getStringFromNSString(nstr);
 					}
 				}
 				return sl_null;

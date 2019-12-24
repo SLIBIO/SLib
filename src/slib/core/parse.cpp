@@ -22,6 +22,7 @@
 
 #include "slib/core/parse.h"
 
+#include "slib/core/string.h"
 #include "slib/core/scoped.h"
 #include "slib/core/math.h"
 
@@ -37,7 +38,7 @@ namespace slib
 			static sl_size applyBackslashEscapes(const ST& s, sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii, CT* buf) noexcept
 			{
 				const CT* ch = s.getData();
-				sl_size len = s.getLength();
+				sl_size len = s.getLengthForParser();
 				sl_size d;
 				if (flagAddQuote) {
 					d = 1;
@@ -66,6 +67,9 @@ namespace slib
 							}
 							break;
 						case 0:
+							if (len & SLIB_SIZE_TEST_SIGN_BIT) {
+								break;
+							}
 							r = '0';
 							break;
 						case '\n':
@@ -154,9 +158,10 @@ namespace slib
 		}
 	}
 
-	String ParseUtil::applyBackslashEscapes(const String& str, sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii) noexcept
+	String ParseUtil::applyBackslashEscapes(const StringParam& _str, sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii) noexcept
 	{
-		sl_size n = priv::parse::applyBackslashEscapes<String, sl_char8>(str, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, sl_null);
+		StringData str(_str);
+		sl_size n = priv::parse::applyBackslashEscapes<StringData, sl_char8>(str, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, sl_null);
 		if (n == 0) {
 			return String::getEmpty();
 		}
@@ -164,33 +169,21 @@ namespace slib
 		if (ret.isEmpty()) {
 			return sl_null;
 		}
-		priv::parse::applyBackslashEscapes<String, sl_char8>(str, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, ret.getData());
+		priv::parse::applyBackslashEscapes<StringData, sl_char8>(str, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, ret.getData());
 		return ret;
 	}
 
-	String16 ParseUtil::applyBackslashEscapes(const String16& str, sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii) noexcept
+	String16 ParseUtil::applyBackslashEscapes16(const StringParam& _str, sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii) noexcept
 	{
-		sl_size n = priv::parse::applyBackslashEscapes<String16, sl_char16>(str, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, sl_null);
+		StringData16 str(_str);
+		sl_size n = priv::parse::applyBackslashEscapes<StringData16, sl_char16>(str, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, sl_null);
 		String16 ret = String16::allocate(n);
 		if (ret.isEmpty()) {
 			return sl_null;
 		}
-		priv::parse::applyBackslashEscapes<String16, sl_char16>(str, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, ret.getData());
+		priv::parse::applyBackslashEscapes<StringData16, sl_char16>(str, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, ret.getData());
 		return ret;
 	}
-
-	String ParseUtil::applyBackslashEscapes(const AtomicString& str, sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii) noexcept
-	{
-		String s(str);
-		return applyBackslashEscapes(s, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii);
-	}
-
-	String16 ParseUtil::applyBackslashEscapes(const AtomicString16& str, sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii) noexcept
-	{
-		String16 s(str);
-		return applyBackslashEscapes(s, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii);
-	}
-	
 	
 	namespace priv
 	{
@@ -229,6 +222,8 @@ namespace slib
 					sl_bool flagError = sl_false;
 					sl_bool flagBackslash = sl_false;
 					switch (ch) {
+						case 0:
+							break;
 						case '\\':
 							flagBackslash = sl_true;
 							i++;
@@ -432,7 +427,6 @@ namespace slib
 								flagError = sl_true;
 							}
 							break;
-						case 0:
 						case '\r':
 						case '\n':
 						case '\v':
@@ -467,39 +461,19 @@ namespace slib
 		}
 	}
 
-	String ParseUtil::parseBackslashEscapes(const sl_char8* sz, sl_size n, sl_size* lengthParsed, sl_bool* outFlagError) noexcept
+	String ParseUtil::parseBackslashEscapes(const StringParam& _str, sl_size* lengthParsed, sl_bool* outFlagError) noexcept
 	{
-		return priv::parse::parseBackslashEscapes<String, sl_char8>(sz, n, lengthParsed, outFlagError);
+		StringData str(_str);
+		return priv::parse::parseBackslashEscapes<String, sl_char8>(str.getData(), str.getLengthForParser(), lengthParsed, outFlagError);
 	}
 
-	String16 ParseUtil::parseBackslashEscapes(const sl_char16* sz, sl_size n, sl_size* lengthParsed, sl_bool* outFlagError) noexcept
+	String16 ParseUtil::parseBackslashEscapes16(const StringParam& _str, sl_size* lengthParsed, sl_bool* outFlagError) noexcept
 	{
-		return priv::parse::parseBackslashEscapes<String16, sl_char16>(sz, n, lengthParsed, outFlagError);
+		StringData16 str(_str);
+		return priv::parse::parseBackslashEscapes<String16, sl_char16>(str.getData(), str.getLengthForParser(), lengthParsed, outFlagError);
 	}
 
-	String ParseUtil::parseBackslashEscapes(const String& str, sl_size* lengthParsed, sl_bool* flagError) noexcept
-	{
-		return parseBackslashEscapes(str.getData(), str.getLength(), lengthParsed, flagError);
-	}
 
-	String16 ParseUtil::parseBackslashEscapes(const String16& str, sl_size* lengthParsed, sl_bool* flagError) noexcept
-	{
-		return parseBackslashEscapes(str.getData(), str.getLength(), lengthParsed, flagError);
-	}
-
-	String ParseUtil::parseBackslashEscapes(const AtomicString& str, sl_size* lengthParsed, sl_bool* flagError) noexcept
-	{
-		String s(str);
-		return parseBackslashEscapes(s.getData(), s.getLength(), lengthParsed, flagError);
-	}
-
-	String16 ParseUtil::parseBackslashEscapes(const AtomicString16& str, sl_size* lengthParsed, sl_bool* flagError) noexcept
-	{
-		String16 s(str);
-		return parseBackslashEscapes(s.getData(), s.getLength(), lengthParsed, flagError);
-	}
-
-	
 	namespace priv
 	{
 		namespace parse
@@ -512,6 +486,9 @@ namespace slib
 				sl_size col = 1;
 				for (sl_size i = 0; i < len; i++) {
 					CT ch = input[i];
+					if (!ch) {
+						break;
+					}
 					if (ch == '\r') {
 						line++;
 						col = 0;
@@ -533,92 +510,55 @@ namespace slib
 		}
 	}
 	
-	sl_size ParseUtil::countLineNumber(const sl_char8* input, sl_size len, sl_size* columnLast) noexcept
+	sl_size ParseUtil::countLineNumber(const StringParam& _str, sl_size pos, sl_size* columnLast) noexcept
 	{
-		return priv::parse::countLineNumber(input, len, columnLast);
-	}
-
-	sl_size ParseUtil::countLineNumber(const sl_char16* input, sl_size len, sl_size* columnLast) noexcept
-	{
-		return priv::parse::countLineNumber(input, len, columnLast);
-	}
-
-	sl_size ParseUtil::countLineNumber(const String& str, sl_size pos, sl_size* column) noexcept
-	{
-		return countLineNumber(str.getData(), Math::min(str.getLength(), pos), column);
-	}
-
-	sl_size ParseUtil::countLineNumber(const String16& str, sl_size pos, sl_size* column) noexcept
-	{
-		return countLineNumber(str.getData(), Math::min(str.getLength(), pos), column);
-	}
-
-	sl_size ParseUtil::countLineNumber(const AtomicString& str, sl_size pos, sl_size* column) noexcept
-	{
-		String s(str);
-		return countLineNumber(s, pos, column);
-	}
-
-	sl_size ParseUtil::countLineNumber(const AtomicString16& str, sl_size pos, sl_size* column) noexcept
-	{
-		String16 s(str);
-		return countLineNumber(s, pos, column);
-	}
-	
-	
-	namespace priv
-	{
-		namespace parse
-		{
-			
-			template <class CT>
-			static sl_reg indexOfLine(const CT* input, sl_reg len) noexcept
-			{
-				for (sl_reg i = 0; i < len; i++) {
-					CT ch = input[i];
-					if (ch == '\r' || ch == '\n') {
-						return i;
-					}
+		if (_str.isNotNull()) {
+			if (_str.is8()) {
+				StringData str(_str);
+				sl_size n = str.getLengthForParser();
+				if (pos < n) {
+					return priv::parse::countLineNumber(str.getData() + pos, n - pos, columnLast);
 				}
-				return -1;
+			} else {
+				StringData16 str(_str);
+				sl_size n = str.getLengthForParser();
+				if (pos < n) {
+					return priv::parse::countLineNumber(str.getData() + pos, n - pos, columnLast);
+				}
 			}
-			
 		}
+		return 0;
 	}
-	
-	sl_reg ParseUtil::indexOfLine(const sl_char8* input, sl_size len) noexcept
+
+	sl_size ParseUtil::countLineNumber(const StringParam& str, sl_size* columnLast) noexcept
 	{
-		return priv::parse::indexOfLine(input, len);
+		return countLineNumber(str, 0, columnLast);
 	}
-	
-	sl_reg ParseUtil::indexOfLine(const sl_char16* input, sl_size len) noexcept
-	{
-		return priv::parse::indexOfLine(input, len);
-	}
-	
-	
+
 	namespace priv
 	{
 		namespace parse
 		{
 			
 			template <class CT, class ST>
-			static sl_reg indexOfLine(const ST& str, sl_reg start) noexcept
+			static sl_reg indexOfLine(const ST& str, sl_reg _start) noexcept
 			{
-				sl_reg count = str.getLength();
-				if (count <= 0) {
-					return -1;
-				}
-				if (start < 0) {
+				sl_size count = str.getLengthForParser();
+				sl_size start;
+				if (_start < 0) {
 					start = 0;
 				} else {
+					start = _start;
 					if (start >= count) {
 						return -1;
 					}
 				}
 				CT* sz = str.getData();
-				for (sl_reg i = start; i < count; i++) {
+				for (sl_size i = start; i < count; i++) {
 					CT ch = sz[i];
+					if (!ch) {
+						break;
+					}
 					if (ch == '\r' || ch == '\n') {
 						return i;
 					}
@@ -629,24 +569,18 @@ namespace slib
 		}
 	}
 	
-	sl_reg ParseUtil::indexOfLine(const String& str, sl_reg start) noexcept
+	sl_reg ParseUtil::indexOfLine(const StringParam& _str, sl_reg start) noexcept
 	{
-		return priv::parse::indexOfLine<sl_char8, String>(str, start);
+		if (_str.isNotNull()) {
+			if (_str.is8()) {
+				StringData str(_str);
+				return priv::parse::indexOfLine<sl_char8, StringData>(str, start);
+			} else {
+				StringData16 str(_str);
+				return priv::parse::indexOfLine<sl_char16, StringData16>(str, start);
+			}
+		}
+		return 0;
 	}
 	
-	sl_reg ParseUtil::indexOfLine(const String16& str, sl_reg start) noexcept
-	{
-		return priv::parse::indexOfLine<sl_char16, String16>(str, start);
-	}
-	
-	sl_reg ParseUtil::indexOfLine(const AtomicString& str, sl_reg start) noexcept
-	{
-		return priv::parse::indexOfLine<sl_char8, String>(str, start);
-	}
-	
-	sl_reg ParseUtil::indexOfLine(const AtomicString16& str, sl_reg start) noexcept
-	{
-		return priv::parse::indexOfLine<sl_char16, String16>(str, start);
-	}
-
 }

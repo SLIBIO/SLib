@@ -285,11 +285,11 @@ namespace slib
 
 				void onDrawText(const StringParam& _text, sl_real x, sl_real y, const Ref<Font>& font, const DrawTextParam& param) override
 				{
-					String16 text = _text.getString16();
+					StringData16 text = (_text);
 					if (text.isNotEmpty()) {
 						jobject hFont = GraphicsPlatform::getNativeFont(font.get());
 						if (hFont) {
-							JniLocal<jstring> jtext = Jni::getJniString(text);
+							JniLocal<jstring> jtext = Jni::getJniString(text.data, text.getLength());
 							sl_real shadowOpacity = param.shadowOpacity;
 							if (shadowOpacity > 0.0001f) {
 								Color shadowColor = param.shadowColor;

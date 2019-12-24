@@ -190,12 +190,12 @@ namespace slib
 		return _measureText_PO(text);
 	}
 
-	Size Font::measureText(const StringParam& varText, sl_bool flagMultiLine)
+	Size Font::measureText(const StringParam& _text, sl_bool flagMultiLine)
 	{
 		if (!flagMultiLine) {
-			return _measureText_PO(varText);
+			return _measureText_PO(_text);
 		}
-		String16 text = varText.getString16();
+		StringData16 text(_text);
 		sl_char16* sz = text.getData();
 		sl_size len = text.getLength();
 		sl_size startLine = 0;

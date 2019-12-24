@@ -38,13 +38,13 @@
 namespace slib
 {
 
-	void Console::print(const String& s)
+	void Console::print(const StringParam& s)
 	{
 #if defined(SLIB_PLATFORM_IS_ANDROID) || defined(SLIB_PLATFORM_IS_TIZEN)
 		SLIB_STATIC_STRING(c, "Console");
 		Logger::getConsoleLogger()->log(c, s);
 #else
-		String _s = s;
+		StringData _s = s;
 		printf("%s", _s.getData());
 #endif
 	}

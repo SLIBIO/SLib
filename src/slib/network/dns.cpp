@@ -528,7 +528,7 @@ namespace slib
 		} else if (type == DnsRecordType::PTR) {
 			ret += "PTR " + parseData_PTR();
 		} else {
-			ret += String("TYPE=") + (sl_uint32)type;
+			ret += "TYPE=" + String::fromUint32((sl_uint32)type);
 		}
 		return ret;
 	}

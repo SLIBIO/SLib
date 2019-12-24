@@ -391,7 +391,11 @@ namespace slib
 
 	void SqlBuilder::appendParameter(const String& name)
 	{
-		appendStatic("?");
+		if (dialect == DatabaseDialect::PostgreSQL) {
+			append(":" + String::fromUint32((sl_int32)(parameters.getCount() + 1)));
+		} else {
+			appendStatic("?");
+		}
 		parameters.add_NoLock(name);
 	}
 

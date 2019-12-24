@@ -32,31 +32,19 @@
 
 namespace slib
 {
-	
-	// Same as VariantType values
-	enum class StringType
-	{
-		Null = 0,
-		String8 = 1,
-		String16 = 2,
-		Sz8 = 3,
-		Sz16 = 4,
-		StringRef8 = 5,
-		StringRef16 = 6,
-		Std8 = 7,
-		Std16 = 8
-	};
+
+	class Variant;
 	
 	class SLIB_EXPORT StringParam
 	{
 	public:
 		sl_size _value;
-		StringType _type;
+		sl_size _length;
 		
 	public:
-		SLIB_INLINE constexpr StringParam() noexcept : _value(0), _type(StringType::Null) {}
+		SLIB_INLINE constexpr StringParam() noexcept : _value(0), _length(0) {}
 		
-		SLIB_INLINE constexpr StringParam(sl_null_t) noexcept : _value(1), _type(StringType::Null) {}
+		SLIB_INLINE constexpr StringParam(sl_null_t) noexcept : _value(0), _length(1) {}
 		
 		StringParam(StringParam&& other) noexcept;
 		
@@ -81,24 +69,24 @@ namespace slib
 		
 		StringParam(AtomicString16&& value) noexcept;
 		
-#ifdef SLIB_SUPPORT_STD_TYPES
-		StringParam(const std::string& value) noexcept;
-		
-		StringParam(std::string&& value) = delete;
-		
-		StringParam(const std::u16string& value) noexcept;
-
-		StringParam(std::u16string&& value) = delete;
-#endif
-		
 		StringParam(const sl_char8* sz8) noexcept;
-		
+
 		StringParam(const sl_char16* sz16) noexcept;
+
+		StringParam(const sl_char8* sz8, sl_reg length) noexcept;
+		
+		StringParam(const sl_char16* sz16, sl_reg length) noexcept;
 		
 	public:
 		static const StringParam& undefined() noexcept;
 		
 		static const StringParam& null() noexcept;
+		
+		template <sl_size N>
+		static StringParam literal(const sl_char8 (&s)[N]) noexcept;
+		
+		template <sl_size N>
+		static StringParam literal(const sl_char16 (&s)[N]) noexcept;
 		
 	public:
 		StringParam& operator=(StringParam&& other) noexcept;
@@ -123,23 +111,11 @@ namespace slib
 		
 		StringParam& operator=(AtomicString16&& value) noexcept;
 		
-#ifdef SLIB_SUPPORT_STD_TYPES
-		StringParam& operator=(const std::string& value) noexcept;
-		
-		StringParam& operator=(std::string&& value) = delete;
-		
-		StringParam& operator=(const std::u16string& value) noexcept;
-		
-		StringParam& operator=(std::u16string&& value) = delete;
-#endif
-		
 		StringParam& operator=(const sl_char8* sz8) noexcept;
 		
 		StringParam& operator=(const sl_char16* sz16) noexcept;
 
 	public:
-		StringType getType() const noexcept;
-		
 		void setUndefined() noexcept;
 		
 		sl_bool isUndefined() const noexcept;
@@ -165,21 +141,17 @@ namespace slib
 		sl_bool isSz8() const noexcept;
 		
 		sl_bool isSz16() const noexcept;
+		
+		sl_bool is8() const noexcept;
 
-#ifdef SLIB_SUPPORT_STD_TYPES
-		sl_bool isStdString() const noexcept;
+		sl_bool is16() const noexcept;
 		
-		sl_bool isStdString16() const noexcept;
-#endif
 		
-		String getString(const String& def) const noexcept;
+		String toString() const noexcept;
 		
-		String getString() const noexcept;
+		String16 toString16() const noexcept;
 		
-		String16 getString16(const String16& def) const noexcept;
-		
-		String16 getString16() const noexcept;
-		
+		Variant toVariant() const noexcept;
 		
 		sl_compare_result compare(const StringParam& other) const noexcept;
 		
@@ -188,10 +160,10 @@ namespace slib
 		sl_size getHashCode() const noexcept;
 
 	public:
-		static void _free(StringType type, sl_size value) noexcept;
+		static void _free(sl_size value, sl_size length) noexcept;
 		
-		friend class StringParamData;
-		friend class StringParamData16;
+		friend class StringData;
+		friend class StringData16;
 	};
 	
 	sl_bool operator==(const StringParam& v1, const StringParam& v2) noexcept;
@@ -220,16 +192,16 @@ namespace slib
 		sl_size operator()(const StringParam &a) const noexcept;
 	};
 
-	class SLIB_EXPORT StringParamData
+	class SLIB_EXPORT StringData
 	{
 	public:
 		sl_char8* data;
 		String string;
 		
 	public:
-		StringParamData(const StringParam& param) noexcept;
+		StringData(const StringParam& param) noexcept;
 		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(StringParamData)
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(StringData)
 		
 	public:
 		SLIB_INLINE sl_char8* getData() const noexcept
@@ -237,23 +209,29 @@ namespace slib
 			return data;
 		}
 		
+		sl_bool isEmpty() const noexcept;
+
+		sl_bool isNotEmpty() const noexcept;
+
 		sl_size getLength() const noexcept;
 		
+		sl_size getLengthForParser() const noexcept;
+		
 	private:
-		sl_size _length;
+		mutable sl_size length;
 		
 	};
 
-	class SLIB_EXPORT StringParamData16
+	class SLIB_EXPORT StringData16
 	{
 	public:
 		sl_char16* data;
 		String16 string;
 		
 	public:
-		StringParamData16(const StringParam& param) noexcept;
+		StringData16(const StringParam& param) noexcept;
 		
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(StringParamData16)
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(StringData16)
 		
 	public:
 		SLIB_INLINE sl_char16* getData() const noexcept
@@ -261,10 +239,16 @@ namespace slib
 			return data;
 		}
 		
+		sl_bool isEmpty() const noexcept;
+
+		sl_bool isNotEmpty() const noexcept;
+
 		sl_size getLength() const noexcept;
+		
+		sl_size getLengthForParser() const noexcept;
 
 	private:
-		sl_size _length;			
+		mutable sl_size length;			
 	};
 	
 }

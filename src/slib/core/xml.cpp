@@ -1067,7 +1067,7 @@ namespace slib
 			if (!(output.addStatic(SLIB_UNICODE("<![CDATA["), 9))) {
 				return sl_false;
 			}
-			StringData data;
+			StringStorage data;
 			data.str16 = text;
 			sl_char16* sz = text.getData();
 			sl_size len = text.getLength();
@@ -1171,7 +1171,7 @@ namespace slib
 		// content
 		{
 			XmlString content = m_content;
-			StringData data;
+			StringStorage data;
 			data.str16 = content;
 			sl_char16* sz = content.getData();
 			sl_size len = content.getLength();
@@ -1263,7 +1263,7 @@ namespace slib
 		}
 		// comment
 		{
-			StringData data;
+			StringStorage data;
 			data.str16 = comment;
 			sl_char16* sz = comment.getData();
 			sl_size len = comment.getLength();
@@ -2403,7 +2403,7 @@ namespace slib
 				param.flagError = sl_true;
 				param.errorPosition = parser.pos;
 				param.errorMessage = parser.errorMessage;
-				param.errorLine = ParseUtil::countLineNumber(buf, parser.pos, &(param.errorColumn));
+				param.errorLine = ParseUtil::countLineNumber(StringParam(buf, len), parser.pos, &(param.errorColumn));
 				
 				if (param.flagLogError) {
 					LogError("Xml", param.getErrorText());
@@ -2496,8 +2496,8 @@ namespace slib
 
 	sl_bool Xml::encodeTextToEntities(const XmlString& text, XmlStringBuffer& output)
 	{
-		StringData data;
-		StringData dataEscape;
+		StringStorage data;
+		StringStorage dataEscape;
 		data.str16 = text;
 		sl_char16* sz = text.getData();
 		sl_size len = text.getLength();

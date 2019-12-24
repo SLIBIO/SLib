@@ -229,19 +229,17 @@ namespace slib
 		Time(sl_int32 year, sl_int32 month, sl_int32 date, sl_int32 hour, sl_int32 minute, sl_int32 second, sl_int32 milliseconds = 0, sl_int32 microseconds = 0, const TimeZone& zone = TimeZone::Local) noexcept;
 
 		Time(const TimeComponents& comps, const TimeZone& zone = TimeZone::Local) noexcept;
+		
+		Time(const StringParam& str) noexcept;
+		SLIB_INLINE Time(const String& value) noexcept: Time(StringParam(value)) {}
+		SLIB_INLINE Time(const String16& value) noexcept: Time(StringParam(value)) {}
+		SLIB_INLINE Time(const AtomicString& value) noexcept: Time(StringParam(value)) {}
+		SLIB_INLINE Time(const AtomicString16& value) noexcept: Time(StringParam(value)) {}
+		SLIB_INLINE Time(const sl_char8* value) noexcept: Time(StringParam(value)) {}
+		SLIB_INLINE Time(const sl_char16* value) noexcept: Time(StringParam(value)) {}
 
-		Time(const String& str, const TimeZone& zone = TimeZone::Local) noexcept;
+		Time(const StringParam& str, const TimeZone& zone) noexcept;
 
-		Time(const String16& str, const TimeZone& zone = TimeZone::Local) noexcept;
-
-		Time(const AtomicString& str, const TimeZone& zone = TimeZone::Local) noexcept;
-
-		Time(const AtomicString16& str, const TimeZone& zone = TimeZone::Local) noexcept;
-
-		Time(const sl_char8* str, const TimeZone& zone = TimeZone::Local) noexcept;
-
-		Time(const sl_char16* str, const TimeZone& zone = TimeZone::Local) noexcept;
-	
 	public:
 		static Time now() noexcept;
 		
@@ -331,18 +329,8 @@ namespace slib
 
 		Time& operator=(sl_uint64 time) noexcept;
 
-		Time& operator=(const String& str) noexcept;
+		Time& operator=(const StringParam& str) noexcept;
 
-		Time& operator=(const String16& str) noexcept;
-
-		Time& operator=(const AtomicString& str) noexcept;
-
-		Time& operator=(const AtomicString16& str) noexcept;
-
-		Time& operator=(const sl_char8* str) noexcept;
-
-		Time& operator=(const sl_char16* str) noexcept;
-	
 
 		sl_bool operator==(const Time& other) const noexcept;
 
@@ -612,31 +600,10 @@ namespace slib
 		
 		String format(TimeFormat fmt, const Locale& locale = Locale::Unknown) const noexcept;
 		
-		
-		String format(const String& fmt, const Locale& locale = Locale::Unknown) const noexcept;
+		String format(const StringParam& fmt, const Locale& locale = Locale::Unknown) const noexcept;
 
-		String format(const AtomicString& fmt, const Locale& locale = Locale::Unknown) const noexcept;
-
-		String format(const String16& fmt, const Locale& locale = Locale::Unknown) const noexcept;
-
-		String format(const AtomicString16& fmt, const Locale& locale = Locale::Unknown) const noexcept;
-
-		String format(const sl_char8* fmt, const Locale& locale = Locale::Unknown) const noexcept;
-
-		String format(const sl_char16* fmt, const Locale& locale = Locale::Unknown) const noexcept;
-	
 		
-		sl_bool setString(const String& str, const TimeZone& zone = TimeZone::Local) noexcept;
-		
-		sl_bool setString(const String16& str, const TimeZone& zone = TimeZone::Local) noexcept;
-		
-		sl_bool setString(const AtomicString& str, const TimeZone& zone = TimeZone::Local) noexcept;
-		
-		sl_bool setString(const AtomicString16& str, const TimeZone& zone = TimeZone::Local) noexcept;
-		
-		sl_bool setString(const sl_char8* str, const TimeZone& zone = TimeZone::Local) noexcept;
-		
-		sl_bool setString(const sl_char16* str, const TimeZone& zone = TimeZone::Local) noexcept;
+		sl_bool setString(const StringParam& str, const TimeZone& zone = TimeZone::Local) noexcept;
 		
 		
 		template <class ST>

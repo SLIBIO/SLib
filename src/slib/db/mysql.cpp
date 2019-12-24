@@ -152,8 +152,9 @@ namespace slib
 					sl_uint32 cols = (sl_uint32)(mysql_num_fields(result));
 					m_fields = mysql_fetch_fields(result);
 					for (sl_uint32 i = 0; i < cols; i++) {
-						m_listColumnNames.add_NoLock(m_fields[i].name);
-						m_mapColumnIndexes.put_NoLock(m_fields[i].name, i);
+						String fieldName = String::create(m_fields[i].name);
+						m_listColumnNames.add_NoLock(fieldName);
+						m_mapColumnIndexes.put_NoLock(fieldName, i);
 					}
 					m_nColumnNames = (sl_uint32)(m_listColumnNames.getCount());
 					m_columnNames = m_listColumnNames.getData();
@@ -184,8 +185,9 @@ namespace slib
 					return sl_null;
 				}
 
-				sl_int32 getColumnIndex(const String& name) override
+				sl_int32 getColumnIndex(const StringParam& name) override
 				{
+					String a;
 					return m_mapColumnIndexes.getValue_NoLock(name, -1);
 				}
 
@@ -282,8 +284,9 @@ namespace slib
 					m_fds = fds;
 
 					for (sl_uint32 i = 0; i < cols; i++) {
-						m_listColumnNames.add_NoLock(m_fields[i].name);
-						m_mapColumnIndexes.put_NoLock(m_fields[i].name, i);
+						String fieldName = String::create(m_fields[i].name);
+						m_listColumnNames.add_NoLock(fieldName);
+						m_mapColumnIndexes.put_NoLock(fieldName, i);
 					}
 					m_nColumnNames = (sl_uint32)(m_listColumnNames.getCount());
 					m_columnNames = m_listColumnNames.getData();
@@ -314,7 +317,7 @@ namespace slib
 					return sl_null;
 				}
 
-				sl_int32 getColumnIndex(const String& name) override
+				sl_int32 getColumnIndex(const StringParam& name) override
 				{
 					return m_mapColumnIndexes.getValue_NoLock(name, -1);
 				}
@@ -1106,7 +1109,7 @@ namespace slib
 							}
 
 						} else {
-							param.error = mysql_error(mysql);
+							param.error = String::create(mysql_error(mysql));
 							LogError(TAG, param.error);
 						}
 						mysql_close(mysql);
@@ -1126,7 +1129,7 @@ namespace slib
 
 				sl_int64 _execute(const StringParam& _sql) override
 				{
-					StringParamData sql(_sql);
+					StringData sql(_sql);
 					initThread();
 					ObjectLocker lock(this);
 					if (0 == mysql_real_query(m_mysql, sql.data, (sl_uint32)(sql.getLength()))) {
@@ -1159,7 +1162,7 @@ namespace slib
 
 				Ref<DatabaseCursor> _query(const StringParam& _sql) override
 				{
-					StringParamData sql(_sql);
+					StringData sql(_sql);
 					initThread();
 					ObjectLocker lock(this);
 					if (0 == mysql_real_query(m_mysql, sql.data, (sl_uint32)(sql.getLength()))) {
@@ -1179,7 +1182,7 @@ namespace slib
 				{
 					initThread();
 					ObjectLocker lock(this);
-					Ref<StatementImpl> ret = new StatementImpl(this, m_mysql, sql.getString());
+					Ref<StatementImpl> ret = new StatementImpl(this, m_mysql, sql);
 					if (ret.isNotNull()) {
 						if (ret->prepare()) {
 							return ret;
@@ -1190,7 +1193,7 @@ namespace slib
 
 				String getErrorMessage() override
 				{
-					String error = mysql_error(m_mysql);
+					String error = String::create(mysql_error(m_mysql));
 					if (error.isEmpty()) {
 						return sl_null;
 					}
@@ -1200,7 +1203,7 @@ namespace slib
 				sl_bool isDatabaseExisting(const StringParam& _name) override
 				{
 					initThread();
-					StringParamData name(_name);
+					StringData name(_name);
 					sl_bool bRet = sl_false;
 					MYSQL_RES* res = mysql_list_dbs(m_mysql, name.data);
 					if (res) {
@@ -1224,7 +1227,7 @@ namespace slib
 							if (!row) {
 								break;
 							}
-							ret.add_NoLock(row[0]);
+							ret.add_NoLock(String::create(row[0]));
 						}
 						mysql_free_result(res);
 					}
@@ -1234,7 +1237,7 @@ namespace slib
 				sl_bool isTableExisting(const StringParam& _name) override
 				{
 					initThread();
-					StringParamData name(_name);
+					StringData name(_name);
 					sl_bool bRet = sl_false;
 					MYSQL_RES* res = mysql_list_tables(m_mysql, name.data);
 					if (res) {
@@ -1258,7 +1261,7 @@ namespace slib
 							if (!row) {
 								break;
 							}
-							ret.add_NoLock(row[0]);
+							ret.add_NoLock(String::create(row[0]));
 						}
 						mysql_free_result(res);
 					}

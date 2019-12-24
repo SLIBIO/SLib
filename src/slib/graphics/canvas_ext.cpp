@@ -110,7 +110,7 @@ namespace slib
 		Size size = measureText(font, param.text, sl_true);
 		Point pt = GraphicsUtil::calculateAlignPosition(Rectangle(param.x, param.y, param.x + param.width, param.y + param.height), size.x, size.y, param.alignment);
 		Alignment hAlign = param.alignment & Alignment::HorizontalMask;
-		String16 text = param.text.getString16();
+		StringData16 text = param.text;
 		sl_char16* sz = text.getData();
 		sl_size len = text.getLength();
 		if (!len) {
