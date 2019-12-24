@@ -37,8 +37,6 @@ extern "C"
 
 #define TAG "PostgreSQL"
 
-#define POSTGRES_BASE_TIME SLIB_INT64(946684800000000)
-
 namespace slib
 {
 	
@@ -162,75 +160,25 @@ namespace slib
 					if (PQgetisnull(result, 0, index)) {
 						return sl_null;
 					}
-					Oid type = PQftype(result, index);
 					char* v = PQgetvalue(result, 0, index);
 					int len = PQgetlength(result, 0, index);
-					switch (type) {
-						case 16: // bool
-							if (len == 1) {
-								return (sl_bool)(*v != 0);
+					if (PQfformat(result, index) == 0) { // text format
+						if (len >= 2 && v[0] == '\\' && v[1] == 'x') {
+							Oid t = PQftype(result, index);
+							if (t == 17) { // bytea
+								sl_uint32 n = (sl_uint32)((len - 2) >> 1);
+								Memory mem = Memory::create(n);
+								if (mem.isNotNull()) {
+									if (SLIB_PARSE_ERROR != String::parseHexString(mem.getData(), v, 2, len)) {
+										return mem;
+									}
+								}
 							}
-						case 18: // char
-							if (len == 1) {
-								return (sl_int32)(*v);
-							}
-						case 20: // int8
-							if (len == 8) {
-								return MIO::readInt64BE(v);
-							}
-							break;
-						case 21: // int2
-							if (len == 2) {
-								return MIO::readInt16BE(v);
-							}
-							break;
-						case 23: // int4
-							if (len == 4) {
-								return MIO::readInt32BE(v);
-							}
-							break;
-						case 700: // float4
-							if (len == 4) {
-								return MIO::readFloatBE(v);
-							}
-							break;
-						case 701: // float8
-							if (len == 8) {
-								return MIO::readDoubleBE(v);
-							}
-							break;
-						case 1082: // date
-							if (len == 4) {
-								return Time::withDays(MIO::readInt32(v)) + POSTGRES_BASE_TIME;
-							}
-							break;
-						case 1083: // time
-							if (len == 8) {
-								return Time::withMicroseconds(MIO::readInt64(v));
-							}
-							break;
-						case 1114: // timestamp
-						case 1184: // timestamptz
-							if (len == 8) {
-								return Time::withMicroseconds(MIO::readInt64(v)) + POSTGRES_BASE_TIME;
-							}
-							break;
-						case 25: // text
-						case 1042: // bpchar
-						case 1043: // varchar
-						case 1700: // numeric
-							if (len) {
-								return String::create(v, len);
-							}
-							return String::getEmpty();
-						case 17: // bytea
-						default:
-							if (len) {
-								return Memory::create(v, len);
-							}
-							return sl_null;
+						}
+						return String::create(v, len);
+					} else {
+						return Memory::create(v, len);
 					}
-					return sl_null;
 				}
 				
 				Variant getValue(sl_uint32 index) override
@@ -272,7 +220,11 @@ namespace slib
 						values[i] = sl_null;
 						lengths[i] = 0;
 					} else {
-						if (params[i].isSz8()) {
+						if (params[i].isMemory()) {
+							Memory mem = params[i].getMemory();
+							values[i] = (char*)(mem.getData());
+							lengths[i] = (int)(mem.getSize());
+						} if (params[i].isSz8()) {
 							values[i] = params[i].getSz8();
 							lengths[i] = (int)(Base::getStringLength(values[i]));
 						} else {
