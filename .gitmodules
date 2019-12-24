@@ -23,3 +23,6 @@
 [submodule "external/bin/Firebase"]
 	path = external/bin/Firebase
 	url = https://github.com/SLIBIO/SLibExternalBin_Firebase
+[submodule "external/bin/Alipay"]
+	path = external/bin/Alipay
+	url = https://github.com/SLIBIO/SLibExternalBin_Alipay.git
