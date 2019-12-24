@@ -4,13 +4,13 @@ using namespace slib;
 
 int main(int argc, const char * argv[])
 {
-	MySQL_Param param;
-	param.host = "172.20.30.1";
+	MySQL::Param param;
+	param.host = "172.20.10.1";
 	param.user = "test";
 	param.password = "test";
 	param.db = "test";
 	
-	Ref<Database> db = MySQL_Database::connect(param);
+	Ref<Database> db = MySQL::connect(param);
 	if (db.isNull()) {
 		Println("Cannot connect to MySQL server");
 		return -1;

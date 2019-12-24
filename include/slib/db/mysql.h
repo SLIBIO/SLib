@@ -34,7 +34,7 @@
 namespace slib
 {
 	
-	class SLIB_EXPORT MySQL_Param
+	class SLIB_EXPORT MySqlParam
 	{
 	public:
 		String host;
@@ -50,23 +50,24 @@ namespace slib
 		String error;
 
 	public:
-		MySQL_Param();
+		MySqlParam();
 
-		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(MySQL_Param)
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(MySqlParam)
 
 	};
 
-	class SLIB_EXPORT MySQL_Database : public Database
+	class SLIB_EXPORT MySQL : public Database
 	{
 		SLIB_DECLARE_OBJECT
 
 	protected:
-		MySQL_Database();
+		MySQL();
 
-		~MySQL_Database();
+		~MySQL();
 	
 	public:
-		static Ref<MySQL_Database> connect(MySQL_Param& param);
+		typedef MySqlParam Param;
+		static Ref<MySQL> connect(Param& param);
 	
 	public:
 		virtual sl_bool ping() = 0;

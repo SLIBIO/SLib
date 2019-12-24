@@ -32,27 +32,28 @@
 #include "slib/core/log.h"
 #include "slib/core/safe_static.h"
 
-#define TAG "MySQL_Database"
+#define TAG "MySQL"
 
 namespace slib
 {
 	
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(MySQL_Param)
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(MySqlParam)
 
-	MySQL_Param::MySQL_Param()
+	MySqlParam::MySqlParam()
 	{
 		port = 0;
 		flagAutoReconnect = sl_true;
 		flagMultipleStatements = sl_true;
 	}
 
-	SLIB_DEFINE_OBJECT(MySQL_Database, Database)
+	SLIB_DEFINE_OBJECT(MySQL, Database)
 
-	MySQL_Database::MySQL_Database()
+	MySQL::MySQL()
 	{
+		m_dialect = DatabaseDialect::MySQL;
 	}
 
-	MySQL_Database::~MySQL_Database()
+	MySQL::~MySQL()
 	{
 	}
 
@@ -152,7 +153,7 @@ namespace slib
 					sl_uint32 cols = (sl_uint32)(mysql_num_fields(result));
 					m_fields = mysql_fetch_fields(result);
 					for (sl_uint32 i = 0; i < cols; i++) {
-						String fieldName = String::create(m_fields[i].name);
+						String fieldName = m_fields[i].name;
 						m_listColumnNames.add_NoLock(fieldName);
 						m_mapColumnIndexes.put_NoLock(fieldName, i);
 					}
@@ -284,7 +285,7 @@ namespace slib
 					m_fds = fds;
 
 					for (sl_uint32 i = 0; i < cols; i++) {
-						String fieldName = String::create(m_fields[i].name);
+						String fieldName = m_fields[i].name;
 						m_listColumnNames.add_NoLock(fieldName);
 						m_mapColumnIndexes.put_NoLock(fieldName, i);
 					}
@@ -948,7 +949,7 @@ namespace slib
 
 				sl_int64 executeBy(const Variant* params, sl_uint32 nParams) override
 				{
-					MySQL_Database::initThread();
+					MySQL::initThread();
 					ObjectLocker lock(m_db.get());
 					if (_execute(params, nParams)) {
 						return mysql_stmt_affected_rows(m_statement);
@@ -958,7 +959,7 @@ namespace slib
 
 				Ref<DatabaseCursor> queryBy(const Variant* params, sl_uint32 nParams) override
 				{
-					MySQL_Database::initThread();
+					MySQL::initThread();
 					ObjectLocker lock(m_db.get());
 					Ref<DatabaseCursor> ret;
 					if (_execute(params, nParams)) {
@@ -1056,7 +1057,7 @@ namespace slib
 
 			};
 
-			class DatabaseImpl : public MySQL_Database
+			class DatabaseImpl : public MySQL
 			{
 			public:
 				MYSQL* m_mysql;
@@ -1065,7 +1066,6 @@ namespace slib
 				DatabaseImpl()
 				{
 					m_mysql = sl_null;					
-					m_dialect = DatabaseDialect::MySQL;
 				}
 
 				~DatabaseImpl()
@@ -1074,7 +1074,7 @@ namespace slib
 				}
 
 			public:
-				static Ref<DatabaseImpl> connect(MySQL_Param& param)
+				static Ref<DatabaseImpl> connect(MySqlParam& param)
 				{
 					initThread();
 
@@ -1109,7 +1109,7 @@ namespace slib
 							}
 
 						} else {
-							param.error = String::create(mysql_error(mysql));
+							param.error = mysql_error(mysql);
 							LogError(TAG, param.error);
 						}
 						mysql_close(mysql);
@@ -1193,7 +1193,7 @@ namespace slib
 
 				String getErrorMessage() override
 				{
-					String error = String::create(mysql_error(m_mysql));
+					String error = mysql_error(m_mysql);
 					if (error.isEmpty()) {
 						return sl_null;
 					}
@@ -1227,7 +1227,7 @@ namespace slib
 							if (!row) {
 								break;
 							}
-							ret.add_NoLock(String::create(row[0]));
+							ret.add_NoLock(row[0]);
 						}
 						mysql_free_result(res);
 					}
@@ -1261,7 +1261,7 @@ namespace slib
 							if (!row) {
 								break;
 							}
-							ret.add_NoLock(String::create(row[0]));
+							ret.add_NoLock(row[0]);
 						}
 						mysql_free_result(res);
 					}
@@ -1280,7 +1280,7 @@ namespace slib
 
 	using namespace priv::mysql;
 
-	void MySQL_Database::initThread()
+	void MySQL::initThread()
 	{
 		SLIB_SAFE_STATIC(LibraryInitializer, lib)
 		if (SLIB_SAFE_STATIC_CHECK_FREED(lib)) {
@@ -1309,7 +1309,7 @@ namespace slib
 		}
 	}
 
-	Ref<MySQL_Database> MySQL_Database::connect(MySQL_Param& param)
+	Ref<MySQL> MySQL::connect(MySqlParam& param)
 	{
 		return DatabaseImpl::connect(param);
 	}
