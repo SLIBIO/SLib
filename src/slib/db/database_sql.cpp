@@ -392,11 +392,16 @@ namespace slib
 	void SqlBuilder::appendParameter(const String& name)
 	{
 		if (dialect == DatabaseDialect::PostgreSQL) {
-			append(":" + String::fromUint32((sl_int32)(parameters.getCount() + 1)));
+			append("$" + String::fromUint32((sl_int32)(parameters.getCount() + 1)));
 		} else {
 			appendStatic("?");
 		}
 		parameters.add_NoLock(name);
+	}
+
+	void SqlBuilder::appendParameter()
+	{
+		appendParameter(String::null());
 	}
 
 	String SqlBuilder::toString() const
@@ -621,7 +626,7 @@ namespace slib
 				if (columns[i].expression.isNotNull()) {
 					columns[i].expression.appendTo(*this, sl_false);
 				} else {
-					appendStatic("?");
+					appendParameter();
 				}
 			}
 		}
@@ -651,7 +656,7 @@ namespace slib
 				if (i) {
 					appendStatic(", ");
 				}
-				appendStatic("?");
+				appendParameter();
 			}
 		}
 		appendStatic(")");
@@ -676,7 +681,7 @@ namespace slib
 				if (columns[i].expression.isNotNull()) {
 					columns[i].expression.appendTo(*this, sl_false);
 				} else {
-					appendStatic("?");
+					appendParameter();
 				}
 			}
 		}

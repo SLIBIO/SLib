@@ -505,6 +505,8 @@ namespace slib
 		
 		void appendParameter(const String& name);
 		
+		void appendParameter();
+		
 		String toString() const;
 		
 	public:

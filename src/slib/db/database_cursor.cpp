@@ -54,6 +54,11 @@ namespace slib
 		return sl_null;
 	}
 
+	String DatabaseCursor::getString(sl_uint32 index)
+	{
+		return getValue(index).getString();
+	}
+
 	String DatabaseCursor::getString(const StringParam& name)
 	{
 		sl_int32 index = getColumnIndex(name);
@@ -65,7 +70,7 @@ namespace slib
 
 	sl_int64 DatabaseCursor::getInt64(sl_uint32 index, sl_int64 defaultValue)
 	{
-		return getString(index).parseInt64(10, defaultValue);
+		return getValue(index).getInt64(defaultValue);
 	}
 
 	sl_int64 DatabaseCursor::getInt64(const StringParam& name, sl_int64 defaultValue)
@@ -79,7 +84,7 @@ namespace slib
 
 	sl_uint64 DatabaseCursor::getUint64(sl_uint32 index, sl_uint64 defaultValue)
 	{
-		return getInt64(index, defaultValue);
+		return getValue(index).getUint64(defaultValue);
 	}
 
 	sl_uint64 DatabaseCursor::getUint64(const StringParam& name, sl_uint64 defaultValue)
@@ -93,7 +98,7 @@ namespace slib
 
 	sl_int32 DatabaseCursor::getInt32(sl_uint32 index, sl_int32 defaultValue)
 	{
-		return (sl_int32)(getInt64(index, defaultValue));
+		return getValue(index).getInt32(defaultValue);
 	}
 
 	sl_int32 DatabaseCursor::getInt32(const StringParam& name, sl_int32 defaultValue)
@@ -107,7 +112,7 @@ namespace slib
 
 	sl_uint32 DatabaseCursor::getUint32(sl_uint32 index, sl_uint32 defaultValue)
 	{
-		return (sl_int32)(getInt64(index, defaultValue));
+		return getValue(index).getUint32(defaultValue);
 	}
 
 	sl_uint32 DatabaseCursor::getUint32(const StringParam& name, sl_uint32 defaultValue)
@@ -121,7 +126,7 @@ namespace slib
 
 	float DatabaseCursor::getFloat(sl_uint32 index, float defaultValue)
 	{
-		return (float)(getDouble(index, defaultValue));
+		return getValue(index).getFloat(defaultValue);
 	}
 
 	float DatabaseCursor::getFloat(const StringParam& name, float defaultValue)
@@ -135,7 +140,7 @@ namespace slib
 
 	double DatabaseCursor::getDouble(sl_uint32 index, double defaultValue)
 	{
-		return getString(index).parseDouble(defaultValue);
+		return getValue(index).getDouble(defaultValue);
 	}
 
 	double DatabaseCursor::getDouble(const StringParam& name, double defaultValue)
@@ -149,7 +154,7 @@ namespace slib
 
 	sl_bool DatabaseCursor::getBoolean(sl_uint32 index, sl_bool defaultValue)
 	{
-		return getInt64(index, defaultValue ? 1 : 0) != 0;
+		return getValue(index).getBoolean(defaultValue);
 	}
 
 	sl_bool DatabaseCursor::getBoolean(const StringParam& name, sl_bool defaultValue)
@@ -163,11 +168,7 @@ namespace slib
 	
 	Time DatabaseCursor::getTime(sl_uint32 index, const Time& defaultValue)
 	{
-		String s = getString(index);
-		if (s.isNotEmpty()) {
-			return Time(s);
-		}
-		return defaultValue;
+		return getValue(index).getTime(defaultValue);
 	}
 
 	Time DatabaseCursor::getTime(const StringParam& name, const Time& defaultValue)
@@ -187,6 +188,11 @@ namespace slib
 	Time DatabaseCursor::getTime(const StringParam& name)
 	{
 		return getTime(name, Time::zero());
+	}
+
+	Memory DatabaseCursor::getBlob(sl_uint32 index)
+	{
+		return getValue(index).getMemory();
 	}
 
 	Memory DatabaseCursor::getBlob(const StringParam& name)

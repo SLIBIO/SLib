@@ -39,6 +39,25 @@
 namespace slib
 {	
 
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(SQLiteParam)
+
+	SQLiteParam::SQLiteParam()
+	{
+		flagCreate = sl_true;
+		flagReadonly = sl_false;
+	}
+
+	SLIB_DEFINE_OBJECT(SQLiteDatabase, Database)
+
+	SQLiteDatabase::SQLiteDatabase()
+	{
+		m_dialect = DatabaseDialect::SQLite;
+	}
+
+	SQLiteDatabase::~SQLiteDatabase()
+	{
+	}
+
 	namespace priv
 	{
 		namespace sqlite
@@ -463,8 +482,6 @@ namespace slib
 				DatabaseImpl()
 				{
 					m_db = sl_null;
-					
-					m_dialect = DatabaseDialect::SQLite;
 				}
 
 				~DatabaseImpl()
@@ -767,24 +784,6 @@ namespace slib
 			};
 
 		}
-	}
-
-	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(SQLiteParam)
-
-	SQLiteParam::SQLiteParam()
-	{
-		flagCreate = sl_true;
-		flagReadonly = sl_false;
-	}
-	
-	SLIB_DEFINE_OBJECT(SQLiteDatabase, Database)
-
-	SQLiteDatabase::SQLiteDatabase()
-	{
-	}
-
-	SQLiteDatabase::~SQLiteDatabase()
-	{
 	}
 
 	Ref<SQLiteDatabase> SQLiteDatabase::open(const SQLiteParam& param)

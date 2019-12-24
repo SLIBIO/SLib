@@ -60,7 +60,7 @@ namespace slib
 		virtual Variant getValue(const StringParam& name);
 	
 
-		virtual String getString(sl_uint32 index) = 0;
+		virtual String getString(sl_uint32 index);
 
 		virtual String getString(const StringParam& name);
 	
@@ -109,7 +109,7 @@ namespace slib
 		Time getTime(const StringParam& name);
 	
 
-		virtual Memory getBlob(sl_uint32 index) = 0;
+		virtual Memory getBlob(sl_uint32 index);
 
 		virtual Memory getBlob(const StringParam& name);
 	
