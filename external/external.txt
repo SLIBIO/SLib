@@ -21,6 +21,7 @@ FFmpeg 4.1.1
 	openh264 8.1.0
 	kvazaar 1.2.0
 libmysqlclient 8.0
+libpq 12.1
 FacebookSDK(iOS) 5.11.0
 Firebase(iOS) 6.13.0
 XGPush(iOS) 3.3.7
