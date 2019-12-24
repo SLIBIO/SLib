@@ -285,7 +285,6 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/db/database_expression.cpp"
  "${SLIB_PATH}/src/slib/db/database_sql.cpp"
  "${SLIB_PATH}/src/slib/db/database_statement.cpp"
- "${SLIB_PATH}/src/slib/db/mysql.cpp"
  "${SLIB_PATH}/src/slib/db/redis.cpp"
  "${SLIB_PATH}/src/slib/db/sqlite.cpp"
  
@@ -445,6 +444,9 @@ if(ANDROID)
  )
 else ()
  set (SLIB_EXTRA_PLATFORM_FILES
+  "${SLIB_PATH}/src/slib/db/mysql.cpp"
+  "${SLIB_PATH}/src/slib/db/postgresql.cpp"
+
   "${SLIB_PATH}/src/slib/graphics/bitmap_cairo.cpp"
   "${SLIB_PATH}/src/slib/graphics/canvas_cairo.cpp"
   "${SLIB_PATH}/src/slib/graphics/drawable_cairo.cpp"

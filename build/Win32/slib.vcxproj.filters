@@ -1367,5 +1367,8 @@
     <ClCompile Include="..\..\src\slib\db\database_expression.cpp">
       <Filter>src\db</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\db\postgresql.cpp">
+      <Filter>src\db</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

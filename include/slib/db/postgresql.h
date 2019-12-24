@@ -20,19 +20,57 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_DB_HEADER
-#define CHECKHEADER_SLIB_DB_HEADER
+#ifndef CHECKHEADER_SLIB_DB_POSTGRESQL
+#define CHECKHEADER_SLIB_DB_POSTGRESQL
 
-#include "db/constants.h"
+#include "database.h"
 
-#include "db/expression.h"
-#include "db/sql.h"
+#if defined(SLIB_PLATFORM_IS_DESKTOP)
+#define SLIB_DATABASE_SUPPORT_POSTGRESQL
+#endif
 
-#include "db/database.h"
-#include "db/sqlite.h"
-#include "db/mysql.h"
-#include "db/postgresql.h"
+#if defined(SLIB_DATABASE_SUPPORT_POSTGRESQL)
 
-#include "db/redis.h"
+namespace slib
+{
+	
+	class SLIB_EXPORT PostgreSqlParam
+	{
+	public:
+		String host;
+		sl_uint16 port;
+		String user;
+		String password;
+		String db;
+		
+		// Output
+		String error;
+
+	public:
+		PostgreSqlParam();
+
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(PostgreSqlParam)
+
+	};
+
+	class SLIB_EXPORT PostgreSQL : public Database
+	{
+		SLIB_DECLARE_OBJECT
+
+	protected:
+		PostgreSQL();
+
+		~PostgreSQL();
+	
+	public:
+		typedef PostgreSqlParam Param;
+		
+		static Ref<PostgreSQL> connect(PostgreSqlParam& param);
+	
+	};
+
+}
+
+#endif
 
 #endif

@@ -209,6 +209,7 @@
     <ClCompile Include="..\..\src\slib\db\database_sql.cpp" />
     <ClCompile Include="..\..\src\slib\db\database_statement.cpp" />
     <ClCompile Include="..\..\src\slib\db\mysql.cpp" />
+    <ClCompile Include="..\..\src\slib\db\postgresql.cpp" />
     <ClCompile Include="..\..\src\slib\db\sqlite.cpp" />
     <ClCompile Include="..\..\src\slib\device\device.cpp" />
     <ClCompile Include="..\..\src\slib\device\device_win32.cpp" />

@@ -1418,6 +1418,7 @@
 		26F5C77A237AEF44009F3EEF /* contact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5C779237AEF44009F3EEF /* contact.cpp */; };
 		26F5C77E237EEDFD009F3EEF /* ui_notification_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26F5C77D237EEDFC009F3EEF /* ui_notification_apple.mm */; };
 		26F5EA6622D6835C00CD1595 /* toast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F5EA6522D6835B00CD1595 /* toast.cpp */; };
+		26F607B323ABE0C600DCE0C3 /* postgresql.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F607B223ABE0C600DCE0C3 /* postgresql.cpp */; };
 		26FADD30215676D50057F7EA /* stun.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FADD2F215676D40057F7EA /* stun.cpp */; };
 		26FBB34B1ED5581F0086C27A /* ui_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FBB34A1ED5581F0086C27A /* ui_text.cpp */; };
 		26FD9030235DE31600574068 /* charset_ext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FD902F235DE31600574068 /* charset_ext.cpp */; };
@@ -2920,6 +2921,7 @@
 		26F5C779237AEF44009F3EEF /* contact.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = contact.cpp; path = social/contact.cpp; sourceTree = "<group>"; };
 		26F5C77D237EEDFC009F3EEF /* ui_notification_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_notification_apple.mm; sourceTree = "<group>"; };
 		26F5EA6522D6835B00CD1595 /* toast.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = toast.cpp; sourceTree = "<group>"; };
+		26F607B223ABE0C600DCE0C3 /* postgresql.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = postgresql.cpp; sourceTree = "<group>"; };
 		26F900641D994ED0001A6EE9 /* animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = animation.cpp; sourceTree = "<group>"; };
 		26FA807B1C98891B0074F76B /* quaternion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = quaternion.cpp; sourceTree = "<group>"; };
 		26FADD2F215676D40057F7EA /* stun.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stun.cpp; sourceTree = "<group>"; };
@@ -5407,6 +5409,7 @@
 				265EBF201C23041600AD81D9 /* database_statement.cpp */,
 				265EBF211C23041600AD81D9 /* database.cpp */,
 				265EBF221C23041600AD81D9 /* mysql.cpp */,
+				26F607B223ABE0C600DCE0C3 /* postgresql.cpp */,
 				2639194321CD2510008B335B /* redis.cpp */,
 				265EBF231C23041600AD81D9 /* sqlite.cpp */,
 			);
@@ -7340,6 +7343,7 @@
 				26D9D9481E9645CE005F7BD3 /* line_segment.cpp in Sources */,
 				26D9D9A11E96467B005F7BD3 /* socket.cpp in Sources */,
 				26D9D9491E9645CE005F7BD3 /* triangle.cpp in Sources */,
+				26F607B323ABE0C600DCE0C3 /* postgresql.cpp in Sources */,
 				26D9D94A1E9645CE005F7BD3 /* system.cpp in Sources */,
 				262D599F2324E9A500F85780 /* emoji.cpp in Sources */,
 				26D9D9CB1E96468D005F7BD3 /* progress_bar.cpp in Sources */,
