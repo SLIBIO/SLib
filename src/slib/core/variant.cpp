@@ -2106,29 +2106,33 @@ namespace slib
 							if (!priv::variant::getVariantListJsonString(ret, p1)) {
 								return sl_false;
 							}
+							return sl_true;
 						} else if (CMap<String, Variant>* p2 = CastInstance< CMap<String, Variant> >(obj._ptr)) {
 							if (!priv::variant::getVariantMapJsonString(ret, p2)) {
 								return sl_false;
 							}
+							return sl_true;
 						} else if (CHashMap<String, Variant>* p3 = CastInstance< CHashMap<String, Variant> >(obj._ptr)) {
 							if (!priv::variant::getVariantHashMapJsonString(ret, p3)) {
 								return sl_false;
 							}
+							return sl_true;
 						} else if (CList< Map<String, Variant> >* p4 = CastInstance< CList< Map<String, Variant> > >(obj._ptr)) {
 							if (!priv::variant::getVariantMapListJsonString(ret, p4)) {
 								return sl_false;
 							}
+							return sl_true;
 						} else if (CList< HashMap<String, Variant> >* p5 = CastInstance< CList< HashMap<String, Variant> > >(obj._ptr)) {
 							if (!priv::variant::getVariantHashMapListJsonString(ret, p5)) {
 								return sl_false;
 							}
+							return sl_true;
 						}
 					}
-				} else {
-					String valueText = v.toJsonString();
-					if (!(ret.add(valueText))) {
-						return sl_false;
-					}
+				}
+				String valueText = v.toJsonString();
+				if (!(ret.add(valueText))) {
+					return sl_false;
 				}
 				return sl_true;
 			}
