@@ -45,7 +45,7 @@ namespace slib
 	{
 		namespace wechat_ios
 		{
-						
+			
 			class StaticContext
 			{
 			public:
@@ -70,6 +70,7 @@ namespace slib
 					MutexLocker locker(&lock);
 					if (callbackPay.isNotNull()) {
 						WeChatLoginResult result;
+						result.flagCancel = sl_true;
 						callbackLogin(result);
 					}
 					callbackLogin = callback;
@@ -87,6 +88,7 @@ namespace slib
 					MutexLocker locker(&lock);
 					if (callbackPay.isNotNull()) {
 						WeChatPaymentResult result;
+						result.flagCancel = sl_true;
 						callbackPay(result);
 					}
 					callbackPay = callback;
