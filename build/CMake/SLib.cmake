@@ -304,6 +304,9 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/service/web_service.cpp"
  "${SLIB_PATH}/src/slib/service/xgpush_service.cpp"
 
+ "${SLIB_PATH}/src/slib/social/alipay.cpp"
+ "${SLIB_PATH}/src/slib/social/alipay_openssl.cpp"
+ "${SLIB_PATH}/src/slib/social/alipay_sdk.cpp"
  "${SLIB_PATH}/src/slib/social/contact.cpp"
  "${SLIB_PATH}/src/slib/social/ebay.cpp"
  "${SLIB_PATH}/src/slib/social/etsy.cpp"
@@ -418,6 +421,7 @@ if(ANDROID)
   "${SLIB_PATH}/src/slib/device/device_android.cpp"
   "${SLIB_PATH}/src/slib/device/sensor_android.cpp"
 
+  "${SLIB_PATH}/src/slib/social/alipay_android.cpp"
   "${SLIB_PATH}/src/slib/social/facebook_android.cpp"
   "${SLIB_PATH}/src/slib/social/instagram_android.cpp"
   "${SLIB_PATH}/src/slib/social/wechat_android.cpp"

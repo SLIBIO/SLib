@@ -22,6 +22,7 @@ dependencies {
     compileOnly project(':slib_facebook')
     compileOnly project(':slib_xgpush')
     compileOnly project(':slib_wechat')
+    compileOnly project(':slib_alipay')
 }
 
 tasks.all { task ->
@@ -33,5 +34,7 @@ tasks.all { task ->
         task.dependsOn(project(":slib_call").getTasksByName(task.name, true)[0])
         task.dependsOn(project(":slib_facebook").getTasksByName(task.name, true)[0])
         task.dependsOn(project(":slib_xgpush").getTasksByName(task.name, true)[0])
+        task.dependsOn(project(":slib_wechat").getTasksByName(task.name, true)[0])
+        task.dependsOn(project(":slib_alipay").getTasksByName(task.name, true)[0])
     }
 }

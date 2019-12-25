@@ -36,7 +36,6 @@ namespace slib
 		sl_bool flagSuccess;
 		sl_bool flagCancel;
 		String error;
-		HashMap<String, String> response;
 
 	public:
 		AlipayResult();
@@ -98,6 +97,9 @@ namespace slib
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(AlipayPaymentResult)
 
+	public:
+		void applyAppResponse(const String& result);
+		
 	};
 
 	class SLIB_EXPORT AlipayPaymentRequest

@@ -41,10 +41,13 @@ android {
 repositories {
     flatDir{
         dirs "${System.env.SLIB_PATH}/lib/Android"
+        dirs "${System.env.SLIB_PATH}/external/bin/Alipay/Android"
     }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation ':slib@aar'
+    implementation ':slib_alipay@aar'
+    implementation (name: 'alipaySdk-15.6.8-20191021122514', ext: 'aar')
 }

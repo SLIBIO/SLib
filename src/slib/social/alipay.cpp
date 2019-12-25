@@ -118,6 +118,14 @@ namespace slib
 	{
 	}
 
+	void AlipayPaymentResult::applyAppResponse(const String& result)
+	{
+		Json json = Json::parseJson(result);
+		if (json["alipay_trade_app_pay_response"]["msg"].getString() == "Success") {
+			flagSuccess = sl_true;
+		}
+	}
+
 
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(AlipayPaymentRequest)
 

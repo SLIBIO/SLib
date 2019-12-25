@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.4.1)
 
 include (${SLIB_PATH}/tool/slib-app.cmake)
 
+link_directories ("${SLIB_PATH}/external/bin/OpenSSL/Android/${ANDROID_ABI}")
+
 set (SOURCE_FILES
 	"${CMAKE_CURRENT_LIST_DIR}/src/main/cpp/native-lib.cpp"
 
@@ -13,7 +15,6 @@ set (SOURCE_FILES
 	"${CMAKE_CURRENT_LIST_DIR}/../../src/gen/strings.cpp"
 
 	"${CMAKE_CURRENT_LIST_DIR}/../../src/cpp/app.cpp"
-	"${CMAKE_CURRENT_LIST_DIR}/../../src/cpp/LaunchScreen.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/../../src/cpp/MainPage.cpp"
 )
 
@@ -21,4 +22,4 @@ add_library(native-lib SHARED
 	${SOURCE_FILES}
 )
 
-target_link_libraries(native-lib slib log GLESv2)
+target_link_libraries(native-lib slib ssl crypto log GLESv2)
