@@ -3510,6 +3510,16 @@ namespace slib
 	}
 
 	template <class T>
+	SLIB_INLINE ListLocker<T>::ListLocker(AtomicList<T>&& _list) noexcept: ListLocker(List<T>(Move(_list)))
+	{
+	}
+
+	template <class T>
+	SLIB_INLINE ListLocker<T>::ListLocker(const AtomicList<T>& _list) noexcept: ListLocker(List<T>(_list))
+	{
+	}
+
+	template <class T>
 	SLIB_INLINE ListLocker<T>::ListLocker(const CList<T>& _list) noexcept
 	 : ObjectLocker(&_list)
 	{
@@ -3559,6 +3569,22 @@ namespace slib
 
 	template <class T>
 	SLIB_INLINE ListElements<T>::ListElements(const List<T>& _list) noexcept
+	 : list(_list)
+	{
+		data = list.getData();
+		count = list.getCount();
+	}
+
+	template <class T>
+	SLIB_INLINE ListElements<T>::ListElements(AtomicList<T>&& _list) noexcept
+	 : list(Move(_list))
+	{
+		data = list.getData();
+		count = list.getCount();
+	}
+
+	template <class T>
+	SLIB_INLINE ListElements<T>::ListElements(const AtomicList<T>& _list) noexcept
 	 : list(_list)
 	{
 		data = list.getData();
@@ -3645,6 +3671,18 @@ namespace slib
 		} else {
 			m_count = 0;
 		}
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>::ListParam(AtomicList<T>&& _list) noexcept
+	{
+		m_count = TYPE_LIST;
+		new (reinterpret_cast<List<T>*>(&m_data)) List<T>(Move(_list));
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>::ListParam(const AtomicList<T>& _list) noexcept: ListParam(List<T>(_list))
+	{
 	}
 
 	template <class T>
@@ -3746,6 +3784,21 @@ namespace slib
 			m_count = 0;
 		}
 		return *this;
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(AtomicList<T>&& _list) noexcept
+	{
+		_free();
+		m_count = TYPE_LIST;
+		new (reinterpret_cast<List<T>*>(&m_data)) List<T>(Move(_list));
+		return *this;
+	}
+
+	template <class T>
+	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(const AtomicList<T>& _list) noexcept
+	{
+		return *this = List<T>(_list);
 	}
 
 	template <class T>

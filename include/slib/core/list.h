@@ -893,6 +893,10 @@ namespace slib
 
 		ListLocker(const List<T>& list) noexcept;
 
+		ListLocker(AtomicList<T>&& list) noexcept;
+
+		ListLocker(const AtomicList<T>& list) noexcept;
+
 		ListLocker(const CList<T>& list) noexcept;
 
 		ListLocker(const ListParam<T>& list) noexcept;
@@ -922,6 +926,10 @@ namespace slib
 		ListElements(List<T>&& list) noexcept;
 
 		ListElements(const List<T>& list) noexcept;
+
+		ListElements(AtomicList<T>&& list) noexcept;
+
+		ListElements(const AtomicList<T>& list) noexcept;
 
 		ListElements(const CList<T>& list) noexcept;
 
@@ -956,6 +964,10 @@ namespace slib
 		ListParam(List<T>&& list) noexcept;
 
 		ListParam(const List<T>& list) noexcept;
+		
+		ListParam(AtomicList<T>&& list) noexcept;
+
+		ListParam(const AtomicList<T>& list) noexcept;
 
 		ListParam(const CList<T>& list) noexcept;
 
@@ -980,6 +992,10 @@ namespace slib
 		ListParam& operator=(List<T>&& list) noexcept;
 
 		ListParam& operator=(const List<T>& list) noexcept;
+		
+		ListParam& operator=(AtomicList<T>&& list) noexcept;
+
+		ListParam& operator=(const AtomicList<T>& list) noexcept;
 
 		ListParam& operator=(const CList<T>& list) noexcept;
 
