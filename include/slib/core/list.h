@@ -949,8 +949,11 @@ namespace slib
 	class SLIB_EXPORT ListParam
 	{
 	private:
-		void* m_data;
-		sl_size m_count;
+		union {
+			const T* _data;
+			const CList<T>* _list;
+		};
+		sl_reg _count;
 
 	public:
 		ListParam() noexcept;
@@ -1036,10 +1039,10 @@ namespace slib
 
 		void _free() noexcept;
 
-		enum TYPE : sl_size {
-			TYPE_LIST = (sl_size)-1,
-			TYPE_LIST_REF = (sl_size)-2,
-			TYPE_OBJECT = (sl_size)-3
+		enum TYPE : sl_reg {
+			TYPE_LIST = (sl_reg)-1,
+			TYPE_LIST_REF = (sl_reg)-2,
+			TYPE_OBJECT = (sl_reg)-3
 		};
 
 		friend class ListLocker<T>;

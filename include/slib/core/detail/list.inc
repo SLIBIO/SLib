@@ -3626,107 +3626,107 @@ namespace slib
 
 
 	template <class T>
-	SLIB_INLINE ListParam<T>::ListParam() noexcept: m_data(0), m_count(0)
+	SLIB_INLINE ListParam<T>::ListParam() noexcept: _data(sl_null), _count(0)
 	{		
 	}
 
 	template <class T>
-	SLIB_INLINE ListParam<T>::ListParam(sl_null_t) noexcept: m_data(0), m_count(0)
+	SLIB_INLINE ListParam<T>::ListParam(sl_null_t) noexcept: _data(sl_null), _count(0)
 	{
 	}
 
 	template <class T>
 	SLIB_INLINE ListParam<T>::ListParam(ListParam<T>&& other) noexcept
 	{
-		m_data = other.m_data;
-		m_count = other.m_count;
-		other.m_data = sl_null;
-		other.m_count = 0;
+		_data = other._data;
+		_count = other._count;
+		other._data = sl_null;
+		other._count = 0;
 	}
 
 	template <class T>
 	SLIB_INLINE ListParam<T>::ListParam(const ListParam<T>& other) noexcept
 	{
-		m_count = other.m_count;
-		if (m_count == (sl_size)TYPE_LIST) {
-			new (reinterpret_cast<List<T>*>(&m_data)) List<T>(*(reinterpret_cast<const List<T>*>(&(other.m_data))));
+		_count = other._count;
+		if (_count == (sl_reg)TYPE_LIST) {
+			new (reinterpret_cast<List<T>*>(&_data)) List<T>(*(reinterpret_cast<const List<T>*>(&(other._data))));
 		} else {
-			m_data = other.m_data;
+			_data = other._data;
 		}
 	}
 
 	template <class T>
-	SLIB_INLINE ListParam<T>::ListParam(List<T>&& _list) noexcept
+	SLIB_INLINE ListParam<T>::ListParam(List<T>&& list) noexcept
 	{
-		if (_list.isNotNull()) {
-			m_count = TYPE_LIST;
-			new (reinterpret_cast<List<T>*>(&m_data)) List<T>(Move(_list));
+		if (list.isNotNull()) {
+			_count = TYPE_LIST;
+			new (reinterpret_cast<List<T>*>(&_data)) List<T>(Move(list));
 		} else {
-			m_data = sl_null;
-			m_count = 0;
+			_data = sl_null;
+			_count = 0;
 		}
 	}
 
 	template <class T>
-	SLIB_INLINE ListParam<T>::ListParam(const List<T>& _list) noexcept
+	SLIB_INLINE ListParam<T>::ListParam(const List<T>& list) noexcept
 	{
-		m_data = (void*)(_list.ref._ptr);
-		if (m_data) {
-			m_count = TYPE_LIST_REF;
+		_list = list.ref._ptr;
+		if (_list) {
+			_count = TYPE_LIST_REF;
 		} else {
-			m_count = 0;
+			_count = 0;
 		}
 	}
 
 	template <class T>
-	SLIB_INLINE ListParam<T>::ListParam(AtomicList<T>&& _list) noexcept: ListParam(List<T>(Move(_list)))
+	SLIB_INLINE ListParam<T>::ListParam(AtomicList<T>&& list) noexcept: ListParam(List<T>(Move(list)))
 	{
 	}
 
 	template <class T>
-	SLIB_INLINE ListParam<T>::ListParam(const AtomicList<T>& _list) noexcept: ListParam(List<T>(_list))
+	SLIB_INLINE ListParam<T>::ListParam(const AtomicList<T>& list) noexcept: ListParam(List<T>(list))
 	{
 	}
 
 	template <class T>
-	SLIB_INLINE ListParam<T>::ListParam(const CList<T>& _list) noexcept
+	SLIB_INLINE ListParam<T>::ListParam(const CList<T>& list) noexcept
 	{
-		m_count = TYPE_OBJECT;
-		m_data = (void*)(&_list);
+		_count = TYPE_OBJECT;
+		_list = &list;
 	}
 
 	template <class T>
-	SLIB_INLINE ListParam<T>::ListParam(const T* _data, sl_size _count) noexcept
+	SLIB_INLINE ListParam<T>::ListParam(const T* data, sl_size count) noexcept
 	{
-		if (_data && _count) {
-			m_count = _count & SLIB_SIZE_MASK_NO_SIGN_BITS;
-			m_data = (void*)_data;
+		if (data && count) {
+			_count = count & SLIB_SIZE_MASK_NO_SIGN_BITS;
+			_data = data;
 		} else {
-			m_count = 0;
-			m_data = sl_null;
+			_count = 0;
+			_data = sl_null;
 		}
 	}
 
 	template <class T>
 	template <sl_size N>
-	SLIB_INLINE ListParam<T>::ListParam(T(&_data)[N]) noexcept
+	SLIB_INLINE ListParam<T>::ListParam(T(&data)[N]) noexcept
 	{
-		m_count = N & SLIB_SIZE_MASK_NO_SIGN_BITS;
-		m_data = (void*)_data;
+		_count = N & SLIB_SIZE_MASK_NO_SIGN_BITS;
+		_data = data;
 	}
 
 	template <class T>
-	SLIB_INLINE ListParam<T>::ListParam(const ListLocker<T>& _list) noexcept
+	SLIB_INLINE ListParam<T>::ListParam(const ListLocker<T>& list) noexcept
 	{
-		m_count = _list.count & SLIB_SIZE_MASK_NO_SIGN_BITS;
-		m_data = (void*)(_list.data);
+		_count = list.count & SLIB_SIZE_MASK_NO_SIGN_BITS;
+		_data = list.data;
 	}
 
 	template <class T>
-	SLIB_INLINE ListParam<T>::ListParam(const ListElements<T>& _list) noexcept
+	SLIB_INLINE ListParam<T>::ListParam(const ListElements<T>& list) noexcept
 	{
-		m_count = _list.count & SLIB_SIZE_MASK_NO_SIGN_BITS;
-		m_data = (void*)(_list.data);
+		_count = list.count & SLIB_SIZE_MASK_NO_SIGN_BITS;
+		_data = list.data;
 	}
 
 	template <class T>
@@ -3739,18 +3739,18 @@ namespace slib
 	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(sl_null_t) noexcept
 	{
 		_free();
-		m_data = sl_null;
-		m_count = 0;
+		_data = sl_null;
+		_count = 0;
 		return *this;
 	}
 
 	template <class T>
 	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(ListParam<T>&& other) noexcept
 	{
-		m_data = other.m_data;
-		m_count = other.m_count;
-		other.m_data = sl_null;
-		other.m_count = 0;
+		_data = other._data;
+		_count = other._count;
+		other._data = sl_null;
+		other._count = 0;
 		return *this;
 	}
 
@@ -3758,88 +3758,88 @@ namespace slib
 	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(const ListParam<T>& other) noexcept
 	{
 		_free();
-		m_count = other.m_count;
-		if (m_count == (sl_size)TYPE_LIST) {
-			new (reinterpret_cast<List<T>*>(&m_data)) List<T>(*(reinterpret_cast<const List<T>*>(&(other.m_data))));
+		_count = other._count;
+		if (_count == (sl_reg)TYPE_LIST) {
+			new (reinterpret_cast<List<T>*>(&_data)) List<T>(*(reinterpret_cast<const List<T>*>(&(other._data))));
 		} else {
-			m_data = other.m_data;
+			_data = other._data;
 		}
 		return *this;
 	}
 
 	template <class T>
-	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(List<T>&& _list) noexcept
+	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(List<T>&& list) noexcept
 	{
 		_free();
-		if (_list.isNotNull()) {
-			m_count = TYPE_LIST;
-			new (reinterpret_cast<List<T>*>(&m_data)) List<T>(Move(_list));
+		if (list.isNotNull()) {
+			_count = TYPE_LIST;
+			new (reinterpret_cast<List<T>*>(&_data)) List<T>(Move(list));
 		} else {
-			m_data = sl_null;
-			m_count = 0;
+			_data = sl_null;
+			_count = 0;
 		}
 		return *this;
 	}
 
 	template <class T>
-	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(const List<T>& _list) noexcept
+	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(const List<T>& list) noexcept
 	{
 		_free();
-		m_data = (void*)(_list.ref._ptr);
-		if (m_data) {
-			m_count = TYPE_LIST_REF;
+		_list = list.ref._ptr;
+		if (_list) {
+			_count = TYPE_LIST_REF;
 		} else {
-			m_count = 0;
+			_count = 0;
 		}
 		return *this;
 	}
 
 	template <class T>
-	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(AtomicList<T>&& _list) noexcept
+	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(AtomicList<T>&& list) noexcept
 	{
-		return *this = List<T>(Move(_list));
+		return *this = List<T>(Move(list));
 	}
 
 	template <class T>
-	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(const AtomicList<T>& _list) noexcept
+	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(const AtomicList<T>& list) noexcept
 	{
-		return *this = List<T>(_list);
+		return *this = List<T>(list);
 	}
 
 	template <class T>
-	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(const CList<T>& _list) noexcept
+	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(const CList<T>& list) noexcept
 	{
 		_free();
-		m_count = TYPE_OBJECT;
-		m_data = (void*)(&_list);
+		_count = TYPE_OBJECT;
+		_list = &list;
 		return *this;
 	}
 
 	template <class T>
 	template <sl_size N>
-	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(T(&_data)[N]) noexcept
+	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(T(&data)[N]) noexcept
 	{
 		_free();
-		m_count = N & SLIB_SIZE_MASK_NO_SIGN_BITS;
-		m_data = (void*)_data;
+		_count = N & SLIB_SIZE_MASK_NO_SIGN_BITS;
+		_data = (void*)data;
 		return *this;
 	}
 
 	template <class T>
-	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(const ListLocker<T>& _list) noexcept
+	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(const ListLocker<T>& list) noexcept
 	{
 		_free();
-		m_count = _list.count & SLIB_SIZE_MASK_NO_SIGN_BITS;
-		m_data = (void*)(_list.data);
+		_count = list.count & SLIB_SIZE_MASK_NO_SIGN_BITS;
+		_data = (void*)(list.data);
 		return *this;
 	}
 
 	template <class T>
-	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(const ListElements<T>& _list) noexcept
+	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(const ListElements<T>& list) noexcept
 	{
 		_free();
-		m_count = _list.count & SLIB_SIZE_MASK_NO_SIGN_BITS;
-		m_data = (void*)(_list.data);
+		_count = list.count & SLIB_SIZE_MASK_NO_SIGN_BITS;
+		_data = (void*)(list.data);
 		return *this;
 	}
 
@@ -3853,53 +3853,47 @@ namespace slib
 	SLIB_INLINE void ListParam<T>::setNull() noexcept
 	{
 		_free();
-		m_data = sl_null;
-		m_count = 0;
+		_data = sl_null;
+		_count = 0;
 	}
 
 	template <class T>
 	SLIB_INLINE sl_bool ListParam<T>::isNull() const noexcept
 	{
-		return !m_data;
+		return !_data;
 	}
 
 	template <class T>
 	SLIB_INLINE sl_bool ListParam<T>::isNotNull() const noexcept
 	{
-		return m_data != sl_null;
+		return _data != sl_null;
 	}
 
 	template <class T>
 	SLIB_INLINE sl_size ListParam<T>::getCount() const noexcept
 	{
-		if (m_count == (sl_size)TYPE_LIST) {
-			return (reinterpret_cast<const List<T>*>(&m_data))->getCount();
-		} else if (m_count == (sl_size)TYPE_LIST_REF || m_count == (sl_size)TYPE_OBJECT) {
-			return ((CList<T>*)m_data)->getCount();
+		if (_count & SLIB_SIZE_TEST_SIGN_BIT) {
+			return _list->getCount();
 		} else {
-			return m_count;
+			return _count;
 		}
 	}
 
 	template <class T>
 	SLIB_INLINE T* ListParam<T>::getData() const noexcept
 	{
-		if (m_count == (sl_size)TYPE_LIST) {
-			return (reinterpret_cast<const List<T>*>(&m_data))->getData();
-		} else if (m_count == (sl_size)TYPE_LIST_REF || m_count == (sl_size)TYPE_OBJECT) {
-			return ((CList<T>*)m_data)->getData();
+		if (_count & SLIB_SIZE_TEST_SIGN_BIT) {
+			return _list->getData();
 		} else {
-			return (T*)m_data;
+			return (T*)_data;
 		}
 	}
 
 	template <class T>
 	SLIB_INLINE CList<T>* ListParam<T>::getObject() const noexcept
 	{
-		if (m_count == (sl_size)TYPE_LIST) {
-			return (reinterpret_cast<const List<T>*>(&m_data))->ref._ptr;
-		} else if (m_count == (sl_size)TYPE_LIST_REF || m_count == (sl_size)TYPE_OBJECT) {
-			return (CList<T>*)m_data;
+		if (_count & SLIB_SIZE_TEST_SIGN_BIT) {
+			return (CList<T>*)_list;
 		} else {
 			return sl_null;
 		}
@@ -3908,14 +3902,12 @@ namespace slib
 	template <class T>
 	List<T> ListParam<T>::toList() const noexcept
 	{
-		if (m_count == (sl_size)TYPE_LIST) {
-			return *(reinterpret_cast<const List<T>*>(&m_data));
-		} else if (m_count == (sl_size)TYPE_LIST_REF) {
-			return (CList<T>*)m_data;
-		} else if (m_count == (sl_size)TYPE_OBJECT) {
-			return ((CList<T>*)m_data)->duplicate();
+		if (_count == (sl_reg)TYPE_LIST || _count == (sl_reg)TYPE_LIST_REF) {
+			return (CList<T>*)_list;
+		} else if (_count == (sl_reg)TYPE_OBJECT) {
+			return _list->duplicate();
 		} else {
-			return List<T>::create((T*)m_data, m_count);
+			return List<T>::create(_data, _count);
 		}
 	}
 
@@ -3923,24 +3915,22 @@ namespace slib
 	template <class... ARGS>
 	sl_bool ListParam<T>::add(ARGS&&... args) noexcept
 	{
-		if (m_count == (sl_size)TYPE_LIST) {
-			return (reinterpret_cast<List<T>*>(&m_data))->add_NoLock(Forward<ARGS>(args)...);
-		} else if (m_count == (sl_size)TYPE_LIST_REF || m_count == (sl_size)TYPE_OBJECT) {
-			return ((CList<T>*)m_data)->add_NoLock(Forward<ARGS>(args)...);
+		if (_count & SLIB_SIZE_TEST_SIGN_BIT) {
+			return _list->add_NoLock(Forward<ARGS>(args)...);
 		} else {
-			if (m_count) {
+			if (_count) {
 				return sl_false;
 			}
-			m_count = (sl_size)TYPE_LIST;
-			return (reinterpret_cast<List<T>*>(&m_data))->add_NoLock(Forward<ARGS>(args)...);
+			_count = (sl_reg)TYPE_LIST;
+			return (reinterpret_cast<List<T>*>(&_data))->add_NoLock(Forward<ARGS>(args)...);
 		}
 	}
 
 	template <class T>
 	SLIB_INLINE const List<T>& ListParam<T>::_getList() const noexcept
 	{
-		if (m_count == (sl_size)TYPE_LIST) {
-			return *(reinterpret_cast<const List<T>*>(&m_data));
+		if (_count == (sl_reg)TYPE_LIST) {
+			return *(reinterpret_cast<const List<T>*>(&_data));
 		} else {
 			return List<T>::null();
 		}
@@ -3949,8 +3939,8 @@ namespace slib
 	template <class T>
 	SLIB_INLINE void ListParam<T>::_free() noexcept
 	{
-		if (m_count == (sl_size)TYPE_LIST) {
-			(*(reinterpret_cast<List<T>*>(&m_data))).List<T>::~List();
+		if (_count == (sl_reg)TYPE_LIST) {
+			(*(reinterpret_cast<List<T>*>(&_data))).List<T>::~List();
 		}
 	}
 
