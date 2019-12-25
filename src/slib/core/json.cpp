@@ -166,6 +166,10 @@ namespace slib
 	Json::Json(const sl_char16* sz16): Variant(sz16)
 	{
 	}
+
+	Json::Json(const StringParam& param): Variant(param)
+	{
+	}
 	
 	Json::Json(const std::string& str): Variant(str)
 	{
@@ -1189,6 +1193,16 @@ namespace slib
 		json.setString(_in);
 	}
 	
+	void FromJson(const Json& json, StringParam& _out)
+	{
+		_out = json.getStringParam();
+	}
+
+	void ToJson(Json& json, const StringParam& _in)
+	{
+		json.setString(_in);
+	}
+
 	void FromJson(const Json& json, Time& _out)
 	{
 		_out = json.getTime(_out);

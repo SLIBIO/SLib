@@ -1010,6 +1010,10 @@ namespace slib
 
 	public:
 		void setNull() noexcept;
+		
+		sl_bool isNull() const noexcept;
+		
+		sl_bool isNotNull() const noexcept;
 
 		sl_size getCount() const noexcept;
 

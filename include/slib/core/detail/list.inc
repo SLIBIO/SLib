@@ -3658,8 +3658,13 @@ namespace slib
 	template <class T>
 	SLIB_INLINE ListParam<T>::ListParam(List<T>&& _list) noexcept
 	{
-		m_count = TYPE_LIST;
-		new (reinterpret_cast<List<T>*>(&m_data)) List<T>(Move(_list));
+		if (_list.isNotNull()) {
+			m_count = TYPE_LIST;
+			new (reinterpret_cast<List<T>*>(&m_data)) List<T>(Move(_list));
+		} else {
+			m_data = sl_null;
+			m_count = 0;
+		}
 	}
 
 	template <class T>
@@ -3674,10 +3679,8 @@ namespace slib
 	}
 
 	template <class T>
-	SLIB_INLINE ListParam<T>::ListParam(AtomicList<T>&& _list) noexcept
+	SLIB_INLINE ListParam<T>::ListParam(AtomicList<T>&& _list) noexcept: ListParam(List<T>(Move(_list)))
 	{
-		m_count = TYPE_LIST;
-		new (reinterpret_cast<List<T>*>(&m_data)) List<T>(Move(_list));
 	}
 
 	template <class T>
@@ -3768,8 +3771,13 @@ namespace slib
 	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(List<T>&& _list) noexcept
 	{
 		_free();
-		m_count = TYPE_LIST;
-		new (reinterpret_cast<List<T>*>(&m_data)) List<T>(Move(_list));
+		if (_list.isNotNull()) {
+			m_count = TYPE_LIST;
+			new (reinterpret_cast<List<T>*>(&m_data)) List<T>(Move(_list));
+		} else {
+			m_data = sl_null;
+			m_count = 0;
+		}
 		return *this;
 	}
 
@@ -3789,10 +3797,7 @@ namespace slib
 	template <class T>
 	SLIB_INLINE ListParam<T>& ListParam<T>::operator=(AtomicList<T>&& _list) noexcept
 	{
-		_free();
-		m_count = TYPE_LIST;
-		new (reinterpret_cast<List<T>*>(&m_data)) List<T>(Move(_list));
-		return *this;
+		return *this = List<T>(Move(_list));
 	}
 
 	template <class T>
@@ -3850,6 +3855,18 @@ namespace slib
 		_free();
 		m_data = sl_null;
 		m_count = 0;
+	}
+
+	template <class T>
+	SLIB_INLINE sl_bool ListParam<T>::isNull() const noexcept
+	{
+		return !m_data;
+	}
+
+	template <class T>
+	SLIB_INLINE sl_bool ListParam<T>::isNotNull() const noexcept
+	{
+		return m_data != sl_null;
 	}
 
 	template <class T>

@@ -62,6 +62,12 @@ namespace slib
 		ToJson(*this, list);
 	}
 	
+	template <class T>
+	SLIB_INLINE Json::Json(const ListParam<T>& list)
+	{
+		ToJson(*this, list);
+	}
+	
 	template <class KT, class VT, class KEY_COMPARE>
 	SLIB_INLINE Json::Json(const Map<KT, VT, KEY_COMPARE>& map)
 	{
@@ -257,6 +263,22 @@ namespace slib
 	SLIB_INLINE void ToJson(Json& json, const AtomicList<T>& _in)
 	{
 		ToJson(json, List<T>(_in));
+	}
+	
+	template <class T>
+	void ToJson(Json& json, const ListParam<T>& _in)
+	{
+		if (_in.isNotNull()) {
+			JsonList list;
+			ListLocker<T> src(_in);
+			for (sl_size i = 0; i < src.count; i++) {
+				T& o = src[i];
+				list.add_NoLock(Json(o));
+			}
+			json = Move(list);
+		} else {
+			json.setNull();
+		}
 	}
 	
 	template <class KT, class VT, class KEY_COMPARE>

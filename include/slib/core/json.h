@@ -136,6 +136,8 @@ namespace slib
 		
 		Json(const sl_char16* sz16);
 		
+		Json(const StringParam& param);
+		
 #ifdef SLIB_SUPPORT_STD_TYPES
 		Json(const std::string& value);
 
@@ -196,6 +198,9 @@ namespace slib
 		
 		template <class T>
 		Json(const AtomicList<T>& list);
+		
+		template <class T>
+		Json(const ListParam<T>& list);
 		
 		template <class KT, class VT, class KEY_COMPARE>
 		Json(const Map<KT, VT, KEY_COMPARE>& map);
@@ -425,6 +430,9 @@ namespace slib
 	void ToJson(Json& json, const sl_char8* sz8);
 	void ToJson(Json& json, const sl_char16* sz16);
 	
+	void FromJson(const Json& json, StringParam& _out);
+	void ToJson(Json& json, const StringParam& _in);
+
 #ifdef SLIB_SUPPORT_STD_TYPES
 	void FromJson(const Json& json, std::string& _out);
 	void FromJson(const Json& json, std::string& _out, const std::string& def);
@@ -522,6 +530,9 @@ namespace slib
 	void FromJson(const Json& json, AtomicList<T>& _out);
 	template <class T>
 	void ToJson(Json& json, const AtomicList<T>& _in);
+	
+	template <class T>
+	void ToJson(Json& json, const ListParam<T>& _in);
 	
 	template <class KT, class VT, class KEY_COMPARE>
 	void FromJson(const Json& json, Map<KT, VT, KEY_COMPARE>& _out);
