@@ -26,7 +26,7 @@ FacebookSDK(iOS) 5.11.0
 Firebase(iOS) 6.13.0
 XGPush(iOS) 3.3.7
 WeChat(iOS) 1.8.6.1
-Alipay(iOS) 15.5.5
+Alipay 15.6.8
 
 # Headers
 gl
