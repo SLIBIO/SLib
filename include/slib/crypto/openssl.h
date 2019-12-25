@@ -47,9 +47,9 @@ namespace slib
 		~OpenSSL_Key();
 		
 	public:
-		static Ref<OpenSSL_Key> createPublicKey(const String& pem);
+		static Ref<OpenSSL_Key> createPublicKey(const StringParam& pem);
 		
-		static Ref<OpenSSL_Key> createPrivateKey(const String& pem);
+		static Ref<OpenSSL_Key> createPrivateKey(const StringParam& pem);
 		
 	public:
 		SLIB_INLINE evp_pkey_st* get_EVP_PKEY()

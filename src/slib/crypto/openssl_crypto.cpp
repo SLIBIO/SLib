@@ -434,10 +434,11 @@ namespace slib
 		}
 	}
 
-	Ref<OpenSSL_Key> OpenSSL_Key::createPublicKey(const String& pem)
+	Ref<OpenSSL_Key> OpenSSL_Key::createPublicKey(const StringParam& _pem)
 	{
 		BIO* bio = BIO_new(BIO_s_mem());
 		if (bio) {
+			StringData pem(_pem);
 			BIO_write(bio, pem.getData(), (int)(pem.getLength()));
 			EVP_PKEY* key = PEM_read_bio_PUBKEY(bio, sl_null, sl_null, sl_null);
 			BIO_free(bio);
@@ -453,10 +454,11 @@ namespace slib
 		return sl_null;
 	}
 
-	Ref<OpenSSL_Key> OpenSSL_Key::createPrivateKey(const String& pem)
+	Ref<OpenSSL_Key> OpenSSL_Key::createPrivateKey(const StringParam& _pem)
 	{
 		BIO* bio = BIO_new(BIO_s_mem());
 		if (bio) {
+			StringData pem(_pem);
 			BIO_write(bio, pem.getData(), (int)(pem.getLength()));
 			EVP_PKEY* key = PEM_read_bio_PrivateKey(bio, sl_null, sl_null, sl_null);
 			BIO_free(bio);
