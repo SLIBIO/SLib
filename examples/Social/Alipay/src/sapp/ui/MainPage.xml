@@ -1,0 +1,15 @@
+<sapp>
+	<layout
+		type='page'
+		background='white'
+		>
+		
+		<label
+			text='Hello World'
+			fontSize='5mm'
+			textColor='black'
+			alignCenter='true'
+			/>
+
+ 	</layout>
+</sapp>
