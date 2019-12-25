@@ -40,13 +40,18 @@ namespace slib
 	class SLIB_EXPORT StringParam
 	{
 	public:
-		sl_size _value;
-		sl_size _length;
+		union {
+			const sl_char8* _value;
+			const sl_char16* _value16;
+			const StringContainer* _container;
+			const StringContainer16* _container16;
+		};
+		sl_reg _length;
 		
 	public:
-		SLIB_INLINE constexpr StringParam() noexcept : _value(0), _length(0) {}
+		SLIB_INLINE constexpr StringParam() noexcept : _value(sl_null), _length(0) {}
 		
-		SLIB_INLINE constexpr StringParam(sl_null_t) noexcept : _value(0), _length(1) {}
+		SLIB_INLINE constexpr StringParam(sl_null_t) noexcept : _value(sl_null), _length(1) {}
 		
 		StringParam(StringParam&& other) noexcept;
 		
@@ -170,7 +175,7 @@ namespace slib
 		sl_size getHashCode() const noexcept;
 
 	public:
-		static void _free(sl_size value, sl_size length) noexcept;
+		void _free() noexcept;
 		
 		friend class StringData;
 		friend class StringData16;
@@ -266,7 +271,8 @@ namespace slib
 		sl_size getLengthForParser() const noexcept;
 
 	private:
-		mutable sl_size length;			
+		mutable sl_size length;
+		
 	};
 	
 }

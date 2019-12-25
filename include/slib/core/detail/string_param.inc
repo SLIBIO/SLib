@@ -29,7 +29,7 @@ namespace slib
 		{
 			struct ConstContainer
 			{
-				sl_size value;
+				void* value;
 				sl_size length;
 			};
 
