@@ -504,6 +504,28 @@ namespace slib
 			_length = 1;
 		}
 	}
+
+	StringParam::StringParam(const StringData& str) noexcept
+	{
+		REF_VAR(const sl_char8*, _value) = str.data;
+		_length = str.getLengthForParser();
+		if (_length & SLIB_SIZE_TEST_SIGN_BIT) {
+			_length = 0;
+		} else {
+			_length = GET_LENGTH(_length);
+		}
+	}
+	
+	StringParam::StringParam(const StringData16& str) noexcept
+	{
+		REF_VAR(const sl_char16*, _value) = str.data;
+		_length = str.getLengthForParser();
+		if (_length & SLIB_SIZE_TEST_SIGN_BIT) {
+			_length = STRING_TYPE_SZ16_PREFIX;
+		} else {
+			_length = STRING_TYPE_SZ16_PREFIX | GET_LENGTH(_length);
+		}
+	}
 	
 	StringParam& StringParam::operator=(StringParam&& other) noexcept
 	{
@@ -649,6 +671,32 @@ namespace slib
 			_length = STRING_TYPE_SZ16_PREFIX;
 		} else {
 			setNull();
+		}
+		return *this;
+	}
+
+	StringParam& StringParam::operator=(const StringData& str) noexcept
+	{
+		free_param(_value, _length);
+		REF_VAR(const sl_char8*, _value) = str.data;
+		_length = str.getLengthForParser();
+		if (_length & SLIB_SIZE_TEST_SIGN_BIT) {
+			_length = 0;
+		} else {
+			_length = GET_LENGTH(_length);
+		}
+		return *this;
+	}
+
+	StringParam& StringParam::operator=(const StringData16& str) noexcept
+	{
+		free_param(_value, _length);
+		REF_VAR(const sl_char16*, _value) = str.data;
+		_length = str.getLengthForParser();
+		if (_length & SLIB_SIZE_TEST_SIGN_BIT) {
+			_length = STRING_TYPE_SZ16_PREFIX;
+		} else {
+			_length = STRING_TYPE_SZ16_PREFIX | GET_LENGTH(_length);
 		}
 		return *this;
 	}
@@ -1011,6 +1059,30 @@ namespace slib
 		}
 	}
 
+	StringData::StringData(const sl_char8* _str) noexcept
+	{
+		if (_str) {
+			data = (sl_char8*)_str;
+			length = SLIB_SIZE_MAX;
+		} else {
+			static sl_char8 s[] = "";
+			data = s;
+			length = 0;
+		}
+	}
+
+	StringData::StringData(const sl_char8* _str, sl_size _length) noexcept
+	{
+		if (_str && _length) {
+			data = (sl_char8*)_str;
+			length = _length;
+		} else {
+			static sl_char8 s[] = "";
+			data = s;
+			length = 0;
+		}
+	}
+
 	sl_bool StringData::isEmpty() const noexcept
 	{
 		return !length;
@@ -1068,6 +1140,30 @@ namespace slib
 					}
 					break;
 			}
+		} else {
+			static sl_char16 s[] = SLIB_UNICODE("");
+			data = s;
+			length = 0;
+		}
+	}
+
+	StringData16::StringData16(const sl_char16* _str) noexcept
+	{
+		if (_str) {
+			data = (sl_char16*)_str;
+			length = SLIB_SIZE_MAX;
+		} else {
+			static sl_char16 s[] = SLIB_UNICODE("");
+			data = s;
+			length = 0;
+		}
+	}
+
+	StringData16::StringData16(const sl_char16* _str, sl_size _length) noexcept
+	{
+		if (_str && _length) {
+			data = (sl_char16*)_str;
+			length = _length;
 		} else {
 			static sl_char16 s[] = SLIB_UNICODE("");
 			data = s;

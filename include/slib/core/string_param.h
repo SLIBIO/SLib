@@ -34,6 +34,8 @@ namespace slib
 {
 
 	class Variant;
+	class StringData;
+	class StringData16;
 	
 	class SLIB_EXPORT StringParam
 	{
@@ -77,6 +79,10 @@ namespace slib
 		
 		StringParam(const sl_char16* sz16, sl_reg length) noexcept;
 		
+		StringParam(const StringData& str) noexcept;
+		
+		StringParam(const StringData16& str) noexcept;
+		
 	public:
 		static const StringParam& undefined() noexcept;
 		
@@ -114,7 +120,11 @@ namespace slib
 		StringParam& operator=(const sl_char8* sz8) noexcept;
 		
 		StringParam& operator=(const sl_char16* sz16) noexcept;
-
+		
+		StringParam& operator=(const StringData& str) noexcept;
+		
+		StringParam& operator=(const StringData16& str) noexcept;
+		
 	public:
 		void setUndefined() noexcept;
 		
@@ -201,6 +211,10 @@ namespace slib
 	public:
 		StringData(const StringParam& param) noexcept;
 		
+		StringData(const sl_char8* data) noexcept;
+		
+		StringData(const sl_char8* data, sl_size length) noexcept;
+		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(StringData)
 		
 	public:
@@ -230,6 +244,10 @@ namespace slib
 		
 	public:
 		StringData16(const StringParam& param) noexcept;
+		
+		StringData16(const sl_char16* data) noexcept;
+		
+		StringData16(const sl_char16* data, sl_size length) noexcept;
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(StringData16)
 		
