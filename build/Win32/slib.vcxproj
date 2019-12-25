@@ -349,6 +349,9 @@
     <ClCompile Include="..\..\src\slib\service\push_notification.cpp" />
     <ClCompile Include="..\..\src\slib\service\web_service.cpp" />
     <ClCompile Include="..\..\src\slib\service\xgpush_service.cpp" />
+    <ClCompile Include="..\..\src\slib\social\alipay.cpp" />
+    <ClCompile Include="..\..\src\slib\social\alipay_openssl.cpp" />
+    <ClCompile Include="..\..\src\slib\social\alipay_sdk.cpp" />
     <ClCompile Include="..\..\src\slib\social\contact.cpp" />
     <ClCompile Include="..\..\src\slib\social\ebay.cpp" />
     <ClCompile Include="..\..\src\slib\social\etsy.cpp" />

@@ -710,6 +710,10 @@
 		26781C1F2350F6B3002FCA2F /* brush_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26781C1E2350F6B2002FCA2F /* brush_quartz.mm */; };
 		267B9D65225D11450057DF2A /* instagram_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 267B9D64225D11450057DF2A /* instagram_ios.mm */; };
 		267B9D67225D11760057DF2A /* instagram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 267B9D66225D11760057DF2A /* instagram.cpp */; };
+		26987CF123B3993E00872C1D /* alipay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26987CF023B3993E00872C1D /* alipay.cpp */; };
+		26987CF423B3994400872C1D /* alipay_sdk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26987CF223B3994300872C1D /* alipay_sdk.cpp */; };
+		26987CF523B3994400872C1D /* alipay_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26987CF323B3994400872C1D /* alipay_ios.mm */; };
+		26987CF723B3A91F00872C1D /* alipay_openssl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26987CF623B3A91F00872C1D /* alipay_openssl.cpp */; };
 		2698A54A226A1C4300662528 /* refresh_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2698A549226A1C4300662528 /* refresh_view.cpp */; };
 		2698A54C226A1C4C00662528 /* refresh_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2698A54B226A1C4B00662528 /* refresh_view_ios.mm */; };
 		269C2FA0235EDDB600775765 /* charset_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 269C2F9E235EDDB600775765 /* charset_apple.mm */; };
@@ -2240,6 +2244,10 @@
 		2692222F1DC12F600055095F /* image_stb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = image_stb.cpp; sourceTree = "<group>"; };
 		269394CB1D7609EB002B9B03 /* list_report_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list_report_view.cpp; sourceTree = "<group>"; };
 		269462091CAD1C47001B2130 /* xml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = xml.cpp; sourceTree = "<group>"; };
+		26987CF023B3993E00872C1D /* alipay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = alipay.cpp; sourceTree = "<group>"; };
+		26987CF223B3994300872C1D /* alipay_sdk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = alipay_sdk.cpp; sourceTree = "<group>"; };
+		26987CF323B3994400872C1D /* alipay_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = alipay_ios.mm; sourceTree = "<group>"; };
+		26987CF623B3A91F00872C1D /* alipay_openssl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = alipay_openssl.cpp; sourceTree = "<group>"; };
 		2698A549226A1C4300662528 /* refresh_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = refresh_view.cpp; sourceTree = "<group>"; };
 		2698A54B226A1C4B00662528 /* refresh_view_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = refresh_view_ios.mm; sourceTree = "<group>"; };
 		269C2F9E235EDDB600775765 /* charset_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = charset_apple.mm; sourceTree = "<group>"; };
@@ -3965,6 +3973,10 @@
 		26ACB3B7220978310093FF3F /* social */ = {
 			isa = PBXGroup;
 			children = (
+				26987CF023B3993E00872C1D /* alipay.cpp */,
+				26987CF623B3A91F00872C1D /* alipay_openssl.cpp */,
+				26987CF223B3994300872C1D /* alipay_sdk.cpp */,
+				26987CF323B3994400872C1D /* alipay_ios.mm */,
 				26F5C777237AEF35009F3EEF /* contact.cpp */,
 				26E1B85922290380007C222E /* ebay.cpp */,
 				26BAE007221BEE530085B5AB /* etsy.cpp */,
@@ -5229,6 +5241,7 @@
 				26E1B8C0222ABBE7007C222E /* pngrio.c in Sources */,
 				26D9D7F31E9628E0005F7BD3 /* box.cpp in Sources */,
 				26C795AB2215A8940053C5A1 /* facebook_ios.mm in Sources */,
+				26987CF723B3A91F00872C1D /* alipay_openssl.cpp in Sources */,
 				26D9D8971E962962005F7BD3 /* http_server.cpp in Sources */,
 				26D9D89B1E962962005F7BD3 /* nat.cpp in Sources */,
 				26D9D7F51E9628E0005F7BD3 /* plane.cpp in Sources */,
@@ -5532,6 +5545,7 @@
 				26E1B8D2222ABCDD007C222E /* jccolor.c in Sources */,
 				26D9D8861E96295A005F7BD3 /* audio_util.cpp in Sources */,
 				261EB60B23982A4400630C06 /* fcm_service.cpp in Sources */,
+				26987CF123B3993E00872C1D /* alipay.cpp in Sources */,
 				26E1B8EF222ABCDD007C222E /* jerror.c in Sources */,
 				26F53F9E22E1EBD50031D485 /* date_picker.cpp in Sources */,
 				26D9D88C1E96295A005F7BD3 /* media_player.cpp in Sources */,
@@ -5574,6 +5588,7 @@
 				26ACB3F4220984FF0093FF3F /* ui_core_badge_ios.mm in Sources */,
 				26D9D83C1E9628E0005F7BD3 /* object.cpp in Sources */,
 				26E1B8D3222ABCDD007C222E /* jcdctmgr.c in Sources */,
+				26987CF423B3994400872C1D /* alipay_sdk.cpp in Sources */,
 				2639196E21CD469E008B335B /* redis.cpp in Sources */,
 				26D9D89C1E962962005F7BD3 /* net_capture_pcap.cpp in Sources */,
 				26D9D83D1E9628E0005F7BD3 /* app.cpp in Sources */,
@@ -5651,6 +5666,7 @@
 				26FADD33215754860057F7EA /* stun.cpp in Sources */,
 				26D9D8AC1E962969005F7BD3 /* opengl_gles.cpp in Sources */,
 				265A937023048D8600B155A2 /* process_unix.cpp in Sources */,
+				26987CF523B3994400872C1D /* alipay_ios.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

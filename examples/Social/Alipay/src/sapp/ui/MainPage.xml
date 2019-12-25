@@ -2,14 +2,58 @@
 	<layout
 		type='page'
 		background='white'
+		fontSize='20dp'
 		>
 		
-		<label
-			text='Hello World'
-			fontSize='5mm'
-			textColor='black'
+		<linear
 			alignCenter='true'
-			/>
+			width='fill'
+			marginTop='1safeT'
+			marginBottom='1safeB'
+			>
+			
+			<grid
+				width='*'
+				>
+				<column width='wrap' />
+				<column width='*' />
+				<row>
+					<label
+						text='Amount'
+						margin='5dp'
+						alignCenter='true'
+						/>
+					<edit
+						name='txtAmount'
+						width='*'
+						alignCenter='true'
+						keyboard='decimal'
+						margin='5dp'
+						/>
+				</row>
+			</grid>
+
+			<button
+				name='btnPay'
+				style='button'
+				text='Pay'
+				centerHorizontal='true'
+				margin='20dp'
+				fontSize='30dp'
+				paddingLeft='30dp'
+				paddingRight='30dp'
+				/>
+
+		</linear>
 
  	</layout>
+	
+	<style
+		name='button'
+		background='#008050'
+		boundRadius='5dp'
+		padding='5dp'
+		textColor='white'
+		/>
+
 </sapp>

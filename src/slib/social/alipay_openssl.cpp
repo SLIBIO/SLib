@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -20,24 +20,28 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_SOCIAL_HEADER
-#define CHECKHEADER_SLIB_SOCIAL_HEADER
+#include "slib/social/alipay.h"
 
-#include "social/contact.h"
+#include "slib/crypto/openssl.h"
+#include "slib/crypto/base64.h"
 
-#include "social/oauth.h"
-#include "social/oauth_server.h"
+namespace slib
+{
 
-#include "social/facebook.h"
-#include "social/instagram.h"
-#include "social/twitter.h"
-#include "social/linkedin.h"
-#include "social/pinterest.h"
-#include "social/ebay.h"
-#include "social/etsy.h"
-#include "social/wechat.h"
+	sl_bool AlipayOrder::sign(const StringParam& privateKey_PEM)
+	{
+		signature.setNull();
+		String info = generateString(sl_false);
+		
+		Ref<OpenSSL_Key> key = OpenSSL_Key::createPrivateKey(privateKey_PEM);
+		if (key.isNotNull()) {
+			Memory mem = key->sign_RSA_SHA256(info.getData(), info.getLength());
+			if (mem.isNotNull()) {
+				signature = Base64::encode(mem);
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
 
-#include "social/paypal.h"
-#include "social/alipay.h"
-
-#endif
+}

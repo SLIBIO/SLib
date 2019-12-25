@@ -1370,5 +1370,14 @@
     <ClCompile Include="..\..\src\slib\db\postgresql.cpp">
       <Filter>src\db</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\alipay.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\alipay_openssl.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\slib\social\alipay_sdk.cpp">
+      <Filter>src\social</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

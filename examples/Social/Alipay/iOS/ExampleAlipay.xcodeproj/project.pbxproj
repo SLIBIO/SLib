@@ -18,6 +18,12 @@
 		268256BA21E658360079600F /* drawables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268256B421E658360079600F /* drawables.cpp */; };
 		268256BB21E658360079600F /* menus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268256B521E658360079600F /* menus.cpp */; };
 		268256BC21E658360079600F /* colors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268256B621E658360079600F /* colors.cpp */; };
+		26987CFA23B3B10200872C1D /* AlipaySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26987CF923B3B10200872C1D /* AlipaySDK.framework */; };
+		26987CFC23B3B97B00872C1D /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26987CFB23B3B97B00872C1D /* CoreMotion.framework */; };
+		26987D0023B3B98800872C1D /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26987CFF23B3B98800872C1D /* CoreTelephony.framework */; };
+		26987D0123B3B9A300872C1D /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26987CFD23B3B98300872C1D /* Security.framework */; };
+		26987D0323B3B9B800872C1D /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 26987D0223B3B9AE00872C1D /* libz.tbd */; };
+		26987D0923B3BA1800872C1D /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26987D0823B3BA1800872C1D /* SystemConfiguration.framework */; };
 		26B92D6121D4DA80003F6F82 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26B92D6021D4DA80003F6F82 /* UserNotifications.framework */; };
 		26F2DDF0216BDE39007CE8E6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDEF216BDE39007CE8E6 /* UIKit.framework */; };
 		26F2DDF2216BDE44007CE8E6 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F2DDF1216BDE44007CE8E6 /* GLKit.framework */; };
@@ -47,6 +53,15 @@
 		268256B521E658360079600F /* menus.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = menus.cpp; path = ../src/gen/menus.cpp; sourceTree = "<group>"; };
 		268256B621E658360079600F /* colors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = colors.cpp; path = ../src/gen/colors.cpp; sourceTree = "<group>"; };
 		268256BE21E6590A0079600F /* sapp */ = {isa = PBXFileReference; lastKnownFileType = folder; name = sapp; path = ../src/sapp; sourceTree = "<group>"; };
+		26987CF823B3ABA900872C1D /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
+		26987CF923B3B10200872C1D /* AlipaySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AlipaySDK.framework; path = ../../../../external/bin/Alipay/iOS/AlipaySDK.framework; sourceTree = "<group>"; };
+		26987CFB23B3B97B00872C1D /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
+		26987CFD23B3B98300872C1D /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		26987CFF23B3B98800872C1D /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
+		26987D0223B3B9AE00872C1D /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		26987D0423B3B9E200872C1D /* CoreNFC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreNFC.framework; path = System/Library/Frameworks/CoreNFC.framework; sourceTree = SDKROOT; };
+		26987D0623B3B9FA00872C1D /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		26987D0823B3BA1800872C1D /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		26B92D6021D4DA80003F6F82 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		26F2DDEF216BDE39007CE8E6 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		26F2DDF1216BDE44007CE8E6 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
@@ -69,10 +84,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				26B92D6121D4DA80003F6F82 /* UserNotifications.framework in Frameworks */,
+				26987D0323B3B9B800872C1D /* libz.tbd in Frameworks */,
+				26987D0123B3B9A300872C1D /* Security.framework in Frameworks */,
 				263918BC21C9458B008B335B /* CoreVideo.framework in Frameworks */,
 				263918BA21C94584008B335B /* CoreMedia.framework in Frameworks */,
 				2639171621C943F9008B335B /* AVFoundation.framework in Frameworks */,
 				26F2DDFC216BDE66007CE8E6 /* QuartzCore.framework in Frameworks */,
+				26987CFA23B3B10200872C1D /* AlipaySDK.framework in Frameworks */,
+				26987D0023B3B98800872C1D /* CoreTelephony.framework in Frameworks */,
+				26987CFC23B3B97B00872C1D /* CoreMotion.framework in Frameworks */,
+				26987D0923B3BA1800872C1D /* SystemConfiguration.framework in Frameworks */,
 				26F2DDFA216BDE5E007CE8E6 /* CoreImage.framework in Frameworks */,
 				26F2DDF8216BDE58007CE8E6 /* CoreText.framework in Frameworks */,
 				26F2DDF6216BDE53007CE8E6 /* CoreGraphics.framework in Frameworks */,
@@ -111,6 +132,7 @@
 		268256A721E658200079600F /* cpp */ = {
 			isa = PBXGroup;
 			children = (
+				26987CF823B3ABA900872C1D /* config.h */,
 				268256A821E658200079600F /* app.cpp */,
 				268256A921E658200079600F /* app.h */,
 				268256AC21E658200079600F /* MainPage.cpp */,
@@ -123,6 +145,7 @@
 		26F5DE162051ACD500BC4998 = {
 			isa = PBXGroup;
 			children = (
+				26987CF923B3B10200872C1D /* AlipaySDK.framework */,
 				26F5DE212051ACD500BC4998 /* project */,
 				260D833520C7DAE60013B34E /* src */,
 				26F5DE202051ACD500BC4998 /* Products */,
@@ -153,6 +176,13 @@
 		26F5DE3C2051B60500BC4998 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				26987D0823B3BA1800872C1D /* SystemConfiguration.framework */,
+				26987D0623B3B9FA00872C1D /* CFNetwork.framework */,
+				26987D0423B3B9E200872C1D /* CoreNFC.framework */,
+				26987D0223B3B9AE00872C1D /* libz.tbd */,
+				26987CFF23B3B98800872C1D /* CoreTelephony.framework */,
+				26987CFD23B3B98300872C1D /* Security.framework */,
+				26987CFB23B3B97B00872C1D /* CoreMotion.framework */,
 				26B92D6021D4DA80003F6F82 /* UserNotifications.framework */,
 				263918BB21C9458B008B335B /* CoreVideo.framework */,
 				263918B921C94584008B335B /* CoreMedia.framework */,
@@ -409,11 +439,19 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 56WV5U3VJT;
+				FRAMEWORK_SEARCH_PATHS = "$(SLIB_PATH)/external/bin/Alipay/iOS";
 				HEADER_SEARCH_PATHS = "$(SLIB_PATH)/include";
 				INFOPLIST_FILE = project/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				OTHER_LDFLAGS = "-lslib";
+				LIBRARY_SEARCH_PATHS = (
+					"$(SLIB_PATH)/lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)",
+					"$(SLIB_PATH)/external/bin/OpenSSL/iOS",
+				);
+				OTHER_LDFLAGS = (
+					"-lslib",
+					"-lcrypto",
+					"-lssl",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.joycore.schuker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -427,11 +465,19 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 56WV5U3VJT;
+				FRAMEWORK_SEARCH_PATHS = "$(SLIB_PATH)/external/bin/Alipay/iOS";
 				HEADER_SEARCH_PATHS = "$(SLIB_PATH)/include";
 				INFOPLIST_FILE = project/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(SLIB_PATH)/lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
-				OTHER_LDFLAGS = "-lslib";
+				LIBRARY_SEARCH_PATHS = (
+					"$(SLIB_PATH)/lib/iOS/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)",
+					"$(SLIB_PATH)/external/bin/OpenSSL/iOS",
+				);
+				OTHER_LDFLAGS = (
+					"-lslib",
+					"-lcrypto",
+					"-lssl",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.joycore.schuker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

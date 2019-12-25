@@ -15,7 +15,7 @@ void PayPage::onOpen()
 		txtIp->setText(ip);
 	});
 	btnOrder->setOnClick([this, thiz](View*) {
-		// Note: This section has to be implemented on server-side. Here, added for testing purpose
+		// Note: This section should be implemented on server-side. Here, added for testing purpose
 		WeChatCreateOrderParam param;
 		param.orderId = "Test" + String::fromUint64(Time::now().getMillisecondsCount());
 		param.amount = (sl_uint64)(txtAmount->getText().parseDouble() * 100);
