@@ -945,15 +945,27 @@ namespace slib
 
 	};
 	
+	enum class ListType : sl_reg
+	{
+		List_Ref = (sl_reg)-1,
+		List_NoRef = (sl_reg)-2,
+		CList = (sl_reg)-3
+	};
+
 	template <class T>
 	class SLIB_EXPORT ListParam
 	{
 	private:
 		union {
+			void* _value;
+			
 			const T* _data;
 			const CList<T>* _list;
 		};
-		sl_reg _count;
+		union {
+			ListType _type;
+			sl_reg _count;
+		};
 
 	public:
 		ListParam() noexcept;
@@ -1039,12 +1051,6 @@ namespace slib
 
 		void _free() noexcept;
 
-		enum TYPE : sl_reg {
-			TYPE_LIST = (sl_reg)-1,
-			TYPE_LIST_REF = (sl_reg)-2,
-			TYPE_OBJECT = (sl_reg)-3
-		};
-
 		friend class ListLocker<T>;
 		friend class ListElements<T>;
 
@@ -1053,6 +1059,9 @@ namespace slib
 }
 
 #include "detail/list.inc"
+#include "detail/list_elements.inc"
+#include "detail/list_locker.inc"
+#include "detail/list_param.inc"
 
 #ifdef SLIB_SUPPORT_STD_TYPES
 #include "detail/list_std.inc"
