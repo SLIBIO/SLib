@@ -271,6 +271,12 @@ namespace slib
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(StringData)
 		
 	public:
+		template <sl_size N>
+		SLIB_INLINE static StringData literal(const sl_char8 (&s)[N]) noexcept
+		{
+			return StringData(s, N);
+		}
+		
 		SLIB_INLINE sl_char8* getData() const noexcept
 		{
 			return data;
@@ -283,6 +289,10 @@ namespace slib
 		sl_size getLength() const noexcept;
 		
 		sl_size getLengthForParser() const noexcept;
+		
+		sl_compare_result compare(const StringData& other) const noexcept;
+		
+		sl_bool equals(const StringData& other) const noexcept;
 		
 	private:
 		mutable sl_size length;
@@ -305,6 +315,12 @@ namespace slib
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(StringData16)
 		
 	public:
+		template <sl_size N>
+		SLIB_INLINE static StringData16 literal(const sl_char16 (&s)[N]) noexcept
+		{
+			return StringData16(s, N);
+		}
+
 		SLIB_INLINE sl_char16* getData() const noexcept
 		{
 			return data;
@@ -317,11 +333,27 @@ namespace slib
 		sl_size getLength() const noexcept;
 		
 		sl_size getLengthForParser() const noexcept;
-
+		
+		sl_compare_result compare(const StringData16& other) const noexcept;
+		
+		sl_bool equals(const StringData16& other) const noexcept;
+		
 	private:
 		mutable sl_size length;
 		
 	};
+	
+	sl_bool operator==(const StringData& v1, const StringData& v2) noexcept;
+	
+	sl_bool operator!=(const StringData& v1, const StringData& v2) noexcept;
+
+	String operator+(const StringData& v1, const StringData& v2) noexcept;
+
+	sl_bool operator==(const StringData16& v1, const StringData16& v2) noexcept;
+
+	sl_bool operator!=(const StringData16& v1, const StringData16& v2) noexcept;
+
+	String16 operator+(const StringData16& v1, const StringData16& v2) noexcept;
 	
 }
 

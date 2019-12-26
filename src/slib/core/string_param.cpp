@@ -1146,6 +1146,32 @@ namespace slib
 		return length;
 	}
 
+	sl_compare_result StringData::compare(const StringData& other) const noexcept
+	{
+		return String::compare(data, length, other.data, other.length);
+	}
+
+	sl_bool StringData::equals(const StringData& other) const noexcept
+	{
+		return String::equals(data, length, other.data, other.length);
+	}
+
+	sl_bool operator==(const StringData& v1, const StringData& v2) noexcept
+	{
+		return v1.equals(v2);
+	}
+
+	sl_bool operator!=(const StringData& v1, const StringData& v2) noexcept
+	{
+		return !(v1.equals(v2));
+	}
+
+	String operator+(const StringData& v1, const StringData& v2) noexcept
+	{
+		return String::merge(v1.data, v1.getLengthForParser(), v2.data, v2.getLengthForParser());
+	}
+
+
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(StringData16)
 
 	StringData16::StringData16(const StringParam& param) noexcept
@@ -1230,6 +1256,31 @@ namespace slib
 	sl_size StringData16::getLengthForParser() const noexcept
 	{
 		return length;
+	}
+
+	sl_compare_result StringData16::compare(const StringData16& other) const noexcept
+	{
+		return String16::compare(data, length, other.data, other.length);
+	}
+
+	sl_bool StringData16::equals(const StringData16& other) const noexcept
+	{
+		return String16::equals(data, length, other.data, other.length);
+	}
+
+	sl_bool operator==(const StringData16& v1, const StringData16& v2) noexcept
+	{
+		return v1.equals(v2);
+	}
+
+	sl_bool operator!=(const StringData16& v1, const StringData16& v2) noexcept
+	{
+		return !(v1.equals(v2));
+	}
+
+	String16 operator+(const StringData16& v1, const StringData16& v2) noexcept
+	{
+		return String16::merge(v1.data, v1.getLengthForParser(), v2.data, v2.getLengthForParser());
 	}
 
 }
