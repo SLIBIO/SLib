@@ -36,17 +36,30 @@ namespace slib
 	class Variant;
 	class StringData;
 	class StringData16;
+
+	enum class StringType : sl_reg
+	{
+		String8_Ref = -1,
+		String16_Ref = -2,
+		String8_NoRef = -3,
+		String16_NoRef = -4,
+	};
 	
 	class SLIB_EXPORT StringParam
 	{
 	public:
 		union {
-			const sl_char8* _value;
-			const sl_char16* _value16;
-			const StringContainer* _container;
-			const StringContainer16* _container16;
+			void* _value;
+			
+			const sl_char8* _sz8;
+			const sl_char16* _sz16;
+			const StringContainer* _string;
+			const StringContainer16* _string16;
 		};
-		sl_reg _length;
+		union {
+			StringType _type;
+			sl_reg _length;
+		};
 		
 	public:
 		SLIB_INLINE constexpr StringParam() noexcept : _value(sl_null), _length(0) {}
