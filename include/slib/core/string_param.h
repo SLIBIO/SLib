@@ -89,17 +89,35 @@ namespace slib
 		
 		StringParam(AtomicString16&& value) noexcept;
 		
-		StringParam(const sl_char8* sz8) noexcept;
-
-		StringParam(const sl_char16* sz16) noexcept;
-
-		StringParam(const sl_char8* sz8, sl_reg length) noexcept;
+		StringParam(const char* sz) noexcept;
 		
-		StringParam(const sl_char16* sz16, sl_reg length) noexcept;
+		StringParam(const wchar_t* sz) noexcept;
+		
+		StringParam(const char16_t* sz) noexcept;
+		
+		StringParam(const char32_t* sz) noexcept;
+
+		StringParam(const char* str, sl_reg length) noexcept;
+		
+		StringParam(const wchar_t* str, sl_reg length) noexcept;
+		
+		StringParam(const char16_t* str, sl_reg length) noexcept;
+		
+		StringParam(const char32_t* str, sl_reg length) noexcept;
 		
 		StringParam(const StringData& str) noexcept;
 		
 		StringParam(const StringData16& str) noexcept;
+		
+#ifdef SLIB_SUPPORT_STD_TYPES
+		StringParam(const std::string& str) noexcept;
+
+		StringParam(const std::wstring& str) noexcept;
+		
+		StringParam(const std::u16string& str) noexcept;
+		
+		StringParam(const std::u32string& str) noexcept;
+#endif
 		
 	public:
 		static const StringParam& undefined() noexcept;
@@ -135,13 +153,27 @@ namespace slib
 		
 		StringParam& operator=(AtomicString16&& value) noexcept;
 		
-		StringParam& operator=(const sl_char8* sz8) noexcept;
+		StringParam& operator=(const char* sz) noexcept;
 		
-		StringParam& operator=(const sl_char16* sz16) noexcept;
+		StringParam& operator=(const wchar_t* sz) noexcept;
+		
+		StringParam& operator=(const char16_t* sz) noexcept;
+		
+		StringParam& operator=(const char32_t* sz) noexcept;
 		
 		StringParam& operator=(const StringData& str) noexcept;
 		
 		StringParam& operator=(const StringData16& str) noexcept;
+
+#ifdef SLIB_SUPPORT_STD_TYPES
+		StringParam& operator=(const std::string& str) noexcept;
+
+		StringParam& operator=(const std::wstring& str) noexcept;
+		
+		StringParam& operator=(const std::u16string& str) noexcept;
+		
+		StringParam& operator=(const std::u32string& str) noexcept;
+#endif
 		
 	public:
 		void setUndefined() noexcept;
@@ -190,6 +222,9 @@ namespace slib
 	public:
 		void _free() noexcept;
 		
+		void _assign(const sl_char8* str, sl_reg length) noexcept;
+		void _assign(const sl_char16* str, sl_reg length) noexcept;
+
 		friend class StringData;
 		friend class StringData16;
 	};
