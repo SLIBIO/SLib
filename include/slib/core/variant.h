@@ -67,7 +67,30 @@ namespace slib
 	class SLIB_EXPORT Variant
 	{
 	public:
-		sl_uint64 _value;
+		union {
+			sl_uint64 _value;
+			
+			sl_int32 _m_int32;
+			sl_uint32 _m_uint32;
+			sl_int64 _m_int64;
+			sl_uint64 _m_uint64;
+			float _m_float;
+			double _m_double;
+			sl_bool _m_boolean;
+			const StringContainer* _m_string8;
+			const StringContainer16* _m_string16;
+			const sl_char8* _m_sz8;
+			const sl_char16* _m_sz16;
+			Referable* _m_ref;
+			CWeakRef* _m_wref;
+			CMemory* _m_mem;
+			CPromise<Variant>* _m_promise;
+			CList<Variant>* _m_vlist;
+			CHashMap<String, Variant>* _m_vhmap;
+			CMap<String, Variant>* _m_vmap;
+			CList< HashMap<String, Variant> >* _m_vhmaplist;
+			CList< Map<String, Variant> >* _m_vmaplist;
+		};
 		VariantType _type;
 	
 	public:
