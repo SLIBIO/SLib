@@ -251,30 +251,22 @@ namespace slib
 
 		static Json parseJson(const sl_char8* sz, sl_size len);
 
-		static Json parseJson(const String& json, JsonParseParam& param);
+		static Json parseJson(const StringParam& str, JsonParseParam& param);
 
-		static Json parseJson(const String& json);
+		static Json parseJson(const StringParam& str);
 
 		static Json parseJson16(const sl_char16* sz, sl_size len, JsonParseParam& param);
 
 		static Json parseJson16(const sl_char16* sz, sl_size len);
 
-		static Json parseJson16(const String16& json, JsonParseParam& param);
+		static Json parseJson16(const StringParam& str, JsonParseParam& param);
 
-		static Json parseJson16(const String16& json);
+		static Json parseJson16(const StringParam& str);
 
-		static Json parseJsonFromTextFile(const String& filePath, JsonParseParam& param);
+		static Json parseJsonFromTextFile(const StringParam& filePath, JsonParseParam& param);
 
-		static Json parseJsonFromTextFile(const String& filePath);
+		static Json parseJsonFromTextFile(const StringParam& filePath);
 
-		static Json parseJsonUtf8(const Memory& mem, JsonParseParam& param);
-
-		static Json parseJsonUtf8(const Memory& mem);
-
-		static Json parseJson16Utf8(const Memory& mem, JsonParseParam& param);
-
-		static Json parseJson16Utf8(const Memory& mem);
-		
 	public:
 		sl_bool isJsonList() const;
 		

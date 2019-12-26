@@ -84,7 +84,8 @@ namespace slib
 
 	Json HttpServerContext::getRequestBodyAsJson() const
 	{
-		return Json::parseJson16Utf8(m_requestBody);
+		Memory body = m_requestBody;
+		return Json::parseJson((sl_char8*)(body.getData()), body.getSize());
 	}
 
 	void HttpServerContext::applyRequestBodyAsFormUrlEncoded()

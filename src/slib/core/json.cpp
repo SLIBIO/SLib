@@ -641,6 +641,10 @@ namespace slib
 			template <class ST, class CT>
 			Json Parser<ST, CT>::parseJson(const CT* buf, sl_size len, JsonParseParam& param)
 			{
+				if (!len) {
+					return sl_null;
+				}
+				
 				param.flagError = sl_false;
 				
 				Parser<ST, CT> parser;
@@ -686,19 +690,27 @@ namespace slib
 
 	Json Json::parseJson(const sl_char8* sz, sl_size len)
 	{
+		if (!len) {
+			return sl_null;
+		}
 		JsonParseParam param;
 		return parseJson(sz, len, param);
 	}
 
-	Json Json::parseJson(const String& json, JsonParseParam& param)
+	Json Json::parseJson(const StringParam& _str, JsonParseParam& param)
 	{
-		return priv::json::Parser<String, sl_char8>::parseJson(json.getData(), json.getLength(), param);
+		StringData str(_str);
+		return priv::json::Parser<String, sl_char8>::parseJson(str.getData(), str.getLength(), param);
 	}
 
-	Json Json::parseJson(const String& json)
+	Json Json::parseJson(const StringParam& _str)
 	{
+		StringData str(_str);
+		if (str.isEmpty()) {
+			return sl_null;
+		}
 		JsonParseParam param;
-		return parseJson(json, param);
+		return priv::json::Parser<String, sl_char8>::parseJson(str.getData(), str.getLength(), param);
 	}
 
 
@@ -709,52 +721,40 @@ namespace slib
 
 	Json Json::parseJson16(const sl_char16* sz, sl_size len)
 	{
+		if (!len) {
+			return sl_null;
+		}
 		JsonParseParam param;
 		return Json::parseJson16(sz, len, param);
 	}
 
-	Json Json::parseJson16(const String16& json, JsonParseParam& param)
+	Json Json::parseJson16(const StringParam& _str, JsonParseParam& param)
 	{
-		return priv::json::Parser<String16, sl_char16>::parseJson(json.getData(), json.getLength(), param);
+		StringData16 str(_str);
+		return priv::json::Parser<String16, sl_char16>::parseJson(str.getData(), str.getLength(), param);
 	}
 
-	Json Json::parseJson16(const String16& json)
+	Json Json::parseJson16(const StringParam& _str)
 	{
+		StringData16 str(_str);
+		if (str.isEmpty()) {
+			return sl_null;
+		}
 		JsonParseParam param;
-		return Json::parseJson16(json, param);
+		return priv::json::Parser<String16, sl_char16>::parseJson(str.getData(), str.getLength(), param);
 	}
 
 
-	Json Json::parseJsonFromTextFile(const String& filePath, JsonParseParam& param)
+	Json Json::parseJsonFromTextFile(const StringParam& filePath, JsonParseParam& param)
 	{
 		String16 json = File::readAllText16(filePath);
 		return parseJson16(json, param);
 	}
 
-	Json Json::parseJsonFromTextFile(const String& filePath)
+	Json Json::parseJsonFromTextFile(const StringParam& filePath)
 	{
 		JsonParseParam param;
 		return parseJsonFromTextFile(filePath, param);
-	}
-
-	Json Json::parseJsonUtf8(const Memory& mem, JsonParseParam& param)
-	{
-		return parseJson((sl_char8*)(mem.getData()), mem.getSize(), param);
-	}
-
-	Json Json::parseJsonUtf8(const Memory& mem)
-	{
-		return parseJson((sl_char8*)(mem.getData()), mem.getSize());
-	}
-
-	Json Json::parseJson16Utf8(const Memory& mem, JsonParseParam& param)
-	{
-		return parseJson(String16((sl_char8*)(mem.getData()), mem.getSize()), param);
-	}
-
-	Json Json::parseJson16Utf8(const Memory& mem)
-	{
-		return parseJson(String16((sl_char8*)(mem.getData()), mem.getSize()));
 	}
 
 
