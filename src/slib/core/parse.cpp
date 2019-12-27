@@ -38,7 +38,7 @@ namespace slib
 			static sl_size applyBackslashEscapes(const ST& s, sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii, CT* buf) noexcept
 			{
 				const CT* ch = s.getData();
-				sl_size len = s.getLengthForParser();
+				sl_size len = s.getUnsafeLength();
 				sl_size d;
 				if (flagAddQuote) {
 					d = 1;
@@ -464,13 +464,13 @@ namespace slib
 	String ParseUtil::parseBackslashEscapes(const StringParam& _str, sl_size* lengthParsed, sl_bool* outFlagError) noexcept
 	{
 		StringData str(_str);
-		return priv::parse::parseBackslashEscapes<String, sl_char8>(str.getData(), str.getLengthForParser(), lengthParsed, outFlagError);
+		return priv::parse::parseBackslashEscapes<String, sl_char8>(str.getData(), str.getUnsafeLength(), lengthParsed, outFlagError);
 	}
 
 	String16 ParseUtil::parseBackslashEscapes16(const StringParam& _str, sl_size* lengthParsed, sl_bool* outFlagError) noexcept
 	{
 		StringData16 str(_str);
-		return priv::parse::parseBackslashEscapes<String16, sl_char16>(str.getData(), str.getLengthForParser(), lengthParsed, outFlagError);
+		return priv::parse::parseBackslashEscapes<String16, sl_char16>(str.getData(), str.getUnsafeLength(), lengthParsed, outFlagError);
 	}
 
 
@@ -515,13 +515,13 @@ namespace slib
 		if (_str.isNotNull()) {
 			if (_str.is8()) {
 				StringData str(_str);
-				sl_size n = str.getLengthForParser();
+				sl_size n = str.getUnsafeLength();
 				if (pos < n) {
 					return priv::parse::countLineNumber(str.getData() + pos, n - pos, columnLast);
 				}
 			} else {
 				StringData16 str(_str);
-				sl_size n = str.getLengthForParser();
+				sl_size n = str.getUnsafeLength();
 				if (pos < n) {
 					return priv::parse::countLineNumber(str.getData() + pos, n - pos, columnLast);
 				}
@@ -543,7 +543,7 @@ namespace slib
 			template <class CT, class ST>
 			static sl_reg indexOfLine(const ST& str, sl_reg _start) noexcept
 			{
-				sl_size count = str.getLengthForParser();
+				sl_size count = str.getUnsafeLength();
 				sl_size start;
 				if (_start < 0) {
 					start = 0;

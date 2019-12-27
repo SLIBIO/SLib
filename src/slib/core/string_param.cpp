@@ -529,7 +529,7 @@ namespace slib
 	StringParam::StringParam(const StringData& str) noexcept
 	{
 		_value = str.data;
-		_length = str.getLengthForParser();
+		_length = str.getUnsafeLength();
 		if (_length & SLIB_SIZE_TEST_SIGN_BIT) {
 			_length = 0;
 		} else {
@@ -540,7 +540,7 @@ namespace slib
 	StringParam::StringParam(const StringData16& str) noexcept
 	{
 		_value = str.data;
-		_length = str.getLengthForParser();
+		_length = str.getUnsafeLength();
 		if (_length & SLIB_SIZE_TEST_SIGN_BIT) {
 			_length = STRING_TYPE_SZ16_PREFIX;
 		} else {
@@ -724,13 +724,13 @@ namespace slib
 
 	StringParam& StringParam::operator=(const StringData& str) noexcept
 	{
-		_assign(str.data, str.getLengthForParser());
+		_assign(str.data, str.getUnsafeLength());
 		return *this;
 	}
 
 	StringParam& StringParam::operator=(const StringData16& str) noexcept
 	{
-		_assign(str.data, str.getLengthForParser());
+		_assign(str.data, str.getUnsafeLength());
 		return *this;
 	}
 
@@ -1141,7 +1141,7 @@ namespace slib
 		return length;
 	}
 
-	sl_size StringData::getLengthForParser() const noexcept
+	sl_size StringData::getUnsafeLength() const noexcept
 	{
 		return length;
 	}
@@ -1168,7 +1168,7 @@ namespace slib
 
 	String operator+(const StringData& v1, const StringData& v2) noexcept
 	{
-		return String::merge(v1.data, v1.getLengthForParser(), v2.data, v2.getLengthForParser());
+		return String::merge(v1.data, v1.getUnsafeLength(), v2.data, v2.getUnsafeLength());
 	}
 
 
@@ -1253,7 +1253,7 @@ namespace slib
 		return length;
 	}
 
-	sl_size StringData16::getLengthForParser() const noexcept
+	sl_size StringData16::getUnsafeLength() const noexcept
 	{
 		return length;
 	}
@@ -1280,7 +1280,7 @@ namespace slib
 
 	String16 operator+(const StringData16& v1, const StringData16& v2) noexcept
 	{
-		return String16::merge(v1.data, v1.getLengthForParser(), v2.data, v2.getLengthForParser());
+		return String16::merge(v1.data, v1.getUnsafeLength(), v2.data, v2.getUnsafeLength());
 	}
 
 }

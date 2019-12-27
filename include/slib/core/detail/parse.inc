@@ -29,7 +29,7 @@ namespace slib
 		if (_str.isNotNull()) {
 			if (_str.is8()) {
 				StringData str(_str);
-				sl_size n = str.getLengthForParser();
+				sl_size n = str.getUnsafeLength();
 				if (n) {
 					if (n & SLIB_SIZE_TEST_SIGN_BIT) {
 						const sl_char8* data = str.getData();
@@ -41,7 +41,7 @@ namespace slib
 				}
 			} else {
 				StringData16 str(_str);
-				sl_size n = str.getLengthForParser();
+				sl_size n = str.getUnsafeLength();
 				if (n) {
 					if (n & SLIB_SIZE_TEST_SIGN_BIT) {
 						const sl_char16* data = str.getData();
@@ -62,7 +62,7 @@ namespace slib
 		if (_str.isNotNull()) {
 			if (_str.is8()) {
 				StringData str(_str);
-				sl_size n = str.getLengthForParser();
+				sl_size n = str.getUnsafeLength();
 				if (n) {
 					if (n & SLIB_SIZE_TEST_SIGN_BIT) {
 						const sl_char8* data = str.getData();
@@ -74,7 +74,7 @@ namespace slib
 				}
 			} else {
 				StringData16 str(_str);
-				sl_size n = str.getLengthForParser();
+				sl_size n = str.getUnsafeLength();
 				if (n) {
 					if (n & SLIB_SIZE_TEST_SIGN_BIT) {
 						const sl_char16* data = str.getData();
@@ -95,7 +95,7 @@ namespace slib
 		if (_str.isNotNull()) {
 			if (_str.is8()) {
 				StringData str(_str);
-				sl_size n = str.getLengthForParser();
+				sl_size n = str.getUnsafeLength();
 				if (n) {
 					if (n & SLIB_SIZE_TEST_SIGN_BIT) {
 						const sl_char8* data = str.getData();
@@ -107,7 +107,7 @@ namespace slib
 				}
 			} else {
 				StringData16 str(_str);
-				sl_size n = str.getLengthForParser();
+				sl_size n = str.getUnsafeLength();
 				if (n) {
 					if (n & SLIB_SIZE_TEST_SIGN_BIT) {
 						const sl_char16* data = str.getData();

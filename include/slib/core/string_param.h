@@ -288,7 +288,7 @@ namespace slib
 
 		sl_size getLength() const noexcept;
 		
-		sl_size getLengthForParser() const noexcept;
+		sl_size getUnsafeLength() const noexcept;
 		
 		sl_compare_result compare(const StringData& other) const noexcept;
 		
@@ -332,7 +332,7 @@ namespace slib
 
 		sl_size getLength() const noexcept;
 		
-		sl_size getLengthForParser() const noexcept;
+		sl_size getUnsafeLength() const noexcept;
 		
 		sl_compare_result compare(const StringData16& other) const noexcept;
 		
