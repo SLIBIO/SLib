@@ -1060,6 +1060,7 @@
 		26987D1323B3F7E300872C1D /* alipay_sdk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26987D1023B3F7E300872C1D /* alipay_sdk.cpp */; };
 		26987D1923B5CF8900872C1D /* string_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26987D1823B5CF8800872C1D /* string_view.cpp */; };
 		26987D1B23BA9B6F00872C1D /* string_op.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26987D1A23BA9B6F00872C1D /* string_op.cpp */; };
+		26987D2123BBE05D00872C1D /* captcha.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26987D2023BBE05C00872C1D /* captcha.cpp */; };
 		2698A54E226A383500662528 /* refresh_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2698A54D226A383400662528 /* refresh_view.cpp */; };
 		269E31A92255F431005CD0ED /* paypal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31A82255F430005CD0ED /* paypal.cpp */; };
 		269E31AD2255F53B005CD0ED /* paypal_ui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31AC2255F53B005CD0ED /* paypal_ui.cpp */; };
@@ -2805,6 +2806,7 @@
 		26987D1023B3F7E300872C1D /* alipay_sdk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = alipay_sdk.cpp; path = social/alipay_sdk.cpp; sourceTree = "<group>"; };
 		26987D1823B5CF8800872C1D /* string_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = string_view.cpp; sourceTree = "<group>"; };
 		26987D1A23BA9B6F00872C1D /* string_op.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = string_op.cpp; sourceTree = "<group>"; };
+		26987D2023BBE05C00872C1D /* captcha.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = captcha.cpp; sourceTree = "<group>"; };
 		2698A54D226A383400662528 /* refresh_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = refresh_view.cpp; sourceTree = "<group>"; };
 		2699DC8F1D43682D0085EE67 /* list_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list_view.cpp; sourceTree = "<group>"; };
 		269E31A82255F430005CD0ED /* paypal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = paypal.cpp; path = social/paypal.cpp; sourceTree = "<group>"; };
@@ -4741,6 +4743,7 @@
 		26539F922374B9090064340D /* service */ = {
 			isa = PBXGroup;
 			children = (
+				26987D2023BBE05C00872C1D /* captcha.cpp */,
 				263D477E2386AE2F00DAC43F /* chat.cpp */,
 				263D478A2386E1BD00DAC43F /* chat_client.cpp */,
 				263D478E23872AD100DAC43F /* chat_sqlite.cpp */,
@@ -6991,6 +6994,7 @@
 				26D9D9731E96466A005F7BD3 /* graphics_text.cpp in Sources */,
 				26D9D9941E96467B005F7BD3 /* ethernet.cpp in Sources */,
 				269E31A92255F431005CD0ED /* paypal.cpp in Sources */,
+				26987D2123BBE05D00872C1D /* captcha.cpp in Sources */,
 				26C1B64220D51D1D00E36539 /* graphics_path.cpp in Sources */,
 				26D9D8FE1E9645CE005F7BD3 /* base.cpp in Sources */,
 				269308662368DE7E00C9C7F9 /* openssl_crypto.cpp in Sources */,

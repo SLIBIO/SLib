@@ -297,6 +297,7 @@ set (SLIB_EXTRA_FILES
  "${SLIB_PATH}/src/slib/geo/globe.cpp"
  "${SLIB_PATH}/src/slib/geo/latlon.cpp"
  
+ "${SLIB_PATH}/src/slib/service/captcha.cpp"
  "${SLIB_PATH}/src/slib/service/chat.cpp"
  "${SLIB_PATH}/src/slib/service/chat_client.cpp"
  "${SLIB_PATH}/src/slib/service/chat_sqlite.cpp"

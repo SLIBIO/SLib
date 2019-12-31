@@ -343,6 +343,7 @@
     <ClCompile Include="..\..\src\slib\render\render_resource.cpp" />
     <ClCompile Include="..\..\src\slib\render\texture.cpp" />
     <ClCompile Include="..\..\src\slib\render\vertex_buffer.cpp" />
+    <ClCompile Include="..\..\src\slib\service\captcha.cpp" />
     <ClCompile Include="..\..\src\slib\service\chat.cpp" />
     <ClCompile Include="..\..\src\slib\service\chat_client.cpp" />
     <ClCompile Include="..\..\src\slib\service\chat_sqlite.cpp" />

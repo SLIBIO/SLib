@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2008-2018 SLIBIO <https://github.com/SLIBIO>
+ *   Copyright (c) 2008-2019 SLIBIO <https://github.com/SLIBIO>
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -20,18 +20,41 @@
  *   THE SOFTWARE.
  */
 
-#ifndef CHECKHEADER_SLIB_SERVICE_HEADER
-#define CHECKHEADER_SLIB_SERVICE_HEADER
+#ifndef CHECKHEADER_SLIB_SERVICE_CAPTCHA
+#define CHECKHEADER_SLIB_SERVICE_CAPTCHA
 
-#include "service/web.h"
-#include "service/ginger.h"
-#include "service/captcha.h"
+#include "definition.h"
 
-#include "service/push_notification.h"
-#include "service/fcm.h"
-#include "service/xgpush.h"
+#include "../core/string.h"
+#include "../graphics/image.h"
+#include "../graphics/font.h"
 
-#include "service/chat.h"
-#include "service/chat_client.h"
+namespace slib
+{
+
+	class SLIB_EXPORT Captcha
+	{
+	public:
+		// output
+		String code;
+		Ref<Image> image;
+		
+		// input
+		sl_uint32 length;
+		sl_uint32 width;
+		sl_uint32 height;
+		Ref<Font> font;
+		
+	public:
+		Captcha();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(Captcha)
+
+	public:
+		sl_bool generate();
+		
+	};
+	
+}
 
 #endif

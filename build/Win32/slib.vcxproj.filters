@@ -1385,5 +1385,8 @@
     <ClCompile Include="..\..\src\slib\core\string_view.cpp">
       <Filter>src\core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\slib\service\captcha.cpp">
+      <Filter>src\service</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

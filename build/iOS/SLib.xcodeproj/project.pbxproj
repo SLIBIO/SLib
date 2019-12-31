@@ -716,6 +716,7 @@
 		26987CF723B3A91F00872C1D /* alipay_openssl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26987CF623B3A91F00872C1D /* alipay_openssl.cpp */; };
 		26987D1D23BBD40800872C1D /* string_op.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26987D1C23BBD40700872C1D /* string_op.cpp */; };
 		26987D1F23BBD40E00872C1D /* string_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26987D1E23BBD40E00872C1D /* string_view.cpp */; };
+		26987D2523BBED9C00872C1D /* captcha.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26987D2423BBED9C00872C1D /* captcha.cpp */; };
 		2698A54A226A1C4300662528 /* refresh_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2698A549226A1C4300662528 /* refresh_view.cpp */; };
 		2698A54C226A1C4C00662528 /* refresh_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2698A54B226A1C4B00662528 /* refresh_view_ios.mm */; };
 		269C2FA0235EDDB600775765 /* charset_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 269C2F9E235EDDB600775765 /* charset_apple.mm */; };
@@ -2252,6 +2253,7 @@
 		26987CF623B3A91F00872C1D /* alipay_openssl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = alipay_openssl.cpp; sourceTree = "<group>"; };
 		26987D1C23BBD40700872C1D /* string_op.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = string_op.cpp; sourceTree = "<group>"; };
 		26987D1E23BBD40E00872C1D /* string_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = string_view.cpp; sourceTree = "<group>"; };
+		26987D2423BBED9C00872C1D /* captcha.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = captcha.cpp; sourceTree = "<group>"; };
 		2698A549226A1C4300662528 /* refresh_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = refresh_view.cpp; sourceTree = "<group>"; };
 		2698A54B226A1C4B00662528 /* refresh_view_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = refresh_view_ios.mm; sourceTree = "<group>"; };
 		269C2F9E235EDDB600775765 /* charset_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = charset_apple.mm; sourceTree = "<group>"; };
@@ -3893,6 +3895,7 @@
 		26539F892374B8F50064340D /* service */ = {
 			isa = PBXGroup;
 			children = (
+				26987D2423BBED9C00872C1D /* captcha.cpp */,
 				263D47822386AE5600DAC43F /* chat.cpp */,
 				263D478C2386E1CB00DAC43F /* chat_client.cpp */,
 				263D479023872AD800DAC43F /* chat_sqlite.cpp */,
@@ -5257,6 +5260,7 @@
 				26D9D86F1E96294F005F7BD3 /* graphics_path.cpp in Sources */,
 				26D9D7F71E9628E0005F7BD3 /* atomic.cpp in Sources */,
 				26E1B8DE222ABCDD007C222E /* jdapimin.c in Sources */,
+				26987D2523BBED9C00872C1D /* captcha.cpp in Sources */,
 				26E1B8C3222ABBE7007C222E /* pngset.c in Sources */,
 				26D9D85B1E962937005F7BD3 /* earth.cpp in Sources */,
 				26D9D7F81E9628E0005F7BD3 /* preference.cpp in Sources */,
