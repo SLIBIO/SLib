@@ -2757,7 +2757,7 @@ namespace slib
 		if (op == OP_PARSE) {
 			if (!(attr->text.flagDefined) && !(attr->hyperText.flagDefined)) {
 				resourceItem->flagNoChildren = sl_true;
-				String value = params->source.substring(element->getStartContentPositionInSource(), element->getEndContentPositionInSource());
+				String value = String::create(params->source.substring(element->getStartContentPositionInSource(), element->getEndContentPositionInSource()));
 				if (value.isNotEmpty()) {
 					attr->hyperText.flagDefined = sl_true;
 					attr->hyperText.flagReferResource = sl_false;

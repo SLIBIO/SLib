@@ -136,7 +136,7 @@ namespace slib
 					if (filterSource) {
 
 						IGraphBuilder* graph = NULL;
-						hr = ::CoCreateInstance(CLSID_FilterGraph, NULL, CLSCTX_INPROC, IID_IGraphBuilder, (void**)&graph);
+						hr = CoCreateInstance(CLSID_FilterGraph, NULL, CLSCTX_INPROC, IID_IGraphBuilder, (void**)&graph);
 						if (graph) {
 							ICaptureGraphBuilder2* capture = NULL;
 							hr = CoCreateInstance(CLSID_CaptureGraphBuilder2, NULL, CLSCTX_INPROC, IID_ICaptureGraphBuilder2, (void**)&capture);
@@ -356,7 +356,7 @@ namespace slib
 					}
 
 					ICreateDevEnum* pDevEnum = NULL;
-					hr = ::CoCreateInstance(CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC, IID_ICreateDevEnum, (void**)&pDevEnum);
+					hr = CoCreateInstance(CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC, IID_ICreateDevEnum, (void**)&pDevEnum);
 					if (pDevEnum) {
 
 						IEnumMoniker* pClassEnum = NULL;
@@ -380,26 +380,26 @@ namespace slib
 
 										VARIANT var;
 
-										::VariantInit(&var);
+										VariantInit(&var);
 										hr = prop->Read(L"DevicePath", &var, 0);
 										if (SUCCEEDED(hr)) {
-											dev.id = var.bstrVal;
+											dev.id = String::create(var.bstrVal);
 										}
-										::VariantClear(&var);
+										VariantClear(&var);
 
-										::VariantInit(&var);
+										VariantInit(&var);
 										hr = prop->Read(L"FriendlyName", &var, 0);
 										if (SUCCEEDED(hr)) {
-											dev.name = var.bstrVal;
+											dev.name = String::create(var.bstrVal);
 										}
-										::VariantClear(&var);
+										VariantClear(&var);
 
-										::VariantInit(&var);
+										VariantInit(&var);
 										hr = prop->Read(L"Description", &var, 0);
 										if (SUCCEEDED(hr)) {
-											dev.description = var.bstrVal;
+											dev.description = String::create(var.bstrVal);
 										}
-										::VariantClear(&var);
+										VariantClear(&var);
 
 										prop->Release();
 

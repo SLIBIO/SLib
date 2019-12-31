@@ -104,13 +104,13 @@ namespace slib
 		void log(const StringParam& _tag, const StringParam& _content) override
 		{
 #if defined(SLIB_PLATFORM_IS_ANDROID)
-			StringData tag(_tag);
-			StringData content(_content);
+			StringCstr tag(_tag);
+			StringCstr content(_content);
 			ObjectLocker lock(this);
 			__android_log_print(ANDROID_LOG_INFO, tag.getData(), "%s", content.getData());
 #elif defined(SLIB_PLATFORM_IS_TIZEN)
-			StringData tag(_tag);
-			StringData content(_content);
+			StringCstr tag(_tag);
+			StringCstr content(_content);
 			ObjectLocker lock(this);
 			if (content.isNotEmpty()) {
 				::dlog_print(DLOG_INFO, tag.getData(), "%s", content.getData());
@@ -126,13 +126,13 @@ namespace slib
 		void logError(const StringParam& _tag, const StringParam& _content) override
 		{
 #if defined(SLIB_PLATFORM_IS_ANDROID)
-			StringData tag(_tag);
-			StringData content(_content);
+			StringCstr tag(_tag);
+			StringCstr content(_content);
 			ObjectLocker lock(this);
 			__android_log_print(ANDROID_LOG_ERROR, tag.getData(), "%s", content.getData());
 #elif defined(SLIB_PLATFORM_IS_TIZEN)
-			StringData tag(_tag);
-			StringData content(_content);
+			StringCstr tag(_tag);
+			StringCstr content(_content);
 			ObjectLocker lock(this);
 			if (content.isNotEmpty()) {
 				::dlog_print(DLOG_ERROR, tag.getData(), "%s", content.getData());

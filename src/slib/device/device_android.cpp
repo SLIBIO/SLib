@@ -427,9 +427,9 @@ namespace slib
 						c.displayName = JContact::displayName.get(obj.get());
 						c.nickname = JContact::nickname.get(obj.get());
 						{
-							ListElements<String16> list(JContact::phoneNumbers.get(obj.get()).split(","));
+							ListElements<String> list(JContact::phoneNumbers.get(obj.get()).split(","));
 							for (sl_size k = 0; k < list.count; k++) {
-								String16& e = list[k];
+								String& e = list[k];
 								sl_reg t = e.indexOf(':');
 								if (t >= 0) {
 									String label = e.substring(0, t);
@@ -441,9 +441,9 @@ namespace slib
 							}
 						}
 						{
-							ListElements<String16> list(JContact::emails.get(obj.get()).split(","));
+							ListElements<String> list(JContact::emails.get(obj.get()).split(","));
 							for (sl_size k = 0; k < list.count; k++) {
-								String16& e = list[k];
+								String& e = list[k];
 								sl_reg t = e.indexOf(':');
 								if (t >= 0) {
 									String label = e.substring(0, t);

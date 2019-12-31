@@ -184,7 +184,7 @@ namespace slib
 			}
 			if (result.isValid()) {
 				std::wstring wstr(result.text());
-				return String(wstr.c_str(), wstr.length());
+				return String::create(wstr.c_str(), wstr.length());
 			}
 		} catch (std::exception&) {
 		}

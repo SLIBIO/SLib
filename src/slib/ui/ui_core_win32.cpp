@@ -387,7 +387,7 @@ namespace slib
 
 	void UIApp::onExistingInstance()
 	{
-		String16 appId = getUniqueInstanceId();
+		String16 appId = String16::from(getUniqueInstanceId());
 		if (appId.isEmpty()) {
 			return;
 		}
@@ -456,7 +456,7 @@ namespace slib
 			String16 appId;
 			Ref<UIApp> app = UIApp::getApp();
 			if (app.isNotNull()) {
-				appId = app->getUniqueInstanceId();
+				appId = String16::from(app->getUniqueInstanceId());
 			}
 			hWndMessage = CreateWindowExW(0, (LPCWSTR)((LONG_PTR)m_wndClassForMessage), (LPCWSTR)(appId.getData()), 0, 0, 0, 0, 0, HWND_MESSAGE, 0, hInstance, 0);
 		}

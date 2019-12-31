@@ -62,9 +62,9 @@ namespace slib
 	*((FARPROC*)(&(g_entries.name))) = proc;
 	
 
-	void GLES::loadEntries(const String& _pathDll, sl_bool flagReload)
+	void GLES::loadEntries(const StringParam& _pathDll, sl_bool flagReload)
 	{
-		String16 pathDll = _pathDll;
+		StringCstr16 pathDll(_pathDll);
 		if (pathDll.isEmpty()) {
 			return;
 		}
@@ -99,7 +99,7 @@ namespace slib
 
 namespace slib
 {
-	void GLES::loadEntries(const String& pathDll, sl_bool flagReload)
+	void GLES::loadEntries(const StringParam& pathDll, sl_bool flagReload)
 	{
 	}
 	
@@ -124,7 +124,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	void GLES::loadEntries(const String& pathDll, sl_bool flagReload)
+	void GLES::loadEntries(const StringParam& pathDll, sl_bool flagReload)
 	{
 	}
 	

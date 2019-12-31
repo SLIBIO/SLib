@@ -52,7 +52,7 @@ namespace slib
 #if defined(SLIB_PLATFORM_IS_WIN32)
 		sl_char16 bufAppPath[PRIV_PATH_MAX] = {0};
 		GetModuleFileNameW(GetModuleHandle(NULL), (WCHAR*)bufAppPath, PRIV_PATH_MAX - 1);
-		return String(bufAppPath);
+		return String::create(bufAppPath);
 #endif
 #if defined(SLIB_PLATFORM_IS_UWP)
 		return String::fromUtf16(ApplicationData::Current->LocalFolder->Path->Data());
@@ -64,7 +64,7 @@ namespace slib
 #if defined(SLIB_PLATFORM_IS_WIN32)
 		WCHAR path[MAX_PATH] = { 0 };
 		if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, 0, path))) {
-			return String::fromUtf16((sl_char16*)path);
+			return String::create(path);
 		}
 #endif
 		return getApplicationDirectory();
@@ -75,7 +75,7 @@ namespace slib
 #if defined(SLIB_PLATFORM_IS_WIN32)
 		WCHAR path[MAX_PATH] = { 0 };
 		if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, path))) {
-			return String::fromUtf16((sl_char16*)path);
+			return String::create(path);
 		}
 #endif
 		return getApplicationDirectory();
@@ -86,7 +86,7 @@ namespace slib
 #if defined(SLIB_PLATFORM_IS_WIN32)
 		sl_char16 sz[PRIV_PATH_MAX] = {0};
 		sl_int32 n = GetTempPathW(PRIV_PATH_MAX - 1, (LPWSTR)sz);
-		return String(sz, n);
+		return String::create(sz, n);
 #else
 		SLIB_STATIC_STRING(temp, "/temp");
 		String dir = getApplicationDirectory() + temp;
@@ -100,16 +100,16 @@ namespace slib
 #if defined(SLIB_PLATFORM_IS_WIN32)
 		WCHAR path[PRIV_PATH_MAX] = { 0 };
 		GetCurrentDirectoryW(PRIV_PATH_MAX - 1, path);
-		return String(path);
+		return String::create(path);
 #else
 		return getApplicationPath();
 #endif
 	}
 
-	sl_bool System::setCurrentDirectory(const String& _dir)
+	sl_bool System::setCurrentDirectory(const StringParam& _dir)
 	{
 #if defined(SLIB_PLATFORM_IS_WIN32)
-		String16 dir = _dir;
+		StringCstr16 dir(_dir);
 		if (SetCurrentDirectoryW((LPCWSTR)(dir.getData()))) {
 			return sl_true;
 		}
@@ -208,7 +208,7 @@ namespace slib
 				(LPWSTR)&buf, 0,
 				NULL);
 			if (buf) {
-				ret = String((sl_char16*)buf, size);
+				ret = String::create(buf, size);
 				LocalFree(buf);
 			}
 		}
@@ -218,11 +218,11 @@ namespace slib
 		return ret;
 	}
 
-	void System::abort(const String& _msg, const String& _file, sl_uint32 line)
+	void System::abort(const StringParam& _msg, const StringParam& _file, sl_uint32 line)
 	{
 #if defined(SLIB_DEBUG)
-		String16 msg = _msg;
-		String16 file = _file;
+		StringCstr16 msg(_msg);
+		StringCstr16 file(_file);
 		_wassert((wchar_t*)(msg.getData()), (wchar_t*)(file.getData()), line);
 #endif
 	}

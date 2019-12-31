@@ -86,8 +86,9 @@ namespace slib
 		return sl_null;
 	}
 
-	sl_bool System::setCurrentDirectory(const String& dir)
+	sl_bool System::setCurrentDirectory(const StringParam& _dir)
 	{
+		StringCstr dir(_dir);
 		int iRet = chdir(dir.getData());
 		if (iRet == 0) {
 			return sl_true;
@@ -181,9 +182,11 @@ namespace slib
 	}
 
 #if !defined(SLIB_PLATFORM_IS_ANDROID)
-	void System::abort(const String& msg, const String& file, sl_uint32 line)
+	void System::abort(const StringParam& _msg, const StringParam& _file, sl_uint32 line)
 	{
 #if defined(SLIB_DEBUG)
+		StringCstr msg(_msg);
+		StringCstr file(_file);
 		__assert(msg.getData(), file.getData(), line);
 #endif
 	}

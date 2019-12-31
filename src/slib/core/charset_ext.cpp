@@ -80,7 +80,7 @@ namespace slib
 			
 			Memory EncodeString8(const sl_char8* utf8, sl_size lenUtf8, sl_uint32 codepage)
 			{
-				String16 str(utf8, lenUtf8);
+				String16 str = String16::create(utf8, lenUtf8);
 				return EncodeString16(str.getData(), str.getLength(), codepage);
 			}
 			
@@ -89,7 +89,7 @@ namespace slib
 				SLIB_SCOPED_BUFFER(sl_char16, 1024, buf, size)
 				sl_size len = Decode16(codepage, data, size, buf, size);
 				if (len) {
-					return String(buf, len);
+					return String::create(buf, len);
 				}
 				return sl_null;
 			}

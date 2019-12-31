@@ -52,11 +52,12 @@ namespace slib
 		return sl_null;
 	}
 	
-	void Clipboard::setText(const String& text)
+	void Clipboard::setText(const StringParam& _text)
 	{
 		GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
 		if (clipboard) {
 			gtk_clipboard_clear(clipboard);
+			StringData text(_text);
 			gtk_clipboard_set_text(clipboard, text.getData(), text.getLength());
 		}
 	}

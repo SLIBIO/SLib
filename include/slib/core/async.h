@@ -492,30 +492,30 @@ namespace slib
 		static Ref<AsyncFile> create(const Ref<File>& file, const Ref<Dispatcher>& dispatcher);
 
 
-		static Ref<AsyncFile> open(const String& path, FileMode mode);
+		static Ref<AsyncFile> open(const StringParam& path, FileMode mode);
 	
-		static Ref<AsyncFile> open(const String& path, FileMode mode, const Ref<Dispatcher>& dispatcher);
+		static Ref<AsyncFile> open(const StringParam& path, FileMode mode, const Ref<Dispatcher>& dispatcher);
 
 
-		static Ref<AsyncFile> openForRead(const String& path);
+		static Ref<AsyncFile> openForRead(const StringParam& path);
 
-		static Ref<AsyncFile> openForRead(const String& path, const Ref<Dispatcher>& dispatcher);
-
-
-		static Ref<AsyncFile> openForWrite(const String& path);
-
-		static Ref<AsyncFile> openForWrite(const String& path, const Ref<Dispatcher>& dispatcher);
+		static Ref<AsyncFile> openForRead(const StringParam& path, const Ref<Dispatcher>& dispatcher);
 
 
-		static Ref<AsyncFile> openForAppend(const String& path);
+		static Ref<AsyncFile> openForWrite(const StringParam& path);
 
-		static Ref<AsyncFile> openForAppend(const String& path, const Ref<Dispatcher>& dispatcher);
+		static Ref<AsyncFile> openForWrite(const StringParam& path, const Ref<Dispatcher>& dispatcher);
+
+
+		static Ref<AsyncFile> openForAppend(const StringParam& path);
+
+		static Ref<AsyncFile> openForAppend(const StringParam& path, const Ref<Dispatcher>& dispatcher);
 
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
-		static Ref<AsyncStream> openIOCP(const String& path, FileMode mode, const Ref<AsyncIoLoop>& loop);
+		static Ref<AsyncStream> openIOCP(const StringParam& path, FileMode mode, const Ref<AsyncIoLoop>& loop);
 
-		static Ref<AsyncStream> openIOCP(const String& path, FileMode mode);
+		static Ref<AsyncStream> openIOCP(const StringParam& path, FileMode mode);
 #endif
 	
 	public:

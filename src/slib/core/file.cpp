@@ -39,7 +39,7 @@ namespace slib
 		close();
 	}
 
-	Ref<File> File::open(const String& filePath, const FileMode& mode, const FilePermissions& permissions)
+	Ref<File> File::open(const StringParam& filePath, const FileMode& mode, const FilePermissions& permissions)
 	{
 		sl_file file = _open(filePath, mode, permissions);
 		if (file != SLIB_FILE_INVALID_HANDLE) {
@@ -52,42 +52,42 @@ namespace slib
 		return sl_null;
 	}
 
-	Ref<File> File::open(const String& filePath, const FileMode& mode)
+	Ref<File> File::open(const StringParam& filePath, const FileMode& mode)
 	{
 		return open(filePath, mode, FilePermissions::All);
 	}
 
-	Ref<File> File::openForRead(const String& filePath, sl_bool flagShareRead)
+	Ref<File> File::openForRead(const StringParam& filePath, sl_bool flagShareRead)
 	{
 		return open(filePath, FileMode::Read, flagShareRead ? (FilePermissions::All | FilePermissions::ShareRead) : FilePermissions::All);
 	}
 
-	Ref<File> File::openForWrite(const String& filePath)
+	Ref<File> File::openForWrite(const StringParam& filePath)
 	{
 		return open(filePath, FileMode::Write);
 	}
 
-	Ref<File> File::openForReadWrite(const String& filePath)
+	Ref<File> File::openForReadWrite(const StringParam& filePath)
 	{
 		return open(filePath, FileMode::ReadWrite);
 	}
 
-	Ref<File> File::openForAppend(const String& filePath)
+	Ref<File> File::openForAppend(const StringParam& filePath)
 	{
 		return open(filePath, FileMode::Append);
 	}
 
-	Ref<File> File::openForRandomAccess(const String& filePath)
+	Ref<File> File::openForRandomAccess(const StringParam& filePath)
 	{
 		return open(filePath, FileMode::RandomAccess);
 	}
 
-	Ref<File> File::openForRandomRead(const String& filePath, sl_bool flagShareRead)
+	Ref<File> File::openForRandomRead(const StringParam& filePath, sl_bool flagShareRead)
 	{
 		return open(filePath, FileMode::RandomRead, flagShareRead ? (FilePermissions::All | FilePermissions::ShareRead) : FilePermissions::All);
 	}
 
-	Ref<File> File::openDevice(const String16& path, sl_bool flagRead, sl_bool flagWrite)
+	Ref<File> File::openDevice(const StringParam& path, sl_bool flagRead, sl_bool flagWrite)
 	{
 		FileMode mode = FileMode::NotCreate | FileMode::NotTruncate | FileMode::HintRandomAccess;
 		FilePermissions perms = FilePermissions::None;
@@ -141,7 +141,7 @@ namespace slib
 		return getDiskSize(m_file);
 	}
 
-	sl_uint64 File::getDiskSize(const String& path)
+	sl_uint64 File::getDiskSize(const StringParam& path)
 	{
 		Ref<File> file = openDevice(path, sl_false, sl_false);
 		if (file.isNotNull()) {
@@ -150,23 +150,23 @@ namespace slib
 		return 0;
 	}
 	
-	sl_bool File::exists(const String& filePath)
+	sl_bool File::exists(const StringParam& filePath)
 	{
 		return (getAttributes(filePath) & FileAttributes::NotExist) == 0;
 	}
 
-	sl_bool File::isFile(const String& filePath)
+	sl_bool File::isFile(const StringParam& filePath)
 	{
 		FileAttributes attrs = getAttributes(filePath);
 		return (attrs & (FileAttributes::NotExist | FileAttributes::Directory)) == 0;
 	}
 
-	sl_bool File::isDirectory(const String& filePath)
+	sl_bool File::isDirectory(const StringParam& filePath)
 	{
 		return (getAttributes(filePath) & FileAttributes::Directory) != 0;
 	}
 
-	sl_bool File::isHidden(const String& filePath)
+	sl_bool File::isHidden(const StringParam& filePath)
 	{
 		return (getAttributes(filePath) & FileAttributes::Hidden) != 0;
 	}
@@ -274,7 +274,7 @@ namespace slib
 		return IO::readAllBytes(maxSize);
 	}
 
-	Memory File::readAllBytes(const String& path, sl_size maxSize)
+	Memory File::readAllBytes(const StringParam& path, sl_size maxSize)
 	{
 		Ref<File> file = File::openForRead(path);
 		if (file.isNotNull()) {
@@ -288,7 +288,7 @@ namespace slib
 		return IO::readAllTextUTF8(maxSize);
 	}
 	
-	String File::readAllTextUTF8(const String& path, sl_size maxSize)
+	String File::readAllTextUTF8(const StringParam& path, sl_size maxSize)
 	{
 		Ref<File> file = File::openForRead(path);
 		if (file.isNotNull()) {
@@ -302,7 +302,7 @@ namespace slib
 		return IO::readAllTextUTF16(endian, maxSize);
 	}
 
-	String16 File::readAllTextUTF16(const String& path, EndianType endian, sl_size maxSize)
+	String16 File::readAllTextUTF16(const StringParam& path, EndianType endian, sl_size maxSize)
 	{
 		Ref<File> file = File::openForRead(path);
 		if (file.isNotNull()) {
@@ -316,7 +316,7 @@ namespace slib
 		return IO::readAllText(outCharset, maxSize);
 	}
 
-	String File::readAllText(const String& path, Charset* outCharset, sl_size maxSize)
+	String File::readAllText(const StringParam& path, Charset* outCharset, sl_size maxSize)
 	{
 		Ref<File> file = File::openForRead(path);
 		if (file.isNotNull()) {
@@ -330,7 +330,7 @@ namespace slib
 		return IO::readAllText16(outCharset, maxSize);
 	}
 	
-	String16 File::readAllText16(const String& path, Charset* outCharset, sl_size maxSize)
+	String16 File::readAllText16(const StringParam& path, Charset* outCharset, sl_size maxSize)
 	{
 		Ref<File> file = File::openForRead(path);
 		if (file.isNotNull()) {
@@ -339,7 +339,7 @@ namespace slib
 		return sl_null;
 	}
 
-	sl_size File::writeAllBytes(const String& path, const void* buf, sl_size size)
+	sl_size File::writeAllBytes(const StringParam& path, const void* buf, sl_size size)
 	{
 		Ref<File> file = File::openForWrite(path);
 		if (file.isNotNull()) {
@@ -351,12 +351,12 @@ namespace slib
 		return 0;
 	}
 
-	sl_size File::writeAllBytes(const String& path, const Memory& mem)
+	sl_size File::writeAllBytes(const StringParam& path, const Memory& mem)
 	{
 		return File::writeAllBytes(path, mem.getData(), mem.getSize());
 	}
 
-	sl_bool File::writeAllTextUTF8(const String& path, const String& text, sl_bool flagWriteByteOrderMark)
+	sl_bool File::writeAllTextUTF8(const StringParam& path, const StringParam& text, sl_bool flagWriteByteOrderMark)
 	{
 		Ref<File> file = File::openForWrite(path);
 		if (file.isNotNull()) {
@@ -365,7 +365,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool File::writeAllTextUTF16LE(const String& path, const String16& text, sl_bool flagWriteByteOrderMark)
+	sl_bool File::writeAllTextUTF16LE(const StringParam& path, const StringParam& text, sl_bool flagWriteByteOrderMark)
 	{
 		Ref<File> file = File::openForWrite(path);
 		if (file.isNotNull()) {
@@ -374,7 +374,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool File::writeAllTextUTF16BE(const String& path, const String16& text, sl_bool flagWriteByteOrderMark)
+	sl_bool File::writeAllTextUTF16BE(const StringParam& path, const StringParam& text, sl_bool flagWriteByteOrderMark)
 	{
 		Ref<File> file = File::openForWrite(path);
 		if (file.isNotNull()) {
@@ -383,7 +383,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_size File::appendAllBytes(const String& path, const void* buf, sl_size size)
+	sl_size File::appendAllBytes(const StringParam& path, const void* buf, sl_size size)
 	{
 		Ref<File> file = File::openForAppend(path);
 		if (file.isNotNull()) {
@@ -395,12 +395,12 @@ namespace slib
 		return 0;
 	}
 
-	sl_size File::appendAllBytes(const String& path, const Memory& mem)
+	sl_size File::appendAllBytes(const StringParam& path, const Memory& mem)
 	{
 		return File::appendAllBytes(path, mem.getData(), mem.getSize());
 	}
 
-	sl_bool File::appendAllTextUTF8(const String& path, const String& text)
+	sl_bool File::appendAllTextUTF8(const StringParam& path, const StringParam& text)
 	{
 		Ref<File> file = File::openForAppend(path);
 		if (file.isNotNull()) {
@@ -409,7 +409,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool File::appendAllTextUTF16LE(const String& path, const String16& text)
+	sl_bool File::appendAllTextUTF16LE(const StringParam& path, const StringParam& text)
 	{
 		Ref<File> file = File::openForAppend(path);
 		if (file.isNotNull()) {
@@ -418,7 +418,7 @@ namespace slib
 		return sl_false;
 	}
 
-	sl_bool File::appendAllTextUTF16BE(const String& path, const String16& text)
+	sl_bool File::appendAllTextUTF16BE(const StringParam& path, const StringParam& text)
 	{
 		Ref<File> file = File::openForAppend(path);
 		if (file.isNotNull()) {
@@ -427,7 +427,7 @@ namespace slib
 		return sl_false;
 	}
 
-	List<String> File::getAllDescendantFiles(const String& dirPath)
+	List<String> File::getAllDescendantFiles(const StringParam& dirPath)
 	{
 		if (!isDirectory(dirPath)) {
 			return sl_null;
@@ -441,7 +441,7 @@ namespace slib
 			String& item = p[i];
 			if (item != "." && item != "..") {
 				ret.add_NoLock(item);
-				String dir = dirPath + "/" + item;
+				String dir = dirPath.toString() + "/" + item;
 				if (File::isDirectory(dir)) {
 					ListElements<String> sub(File::getAllDescendantFiles(dir));
 					for (sl_size j = 0; j < sub.count; j++) {
@@ -453,7 +453,7 @@ namespace slib
 		return ret;
 	}
 
-	sl_bool File::createDirectory(const String& dirPath, sl_bool flagErrorOnCreateExistingDirectory)
+	sl_bool File::createDirectory(const StringParam& dirPath, sl_bool flagErrorOnCreateExistingDirectory)
 	{
 		FileAttributes attr = File::getAttributes(dirPath);
 		if (attr !=  FileAttributes::NotExist) {
@@ -471,7 +471,7 @@ namespace slib
 		return File::isDirectory(dirPath);
 	}
 
-	sl_bool File::createDirectories(const String& dirPath)
+	sl_bool File::createDirectories(const StringParam& dirPath)
 	{
 		if (dirPath.isEmpty()) {
 			return sl_false;
@@ -482,7 +482,7 @@ namespace slib
 		if (File::isFile(dirPath)) {
 			return sl_false;
 		}
-		String parent = File::getParentDirectoryPath(dirPath);
+		String parent = File::getParentDirectoryPath(dirPath.toString());
 		if (parent.isEmpty()) {
 			return File::createDirectory(dirPath);
 		} else {
@@ -493,7 +493,7 @@ namespace slib
 		}
 	}
 
-	sl_bool File::deleteFile(const String& filePath, sl_bool flagErrorOnDeleteNotExistingFile)
+	sl_bool File::deleteFile(const StringParam& filePath, sl_bool flagErrorOnDeleteNotExistingFile)
 	{
 		FileAttributes attr = File::getAttributes(filePath);
 		if (attr ==  FileAttributes::NotExist) {
@@ -511,8 +511,9 @@ namespace slib
 		return !(File::exists(filePath));
 	}
 
-	sl_bool File::deleteDirectoryRecursively(const String& dirPath)
+	sl_bool File::deleteDirectoryRecursively(const StringParam& _dirPath)
 	{
+		String dirPath = _dirPath.toString();
 		if (File::isDirectory(dirPath)) {
 			String path = dirPath + "/";
 			ListElements<String> list(File::getFiles(dirPath));

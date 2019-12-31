@@ -175,8 +175,8 @@ namespace slib
 						while (adapter) {
 							NetworkInterfaceInfo device;
 							device.name = adapter->AdapterName;
-							device.displayName = adapter->FriendlyName;
-							device.description = adapter->Description;
+							device.displayName = String::create(adapter->FriendlyName);
+							device.description = String::create(adapter->Description);
 							
 							IP_ADAPTER_UNICAST_ADDRESS* pip = adapter->FirstUnicastAddress;
 							while (pip) {

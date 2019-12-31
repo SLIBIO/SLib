@@ -99,9 +99,11 @@ namespace slib
 		return "Mobile User";
 	}
 
-	void System::abort(const String& msg, const String& file, sl_uint32 line)
+	void System::abort(const StringParam& _msg, const StringParam& _file, sl_uint32 line)
 	{
 #if defined(SLIB_DEBUG)
+		StringCstr msg(_msg);
+		StringCstr file(_file);
 		__assert(file.getData(), line, msg.getData());
 #endif
 	}

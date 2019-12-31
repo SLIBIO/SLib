@@ -47,8 +47,9 @@
 namespace slib
 {
 
-	sl_file File::_open(const String& filePath, const FileMode& mode, const FilePermissions& permissions)
+	sl_file File::_open(const StringParam& _filePath, const FileMode& mode, const FilePermissions& permissions)
 	{
+		StringCstr filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return (sl_file)-1;
 		}
@@ -225,8 +226,9 @@ namespace slib
 		}
 	}
 	
-	sl_uint64 File::getSize(const String& filePath)
+	sl_uint64 File::getSize(const StringParam& _filePath)
 	{
+		StringCstr filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return 0;
 		}
@@ -370,8 +372,9 @@ namespace slib
 		return Time::zero();
 	}
 
-	Time File::getModifiedTime(const String& filePath)
+	Time File::getModifiedTime(const StringParam& _filePath)
 	{
+		StringCstr filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return Time::zero();
 		}
@@ -395,8 +398,9 @@ namespace slib
 		return Time::zero();
 	}
 
-	Time File::getAccessedTime(const String& filePath)
+	Time File::getAccessedTime(const StringParam& _filePath)
 	{
+		StringCstr filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return Time::zero();
 		}
@@ -420,8 +424,9 @@ namespace slib
 		return Time::zero();
 	}
 
-	Time File::getCreatedTime(const String& filePath)
+	Time File::getCreatedTime(const StringParam& _filePath)
 	{
+		StringCstr filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return Time::zero();
 		}
@@ -438,8 +443,9 @@ namespace slib
 		namespace file
 		{
 			
-			static sl_bool setAccessedAndModifiedTime(const String& filePath, Time timeAccess, Time timeModify)
+			static sl_bool setAccessedAndModifiedTime(const StringParam& _filePath, Time timeAccess, Time timeModify)
 			{
+				StringCstr filePath(_filePath);
 				if (filePath.isEmpty()) {
 					return sl_false;
 				}
@@ -454,26 +460,29 @@ namespace slib
 		}
 	}
 
-	sl_bool File::setModifiedTime(const String& filePath, Time time)
+	sl_bool File::setModifiedTime(const StringParam& _filePath, Time time)
 	{
+		StringCstr filePath(_filePath);
 		Time timeAccess = getAccessedTime(filePath);
 		return priv::file::setAccessedAndModifiedTime(filePath, timeAccess, time);
 	}
 
-	sl_bool File::setAccessedTime(const String& filePath, Time time)
+	sl_bool File::setAccessedTime(const StringParam& _filePath, Time time)
 	{
+		StringCstr filePath(_filePath);
 		Time timeModify = getModifiedTime(filePath);
 		return priv::file::setAccessedAndModifiedTime(filePath, time, timeModify);
 	}
 
-	sl_bool File::setCreatedTime(const String& filePath, Time time)
+	sl_bool File::setCreatedTime(const StringParam& filePath, Time time)
 	{
 		// not supported
 		return sl_false;
 	}
 
-	FileAttributes File::getAttributes(const String& filePath)
+	FileAttributes File::getAttributes(const StringParam& _filePath)
 	{
+		StringCstr filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return FileAttributes::NotExist;
 		}
@@ -492,15 +501,15 @@ namespace slib
 		}
 	}
 
-	sl_bool File::setHidden(const String& filePath, sl_bool flagHidden)
+	sl_bool File::setHidden(const StringParam& filePath, sl_bool flagHidden)
 	{
 		// not supported
 		return sl_false;
 	}
 
-	List<String> File::getFiles(const String& _filePath)
+	List<String> File::getFiles(const StringParam& _filePath)
 	{
-		String filePath = _filePath;
+		String filePath = _filePath.toString();
 		if (filePath.isEmpty()) {
 			return sl_null;
 		}
@@ -522,8 +531,9 @@ namespace slib
 		return ret;
 	}
 
-	sl_bool File::_createDirectory(const String& filePath)
+	sl_bool File::_createDirectory(const StringParam& _filePath)
 	{
+		StringCstr filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return sl_false;
 		}
@@ -531,16 +541,18 @@ namespace slib
 	}
 
 
-	sl_bool File::_deleteFile(const String& filePath)
+	sl_bool File::_deleteFile(const StringParam& _filePath)
 	{
+		StringCstr filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return sl_false;
 		}
 		return 0 == remove(filePath.getData());
 	}
 
-	sl_bool File::_deleteDirectory(const String& filePath)
+	sl_bool File::_deleteDirectory(const StringParam& _filePath)
 	{
+		String filePath = _filePath.toString();
 		if (filePath.isEmpty()) {
 			return sl_false;
 		}
@@ -548,11 +560,13 @@ namespace slib
 		return 0 == rmdir(dirPath.getData());
 	}
 
-	sl_bool File::rename(const String& oldPath, const String& newPath)
+	sl_bool File::rename(const StringParam& _oldPath, const StringParam& _newPath)
 	{
+		StringCstr oldPath(_oldPath);
 		if (oldPath.isEmpty()) {
 			return sl_false;
 		}
+		StringCstr newPath(_newPath);
 		if (newPath.isEmpty()) {
 			return sl_false;
 		}
@@ -575,8 +589,12 @@ namespace slib
 		}
 	}
 	
-	String File::getRealPath(const String& filePath)
+	String File::getRealPath(const StringParam& _filePath)
 	{
+		StringCstr filePath(_filePath);
+		if (filePath.isEmpty()) {
+			return sl_null;
+		}
 		char path[4096];
 		path[0] = 0;
 		return realpath(filePath.getData(), path);

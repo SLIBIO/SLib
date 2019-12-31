@@ -31,9 +31,9 @@
 namespace slib
 {
 
-	sl_file File::_open(const String& _filePath, const FileMode& mode, const FilePermissions& permisions)
+	sl_file File::_open(const StringParam& _filePath, const FileMode& mode, const FilePermissions& permisions)
 	{
-		String16 filePath = _filePath;
+		StringCstr16 filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return (sl_file)(INVALID_HANDLE_VALUE);
 		}
@@ -210,9 +210,9 @@ namespace slib
 		return 0;
 	}
 
-	sl_uint64 File::getSize(const String& _filePath)
+	sl_uint64 File::getSize(const StringParam& _filePath)
 	{
-		String16 filePath = _filePath;
+		StringCstr16 filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return 0;
 		}
@@ -321,9 +321,9 @@ namespace slib
 		}
 	}
 
-	Time File::getModifiedTime(const String& _filePath)
+	Time File::getModifiedTime(const StringParam& _filePath)
 	{
-		String16 filePath = _filePath;
+		StringCstr16 filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return Time::zero();
 		}
@@ -346,9 +346,9 @@ namespace slib
 		}
 	}
 
-	Time File::getAccessedTime(const String& _filePath)
+	Time File::getAccessedTime(const StringParam& _filePath)
 	{
-		String16 filePath = _filePath;
+		StringCstr16 filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return Time::zero();
 		}
@@ -371,9 +371,9 @@ namespace slib
 		}
 	}
 
-	Time File::getCreatedTime(const String& _filePath)
+	Time File::getCreatedTime(const StringParam& _filePath)
 	{
-		String16 filePath = _filePath;
+		StringCstr16 filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return Time::zero();
 		}
@@ -387,9 +387,9 @@ namespace slib
 		}
 	}
 
-	sl_bool File::setModifiedTime(const String& _filePath, Time time)
+	sl_bool File::setModifiedTime(const StringParam& _filePath, Time time)
 	{
-		String16 filePath = _filePath;
+		StringCstr16 filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return sl_false;
 		}
@@ -407,9 +407,9 @@ namespace slib
 		}
 	}
 
-	sl_bool File::setAccessedTime(const String& _filePath, Time time)
+	sl_bool File::setAccessedTime(const StringParam& _filePath, Time time)
 	{
-		String16 filePath = _filePath;
+		StringCstr16 filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return sl_false;
 		}
@@ -427,9 +427,9 @@ namespace slib
 		}
 	}
 
-	sl_bool File::setCreatedTime(const String& _filePath, Time time)
+	sl_bool File::setCreatedTime(const StringParam& _filePath, Time time)
 	{
-		String16 filePath = _filePath;
+		StringCstr16 filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return sl_false;
 		}
@@ -447,9 +447,9 @@ namespace slib
 		}
 	}
 
-	FileAttributes File::getAttributes(const String& _filePath)
+	FileAttributes File::getAttributes(const StringParam& _filePath)
 	{
-		String16 filePath = _filePath;
+		StringCstr16 filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return FileAttributes::NotExist;
 		}
@@ -468,9 +468,9 @@ namespace slib
 		}
 	}
 
-	sl_bool File::setHidden(const String& _filePath, sl_bool flagHidden)
+	sl_bool File::setHidden(const StringParam& _filePath, sl_bool flagHidden)
 	{
-		String16 filePath = _filePath;
+		StringCstr16 filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return sl_false;
 		}
@@ -486,9 +486,9 @@ namespace slib
 		return SetFileAttributesW((LPCWSTR)(filePath.getData()), attr) != 0;
 	}
 
-	List<String> File::getFiles(const String& _filePath)
+	List<String> File::getFiles(const StringParam& _filePath)
 	{
-		String filePath = _filePath;
+		String filePath(_filePath.toString());
 		if (filePath.isEmpty()) {
 			return sl_null;
 		}
@@ -498,16 +498,16 @@ namespace slib
 			return sl_null;
 		}
 
-		String16 query = filePath + "/*";
+		String16 query = String16::create(filePath + "/*");
 		WIN32_FIND_DATAW fd;
 		HANDLE handle = FindFirstFileW((LPCWSTR)(query.getData()), &fd);
 		if (handle != INVALID_HANDLE_VALUE) {
 			List<String> ret;
 			BOOL c = TRUE;
 			while (c) {
-				String str((sl_char16*)(fd.cFileName));
+				String str = String::create((sl_char16*)(fd.cFileName));
 				if (str != "." && str != "..") {
-					ret.add_NoLock(str);
+					ret.add_NoLock(Move(str));
 				}
 				c = FindNextFileW(handle, &fd);
 			}
@@ -518,9 +518,9 @@ namespace slib
 		}
 	}
 
-	sl_bool File::_createDirectory(const String& _filePath)
+	sl_bool File::_createDirectory(const StringParam& _filePath)
 	{
-		String16 filePath = _filePath;
+		StringCstr16 filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return sl_false;
 		}
@@ -528,9 +528,9 @@ namespace slib
 		return ret != 0;
 	}
 
-	sl_bool File::_deleteFile(const String& _filePath)
+	sl_bool File::_deleteFile(const StringParam& _filePath)
 	{
-		String16 filePath = _filePath;
+		StringCstr16 filePath(_filePath);
 		if (filePath.isEmpty()) {
 			return sl_false;
 		}
@@ -538,23 +538,24 @@ namespace slib
 		return ret != 0;
 	}
 
-	sl_bool File::_deleteDirectory(const String& filePath)
+	sl_bool File::_deleteDirectory(const StringParam& _filePath)
 	{
+		String filePath = _filePath.toString();
 		if (filePath.isEmpty()) {
 			return sl_false;
 		}
-		String16 dirPath = normalizeDirectoryPath(filePath);
+		String16 dirPath = String16::from(normalizeDirectoryPath(filePath));
 		BOOL ret = RemoveDirectoryW((LPCWSTR)(dirPath.getData()));
 		return ret != 0;
 	}
 
-	sl_bool File::rename(const String& _oldPath, const String& _newPath)
+	sl_bool File::rename(const StringParam& _oldPath, const StringParam& _newPath)
 	{
-		String16 oldPath = _oldPath;
+		StringCstr16 oldPath(_oldPath);
 		if (oldPath.isEmpty()) {
 			return sl_false;
 		}
-		String16 newPath = _newPath;
+		StringCstr16 newPath(_newPath);
 		if (newPath.isEmpty()) {
 			return sl_false;
 		}
@@ -562,13 +563,13 @@ namespace slib
 		return ret != 0;
 	}
 
-	String File::getRealPath(const String& _filePath)
+	String File::getRealPath(const StringParam& _filePath)
 	{
-		String16 path = _filePath;
+		StringCstr16 path(_filePath);
 		WCHAR buf[4096];
 		buf[0] = 0;
 		if (GetFullPathNameW((LPCWSTR)(path.getData()), 4096, buf, NULL)) {
-			return buf;
+			return String::create(buf);
 		}
 		return sl_null;
 	}

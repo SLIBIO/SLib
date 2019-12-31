@@ -52,24 +52,24 @@ namespace slib
 	public:
 		static sl_uint32 getCurrentProcessId();
 		
-		static Ref<Process> open(const String& pathExecutable, const String* arguments, sl_uint32 nArguments);
+		static Ref<Process> open(const StringParam& pathExecutable, const String* arguments, sl_uint32 nArguments);
 
-		static Ref<Process> open(const String& pathExecutable, const List<String>& arguments);
+		static Ref<Process> open(const StringParam& pathExecutable, const ListParam<String>& arguments);
 
-		static sl_bool run(const String& pathExecutable, const String* arguments, sl_uint32 nArguments);
+		static sl_bool run(const StringParam& pathExecutable, const String* arguments, sl_uint32 nArguments);
 
-		static sl_bool run(const String& pathExecutable, const List<String>& arguments);
+		static sl_bool run(const StringParam& pathExecutable, const ListParam<String>& arguments);
 
-		static void runAsAdmin(const String& pathExecutable, const String* arguments, sl_uint32 nArguments);
+		static void runAsAdmin(const StringParam& pathExecutable, const String* arguments, sl_uint32 nArguments);
 		
-		static void runAsAdmin(const String& pathExecutable, const List<String>& arguments);
+		static void runAsAdmin(const StringParam& pathExecutable, const ListParam<String>& arguments);
 		
 		// check administrative privilege (effective root user on Unix)
 		static sl_bool isAdmin();
 		
-		static void exec(const String& pathExecutable, const String* arguments, sl_uint32 nArguments);
+		static void exec(const StringParam& pathExecutable, const String* arguments, sl_uint32 nArguments);
 
-		static void exec(const String& pathExecutable, const List<String>& arguments);
+		static void exec(const StringParam& pathExecutable, const ListParam<String>& arguments);
 		
 		static void exit(int code);
 		

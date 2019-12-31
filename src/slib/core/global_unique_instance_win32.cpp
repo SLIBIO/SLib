@@ -62,7 +62,7 @@ namespace slib
 		if (_name.isEmpty()) {
 			return sl_null;
 		}
-		String16 name = "Global\\" + File::makeSafeFileName(_name);
+		String16 name = String16::from("Global\\" + File::makeSafeFileName(_name));
 		HANDLE hMutex = OpenMutexW(MUTEX_ALL_ACCESS, FALSE, (LPCWSTR)(name.getData()));
 		if (hMutex != NULL) {
 			CloseHandle(hMutex);
@@ -84,7 +84,7 @@ namespace slib
 		if (_name.isEmpty()) {
 			return sl_false;
 		}
-		String16 name = "Global\\" + File::makeSafeFileName(_name);
+		String16 name = String16::from("Global\\" + File::makeSafeFileName(_name));
 		HANDLE hMutex = OpenMutexW(MUTEX_ALL_ACCESS, FALSE, (LPCWSTR)(name.getData()));
 		if (hMutex != NULL) {
 			CloseHandle(hMutex);

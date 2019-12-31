@@ -1025,7 +1025,7 @@ namespace slib
 		return sl_null;
 	}
 
-	Ref<AsyncFile> AsyncFile::open(const String& path, FileMode mode)
+	Ref<AsyncFile> AsyncFile::open(const StringParam& path, FileMode mode)
 	{
 		Ref<File> file = File::open(path, mode);
 		if (file.isNotNull()) {
@@ -1034,7 +1034,7 @@ namespace slib
 		return sl_null;
 	}
 
-	Ref<AsyncFile> AsyncFile::open(const String& path, FileMode mode, const Ref<Dispatcher>& dispatcher)
+	Ref<AsyncFile> AsyncFile::open(const StringParam& path, FileMode mode, const Ref<Dispatcher>& dispatcher)
 	{
 		Ref<File> file = File::open(path, mode);
 		if (file.isNotNull()) {
@@ -1043,32 +1043,32 @@ namespace slib
 		return sl_null;
 	}
 
-	Ref<AsyncFile> AsyncFile::openForRead(const String& path)
+	Ref<AsyncFile> AsyncFile::openForRead(const StringParam& path)
 	{
 		return AsyncFile::open(path, FileMode::Read);
 	}
 
-	Ref<AsyncFile> AsyncFile::openForRead(const String& path, const Ref<Dispatcher>& dispatcher)
+	Ref<AsyncFile> AsyncFile::openForRead(const StringParam& path, const Ref<Dispatcher>& dispatcher)
 	{
 		return AsyncFile::open(path, FileMode::Read, dispatcher);
 	}
 
-	Ref<AsyncFile> AsyncFile::openForWrite(const String& path)
+	Ref<AsyncFile> AsyncFile::openForWrite(const StringParam& path)
 	{
 		return AsyncFile::open(path, FileMode::Write);
 	}
 
-	Ref<AsyncFile> AsyncFile::openForWrite(const String& path, const Ref<Dispatcher>& dispatcher)
+	Ref<AsyncFile> AsyncFile::openForWrite(const StringParam& path, const Ref<Dispatcher>& dispatcher)
 	{
 		return AsyncFile::open(path, FileMode::Write, dispatcher);
 	}
 
-	Ref<AsyncFile> AsyncFile::openForAppend(const String& path)
+	Ref<AsyncFile> AsyncFile::openForAppend(const StringParam& path)
 	{
 		return AsyncFile::open(path, FileMode::Append);
 	}
 
-	Ref<AsyncFile> AsyncFile::openForAppend(const String& path, const Ref<Dispatcher>& dispatcher)
+	Ref<AsyncFile> AsyncFile::openForAppend(const StringParam& path, const Ref<Dispatcher>& dispatcher)
 	{
 		return AsyncFile::open(path, FileMode::Append, dispatcher);
 	}

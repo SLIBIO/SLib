@@ -228,7 +228,7 @@ namespace slib
 						Ref<TextStyle> styleNew = style->duplicate();
 						if (styleNew.isNotNull()) {
 							styleNew->flagLink = sl_true;
-							styleNew->href = url;
+							styleNew->href = String::from(url);
 							ret->m_style = styleNew;
 						}
 					}
@@ -322,7 +322,7 @@ namespace slib
 					if (ch < 0xDC00 && ch1 >= 0xDC00 && ch1 < 0xE000) {
 						sl_char32 c32 = (sl_char32)(((ch - 0xD800) << 10) | (ch1 - 0xDC00)) + 0x10000;
 						Size size = atlas->getFontSize(c32);
-						String16 s32(&c32, 1);
+						String16 s32 = String16::create(&c32, 1);
 						dp.text = s32;
 						dp.x = x;
 						canvas->drawText(dp);
@@ -564,8 +564,9 @@ namespace slib
 	{
 	}
 
-	void TextParagraph::addText(const String16& text, const Ref<TextStyle>& style, sl_bool flagEnabledHyperlinksInPlainText) noexcept
+	void TextParagraph::addText(const StringParam& _text, const Ref<TextStyle>& style, sl_bool flagEnabledHyperlinksInPlainText) noexcept
 	{
+		StringData16 text(_text);
 		if (text.isEmpty()) {
 			return;
 		}
@@ -691,7 +692,7 @@ namespace slib
 	{
 		namespace text_paragraph
 		{
-			static sl_bool ParseSize(const XmlString& _str, const Ref<Font>& _font, float* _out)
+			static sl_bool ParseSize(const String& _str, const Ref<Font>& _font, float* _out)
 			{
 				sl_real sizeBase;
 				Ref<Font> font = _font;
@@ -705,7 +706,7 @@ namespace slib
 						sizeBase = Font::getDefaultFontSize();
 					}
 				}
-				XmlString str = _str.trim().toLower();
+				String str = _str.trim().toLower();
 				sl_real f = -1;
 				if (str == "medium") {
 					f = Font::getDefaultFontSize();
@@ -734,45 +735,45 @@ namespace slib
 					}
 					return sl_true;
 				}
-				sl_char16* sz = str.getData();
+				sl_char8* sz = str.getData();
 				sl_size len = str.getLength();
 				f = 0;
 				sl_reg pos = Calculator::calculate(&f, sl_null, sz, 0, len);
 				if (pos > 0) {
-					XmlString unit = XmlString(sz + pos, len - pos).trim();
+					StringView unit = StringView(sz + pos, len - pos).trim();
 					if (Math::isAlmostZero(f) && unit.isEmpty()) {
-					} else if (unit == SLIB_UNICODE("%")) {
+					} else if (unit == ("%")) {
 						f = sizeBase * f / 100;
-					} else if (unit == SLIB_UNICODE("cm")) {
+					} else if (unit == ("cm")) {
 						f = GraphicsUtil::centimeterToPixel(f);
-					} else if (unit == SLIB_UNICODE("mm")) {
+					} else if (unit == ("mm")) {
 						f = GraphicsUtil::millimeterToPixel(f);
-					} else if (unit == SLIB_UNICODE("in")) {
+					} else if (unit == ("in")) {
 						f = GraphicsUtil::inchToPixel(f);
-					} else if (unit == SLIB_UNICODE("px")) {
-					} else if (unit == SLIB_UNICODE("pt")) {
+					} else if (unit == ("px")) {
+					} else if (unit == ("pt")) {
 						f = GraphicsUtil::pointToPixel(f);
-					} else if (unit == SLIB_UNICODE("pc")) {
+					} else if (unit == ("pc")) {
 						f = GraphicsUtil::picasToPixel(f);
-					} else if (unit == SLIB_UNICODE("em")) {
+					} else if (unit == ("em")) {
 						f = sizeBase * f;
-					} else if (unit == SLIB_UNICODE("rem")) {
+					} else if (unit == ("rem")) {
 						f = Font::getDefaultFontSize() * f;
-					} else if (unit == SLIB_UNICODE("ch")) {
+					} else if (unit == ("ch")) {
 						if (font.isNotNull()) {
 							f = font->getFontHeight() * f;
 						}
-					} else if (unit == SLIB_UNICODE("ex")) {
+					} else if (unit == ("ex")) {
 						if (font.isNotNull()) {
 							f = font->measureText("0").x * f;
 						}
-					} else if (unit == SLIB_UNICODE("vw")) {
+					} else if (unit == ("vw")) {
 						f = (sl_real)(Device::getScreenWidth() * f / 100);
-					} else if (unit == SLIB_UNICODE("vh")) {
+					} else if (unit == ("vh")) {
 						f = (sl_real)(Device::getScreenHeight() * f / 100);
-					} else if (unit == SLIB_UNICODE("vmin")) {
+					} else if (unit == ("vmin")) {
 						f = (sl_real)(Math::min(Device::getScreenWidth(), Device::getScreenHeight()) * f / 100);
-					} else if (unit == SLIB_UNICODE("vmax")) {
+					} else if (unit == ("vmax")) {
 						f = (sl_real)(Math::max(Device::getScreenWidth(), Device::getScreenHeight()) * f / 100);
 					} else {
 						return sl_false;
@@ -800,11 +801,11 @@ namespace slib
 		sl_bool flagDefineBackColor = sl_false;
 		Color attrBackColor;
 		sl_bool flagDefineFamilyName = sl_false;
-		XmlString attrFamilyName;
+		String attrFamilyName;
 		sl_bool flagDefineEmojiFamilyName = sl_false;
-		XmlString attrEmojiFamilyName;
+		String attrEmojiFamilyName;
 		sl_bool flagDefineFontSize = sl_false;
-		XmlString attrFontSize;
+		String attrFontSize;
 		sl_real attrFontSizeParsed = 0;
 		sl_bool flagDefineBold = sl_false;
 		sl_bool attrBold = sl_false;
@@ -818,33 +819,33 @@ namespace slib
 		sl_bool attrItalic = sl_false;
 		sl_bool flagDefineLink = sl_false;
 		sl_bool flagDefineHref = sl_false;
-		XmlString attrHref;
+		String attrHref;
 		sl_bool flagDefineLineHeight = sl_false;
-		XmlString attrLineHeight;
+		String attrLineHeight;
 		sl_real attrLineHeightParsed = 0;
 		sl_bool flagDefineYOffset = sl_false;
 		sl_real attrYOffset = 0;
 
-		XmlString name = element->getName().toLower();
-		if (name == SLIB_UNICODE("a")) {
+		String name = element->getName().toLower();
+		if (name == "a") {
 			flagDefineLink = sl_true;
-		} else if (name == SLIB_UNICODE("b")) {
+		} else if (name == "b") {
 			flagDefineBold = sl_true;
 			attrBold = sl_true;
-		} else if (name == SLIB_UNICODE("i")) {
+		} else if (name == "i") {
 			flagDefineItalic = sl_true;
 			attrItalic = sl_true;
-		} else if (name == SLIB_UNICODE("u")) {
+		} else if (name == "u") {
 			flagDefineUnderline = sl_true;
 			attrUnderline = sl_true;
-		} else if (name == SLIB_UNICODE("sup")) {
+		} else if (name == "sup") {
 			if (font.isNotNull()) {
 				flagDefineYOffset = sl_true;
 				attrYOffset = style->yOffset - font->getFontHeight() / 4;
 				flagDefineFontSize = sl_true;
 				attrFontSizeParsed = font->getSize() * 2 / 3;
 			}
-		} else if (name == SLIB_UNICODE("sub")) {
+		} else if (name == "sub") {
 			if (font.isNotNull()) {
 				flagDefineYOffset = sl_true;
 				attrYOffset = style->yOffset + font->getFontHeight() / 4;
@@ -854,35 +855,35 @@ namespace slib
 		}
 
 		{
-			XmlString value = element->getAttribute(SLIB_UNICODE("href"));
+			String value = element->getAttribute("href");
 			if (value.isNotNull()) {
 				flagDefineHref = sl_true;
 				attrHref = value;
 			}
 		}
 		{
-			XmlString value = element->getAttribute(SLIB_UNICODE("face"));
+			String value = element->getAttribute("face");
 			if (value.isNotNull()) {
 				flagDefineFamilyName = sl_true;
 				attrFamilyName = value;
 			}
 		}
 		{
-			XmlString value = element->getAttribute(SLIB_UNICODE("emojiFace"));
+			String value = element->getAttribute("emojiFace");
 			if (value.isNotNull()) {
 				flagDefineEmojiFamilyName = sl_true;
 				attrEmojiFamilyName = value;
 			}
 		}
 		{
-			XmlString value = element->getAttributeIgnoreCase(SLIB_UNICODE("size"));
+			String value = element->getAttributeIgnoreCase("size");
 			if (value.isNotNull()) {
 				flagDefineFontSize = sl_true;
 				attrFontSize = value.trim().toLower();
 			}
 		}
 		{
-			XmlString value = element->getAttributeIgnoreCase(SLIB_UNICODE("color"));
+			String value = element->getAttributeIgnoreCase("color");
 			if (value.isNotNull()) {
 				if (attrTextColor.parse(value)) {
 					flagDefineTextColor = sl_true;
@@ -890,7 +891,7 @@ namespace slib
 			}
 		}
 		{
-			XmlString value = element->getAttributeIgnoreCase(SLIB_UNICODE("bgcolor"));
+			String value = element->getAttributeIgnoreCase("bgcolor");
 			if (value.isNotNull()) {
 				if (attrBackColor.parse(value)) {
 					flagDefineBackColor = sl_true;
@@ -898,10 +899,10 @@ namespace slib
 			}
 		}
 		
-		XmlString attrStyle = element->getAttributeIgnoreCase(SLIB_UNICODE("style"));
+		String attrStyle = element->getAttributeIgnoreCase("style");
 		if (attrStyle.isNotEmpty()) {
 			attrStyle = attrStyle.toLower();
-			sl_char16* buf = attrStyle.getData();
+			sl_char8* buf = attrStyle.getData();
 			sl_size len = attrStyle.getLength();
 			sl_size pos = 0;
 			while (pos < len) {
@@ -916,43 +917,43 @@ namespace slib
 					}
 				}
 				if (pos < d && (sl_reg)d < end - 1) {
-					XmlString name = attrStyle.substring(pos, d).trim().toLower();
-					XmlString value = attrStyle.substring(d + 1, end).trim().toLower();
-					if (name == SLIB_UNICODE("background-color")) {
+					String name = attrStyle.substring(pos, d).trim().toLower();
+					String value = attrStyle.substring(d + 1, end).trim().toLower();
+					if (name == "background-color") {
 						if (attrBackColor.parse(value)) {
 							flagDefineBackColor = sl_true;
 						}
-					} else if (name == SLIB_UNICODE("color")) {
+					} else if (name == "color") {
 						if (attrTextColor.parse(value)) {
 							flagDefineTextColor = sl_true;
 						}
-					} else if (name == SLIB_UNICODE("line-height")) {
+					} else if (name == "line-height") {
 						flagDefineLineHeight = sl_true;
 						attrLineHeight = value;
-					} else if (name == SLIB_UNICODE("font-family")) {
+					} else if (name == "font-family") {
 						flagDefineFamilyName = sl_true;
 						attrFamilyName = value;
-					} else if (name == SLIB_UNICODE("emoji-family")) {
+					} else if (name == "emoji-family") {
 						flagDefineEmojiFamilyName = sl_true;
 						attrEmojiFamilyName = value;
-					} else if (name == SLIB_UNICODE("font-size")) {
+					} else if (name == "font-size") {
 						flagDefineFontSize = sl_true;
 						attrFontSize = value;
-					} else if (name == SLIB_UNICODE("font-weight")) {
+					} else if (name == "font-weight") {
 						flagDefineBold = sl_true;
-						attrBold = value == SLIB_UNICODE("bold");
-					} else if (name == SLIB_UNICODE("font-style")) {
+						attrBold = value == "bold";
+					} else if (name == "font-style") {
 						flagDefineItalic = sl_true;
-						attrItalic = value == SLIB_UNICODE("italic") || value == SLIB_UNICODE("oblique");
-					} else if (name == SLIB_UNICODE("font")) {
-						ListElements<XmlString> elements(value.split(SLIB_UNICODE(" ")));
+						attrItalic = value == "italic" || value == "oblique";
+					} else if (name == "font") {
+						ListElements<String> elements(value.split(" "));
 						sl_size indexSize = 0;
 						for (; indexSize < elements.count; indexSize++) {
-							XmlString& s = elements[indexSize];
-							if (s == SLIB_UNICODE("oblique") || s == SLIB_UNICODE("italic")) {
+							String& s = elements[indexSize];
+							if (s == "oblique" || s == "italic") {
 								flagDefineItalic = sl_true;
 								attrBold = sl_true;
-							} else if (s == SLIB_UNICODE("bold")) {
+							} else if (s == "bold") {
 								flagDefineBold = sl_true;
 								attrBold = sl_true;
 							}
@@ -976,18 +977,18 @@ namespace slib
 							}
 						}
 						SLIB_STATIC_STRING16(strSpace, " ")
-						XmlString face = XmlString::join(elements.list, indexSize + 1, strSpace);
+						String face = String::join(elements.list, indexSize + 1, strSpace);
 						if (face.isNotEmpty()) {
 							flagDefineFamilyName = sl_true;
 							attrFamilyName = face;
 						}
-					} else if (name == SLIB_UNICODE("text-decoration") || name == SLIB_UNICODE("text-decoration-line")) {
+					} else if (name == "text-decoration" || name == "text-decoration-line") {
 						flagDefineUnderline = sl_true;
-						attrUnderline = value.contains(SLIB_UNICODE("underline"));
+						attrUnderline = value.contains("underline");
 						flagDefineOverline = sl_true;
-						attrOverline = value.contains(SLIB_UNICODE("overline"));
+						attrOverline = value.contains("overline");
 						flagDefineLineThrough = sl_true;
-						attrLineThrough = value.contains(SLIB_UNICODE("line-through"));
+						attrLineThrough = value.contains("line-through");
 					}
 				}
 				pos = end + 1;
@@ -1164,21 +1165,21 @@ namespace slib
 			}
 		}
 		
-		if (name == SLIB_UNICODE("br")) {
+		if (name == "br") {
 			SLIB_STATIC_STRING16(line, "\n");
 			addText(line, styleNew);
 		}
 		addHyperTextNodeGroup(Ref<XmlNodeGroup>::from(element), styleNew);
 	}
 	
-	void TextParagraph::addHyperText(const String16& text, const Ref<TextStyle>& style) noexcept
+	void TextParagraph::addHyperText(const StringParam& text, const Ref<TextStyle>& style) noexcept
 	{
 		XmlParseParam param;
 		param.flagLogError = sl_false;
 		param.setCreatingOnlyElementsAndTexts();
 		param.flagCreateWhiteSpaces = sl_true;
 		param.flagCheckWellFormed = sl_false;
-		Ref<XmlDocument> xml = Xml::parseXml16(text, param);
+		Ref<XmlDocument> xml = Xml::parseXml(text, param);
 		if (xml.isNotNull()) {
 			addHyperTextNodeGroup(Ref<XmlNodeGroup>::from(xml), style);
 		}

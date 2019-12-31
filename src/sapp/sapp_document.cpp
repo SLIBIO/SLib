@@ -698,7 +698,7 @@ namespace slib
 		param.flagSupportCpp11String = sl_true;
 		param.setCreatingOnlyElementsAndTexts();
 		String16 textXML = File::readAllText16(filePath);
-		Ref<XmlDocument> xml = Xml::parseXml16(textXML, param);
+		Ref<XmlDocument> xml = Xml::parseXml(textXML, param);
 		if (param.flagError) {
 			_logError(filePath, param.errorLine, param.errorColumn, param.errorMessage);
 			return sl_false;

@@ -416,9 +416,9 @@ namespace slib
 					sl_bool f = sl_false;
 					ST str;
 					if (sizeof(CT) == 1) {
-						str = ParseUtil::parseBackslashEscapes(StringParam(buf + pos, len - pos), &m, &f);
+						str = ST::from(ParseUtil::parseBackslashEscapes(StringParam(buf + pos, len - pos), &m, &f));
 					} else {
-						str = ParseUtil::parseBackslashEscapes16(StringParam(buf + pos, len - pos), &m, &f);
+						str = ST::from(ParseUtil::parseBackslashEscapes16(StringParam(buf + pos, len - pos), &m, &f));
 					}
 					pos += m;
 					if (f) {
@@ -529,9 +529,9 @@ namespace slib
 							sl_size m = 0;
 							sl_bool f = sl_false;
 							if (sizeof(CT) == 1) {
-								key = ParseUtil::parseBackslashEscapes(StringParam(buf + pos, len - pos), &m, &f);
+								key = ST::from(ParseUtil::parseBackslashEscapes(StringParam(buf + pos, len - pos), &m, &f));
 							} else {
-								key = ParseUtil::parseBackslashEscapes16(StringParam(buf + pos, len - pos), &m, &f);
+								key = ST::from(ParseUtil::parseBackslashEscapes16(StringParam(buf + pos, len - pos), &m, &f));
 							}							
 							pos += m;
 							if (f) {
@@ -576,14 +576,14 @@ namespace slib
 							return sl_null;
 						}
 						if (buf[pos] == '}' || buf[pos] == ',') {
-							map.put_NoLock(key, Json::null());
+							map.put_NoLock(String::from(key), Json::null());
 						} else {
 							Json item = parseJson();
 							if (flagError) {
 								return sl_null;
 							}
 							if (item.isNotUndefined()) {
-								map.put_NoLock(key, item);
+								map.put_NoLock(String::from(key), item);
 							}
 						}
 						flagFirst = sl_false;
@@ -697,58 +697,47 @@ namespace slib
 		return parseJson(sz, len, param);
 	}
 
-	Json Json::parseJson(const StringParam& _str, JsonParseParam& param)
-	{
-		StringData str(_str);
-		return priv::json::Parser<String, sl_char8>::parseJson(str.getData(), str.getLength(), param);
-	}
-
-	Json Json::parseJson(const StringParam& _str)
-	{
-		StringData str(_str);
-		if (str.isEmpty()) {
-			return sl_null;
-		}
-		JsonParseParam param;
-		return priv::json::Parser<String, sl_char8>::parseJson(str.getData(), str.getLength(), param);
-	}
-
-
-	Json Json::parseJson16(const sl_char16* sz, sl_size len, JsonParseParam& param)
+	Json Json::parseJson(const sl_char16* sz, sl_size len, JsonParseParam& param)
 	{
 		return priv::json::Parser<String16, sl_char16>::parseJson(sz, len, param);
 	}
 
-	Json Json::parseJson16(const sl_char16* sz, sl_size len)
+	Json Json::parseJson(const sl_char16* sz, sl_size len)
 	{
 		if (!len) {
 			return sl_null;
 		}
 		JsonParseParam param;
-		return Json::parseJson16(sz, len, param);
+		return parseJson(sz, len, param);
 	}
 
-	Json Json::parseJson16(const StringParam& _str, JsonParseParam& param)
+	Json Json::parseJson(const StringParam& _str, JsonParseParam& param)
 	{
-		StringData16 str(_str);
-		return priv::json::Parser<String16, sl_char16>::parseJson(str.getData(), str.getLength(), param);
+		if (_str.isEmpty()) {
+			return sl_null;
+		}
+		if (_str.is16()) {
+			StringData16 str(_str);
+			return priv::json::Parser<String16, sl_char16>::parseJson(str.getData(), str.getLength(), param);
+		} else {
+			StringData str(_str);
+			return priv::json::Parser<String, sl_char8>::parseJson(str.getData(), str.getLength(), param);
+		}
 	}
 
-	Json Json::parseJson16(const StringParam& _str)
+	Json Json::parseJson(const StringParam& str)
 	{
-		StringData16 str(_str);
 		if (str.isEmpty()) {
 			return sl_null;
 		}
 		JsonParseParam param;
-		return priv::json::Parser<String16, sl_char16>::parseJson(str.getData(), str.getLength(), param);
+		return parseJson(str, param);
 	}
-
 
 	Json Json::parseJsonFromTextFile(const StringParam& filePath, JsonParseParam& param)
 	{
 		String16 json = File::readAllText16(filePath);
-		return parseJson16(json, param);
+		return parseJson(json, param);
 	}
 
 	Json Json::parseJsonFromTextFile(const StringParam& filePath)
@@ -1138,6 +1127,11 @@ namespace slib
 		json.setString(_in);
 	}
 	
+	void ToJson(Json& json, const StringView& _in)
+	{
+		json.setString(_in);
+	}
+	
 	void FromJson(const Json& json, AtomicString& _out)
 	{
 		_out = json.getString(_out);
@@ -1164,6 +1158,11 @@ namespace slib
 	}
 	
 	void ToJson(Json& json, const String16& _in)
+	{
+		json.setString(_in);
+	}
+	
+	void ToJson(Json& json, const StringView16& _in)
 	{
 		json.setString(_in);
 	}

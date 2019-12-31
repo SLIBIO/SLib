@@ -142,6 +142,10 @@ namespace slib
 		Variant(const AtomicString& value) noexcept;
 
 		Variant(const AtomicString16& value) noexcept;
+		
+		Variant(const StringView& value) noexcept;
+
+		Variant(const StringView16& value) noexcept;
 
 #ifdef SLIB_SUPPORT_STD_TYPES
 		Variant(const std::string& value) noexcept;
@@ -394,6 +398,10 @@ namespace slib
 
 		void setString(const AtomicString16& value) noexcept;
 
+		void setString(const StringView& value) noexcept;
+
+		void setString(const StringView16& value) noexcept;
+
 		void setString(const sl_char8* sz8) noexcept;
 
 		void setString(const sl_char16* sz16) noexcept;
@@ -595,7 +603,8 @@ namespace slib
 		void get(String& _out) const noexcept;
 		void get(String& _out, const String& def) const noexcept;
 		void set(const String& _in) noexcept;
-		
+		void set(const StringView& _in) noexcept;
+
 		void get(AtomicString& _out) const noexcept;
 		void get(AtomicString& _out, const String& def) const noexcept;
 		void set(const AtomicString& _in) noexcept;
@@ -603,7 +612,8 @@ namespace slib
 		void get(String16& _out) const noexcept;
 		void get(String16& _out, const String16& def) const noexcept;
 		void set(const String16& _in) noexcept;
-		
+		void set(const StringView16& _in) noexcept;
+
 		void get(AtomicString16& _out) const noexcept;
 		void get(AtomicString16& _out, const String16& def) const noexcept;
 		void set(const AtomicString16& _in) noexcept;

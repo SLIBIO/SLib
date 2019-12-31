@@ -256,10 +256,10 @@ namespace slib
 		void callVoidMethod(const char* name, const char* sig, jobject _this, ...) const;
 		void callStaticVoidMethod(jmethodID method, ...) const;
 		void callStaticVoidMethod(const char* name, const char* sig, ...) const;
-		String16 callStringMethod(jmethodID method, jobject _this, ...) const;
-		String16 callStringMethod(const char* name, const char* sig, jobject _this, ...) const;
-		String16 callStaticStringMethod(jmethodID method, ...) const;
-		String16 callStaticStringMethod(const char* name, const char* sig, ...) const;
+		String callStringMethod(jmethodID method, jobject _this, ...) const;
+		String callStringMethod(const char* name, const char* sig, jobject _this, ...) const;
+		String callStaticStringMethod(jmethodID method, ...) const;
+		String callStaticStringMethod(const char* name, const char* sig, ...) const;
 
 		jobject getObjectField(jfieldID field, jobject _this) const;
 		jobject getObjectField(const char* name, const char* sig, jobject _this) const;
@@ -334,15 +334,15 @@ namespace slib
 		void setStaticDoubleField(jfieldID field, jdouble value) const;
 		void setStaticDoubleField(const char* name, const char* sig, jdouble value) const;
 
-		String16 getStringField(jfieldID field, jobject _this) const;
-		String16 getStringField(const char* name, const char* sig, jobject _this) const;
-		String16 getStaticStringField(jfieldID field) const;
-		String16 getStaticStringField(const char* name, const char* sig) const;
+		String getStringField(jfieldID field, jobject _this) const;
+		String getStringField(const char* name, const char* sig, jobject _this) const;
+		String getStaticStringField(jfieldID field) const;
+		String getStaticStringField(const char* name, const char* sig) const;
 
-		void setStringField(jfieldID field, jobject _this, const String16& value) const;
-		void setStringField(const char* name, const char* sig, jobject _this, const String16& value) const;
-		void setStaticStringField(jfieldID field, const String16& value) const;
-		void setStaticStringField(const char* name, const char* sig, const String16& value) const;
+		void setStringField(jfieldID field, jobject _this, const StringParam& value) const;
+		void setStringField(const char* name, const char* sig, jobject _this, const StringParam& value) const;
+		void setStaticStringField(jfieldID field, const StringParam& value) const;
+		void setStaticStringField(const char* name, const char* sig, const StringParam& value) const;
 
 		sl_bool registerNative(const char* name, const char* sig, const void* fn) const;
 
@@ -392,7 +392,7 @@ namespace slib
 		// string
 		static jstring getJniString(const StringParam& str);
 		static jstring getJniString(const sl_char16* str, const sl_size length);
-		static String16 getString(jstring str);
+		static String getString(jstring str);
 
 		/*
 		 * Array release<TYPE>ArrayElements Mode
@@ -405,8 +405,8 @@ namespace slib
 		static jobject getObjectArrayElement(jobjectArray array, sl_uint32 index);
 		static void setObjectArrayElement(jobjectArray array, sl_uint32 index, jobject value);
 		static jobjectArray newStringArray(sl_uint32 length);
-		static String16 getStringArrayElement(jobjectArray array, sl_uint32 index);
-		static void setStringArrayElement(jobjectArray array, sl_uint32 index, const String16& value);
+		static String getStringArrayElement(jobjectArray array, sl_uint32 index);
+		static void setStringArrayElement(jobjectArray array, sl_uint32 index, const StringParam& value);
 		static jbooleanArray newBooleanArray(sl_uint32 length);
 		static jboolean* getBooleanArrayElements(jbooleanArray array, jboolean* isCopy = sl_null);
 		static void releaseBooleanArrayElements(jbooleanArray array, jboolean* buf, jint mode = 0);

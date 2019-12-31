@@ -1175,8 +1175,9 @@ namespace slib
 		return writeSection(mem.getData(), mem.getSize());
 	}
 
-	sl_bool IWriter::writeStringSection(const String& str, sl_size maxLen)
+	sl_bool IWriter::writeStringSection(const StringParam& _str, sl_size maxLen)
 	{
+		StringData str(_str);
 		return writeSection(str.getData(), str.getLength());
 	}
 
@@ -1196,7 +1197,7 @@ namespace slib
 		return writeInt64(t.toInt());
 	}
 
-	sl_bool IWriter::writeTextUTF8(const String& text, sl_bool flagWriteByteOrderMark)
+	sl_bool IWriter::writeTextUTF8(const StringParam& _text, sl_bool flagWriteByteOrderMark)
 	{
 		if (flagWriteByteOrderMark) {
 			static sl_char8 sbuf[3] = {(sl_char8)0xEF, (sl_char8)0xBB, (sl_char8)0xBF};
@@ -1204,6 +1205,7 @@ namespace slib
 				return sl_false;
 			}
 		}
+		StringData text(_text);
 		sl_size n = text.getLength();
 		if (n == 0) {
 			return sl_true;
@@ -1216,7 +1218,7 @@ namespace slib
 
 #define UTF16_SWAPPING_BUF_SIZE 0x2000
 
-	sl_bool IWriter::writeTextUTF16LE(const String16& text, sl_bool flagWriteByteOrderMark)
+	sl_bool IWriter::writeTextUTF16LE(const StringParam& _text, sl_bool flagWriteByteOrderMark)
 	{
 		if (flagWriteByteOrderMark) {
 			static sl_char8 sbuf[2] = {(sl_char8)0xFE, (sl_char8)0xFF};
@@ -1224,6 +1226,7 @@ namespace slib
 				return sl_false;
 			}
 		}
+		StringData16 text(_text);
 		sl_size n = text.getLength();
 		if (n == 0) {
 			return sl_true;
@@ -1257,7 +1260,7 @@ namespace slib
 		}
 	}
 
-	sl_bool IWriter::writeTextUTF16BE(const String16& text, sl_bool flagWriteByteOrderMark)
+	sl_bool IWriter::writeTextUTF16BE(const StringParam& _text, sl_bool flagWriteByteOrderMark)
 	{
 		if (flagWriteByteOrderMark) {
 			static sl_char8 sbuf[2] = {(sl_char8)0xFF, (sl_char8)0xFE};
@@ -1265,6 +1268,7 @@ namespace slib
 				return sl_false;
 			}
 		}
+		StringData16 text(_text);
 		sl_size n = text.getLength();
 		if (n == 0) {
 			return sl_true;

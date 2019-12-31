@@ -192,13 +192,14 @@ namespace slib
 			static String GetString(const CefString& str)
 			{
 				if (str.length()) {
-					return (sl_char16*)(str.c_str());
+					return String::create((sl_char16*)(str.c_str()));
 				}
 				return sl_null;
 			}
 			
-			static CefString GetCefString(const String16& str)
+			static CefString GetCefString(const StringParam& _str)
 			{
+				StringData16 str(_str);
 				return CefString((typename CefString::char_type*)(str.getData()), str.getLength(), true);
 			}
 			

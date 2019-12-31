@@ -47,8 +47,9 @@ namespace slib
 
 #if !defined(SLIB_PLATFORM_IS_MOBILE)
 			
-			static void Exec(const String& pathExecutable, const String* strArguments, sl_uint32 nArguments)
+			static void Exec(const StringParam& _pathExecutable, const String* strArguments, sl_uint32 nArguments)
 			{
+				StringCstr pathExecutable(_pathExecutable);
 				char* exe = pathExecutable.getData();
 				char* args[1024];
 				args[0] = exe;
@@ -160,7 +161,7 @@ namespace slib
 				}
 				
 			public:
-				static Ref<ProcessImpl> create(const String& pathExecutable, const String* strArguments, sl_uint32 nArguments)
+				static Ref<ProcessImpl> create(const StringParam& pathExecutable, const String* strArguments, sl_uint32 nArguments)
 				{
 					int hStdin[2], hStdout[2];
 					if (pipe(hStdin) == 0) {
@@ -283,14 +284,14 @@ namespace slib
 	}
 	
 #if !defined(SLIB_PLATFORM_IS_MOBILE)
-	Ref<Process> Process::open(const String& pathExecutable, const String* arguments, sl_uint32 nArguments)
+	Ref<Process> Process::open(const StringParam& pathExecutable, const String* arguments, sl_uint32 nArguments)
 	{
 		return Ref<Process>::from(ProcessImpl::create(pathExecutable, arguments, nArguments));
 	}
 #endif
 	
 #if !defined(SLIB_PLATFORM_IS_MOBILE) && !defined(SLIB_PLATFORM_IS_MACOS)
-	sl_bool Process::run(const String& pathExecutable, const String* strArguments, sl_uint32 nArguments)
+	sl_bool Process::run(const StringParam& pathExecutable, const String* strArguments, sl_uint32 nArguments)
 	{
 		pid_t pid = fork();
 		if (pid < 0) {
@@ -324,7 +325,7 @@ namespace slib
 		}
 	}
 
-	void Process::runAsAdmin(const String& pathExecutable, const String* strArguments, sl_uint32 nArguments)
+	void Process::runAsAdmin(const StringParam& pathExecutable, const String* strArguments, sl_uint32 nArguments)
 	{
 		String command;
 		if (File::isFile("/usr/bin/pkexec")) {
@@ -336,7 +337,8 @@ namespace slib
 		} else {
 			return;
 		}
-		List<String> arguments(&pathExecutable, 1);
+		List<String> arguments;
+		arguments.add_NoLock(pathExecutable.toString());
 		arguments.addElements_NoLock(strArguments, nArguments);
 		auto process = open(command, arguments);
 		if (process.isNotNull()) {
@@ -353,7 +355,7 @@ namespace slib
 #endif
 	
 #if !defined(SLIB_PLATFORM_IS_MOBILE)
-	void Process::exec(const String& pathExecutable, const String* strArguments, sl_uint32 nArguments)
+	void Process::exec(const StringParam& pathExecutable, const String* strArguments, sl_uint32 nArguments)
 	{
 		Exec(pathExecutable, strArguments, nArguments);
 	}

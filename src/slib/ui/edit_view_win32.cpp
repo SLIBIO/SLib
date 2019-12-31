@@ -140,7 +140,7 @@ namespace slib
 				{
 					HWND handle = m_handle;
 					if (handle) {
-						String16 s = text;
+						String16 s = String16::from(text);
 						SendMessageW(handle, 0x1501 /*EM_SETCUEBANNER*/, FALSE, (LPARAM)(LPCWSTR)(s.getData()));
 					}
 				}
@@ -331,7 +331,7 @@ namespace slib
 
 				void setHintText(EditView* view, const String& text) override
 				{
-					m_hintText = text;
+					m_hintText = String16::from(text);
 					HWND handle = m_handle;
 					if (handle) {
 						InvalidateRect(handle, NULL, TRUE);
@@ -568,7 +568,7 @@ namespace slib
 		Ref<TextAreaInstance> ret = Win32_ViewInstance::create<TextAreaInstance>(this, parent, className, getText(), style, 0);
 		if (ret.isNotNull()) {
 			HWND handle = ret->getHandle();
-			ret->m_hintText = m_hintText;
+			ret->m_hintText = String16::from(m_hintText);
 			ret->m_hintGravity = m_hintGravity;
 			ret->m_hintTextColor = m_hintTextColor;
 			ret->m_hintFont = getHintFont();

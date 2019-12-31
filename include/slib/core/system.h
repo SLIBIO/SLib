@@ -49,7 +49,7 @@ namespace slib
 
 		static String getCurrentDirectory();
 
-		static sl_bool setCurrentDirectory(const String& dir);
+		static sl_bool setCurrentDirectory(const StringParam& dir);
 		
 		
 		static String getComputerName();
@@ -74,7 +74,7 @@ namespace slib
 		
 		static String formatErrorCode(sl_uint32 errorCode);
 		
-		static void abort(const String& msg, const String& file, sl_uint32 line);
+		static void abort(const StringParam& msg, const StringParam& file, sl_uint32 line);
 
 		static void setCrashHandler(SIGNAL_HANDLER handler);
 		

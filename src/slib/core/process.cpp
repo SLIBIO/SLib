@@ -47,38 +47,42 @@ namespace slib
 		return m_exitStatus;
 	}
 	
-	Ref<Process> Process::open(const String& pathExecutable, const List<String>& arguments)
+	Ref<Process> Process::open(const StringParam& pathExecutable, const ListParam<String>& _arguments)
 	{
-		return open(pathExecutable, arguments.getData(), (sl_uint32)(arguments.getCount()));
+		ListLocker<String> arguments(_arguments);
+		return open(pathExecutable, arguments.data, (sl_uint32)(arguments.count));
 	}
 
-	sl_bool Process::run(const String& pathExecutable, const List<String>& arguments)
+	sl_bool Process::run(const StringParam& pathExecutable, const ListParam<String>& _arguments)
 	{
-		return run(pathExecutable, arguments.getData(), (sl_uint32)(arguments.getCount()));
+		ListLocker<String> arguments(_arguments);
+		return run(pathExecutable, arguments.data, (sl_uint32)(arguments.count));
 	}
 	
-	void Process::runAsAdmin(const String& pathExecutable, const List<String>& arguments)
+	void Process::runAsAdmin(const StringParam& pathExecutable, const ListParam<String>& _arguments)
 	{
-		runAsAdmin(pathExecutable, arguments.getData(), (sl_uint32)(arguments.getCount()));
+		ListLocker<String> arguments(_arguments);
+		runAsAdmin(pathExecutable, arguments.data, (sl_uint32)(arguments.count));
 	}
 	
-	void Process::exec(const String& pathExecutable, const List<String>& arguments)
+	void Process::exec(const StringParam& pathExecutable, const ListParam<String>& _arguments)
 	{
-		exec(pathExecutable, arguments.getData(), (sl_uint32)(arguments.getCount()));
+		ListLocker<String> arguments(_arguments);
+		exec(pathExecutable, arguments.data, (sl_uint32)(arguments.count));
 	}
 	
 #if defined(SLIB_PLATFORM_IS_MOBILE)
-	Ref<Process> Process::open(const String& pathExecutable, const String* arguments, sl_uint32 nArguments)
+	Ref<Process> Process::open(const StringParam& pathExecutable, const String* arguments, sl_uint32 nArguments)
 	{
 		return sl_null;
 	}
 
-	sl_bool Process::run(const String& pathExecutable, const String* arguments, sl_uint32 nArguments)
+	sl_bool Process::run(const StringParam& pathExecutable, const String* arguments, sl_uint32 nArguments)
 	{
 		return sl_false;
 	}
 	
-	void Process::runAsAdmin(const String& pathExecutable, const String* arguments, sl_uint32 nArguments)
+	void Process::runAsAdmin(const StringParam& pathExecutable, const String* arguments, sl_uint32 nArguments)
 	{
 	}
 	
@@ -87,7 +91,7 @@ namespace slib
 		return sl_false;
 	}
 	
-	void Process::exec(const String& pathExecutable, const String* arguments, sl_uint32 nArguments)
+	void Process::exec(const StringParam& pathExecutable, const String* arguments, sl_uint32 nArguments)
 	{
 	}
 	

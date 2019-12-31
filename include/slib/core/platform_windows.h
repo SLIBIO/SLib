@@ -182,7 +182,7 @@ namespace slib
 
 		static String16 getWindowText16(HWND hWnd);
 
-		static void setWindowText(HWND hWnd, const String16& text);
+		static void setWindowText(HWND hWnd, const StringParam& text);
 
 		static void setWindowStyle(HWND hWnd, LONG flags, sl_bool flagAddOrRemove);
 
@@ -207,7 +207,7 @@ namespace slib
 		static void setDebugAllocHook(WINDOWS_DEBUG_ALLOC_HOOK hook);
 
 	
-		static HMODULE loadLibrary(const String& path);
+		static HMODULE loadLibrary(const StringParam& path);
 
 		static HMODULE loadLibrary_kernel32();
 
@@ -245,16 +245,16 @@ namespace slib
 		static Ref<Event> createEvent(HANDLE hEvent, sl_bool flagCloseOnRelease = sl_true);
 	
 	
-		static sl_bool getRegistryValue(HKEY hKey, const String16& subPath, const String16& name, Variant* out);
+		static sl_bool getRegistryValue(HKEY hKey, const StringParam& subPath, const StringParam& name, Variant* out);
 	
-		static sl_bool setRegistryValue(HKEY hKey, const String16& subPath, const String16& name, const Variant& value);
+		static sl_bool setRegistryValue(HKEY hKey, const StringParam& subPath, const StringParam& name, const Variant& value);
 	
-		static void setApplicationRunAtStartup(const String16& name, const String16& path, sl_bool flagRegister);
+		static void setApplicationRunAtStartup(const StringParam& name, const StringParam& path, sl_bool flagRegister);
 
 
 		static WindowsVersion getVersion();
 
-		static WindowsDllVersion getDllVersion(const String16& pathDll);
+		static WindowsDllVersion getDllVersion(const StringParam& pathDll);
 
 
 		static sl_bool isCurrentProcessInAdminGroup();
@@ -265,11 +265,11 @@ namespace slib
 		class ShellExecuteParam
 		{
 		public:
-			String16 operation;
-			String16 path;
-			String16 params;
+			StringParam operation;
+			StringParam path;
+			StringParam params;
 			sl_bool runAsAdmin; // `shellExecute` returns sl_false if the user refused the elevation
-			String16 currentDirectory;
+			StringParam currentDirectory;
 			HWND hWndParent;
 			int nShow;
 

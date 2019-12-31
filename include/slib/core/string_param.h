@@ -34,8 +34,6 @@ namespace slib
 {
 
 	class Variant;
-	class StringData;
-	class StringData16;
 
 	enum class StringType : sl_reg
 	{
@@ -43,6 +41,8 @@ namespace slib
 		String16_Ref = -2,
 		String8_NoRef = -3,
 		String16_NoRef = -4,
+		Sz8 = -5,
+		Sz16 = -6
 	};
 	
 	class SLIB_EXPORT StringParam
@@ -89,6 +89,10 @@ namespace slib
 		
 		StringParam(AtomicString16&& value) noexcept;
 		
+		StringParam(const StringView& value) noexcept;
+		
+		StringParam(const StringView16& value) noexcept;
+		
 		StringParam(const char* sz) noexcept;
 		
 		StringParam(const wchar_t* sz) noexcept;
@@ -104,10 +108,6 @@ namespace slib
 		StringParam(const char16_t* str, sl_reg length) noexcept;
 		
 		StringParam(const char32_t* str, sl_reg length) noexcept;
-		
-		StringParam(const StringData& str) noexcept;
-		
-		StringParam(const StringData16& str) noexcept;
 		
 #ifdef SLIB_SUPPORT_STD_TYPES
 		StringParam(const std::string& str) noexcept;
@@ -153,6 +153,10 @@ namespace slib
 		
 		StringParam& operator=(AtomicString16&& value) noexcept;
 		
+		StringParam& operator=(const StringView& value) noexcept;
+		
+		StringParam& operator=(const StringView16& value) noexcept;
+		
 		StringParam& operator=(const char* sz) noexcept;
 		
 		StringParam& operator=(const wchar_t* sz) noexcept;
@@ -161,10 +165,6 @@ namespace slib
 		
 		StringParam& operator=(const char32_t* sz) noexcept;
 		
-		StringParam& operator=(const StringData& str) noexcept;
-		
-		StringParam& operator=(const StringData16& str) noexcept;
-
 #ifdef SLIB_SUPPORT_STD_TYPES
 		StringParam& operator=(const std::string& str) noexcept;
 
@@ -213,10 +213,11 @@ namespace slib
 		
 		Variant toVariant() const noexcept;
 		
-		sl_compare_result compare(const StringParam& other) const noexcept;
-		
-		sl_bool equals(const StringParam& other) const noexcept;
-		
+	public:
+		PRIV_SLIB_DECLARE_STRING_CLASS_OP_TEMPLATE(sl_bool, equals)
+
+		PRIV_SLIB_DECLARE_STRING_CLASS_OP_TEMPLATE(sl_compare_result, compare)
+
 		sl_size getHashCode() const noexcept;
 
 	public:
@@ -227,38 +228,35 @@ namespace slib
 
 		friend class StringData;
 		friend class StringData16;
+		friend class StringCstr;
+		friend class StringCstr16;
 	};
-	
-	sl_bool operator==(const StringParam& v1, const StringParam& v2) noexcept;
-	
-	sl_bool operator!=(const StringParam& v1, const StringParam& v2) noexcept;
-	
 	
 	template <>
 	class Compare<StringParam>
 	{
 	public:
-		sl_compare_result operator()(const StringParam &a, const StringParam &b) const noexcept;
+		sl_compare_result operator()(const StringParam& a, const StringParam& b) const noexcept;
 	};
 	
 	template <>
 	class Equals<StringParam>
 	{
 	public:
-		sl_bool operator()(const StringParam &a, const StringParam &b) const noexcept;
+		sl_bool operator()(const StringParam& a, const StringParam& b) const noexcept;
 	};
 	
 	template <>
 	class Hash<StringParam>
 	{
 	public:
-		sl_size operator()(const StringParam &a) const noexcept;
+		sl_size operator()(const StringParam& a) const noexcept;
 	};
 
-	class SLIB_EXPORT StringData
+
+	class SLIB_EXPORT StringData : public StringView
 	{
 	public:
-		sl_char8* data;
 		String string;
 		
 	public:
@@ -277,32 +275,11 @@ namespace slib
 			return StringData(s, N);
 		}
 		
-		SLIB_INLINE sl_char8* getData() const noexcept
-		{
-			return data;
-		}
-		
-		sl_bool isEmpty() const noexcept;
-
-		sl_bool isNotEmpty() const noexcept;
-
-		sl_size getLength() const noexcept;
-		
-		sl_size getUnsafeLength() const noexcept;
-		
-		sl_compare_result compare(const StringData& other) const noexcept;
-		
-		sl_bool equals(const StringData& other) const noexcept;
-		
-	private:
-		mutable sl_size length;
-		
 	};
 
-	class SLIB_EXPORT StringData16
+	class SLIB_EXPORT StringData16 : public StringView16
 	{
 	public:
-		sl_char16* data;
 		String16 string;
 		
 	public:
@@ -321,42 +298,66 @@ namespace slib
 			return StringData16(s, N);
 		}
 
-		SLIB_INLINE sl_char16* getData() const noexcept
-		{
-			return data;
-		}
-		
-		sl_bool isEmpty() const noexcept;
-
-		sl_bool isNotEmpty() const noexcept;
-
-		sl_size getLength() const noexcept;
-		
-		sl_size getUnsafeLength() const noexcept;
-		
-		sl_compare_result compare(const StringData16& other) const noexcept;
-		
-		sl_bool equals(const StringData16& other) const noexcept;
-		
-	private:
-		mutable sl_size length;
-		
 	};
 	
-	sl_bool operator==(const StringData& v1, const StringData& v2) noexcept;
-	
-	sl_bool operator!=(const StringData& v1, const StringData& v2) noexcept;
+	class SLIB_EXPORT StringCstr : public StringView
+	{
+	public:
+		String string;
+		
+	public:
+		StringCstr(const StringParam& param) noexcept;
+		
+		StringCstr(const sl_char8* data) noexcept;
+		
+		StringCstr(const sl_char8* data, sl_size length) noexcept;
+		
+		StringCstr(const String& str) noexcept;
+		
+		StringCstr(const AtomicString& str) noexcept;
+		
+		StringCstr(const StringView& str) noexcept;
 
-	String operator+(const StringData& v1, const StringData& v2) noexcept;
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(StringCstr)
+		
+	public:
+		template <sl_size N>
+		SLIB_INLINE static StringCstr literal(const sl_char8 (&s)[N]) noexcept
+		{
+			return StringCstr(s, N);
+		}
+		
+	};
 
-	sl_bool operator==(const StringData16& v1, const StringData16& v2) noexcept;
+	class SLIB_EXPORT StringCstr16 : public StringView16
+	{
+	public:
+		String16 string;
+		
+	public:
+		StringCstr16(const StringParam& param) noexcept;
+		
+		StringCstr16(const sl_char16* data) noexcept;
+		
+		StringCstr16(const sl_char16* data, sl_size length) noexcept;
+		
+		StringCstr16(const String16& str) noexcept;
+		
+		StringCstr16(const AtomicString16& str) noexcept;
+		
+		StringCstr16(const StringView16& str) noexcept;
 
-	sl_bool operator!=(const StringData16& v1, const StringData16& v2) noexcept;
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(StringCstr16)
+		
+	public:
+		template <sl_size N>
+		SLIB_INLINE static StringCstr16 literal(const sl_char16 (&s)[N]) noexcept
+		{
+			return StringCstr16(s, N);
+		}
+		
+	};
 
-	String16 operator+(const StringData16& v1, const StringData16& v2) noexcept;
-	
 }
-
-#include "detail/string_param.inc"
 
 #endif

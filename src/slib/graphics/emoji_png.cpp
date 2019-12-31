@@ -56,7 +56,7 @@ namespace slib
 					for (sl_uint32 index = 0; ; index++) {
 						const char32_t* sz = emojis[index];
 						if (sz) {
-							String16 str(sz);
+							String16 str = String16::create(sz);
 							sl_size len = str.getLength();
 							if (len) {
 								const void* data = png[index];

@@ -33,18 +33,22 @@ namespace slib
 #define STRING_TYPE_STRING16_REF ((sl_reg)(StringType::String16_Ref))
 #define STRING_TYPE_STRING8_NOREF ((sl_reg)(StringType::String8_NoRef))
 #define STRING_TYPE_STRING16_NOREF ((sl_reg)(StringType::String16_NoRef))
+#define STRING_TYPE_SZ8 ((sl_reg)(StringType::Sz8))
+#define STRING_TYPE_SZ16 ((sl_reg)(StringType::Sz16))
 
 #ifdef SLIB_ARCH_IS_64BIT
-#define IS_SZ8(length) (((length) >> 62) == 0)
-#define IS_SZ16(length) (((length) >> 62) == 1)
-#define STRING_TYPE_SZ16_PREFIX SLIB_UINT64(0x4000000000000000)
-#define GET_LENGTH(length) ((length) & SLIB_UINT64(0x3FFFFFFFFFFFFFFF))
+#define IS_STR8(length) (((length) >> 62) == 0)
+#define IS_STR16(length) (((length) >> 62) == 1)
+#define STRING_TYPE_STR16_PREFIX SLIB_UINT64(0x4000000000000000)
+#define LENGTH_MASK SLIB_UINT64(0x3FFFFFFFFFFFFFFF)
 #else
-#define IS_SZ8(length) (((length) >> 30) == 0)
-#define IS_SZ16(length) (((length) >> 30) == 1)
-#define STRING_TYPE_SZ16_PREFIX 0x40000000
-#define GET_LENGTH(length) ((length) & 0x3FFFFFFF)
+#define IS_STR8(length) (((length) >> 30) == 0)
+#define IS_STR16(length) (((length) >> 30) == 1)
+#define STRING_TYPE_STR16_PREFIX 0x40000000
+#define LENGTH_MASK 0x3FFFFFFF
 #endif
+
+#define GET_LENGTH(length) ((length) & LENGTH_MASK)
 
 #define STRING_PTR(s) ((String*)(void*)(&((s)._value)))
 #define STRING_REF(s) (*STRING_PTR(s))
@@ -76,265 +80,7 @@ namespace slib
 					}
 				}
 			}
-
-			SLIB_INLINE static sl_bool equals_element(const String* v1, sl_size len1, const String* v2, sl_size len2) noexcept
-			{
-				return *v1 == *v2;
-			}
-			
-			SLIB_INLINE static sl_bool equals_element(const String* v1, sl_size len1, const String16* v2, sl_size len2) noexcept
-			{
-				return *v1 == *v2;
-			}
-			
-			SLIB_INLINE static sl_bool equals_element(const String16* v2, sl_size len2, const String* v1, sl_size len1) noexcept
-			{
-				return equals_element(v1, len1, v2, len2);
-			}
-			
-			SLIB_INLINE static sl_bool equals_element(const String* v1, sl_size len1, const sl_char8* v2, sl_size len2) noexcept
-			{
-				if (len2) {
-					if (v1->getLength() != len2) {
-						return sl_false;
-					}
-					return Base::equalsMemory(v1->getData(), v2, len2);
-				} else {
-					if (!len2) {
-						len2 = -1;
-					}
-					return String::equals(v1->getData(), v1->getLength(), v2, len2);
-				}
-			}
-			
-			SLIB_INLINE static sl_bool equals_element(const sl_char8* v2, sl_size len2, const String* v1, sl_size len1) noexcept
-			{
-				return equals_element(v1, len1, v2, len2);
-			}
-			
-			SLIB_INLINE static sl_bool equals_element(const String* v1, sl_size len1, const sl_char16* v2, sl_size len2) noexcept
-			{
-				if (!len2) {
-					len2 = -1;
-				}
-				return String::equals(v1->getData(), v1->getLength(), v2, len2);
-			}
-			
-			SLIB_INLINE static sl_bool equals_element(const sl_char16* v2, sl_size len2, const String* v1, sl_size len1) noexcept
-			{
-				return equals_element(v1, len1, v2, len2);
-			}
-			
-			
-			SLIB_INLINE static sl_bool equals_element(const String16* v1, sl_size len1, const String16* v2, sl_size len2) noexcept
-			{
-				return *v1 == *v2;
-			}
-			
-			SLIB_INLINE static sl_bool equals_element(const String16* v1, sl_size len1, const sl_char8* v2, sl_size len2) noexcept
-			{
-				if (!len2) {
-					len2 = -1;
-				}
-				return String16::equals(v1->getData(), v1->getLength(), v2, len2);
-			}
-			
-			SLIB_INLINE static sl_bool equals_element(const sl_char8* v2, sl_size len2, const String16* v1, sl_size len1) noexcept
-			{
-				return equals_element(v1, len1, v2, len2);
-			}
-			
-			SLIB_INLINE static sl_bool equals_element(const String16* v1, sl_size len1, const sl_char16* v2, sl_size len2) noexcept
-			{
-				if (len2) {
-					if (v1->getLength() != len2) {
-						return sl_false;
-					}
-					return Base::equalsMemory2((sl_uint16*)(v1->getData()), (sl_uint16*)v2, len2);
-				} else {
-					if (!len2) {
-						len2 = -1;
-					}
-					return String16::equals(v1->getData(), v1->getLength(), v2, len2);
-				}
-			}
-			
-			SLIB_INLINE static sl_bool equals_element(const sl_char16* v2, sl_size len2, const String16* v1, sl_size len1) noexcept
-			{
-				return equals_element(v1, len1, v2, len2);
-			}
-			
-			
-			SLIB_INLINE static sl_bool equals_element(const sl_char8* v1, sl_size len1, const sl_char8* v2, sl_size len2) noexcept
-			{
-				if (len1 && len2) {
-					if (len1 != len2) {
-						return sl_false;
-					}
-					return Base::equalsMemory(v1, v2, len1);
-				} else {
-					return Base::compareString(v1, v2) == 0;
-				}
-			}
-			
-			SLIB_INLINE static sl_bool equals_element(const sl_char8* v1, sl_size len1, const sl_char16* v2, sl_size len2) noexcept
-			{
-				if (!len1) {
-					len1 = -1;
-				}
-				if (!len2) {
-					len2 = -1;
-				}
-				return String::equals(v1, len1, v2, len2);
-			}
-			
-			SLIB_INLINE static sl_bool equals_element(const sl_char16* v2, sl_size len2, const sl_char8* v1, sl_size len1) noexcept
-			{
-				return equals_element(v1, len1, v2, len2);
-			}
-			
-			
-			SLIB_INLINE static sl_bool equals_element(const sl_char16* v1, sl_size len1, const sl_char16* v2, sl_size len2) noexcept
-			{
-				if (len1 && len2) {
-					if (len1 != len2) {
-						return sl_false;
-					}
-					return Base::equalsMemory2((sl_uint16*)v1, (sl_uint16*)v2, len1);
-				} else {
-					return Base::compareString2(v1, v2) == 0;
-				}
-			}
-			
-			
-			template <class T>
-			SLIB_INLINE static sl_bool equals_param(const T* v1, sl_size len1, const StringParam& v2) noexcept
-			{
-				if (v2.isNull()) {
-					return sl_false;
-				}
-				switch (v2._length) {
-					case STRING_TYPE_STRING8_REF:
-					case STRING_TYPE_STRING8_NOREF:
-						return equals_element(v1, len1, STRING_PTR(v2), 0);
-					case STRING_TYPE_STRING16_REF:
-					case STRING_TYPE_STRING16_NOREF:
-						return equals_element(v1, len1, STRING16_PTR(v2), 0);
-					default:
-						if (IS_SZ16(v2._length)) {
-							return equals_element(v1, len1, (sl_char16*)(v2._value), GET_LENGTH(v2._length));
-						} else {
-							return equals_element(v1, len1, (sl_char8*)(v2._value), GET_LENGTH(v2._length));
-						}
-				}
-			}
-			
-			
-			SLIB_INLINE static sl_compare_result compare_element(const String* v1, const String* v2) noexcept
-			{
-				return v1->compare(*v2);
-			}
-			
-			SLIB_INLINE static sl_compare_result compare_element(const String* v1, const String16* v2) noexcept
-			{
-				return v1->compare(*v2);
-			}
-			
-			SLIB_INLINE static sl_compare_result compare_element(const String16* v2, const String* v1) noexcept
-			{
-				return -compare_element(v1, v2);
-			}
-			
-			SLIB_INLINE static sl_compare_result compare_element(const String* v1, const sl_char8* v2) noexcept
-			{
-				return String::compare(v1->getData(), v1->getLength(), v2, -1);
-			}
-			
-			SLIB_INLINE static sl_compare_result compare_element(const sl_char8* v2, const String* v1) noexcept
-			{
-				return -compare_element(v1, v2);
-			}
-			
-			SLIB_INLINE static sl_compare_result compare_element(const String* v1, const sl_char16* v2) noexcept
-			{
-				return String::compare(v1->getData(), v1->getLength(), v2, -1);
-			}
-			
-			SLIB_INLINE static sl_compare_result compare_element(const sl_char16* v2, const String* v1) noexcept
-			{
-				return -compare_element(v1, v2);
-			}
-			
-			
-			SLIB_INLINE static sl_compare_result compare_element(const String16* v1, const String16* v2) noexcept
-			{
-				return v1->compare(*v2);
-			}
-			
-			SLIB_INLINE static sl_compare_result compare_element(const String16* v1, const sl_char8* v2) noexcept
-			{
-				return String16::compare(v1->getData(), v1->getLength(), v2, -1);
-			}
-			
-			SLIB_INLINE static sl_compare_result compare_element(const sl_char8* v2, const String16* v1) noexcept
-			{
-				return -compare_element(v1, v2);
-			}
-			
-			SLIB_INLINE static sl_compare_result compare_element(const String16* v1, const sl_char16* v2) noexcept
-			{
-				return String16::compare(v1->getData(), v1->getLength(), v2, -1);
-			}
-			
-			SLIB_INLINE static sl_compare_result compare_element(const sl_char16* v2, const String16* v1) noexcept
-			{
-				return -compare_element(v1, v2);
-			}
-			
-			
-			SLIB_INLINE static sl_compare_result compare_element(const sl_char8* v1, const sl_char8* v2) noexcept
-			{
-				return Base::compareString(v1, v2);
-			}
-			
-			SLIB_INLINE static sl_compare_result compare_element(const sl_char8* v1, const sl_char16* v2) noexcept
-			{
-				return String::compare(v1, -1, v2, -1);
-			}
-			
-			SLIB_INLINE static sl_compare_result compare_element(const sl_char16* v2, const sl_char8* v1) noexcept
-			{
-				return -compare_element(v1, v2);
-			}
-			
-			
-			SLIB_INLINE static sl_compare_result compare_element(const sl_char16* v1, const sl_char16* v2) noexcept
-			{
-				return Base::compareString2(v1, v2) == 0;
-			}
-			
-			
-			template <class T>
-			SLIB_INLINE static sl_compare_result compare_param(const T* v1, const StringParam& v2) noexcept
-			{
-				if (v2.isNull()) {
-					return 1;
-				}
-				switch (v2._length) {
-					case STRING_TYPE_STRING8_REF:
-					case STRING_TYPE_STRING8_NOREF:
-						return compare_element(v1, STRING_PTR(v2));
-					case STRING_TYPE_STRING16_REF:
-					case STRING_TYPE_STRING16_NOREF:
-						return compare_element(v1, STRING16_PTR(v2));
-					default:
-						if (IS_SZ16(v2._length)) {
-							return compare_element(v1, (sl_char16*)(v2._value));
-						} else {
-							return compare_element(v1, (sl_char8*)(v2._value));
-						}
-				}
-			}
+		
 		}
 	}
 	
@@ -433,11 +179,19 @@ namespace slib
 	{
 	}
 
+	StringParam::StringParam(const StringView& str) noexcept: StringParam(str.getUnsafeData(), str.getUnsafeLength())
+	{
+	}
+
+	StringParam::StringParam(const StringView16& str) noexcept: StringParam(str.getUnsafeData(), str.getUnsafeLength())
+	{
+	}
+
 	StringParam::StringParam(const char* sz) noexcept
 	{
 		if (sz) {
 			_value = (void*)sz;
-			_length = 0;
+			_length = STRING_TYPE_SZ8;
 		} else {
 			_value = sl_null;
 			_length = 1;
@@ -449,10 +203,10 @@ namespace slib
 		if (sz) {
 			if (sizeof(wchar_t) == 2) {
 				_value = (void*)sz;
-				_length = STRING_TYPE_SZ16_PREFIX;
+				_length = STRING_TYPE_SZ16;
 			} else {
 				_length = STRING_TYPE_STRING8_REF;
-				new STRING_PTR(*this) String(sz);
+				new STRING_PTR(*this) String(String::create(sz));
 			}
 		} else {
 			_value = sl_null;
@@ -464,25 +218,26 @@ namespace slib
 	{
 		if (sz) {
 			_value = (void*)sz;
-			_length = STRING_TYPE_SZ16_PREFIX;
+			_length = STRING_TYPE_SZ16;
 		} else {
 			_value = sl_null;
 			_length = 1;
 		}
 	}
 
-	StringParam::StringParam(const char32_t* sz) noexcept: StringParam(String(sz))
+	StringParam::StringParam(const char32_t* sz) noexcept: StringParam(String::create(sz))
 	{
 	}
 
 	StringParam::StringParam(const char* str, sl_reg length) noexcept
 	{
 		if (str) {
-			if (length < 0) {
-				length = 0;
-			}
 			_value = (void*)str;
-			_length = GET_LENGTH(length);
+			if (length < 0) {
+				_length = STRING_TYPE_SZ8;
+			} else {
+				_length = GET_LENGTH(length);
+			}
 		} else {
 			_value = sl_null;
 			_length = 1;
@@ -493,14 +248,15 @@ namespace slib
 	{
 		if (str) {
 			if (sizeof(wchar_t) == 2) {
-				if (length < 0) {
-					length = 0;
-				}
 				_value = (void*)str;
-				_length = STRING_TYPE_SZ16_PREFIX | GET_LENGTH(length);
+				if (length < 0) {
+					_length = STRING_TYPE_SZ16;
+				} else {
+					_length = STRING_TYPE_STR16_PREFIX | GET_LENGTH(length);
+				}
 			} else {
 				_length = STRING_TYPE_STRING8_REF;
-				new STRING_PTR(*this) String(str, length);
+				new STRING_PTR(*this) String(String::create(str, length));
 			}
 		} else {
 			_value = sl_null;
@@ -511,41 +267,20 @@ namespace slib
 	StringParam::StringParam(const char16_t* str, sl_reg length) noexcept
 	{
 		if (str) {
-			if (length < 0) {
-				length = 0;
-			}
 			_value = (void*)str;
-			_length = STRING_TYPE_SZ16_PREFIX | GET_LENGTH(length);
+			if (length < 0) {
+				_length = STRING_TYPE_SZ16;
+			} else {
+				_length = STRING_TYPE_STR16_PREFIX | GET_LENGTH(length);
+			}
 		} else {
 			_value = sl_null;
 			_length = 1;
 		}
 	}
 
-	StringParam::StringParam(const char32_t* str, sl_reg length) noexcept: StringParam(String(str, length))
+	StringParam::StringParam(const char32_t* str, sl_reg length) noexcept: StringParam(String::create(str, length))
 	{
-	}
-
-	StringParam::StringParam(const StringData& str) noexcept
-	{
-		_value = str.data;
-		_length = str.getUnsafeLength();
-		if (_length & SLIB_SIZE_TEST_SIGN_BIT) {
-			_length = 0;
-		} else {
-			_length = GET_LENGTH(_length);
-		}
-	}
-	
-	StringParam::StringParam(const StringData16& str) noexcept
-	{
-		_value = str.data;
-		_length = str.getUnsafeLength();
-		if (_length & SLIB_SIZE_TEST_SIGN_BIT) {
-			_length = STRING_TYPE_SZ16_PREFIX;
-		} else {
-			_length = STRING_TYPE_SZ16_PREFIX | GET_LENGTH(_length);
-		}
 	}
 
 	StringParam::StringParam(const std::string& str) noexcept: StringParam(str.c_str(), str.length())
@@ -659,12 +394,24 @@ namespace slib
 		return *this = String16(Move(s));
 	}
 	
+	StringParam& StringParam::operator=(const StringView& str) noexcept
+	{
+		_assign(str.getUnsafeData(), str.getUnsafeLength());
+		return *this;
+	}
+
+	StringParam& StringParam::operator=(const StringView16& str) noexcept
+	{
+		_assign(str.getUnsafeData(), str.getUnsafeLength());
+		return *this;
+	}
+
 	StringParam& StringParam::operator=(const char* value) noexcept
 	{
 		if (value) {
 			_free();
 			_value = (void*)value;
-			_length = 0;
+			_length = STRING_TYPE_SZ8;
 		} else {
 			setNull();
 		}
@@ -676,7 +423,7 @@ namespace slib
 		if (sizeof(wchar_t) == 2) {
 			return *this = (char16_t*)value;
 		} else {
-			return *this = String(value);
+			return *this = String::create(value);
 		}
 	}
 
@@ -685,7 +432,7 @@ namespace slib
 		if (value) {
 			_free();
 			_value = (void*)value;
-			_length = STRING_TYPE_SZ16_PREFIX;
+			_length = STRING_TYPE_SZ16;
 		} else {
 			setNull();
 		}
@@ -694,44 +441,29 @@ namespace slib
 
 	StringParam& StringParam::operator=(const char32_t* value) noexcept
 	{
-		return *this = String(value);
+		return *this = String::create(value);
 	}
 
 	void StringParam::_assign(const sl_char8* str, sl_reg length) noexcept
 	{
 		_free();
 		_value = (void*)str;
-		_length = length;
-		if (_length & SLIB_SIZE_TEST_SIGN_BIT) {
-			_length = 0;
+		if (length < 0) {
+			_length = STRING_TYPE_SZ8;
 		} else {
-			_length = GET_LENGTH(_length);
+			_length = GET_LENGTH(length);
 		}
-
 	}
 
 	void StringParam::_assign(const sl_char16* str, sl_reg length) noexcept
 	{
 		_free();
 		_value = (void*)str;
-		_length = length;
-		if (_length & SLIB_SIZE_TEST_SIGN_BIT) {
-			_length = STRING_TYPE_SZ16_PREFIX;
+		if (length < 0) {
+			_length = STRING_TYPE_SZ16;
 		} else {
-			_length = STRING_TYPE_SZ16_PREFIX | GET_LENGTH(_length);
+			_length = STRING_TYPE_STR16_PREFIX | GET_LENGTH(length);
 		}
-	}
-
-	StringParam& StringParam::operator=(const StringData& str) noexcept
-	{
-		_assign(str.data, str.getUnsafeLength());
-		return *this;
-	}
-
-	StringParam& StringParam::operator=(const StringData16& str) noexcept
-	{
-		_assign(str.data, str.getUnsafeLength());
-		return *this;
 	}
 
 	StringParam& StringParam::operator=(const std::string& str) noexcept
@@ -746,7 +478,7 @@ namespace slib
 			_assign((sl_char16*)(str.c_str()), str.length());
 			return *this;
 		} else {
-			return *this = String(str);
+			return *this = String::create(str);
 		}
 	}
 
@@ -758,7 +490,7 @@ namespace slib
 
 	StringParam& StringParam::operator=(const std::u32string& str) noexcept
 	{
-		return *this = String(str);
+		return *this = String::create(str);
 	}
 
 	void StringParam::setUndefined() noexcept
@@ -785,18 +517,21 @@ namespace slib
 			return sl_true;
 		}
 		switch (_length) {
+			case 0:
+			case STRING_TYPE_STR16_PREFIX:
+				return sl_true;
 			case STRING_TYPE_STRING8_REF:
 			case STRING_TYPE_STRING8_NOREF:
 				return STRING_REF(*this).isEmpty();
 			case STRING_TYPE_STRING16_REF:
 			case STRING_TYPE_STRING16_NOREF:
 				return STRING16_REF(*this).isEmpty();
+			case STRING_TYPE_SZ8:
+				return !(*((sl_char8*)_value));
+			case STRING_TYPE_SZ16:
+				return !(*((sl_char16*)_value));
 			default:
-				if (IS_SZ16(_length)) {
-					return !(*((sl_char16*)_value));
-				} else {
-					return !(*((sl_char8*)_value));
-				}
+				return sl_false;
 		}
 	}
 	
@@ -817,22 +552,22 @@ namespace slib
 
 	sl_bool StringParam::isSz8() const noexcept
 	{
-		return _value && IS_SZ8(_length);
+		return _value && (_length == STRING_TYPE_SZ8 || IS_STR8(_length));
 	}
 
 	sl_bool StringParam::isSz16() const noexcept
 	{
-		return _value && IS_SZ16(_length);
+		return _value && (_length == STRING_TYPE_SZ16 || IS_STR16(_length));
 	}
 
 	sl_bool StringParam::is8() const noexcept
 	{
-		return _value && (_length == STRING_TYPE_STRING8_REF || _length == STRING_TYPE_STRING8_NOREF || IS_SZ8(_length));
+		return _value && (_length == STRING_TYPE_STRING8_REF || _length == STRING_TYPE_STRING8_NOREF || _length == STRING_TYPE_SZ8 || IS_STR8(_length));
 	}
 
 	sl_bool StringParam::is16() const noexcept
 	{
-		return _value && (_length == STRING_TYPE_STRING16_REF || _length == STRING_TYPE_STRING16_NOREF || IS_SZ16(_length));
+		return _value && (_length == STRING_TYPE_STRING16_REF || _length == STRING_TYPE_STRING16_NOREF || _length == STRING_TYPE_SZ16 || IS_STR16(_length));
 	}
 
 	String StringParam::toString() const noexcept
@@ -846,22 +581,16 @@ namespace slib
 				return STRING_REF(*this);
 			case STRING_TYPE_STRING16_REF:
 			case STRING_TYPE_STRING16_NOREF:
-				return STRING16_REF(*this);
+				return String::create(STRING16_REF(*this));
+			case STRING_TYPE_SZ8:
+				return String::create((sl_char8*)_value);
+			case STRING_TYPE_SZ16:
+				return String::create((sl_char16*)_value);
 			default:
-				if (IS_SZ16(_length)) {
-					sl_size len = GET_LENGTH(_length);
-					if (len) {
-						return String((sl_char16*)_value, len);
-					} else {
-						return String((sl_char16*)_value, -1);
-					}
+				if (IS_STR16(_length)) {
+					return String::create((sl_char16*)_value, GET_LENGTH(_length));
 				} else {
-					sl_size len = GET_LENGTH(_length);
-					if (len) {
-						return String((sl_char8*)_value, len);
-					} else {
-						return String((sl_char8*)_value, -1);
-					}
+					return String::create((sl_char8*)_value, _length);
 				}
 		}
 	}
@@ -874,25 +603,19 @@ namespace slib
 		switch (_length) {
 			case STRING_TYPE_STRING8_REF:
 			case STRING_TYPE_STRING8_NOREF:
-				return STRING_REF(*this);
+				return String16::create(STRING_REF(*this));
 			case STRING_TYPE_STRING16_REF:
 			case STRING_TYPE_STRING16_NOREF:
 				return STRING16_REF(*this);
+			case STRING_TYPE_SZ8:
+				return String16::create((sl_char8*)_value);
+			case STRING_TYPE_SZ16:
+				return String16::create((sl_char16*)_value);
 			default:
-				if (IS_SZ16(_length)) {
-					sl_size len = GET_LENGTH(_length);
-					if (len) {
-						return String16((sl_char16*)_value, len);
-					} else {
-						return String16((sl_char16*)_value, -1);
-					}
+				if (IS_STR16(_length)) {
+					return String16::create((sl_char16*)_value, GET_LENGTH(_length));
 				} else {
-					sl_size len = GET_LENGTH(_length);
-					if (len) {
-						return String16((sl_char8*)_value, len);
-					} else {
-						return String16((sl_char8*)_value, -1);
-					}
+					return String16::create((sl_char8*)_value, _length);
 				}
 		}
 	}
@@ -909,109 +632,31 @@ namespace slib
 			case STRING_TYPE_STRING16_REF:
 			case STRING_TYPE_STRING16_NOREF:
 				return STRING16_REF(*this);
+			case STRING_TYPE_SZ8:
+				return (sl_char8*)_value;
+			case STRING_TYPE_SZ16:
+				return (sl_char16*)_value;
 			default:
-				if (IS_SZ16(_length)) {
-					return (sl_char16*)_value;
+				if (IS_STR16(_length)) {
+					sl_char16* s = (sl_char16*)_value;
+					sl_size l = GET_LENGTH(_length);
+					if (s[l]) {
+						return String::create(s, l);
+					} else {
+						return s;
+					}
 				} else {
-					return (sl_char8*)_value;
+					sl_char8* s = (sl_char8*)_value;
+					sl_size l = _length;
+					if (s[l]) {
+						return String::create(s, l);
+					} else {
+						return s;
+					}
 				}
 		}
 	}
 
-	sl_compare_result StringParam::compare(const StringParam& v2) const noexcept
-	{
-		const StringParam& v1 = *this;
-		if (!(v1._value)) {
-			if (v2._value) {
-				return -1;
-			}
-			return 0;
-		}
-		if (v1._length == v2._length) {
-			switch (v1._length) {
-				case STRING_TYPE_STRING8_REF:
-				case STRING_TYPE_STRING8_NOREF:
-					return STRING_REF(v1).compare(STRING_REF(v2));
-				case STRING_TYPE_STRING16_REF:
-				case STRING_TYPE_STRING16_NOREF:
-					return STRING16_REF(v1).compare(STRING16_REF(v2));
-				default:
-					if (IS_SZ16(v1._length)) {
-						return Base::compareString2((sl_char16*)(v1._value), (sl_char16*)(v2._value));
-					} else {
-						return Base::compareString((sl_char8*)(v1._value), (sl_char8*)(v2._value));
-					}
-
-			}
-		} else {
-			switch (v1._length) {
-				case STRING_TYPE_STRING8_REF:
-				case STRING_TYPE_STRING8_NOREF:
-					return compare_param(STRING_PTR(v1), v2);
-				case STRING_TYPE_STRING16_REF:
-				case STRING_TYPE_STRING16_NOREF:
-					return compare_param(STRING16_PTR(v1), v2);
-				default:
-					if (IS_SZ16(v1._length)) {
-						return compare_param((sl_char16*)(v1._value), v2);
-					} else {
-						return compare_param((sl_char8*)(v1._value), v2);
-					}
-			}
-		}
-		return 0;
-	}
-	
-	sl_bool StringParam::equals(const StringParam& v2) const noexcept
-	{
-		const StringParam& v1 = *this;
-		if (!(v1._value)) {
-			return !(v2._value);
-		}
-		if (v1._length == v2._length) {
-			switch (v1._length) {
-				case STRING_TYPE_STRING8_REF:
-				case STRING_TYPE_STRING8_NOREF:
-					return STRING_REF(v1) == STRING_REF(v2);
-				case STRING_TYPE_STRING16_REF:
-				case STRING_TYPE_STRING16_NOREF:
-					return STRING16_REF(v1) == STRING16_REF(v2);
-				default:
-					if (IS_SZ16(v1._length)) {
-						sl_size len = GET_LENGTH(v1._length);
-						if (len) {
-							return Base::equalsMemory2((sl_uint16*)(v1._value), (sl_uint16*)(v2._value), len);
-						} else {
-							return Base::compareString2((sl_char16*)(v1._value), (sl_char16*)(v2._value)) == 0;
-						}
-					} else {
-						sl_size len = GET_LENGTH(v1._length);
-						if (len) {
-							return Base::equalsMemory((sl_char8*)(v1._value), (sl_char8*)(v2._value), len);
-						} else {
-							return Base::compareString((sl_char8*)(v1._value), (sl_char8*)(v2._value)) == 0;
-						}
-					}
-			}
-		} else {
-			switch (v1._length) {
-				case STRING_TYPE_STRING8_REF:
-				case STRING_TYPE_STRING8_NOREF:
-					return equals_param(STRING_PTR(v1), 0, v2);
-				case STRING_TYPE_STRING16_REF:
-				case STRING_TYPE_STRING16_NOREF:
-					return equals_param(STRING16_PTR(v1), 0, v2);
-				default:
-					if (IS_SZ16(v1._length)) {
-						return equals_param((sl_char16*)(v1._value), GET_LENGTH(v1._length), v2);
-					} else {
-						return equals_param((sl_char8*)(v1._value), GET_LENGTH(v1._length), v2);
-					}
-			}
-		}
-		return sl_false;
-	}
-	
 	sl_size StringParam::getHashCode() const noexcept
 	{
 		if (!_value) {
@@ -1024,25 +669,19 @@ namespace slib
 			case STRING_TYPE_STRING16_REF:
 			case STRING_TYPE_STRING16_NOREF:
 				return STRING16_REF(*this).getHashCode();
+			case STRING_TYPE_SZ8:
+				return String::getHashCode((sl_char8*)_value);
+			case STRING_TYPE_SZ16:
+				return String16::getHashCode((sl_char16*)_value);
 			default:
-				if (IS_SZ16(_length)) {
-					return toString16().getHashCode();
+				if (IS_STR16(_length)) {
+					return String16::getHashCode((sl_char16*)_value, GET_LENGTH(_length));
 				} else {
-					return toString().getHashCode();
+					return String::getHashCode((sl_char8*)_value, _length);
 				}
 		}
 	}
 	
-	sl_bool operator==(const StringParam& v1, const StringParam& v2) noexcept
-	{
-		return v1.equals(v2);
-	}
-
-	sl_bool operator!=(const StringParam& v1, const StringParam& v2) noexcept
-	{
-		return !(v1.equals(v2));
-	}
-
 	
 	sl_compare_result Compare<StringParam>::operator()(const StringParam& a, const StringParam& b) const noexcept
 	{
@@ -1068,107 +707,40 @@ namespace slib
 			switch (param._length) {
 				case STRING_TYPE_STRING8_REF:
 				case STRING_TYPE_STRING8_NOREF:
-					data = STRING_REF(param).getData(length);
+					data = STRING_REF(param).getData(*((sl_size*)&length));
 					break;
 				case STRING_TYPE_STRING16_REF:
 				case STRING_TYPE_STRING16_NOREF:
-					string = param.toString();
-					data = string.getData(length);
+					string = String::create(STRING16_REF(param));
+					data = string.getData(*((sl_size*)&length));
+					break;
+				case STRING_TYPE_SZ8:
+					data = (sl_char8*)(param._value);
+					length = -1;
+					break;
+				case STRING_TYPE_SZ16:
+					string = String::create((sl_char16*)(param._value));
+					data = string.getData(*((sl_size*)&length));
 					break;
 				default:
-					if (IS_SZ16(param._length)) {
-						string = param.toString();
-						data = string.getData(length);
+					if (IS_STR16(param._length)) {
+						string = String::create((sl_char16*)(param._value), GET_LENGTH(param._length));
+						data = string.getData(*((sl_size*)&length));
 					} else {
 						data = (sl_char8*)(param._value);
-						length = GET_LENGTH(param._length);
-						if (!length) {
-							if (data[0]) {
-								length = SLIB_SIZE_MAX;
-							} else {
-								length = 0;
-							}
-						}
+						length = param._length;
 					}
 					break;
 			}
-		} else {
-			static sl_char8 s[] = "";
-			data = s;
-			length = 0;
 		}
 	}
 
-	StringData::StringData(const sl_char8* _str) noexcept
+	StringData::StringData(const sl_char8* str) noexcept: StringView(str)
 	{
-		if (_str) {
-			data = (sl_char8*)_str;
-			length = SLIB_SIZE_MAX;
-		} else {
-			static sl_char8 s[] = "";
-			data = s;
-			length = 0;
-		}
 	}
 
-	StringData::StringData(const sl_char8* _str, sl_size _length) noexcept
+	StringData::StringData(const sl_char8* str, sl_size length) noexcept: StringView(str, length)
 	{
-		if (_str && _length) {
-			data = (sl_char8*)_str;
-			length = _length;
-		} else {
-			static sl_char8 s[] = "";
-			data = s;
-			length = 0;
-		}
-	}
-
-	sl_bool StringData::isEmpty() const noexcept
-	{
-		return !length;
-	}
-
-	sl_bool StringData::isNotEmpty() const noexcept
-	{
-		return length != 0;
-	}
-
-	sl_size StringData::getLength() const noexcept
-	{
-		if (length & SLIB_SIZE_TEST_SIGN_BIT) {
-			length = Base::getStringLength(data);
-		}
-		return length;
-	}
-
-	sl_size StringData::getUnsafeLength() const noexcept
-	{
-		return length;
-	}
-
-	sl_compare_result StringData::compare(const StringData& other) const noexcept
-	{
-		return String::compare(data, length, other.data, other.length);
-	}
-
-	sl_bool StringData::equals(const StringData& other) const noexcept
-	{
-		return String::equals(data, length, other.data, other.length);
-	}
-
-	sl_bool operator==(const StringData& v1, const StringData& v2) noexcept
-	{
-		return v1.equals(v2);
-	}
-
-	sl_bool operator!=(const StringData& v1, const StringData& v2) noexcept
-	{
-		return !(v1.equals(v2));
-	}
-
-	String operator+(const StringData& v1, const StringData& v2) noexcept
-	{
-		return String::merge(v1.data, v1.getUnsafeLength(), v2.data, v2.getUnsafeLength());
 	}
 
 
@@ -1180,107 +752,184 @@ namespace slib
 			switch (param._length) {
 				case STRING_TYPE_STRING16_REF:
 				case STRING_TYPE_STRING16_NOREF:
-					data = STRING16_REF(param).getData(length);
+					data = STRING16_REF(param).getData(*((sl_size*)&length));
 					break;
 				case STRING_TYPE_STRING8_REF:
 				case STRING_TYPE_STRING8_NOREF:
-					string = param.toString16();
-					data = string.getData(length);
+					string = String16::create(STRING_REF(param));
+					data = string.getData(*((sl_size*)&length));
+					break;
+				case STRING_TYPE_SZ8:
+					string = String16::create((sl_char8*)(param._value));
+					data = string.getData(*((sl_size*)&length));
+					break;
+				case STRING_TYPE_SZ16:
+					data = (sl_char16*)(param._value);
+					length = -1;
 					break;
 				default:
-					if (IS_SZ16(param._length)) {
+					if (IS_STR16(param._length)) {
 						data = (sl_char16*)(param._value);
 						length = GET_LENGTH(param._length);
-						if (!length) {
-							if (data[0]) {
-								length = SLIB_SIZE_MAX;
-							} else {
-								length = 0;
-							}
-						}
 					} else {
-						string = param.toString16();
-						data = string.getData(length);
+						string = String16::create((sl_char8*)(param._value), param._length);
+						data = string.getData(*((sl_size*)&length));
 					}
 					break;
 			}
-		} else {
-			static sl_char16 s[] = SLIB_UNICODE("");
-			data = s;
-			length = 0;
 		}
 	}
 
-	StringData16::StringData16(const sl_char16* _str) noexcept
+	StringData16::StringData16(const sl_char16* str) noexcept: StringView16(str)
 	{
-		if (_str) {
-			data = (sl_char16*)_str;
-			length = SLIB_SIZE_MAX;
-		} else {
-			static sl_char16 s[] = SLIB_UNICODE("");
-			data = s;
-			length = 0;
+	}
+
+	StringData16::StringData16(const sl_char16* str, sl_size length) noexcept: StringView16(str, length)
+	{
+	}
+
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(StringCstr)
+
+	StringCstr::StringCstr(const StringParam& param) noexcept
+	{
+		if (param._value) {
+			switch (param._length) {
+				case STRING_TYPE_STRING8_REF:
+				case STRING_TYPE_STRING8_NOREF:
+					data = STRING_REF(param).getData(*((sl_size*)&length));
+					break;
+				case STRING_TYPE_STRING16_REF:
+				case STRING_TYPE_STRING16_NOREF:
+					string = String::create(STRING16_REF(param));
+					data = string.getData(*((sl_size*)&length));
+					break;
+				case STRING_TYPE_SZ8:
+					data = (sl_char8*)(param._value);
+					length = -1;
+					break;
+				case STRING_TYPE_SZ16:
+					string = String::create((sl_char16*)(param._value));
+					data = string.getData(*((sl_size*)&length));
+					break;
+				default:
+					if (IS_STR16(param._length)) {
+						string = String::create((sl_char16*)(param._value), GET_LENGTH(param._length));
+						data = string.getData(*((sl_size*)&length));
+					} else {
+						data = (sl_char8*)(param._value);
+						length = param._length;
+						if (data[length]) {
+							string = String::create(data, length);
+							data = string.getData(*((sl_size*)&length));
+						}
+					}
+					break;
+			}
 		}
 	}
 
-	StringData16::StringData16(const sl_char16* _str, sl_size _length) noexcept
+	StringCstr::StringCstr(const sl_char8* str) noexcept: StringView(str)
 	{
-		if (_str && _length) {
-			data = (sl_char16*)_str;
-			length = _length;
-		} else {
-			static sl_char16 s[] = SLIB_UNICODE("");
-			data = s;
-			length = 0;
+	}
+
+	StringCstr::StringCstr(const sl_char8* str, sl_size length) noexcept: StringView(str, length)
+	{
+	}
+
+	StringCstr::StringCstr(const String& str) noexcept
+	{
+		if (str.isNotNull()) {
+			data = str.getData(*((sl_size*)&length));
 		}
 	}
 
-	sl_bool StringData16::isEmpty() const noexcept
+	StringCstr::StringCstr(const AtomicString& str) noexcept: StringCstr(String(str))
 	{
-		return !length;
 	}
 
-	sl_bool StringData16::isNotEmpty() const noexcept
+	StringCstr::StringCstr(const StringView& str) noexcept: StringView(str.getUnsafeData(), str.getUnsafeLength())
 	{
-		return length != 0;
-	}
-
-	sl_size StringData16::getLength() const noexcept
-	{
-		if (length & SLIB_SIZE_TEST_SIGN_BIT) {
-			length = Base::getStringLength2(data);
+		if (data) {
+			if (length > 0) {
+				if (data[length]) {
+					string = String::create(data, length);
+					data = string.getData(*((sl_size*)&length));
+				}
+			}
 		}
-		return length;
 	}
 
-	sl_size StringData16::getUnsafeLength() const noexcept
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(StringCstr16)
+
+	StringCstr16::StringCstr16(const StringParam& param) noexcept
 	{
-		return length;
+		if (param._value) {
+			switch (param._length) {
+				case STRING_TYPE_STRING16_REF:
+				case STRING_TYPE_STRING16_NOREF:
+					data = STRING16_REF(param).getData(*((sl_size*)&length));
+					break;
+				case STRING_TYPE_STRING8_REF:
+				case STRING_TYPE_STRING8_NOREF:
+					string = String16::create(STRING_REF(param));
+					data = string.getData(*((sl_size*)&length));
+					break;
+				case STRING_TYPE_SZ8:
+					string = String16::create((sl_char8*)(param._value));
+					data = string.getData(*((sl_size*)&length));
+					break;
+				case STRING_TYPE_SZ16:
+					data = (sl_char16*)(param._value);
+					length = -1;
+					break;
+				default:
+					if (IS_STR16(param._length)) {
+						data = (sl_char16*)(param._value);
+						length = GET_LENGTH(param._length);
+						if (data[length]) {
+							string = String16::create(data, length);
+							data = string.getData(*((sl_size*)&length));
+						}
+					} else {
+						string = String16::create((sl_char8*)(param._value), param._length);
+						data = string.getData(*((sl_size*)&length));
+					}
+					break;
+			}
+		}
 	}
 
-	sl_compare_result StringData16::compare(const StringData16& other) const noexcept
+	StringCstr16::StringCstr16(const sl_char16* str) noexcept: StringView16(str)
 	{
-		return String16::compare(data, length, other.data, other.length);
 	}
 
-	sl_bool StringData16::equals(const StringData16& other) const noexcept
+	StringCstr16::StringCstr16(const sl_char16* str, sl_size length) noexcept: StringView16(str, length)
 	{
-		return String16::equals(data, length, other.data, other.length);
 	}
 
-	sl_bool operator==(const StringData16& v1, const StringData16& v2) noexcept
+	StringCstr16::StringCstr16(const String16& str) noexcept
 	{
-		return v1.equals(v2);
+		if (str.isNotNull()) {
+			data = str.getData(*((sl_size*)&length));
+		}
 	}
 
-	sl_bool operator!=(const StringData16& v1, const StringData16& v2) noexcept
+	StringCstr16::StringCstr16(const AtomicString16& str) noexcept: StringCstr16(String16(str))
 	{
-		return !(v1.equals(v2));
 	}
 
-	String16 operator+(const StringData16& v1, const StringData16& v2) noexcept
+	StringCstr16::StringCstr16(const StringView16& str) noexcept: StringView16(str.getUnsafeData(), str.getUnsafeLength())
 	{
-		return String16::merge(v1.data, v1.getUnsafeLength(), v2.data, v2.getUnsafeLength());
+		if (data) {
+			if (length > 0) {
+				if (data[length]) {
+					string = String16::create(data, length);
+					data = string.getData(*((sl_size*)&length));
+				}
+			}
+		}
 	}
 
 }

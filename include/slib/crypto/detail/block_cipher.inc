@@ -155,7 +155,7 @@ namespace slib
 	sl_size BlockCipher_CBC<CLASS, PADDING>::encrypt(const CLASS* crypto, const void* src, sl_size size, void* dst)
 	{
 		Math::randomMemory(dst, CLASS::BlockSize);
-		return encrypt(crypto, dst, src, size, ((char*)dst) + CLASS::BlockSize) + CLASS::BlockSize;
+		return encrypt(crypto, dst, src, size, ((char*)dst) + (int)(CLASS::BlockSize)) + CLASS::BlockSize;
 	}
 
 	template <class CLASS, class PADDING>
@@ -219,7 +219,7 @@ namespace slib
 		if (size < CLASS::BlockSize) {
 			return 0;
 		}
-		return decrypt(crypto, src, ((char*)src) + CLASS::BlockSize, size - CLASS::BlockSize, dst);
+		return decrypt(crypto, src, ((char*)src) + (int)(CLASS::BlockSize), size - CLASS::BlockSize, dst);
 	}
 
 	template <class CLASS, class PADDING>

@@ -121,21 +121,21 @@ namespace slib
 		~File();
 	
 	public:
-		static Ref<File> open(const String& filePath, const FileMode& mode, const FilePermissions& permissions);
+		static Ref<File> open(const StringParam& filePath, const FileMode& mode, const FilePermissions& permissions);
 
-		static Ref<File> open(const String& filePath, const FileMode& mode);
+		static Ref<File> open(const StringParam& filePath, const FileMode& mode);
 	
-		static Ref<File> openForRead(const String& filePath, sl_bool flagShareRead = sl_true);
+		static Ref<File> openForRead(const StringParam& filePath, sl_bool flagShareRead = sl_true);
 
-		static Ref<File> openForWrite(const String& filePath);
+		static Ref<File> openForWrite(const StringParam& filePath);
 
-		static Ref<File> openForReadWrite(const String& filePath);
+		static Ref<File> openForReadWrite(const StringParam& filePath);
 
-		static Ref<File> openForAppend(const String& filePath);
+		static Ref<File> openForAppend(const StringParam& filePath);
 
-		static Ref<File> openForRandomAccess(const String& filePath);
+		static Ref<File> openForRandomAccess(const StringParam& filePath);
 	
-		static Ref<File> openForRandomRead(const String& filePath, sl_bool flagShareRead = sl_true);
+		static Ref<File> openForRandomRead(const StringParam& filePath, sl_bool flagShareRead = sl_true);
 
 		/*
 			Physical Disks and Volumes
@@ -147,7 +147,7 @@ namespace slib
 		 		"/dev/disk0"  (macOS)
 		 		"/dev/sda1"   (Linux)
 		*/
-		static Ref<File> openDevice(const String16& path, sl_bool flagRead, sl_bool flagWrite);
+		static Ref<File> openDevice(const StringParam& path, sl_bool flagRead, sl_bool flagWrite);
 
 	public:
 		void close() override;
@@ -178,11 +178,11 @@ namespace slib
 		
 		static sl_uint64 getSize(sl_file fd);
 		
-		static sl_uint64 getSize(const String& path);
+		static sl_uint64 getSize(const StringParam& path);
 		
 		static sl_uint64 getDiskSize(sl_file fd);
 		
-		static sl_uint64 getDiskSize(const String& path);
+		static sl_uint64 getDiskSize(const StringParam& path);
 		
 		
 		sl_bool lock();
@@ -198,90 +198,90 @@ namespace slib
 
 		Time getCreatedTime();
 
-		static Time getModifiedTime(const String& filePath);
+		static Time getModifiedTime(const StringParam& filePath);
 
-		static Time getAccessedTime(const String& filePath);
+		static Time getAccessedTime(const StringParam& filePath);
 
-		static Time getCreatedTime(const String& filePath);
+		static Time getCreatedTime(const StringParam& filePath);
 
-		static sl_bool setModifiedTime(const String& filePath, Time time);
+		static sl_bool setModifiedTime(const StringParam& filePath, Time time);
 
-		static sl_bool setAccessedTime(const String& filePath, Time time);
+		static sl_bool setAccessedTime(const StringParam& filePath, Time time);
 
-		static sl_bool setCreatedTime(const String& filePath, Time time);
+		static sl_bool setCreatedTime(const StringParam& filePath, Time time);
 	
 
-		static FileAttributes getAttributes(const String& filePath);
+		static FileAttributes getAttributes(const StringParam& filePath);
 
-		static sl_bool exists(const String& filePath);
+		static sl_bool exists(const StringParam& filePath);
 	
-		static sl_bool isFile(const String& filePath);
+		static sl_bool isFile(const StringParam& filePath);
 	
-		static sl_bool isDirectory(const String& filePath);
+		static sl_bool isDirectory(const StringParam& filePath);
 
-		static sl_bool isHidden(const String& filePath);
+		static sl_bool isHidden(const StringParam& filePath);
 	
-		static sl_bool setHidden(const String& filePath, sl_bool flagHidden = sl_true);
+		static sl_bool setHidden(const StringParam& filePath, sl_bool flagHidden = sl_true);
 	
 
-		static sl_bool createDirectory(const String& dirPath, sl_bool flagErrorOnCreateExistingDirectory = sl_false);
+		static sl_bool createDirectory(const StringParam& dirPath, sl_bool flagErrorOnCreateExistingDirectory = sl_false);
 
-		static sl_bool createDirectories(const String& dirPath);
+		static sl_bool createDirectories(const StringParam& dirPath);
 
-		static sl_bool deleteFile(const String& filePath, sl_bool flagErrorOnDeleteNotExistingFile = sl_false);
+		static sl_bool deleteFile(const StringParam& filePath, sl_bool flagErrorOnDeleteNotExistingFile = sl_false);
 	
 
 		// Deletes the directory and its sub-directories and files
-		static sl_bool deleteDirectoryRecursively(const String& dirPath);
+		static sl_bool deleteDirectoryRecursively(const StringParam& dirPath);
 
 		// Changes the path of file or directory. Don't replace the existing file.
-		static sl_bool rename(const String& filePathOriginal, const String& filePathNew);
+		static sl_bool rename(const StringParam& filePathOriginal, const StringParam& filePathNew);
 	
 
-		static List<String> getFiles(const String& dirPath);
+		static List<String> getFiles(const StringParam& dirPath);
 	
-		static List<String> getAllDescendantFiles(const String& dirPath);
+		static List<String> getAllDescendantFiles(const StringParam& dirPath);
 	
 
 		Memory readAllBytes(sl_size maxSize = SLIB_SIZE_MAX);
 		
-		static Memory readAllBytes(const String& path, sl_size maxSize = SLIB_SIZE_MAX);
+		static Memory readAllBytes(const StringParam& path, sl_size maxSize = SLIB_SIZE_MAX);
 		
 		String readAllTextUTF8(sl_size maxSize = SLIB_SIZE_MAX);
 
-		static String readAllTextUTF8(const String& path, sl_size maxSize = SLIB_SIZE_MAX);
+		static String readAllTextUTF8(const StringParam& path, sl_size maxSize = SLIB_SIZE_MAX);
 
 		String16 readAllTextUTF16(EndianType endian = Endian::Little, sl_size maxSize = SLIB_SIZE_MAX);
 		
-		static String16 readAllTextUTF16(const String& path, EndianType endian = Endian::Little, sl_size maxSize = SLIB_SIZE_MAX);
+		static String16 readAllTextUTF16(const StringParam& path, EndianType endian = Endian::Little, sl_size maxSize = SLIB_SIZE_MAX);
 		
 		String readAllText(Charset* outCharset = sl_null, sl_size maxSize = SLIB_SIZE_MAX);
 
-		static String readAllText(const String& path, Charset* outCharset = sl_null, sl_size maxSize = SLIB_SIZE_MAX);
+		static String readAllText(const StringParam& path, Charset* outCharset = sl_null, sl_size maxSize = SLIB_SIZE_MAX);
 		
 		String16 readAllText16(Charset* outCharset = sl_null, sl_size maxSize = SLIB_SIZE_MAX);
 
-		static String16 readAllText16(const String& path, Charset* outCharset = sl_null, sl_size maxSize = SLIB_SIZE_MAX);
+		static String16 readAllText16(const StringParam& path, Charset* outCharset = sl_null, sl_size maxSize = SLIB_SIZE_MAX);
 	
-		static sl_size writeAllBytes(const String& path, const void* buf, sl_size size);
+		static sl_size writeAllBytes(const StringParam& path, const void* buf, sl_size size);
 
-		static sl_size writeAllBytes(const String& path, const Memory& mem);
+		static sl_size writeAllBytes(const StringParam& path, const Memory& mem);
 
-		static sl_bool writeAllTextUTF8(const String& path, const String& text, sl_bool flagWriteByteOrderMark = sl_false);
+		static sl_bool writeAllTextUTF8(const StringParam& path, const StringParam& text, sl_bool flagWriteByteOrderMark = sl_false);
 
-		static sl_bool writeAllTextUTF16LE(const String& path, const String16& text, sl_bool flagWriteByteOrderMark = sl_false);
+		static sl_bool writeAllTextUTF16LE(const StringParam& path, const StringParam& text, sl_bool flagWriteByteOrderMark = sl_false);
 
-		static sl_bool writeAllTextUTF16BE(const String& path, const String16& text, sl_bool flagWriteByteOrderMark = sl_false);
+		static sl_bool writeAllTextUTF16BE(const StringParam& path, const StringParam& text, sl_bool flagWriteByteOrderMark = sl_false);
 
-		static sl_size appendAllBytes(const String& path, const void* buf, sl_size size);
+		static sl_size appendAllBytes(const StringParam& path, const void* buf, sl_size size);
 
-		static sl_size appendAllBytes(const String& path, const Memory& mem);
+		static sl_size appendAllBytes(const StringParam& path, const Memory& mem);
 
-		static sl_bool appendAllTextUTF8(const String& path, const String& text);
+		static sl_bool appendAllTextUTF8(const StringParam& path, const StringParam& text);
 
-		static sl_bool appendAllTextUTF16LE(const String& path, const String16& text);
+		static sl_bool appendAllTextUTF16LE(const StringParam& path, const StringParam& text);
 
-		static sl_bool appendAllTextUTF16BE(const String& path, const String16& text);
+		static sl_bool appendAllTextUTF16BE(const StringParam& path, const StringParam& text);
 
 	
 		static String getParentDirectoryPath(const String& path);
@@ -307,18 +307,18 @@ namespace slib
 		static sl_bool setNonBlocking(int fd, sl_bool flag);
 #endif
 		
-		static String getRealPath(const String& filePath);
+		static String getRealPath(const StringParam& filePath);
 
 	private:
-		static sl_file _open(const String& filePath, const FileMode& mode, const FilePermissions& permissions);
+		static sl_file _open(const StringParam& filePath, const FileMode& mode, const FilePermissions& permissions);
 
 		static sl_bool _close(sl_file file);
 
-		static sl_bool _createDirectory(const String& dirPath);
+		static sl_bool _createDirectory(const StringParam& dirPath);
 
-		static sl_bool _deleteFile(const String& dirPath);
+		static sl_bool _deleteFile(const StringParam& dirPath);
 
-		static sl_bool _deleteDirectory(const String& dirPath);
+		static sl_bool _deleteDirectory(const StringParam& dirPath);
 
 	};
 	

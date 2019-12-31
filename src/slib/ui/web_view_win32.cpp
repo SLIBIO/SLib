@@ -229,10 +229,12 @@ namespace slib
 				}
 			};
 
-			static void WriteHTML(IHTMLDocument2* doc, String content, String16 baseURL)
+			static void WriteHTML(IHTMLDocument2* doc, const StringParam& _content, const StringParam& _baseURL)
 			{
+				String16 baseURL = _baseURL.toString16();
 				if (baseURL.isNotEmpty()) {
 					HRESULT hr;
+					StringData content(_content);
 					IStream* stream = ::SHCreateMemStream((BYTE*)(content.getData()), (sl_uint32)(content.getLength()));
 					if (stream) {
 						IPersistMoniker* persistMoniker = NULL;
@@ -269,11 +271,12 @@ namespace slib
 						HRESULT hr = ::SafeArrayAccessData(sa, (void**)(&varArr));
 						if (hr == S_OK) {
 							varArr[0].vt = VT_BSTR;
-							varArr[0].bstrVal = ::SysAllocString((BSTR)(content.getData()));
+							StringCstr content(_content);
+							varArr[0].bstrVal = SysAllocString((BSTR)(content.getData()));
 							doc->write(sa);
 							doc->close();
 						}
-						::SafeArrayDestroy(sa);
+						SafeArrayDestroy(sa);
 					}
 				}
 			}
@@ -327,14 +330,14 @@ namespace slib
 								doc2->Release();
 							}
 						} else {
-							String16 url = helper->m_urlOrigin;
+							String16 url = String16::from(helper->m_urlOrigin);
 							if (url.isNotEmpty()) {
 								VARIANT varURL;
 								VariantInit(&varURL);
 								varURL.vt = VT_BSTR;
 								varURL.bstrVal = (BSTR)(url.getData());
 								if (helper->m_customUserAgent.isNotEmpty()) {
-									String16 headers = "User-Agent: " + helper->m_customUserAgent;
+									String16 headers = String16::from("User-Agent: " + helper->m_customUserAgent);
 									VARIANT varHeaders;
 									varHeaders.vt = VT_BSTR;
 									varHeaders.bstrVal = (BSTR)(headers.getData());
@@ -355,7 +358,7 @@ namespace slib
 						BSTR url = NULL;
 						HRESULT hr = doc2->get_URL(&url);
 						if (hr == S_OK) {
-							_out = (sl_char16*)url;
+							_out = String::create(url);
 							bRet = sl_true;
 						}
 						if (url) {
@@ -375,7 +378,7 @@ namespace slib
 						BSTR title = NULL;
 						HRESULT hr = doc2->get_title(&title);
 						if (hr == S_OK) {
-							_out = (sl_char16*)title;
+							_out = String::create(title);
 							bRet = sl_true;
 						}
 						if (title) {
@@ -413,7 +416,7 @@ namespace slib
 
 				void runJavaScript(WebView* view, const String& _script) override
 				{
-					String16 script = _script;
+					String16 script = String16::from(_script);
 					if (script.isNotEmpty()) {
 						IHTMLDocument2* doc2 = getDoc();
 						if (doc2) {
@@ -466,7 +469,7 @@ namespace slib
 				{
 					Ref<WebViewHelper> helper = getHelper();
 					if (helper.isNotNull()) {
-						helper->dispatchStartLoad(szURL);
+						helper->dispatchStartLoad(String::from(szURL));
 						*pFlagCancel = 0;
 					}
 				}
@@ -481,8 +484,9 @@ namespace slib
 				{
 					Ref<WebViewHelper> helper = getHelper();
 					if (helper.isNotNull()) {
-						helper->dispatchStartLoad(szURL);
-						helper->dispatchFinishLoad(szURL, sl_true);
+						String url = String::from(szURL);
+						helper->dispatchStartLoad(url);
+						helper->dispatchFinishLoad(url, sl_true);
 					}
 				}
 
@@ -490,7 +494,7 @@ namespace slib
 				{
 					Ref<WebViewHelper> helper = getHelper();
 					if (helper.isNotNull()) {
-						helper->dispatchFinishLoad(szURL, sl_false);
+						helper->dispatchFinishLoad(String::from(szURL), sl_false);
 					}
 				}
 
@@ -504,13 +508,13 @@ namespace slib
 							VARIANT& var = pDispParams->rgvarg[n - 1 - i];
 							String s;
 							if (var.vt == VT_BSTR) {
-								s = String((sl_char16*)(var.bstrVal));
+								s = String::create((sl_char16*)(var.bstrVal));
 							} else {
 								VARIANT varStr;
 								VariantInit(&varStr);
 								VariantChangeType(&varStr, &var, 0, VT_BSTR);
 								if (varStr.vt == VT_BSTR) {
-									s = String((sl_char16*)(varStr.bstrVal));
+									s = String::create((sl_char16*)(varStr.bstrVal));
 								}
 								VariantClear(&varStr);
 							}

@@ -25,7 +25,7 @@
 
 #include "definition.h"
 
-#include "string_param.h"
+#include "string.h"
 
 #define SLIB_PARSE_ERROR (-1)
 

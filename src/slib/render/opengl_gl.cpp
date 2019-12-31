@@ -101,9 +101,9 @@ namespace slib
 	g_entries.flagSupports##name = flagSupport; \
 	flagSupport = sl_true;
 	
-	void GL::loadEntries(const String& _pathDll, sl_bool flagReload)
+	void GL::loadEntries(const StringParam& _pathDll, sl_bool flagReload)
 	{
-		String16 pathDll = _pathDll;
+		StringCstr16 pathDll(_pathDll);
 		if (!flagReload) {
 			if (g_flagLoadedEntryPoints) {
 				return;
@@ -144,7 +144,7 @@ namespace slib
 
 namespace slib
 {
-	void GL::loadEntries(const String& pathDll, sl_bool flagReload)
+	void GL::loadEntries(const StringParam& pathDll, sl_bool flagReload)
 	{
 	}
 	
@@ -169,7 +169,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	void GL::loadEntries(const String& pathDll, sl_bool flagReload)
+	void GL::loadEntries(const StringParam& pathDll, sl_bool flagReload)
 	{
 	}
 	

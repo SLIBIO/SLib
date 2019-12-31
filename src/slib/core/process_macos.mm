@@ -51,10 +51,10 @@ namespace slib
 				return s;
 			}
 			
-			static String BuildCommand(const String& pathExecutable, const String* arguments, sl_uint32 nArguments)
+			static String BuildCommand(const StringParam& pathExecutable, const String* arguments, sl_uint32 nArguments)
 			{
 				StringBuffer commandLine;
-				commandLine.add(FixArgument(pathExecutable));
+				commandLine.add(FixArgument(pathExecutable.toString()));
 				if (nArguments > 0) {
 					commandLine.addStatic(" ");
 				}
@@ -72,7 +72,7 @@ namespace slib
 
 	using namespace priv::process;
 
-	sl_bool Process::run(const String& pathExecutable, const String* strArguments, sl_uint32 nArguments)
+	sl_bool Process::run(const StringParam& pathExecutable, const String* strArguments, sl_uint32 nArguments)
 	{
 		@try {
 			NSMutableArray* arguments = [NSMutableArray array];
@@ -85,13 +85,13 @@ namespace slib
 			}
 		} @catch (NSException* e) {
 #ifdef SLIB_DEBUG
-			NSLog(@"Error at run process: %s\n%@", pathExecutable.getData(), e.debugDescription);
+			NSLog(@"Error at run process: %@\n%@", Apple::getNSStringFromString(pathExecutable), e.debugDescription);
 #endif
 		}
 		return sl_false;
 	}
 
-	void Process::runAsAdmin(const String& pathExecutable, const String* strArguments, sl_uint32 nArguments)
+	void Process::runAsAdmin(const StringParam& pathExecutable, const String* strArguments, sl_uint32 nArguments)
 	{
 		String command = BuildCommand(pathExecutable, strArguments, nArguments);
 		String source = "do shell script \"" + command + "\" with administrator privileges";

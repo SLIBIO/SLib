@@ -268,7 +268,7 @@ namespace slib
 	template <class T>
 	SLIB_INLINE sl_size ListParam<T>::getCount() const noexcept
 	{
-		if (_count & SLIB_SIZE_TEST_SIGN_BIT) {
+		if (_count < 0) {
 			return ((CList<T>*)_value)->getCount();
 		} else {
 			return _count;
@@ -278,7 +278,7 @@ namespace slib
 	template <class T>
 	SLIB_INLINE T* ListParam<T>::getData() const noexcept
 	{
-		if (_count & SLIB_SIZE_TEST_SIGN_BIT) {
+		if (_count < 0) {
 			return ((CList<T>*)_value)->getData();
 		} else {
 			return (T*)_value;
@@ -288,7 +288,7 @@ namespace slib
 	template <class T>
 	SLIB_INLINE CList<T>* ListParam<T>::getObject() const noexcept
 	{
-		if (_count & SLIB_SIZE_TEST_SIGN_BIT) {
+		if (_count < 0) {
 			return (CList<T>*)_value;
 		} else {
 			return sl_null;
@@ -311,7 +311,7 @@ namespace slib
 	template <class... ARGS>
 	sl_bool ListParam<T>::add(ARGS&&... args) noexcept
 	{
-		if (_count & SLIB_SIZE_TEST_SIGN_BIT) {
+		if (_count < 0) {
 			return ((CList<T>*)_value)->add_NoLock(Forward<ARGS>(args)...);
 		} else {
 			if (_count) {

@@ -44,7 +44,7 @@ namespace slib
 		SLIB_STATIC_STRING(c, "Console");
 		Logger::getConsoleLogger()->log(c, s);
 #else
-		StringData _s = s;
+		StringCstr _s(s);
 		printf("%s", _s.getData());
 #endif
 	}

@@ -126,13 +126,14 @@ namespace slib
 				}
 
 			public:
-				static HICON createIcon(const String16& name, const Ref<Drawable>& drawable, sl_bool& flagLoadIcon)
+				static HICON createIcon(const StringParam& _name, const Ref<Drawable>& drawable, sl_bool& flagLoadIcon)
 				{
 					flagLoadIcon = sl_false;
 					Win32_UI_Shared* shared = Win32_UI_Shared::get();
 					if (!shared) {
 						return sl_null;
 					}
+					StringCstr16 name(_name);
 					if (name.isNotEmpty()) {
 						HICON hIcon = LoadIconW(shared->hInstance, (LPCWSTR)(name.getData()));
 						if (hIcon) {
@@ -181,8 +182,9 @@ namespace slib
 					return sl_true;
 				}
 
-				static sl_bool setTip(NOTIFYICONDATAW& nid, const String16& toolTip)
+				static sl_bool setTip(NOTIFYICONDATAW& nid, const StringParam& _toolTip)
 				{
+					StringData16 toolTip(_toolTip);
 					sl_size n = toolTip.getLength() << 1;
 					if (n > sizeof(nid.szTip)) {
 						n = sizeof(nid.szTip);
@@ -194,8 +196,9 @@ namespace slib
 					return sl_false;
 				}
 
-				static sl_bool setInfo(NOTIFYICONDATAW& nid, const String16& str)
+				static sl_bool setInfo(NOTIFYICONDATAW& nid, const StringParam& _str)
 				{
+					StringData16 str(_str);
 					sl_size n = str.getLength() << 1;
 					if (n > sizeof(nid.szInfo)) {
 						n = sizeof(nid.szInfo);
@@ -207,8 +210,9 @@ namespace slib
 					return sl_false;
 				}
 
-				static sl_bool setInfoTitle(NOTIFYICONDATAW& nid, const String16& str)
+				static sl_bool setInfoTitle(NOTIFYICONDATAW& nid, const StringParam& _str)
 				{
+					StringData16 str(_str);
 					sl_size n = str.getLength() << 1;
 					if (n > sizeof(nid.szInfoTitle)) {
 						n = sizeof(nid.szInfoTitle);

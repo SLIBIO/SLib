@@ -63,7 +63,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	void Clipboard::setText(const String& text)
+	void Clipboard::setText(const StringParam& text)
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {

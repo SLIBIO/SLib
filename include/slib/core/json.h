@@ -250,18 +250,14 @@ namespace slib
 		static Json parseJson(const sl_char8* sz, sl_size len, JsonParseParam& param);
 
 		static Json parseJson(const sl_char8* sz, sl_size len);
+		
+		static Json parseJson(const sl_char16* sz, sl_size len, JsonParseParam& param);
+
+		static Json parseJson(const sl_char16* sz, sl_size len);
 
 		static Json parseJson(const StringParam& str, JsonParseParam& param);
 
 		static Json parseJson(const StringParam& str);
-
-		static Json parseJson16(const sl_char16* sz, sl_size len, JsonParseParam& param);
-
-		static Json parseJson16(const sl_char16* sz, sl_size len);
-
-		static Json parseJson16(const StringParam& str, JsonParseParam& param);
-
-		static Json parseJson16(const StringParam& str);
 
 		static Json parseJsonFromTextFile(const StringParam& filePath, JsonParseParam& param);
 
@@ -406,7 +402,8 @@ namespace slib
 	void FromJson(const Json& json, String& _out);
 	void FromJson(const Json& json, String& _out, const String& def);
 	void ToJson(Json& json, const String& _in);
-	
+	void ToJson(Json& json, const StringView& _in);
+
 	void FromJson(const Json& json, AtomicString& _out);
 	void FromJson(const Json& json, AtomicString& _out, const String& def);
 	void ToJson(Json& json, const AtomicString& _in);
@@ -414,7 +411,8 @@ namespace slib
 	void FromJson(const Json& json, String16& _out);
 	void FromJson(const Json& json, String16& _out, const String16& def);
 	void ToJson(Json& json, const String16& _in);
-	
+	void ToJson(Json& json, const StringView16& _in);
+
 	void FromJson(const Json& json, AtomicString16& _out);
 	void FromJson(const Json& json, AtomicString16& _out, const String16& def);
 	void ToJson(Json& json, const AtomicString16& _in);

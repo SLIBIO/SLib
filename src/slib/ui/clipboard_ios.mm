@@ -48,7 +48,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	void Clipboard::setText(const String& text)
+	void Clipboard::setText(const StringParam& text)
 	{
 		UIPasteboard* board = [UIPasteboard generalPasteboard];
 		if (board != nil) {

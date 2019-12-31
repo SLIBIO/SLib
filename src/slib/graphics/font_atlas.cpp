@@ -308,7 +308,7 @@ namespace slib
 				return sl_true;
 			}
 		} else {
-			Size sizeFont = m_fontSource->measureText(String(&ch, 1));
+			Size sizeFont = m_fontSource->measureText(String::create(&ch, 1));
 			if (sizeFont.x <= 0 || sizeFont.y <= 0) {
 				FontAtlasChar fac;
 				fac.fontWidth = 0;
@@ -324,7 +324,7 @@ namespace slib
 			}
 		}
 		
-		String s(&ch, 1);
+		String s = String::create(&ch, 1);
 		
 		Sizei sizeDraw = m_fontDraw->measureText(s);
 

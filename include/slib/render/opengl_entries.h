@@ -247,7 +247,7 @@ namespace slib
 	public:
 		static sl_bool isAvailable();
 		
-		static void loadEntries(const String& pathDll, sl_bool flagReload = sl_true);
+		static void loadEntries(const StringParam& pathDll, sl_bool flagReload = sl_true);
 		
 		static void loadEntries(sl_bool flagReload = sl_false);
 		

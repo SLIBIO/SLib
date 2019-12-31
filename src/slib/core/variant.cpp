@@ -419,6 +419,14 @@ namespace slib
 		}
 	}
 
+	Variant::Variant(const StringView& value) noexcept: Variant(String(value))
+	{
+	}
+
+	Variant::Variant(const StringView16& value) noexcept: Variant(String16(value))
+	{
+	}
+
 	Variant::Variant(const AtomicString& s) noexcept
 	{
 		String value(s);
@@ -1301,7 +1309,7 @@ namespace slib
 			case VariantType::String8:
 				return REF_VAR(String const, _value);
 			case VariantType::String16:
-				return REF_VAR(String16 const, _value);
+				return String::create(REF_VAR(String16 const, _value));
 			case VariantType::Sz8:
 				return String::create(REF_VAR(sl_char8 const* const, _value));
 			case VariantType::Sz16:
@@ -1355,9 +1363,9 @@ namespace slib
 					SLIB_RETURN_STRING16("false")
 				}
 			case VariantType::Time:
-				return REF_VAR(Time const, _value).toString();
+				return String16::create(REF_VAR(Time const, _value).toString());
 			case VariantType::String8:
-				return REF_VAR(String const, _value);
+				return String16::create(REF_VAR(String const, _value));
 			case VariantType::String16:
 				return REF_VAR(String16 const, _value);
 			case VariantType::Sz8:
@@ -1485,7 +1493,7 @@ namespace slib
 		if (value.isNotNull()) {
 			priv::variant::free(_type, _value);
 			_type = VariantType::String8;
-			new PTR_VAR(String, _value) String(value);
+			new PTR_VAR(String, _value) String(Move(value));
 		} else {
 			setNull();
 		}
@@ -1493,14 +1501,24 @@ namespace slib
 
 	void Variant::setString(const AtomicString16& s) noexcept
 	{
-		String value(s);
+		String16 value(s);
 		if (value.isNotNull()) {
 			priv::variant::free(_type, _value);
 			_type = VariantType::String16;
-			new PTR_VAR(String16, _value) String16(value);
+			new PTR_VAR(String16, _value) String16(Move(value));
 		} else {
 			setNull();
 		}
+	}
+
+	void Variant::setString(const StringView& value) noexcept
+	{
+		setString(String(value));
+	}
+
+	void Variant::setString(const StringView16& value) noexcept
+	{
+		setString(String16(value));
 	}
 
 	void Variant::setString(const sl_char8* value) noexcept
@@ -2370,7 +2388,7 @@ namespace slib
 				return ParseUtil::applyBackslashEscapes(getString());
 			case VariantType::String16:
 			case VariantType::Sz16:
-				return ParseUtil::applyBackslashEscapes16(getString16());
+				return String::create(ParseUtil::applyBackslashEscapes16(getString16()));
 			case VariantType::Object:
 			case VariantType::Weak:
 				{
@@ -2649,6 +2667,11 @@ namespace slib
 		setString(_in);
 	}
 	
+	void Variant::set(const StringView& _in) noexcept
+	{
+		setString(_in);
+	}
+	
 	void Variant::get(AtomicString& _out) const noexcept
 	{
 		_out = getString();
@@ -2675,6 +2698,11 @@ namespace slib
 	}
 	
 	void Variant::set(const String16& _in) noexcept
+	{
+		setString(_in);
+	}
+	
+	void Variant::set(const StringView16& _in) noexcept
 	{
 		setString(_in);
 	}

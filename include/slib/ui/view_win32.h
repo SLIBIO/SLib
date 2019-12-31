@@ -66,9 +66,10 @@ namespace slib
 		template <class T>
 		static Ref<T> create(
 			View* view, ViewInstance* parent,
-			LPCWSTR wndClass, const String16& text,
+			LPCWSTR wndClass, const StringParam& _text,
 			int style, int styleEx, int styleRemove = 0)
 		{
+			String16 text = String16::from(_text);
 			UIRect frame = view->getFrameInInstance();
 			Matrix3 transform = view->getFinalTransformInInstance();
 			HWND handle = createHandle(view, parent, wndClass, (LPCWSTR)(text.getData()), frame, transform, style, styleEx, styleRemove);
@@ -149,7 +150,7 @@ namespace slib
 		void setScrollBarsVisible(View* view, sl_bool flagHorizontal, sl_bool flagVertical) override;
 
 	public:
-		void setText(const String16& text);
+		void setText(const StringParam& text);
 
 		void setLayered(sl_bool flagLayered);
 

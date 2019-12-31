@@ -353,9 +353,9 @@ namespace slib
 	} \
 	*((FARPROC*)(&(g_entries.name))) = proc;
 
-	void EGL::loadEntries(const String& _pathDll, sl_bool flagReload)
+	void EGL::loadEntries(const StringParam& _pathDll, sl_bool flagReload)
 	{
-		String16 pathDll = _pathDll;
+		StringCstr16 pathDll(_pathDll);
 		if (pathDll.isEmpty()) {
 			return;
 		}
@@ -394,7 +394,7 @@ namespace slib
 namespace slib
 {
 
-	void EGL::loadEntries(const String& pathDll, sl_bool flagReload)
+	void EGL::loadEntries(const StringParam& pathDll, sl_bool flagReload)
 	{
 	}
 
@@ -421,7 +421,7 @@ namespace slib
 		return sl_null;
 	}
 
-	void EGL::loadEntries(const String& pathDll, sl_bool flagReload)
+	void EGL::loadEntries(const StringParam& pathDll, sl_bool flagReload)
 	{
 	}
 

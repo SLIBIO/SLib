@@ -125,7 +125,7 @@ namespace slib
 		if (data) {
 			void* src = GlobalLock(data);
 			if (src) {
-				String ret = (sl_char16*)src;
+				String ret = String::create((sl_char16*)src);
 				GlobalUnlock(src);
 				return ret;
 			}
@@ -133,11 +133,11 @@ namespace slib
 		return sl_null;
 	}
 	
-	void Clipboard::setText(const String& _text)
+	void Clipboard::setText(const StringParam& _text)
 	{
 		ClipboardScope scope;
 		EmptyClipboard();
-		String16 text = _text;
+		StringCstr16 text(_text);
 		HGLOBAL handle = Windows::createGlobalData(text.getData(), (text.getLength() + 1) << 1);
 		if (handle) {
 			SetClipboardData(CF_UNICODETEXT, handle);

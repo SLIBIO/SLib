@@ -35,12 +35,12 @@ namespace slib
 
 	void Console::print(const StringParam& _s)
 	{
-		StringData16 s = _s;
+		StringCstr16 s(_s);
 #if defined(SLIB_PLATFORM_IS_WIN32)
 		wprintf(L"%s", (LPCWSTR)(s.getData()));
 #endif
 #if defined(SLIB_DEBUG)
-		OutputDebugStringW((LPCWSTR)s.getData());
+		OutputDebugStringW((LPCWSTR)(s.getData()));
 #endif
 	}
 

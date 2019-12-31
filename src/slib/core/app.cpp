@@ -138,7 +138,7 @@ namespace slib
 	void Application::run()
 	{
 #ifdef SLIB_PLATFORM_IS_WIN32
-		String commandLine = GetCommandLineW();
+		String commandLine = String::create(GetCommandLineW());
 		m_commandLine = commandLine;
 		m_arguments = breakCommandLine(commandLine);
 #endif

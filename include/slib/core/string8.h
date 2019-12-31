@@ -34,6 +34,8 @@
 #include <string>
 #endif
 
+#include "string_op.h"
+
 /**
  * @addtogroup core
  *  @{
@@ -45,11 +47,14 @@ namespace slib
 	class String;
 	typedef Atomic<String> AtomicString;
 	class String16;
-	typedef Atomic<String16> AtomicString16;
+	class StringView;
+	class StringView16;
 	class StringParam;
 	class StringStorage;
-	class Variant;
 	class Locale;
+	class Variant;
+	class Json;
+	class Time;
 
 	class SLIB_EXPORT StringContainer
 	{
@@ -67,24 +72,6 @@ namespace slib
 		
 	};
 
-#define PRIV_SLIB_DECLARE_STRING_OPERATOR1(RET, FUNC, CONST) \
-	RET FUNC(const String& other) CONST noexcept; \
-	RET FUNC(const String16& other) CONST noexcept; \
-	RET FUNC(const AtomicString& other) CONST noexcept; \
-	RET FUNC(const AtomicString16& other) CONST noexcept; \
-	template <class CHAR, sl_size N> RET FUNC(CHAR (&other)[N]) CONST noexcept; \
-	template <class ARG> RET FUNC(const ARG& other) CONST noexcept;
-	
-#define PRIV_SLIB_DECLARE_STRING_OPERATOR2(STRING, RET, FUNC) \
-	RET FUNC(const String& other) const noexcept; \
-	RET FUNC(const String16& other) const noexcept; \
-	RET FUNC(const AtomicString& other) const noexcept; \
-	RET FUNC(const AtomicString16& other) const noexcept; \
-	template <class CHAR, sl_size N> RET FUNC(CHAR (&other)[N]) const noexcept; \
-	template <class ARG> RET FUNC(const ARG& other) const noexcept; \
-	template <class CHAR, sl_size N> friend RET FUNC(CHAR (&other)[N], const STRING&) noexcept; \
-	template <class ARG> friend RET FUNC(const ARG& other, const STRING&) noexcept; \
-	
 	/** 
 	 * @class String
 	 * @brief String class provides an extensive set of APIs for working with strings, including method for comparing, searching, and modifying strings.
@@ -105,19 +92,14 @@ namespace slib
 		SLIB_INLINE constexpr String(sl_null_t) noexcept : m_container(sl_null) {}
 		
 		/**
-		 * Move constructor
+		 * Contructors
 		 */
 		String(String&& src) noexcept;
 		String(AtomicString&& _src) noexcept;
-		
-		/**
-		 * Copy constructor
-		 */
 		String(const String& src) noexcept;
-		String(const String16& src) noexcept;		
 		String(const AtomicString& src) noexcept;
-		String(const AtomicString16& src) noexcept;
-		
+		String(const StringView& src) noexcept;
+
 		/**
 		 * Destructor
 		 */
@@ -133,17 +115,11 @@ namespace slib
 		 * Copies the null-terminated character sequence pointed by `str`.
 		 */
 		String(const char* str) noexcept;
-		String(const wchar_t* str) noexcept;
-		String(const char16_t* str) noexcept;
-		String(const char32_t* str) noexcept;
 
 		/**
 		 * Copies the first `length` characters from the array of characters pointed by `str`
 		 */
 		String(const char* str, sl_reg length) noexcept;
-		String(const wchar_t* str, sl_reg length) noexcept;
-		String(const char16_t* str, sl_reg length) noexcept;
-		String(const char32_t* str, sl_reg length) noexcept;
 
 #ifdef SLIB_SUPPORT_STD_TYPES
 		/**
@@ -153,16 +129,21 @@ namespace slib
 		String(const std::string& str) noexcept;
 		String(std::string&& str) noexcept;
 #endif
-
-		String(const StringParam& str) noexcept;
 		
 	public:
-		
 		/**
 		 * Creates a string of `len` characters
 		 */
 		static String allocate(sl_size len) noexcept;
-		
+
+		/**
+		 * Creates a string copying other string
+		 */
+		static String create(const String& str) noexcept;
+		static String create(const String16& str) noexcept;
+		static String create(const StringView& str) noexcept;
+		static String create(const StringView16& str) noexcept;
+
 		/**
 		 * Creates a string from the array of characters pointed by `str`
 		 */
@@ -173,11 +154,9 @@ namespace slib
 
 #ifdef SLIB_SUPPORT_STD_TYPES
 		/**
-		 * Create a string from `std::string`.
-		 * This does not copy the data of the string, but keep the reference to the original string.
+		 * Create a string copying from std strings.
 		 */
 		static String create(const std::string& str) noexcept;
-		static String create(std::string&& str) noexcept;
 		static String create(const std::wstring& str) noexcept;
 		static String create(const std::u16string& str) noexcept;
 		static String create(const std::u32string& str) noexcept;
@@ -281,9 +260,38 @@ namespace slib
 		 */
 		static String decode(Charset charset, const Memory& mem);
 		
-		/**
-		 * Creates a string representing the variable
-		 */
+		static const String& from(const String& str) noexcept;
+		static String from(const Atomic<String>& str) noexcept;
+		static String from(const String16& str) noexcept;
+		static String from(const Atomic<String16>& str) noexcept;
+		static String from(const StringView& str) noexcept;
+		static String from(const StringView16& str) noexcept;
+		static String from(const StringParam& str) noexcept;
+		static String from(const char* str, sl_reg length = -1) noexcept;
+		static String from(const wchar_t* str, sl_reg length = -1) noexcept;
+		static String from(const char16_t* str, sl_reg length = -1) noexcept;
+		static String from(const char32_t* str, sl_reg length = -1) noexcept;
+#ifdef SLIB_SUPPORT_STD_TYPES
+		static String from(const std::string& str) noexcept;
+		static String from(const std::wstring& str) noexcept;
+		static String from(const std::u16string& str) noexcept;
+		static String from(const std::u32string& str) noexcept;
+#endif
+		static String from(signed char value) noexcept;
+		static String from(unsigned char value) noexcept;
+		static String from(short value) noexcept;
+		static String from(unsigned short value) noexcept;
+		static String from(int value) noexcept;
+		static String from(unsigned int value) noexcept;
+		static String from(long value) noexcept;
+		static String from(unsigned long value) noexcept;
+		static String from(sl_int64 value) noexcept;
+		static String from(sl_uint64 value) noexcept;
+		static String from(float value) noexcept;
+		static String from(double value) noexcept;
+		static String from(sl_bool value) noexcept;
+		static String from(const Time& value) noexcept;
+		static String from(const Json& json) noexcept;
 		static String from(const Variant& var) noexcept;
 		
 	public:
@@ -349,6 +357,18 @@ namespace slib
 		sl_size getLength() const noexcept;
 		
 		/**
+		 * @return the hash code.
+		 */
+		sl_size getHashCode() const noexcept;
+		static sl_size getHashCode(sl_char8* str, sl_reg len = -1) noexcept;
+
+		/**
+		 * @return the hash code ignoring the case.
+		 */
+		sl_size getHashCodeIgnoreCase() const noexcept;
+		static sl_size getHashCodeIgnoreCase(sl_char8* str, sl_reg len = -1) noexcept;
+
+		/**
 		 * Sets the string length.
 		 *
 		 * Don't use for null or empty string
@@ -356,21 +376,11 @@ namespace slib
 		void setLength(sl_size len) noexcept;
 		
 		/**
-		 * @return the hash code.
-		 */
-		sl_size getHashCode() const noexcept;
-		
-		/**
 		 * Sets the hash code.
 		 *
 		 * Don't use for null or empty string
 		 */
 		void setHashCode(sl_size hash) noexcept;
-		
-		/**
-		 * @return the hash code ignoring the case.
-		 */
-		sl_size getHashCodeIgnoreCase() const noexcept;
 		
 		/**
 		 * @return the character at `index` in string.
@@ -383,6 +393,10 @@ namespace slib
 		 */
 		sl_bool setAt(sl_reg index, sl_char8 ch) noexcept;
 		
+		sl_char8 operator[](sl_size index) const noexcept;
+		
+		sl_char8& operator[](sl_size index) noexcept;
+		
 #ifdef SLIB_SUPPORT_STD_TYPES
 		/**
 		 * Convert this string to std::string.
@@ -394,22 +408,25 @@ namespace slib
 		/**
 		 * String assignment
 		 */
-		String& operator=(const String& other) noexcept;
-		String& operator=(const String16& other) noexcept;
-		String& operator=(const AtomicString& other) noexcept;
-		String& operator=(const AtomicString16& other) noexcept;
 		String& operator=(String&& other) noexcept;
 		String& operator=(AtomicString&& other) noexcept;
+		String& operator=(const String& other) noexcept;
+		String& operator=(const AtomicString& other) noexcept;
+		String& operator=(const StringView& other) noexcept;
 		String& operator=(sl_null_t) noexcept;
 		String& operator=(const char* sz) noexcept;
-		String& operator=(const wchar_t* sz) noexcept;
-		String& operator=(const char16_t* sz) noexcept;
-		String& operator=(const char32_t* sz) noexcept;
 #ifdef SLIB_SUPPORT_STD_TYPES
 		String& operator=(const std::string& other) noexcept;
 		String& operator=(std::string&& other) noexcept;
 #endif
-		String& operator=(const StringParam& param) noexcept;
+
+		String& operator+=(String&& other) noexcept;
+		String& operator+=(AtomicString&& other) noexcept;
+		String& operator+=(const String& other) noexcept;
+		String& operator+=(const AtomicString& other) noexcept;
+		String& operator+=(sl_null_t) noexcept;
+		template <class T>
+		String& operator+=(T&& other) noexcept;
 
 	public:
 		static String merge(const sl_char8* a1, sl_reg len1, const sl_char8* a2, sl_reg len2) noexcept;
@@ -420,10 +437,6 @@ namespace slib
 		static String merge(const char16_t* a1, sl_reg len1, const sl_char8* a2, sl_reg len2) noexcept;
 		static String merge(const char32_t* a1, sl_reg len1, const sl_char8* a2, sl_reg len2) noexcept;
 
-		PRIV_SLIB_DECLARE_STRING_OPERATOR2(String, String, operator+)
-		PRIV_SLIB_DECLARE_STRING_OPERATOR1(String&, operator+=,)
-
-	public:
 		static sl_bool equals(const sl_char8* a1, sl_reg len1, const sl_char8* a2, sl_reg len2) noexcept;
 		static sl_bool equals(const sl_char8* a1, sl_reg len1, const wchar_t* a2, sl_reg len2) noexcept;
 		static sl_bool equals(const sl_char8* a1, sl_reg len1, const char16_t* a2, sl_reg len2) noexcept;
@@ -434,15 +447,10 @@ namespace slib
 		static sl_compare_result compare(const sl_char8* a1, sl_reg len1, const char16_t* a2, sl_reg len2) noexcept;
 		static sl_compare_result compare(const sl_char8* a1, sl_reg len1, const char32_t* a2, sl_reg len2) noexcept;
 		
-		PRIV_SLIB_DECLARE_STRING_OPERATOR1(sl_bool, equals, const)
-		PRIV_SLIB_DECLARE_STRING_OPERATOR1(sl_compare_result, compare, const)
+	public:
+		PRIV_SLIB_DECLARE_STRING_CLASS_OP(String, sl_bool, equals)
 
-		PRIV_SLIB_DECLARE_STRING_OPERATOR2(String, sl_bool, operator==)
-		PRIV_SLIB_DECLARE_STRING_OPERATOR2(String, sl_bool, operator!=)
-		PRIV_SLIB_DECLARE_STRING_OPERATOR2(String, sl_bool, operator>=)
-		PRIV_SLIB_DECLARE_STRING_OPERATOR2(String, sl_bool, operator<=)
-		PRIV_SLIB_DECLARE_STRING_OPERATOR2(String, sl_bool, operator>)
-		PRIV_SLIB_DECLARE_STRING_OPERATOR2(String, sl_bool, operator<)
+		PRIV_SLIB_DECLARE_STRING_CLASS_OP(String, sl_compare_result, compare)
 
 	public:
 		/**
@@ -1130,18 +1138,13 @@ namespace slib
 		SLIB_INLINE constexpr Atomic(sl_null_t) noexcept : m_container(sl_null) {}
 		
 		/**
-		 * Move constructor
+		 * Constructors
 		 */
 		Atomic(String&& src) noexcept;
 		Atomic(AtomicString&& src) noexcept;
-		
-		/**
-		 * Copy constructor
-		 */
 		Atomic(const String& src) noexcept;
-		Atomic(const String16& src) noexcept;
 		Atomic(const AtomicString& src) noexcept;
-		Atomic(const AtomicString16& src) noexcept;
+		Atomic(const StringView& src) noexcept;
 
 		/**
 		 * Destructor
@@ -1155,21 +1158,15 @@ namespace slib
 		Atomic(sl_char8 ch, sl_size nRepeatCount) noexcept;
 		
 		/**
-		 * Initialize string from string literal constant
+		 * Copies the null-terminated character sequence pointed by `str`.
 		 */
 		Atomic(const char* str) noexcept;
-		Atomic(const wchar_t* str) noexcept;
-		Atomic(const char16_t* str) noexcept;
-		Atomic(const char32_t* str) noexcept;
 
 		/**
 		 * Copies the first `length` characters from the array of characters pointed by `str`
 		 */
 		Atomic(const char* str, sl_reg length) noexcept;
-		Atomic(const wchar_t* str, sl_reg length) noexcept;
-		Atomic(const char16_t* str, sl_reg length) noexcept;
-		Atomic(const char32_t* str, sl_reg length) noexcept;
-		
+
 #ifdef SLIB_SUPPORT_STD_TYPES
 		/**
 		 * Initialize from `std::string`.
@@ -1178,8 +1175,6 @@ namespace slib
 		Atomic(const std::string& str) noexcept;
 		Atomic(std::string&& str) noexcept;
 #endif
-
-		Atomic(const StringParam& str) noexcept;
 
 	public:
 		/**
@@ -1222,7 +1217,6 @@ namespace slib
 		 */
 		void setEmpty() noexcept;
 		
-	public:
 		/**
 		 * @return string length.
 		 */
@@ -1249,36 +1243,30 @@ namespace slib
 		/**
 		 * String assignment
 		 */
-		AtomicString& operator=(const String& other) noexcept;
-		AtomicString& operator=(const AtomicString& other) noexcept;
-		AtomicString& operator=(const String16& other) noexcept;
-		AtomicString& operator=(const AtomicString16& other) noexcept;
 		AtomicString& operator=(String&& other) noexcept;
 		AtomicString& operator=(AtomicString&& other) noexcept;
+		AtomicString& operator=(const String& other) noexcept;
+		AtomicString& operator=(const AtomicString& other) noexcept;
+		AtomicString& operator=(const StringView& other) noexcept;
 		AtomicString& operator=(sl_null_t) noexcept;
 		AtomicString& operator=(const char* sz) noexcept;
-		AtomicString& operator=(const wchar_t* sz) noexcept;
-		AtomicString& operator=(const char16_t* sz) noexcept;
-		AtomicString& operator=(const char32_t* sz) noexcept;
 #ifdef SLIB_SUPPORT_STD_TYPES
 		AtomicString& operator=(const std::string& other) noexcept;
 		AtomicString& operator=(std::string&& other) noexcept;
 #endif
-		AtomicString& operator=(const StringParam& param) noexcept;
 
+		AtomicString& operator+=(String&& other) noexcept;
+		AtomicString& operator+=(AtomicString&& other) noexcept;
+		AtomicString& operator+=(const String& other) noexcept;
+		AtomicString& operator+=(const AtomicString& other) noexcept;
+		AtomicString& operator+=(sl_null_t) noexcept;
+		template <class T>
+		AtomicString& operator+=(T&& other) noexcept;
+
+	public:
+		PRIV_SLIB_DECLARE_STRING_CLASS_OP(String, sl_bool, equals)
 		
-		PRIV_SLIB_DECLARE_STRING_OPERATOR2(AtomicString, String, operator+)
-		PRIV_SLIB_DECLARE_STRING_OPERATOR1(AtomicString&, operator+=,)
-
-		PRIV_SLIB_DECLARE_STRING_OPERATOR1(sl_bool, equals, const)
-		PRIV_SLIB_DECLARE_STRING_OPERATOR1(sl_compare_result, compare, const)
-
-		PRIV_SLIB_DECLARE_STRING_OPERATOR2(AtomicString, sl_bool, operator==)
-		PRIV_SLIB_DECLARE_STRING_OPERATOR2(AtomicString, sl_bool, operator!=)
-		PRIV_SLIB_DECLARE_STRING_OPERATOR2(AtomicString, sl_bool, operator>=)
-		PRIV_SLIB_DECLARE_STRING_OPERATOR2(AtomicString, sl_bool, operator<=)
-		PRIV_SLIB_DECLARE_STRING_OPERATOR2(AtomicString, sl_bool, operator>)
-		PRIV_SLIB_DECLARE_STRING_OPERATOR2(AtomicString, sl_bool, operator<)
+		PRIV_SLIB_DECLARE_STRING_CLASS_OP(String, sl_compare_result, compare)
 
 	public:
 		/**

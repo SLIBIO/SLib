@@ -219,17 +219,17 @@ namespace slib
 		sl_bool writeSection(const Memory& mem);
 	
 		// maxLen means the maximum length of utf-8 string
-		sl_bool writeStringSection(const String& str, sl_size maxLen = SLIB_SIZE_MAX);
+		sl_bool writeStringSection(const StringParam& str, sl_size maxLen = SLIB_SIZE_MAX);
 	
 		sl_bool writeBigInt(const BigInt& v, sl_size maxLen = SLIB_SIZE_MAX);
 	
 		sl_bool writeTime(const Time& t);
 	
-		sl_bool writeTextUTF8(const String& text, sl_bool flagWriteByteOrderMark = sl_false);
+		sl_bool writeTextUTF8(const StringParam& text, sl_bool flagWriteByteOrderMark = sl_false);
 
-		sl_bool writeTextUTF16LE(const String16& text, sl_bool flagWriteByteOrderMark = sl_false);
+		sl_bool writeTextUTF16LE(const StringParam& text, sl_bool flagWriteByteOrderMark = sl_false);
 
-		sl_bool writeTextUTF16BE(const String16& text, sl_bool flagWriteByteOrderMark = sl_false);
+		sl_bool writeTextUTF16BE(const StringParam& text, sl_bool flagWriteByteOrderMark = sl_false);
 
 	};
 	

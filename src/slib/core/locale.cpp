@@ -1019,8 +1019,7 @@ namespace slib
 
 	Locale Locale::_getCurrent()
 	{
-		String str = priv::locale::JAndroid::getCurrentLocale.callString(sl_null);
-		return Locale(str);
+		return Locale(priv::locale::JAndroid::getCurrentLocale.callString(sl_null));
 	}
 }
 

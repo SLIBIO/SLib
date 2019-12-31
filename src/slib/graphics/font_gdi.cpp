@@ -121,7 +121,7 @@ namespace slib
 					if (desc.flagStrikeout) {
 						style |= Gdiplus::FontStyleStrikeout;
 					}
-					String16 fontName = desc.familyName;
+					String16 fontName = String16::from(desc.familyName);
 
 					GraphicsPlatform::startGdiplus();
 					Gdiplus::Font* font = new Gdiplus::Font(
@@ -173,7 +173,7 @@ namespace slib
 					} else {
 						bStrikeout = FALSE;
 					}
-					String16 fontName = desc.familyName;
+					String16 fontName = String16::from(desc.familyName);
 					HFONT hFont = CreateFontW(height, 0, 0, 0, weight, bItalic, bUnderline, bStrikeout,
 						DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 						ANTIALIASED_QUALITY,

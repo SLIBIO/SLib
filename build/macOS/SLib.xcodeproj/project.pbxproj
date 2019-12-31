@@ -1058,6 +1058,8 @@
 		26987D1123B3F7E300872C1D /* alipay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26987D0E23B3F7E300872C1D /* alipay.cpp */; };
 		26987D1223B3F7E300872C1D /* alipay_openssl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26987D0F23B3F7E300872C1D /* alipay_openssl.cpp */; };
 		26987D1323B3F7E300872C1D /* alipay_sdk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26987D1023B3F7E300872C1D /* alipay_sdk.cpp */; };
+		26987D1923B5CF8900872C1D /* string_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26987D1823B5CF8800872C1D /* string_view.cpp */; };
+		26987D1B23BA9B6F00872C1D /* string_op.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26987D1A23BA9B6F00872C1D /* string_op.cpp */; };
 		2698A54E226A383500662528 /* refresh_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2698A54D226A383400662528 /* refresh_view.cpp */; };
 		269E31A92255F431005CD0ED /* paypal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31A82255F430005CD0ED /* paypal.cpp */; };
 		269E31AD2255F53B005CD0ED /* paypal_ui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269E31AC2255F53B005CD0ED /* paypal_ui.cpp */; };
@@ -2801,6 +2803,8 @@
 		26987D0E23B3F7E300872C1D /* alipay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = alipay.cpp; path = social/alipay.cpp; sourceTree = "<group>"; };
 		26987D0F23B3F7E300872C1D /* alipay_openssl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = alipay_openssl.cpp; path = social/alipay_openssl.cpp; sourceTree = "<group>"; };
 		26987D1023B3F7E300872C1D /* alipay_sdk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = alipay_sdk.cpp; path = social/alipay_sdk.cpp; sourceTree = "<group>"; };
+		26987D1823B5CF8800872C1D /* string_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = string_view.cpp; sourceTree = "<group>"; };
+		26987D1A23BA9B6F00872C1D /* string_op.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = string_op.cpp; sourceTree = "<group>"; };
 		2698A54D226A383400662528 /* refresh_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = refresh_view.cpp; sourceTree = "<group>"; };
 		2699DC8F1D43682D0085EE67 /* list_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list_view.cpp; sourceTree = "<group>"; };
 		269E31A82255F430005CD0ED /* paypal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = paypal.cpp; path = social/paypal.cpp; sourceTree = "<group>"; };
@@ -5363,7 +5367,9 @@
 				A25F2FB71B03A33700854DAF /* spin_lock.cpp */,
 				A25F2FB81B03A33700854DAF /* string.cpp */,
 				26805B6823533D6A00D8817C /* string_buffer.cpp */,
+				26987D1A23BA9B6F00872C1D /* string_op.cpp */,
 				26805B6623533D4300D8817C /* string_param.cpp */,
+				26987D1823B5CF8800872C1D /* string_view.cpp */,
 				A25F2FBA1B03A33700854DAF /* system.cpp */,
 				26CA8D781C23B4C90049A658 /* system_apple.mm */,
 				A2DE1D8A1B383BB000A74698 /* system_unix.cpp */,
@@ -7035,6 +7041,7 @@
 				26E1B86D222ABA51007C222E /* pngerror.c in Sources */,
 				26D9D9D11E96468D005F7BD3 /* scroll_view.cpp in Sources */,
 				26B748C423696FEF002C1AA4 /* oauth_server_openssl.cpp in Sources */,
+				26987D1B23BA9B6F00872C1D /* string_op.cpp in Sources */,
 				26E1B85E222A8250007C222E /* compress.c in Sources */,
 				26C795BE2215F9C70053C5A1 /* colors.cpp in Sources */,
 				26E1B86E222ABA51007C222E /* pngget.c in Sources */,
@@ -7314,6 +7321,7 @@
 				263D47872386B13D00DAC43F /* chat_view.cpp in Sources */,
 				26E1B89B222ABAB2007C222E /* jdmerge.c in Sources */,
 				26E1B899222ABAB2007C222E /* jdmarker.c in Sources */,
+				26987D1923B5CF8900872C1D /* string_view.cpp in Sources */,
 				26D9D93F1E9645CE005F7BD3 /* transform3d.cpp in Sources */,
 				26D9D9401E9645CE005F7BD3 /* vector3.cpp in Sources */,
 				26D9D9BA1E96468D005F7BD3 /* common_dialogs_macos.mm in Sources */,

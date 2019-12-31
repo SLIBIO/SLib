@@ -135,8 +135,8 @@ namespace slib
 					if (!m_result) {
 						return 0;
 					}
-					StringData name(_name);
-					return (sl_int32)(PQfnumber(m_result, name.data));
+					StringCstr name(_name);
+					return (sl_int32)(PQfnumber(m_result, name.getData()));
 				}
 
 				HashMap<String, Variant> getRow() override
@@ -363,9 +363,9 @@ namespace slib
 				
 				sl_int64 _execute(const StringParam& _sql) override
 				{
-					StringData sql(_sql);
+					StringCstr sql(_sql);
 					ObjectLocker lock(this);
-					PGresult* res = PQexec(m_connection, sql.data);
+					PGresult* res = PQexec(m_connection, sql.getData());
 					sl_int64 ret = -1;
 					if (res) {
 						if (PQresultStatus(res) == PGRES_COMMAND_OK) {
@@ -383,9 +383,9 @@ namespace slib
 
 				Ref<DatabaseCursor> _query(const StringParam& _sql) override
 				{
-					StringData sql(_sql);
+					StringCstr sql(_sql);
 					ObjectLocker lock(this);
-					if (PQsendQuery(m_connection, sql.data) == 1) {
+					if (PQsendQuery(m_connection, sql.getData()) == 1) {
 						return new CursorImpl(this, m_connection);
 					}
 					return sl_null;
@@ -393,7 +393,7 @@ namespace slib
 				
 				sl_int64 _executeBy(const StringParam& _sql, const Variant* params, sl_uint32 nParams) override
 				{
-					StringData sql(_sql);
+					StringCstr sql(_sql);
 
 					SLIB_SCOPED_BUFFER(String, 32, strings, nParams)
 					SLIB_SCOPED_BUFFER(const char*, 32, values, nParams)
@@ -420,7 +420,7 @@ namespace slib
 
 				Ref<DatabaseCursor> _queryBy(const StringParam& _sql, const Variant* params, sl_uint32 nParams) override
 				{
-					StringData sql(_sql);
+					StringCstr sql(_sql);
 
 					SLIB_SCOPED_BUFFER(String, 32, strings, nParams)
 					SLIB_SCOPED_BUFFER(const char*, 32, values, nParams)
@@ -429,7 +429,7 @@ namespace slib
 					BindParams(params, nParams, strings, values, lengths, formats);
 					
 					ObjectLocker lock(this);
-					if (PQsendQueryParams(m_connection, sql.data, (int)nParams, sl_null, values, lengths, formats, 0) == 1) {
+					if (PQsendQueryParams(m_connection, sql.getData(), (int)nParams, sl_null, values, lengths, formats, 0) == 1) {
 						return new CursorImpl(this, m_connection);
 					}
 					return sl_null;
@@ -438,7 +438,7 @@ namespace slib
 				Ref<DatabaseStatement> _prepareStatement(const StringParam& sql) override
 				{
 					ObjectLocker lock(this);
-					Ref<StatementImpl> ret = new StatementImpl(this, m_connection, sql);
+					Ref<StatementImpl> ret = new StatementImpl(this, m_connection, sql.toString());
 					if (ret.isNotNull()) {
 						if (ret->m_name.isNotEmpty()) {
 							return ret;

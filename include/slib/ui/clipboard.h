@@ -37,7 +37,7 @@ namespace slib
 		
 		static String getText();
 		
-		static void setText(const String& text);
+		static void setText(const StringParam& text);
 		
 	};
 

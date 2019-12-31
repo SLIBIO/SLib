@@ -189,7 +189,7 @@ namespace slib
 				sl_int32 getColumnIndex(const StringParam& name) override
 				{
 					String a;
-					return m_mapColumnIndexes.getValue_NoLock(name, -1);
+					return m_mapColumnIndexes.getValue_NoLock(name.toString(), -1);
 				}
 
 				HashMap<String, Variant> getRow() override
@@ -320,7 +320,7 @@ namespace slib
 
 				sl_int32 getColumnIndex(const StringParam& name) override
 				{
-					return m_mapColumnIndexes.getValue_NoLock(name, -1);
+					return m_mapColumnIndexes.getValue_NoLock(name.toString(), -1);
 				}
 
 				HashMap<String, Variant> getRow() override
@@ -1132,7 +1132,7 @@ namespace slib
 					StringData sql(_sql);
 					initThread();
 					ObjectLocker lock(this);
-					if (0 == mysql_real_query(m_mysql, sql.data, (sl_uint32)(sql.getLength()))) {
+					if (0 == mysql_real_query(m_mysql, sql.getData(), (sl_uint32)(sql.getLength()))) {
 						sl_int64 ret = 0;
 						for (;;) {
 							MYSQL_RES* result = mysql_store_result(m_mysql);
@@ -1165,7 +1165,7 @@ namespace slib
 					StringData sql(_sql);
 					initThread();
 					ObjectLocker lock(this);
-					if (0 == mysql_real_query(m_mysql, sql.data, (sl_uint32)(sql.getLength()))) {
+					if (0 == mysql_real_query(m_mysql, sql.getData(), (sl_uint32)(sql.getLength()))) {
 						MYSQL_RES* res = mysql_use_result(m_mysql);
 						if (res) {
 							Ref<DatabaseCursor> ret = new CursorImpl(this, res);
@@ -1182,7 +1182,7 @@ namespace slib
 				{
 					initThread();
 					ObjectLocker lock(this);
-					Ref<StatementImpl> ret = new StatementImpl(this, m_mysql, sql);
+					Ref<StatementImpl> ret = new StatementImpl(this, m_mysql, sql.toString());
 					if (ret.isNotNull()) {
 						if (ret->prepare()) {
 							return ret;
@@ -1203,9 +1203,9 @@ namespace slib
 				sl_bool isDatabaseExisting(const StringParam& _name) override
 				{
 					initThread();
-					StringData name(_name);
+					StringCstr name(_name);
 					sl_bool bRet = sl_false;
-					MYSQL_RES* res = mysql_list_dbs(m_mysql, name.data);
+					MYSQL_RES* res = mysql_list_dbs(m_mysql, name.getData());
 					if (res) {
 						MYSQL_ROW row = mysql_fetch_row(res);
 						if (row) {
@@ -1237,9 +1237,9 @@ namespace slib
 				sl_bool isTableExisting(const StringParam& _name) override
 				{
 					initThread();
-					StringData name(_name);
+					StringCstr name(_name);
 					sl_bool bRet = sl_false;
-					MYSQL_RES* res = mysql_list_tables(m_mysql, name.data);
+					MYSQL_RES* res = mysql_list_tables(m_mysql, name.getData());
 					if (res) {
 						MYSQL_ROW row = mysql_fetch_row(res);
 						if (row) {

@@ -119,7 +119,7 @@ namespace slib
 
 				sl_int32 getColumnIndex(const StringParam& name) override
 				{
-					return m_mapColumnIndexes.getValue_NoLock(name, -1);
+					return m_mapColumnIndexes.getValue_NoLock(name.toString(), -1);
 				}
 
 				HashMap<String, Variant> getRow() override
@@ -711,9 +711,9 @@ namespace slib
 				
 				sl_int64 _execute(const StringParam& _sql) override
 				{
-					StringData sql(_sql);
+					StringCstr sql(_sql);
 					ObjectLocker lock(this);
-					if (SQLITE_OK == sqlite3_exec(m_db, sql.data, 0, 0, sl_null)) {
+					if (SQLITE_OK == sqlite3_exec(m_db, sql.getData(), 0, 0, sl_null)) {
 						return sqlite3_changes(m_db);
 					}
 					return -1;
@@ -721,11 +721,11 @@ namespace slib
 
 				Ref<DatabaseStatement> _prepareStatement(const StringParam& _sql) override
 				{
-					StringData sql(_sql);
+					StringCstr sql(_sql);
 					ObjectLocker lock(this);
 					Ref<DatabaseStatement> ret;
 					sqlite3_stmt* statement = sl_null;
-					if (SQLITE_OK == sqlite3_prepare_v2(m_db, sql.data, -1, &statement, sl_null)) {
+					if (SQLITE_OK == sqlite3_prepare_v2(m_db, sql.getData(), -1, &statement, sl_null)) {
 						ret = new StatementImpl(this, m_db, statement);
 						if (ret.isNotNull()) {
 							return ret;
@@ -760,7 +760,7 @@ namespace slib
 					SLIB_STATIC_STRING(s, "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name LIKE ")
 					builder.append(s);
 					StringData name(_name);
-					builder.appendIdentifier(name.data, name.getLength());
+					builder.appendIdentifier(name.getData(), name.getLength());
 					return getValue(builder.toString()).getUint32() > 0;
 				}
 				

@@ -151,7 +151,7 @@ namespace slib
 							frameScreen = UI::getScreenRegion();
 						}
 						UIRect frameWindow = param.calculateRegion(frameScreen);
-						String16 title = param.title;
+						String16 title = String16::from(param.title);
 						hWnd = CreateWindowExW(
 							styleEx, // ex-style
 							(LPCWSTR)((LONG_PTR)(shared->wndClassForWindow)),

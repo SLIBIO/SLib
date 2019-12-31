@@ -337,13 +337,13 @@ namespace slib
 		~TextParagraph() noexcept;
 
 	public:
-		void addText(const String16& text, const Ref<TextStyle>& style, sl_bool flagEnabledHyperlinksInPlainText = sl_false) noexcept;
+		void addText(const StringParam& text, const Ref<TextStyle>& style, sl_bool flagEnabledHyperlinksInPlainText = sl_false) noexcept;
 		
 		void addHyperTextNodeGroup(const Ref<XmlNodeGroup>& group, const Ref<TextStyle>& style) noexcept;
 		
 		void addHyperTextElement(const Ref<XmlElement>& element, const Ref<TextStyle>& style) noexcept;
 		
-		void addHyperText(const String16& text, const Ref<TextStyle>& style) noexcept;
+		void addHyperText(const StringParam& text, const Ref<TextStyle>& style) noexcept;
 
 		void layout(const TextParagraphLayoutParam& param) noexcept;
 

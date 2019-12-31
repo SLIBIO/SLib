@@ -541,12 +541,13 @@ namespace slib
 		}
 	}
 
-	void Win32_ViewInstance::setText(const String16& text)
+	void Win32_ViewInstance::setText(const StringParam& _text)
 	{
 		HWND handle = m_handle;
 		if (handle) {
+			String16 text = _text.toString16();
 			Windows::setWindowText(handle, text);
-			m_text = text;
+			m_text = Move(text);
 		}
 	}
 

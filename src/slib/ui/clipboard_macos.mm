@@ -52,7 +52,7 @@ namespace slib
 		return sl_null;
 	}
 	
-	void Clipboard::setText(const String& text)
+	void Clipboard::setText(const StringParam& text)
 	{
 		NSPasteboard* board = [NSPasteboard generalPasteboard];
 		if (board != nil) {

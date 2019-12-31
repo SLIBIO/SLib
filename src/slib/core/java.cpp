@@ -129,11 +129,11 @@ namespace slib
 				va_end(args);
 			}
 
-			String16 JMethod::callString(jobject _this, ...)
+			String JMethod::callString(jobject _this, ...)
 			{
 				va_list args;
 				va_start(args, _this);
-				String16 ret;
+				String ret;
 				if (cls && id && _this) {
 					JNIEnv* env = Jni::getCurrent();
 					if (env) {
@@ -182,11 +182,11 @@ namespace slib
 				va_end(args);
 			}
 
-			String16 JStaticMethod::callString(jobject _null, ...)
+			String JStaticMethod::callString(jobject _null, ...)
 			{
 				va_list args;
 				va_start(args, _null);
-				String16 ret;
+				String ret;
 				if (cls && id) {
 					JNIEnv* env = Jni::getCurrent();
 					if (env) {
@@ -266,7 +266,7 @@ namespace slib
 				}
 			}
 
-			String16 JField::getString(jobject _this)
+			String JField::getString(jobject _this)
 			{
 				if (cls && id) {
 					JNIEnv* env = Jni::getCurrent();
@@ -285,7 +285,7 @@ namespace slib
 				return sl_null;
 			}
 
-			void JField::setString(jobject _this, const String16& value)
+			void JField::setString(jobject _this, const StringParam& value)
 			{
 				if (cls && id && _this) {
 					JNIEnv* env = Jni::getCurrent();
@@ -313,7 +313,7 @@ namespace slib
 				}
 			}
 
-			String16 JStaticField::getString(jobject _null)
+			String JStaticField::getString(jobject _null)
 			{
 				if (cls && id) {
 					JNIEnv* env = Jni::getCurrent();
@@ -332,7 +332,7 @@ namespace slib
 				return sl_null;
 			}
 
-			void JStaticField::setString(jobject _null, const String16& value)
+			void JStaticField::setString(jobject _null, const StringParam& value)
 			{
 				if (cls && id) {
 					JNIEnv* env = Jni::getCurrent();
@@ -439,7 +439,7 @@ namespace slib
 			DEFINE_JFIELD_TYPE_MEMBERS(sl_int64, Long, "J")
 			DEFINE_JFIELD_TYPE_MEMBERS(float, Float, "F")
 			DEFINE_JFIELD_TYPE_MEMBERS(double, Double, "D")
-			DEFINE_JFIELD_TYPE_MEMBERS(String16, String, "Ljava/lang/String;")
+			DEFINE_JFIELD_TYPE_MEMBERS(String, String, "Ljava/lang/String;")
 
 			JObjectField::JObjectField(JClass* gcls, const char* name, const char* sig)
 				: JField(gcls, name, sig)
@@ -493,7 +493,7 @@ namespace slib
 			DEFINE_JSTATICFIELD_TYPE_MEMBERS(sl_int64, Long, "J")
 			DEFINE_JSTATICFIELD_TYPE_MEMBERS(float, Float, "F")
 			DEFINE_JSTATICFIELD_TYPE_MEMBERS(double, Double, "D")
-			DEFINE_JSTATICFIELD_TYPE_MEMBERS(String16, String, "Ljava/lang/String;")
+			DEFINE_JSTATICFIELD_TYPE_MEMBERS(String, String, "Ljava/lang/String;")
 
 			JNativeMethod::JNativeMethod(JClass* gcls, const char* name, const char* sig, const void* fn)
 			{
@@ -852,7 +852,7 @@ namespace slib
 			StringData16 str(_str);
 			JNIEnv* env = Jni::getCurrent();
 			if (env) {
-				return env->NewString((jchar*)(str.data), (jsize)(str.getLength()));
+				return env->NewString((jchar*)(str.getData()), (jsize)(str.getLength()));
 			}
 		}
 		return sl_null;
@@ -869,7 +869,7 @@ namespace slib
 		return sl_null;
 	}
 
-	String16 Jni::getString(jstring str)
+	String Jni::getString(jstring str)
 	{
 		if (str) {
 			JNIEnv* env = Jni::getCurrent();
@@ -877,7 +877,7 @@ namespace slib
 				sl_uint32 len = (sl_uint32)(env->GetStringLength(str));
 				const jchar* sz = env->GetStringChars(str, sl_null);
 				if (sz) {
-					String16 ret = String16((const char16_t*)sz, len);
+					String ret = String::create((const char16_t*)sz, len);
 					env->ReleaseStringChars(str, sz);
 					return ret;
 				}
@@ -935,7 +935,7 @@ namespace slib
 		return Jni::newObjectArray(Jni::getClass(cls), length);
 	}
 
-	String16 Jni::getStringArrayElement(jobjectArray array, sl_uint32 index)
+	String Jni::getStringArrayElement(jobjectArray array, sl_uint32 index)
 	{
 		JniLocal<jstring> v((jstring)(Jni::getObjectArrayElement(array, index)));
 		if (v.isNotNull()) {
@@ -944,7 +944,7 @@ namespace slib
 		return sl_null;
 	}
 
-	void Jni::setStringArrayElement(jobjectArray array, sl_uint32 index, const String16& value)
+	void Jni::setStringArrayElement(jobjectArray array, sl_uint32 index, const StringParam& value)
 	{
 		JniLocal<jstring> v(Jni::getJniString(value));
 		Jni::setObjectArrayElement(array, index, v);
@@ -1387,11 +1387,11 @@ namespace slib
 		va_end(args);
 	}
 
-	String16 JniClass::callStringMethod(jmethodID method, jobject _this, ...) const
+	String JniClass::callStringMethod(jmethodID method, jobject _this, ...) const
 	{
 		va_list args;
 		va_start(args, _this);
-		String16 ret;
+		String ret;
 		if (method && _this) {
 			JNIEnv* env = Jni::getCurrent();
 			if (env) {
@@ -1405,11 +1405,11 @@ namespace slib
 		return ret;
 	}
 
-	String16 JniClass::callStringMethod(const char* name, const char* sig, jobject _this, ...) const
+	String JniClass::callStringMethod(const char* name, const char* sig, jobject _this, ...) const
 	{
 		va_list args;
 		va_start(args, _this);
-		String16 ret;
+		String ret;
 		if (_this) {
 			jmethodID method = getMethodID(name, sig);
 			if (method) {
@@ -1428,11 +1428,11 @@ namespace slib
 		return ret;
 	}
 
-	String16 JniClass::callStaticStringMethod(jmethodID method, ...) const
+	String JniClass::callStaticStringMethod(jmethodID method, ...) const
 	{
 		va_list args;
 		va_start(args, method);
-		String16 ret;
+		String ret;
 		if (method) {
 			jclass cls = get();
 			JNIEnv* env = Jni::getCurrent();
@@ -1447,11 +1447,11 @@ namespace slib
 		return ret;
 	}
 
-	String16 JniClass::callStaticStringMethod(const char* name, const char* sig, ...) const
+	String JniClass::callStaticStringMethod(const char* name, const char* sig, ...) const
 	{
 		va_list args;
 		va_start(args, sig);
-		String16 ret;
+		String ret;
 		jclass cls = get();
 		jmethodID method = getStaticMethodID(name, sig);
 		if (method) {
@@ -1577,7 +1577,7 @@ namespace slib
 	DEFINE_JNI_FIELD(jfloat, Float)
 	DEFINE_JNI_FIELD(jdouble, Double)
 
-	String16 JniClass::getStringField(jfieldID field, jobject _this) const
+	String JniClass::getStringField(jfieldID field, jobject _this) const
 	{
 		JniLocal<jstring> str((jstring)(getObjectField(field, _this)));
 		if (str.isNotNull()) {
@@ -1586,7 +1586,7 @@ namespace slib
 		return sl_null;
 	}
 
-	String16 JniClass::getStringField(const char* name, const char* sig, jobject _this) const
+	String JniClass::getStringField(const char* name, const char* sig, jobject _this) const
 	{
 		JniLocal<jstring> str((jstring)(getObjectField(name, sig, _this)));
 		if (str.isNotNull()) {
@@ -1595,7 +1595,7 @@ namespace slib
 		return sl_null;
 	}
 
-	String16 JniClass::getStaticStringField(jfieldID field) const
+	String JniClass::getStaticStringField(jfieldID field) const
 	{
 		JniLocal<jstring> str((jstring)(getStaticObjectField(field)));
 		if (str.isNotNull()) {
@@ -1604,7 +1604,7 @@ namespace slib
 		return sl_null;
 	}
 
-	String16 JniClass::getStaticStringField(const char* name, const char* sig) const
+	String JniClass::getStaticStringField(const char* name, const char* sig) const
 	{
 		JniLocal<jstring> str((jstring)(getStaticObjectField(name, sig)));
 		if (str.isNotNull()) {
@@ -1613,25 +1613,25 @@ namespace slib
 		return sl_null;
 	}
 
-	void JniClass::setStringField(jfieldID field, jobject _this, const String16& value) const
+	void JniClass::setStringField(jfieldID field, jobject _this, const StringParam& value) const
 	{
 		JniLocal<jstring> str(Jni::getJniString(value));
 		setObjectField(field, _this, str);
 	}
 
-	void JniClass::setStringField(const char* name, const char* sig, jobject _this, const String16& value) const
+	void JniClass::setStringField(const char* name, const char* sig, jobject _this, const StringParam& value) const
 	{
 		JniLocal<jstring> str(Jni::getJniString(value));
 		setObjectField(name, sig, _this, str);
 	}
 
-	void JniClass::setStaticStringField(jfieldID field, const String16& value) const
+	void JniClass::setStaticStringField(jfieldID field, const StringParam& value) const
 	{
 		JniLocal<jstring> str(Jni::getJniString(value));
 		setStaticObjectField(field, str);
 	}
 
-	void JniClass::setStaticStringField(const char* name, const char* sig, const String16& value) const
+	void JniClass::setStaticStringField(const char* name, const char* sig, const StringParam& value) const
 	{
 		JniLocal<jstring> str(Jni::getJniString(value));
 		setStaticObjectField(name, sig, str);

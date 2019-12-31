@@ -293,8 +293,8 @@ namespace slib
 					if (lpGUID) {
 						prop.guid = *lpGUID;
 						prop.szGuid = Windows::getStringFromGUID(*lpGUID);
-						prop.name = (sl_char16*)lpszDrvName;
-						prop.description = (sl_char16*)lpszDesc;
+						prop.name = String::create(lpszDrvName);
+						prop.description = String::create(lpszDesc);
 						list.add_NoLock(prop);
 					}
 					return TRUE;

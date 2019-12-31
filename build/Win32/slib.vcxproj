@@ -169,7 +169,9 @@
     <ClCompile Include="..\..\src\slib\core\spin_lock.cpp" />
     <ClCompile Include="..\..\src\slib\core\string.cpp" />
     <ClCompile Include="..\..\src\slib\core\string_buffer.cpp" />
+    <ClCompile Include="..\..\src\slib\core\string_op.cpp" />
     <ClCompile Include="..\..\src\slib\core\string_param.cpp" />
+    <ClCompile Include="..\..\src\slib\core\string_view.cpp" />
     <ClCompile Include="..\..\src\slib\core\system.cpp" />
     <ClCompile Include="..\..\src\slib\core\system_windows.cpp" />
     <ClCompile Include="..\..\src\slib\core\thread.cpp" />

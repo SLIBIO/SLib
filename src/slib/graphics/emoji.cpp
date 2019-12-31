@@ -55,7 +55,7 @@ namespace slib
 						const sl_char32* sz = emojis[index];
 						if (sz) {
 							mapEmojiFirstChars.add_NoLock(sz[0], sl_true);
-							String16 str(sz);
+							String16 str = String16::create(sz);
 							mapEmojis.add_NoLock(str, sl_true);
 							auto ret = mapEmojiList.emplace_NoLock(sz[0], sl_null);
 							if (ret.node) {

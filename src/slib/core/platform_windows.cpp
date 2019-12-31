@@ -38,17 +38,16 @@ namespace slib
 
 	String Windows::getStringFromGUID(const GUID& guid)
 	{
-		String ret;
 		WCHAR sz[40] = { 0 };
 		if (::StringFromGUID2(guid, sz, 40) < 40) {
-			ret = (sl_char16*)sz;
+			return String::create((sl_char16*)sz);
 		}
-		return ret;
+		return sl_null;
 	}
 
 	sl_bool Windows::getGUIDFromString(const String& _str, GUID* pguid)
 	{
-		String16 str = _str;
+		StringCstr16 str(_str);
 		CLSID clsid;
 		HRESULT hr = CLSIDFromString((LPWSTR)(str.getData()), &clsid);
 		if (hr == NOERROR) {
@@ -128,7 +127,7 @@ namespace slib
 			SLIB_SCOPED_BUFFER(WCHAR, 1024, buf, len + 2);
 			if (buf) {
 				len = GetWindowTextW(hWnd, buf, len + 1);
-				return String(buf, len);
+				return String::create(buf, len);
 			}
 		}
 		return sl_null;
@@ -141,15 +140,16 @@ namespace slib
 			SLIB_SCOPED_BUFFER(WCHAR, 1024, buf, len + 2);
 			if (buf) {
 				len = GetWindowTextW(hWnd, buf, len + 1);
-				return String16(buf, len);
+				return String16::create(buf, len);
 			}
 		}
 		return sl_null;
 	}
 
-	void Windows::setWindowText(HWND hWnd, const String16& str)
+	void Windows::setWindowText(HWND hWnd, const StringParam& _str)
 	{
 		if (hWnd) {
+			StringCstr16 str(_str);
 			SetWindowTextW(hWnd, (LPCWSTR)(str.getData()));
 		}
 	}
@@ -413,9 +413,9 @@ namespace slib
 #endif
 	}
 
-	HMODULE Windows::loadLibrary(const String& _path)
+	HMODULE Windows::loadLibrary(const StringParam& _path)
 	{
-		String16 path = _path;
+		StringCstr16 path(_path);
 		if (path.isNotEmpty()) {
 			return LoadLibraryW((LPCWSTR)(path.getData()));
 		} else {
@@ -518,11 +518,12 @@ namespace slib
 
 	}
 
-	sl_bool Windows::getRegistryValue(HKEY hKeyParent, const String16& path, const String16& name, Variant* out)
+	sl_bool Windows::getRegistryValue(HKEY hKeyParent, const StringParam& _path, const StringParam& _name, Variant* out)
 	{
 		if (!hKeyParent) {
 			return sl_false;
 		}
+		StringCstr16 path(_path);
 		HKEY hKey;
 		sl_bool flagOpened = sl_false;
 		if (path.isEmpty()) {
@@ -540,6 +541,7 @@ namespace slib
 		}
 		DWORD type = 0;
 		DWORD size = 0;
+		StringCstr16 name(_name);
 		sl_bool flagSuccess = sl_false;
 		if (ERROR_SUCCESS == RegQueryValueExW(hKey, (LPCWSTR)(name.getData()), NULL, &type, NULL, &size)) {
 			if (out) {
@@ -615,13 +617,14 @@ namespace slib
 		return flagSuccess;
 	}
 
-	sl_bool Windows::setRegistryValue(HKEY hKeyParent, const String16& path, const String16& name, const Variant& value)
+	sl_bool Windows::setRegistryValue(HKEY hKeyParent, const StringParam& _path, const StringParam& _name, const Variant& value)
 	{
 		if (!hKeyParent) {
 			return sl_false;
 		}
 		HKEY hKey;
 		sl_bool flagOpened = sl_false;
+		StringCstr16 path(_path);
 		if (path.isEmpty()) {
 			hKey = hKeyParent;
 		} else {
@@ -638,6 +641,7 @@ namespace slib
 			}
 			flagOpened = sl_true;
 		}
+		StringCstr16 name(_name);
 		sl_bool flagSuccess = sl_false;
 		if (value.isNull()) {
 			if (ERROR_SUCCESS == RegDeleteValueW(hKey, (LPCWSTR)(name.getData()))) {
@@ -672,8 +676,10 @@ namespace slib
 		return flagSuccess;
 	}
 
-	void Windows::setApplicationRunAtStartup(const String16& appName, const String16& path, sl_bool flagRegister)
+	void Windows::setApplicationRunAtStartup(const StringParam& _appName, const StringParam& _path, sl_bool flagRegister)
 	{
+		StringCstr16 appName(_appName);
+		StringCstr16 path(_path);
 		List<String16> listDelete;
 		HKEY hKey = NULL;
 		RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_QUERY_VALUE | KEY_SET_VALUE, &hKey);
@@ -688,7 +694,7 @@ namespace slib
 				LSTATUS lRet = RegEnumValueW(hKey, dwIndex, (LPWSTR)name, &dwLenName, NULL, &dwType, (LPBYTE)data, &nData);
 				if (lRet == ERROR_SUCCESS) {
 					if (dwType == REG_SZ) {
-						if (path == data) {
+						if ((const StringView&)path == data) {
 							if (flagRegister) {
 								// already registered
 								return;
@@ -810,8 +816,9 @@ namespace slib
 		return priv::platform::GetWindowsVersion();
 	}
 
-	WindowsDllVersion Windows::getDllVersion(const String16& pathDll)
+	WindowsDllVersion Windows::getDllVersion(const StringParam& _pathDll)
 	{
+		StringCstr16 pathDll(_pathDll);
 		WindowsDllVersion ret;
 		ret.major = 0;
 		ret.minor = 0;
@@ -904,17 +911,21 @@ namespace slib
 		SHELLEXECUTEINFOW sei;
 		Base::zeroMemory(&sei, sizeof(sei));
 		sei.cbSize = sizeof(sei);
+		StringCstr16 operation(param.operation);
 		if (param.runAsAdmin) {
 			sei.lpVerb = L"runas";
 		} else if (param.operation.isNotEmpty()) {
-			sei.lpVerb = (LPCWSTR)(param.operation.getData());
+			sei.lpVerb = (LPCWSTR)(operation.getData());
 		}
-		sei.lpFile = (LPCWSTR)(param.path.getData());
+		StringCstr16 path(param.path);
+		sei.lpFile = (LPCWSTR)(path.getData());
+		StringCstr16 params(param.params);
 		if (param.params.isNotEmpty()) {
-			sei.lpParameters = (LPCWSTR)(param.params.getData());
+			sei.lpParameters = (LPCWSTR)(params.getData());
 		}
+		StringCstr16 currentDirectory(param.currentDirectory);
 		if (param.currentDirectory.isNotEmpty()) {
-			sei.lpDirectory = (LPCWSTR)(param.currentDirectory.getData());
+			sei.lpDirectory = (LPCWSTR)(currentDirectory.getData());
 		}
 		sei.hwnd = param.hWndParent;
 		sei.nShow = param.nShow;

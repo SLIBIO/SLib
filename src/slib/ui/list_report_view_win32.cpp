@@ -93,7 +93,7 @@ namespace slib
 					ListLocker<ListReportViewColumn> columns(m_columns);
 					for (sl_size i = 0; i < columns.count; i++) {
 						ListReportViewColumn& column = columns[i];
-						String16 title = column.title;
+						String16 title = String16::from(column.title);
 						lvc.pszText = (LPWSTR)(title.getData());
 						int width = (int)(column.width);
 						if (width < 0) {
@@ -142,7 +142,7 @@ namespace slib
 						LVCOLUMNW lvc;
 						Base::zeroMemory(&lvc, sizeof(lvc));
 						lvc.mask = LVCF_TEXT;
-						String16 text = _text;
+						String16 text = String16::from(_text);
 						lvc.pszText = (LPWSTR)(text.getData());
 						SendMessageW(handle, LVM_SETCOLUMNW, (WPARAM)iCol, (LPARAM)(&lvc));
 					}
@@ -193,7 +193,7 @@ namespace slib
 						UINT code = nmhdr->code;
 						if (code == LVN_GETDISPINFOW) {
 							NMLVDISPINFOW* disp = (NMLVDISPINFOW*)nmhdr;
-							String16 s = helper->getItemText(disp->item.iItem, disp->item.iSubItem);
+							String16 s = String16::from(helper->getItemText(disp->item.iItem, disp->item.iSubItem));
 							sl_uint32 n = (sl_uint32)(s.getLength());
 							if (n > 0) {
 								sl_uint32 m = (sl_uint32)(disp->item.cchTextMax);

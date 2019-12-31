@@ -57,7 +57,7 @@ namespace slib
 						}
 					} else {
 						for (sl_uint32 i = nOrig; i < nNew; i++) {
-							String16 s = m_titles.getValueAt(i);
+							String16 s = String16::from(m_titles.getValueAt(i));
 							SendMessageW(hWnd, CB_ADDSTRING, 0, (LPARAM)(s.getData()));
 						}
 					}
@@ -111,7 +111,7 @@ namespace slib
 				{
 					HWND handle = m_handle;
 					if (handle) {
-						String16 s = title;
+						String16 s = String16::from(title);
 						SendMessageW(handle, CB_DELETESTRING, (WPARAM)index, 0);
 						SendMessageW(handle, CB_INSERTSTRING, (WPARAM)index, (LPARAM)(s.getData()));
 					}

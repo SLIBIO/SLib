@@ -52,23 +52,23 @@ namespace slib
 				return ::CreatePipe(pRead, pWrite, &saAttr, 0) != 0;
 			}
 			
-			static sl_bool CreateProcess(const String& _pathExecutable, const String* cmds, sl_uint32 nCmds, PROCESS_INFORMATION* pi, STARTUPINFOW* si, sl_bool flagInheritHandles)
+			static sl_bool Execute(const StringParam& _pathExecutable, const String* cmds, sl_uint32 nCmds, PROCESS_INFORMATION* pi, STARTUPINFOW* si, sl_bool flagInheritHandles)
 			{
-				String16 pathExecutable = _pathExecutable;
+				StringCstr16 pathExecutable(_pathExecutable);
 				String16 cmd;
 				{
 					StringBuffer16 sb;
-					sb.add(SLIB_UNICODE("\""));
-					sb.add(pathExecutable);
-					sb.add(SLIB_UNICODE("\""));
+					sb.addStatic(SLIB_UNICODE("\""));
+					sb.addStatic(pathExecutable.getData(), pathExecutable.getLength());
+					sb.addStatic(SLIB_UNICODE("\""));
 					String args = Application::buildCommandLine(cmds, nCmds);
 					if (args.isNotEmpty()) {
-						sb.add(SLIB_UNICODE(" "));
-						sb.add(args);
+						sb.addStatic(SLIB_UNICODE(" "));
+						sb.add(String16::from(args));
 					}
 					cmd = sb.merge();
 				}
-				return ::CreateProcessW(
+				return CreateProcessW(
 					(LPCWSTR)(pathExecutable.getData()),
 					(LPWSTR)(cmd.getData()),
 					NULL, // process security attributes
@@ -174,7 +174,7 @@ namespace slib
 				}
 
 			public:
-				static Ref<ProcessImpl> create(const String& pathExecutable, const String* strArguments, sl_uint32 nArguments)
+				static Ref<ProcessImpl> create(const StringParam& pathExecutable, const String* strArguments, sl_uint32 nArguments)
 				{
 					HANDLE hStdinRead, hStdinWrite, hStdoutRead, hStdoutWrite;
 					if (CreatePipe(&hStdinRead, &hStdinWrite)) {
@@ -190,7 +190,7 @@ namespace slib
 							si.hStdOutput = hStdoutWrite;
 							si.hStdError = hStdoutWrite;
 							si.dwFlags = STARTF_USESTDHANDLES;
-							if (CreateProcess(pathExecutable, strArguments, nArguments, &pi, &si, sl_true)) {
+							if (Execute(pathExecutable, strArguments, nArguments, &pi, &si, sl_true)) {
 								CloseHandle(pi.hThread);
 								Ref<ProcessImpl> ret = new ProcessImpl;
 								ret->m_hProcess = pi.hProcess;
@@ -279,12 +279,12 @@ namespace slib
 	}
 
 #if !defined(SLIB_PLATFORM_IS_MOBILE)
-	Ref<Process> Process::open(const String& pathExecutable, const String* arguments, sl_uint32 nArguments)
+	Ref<Process> Process::open(const StringParam& pathExecutable, const String* arguments, sl_uint32 nArguments)
 	{
 		return Ref<Process>::from(ProcessImpl::create(pathExecutable, arguments, nArguments));
 	}
 
-	sl_bool Process::run(const String& pathExecutable, const String* strArguments, sl_uint32 nArguments)
+	sl_bool Process::run(const StringParam& pathExecutable, const String* strArguments, sl_uint32 nArguments)
 	{		
 		PROCESS_INFORMATION pi;
 		ZeroMemory(&pi, sizeof(pi));
@@ -294,7 +294,7 @@ namespace slib
 		si.dwFlags = STARTF_USESTDHANDLES;
 		si.cb = sizeof(si);
 
-		if (CreateProcess(pathExecutable, strArguments, nArguments, &pi, &si, sl_false)) {
+		if (Execute(pathExecutable, strArguments, nArguments, &pi, &si, sl_false)) {
 			CloseHandle(pi.hProcess);
 			CloseHandle(pi.hThread);
 			return sl_true;
@@ -302,7 +302,7 @@ namespace slib
 		return sl_false;
 	}
 
-	void Process::runAsAdmin(const String& pathExecutable, const String* strArguments, sl_uint32 nArguments)
+	void Process::runAsAdmin(const StringParam& pathExecutable, const String* strArguments, sl_uint32 nArguments)
 	{
 		Windows::ShellExecuteParam param;
 		param.runAsAdmin = sl_true;
@@ -316,9 +316,10 @@ namespace slib
 		return Windows::isCurrentProcessRunAsAdmin();
 	}
 
-	void Process::exec(const String& pathExecutable, const String* strArguments, sl_uint32 nArguments)
+	void Process::exec(const StringParam& _pathExecutable, const String* strArguments, sl_uint32 nArguments)
 	{
 #if defined(SLIB_PLATFORM_IS_WIN32)
+		StringCstr pathExecutable(_pathExecutable);
 		char* exe = pathExecutable.getData();
 		char* args[1024];
 		args[0] = exe;

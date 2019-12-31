@@ -54,7 +54,7 @@ namespace slib
 					close();
 				}
 
-				static Ref<Win32AsyncFileStreamInstance> open(const String& path, FileMode mode)
+				static Ref<Win32AsyncFileStreamInstance> open(const StringParam& path, FileMode mode)
 				{
 					Ref<Win32AsyncFileStreamInstance> ret;
 					sl_file handle = _openHandle(path, mode);
@@ -200,9 +200,9 @@ namespace slib
 					return File::getSize(handle);
 				}
 
-				static sl_file _openHandle(const String& _filePath, FileMode mode)
+				static sl_file _openHandle(const StringParam& _filePath, FileMode mode)
 				{
-					String16 filePath = _filePath;
+					StringCstr16 filePath(_filePath);
 					if (filePath.isEmpty()) {
 						return (sl_file)-1;
 					}
@@ -262,13 +262,13 @@ namespace slib
 		}
 	}
 	
-	Ref<AsyncStream> AsyncFile::openIOCP(const String& path, FileMode mode, const Ref<AsyncIoLoop>& loop)
+	Ref<AsyncStream> AsyncFile::openIOCP(const StringParam& path, FileMode mode, const Ref<AsyncIoLoop>& loop)
 	{
 		Ref<priv::async::Win32AsyncFileStreamInstance> ret = priv::async::Win32AsyncFileStreamInstance::open(path, mode);
 		return AsyncStream::create(ret.get(), AsyncIoMode::InOut, loop);
 	}
 
-	Ref<AsyncStream> AsyncFile::openIOCP(const String& path, FileMode mode)
+	Ref<AsyncStream> AsyncFile::openIOCP(const StringParam& path, FileMode mode)
 	{
 		return AsyncFile::openIOCP(path, mode, AsyncIoLoop::getDefault());
 	}

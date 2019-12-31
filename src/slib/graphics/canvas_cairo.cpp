@@ -502,7 +502,7 @@ namespace slib
 							}
 							
 							if (_font->isStrikeout() || _font->isUnderline()) {
-								sl_real width = _font->measureText(StringParam(text.data, len)).x;
+								sl_real width = _font->measureText(StringParam(text.getData(), len)).x;
 								if (_font->isUnderline()) {
 									sl_real yLine = y;
 									cairo_move_to(m_graphics, 0, yLine);

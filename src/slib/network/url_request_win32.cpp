@@ -106,7 +106,7 @@ namespace slib
 
 				Ref<Connection> getConnection(const String& url, String16& outPath)
 				{
-					String16 urlBuffer = url;
+					String16 urlBuffer = String16::from(url);
 					DWORD lenURL = (DWORD)(urlBuffer.getLength());
 					URL_COMPONENTSW comps = { 0 };
 					comps.dwStructSize = sizeof(comps);
@@ -117,10 +117,11 @@ namespace slib
 					if (WinHttpCrackUrl((LPCWSTR)(urlBuffer.getData()), lenURL, 0, &comps)) {
 						if (comps.lpszHostName && (comps.nScheme == INTERNET_SCHEME_HTTP || comps.nScheme == INTERNET_SCHEME_HTTPS)) {
 							if (comps.lpszUrlPath && *(comps.lpszUrlPath)) {
-								outPath = comps.lpszUrlPath;
+								outPath = String16::create(comps.lpszUrlPath);
 								*(comps.lpszUrlPath) = 0;
 							} else {
-								outPath = L"/";
+								SLIB_STATIC_STRING16(s, "/")
+								outPath = s;
 							}
 							String16 address = urlBuffer.getData();
 							{
@@ -227,7 +228,7 @@ namespace slib
 									}
 								}
 								sl_int32 taskId = Base::interlockedIncrement32(&(session->lastTaskId)) & 0x7FFFFFFF;
-								String16 verb = HttpMethodHelper::toString(param.method);
+								String16 verb = String16::from(HttpMethodHelper::toString(param.method));
 								DWORD flags = WINHTTP_FLAG_REFRESH;
 								if (connection->flagHttps) {
 									flags |= WINHTTP_FLAG_SECURE;
@@ -336,7 +337,7 @@ namespace slib
 					}
 					if (len) {
 						HttpResponse response;
-						String strPacket((sl_char16*)bufHeaders, len / 2);
+						String strPacket = String::create((sl_char16*)bufHeaders, len / 2);
 						sl_reg iRet = response.parseResponsePacket(strPacket.getData(), strPacket.getLength());
 						if (iRet > 0) {
 							m_responseMessage = response.getResponseMessage();

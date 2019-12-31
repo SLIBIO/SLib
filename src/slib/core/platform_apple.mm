@@ -50,7 +50,7 @@ namespace slib
 		}
 		if (str.is8()) {
 			StringData s(str);
-			NSString* ret = [[NSString alloc] initWithUTF8String:s.getData()];
+			NSString* ret = [[NSString alloc] initWithBytes:s.getData() length:s.getLength() encoding:NSUTF8StringEncoding];
 			if (ret != nil) {
 				return ret;
 			}
