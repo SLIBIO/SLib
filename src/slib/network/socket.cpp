@@ -574,6 +574,7 @@ namespace slib
 #endif
 			if (ret >= 0) {
 				if (ret == 0) {
+					_setClosedError();
 					ret = -1;
 				}
 				return ret;
@@ -603,6 +604,7 @@ namespace slib
 			sl_int32 ret = (sl_int32)(::recv((SOCKET)(m_socket), (char*)buf, size, 0));
 			if (ret >= 0) {
 				if (ret == 0) {
+					_setClosedError();
 					return -1;
 				}
 				return ret;
