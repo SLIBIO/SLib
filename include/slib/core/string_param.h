@@ -272,7 +272,7 @@ namespace slib
 		template <sl_size N>
 		SLIB_INLINE static StringData literal(const sl_char8 (&s)[N]) noexcept
 		{
-			return StringData(s, N);
+			return StringData(s, N - 1);
 		}
 		
 	};
@@ -295,7 +295,7 @@ namespace slib
 		template <sl_size N>
 		SLIB_INLINE static StringData16 literal(const sl_char16 (&s)[N]) noexcept
 		{
-			return StringData16(s, N);
+			return StringData16(s, N - 1);
 		}
 
 	};
@@ -324,7 +324,7 @@ namespace slib
 		template <sl_size N>
 		SLIB_INLINE static StringCstr literal(const sl_char8 (&s)[N]) noexcept
 		{
-			return StringCstr(s, N);
+			return StringCstr(s, N - 1);
 		}
 		
 	};
@@ -353,7 +353,7 @@ namespace slib
 		template <sl_size N>
 		SLIB_INLINE static StringCstr16 literal(const sl_char16 (&s)[N]) noexcept
 		{
-			return StringCstr16(s, N);
+			return StringCstr16(s, N - 1);
 		}
 		
 	};

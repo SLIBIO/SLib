@@ -36,7 +36,7 @@ namespace slib
 	template <sl_size N>
 	SLIB_INLINE StringView StringView::literal(const sl_char8 (&s)[N]) noexcept
 	{
-		return StringView(s, N);
+		return StringView(s, N - 1);
 	}
 	
 	SLIB_INLINE sl_bool StringView::isNull() const noexcept
@@ -98,7 +98,7 @@ namespace slib
 	template <sl_size N>
 	SLIB_INLINE StringView16 StringView16::literal(const sl_char16 (&s)[N]) noexcept
 	{
-		return StringView16(s, N);
+		return StringView16(s, N - 1);
 	}
 	
 	SLIB_INLINE sl_bool StringView16::isNull() const noexcept
