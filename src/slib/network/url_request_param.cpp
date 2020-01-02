@@ -108,7 +108,17 @@ namespace slib
 			requestBody.setNull();
 		}
 	}
+
+	void UrlRequestParam::setRequestHeader(const String& header, const String& value)
+	{
+		requestHeaders.put_NoLock(header, value);
+	}
 	
+	void UrlRequestParam::addRequestHeader(const String& header, const String& value)
+	{
+		requestHeaders.add_NoLock(header, value);
+	}
+
 	void UrlRequestParam::setMultipartFormData(const HashMap<String, Variant>& params)
 	{
 		for (;;) {

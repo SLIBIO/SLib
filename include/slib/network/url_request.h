@@ -85,6 +85,13 @@ namespace slib
 		
 		void setRequestBody(const Variant& var);
 		
+		void setRequestHeader(const String& header, const String& value);
+		
+		void addRequestHeader(const String& header, const String& value);
+		
+		template <class MAP>
+		void setCookie(const MAP& cookies);
+		
 
 		template <class MAP>
 		void setFormData(const MAP& map);
@@ -221,7 +228,17 @@ namespace slib
 		
 		HttpHeaderMap getResponseHeaders();
 		
+		List<String> getResponseHeaderValues(const String& name);
+		
 		String getResponseHeader(const String& name);
+		
+		List<HttpCookie> getResponseCookies();
+		
+		HashMap<String, HttpCookie> getResponseCookieMap();
+		
+		sl_bool getResponseCookie(const String& name, HttpCookie* cookie);
+		
+		String getResponseCookie(const String& name);
 		
 		
 		sl_bool isUsingBackgroundSession();

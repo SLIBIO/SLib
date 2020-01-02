@@ -213,9 +213,8 @@ namespace slib
 
 		static String mergeValues(const List<String>& list, sl_char8 delimiter=',');
 
-		static String mergeValueMap(const HttpHeaderValueMap& map, sl_char8 delimiter=',');
-
-		static String mergeValueMapCaseSensitive(const HashMap<String, String>& map, sl_char8 delimiter=',');
+		template <class MAP>
+		static String mergeValueMap(const MAP& map, sl_char8 delimiter=',');
 
 	};
 	
@@ -437,11 +436,10 @@ namespace slib
 		
 		HashMap<String, String> getRequestCookies() const;
 		
-		void setRequestCookies(const HashMap<String, String>&);
+		template <class MAP>
+		void setRequestCookies(const MAP& map);
 		
 		String getRequestCookie(const String& cookie) const;
-		
-		void setRequestCookie(const String& name, const String& value);
 		
 		
 		const HashMap<String, String>& getParameters() const;

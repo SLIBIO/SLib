@@ -145,10 +145,67 @@ namespace slib
 	{
 		return m_responseHeaders;
 	}
-	
+
 	String UrlRequest::getResponseHeader(const String& name)
 	{
-		return m_responseHeaders.getValue(name, String::null());
+		HttpHeaderMap map = m_responseHeaders;
+		return map.getValue_NoLock(name, String::null());
+	}
+	
+	List<String> UrlRequest::getResponseHeaderValues(const String& name)
+	{
+		HttpHeaderMap map = m_responseHeaders;
+		List<String> list;
+		MapNode<String, String>* node;
+		MapNode<String, String>* nodeEnd;
+		if (map.getEqualRange(name, &node, &nodeEnd)) {
+			for (;;) {
+				HttpHeaderHelper::splitValue(node->value, &list, sl_null, sl_null);
+				if (node == nodeEnd) {
+					break;
+				}
+				node = node->getNext();
+			}
+		}
+		return list;
+	}
+
+	List<HttpCookie> UrlRequest::getResponseCookies()
+	{
+		List<HttpCookie> list;
+		ListElements<String> values(getResponseHeaderValues(HttpHeader::SetCookie));
+		for (sl_size i = 0; i < values.count; i++) {
+			HttpCookie cookie;
+			cookie.parseHeaderValue(values[i]);
+			list.add_NoLock(cookie);
+		}
+		return list;
+	}
+	
+	HashMap<String, HttpCookie> UrlRequest::getResponseCookieMap()
+	{
+		HashMap<String, HttpCookie> map;
+		ListElements<String> values(getResponseHeaderValues(HttpHeader::SetCookie));
+		for (sl_size i = 0; i < values.count; i++) {
+			HttpCookie cookie;
+			cookie.parseHeaderValue(values[i]);
+			map.add_NoLock(cookie.name, cookie);
+		}
+		return map;
+	}
+	
+	sl_bool UrlRequest::getResponseCookie(const String& name, HttpCookie* cookie)
+	{
+		return getResponseCookieMap().get_NoLock(name, cookie);
+	}
+	
+	String UrlRequest::getResponseCookie(const String& name)
+	{
+		HttpCookie cookie;
+		if (getResponseCookieMap().get_NoLock(name, &cookie)) {
+			return cookie.value;
+		}
+		return sl_null;
 	}
 	
 	sl_bool UrlRequest::isUsingBackgroundSession()

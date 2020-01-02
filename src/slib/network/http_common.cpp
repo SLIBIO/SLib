@@ -478,50 +478,6 @@ namespace slib
 		return sb.merge();
 	}
 	
-	String HttpHeaderHelper::mergeValueMap(const HttpHeaderMap& map, sl_char8 delimiter)
-	{
-		MutexLocker lock(map.getLocker());
-		StringBuffer sb;
-		for (auto& item: map) {
-			if (item.key.isNotEmpty()) {
-				if (sb.getLength() > 0) {
-					sb.addStatic(&delimiter, 1);
-					sb.addStatic(" ");
-				}
-				if (item.value.isNull()) {
-					sb.add(makeSafeValue(item.key));
-				} else {
-					sb.add(makeSafeValue(item.key));
-					sb.addStatic("=");
-					sb.add(makeSafeValue(item.value));
-				}
-			}
-		}
-		return sb.merge();
-	}
-
-	String HttpHeaderHelper::mergeValueMapCaseSensitive(const HashMap<String, String>& map, sl_char8 delimiter)
-	{
-		MutexLocker lock(map.getLocker());
-		StringBuffer sb;
-		for (auto& item: map) {
-			if (item.key.isNotEmpty()) {
-				if (sb.getLength() > 0) {
-					sb.addStatic(&delimiter, 1);
-					sb.addStatic(" ");
-				}
-				if (item.value.isNull()) {
-					sb.add(makeSafeValue(item.key));
-				} else {
-					sb.add(makeSafeValue(item.key));
-					sb.addStatic("=");
-					sb.add(makeSafeValue(item.value));
-				}
-			}
-		}
-		return sb.merge();
-	}
-	
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(HttpCookie)
 	
 	HttpCookie::HttpCookie()
@@ -1071,22 +1027,9 @@ namespace slib
 		return map;
 	}
 	
-	void HttpRequest::setRequestCookies(const HashMap<String, String>& cookies)
-	{
-		String value = HttpHeaderHelper::mergeValueMapCaseSensitive(cookies);
-		setRequestHeader(HttpHeader::Cookie, value);
-	}
-	
 	String HttpRequest::getRequestCookie(const String& cookie) const
 	{
 		return getRequestCookies().getValue_NoLock(cookie);
-	}
-	
-	void HttpRequest::setRequestCookie(const String& name, const String& value)
-	{
-		HashMap<String, String> cookies = getRequestCookies();
-		cookies.put_NoLock(name, value);
-		setRequestCookies(cookies);
 	}
 	
 	const HashMap<String, String>& HttpRequest::getParameters() const

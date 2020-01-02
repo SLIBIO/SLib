@@ -25,6 +25,31 @@
 
 namespace slib
 {
+
+	template <class MAP>
+	String HttpHeaderHelper::mergeValueMap(const MAP& map, sl_char8 delimiter)
+	{
+		MutexLocker lock(map.getLocker());
+		StringBuffer sb;
+		for (auto& item: map) {
+			if (item.key.isNotEmpty()) {
+				if (sb.getLength() > 0) {
+					sb.addStatic(&delimiter, 1);
+					sb.addStatic(" ");
+				}
+				String key = Cast<typename MAP::KEY_TYPE, String>()(item.key);
+				String value = Cast<typename MAP::VALUE_TYPE, String>()(item.value);
+				if (value.isNull()) {
+					sb.add(makeSafeValue(key));
+				} else {
+					sb.add(makeSafeValue(key));
+					sb.addStatic("=");
+					sb.add(makeSafeValue(value));
+				}
+			}
+		}
+		return sb.merge();
+	}
 	
 	template <class MAP>
 	String HttpRequest::buildQuery(const MAP& params)
@@ -74,6 +99,13 @@ namespace slib
 			url += query;
 		}
 		setResponseRedirect(url, status);
+	}
+
+	template <class MAP>
+	void HttpRequest::setRequestCookies(const MAP& cookies)
+	{
+		String value = HttpHeaderHelper::mergeValueMap(cookies, ';');
+		setRequestHeader(HttpHeader::Cookie, value);
 	}
 	
 }

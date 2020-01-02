@@ -35,5 +35,12 @@ namespace slib
 		setContentType(ContentType::WebForm);
 		setRequestBodyAsMap(params);
 	}
+	
+	template <class MAP>
+	void UrlRequestParam::setCookie(const MAP& cookies)
+	{
+		String value = HttpHeaderHelper::mergeValueMap(cookies, ';');
+		setRequestHeader(HttpHeader::Cookie, value);
+	}
 
 }
