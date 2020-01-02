@@ -58,12 +58,11 @@ namespace slib
 			public:
 				static Ref<AsyncTcpSocketInstanceImpl> create(const Ref<Socket>& socket)
 				{
-					Ref<AsyncTcpSocketInstanceImpl> ret;
 					if (socket.isNotNull()) {
 						if (socket->setNonBlockingMode(sl_true)) {
 							sl_file handle = (sl_file)(socket->getHandle());
 							if (handle != SLIB_FILE_INVALID_HANDLE) {
-								ret = new AsyncTcpSocketInstanceImpl();
+								Ref<AsyncTcpSocketInstanceImpl> ret = new AsyncTcpSocketInstanceImpl();
 								if (ret.isNotNull()) {
 									ret->m_socket = socket;
 									ret->setHandle(handle);
@@ -72,11 +71,12 @@ namespace slib
 							}
 						}
 					}
-					return ret;
+					return sl_null;
 				}
 				
-				void close()
+				void close() override
 				{
+					AsyncTcpSocketInstance::close();
 					setHandle(SLIB_FILE_INVALID_HANDLE);
 					m_socket.setNull();
 				}
@@ -177,7 +177,7 @@ namespace slib
 					}
 				}
 				
-				void onOrder()
+				void onOrder() override
 				{
 					Ref<Socket> socket = m_socket;
 					if (socket.isNull()) {
@@ -199,7 +199,7 @@ namespace slib
 					processWrite(sl_false);
 				}
 				
-				void onEvent(EventDesc* pev)
+				void onEvent(EventDesc* pev) override
 				{
 					sl_bool flagProcessed = sl_false;
 					if (pev->flagIn) {
@@ -253,12 +253,11 @@ namespace slib
 			public:
 				static Ref<AsyncTcpServerInstanceImpl> create(const Ref<Socket>& socket)
 				{
-					Ref<AsyncTcpServerInstanceImpl> ret;
 					if (socket.isNotNull()) {
 						if (socket->setNonBlockingMode(sl_true)) {
 							sl_file handle = (sl_file)(socket->getHandle());
 							if (handle != SLIB_FILE_INVALID_HANDLE) {
-								ret = new AsyncTcpServerInstanceImpl();
+								Ref<AsyncTcpServerInstanceImpl> ret = new AsyncTcpServerInstanceImpl();
 								if (ret.isNotNull()) {
 									ret->m_socket = socket;
 									ret->setHandle(handle);
@@ -267,17 +266,17 @@ namespace slib
 							}
 						}
 					}
-					return ret;
+					return sl_null;
 				}
 				
-				void close()
+				void close() override
 				{
 					AsyncTcpServerInstance::close();
 					m_socket.setNull();
 					setHandle(SLIB_FILE_INVALID_HANDLE);
 				}
 				
-				void onOrder()
+				void onOrder() override
 				{
 					Ref<Socket> socket = m_socket;
 					if (socket.isNull()) {
@@ -299,7 +298,7 @@ namespace slib
 					}
 				}
 				
-				void onEvent(EventDesc* pev)
+				void onEvent(EventDesc* pev) override
 				{
 					if (pev->flagIn) {
 						onOrder();
@@ -325,12 +324,11 @@ namespace slib
 			public:
 				static Ref<AsyncUdpSocketInstanceImpl> create(const Ref<Socket>& socket, const Memory& buffer)
 				{
-					Ref<AsyncUdpSocketInstanceImpl> ret;
 					if (socket.isNotNull()) {
 						if (socket->setNonBlockingMode(sl_true)) {
 							sl_file handle = (sl_file)(socket->getHandle());
 							if (handle != SLIB_FILE_INVALID_HANDLE) {
-								ret = new AsyncUdpSocketInstanceImpl();
+								Ref<AsyncUdpSocketInstanceImpl> ret = new AsyncUdpSocketInstanceImpl();
 								if (ret.isNotNull()) {
 									ret->m_socket = socket;
 									ret->setHandle(handle);
@@ -340,22 +338,22 @@ namespace slib
 							}
 						}
 					}
-					return ret;
+					return sl_null;
 				}
 				
-				void close()
+				void close() override
 				{
 					AsyncUdpSocketInstance::close();
 					setHandle(SLIB_FILE_INVALID_HANDLE);
 					m_socket.setNull();
 				}
 				
-				void onOrder()
+				void onOrder() override
 				{
 					processReceive();
 				}
 				
-				void onEvent(EventDesc* pev)
+				void onEvent(EventDesc* pev) override
 				{
 					if (pev->flagIn) {
 						processReceive();

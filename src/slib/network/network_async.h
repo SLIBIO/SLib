@@ -36,6 +36,8 @@ namespace slib
 
 	class SLIB_EXPORT AsyncTcpSocketInstance : public AsyncStreamInstance
 	{
+		SLIB_DECLARE_OBJECT
+		
 	protected:
 		AsyncTcpSocketInstance();
 		
@@ -47,6 +49,8 @@ namespace slib
 		sl_bool isSupportedConnect();
 		
 	public:
+		void close() override;
+		
 		sl_bool connect(const SocketAddress& address);
 		
 	protected:
@@ -67,6 +71,8 @@ namespace slib
 
 	class SLIB_EXPORT AsyncTcpServerInstance : public AsyncIoInstance
 	{
+		SLIB_DECLARE_OBJECT
+		
 	public:
 		AsyncTcpServerInstance();
 		
@@ -95,6 +101,8 @@ namespace slib
 
 	class SLIB_EXPORT AsyncUdpSocketInstance : public AsyncIoInstance
 	{
+		SLIB_DECLARE_OBJECT
+		
 	public:
 		AsyncUdpSocketInstance();
 		

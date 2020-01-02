@@ -31,6 +31,8 @@ namespace slib
 			AsyncTcpSocket
 ********************************************/
 
+	SLIB_DEFINE_OBJECT(AsyncTcpSocketInstance, AsyncStreamInstance)
+
 	AsyncTcpSocketInstance::AsyncTcpSocketInstance()
 	{
 		m_flagRequestConnect = sl_false;
@@ -49,6 +51,10 @@ namespace slib
 	sl_bool AsyncTcpSocketInstance::isSupportedConnect()
 	{
 		return m_flagSupportingConnect;
+	}
+
+	void AsyncTcpSocketInstance::close()
+	{
 	}
 
 	sl_bool AsyncTcpSocketInstance::connect(const SocketAddress& address)
@@ -269,6 +275,8 @@ namespace slib
 			AsyncTcpServer
 ********************************************/
 
+	SLIB_DEFINE_OBJECT(AsyncTcpServerInstance, AsyncIoInstance)
+
 	AsyncTcpServerInstance::AsyncTcpServerInstance()
 	{
 		m_flagRunning = sl_false;
@@ -468,6 +476,8 @@ namespace slib
 /*******************************************
 			AsyncUdpSocket
 ********************************************/
+
+	SLIB_DEFINE_OBJECT(AsyncUdpSocketInstance, AsyncIoInstance)
 
 	AsyncUdpSocketInstance::AsyncUdpSocketInstance()
 	{
