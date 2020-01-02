@@ -408,10 +408,6 @@ namespace slib
 		
 		void setHost(const String& type);
 		
-		sl_bool isKeepAlive() const;
-		
-		void setKeepAlive();
-		
 		String getRequestRange() const;
 		
 		void setRequestRange(const String& range);

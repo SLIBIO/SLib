@@ -405,14 +405,8 @@ namespace slib
 			return;
 		}
 		m_output->mergeBuffer(&(context->m_bufferOutput));
-		if (context->isKeepAlive()) {
-			m_output->startWriting();
-			start();
-		} else {
-			m_contextCurrent.setNull();
-			m_flagKeepAlive = sl_false;
-			m_output->startWriting();
-		}
+		m_output->startWriting();
+		start();
 	}
 
 	void HttpServerConnection::onReadStream(AsyncStreamResult& result)

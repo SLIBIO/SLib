@@ -885,18 +885,6 @@ namespace slib
 		setRequestHeader(HttpHeader::Host, type);
 	}
 	
-	sl_bool HttpRequest::isKeepAlive() const
-	{
-		SLIB_STATIC_STRING(str, "Keep-Alive");
-		return getRequestHeader(HttpHeader::Connection).equalsIgnoreCase(str);
-	}
-	
-	void HttpRequest::setKeepAlive()
-	{
-		SLIB_STATIC_STRING(str, "Keep-Alive");
-		setRequestHeader(HttpHeader::Connection, str);
-	}
-	
 	String HttpRequest::getRequestRange() const
 	{
 		return getRequestHeader(HttpHeader::Range);
