@@ -35,23 +35,61 @@ namespace slib
 	class SLIB_EXPORT Captcha
 	{
 	public:
-		// output
-		String code;
-		Ref<Image> image;
-		
-		// input
-		sl_uint32 length;
-		sl_uint32 width;
-		sl_uint32 height;
-		Ref<Font> font;
-		
-	public:
 		Captcha();
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(Captcha)
+		
+	public:
+		String getCode() const;
+		String16 getCode16() const;
+
+		void setCode(const StringParam& code);
+		
+		sl_uint32 getCodeLength() const;
+		
+		void setCodeLength(sl_uint32 length);
+		
+		String16 getCodeElements() const;
+		
+		void setCodeElements(const StringParam& codeset);
+		
+		String16 getInterferingElements() const;
+		
+		void setInterferingElements(const StringParam& elements);
+		
+		sl_uint32 getWidth() const;
+		
+		void setWidth(sl_uint32 width);
+		
+		sl_uint32 getHeight() const;
+		
+		void setHeight(sl_uint32 height);
+		
+		Ref<Font> getFont() const;
+		
+		void setFont(const Ref<Font>& font);
+		
+		void setBackgroundColor(const Color& background);
 
 	public:
-		sl_bool generate();
+		Ref<Image> generate(String* outCode = sl_null);
+		
+	protected:
+		Mutex m_lock;
+		
+		AtomicString16 m_code;
+		AtomicString16 m_codeInput;
+
+		Ref<Image> m_image;
+		Ref<Bitmap> m_bitmap;
+		
+		sl_uint32 m_length;
+		sl_uint32 m_width;
+		sl_uint32 m_height;
+		AtomicRef<Font> m_font;
+		AtomicString16 m_codeset;
+		AtomicString16 m_interferingElements;
+		Color m_background;
 		
 	};
 	
