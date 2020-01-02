@@ -100,8 +100,8 @@ namespace slib
 
 			_stepBegin();
 
-			int nEvents = ::epoll_wait(handle->fdEpoll, waitEvents, ASYNC_MAX_WAIT_EVENT, -1);
-			if (nEvents == 0) {
+			int nEvents = ::epoll_wait(handle->fdEpoll, waitEvents, ASYNC_MAX_WAIT_EVENT, 5000);
+			if (m_queueInstancesClosed.isNotEmpty()) {
 				m_queueInstancesClosed.removeAll();
 			}
 			if (nEvents < 0) {

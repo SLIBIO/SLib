@@ -92,8 +92,11 @@ namespace slib
 
 			_stepBegin();
 
-			int nEvents = ::kevent(handle->kq, sl_null, 0, waitEvents, ASYNC_MAX_WAIT_EVENT, NULL);
-			if (nEvents == 0) {
+			timespec timeout;
+			timeout.tv_nsec = 0;
+			timeout.tv_sec = 5;
+			int nEvents = ::kevent(handle->kq, sl_null, 0, waitEvents, ASYNC_MAX_WAIT_EVENT, &timeout);
+			if (m_queueInstancesClosed.isNotEmpty()) {
 				m_queueInstancesClosed.removeAll();
 			}
 

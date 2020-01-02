@@ -105,10 +105,10 @@ namespace slib
 
 			DWORD nCount = 0;
 			
-			if (!fGetQueuedCompletionStatusEx(handle->hCompletionPort, entries, ASYNC_MAX_WAIT_EVENT, &nCount, INFINITE, FALSE)) {
+			if (!fGetQueuedCompletionStatusEx(handle->hCompletionPort, entries, ASYNC_MAX_WAIT_EVENT, &nCount, 5000, FALSE)) {
 				nCount = 0;
 			}
-			if (nCount == 0) {
+			if (m_queueInstancesClosed.isNotEmpty()) {
 				m_queueInstancesClosed.removeAll();
 			}
 
