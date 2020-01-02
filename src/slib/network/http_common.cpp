@@ -201,6 +201,7 @@ namespace slib
 	const String& HttpHeader::name = priv::http::static_##name;
 
 	DEFINE_HTTP_HEADER(Connection, "Connection")
+	DEFINE_HTTP_HEADER(KeepAlive, "Keep-Alive")
 	DEFINE_HTTP_HEADER(CacheControl, "Cache-Control")
 	DEFINE_HTTP_HEADER(ContentDisposition, "Content-Disposition")
 	DEFINE_HTTP_HEADER(Authorization, "Authorization")
@@ -884,7 +885,25 @@ namespace slib
 	{
 		setRequestHeader(HttpHeader::Host, type);
 	}
+
+	sl_bool HttpRequest::isRequestKeepAlive() const
+	{
+		String connection = getRequestHeader(HttpHeader::Connection);
+		if (connection.isEmpty()) {
+			if (m_requestVersion != "HTTP/1.0") {
+				return sl_true;
+			}
+		}
+		SLIB_STATIC_STRING(str, "Keep-Alive");
+		return connection.equalsIgnoreCase(str);
+	}
 	
+	void HttpRequest::setRequestKeepAlive()
+	{
+		SLIB_STATIC_STRING(str, "Keep-Alive");
+		setRequestHeader(HttpHeader::Connection, str);
+	}
+
 	String HttpRequest::getRequestRange() const
 	{
 		return getRequestHeader(HttpHeader::Range);
@@ -1620,6 +1639,45 @@ namespace slib
 	void HttpResponse::clearResponseHeaders()
 	{
 		m_responseHeaders.removeAll_NoLock();
+	}
+
+	sl_bool HttpResponse::isResponseKeepAlive() const
+	{
+		String connection = getResponseHeader(HttpHeader::Connection);
+		if (connection.isEmpty()) {
+			return sl_true;
+		}
+		SLIB_STATIC_STRING(str, "Keep-Alive");
+		return connection.equalsIgnoreCase(str);
+	}
+
+	sl_bool HttpResponse::getResponseKeepAliveParameters(sl_uint32& timeout, sl_uint32& max) const
+	{
+		HttpHeaderValueMap map = getResponseHeaderValueMap(HttpHeader::KeepAlive);
+		if (map.isNotEmpty()) {
+			SLIB_STATIC_STRING(strTimeout, "timeout")
+			SLIB_STATIC_STRING(strMax, "max")
+			if (map.getValue(strTimeout).parseUint32(10, &timeout)) {
+				if (map.getValue(strMax).parseUint32(10, &max)) {
+					return sl_true;
+				}
+			}
+		}
+		return sl_false;
+	}
+
+	void HttpResponse::setResponseKeepAlive(sl_uint32 timeout, sl_uint32 max)
+	{
+		SLIB_STATIC_STRING(str, "Keep-Alive");
+		setResponseHeader(HttpHeader::Connection, str);
+		if (timeout && max) {
+			StringBuffer buf;
+			buf.addStatic("timeout=");
+			buf.add(String::fromUint32(timeout));
+			buf.addStatic(", max=");
+			buf.add(String::fromUint32(max));
+			setResponseHeader(HttpHeader::KeepAlive, buf.merge());
+		}
 	}
 
 	sl_uint64 HttpResponse::getResponseContentLengthHeader() const

@@ -45,10 +45,13 @@ namespace slib
 	HttpServerContext::HttpServerContext()
 	{
 		m_requestContentLength = 0;
+		
 		m_flagProcessed = sl_false;
-
-		setClosingConnection(sl_false);
-		setProcessingByThread(sl_true);
+		m_flagClosingConnection = sl_false;
+		m_flagProcessingByThread = sl_true;
+		m_flagKeepAlive = sl_true;
+		
+		m_flagBeganProcessing = sl_false;
 	}
 
 	HttpServerContext::~HttpServerContext()
@@ -163,6 +166,35 @@ namespace slib
 		m_flagProcessed = flag;
 	}
 
+	sl_bool HttpServerContext::isClosingConnection() const
+	{
+		return m_flagClosingConnection;
+	}
+
+	void HttpServerContext::setClosingConnection(sl_bool flag)
+	{
+		m_flagClosingConnection = flag;
+	}
+
+	sl_bool HttpServerContext::isProcessingByThread() const
+	{
+		return m_flagProcessingByThread;
+	}
+
+	void HttpServerContext::setProcessingByThread(sl_bool flag)
+	{
+		m_flagProcessingByThread = flag;
+	}
+
+	sl_bool HttpServerContext::isKeepAlive() const
+	{
+		return m_flagKeepAlive;
+	}
+
+	void HttpServerContext::setKeepAlive(sl_bool flag)
+	{
+		m_flagKeepAlive = flag;
+	}
 
 /******************************************************
 			HttpServerConnection
@@ -224,13 +256,14 @@ namespace slib
 		}
 		m_io->close();
 		m_output->close();
+		m_bufReadUnprocessed.setNull();
 	}
 
-	void HttpServerConnection::start(const void* data, sl_uint32 size)
+	void HttpServerConnection::start()
 	{
 		m_contextCurrent.setNull();
-		if (data && size > 0) {
-			_processInput(data, size);
+		if (m_bufReadUnprocessed.isNotEmpty()) {
+			_processInput(sl_null, 0);
 		} else {
 			_read();
 		}
@@ -273,7 +306,27 @@ namespace slib
 		if (server.isNull()) {
 			return;
 		}
+		
+		ObjectLocker lock(this);
+		
 		if (m_flagClosed) {
+			return;
+		}
+		
+		char* data = (char*)_data;
+		if (m_bufReadUnprocessed.isNotEmpty()) {
+			if (size) {
+				if (!(m_bufReadUnprocessed.addElements_NoLock((char*)data, size))) {
+					close();
+					return;
+				}
+			}
+			data = m_bufReadUnprocessed.getData();
+			size = (sl_uint32)(m_bufReadUnprocessed.getCount());
+		}
+		
+		if (!size) {
+			_read();
 			return;
 		}
 		
@@ -281,12 +334,11 @@ namespace slib
 		sl_uint64 maxRequestHeadersSize = param.maxRequestHeadersSize;
 		sl_uint64 maxRequestBodySize = param.maxRequestBodySize;
 
-		char* data = (char*)_data;
 		Ref<HttpServerContext> _context = m_contextCurrent;
 		if (_context.isNull()) {
 			_context = HttpServerContext::create(this);
 			if (_context.isNull()) {
-				sendResponse_ServerError();
+				close();
 				return;
 			}
 			m_contextCurrent = _context;
@@ -298,84 +350,127 @@ namespace slib
 			if (context->m_requestHeaderReader.add(data, size, posBody)) {
 				context->m_requestHeader = context->m_requestHeaderReader.mergeHeader();
 				if (context->m_requestHeader.isNull()) {
-					sendResponse_ServerError();
+					sendResponseAndClose_ServerError();
 					return;
 				}
 				if (posBody > size) {
-					sendResponse_ServerError();
+					sendResponseAndClose_ServerError();
 					return;
 				}
 				context->m_requestHeaderReader.clear();
 				Memory header = context->getRawRequestHeader();
 				sl_reg iRet = context->parseRequestPacket(header.getData(), header.getSize());
 				if (iRet != (sl_reg)(context->m_requestHeader.getSize())) {
-					sendResponse_BadRequest();
+					sendResponseAndClose_BadRequest();
 					return;
 				}
 				context->m_requestContentLength = context->getRequestContentLengthHeader();
 				if (context->m_requestContentLength > maxRequestBodySize) {
-					sendResponse_BadRequest();
+					sendResponseAndClose_BadRequest();
 					return;
 				}
-				context->m_requestBody = Memory::create(data + posBody, size - (sl_uint32)posBody);
-				if (!(context->m_requestBodyBuffer.add(context->m_requestBody))) {
-					sendResponse_ServerError();
-					return;
+				context->setKeepAlive(context->isRequestKeepAlive());
+				if (size > posBody) {
+					sl_size sizeRemain = (sl_size)size - posBody;
+					sl_size sizeRequired = (sl_size)(context->m_requestContentLength);
+					if (sizeRequired) {
+						if (sizeRequired < sizeRemain) {
+							context->m_requestBody = Memory::create(data + posBody, sizeRequired);
+							m_bufReadUnprocessed = List<char>::create(data + posBody + sizeRequired, sizeRemain - sizeRequired);
+						} else {
+							context->m_requestBody = Memory::create(data + posBody, sizeRemain);
+							m_bufReadUnprocessed.setNull();
+						}
+						if (!(context->m_requestBodyBuffer.add(context->m_requestBody))) {
+							sendResponseAndClose_ServerError();
+							return;
+						}
+					} else {
+						m_bufReadUnprocessed = List<char>::create(data + posBody, sizeRemain);
+					}
+				} else {
+					m_bufReadUnprocessed.setNull();
 				}
 				context->applyQueryToParameters();
 				if (server->preprocessRequest(context)) {
 					return;
 				}
 			} else {
+				m_bufReadUnprocessed.setNull();
 				if (context->m_requestHeaderReader.getHeaderSize() > maxRequestHeadersSize) {
-					sendResponse_BadRequest();
+					sendResponseAndClose_BadRequest();
 					return;
 				}
 			}
 		} else {
-			if (!(context->m_requestBodyBuffer.add(Memory::create(data, size)))) {
-				sendResponse_ServerError();
-				return;
+			sl_size sizeBody = (sl_size)(context->m_requestContentLength);
+			sl_size sizeCurrent = context->m_requestBodyBuffer.getSize();
+			if (sizeCurrent < sizeBody) {
+				sl_size sizeRemain = sizeBody - sizeCurrent;
+				if (sizeRemain < size) {
+					if (!(context->m_requestBodyBuffer.add(Memory::create(data, sizeRemain)))) {
+						sendResponseAndClose_ServerError();
+						return;
+					}
+					m_bufReadUnprocessed = List<char>::create(data + sizeRemain, size - sizeRemain);
+				} else {
+					if (!(context->m_requestBodyBuffer.add(Memory::create(data, size)))) {
+						sendResponseAndClose_ServerError();
+						return;
+					}
+					m_bufReadUnprocessed.setNull();
+				}
 			}
 		}
 		
-		if (context->m_requestHeader.isNotNull()) {
+		if (!(context->m_flagBeganProcessing)) {
 			
-			if (context->m_requestBodyBuffer.getSize() >= context->m_requestContentLength) {
+			if (context->m_requestHeader.isNotNull()) {
+				
+				sl_size sizeBody = (sl_size)(context->m_requestContentLength);
+				sl_size sizeCurrent = context->m_requestBodyBuffer.getSize();
 
-				m_contextCurrent.setNull();
+				if (sizeCurrent >= sizeBody) {
+					
+					context->m_flagBeganProcessing = sl_true;
 
-				context->m_requestBody = context->m_requestBodyBuffer.merge();
-				if (context->m_requestContentLength > 0 && context->m_requestBody.isNull()) {
-					sendResponse_ServerError();
+					if (sizeBody) {
+						if (context->m_requestBody.getSize() < sizeBody) {
+							context->m_requestBody = context->m_requestBodyBuffer.merge();
+							if (context->m_requestBody.isNull()) {
+								sendResponseAndClose_ServerError();
+								return;
+							}
+						}
+					}
+					context->m_requestBodyBuffer.clear();
+
+					String multipartBoundary = context->getRequestMultipartFormDataBoundary();
+					if (multipartBoundary.isNotEmpty()) {
+						Memory body = context->getRequestBody();
+						context->applyMultipartFormData(multipartBoundary, body);
+					} else if (context->getMethod() == HttpMethod::POST) {
+						String reqContentType = context->getRequestContentTypeNoParams();
+						if (reqContentType == ContentType::WebForm) {
+							Memory body = context->getRequestBody();
+							context->applyFormUrlEncoded(body.getData(), body.getSize());
+						}
+					}
+					
+					if (context->isProcessingByThread()) {
+						Ref<ThreadPool> threadPool = server->getThreadPool();
+						if (threadPool.isNotNull()) {
+							threadPool->addTask(SLIB_BIND_WEAKREF(void(), HttpServerConnection, _processContext, this, _context));
+						} else {
+							sendResponseAndClose_ServerError();
+						}
+					} else {
+						_processContext(context);
+					}
 					return;
 				}
-				context->m_requestBodyBuffer.clear();
-
-				String multipartBoundary = context->getRequestMultipartFormDataBoundary();
-				if (multipartBoundary.isNotEmpty()) {
-					Memory body = context->getRequestBody();
-					context->applyMultipartFormData(multipartBoundary, body);
-				} else if (context->getMethod() == HttpMethod::POST) {
-					String reqContentType = context->getRequestContentTypeNoParams();
-					if (reqContentType == ContentType::WebForm) {
-						Memory body = context->getRequestBody();
-						context->applyFormUrlEncoded(body.getData(), body.getSize());
-					}
-				}
-				
-				if (context->isProcessingByThread()) {
-					Ref<ThreadPool> threadPool = server->getThreadPool();
-					if (threadPool.isNotNull()) {
-						threadPool->addTask(SLIB_BIND_WEAKREF(void(), HttpServerConnection, _processContext, this, _context));
-					} else {
-						sendResponse_ServerError();
-					}
-				} else {
-					_processContext(context);
-				}
-				return;
 			}
+			
 		}
 		_read();
 	}
@@ -405,8 +500,14 @@ namespace slib
 			return;
 		}
 		m_output->mergeBuffer(&(context->m_bufferOutput));
-		m_output->startWriting();
-		start();
+		if (context->isKeepAlive()) {
+			m_output->startWriting();
+			start();
+		} else {
+			m_contextCurrent.setNull();
+			m_flagKeepAlive = sl_false;
+			m_output->startWriting();
+		}
 	}
 
 	void HttpServerConnection::onReadStream(AsyncStreamResult& result)
@@ -424,16 +525,6 @@ namespace slib
 		if (flagError || !m_flagKeepAlive) {
 			close();
 		}
-	}
-
-	void HttpServerConnection::sendResponse(const Memory& mem)
-	{
-		if (mem.isNotNull()) {
-			if (m_io->writeFromMemory(mem, sl_null)) {
-				return;
-			}
-		}
-		close();
 	}
 
 	void HttpServerConnection::sendResponseAndRestart(const Memory& mem)
@@ -484,34 +575,34 @@ namespace slib
 		close();
 	}
 
-	void HttpServerConnection::sendResponse_BadRequest()
+	void HttpServerConnection::sendResponseAndClose_BadRequest()
 	{
-		SLIB_STATIC_STRING(s, "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n\r\n");
-		sendResponseAndRestart(Memory::create(s.getData(), s.getLength()));
+		static char s[] = "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n\r\n";
+		sendResponseAndClose(Memory::createStatic(s, sizeof(s) - 1));
 	}
-
-	void HttpServerConnection::sendResponse_ServerError()
+	
+	void HttpServerConnection::sendResponseAndClose_ServerError()
 	{
-		SLIB_STATIC_STRING(s, "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\n\r\n");
-		sendResponseAndRestart(Memory::create(s.getData(), s.getLength()));
+		static char s[] = "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\n\r\n";
+		sendResponseAndClose(Memory::createStatic(s, sizeof(s) - 1));
 	}
 
 	void HttpServerConnection::sendConnectResponse_Successed()
 	{
-		SLIB_STATIC_STRING(s, "HTTP/1.1 200 Connection established\r\n\r\n");
-		sendResponse(Memory::create(s.getData(), s.getLength()));
+		static char s[] = "HTTP/1.1 200 Connection established\r\n\r\n";
+		sendResponseAndRestart(Memory::createStatic(s, sizeof(s) - 1));
 	}
 
 	void HttpServerConnection::sendConnectResponse_Failed()
 	{
-		SLIB_STATIC_STRING(s, "HTTP/1.1 500 Tunneling is not supported\r\n\r\n");
-		sendResponseAndClose(Memory::create(s.getData(), s.getLength()));
+		static char s[] = "HTTP/1.1 500 Tunneling is not supported\r\n\r\n";
+		sendResponseAndClose(Memory::createStatic(s, sizeof(s) - 1));
 	}
 
 	void HttpServerConnection::sendProxyResponse_Failed()
 	{
-		SLIB_STATIC_STRING(s, "HTTP/1.1 500 Internal Error\r\nContent-Length: 0\r\n\r\n");
-		sendResponseAndRestart(Memory::create(s.getData(), s.getLength()));
+		static char s[] = "HTTP/1.1 500 Internal Error\r\nContent-Length: 0\r\n\r\n";
+		sendResponseAndClose(Memory::createStatic(s, sizeof(s) - 1));
 	}
 
 /******************************************************
@@ -1562,12 +1653,17 @@ namespace slib
 			context->setResponseCode(status);
 		}
 		
-		context->setResponseHeader(HttpHeader::ContentLength, String::fromUint64(context->getResponseContentLength()));
+		if (context->isKeepAlive() && !(context->containsResponseHeader(HttpHeader::KeepAlive))) {
+			context->setResponseKeepAlive();
+		}
 
 		String oldResponseContentType = context->getResponseContentType();
 		if (oldResponseContentType.isEmpty()) {
 			context->setResponseContentType(ContentType::TextHtml_Utf8);
 		}
+
+		context->setResponseContentLengthHeader(context->getResponseContentLength());
+
 	}
 
 	Ref<HttpServerConnection> HttpServer::addConnection(const Ref<AsyncStream>& stream, const SocketAddress& remoteAddress, const SocketAddress& localAddress)

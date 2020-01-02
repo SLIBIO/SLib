@@ -79,9 +79,17 @@ namespace slib
 		
 		void setProcessed(sl_bool flag = sl_true);
 		
-	public:
-		SLIB_BOOLEAN_PROPERTY(ClosingConnection);
-		SLIB_BOOLEAN_PROPERTY(ProcessingByThread);
+		sl_bool isClosingConnection() const;
+		
+		void setClosingConnection(sl_bool flag = sl_true);
+		
+		sl_bool isProcessingByThread() const;
+		
+		void setProcessingByThread(sl_bool flag = sl_true);
+		
+		sl_bool isKeepAlive() const;
+		
+		void setKeepAlive(sl_bool flag = sl_true);
 		
 	protected:
 		HttpHeaderReader m_requestHeaderReader;
@@ -91,7 +99,12 @@ namespace slib
 		AtomicMemory m_requestBody;
 		
 		sl_bool m_flagProcessed;
+		sl_bool m_flagClosingConnection;
+		sl_bool m_flagProcessingByThread;
+		sl_bool m_flagKeepAlive;
 
+		sl_bool m_flagBeganProcessing;
+		
 	private:
 		WeakRef<HttpServerConnection> m_connection;
 		
@@ -114,7 +127,7 @@ namespace slib
 	public:
 		void close() override;
 		
-		void start(const void* data = sl_null, sl_uint32 size = 0);
+		void start();
 		
 		Ref<AsyncStream> getIO();
 		
@@ -122,15 +135,13 @@ namespace slib
 		
 		Ref<HttpServerContext> getCurrentContext();
 		
-		void sendResponse(const Memory& mem);
-		
 		void sendResponseAndRestart(const Memory& mem);
 		
 		void sendResponseAndClose(const Memory& mem);
 		
-		void sendResponse_BadRequest();
-		
-		void sendResponse_ServerError();
+		void sendResponseAndClose_BadRequest();
+				
+		void sendResponseAndClose_ServerError();
 		
 		void sendConnectResponse_Successed();
 		
@@ -155,6 +166,7 @@ namespace slib
 		Memory m_bufRead;
 		sl_bool m_flagReading;
 		sl_bool m_flagKeepAlive;
+		List<char> m_bufReadUnprocessed;
 		
 	protected:
 		void _read();

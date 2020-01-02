@@ -160,6 +160,7 @@ namespace slib
 	public:
 		// General Headers
 		static const String& Connection;
+		static const String& KeepAlive;
 		static const String& CacheControl;
 		static const String& ContentDisposition;
 		static const String& Authorization;
@@ -408,6 +409,10 @@ namespace slib
 		
 		void setHost(const String& type);
 		
+		sl_bool isRequestKeepAlive() const;
+		
+		void setRequestKeepAlive();
+		
 		String getRequestRange() const;
 		
 		void setRequestRange(const String& range);
@@ -571,6 +576,12 @@ namespace slib
 		
 		void clearResponseHeaders();
 		
+		
+		sl_bool isResponseKeepAlive() const;
+		
+		sl_bool getResponseKeepAliveParameters(sl_uint32& timeout, sl_uint32& max) const;
+		
+		void setResponseKeepAlive(sl_uint32 timeout = 0, sl_uint32 max = 0);
 		
 		sl_uint64 getResponseContentLengthHeader() const;
 		
