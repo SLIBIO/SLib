@@ -1374,6 +1374,45 @@ namespace slib
 		drawImage(dx, dy, dw, dh, src, sx, sy, dw, dh, blend, stretch);
 	}
 
+	void Image::copyBitmap(const Ref<Bitmap>& bitmap, sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
+	{
+		if (bitmap.isNull()) {
+			return;
+		}
+		if (width <= 0 || height <= 0) {
+			return;
+		}
+		sl_uint32 bw = bitmap->getWidth();
+		sl_uint32 bh = bitmap->getHeight();
+		if (x >= bw) {
+			return;
+		}
+		if (y >= bh) {
+			return;
+		}
+		if (width > bw - x) {
+			width = bw - x;
+		}
+		if (height > bh - y) {
+			height = bh - y;
+		}
+		sl_uint32 iw = m_desc.width;
+		sl_uint32 ih = m_desc.height;
+		if (x >= iw) {
+			return;
+		}
+		if (y >= ih) {
+			return;
+		}
+		if (width > iw - x) {
+			width = iw - x;
+		}
+		if (height > ih - y) {
+			height = ih - y;
+		}
+		bitmap->readPixels(x, y, width, height, m_desc.colors, m_desc.stride);
+	}
+
 	Ref<Drawable> Image::subDrawable(sl_real _x, sl_real _y, sl_real _width, sl_real _height)
 	{
 		sl_int32 x = (sl_int32)_x;

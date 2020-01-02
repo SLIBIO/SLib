@@ -140,7 +140,9 @@ namespace slib
 					   const Ref<Image>& src, sl_int32 sx, sl_int32 sy,
 					   BlendMode blend = BlendMode::Copy, StretchMode stretch = StretchMode::Default);
 
+		void copyBitmap(const Ref<Bitmap>& bitmap, sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height);
 
+		
 		Ref<Drawable> subDrawable(sl_real x, sl_real y, sl_real width, sl_real height) override;
 
 		Ref<Image> sub(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height) const;
