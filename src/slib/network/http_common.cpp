@@ -1511,14 +1511,11 @@ namespace slib
 			output.addStatic("--");
 			output.add(boundary);
 			output.addStatic("\r\n");
-			{
-				static const char s[] = "Content-Disposition: form-data; name=\"";
-				output.addStatic(s, sizeof(s)-1);
-			}
+			output.addStatic("Content-Disposition: form-data; name=\"");
 			output.addStatic(name.getData(), name.getLength());
+			output.addStatic("\"");
 			if (fileName.isNotNull()) {
-				static const char s[] = "; filename=\"";
-				output.addStatic(s, sizeof(s)-1);
+				output.addStatic("; filename=\"");
 				output.add(Memory::create(fileName.getData(), fileName.getLength()));
 				output.addStatic("\"\r\n");
 			} else {
