@@ -771,7 +771,10 @@ namespace slib
 				route = &(routes.emplace_NoLock(name).node->value);
 			}
 		}
-		return route->createRoute(subPath);
+		if (route) {
+			return route->createRoute(subPath);
+		}
+		return sl_null;
 	}
 	
 	HttpServerRoute* HttpServerRoute::getRoute(const String& path, HashMap<String, String>& parameters)

@@ -294,7 +294,7 @@ namespace slib
 	
 	void SwitchView::onDraw(Canvas* canvas)
 	{
-		StaticContext* s = GetStaticContext();
+		StaticContext* s;
 		if (m_flagTextInButton) {
 			s = GetStaticLabelContext();
 		} else {

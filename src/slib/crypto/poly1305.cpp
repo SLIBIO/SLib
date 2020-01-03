@@ -199,7 +199,7 @@ namespace slib
 		sl_uint32 h4 = m_h[4];
 		
 		sl_uint32 c = h1 >> 26; h1 = h1 & 0x3ffffff;
-		h2 += h1 >> 26; c = h2 >> 26; h2 = h2 & 0x3ffffff;
+		h2 += c; c = h2 >> 26; h2 = h2 & 0x3ffffff;
 		h3 += c; c = h3 >> 26; h3 = h3 & 0x3ffffff;
 		h4 += c; c = h4 >> 26; h4 = h4 & 0x3ffffff;
 		h0 += c * 5; c = h0 >> 26; h0 = h0 & 0x3ffffff;

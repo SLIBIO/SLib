@@ -247,8 +247,6 @@ namespace slib
 					if (req_width > 0 && req_height > 0) {
 						sl_int32 min_dist = 0;
 						NSString* min_preset = nil;
-						sl_int32 min_width = 0;
-						sl_int32 min_height = 0;
 						for (sl_uint32 i = 0; i < sizeof(presets)/sizeof(presets[0]); i++) {
 							if ([session canSetSessionPreset:(presets[i].preset)]) {
 								sl_int32 dist1 = (req_width - presets[i].width)*(req_width - presets[i].width) + (req_height - presets[i].height)*(req_height - presets[i].height);
@@ -256,8 +254,6 @@ namespace slib
 								sl_int32 dist = SLIB_MIN(dist1, dist2);
 								if (min_preset == nil || dist < min_dist) {
 									min_preset = presets[i].preset;
-									min_width = presets[i].width;
-									min_height = presets[i].height;
 									min_dist = dist;
 								}
 							}

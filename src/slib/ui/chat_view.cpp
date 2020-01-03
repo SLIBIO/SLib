@@ -733,9 +733,11 @@ namespace slib
 				break;
 			}
 		}
-		m_items.removeAt(index);
-		dispatchDeleteItem(itemId);
-		refreshItems();
+		if (flagFound) {
+			m_items.removeAt(index);
+			dispatchDeleteItem(itemId);
+			refreshItems();
+		}
 	}
 	
 }

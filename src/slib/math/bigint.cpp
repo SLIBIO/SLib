@@ -4637,9 +4637,9 @@ namespace slib
 	
 	sl_size BigInt::getHashCode() const noexcept
 	{
-		CBigInt* ret = new CBigInt;
-		if (ret) {
-			return ret->getHashCode();
+		CBigInt* a = ref._ptr;
+		if (a) {
+			return a->getHashCode();
 		}
 		return 0;
 	}

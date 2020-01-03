@@ -3450,7 +3450,7 @@ namespace slib
 
 	sl_int32 String::parseInt32(sl_int32 radix, sl_int32 def) const noexcept
 	{
-		sl_int32 _out;
+		sl_int32 _out = 0;
 		if (parseInt32(radix, &_out)) {
 			return _out;
 		} else {
@@ -3460,7 +3460,7 @@ namespace slib
 
 	sl_int32 String16::parseInt32(sl_int32 radix, sl_int32 def) const noexcept
 	{
-		sl_int32 _out;
+		sl_int32 _out = 0;
 		if (parseInt32(radix, &_out)) {
 			return _out;
 		} else {
@@ -3482,7 +3482,7 @@ namespace slib
 
 	sl_int32 StringView::parseInt32(sl_int32 radix, sl_int32 def) const noexcept
 	{
-		sl_int32 _out;
+		sl_int32 _out = 0;
 		if (parseInt32(radix, &_out)) {
 			return _out;
 		} else {
@@ -3492,7 +3492,7 @@ namespace slib
 
 	sl_int32 StringView16::parseInt32(sl_int32 radix, sl_int32 def) const noexcept
 	{
-		sl_int32 _out;
+		sl_int32 _out = 0;
 		if (parseInt32(radix, &_out)) {
 			return _out;
 		} else {
@@ -3561,7 +3561,7 @@ namespace slib
 
 	sl_uint32 String::parseUint32(sl_int32 radix, sl_uint32 def) const noexcept
 	{
-		sl_uint32 _out;
+		sl_uint32 _out = 0;
 		if (parseUint32(radix, &_out)) {
 			return _out;
 		} else {
@@ -3571,7 +3571,7 @@ namespace slib
 
 	sl_uint32 String16::parseUint32(sl_int32 radix, sl_uint32 def) const noexcept
 	{
-		sl_uint32 _out;
+		sl_uint32 _out = 0;
 		if (parseUint32(radix, &_out)) {
 			return _out;
 		} else {
@@ -3593,7 +3593,7 @@ namespace slib
 
 	sl_uint32 StringView::parseUint32(sl_int32 radix, sl_uint32 def) const noexcept
 	{
-		sl_uint32 _out;
+		sl_uint32 _out = 0;
 		if (parseUint32(radix, &_out)) {
 			return _out;
 		} else {
@@ -3603,7 +3603,7 @@ namespace slib
 
 	sl_uint32 StringView16::parseUint32(sl_int32 radix, sl_uint32 def) const noexcept
 	{
-		sl_uint32 _out;
+		sl_uint32 _out = 0;
 		if (parseUint32(radix, &_out)) {
 			return _out;
 		} else {
@@ -3672,7 +3672,7 @@ namespace slib
 
 	sl_int64 String::parseInt64(sl_int32 radix, sl_int64 def) const noexcept
 	{
-		sl_int64 _out;
+		sl_int64 _out = 0;
 		if (parseInt64(radix, &_out)) {
 			return _out;
 		} else {
@@ -3682,7 +3682,7 @@ namespace slib
 
 	sl_int64 String16::parseInt64(sl_int32 radix, sl_int64 def) const noexcept
 	{
-		sl_int64 _out;
+		sl_int64 _out = 0;
 		if (parseInt64(radix, &_out)) {
 			return _out;
 		} else {
@@ -3704,7 +3704,7 @@ namespace slib
 
 	sl_int64 StringView::parseInt64(sl_int32 radix, sl_int64 def) const noexcept
 	{
-		sl_int64 _out;
+		sl_int64 _out = 0;
 		if (parseInt64(radix, &_out)) {
 			return _out;
 		} else {
@@ -3714,7 +3714,7 @@ namespace slib
 
 	sl_int64 StringView16::parseInt64(sl_int32 radix, sl_int64 def) const noexcept
 	{
-		sl_int64 _out;
+		sl_int64 _out = 0;
 		if (parseInt64(radix, &_out)) {
 			return _out;
 		} else {
@@ -3783,7 +3783,7 @@ namespace slib
 
 	sl_uint64 String::parseUint64(sl_int32 radix, sl_uint64 def) const noexcept
 	{
-		sl_uint64 _out;
+		sl_uint64 _out = 0;
 		if (parseUint64(radix, &_out)) {
 			return _out;
 		} else {
@@ -3793,7 +3793,7 @@ namespace slib
 
 	sl_uint64 String16::parseUint64(sl_int32 radix, sl_uint64 def) const noexcept
 	{
-		sl_uint64 _out;
+		sl_uint64 _out = 0;
 		if (parseUint64(radix, &_out)) {
 			return _out;
 		} else {
@@ -3815,7 +3815,7 @@ namespace slib
 
 	sl_uint64 StringView::parseUint64(sl_int32 radix, sl_uint64 def) const noexcept
 	{
-		sl_uint64 _out;
+		sl_uint64 _out = 0;
 		if (parseUint64(radix, &_out)) {
 			return _out;
 		} else {
@@ -3825,7 +3825,7 @@ namespace slib
 
 	sl_uint64 StringView16::parseUint64(sl_int32 radix, sl_uint64 def) const noexcept
 	{
-		sl_uint64 _out;
+		sl_uint64 _out = 0;
 		if (parseUint64(radix, &_out)) {
 			return _out;
 		} else {
@@ -3885,7 +3885,7 @@ namespace slib
 
 	sl_reg String::parseInt(sl_int32 radix, sl_reg def) const noexcept
 	{
-		sl_reg _out;
+		sl_reg _out = 0;
 		if (parseInt(radix, &_out)) {
 			return _out;
 		} else {
@@ -3895,7 +3895,7 @@ namespace slib
 
 	sl_reg String16::parseInt(sl_int32 radix, sl_reg def) const noexcept
 	{
-		sl_reg _out;
+		sl_reg _out = 0;
 		if (parseInt(radix, &_out)) {
 			return _out;
 		} else {
@@ -3917,7 +3917,7 @@ namespace slib
 
 	sl_reg StringView::parseInt(sl_int32 radix, sl_reg def) const noexcept
 	{
-		sl_reg _out;
+		sl_reg _out = 0;
 		if (parseInt(radix, &_out)) {
 			return _out;
 		} else {
@@ -3927,7 +3927,7 @@ namespace slib
 
 	sl_reg StringView16::parseInt(sl_int32 radix, sl_reg def) const noexcept
 	{
-		sl_reg _out;
+		sl_reg _out = 0;
 		if (parseInt(radix, &_out)) {
 			return _out;
 		} else {
@@ -3986,7 +3986,7 @@ namespace slib
 
 	sl_size String::parseSize(sl_int32 radix, sl_size def) const noexcept
 	{
-		sl_size _out;
+		sl_size _out = 0;
 		if (parseSize(radix, &_out)) {
 			return _out;
 		} else {
@@ -3996,7 +3996,7 @@ namespace slib
 
 	sl_size String16::parseSize(sl_int32 radix, sl_size def) const noexcept
 	{
-		sl_size _out;
+		sl_size _out = 0;
 		if (parseSize(radix, &_out)) {
 			return _out;
 		} else {
@@ -4018,7 +4018,7 @@ namespace slib
 
 	sl_size StringView::parseSize(sl_int32 radix, sl_size def) const noexcept
 	{
-		sl_size _out;
+		sl_size _out = 0;
 		if (parseSize(radix, &_out)) {
 			return _out;
 		} else {
@@ -4028,7 +4028,7 @@ namespace slib
 
 	sl_size StringView16::parseSize(sl_int32 radix, sl_size def) const noexcept
 	{
-		sl_size _out;
+		sl_size _out = 0;
 		if (parseSize(radix, &_out)) {
 			return _out;
 		} else {
@@ -4097,7 +4097,7 @@ namespace slib
 
 	float String::parseFloat(float def) const noexcept
 	{
-		float _out;
+		float _out = 0;
 		if (parseFloat(&_out)) {
 			return _out;
 		} else {
@@ -4107,7 +4107,7 @@ namespace slib
 
 	float String16::parseFloat(float def) const noexcept
 	{
-		float _out;
+		float _out = 0;
 		if (parseFloat(&_out)) {
 			return _out;
 		} else {
@@ -4129,7 +4129,7 @@ namespace slib
 
 	float StringView::parseFloat(float def) const noexcept
 	{
-		float _out;
+		float _out = 0;
 		if (parseFloat(&_out)) {
 			return _out;
 		} else {
@@ -4139,7 +4139,7 @@ namespace slib
 
 	float StringView16::parseFloat(float def) const noexcept
 	{
-		float _out;
+		float _out = 0;
 		if (parseFloat(&_out)) {
 			return _out;
 		} else {
@@ -4208,7 +4208,7 @@ namespace slib
 
 	double String::parseDouble(double def) const noexcept
 	{
-		double _out;
+		double _out = 0;
 		if (parseDouble(&_out)) {
 			return _out;
 		} else {
@@ -4218,7 +4218,7 @@ namespace slib
 
 	double String16::parseDouble(double def) const noexcept
 	{
-		double _out;
+		double _out = 0;
 		if (parseDouble(&_out)) {
 			return _out;
 		} else {
@@ -4240,7 +4240,7 @@ namespace slib
 
 	double StringView::parseDouble(double def) const noexcept
 	{
-		double _out;
+		double _out = 0;
 		if (parseDouble(&_out)) {
 			return _out;
 		} else {
@@ -4250,7 +4250,7 @@ namespace slib
 
 	double StringView16::parseDouble(double def) const noexcept
 	{
-		double _out;
+		double _out = 0;
 		if (parseDouble(&_out)) {
 			return _out;
 		} else {
@@ -4319,7 +4319,7 @@ namespace slib
 
 	sl_bool String::parseBoolean(sl_bool def) const noexcept
 	{
-		sl_bool _out;
+		sl_bool _out = sl_false;
 		if (parseBoolean(&_out)) {
 			return _out;
 		} else {
@@ -4329,7 +4329,7 @@ namespace slib
 
 	sl_bool String16::parseBoolean(sl_bool def) const noexcept
 	{
-		sl_bool _out;
+		sl_bool _out = sl_false;
 		if (parseBoolean(&_out)) {
 			return _out;
 		} else {
@@ -4351,7 +4351,7 @@ namespace slib
 
 	sl_bool StringView::parseBoolean(sl_bool def) const noexcept
 	{
-		sl_bool _out;
+		sl_bool _out = sl_false;
 		if (parseBoolean(&_out)) {
 			return _out;
 		} else {
@@ -4361,7 +4361,7 @@ namespace slib
 
 	sl_bool StringView16::parseBoolean(sl_bool def) const noexcept
 	{
-		sl_bool _out;
+		sl_bool _out = sl_false;
 		if (parseBoolean(&_out)) {
 			return _out;
 		} else {
