@@ -83,7 +83,7 @@ namespace slib
 			static NSAttributedString* GenerateHintString(EditView* view)
 			{
 				Ref<Font> font = view->getHintFont();
-				NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
+				NSFont* hFont = GraphicsPlatform::getNativeFont(font.get());
 				if (hFont != nil) {
 					String _text = view->getHintText();
 					if (_text.isNotEmpty()) {
@@ -460,7 +460,7 @@ namespace slib
 					if (font.isNull()) {
 						return;
 					}
-					NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
+					NSFont* hFont = GraphicsPlatform::getNativeFont(font.get());
 					if (font == nil) {
 						return;
 					}

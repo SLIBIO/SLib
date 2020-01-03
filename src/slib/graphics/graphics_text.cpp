@@ -1966,8 +1966,6 @@ namespace slib
 		}
 
 		m_style->font = param.font;
-		m_style->flagUnderline = param.font->isUnderline();
-		m_style->flagLineThrough = param.font->isStrikeout();
 		
 		sl_real width = param.width;
 		if (width < SLIB_EPSILON) {

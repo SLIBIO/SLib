@@ -127,7 +127,7 @@ namespace slib
 					if (font.isNull()) {
 						return;
 					}
-					NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
+					NSFont* hFont = GraphicsPlatform::getNativeFont(font.get());
 					if (hFont == nil) {
 						return;
 					}

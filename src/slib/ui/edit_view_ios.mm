@@ -323,7 +323,7 @@ namespace slib
 						UIFont* hFont = nil;
 						Ref<Font> font = view->getHintFont();
 						if (font.isNotNull()) {
-							hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
+							hFont = GraphicsPlatform::getNativeFont(font.get(), UIPlatform::getGlobalScaleFactor());
 						}
 						NSString* text = Apple::getNSStringFromString(_text);
 						UIColor* color = GraphicsPlatform::getUIColorFromColor(view->getHintTextColor());

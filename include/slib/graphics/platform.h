@@ -38,8 +38,13 @@
 #endif
 #if defined(SLIB_GRAPHICS_IS_QUARTZ) || defined(SLIB_PLATFORM_IS_APPLE)
 #	include "../core/platform_apple.h"
-#	include <CoreText/CoreText.h>
 #	include <CoreGraphics/CoreGraphics.h>
+#	include <CoreText/CoreText.h>
+#	if defined(SLIB_PLATFORM_IS_MACOS)
+#		if defined(__OBJC__)
+			typedef NSFont UIFont;
+#		endif
+#	endif
 #endif
 #if defined(SLIB_GRAPHICS_IS_ANDROID)
 #	include "../core/platform_android.h"
@@ -101,7 +106,6 @@ namespace slib
 		static CGImageRef getTextureBrushRetainedHandle(Brush* brush);
 
 		static CGPathRef getGraphicsPath(GraphicsPath* path);
-		static CTFontRef getCoreTextFont(Font* font);
 
 		static Ref<Canvas> createCanvas(CanvasType type, CGContextRef graphics, sl_uint32 width, sl_uint32 height);
 		static CGContextRef getCanvasHandle(Canvas* canvas);
@@ -115,15 +119,7 @@ namespace slib
 		static Ref<Bitmap> createBitmapFromCGImage(CGImageRef image);
 
 #	if defined(__OBJC__)
-#		if defined(SLIB_PLATFORM_IS_MACOS)
-
-		static NSFont* getNSFont(Font* font, CGFloat scaleFactor = 1);
-
-#		elif defined(SLIB_PLATFORM_IS_IOS)
-
-		static UIFont* getUIFont(Font* font, CGFloat scaleFactor);
-
-#		endif
+		static UIFont* getNativeFont(Font* font, CGFloat scaleFactor = 1);
 #	endif
 
 #elif defined(SLIB_GRAPHICS_IS_CAIRO)

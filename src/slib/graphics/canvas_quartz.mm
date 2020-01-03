@@ -458,105 +458,69 @@ namespace slib
 					}
 				}
 				
-				void onDrawText(const StringParam& text, sl_real x, sl_real y, const Ref<Font>& _font, const DrawTextParam& param) override
+				void onDrawText(const StringParam& _text, sl_real x, sl_real y, const Ref<Font>& font, const DrawTextParam& param) override
 				{
-					NSString* ns_text = Apple::getNSStringFromString(text);
-					if (ns_text == nil) {
+					NSString* text = Apple::getNSStringFromString(_text);
+					if (text == nil) {
 						return;
 					}
-					if (!(ns_text.length)) {
+					if (!(text.length)) {
 						return;
 					}
-					
-					CTFontRef font = GraphicsPlatform::getCoreTextFont(_font.get());
-					if (font) {
-						
-						CFStringRef string = (__bridge CFStringRef)ns_text;
-						
-						SInt32 _underline = _font->isUnderline() ? kCTUnderlineStyleSingle: kCTUnderlineStyleNone;
-						CFNumberRef underline = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &_underline);
-						
-						CGColorRef color = GraphicsPlatform::getCGColorFromColor(param.color);
-						CFStringRef keys[] = { kCTFontAttributeName, kCTUnderlineStyleAttributeName, kCTForegroundColorAttributeName };
-						CFTypeRef values[] = { font, underline, color };
-						CFDictionaryRef attributes = CFDictionaryCreate(
-																		kCFAllocatorDefault,
-																		(const void**)&keys, (const void**)&values,
-																		sizeof(keys) / sizeof(keys[0]),
-																		&kCFCopyStringDictionaryKeyCallBacks,
-																		&kCFTypeDictionaryValueCallBacks);
-						if (attributes) {
-							
-							CFAttributedStringRef attrString = CFAttributedStringCreate(kCFAllocatorDefault, string, attributes);
-							
-							if (attrString) {
-								
-								CTLineRef line = CTLineCreateWithAttributedString(attrString);
-								
-								if (line) {
-									CGFloat leading = CTFontGetLeading(font);
-									CGFloat ascent = CTFontGetAscent(font);
-									CGFloat descent = CTFontGetDescent(font);
-									
-									CGAffineTransform trans;
-									trans.a = 1;
-									trans.b = 0;
-									trans.c = 0;
-									trans.d = -1;
-									trans.tx = x;
-									trans.ty = y + leading + ascent;
-									
-									CGContextSaveGState(m_graphics);
-									CGContextSetTextMatrix(m_graphics, trans);
-									
-									sl_real shadowOpacity = param.shadowOpacity;
-									if (shadowOpacity > 0.0001f) {
-										Color _shadowColor = param.shadowColor;
-										_shadowColor.multiplyAlpha((float)shadowOpacity);
-										CGColorRef shadowColor = GraphicsPlatform::getCGColorFromColor(_shadowColor);
-										if (shadowColor) {
-											CGSize offset;
-											offset.width = (CGFloat)(param.shadowOffset.x);
-											offset.height = (CGFloat)(param.shadowOffset.y);
+					UIFont* hFont = GraphicsPlatform::getNativeFont(font.get());
+					if (!hFont) {
+						return;
+					}
+					CGColorRef _color = GraphicsPlatform::getCGColorFromColor(param.color);
 #ifdef SLIB_PLATFORM_IS_MACOS
-											if (getType() == CanvasType::View) {
-												offset.height = -offset.height;
-											}
+					NSColor* color = [NSColor colorWithCGColor:_color];
+#else
+					UIColor* color = [UIColor colorWithCGColor:_color];
 #endif
-											CGContextSetShadowWithColor(m_graphics, offset, (CGFloat)(param.shadowRadius), shadowColor);
-											CFRelease(shadowColor);
-										}
-									}
-									
-									CTLineDraw(line, m_graphics);
-									
-									if (_font->isStrikeout()) {
-										CGFloat yStrike = leading + ascent / 2 + descent;
-										CGRect rect = CTLineGetBoundsWithOptions(line, 0);
-										CGFloat widthStrike = rect.size.width;
-										CGContextBeginPath(m_graphics);
-										CGContextMoveToPoint(m_graphics, 0, yStrike);
-										CGContextAddLineToPoint(m_graphics, widthStrike, yStrike);
-										CGContextSetRGBStrokeColor(m_graphics, param.color.getRedF(), param.color.getGreenF(), param.color.getBlueF(), param.color.getAlphaF());
-										CGContextStrokePath(m_graphics);
-									}
-									
-									CGContextRestoreGState(m_graphics);
-									CFRelease(line);
-								}
-								CFRelease(attrString);
+					NSAttributedString* attrText = [[NSAttributedString alloc] initWithString:text attributes:@{
+						NSFontAttributeName: hFont,
+						NSUnderlineStyleAttributeName: @(font->isUnderline()? NSUnderlineStyleSingle : NSUnderlineStyleNone),
+						NSStrikethroughStyleAttributeName: @(font->isStrikeout()? NSUnderlineStyleSingle : NSUnderlineStyleNone),
+						NSForegroundColorAttributeName: color
+					}];
+					if (attrText == nil) {
+						return;
+					}
+					sl_bool flagSaveState = sl_false;
+					sl_real shadowOpacity = param.shadowOpacity;
+					if (shadowOpacity > 0.0001f) {
+						Color _shadowColor = param.shadowColor;
+						_shadowColor.multiplyAlpha((float)shadowOpacity);
+						CGColorRef shadowColor = GraphicsPlatform::getCGColorFromColor(_shadowColor);
+						if (shadowColor) {
+							flagSaveState = sl_true;
+							CGContextSaveGState(m_graphics);
+							CGSize offset;
+							offset.width = (CGFloat)(param.shadowOffset.x);
+							offset.height = (CGFloat)(param.shadowOffset.y);
+#ifdef SLIB_PLATFORM_IS_MACOS
+							if (getType() == CanvasType::View) {
+								offset.height = -offset.height;
 							}
-							CFRelease(attributes);
-						}
-						
-						if (underline) {
-							CFRelease(underline);
-						}
-						if (color) {
-							CFRelease(color);
+#endif
+							CGContextSetShadowWithColor(m_graphics, offset, (CGFloat)(param.shadowRadius), shadowColor);
+							CFRelease(shadowColor);
 						}
 					}
-					
+#if defined(SLIB_PLATFORM_IS_MACOS)
+					NSGraphicsContext* oldContext = [NSGraphicsContext currentContext];
+					NSGraphicsContext* context = [NSGraphicsContext graphicsContextWithGraphicsPort:m_graphics flipped:YES];
+					[NSGraphicsContext setCurrentContext:context];
+					[attrText drawAtPoint:NSMakePoint(x, y)];
+					[NSGraphicsContext setCurrentContext:oldContext];
+#else
+					UIGraphicsPushContext(m_graphics);
+					[attrText drawAtPoint:CGPointMake(x, y)];
+					UIGraphicsPopContext();
+#endif
+					if (flagSaveState) {
+						CGContextRestoreGState(m_graphics);
+					}
 				}
 				
 				void _setAlpha(sl_real alpha) override

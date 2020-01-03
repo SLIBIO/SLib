@@ -29,7 +29,7 @@
 #include "slib/graphics/platform.h"
 
 #if defined(SLIB_PLATFORM_IS_MACOS)
-typedef NSFont UIFont;
+typedef NSFontDescriptor UIFontDescriptor;
 #endif
 
 namespace slib
@@ -43,11 +43,8 @@ namespace slib
 			class FontPlatformObject : public Referable
 			{
 			public:
-				CTFontRef m_fontCoreText;
-				sl_bool m_flagCreatedCoreText;
-				
-				UIFont* m_fontUI;
-				sl_bool m_flagCreatedUI;
+				UIFont* m_font;
+				sl_bool m_flagCreatedFont;
 				CGFloat m_lastUIScaleFactor;
 				
 				SpinLock m_lock;
@@ -55,115 +52,58 @@ namespace slib
 			public:
 				FontPlatformObject()
 				{
-					m_fontCoreText = nil;
-					m_flagCreatedCoreText = sl_false;
-					
-					m_fontUI = nil;
-					m_flagCreatedUI = sl_false;
+					m_font = nil;
+					m_flagCreatedFont = sl_false;
 					m_lastUIScaleFactor = 0;
 				}
 				
 				~FontPlatformObject()
 				{
-					if (m_fontCoreText) {
-						CFRelease(m_fontCoreText);
-					}
-					m_fontUI = nil;
+					m_font = nil;
 				}
 				
 			public:
-				void _createCoreText(const FontDesc& desc)
-				{
-					if (m_flagCreatedCoreText) {
-						return;
-					}
-					
-					SpinLocker lock(&m_lock);
-					
-					if (m_flagCreatedCoreText) {
-						return;
-					}
-					
-					m_flagCreatedCoreText = sl_true;
-					
-					float size = desc.size;
-					
-					NSMutableDictionary* attributes = [NSMutableDictionary dictionary];
-					NSString* familyName = Apple::getNSStringFromString(desc.familyName);
-					[attributes setObject:familyName forKey:(id)kCTFontFamilyNameAttribute];
-					
-					NSMutableDictionary* traits = [NSMutableDictionary dictionary];
-					CTFontSymbolicTraits symbolicTraits = 0;
-					if (desc.flagBold) {
-						symbolicTraits |= kCTFontTraitBold;
-					}
-					if (desc.flagItalic) {
-						symbolicTraits |= kCTFontTraitItalic;
-					}
-					[traits setObject:[NSNumber numberWithUnsignedInt:symbolicTraits] forKey:(id)kCTFontSymbolicTrait];
-					[attributes setObject:traits forKey:(id)kCTFontTraitsAttribute];
-					
-					[attributes setObject:[NSNumber numberWithFloat:size] forKey:(id)kCTFontSizeAttribute];
-					
-					CTFontDescriptorRef descriptor = CTFontDescriptorCreateWithAttributes((CFDictionaryRef)attributes);
-					if (descriptor) {
-						CTFontRef font = CTFontCreateWithFontDescriptor(descriptor, size, NULL);
-						if (font) {
-							m_fontCoreText = font;
-						}
-						CFRelease(descriptor);
-					}
-				}
-				
-				
-				UIFont* _createUI(const FontDesc& desc, CGFloat scaleFactor)
+				UIFont* _createFont(const FontDesc& desc, CGFloat scaleFactor)
 				{
 					SpinLocker lock(&m_lock);
 					
-					if (m_flagCreatedUI && m_lastUIScaleFactor == scaleFactor) {
-						return m_fontUI;
+					if (m_flagCreatedFont && m_lastUIScaleFactor == scaleFactor) {
+						return m_font;
 					}
 					
-					m_flagCreatedUI = sl_true;
+					m_flagCreatedFont = sl_true;
 					
 					float size = desc.size / scaleFactor;
 					NSString* familyName = Apple::getNSStringFromString(desc.familyName);
 					uint32_t traits = 0;
-#if defined(SLIB_PLATFORM_IS_MACOS)
-					NSFontDescriptor* nsFontDesc = [NSFontDescriptor fontDescriptorWithName:familyName size:size];
-					if (nsFontDesc == nil) {
+					UIFontDescriptor* descriptor = [UIFontDescriptor fontDescriptorWithName:familyName size:size];
+					if (descriptor == nil) {
 						return nil;
 					}
+#if defined(SLIB_PLATFORM_IS_MACOS)
 					if (desc.flagBold) {
 						traits |= NSFontBoldTrait;
 					}
 					if (desc.flagItalic) {
 						traits |= NSFontItalicTrait;
 					}
-					NSFontDescriptor* nsFontDescWithTraits = [nsFontDesc fontDescriptorWithSymbolicTraits:traits];
-					if (nsFontDescWithTraits != nil) {
-						nsFontDesc = nsFontDescWithTraits;
-					}
-					m_fontUI = [NSFont fontWithDescriptor:nsFontDesc size:size];
 #else
-					UIFontDescriptor* uiFontDesc = [UIFontDescriptor fontDescriptorWithName:familyName size:size];
-					if (uiFontDesc == nil) {
-						return nil;
-					}
 					if (desc.flagBold) {
 						traits |= UIFontDescriptorTraitBold;
 					}
 					if (desc.flagItalic) {
 						traits |= UIFontDescriptorTraitItalic;
 					}
-					UIFontDescriptor* uiFontDescWithTraits = [uiFontDesc fontDescriptorWithSymbolicTraits:traits];
-					if (uiFontDescWithTraits != nil) {
-						uiFontDesc = uiFontDescWithTraits;
-					}
-					m_fontUI = [UIFont fontWithDescriptor:uiFontDesc size:size];
 #endif
+					if (traits) {
+						UIFontDescriptor* descriptorWithTraits = [descriptor fontDescriptorWithSymbolicTraits:traits];
+						if (descriptorWithTraits != nil) {
+							descriptor = descriptorWithTraits;
+						}
+					}
+					m_font = [UIFont fontWithDescriptor:descriptor size:size];
 					m_lastUIScaleFactor = scaleFactor;
-					return m_fontUI;
+					return m_font;
 				}
 
 			};
@@ -181,22 +121,12 @@ namespace slib
 					}
 					return (FontPlatformObject*)(m_platformObject.get());;
 				}
-				
-				CTFontRef getCoreText()
+								
+				UIFont* getFontObject(CGFloat scaleFactor)
 				{
 					FontPlatformObject* po = getPlatformObject();
 					if (po) {
-						po->_createCoreText(m_desc);
-						return po->m_fontCoreText;
-					}
-					return NULL;
-				}
-				
-				UIFont* getUI(CGFloat scaleFactor)
-				{
-					FontPlatformObject* po = getPlatformObject();
-					if (po) {
-						return po->_createUI(m_desc, scaleFactor);
+						return po->_createFont(m_desc, scaleFactor);
 					}
 					return nil;
 				}
@@ -210,71 +140,46 @@ namespace slib
 
 	sl_bool Font::_getFontMetrics_PO(FontMetrics& _out)
 	{
-		CTFontRef handle = GraphicsPlatform::getCoreTextFont(this);
-		if (!handle) {
+		UIFont* hFont = GraphicsPlatform::getNativeFont(this);
+		if (hFont == nil) {
 			return sl_false;
 		}
-		_out.ascent = CTFontGetAscent(handle);
-		_out.descent = CTFontGetDescent(handle);
-		_out.leading = CTFontGetLeading(handle);
+		_out.ascent = hFont.ascender;
+		_out.descent = hFont.descender;
+		_out.leading = hFont.leading;
 		return sl_true;
 	}
 
-	Size Font::_measureText_PO(const StringParam& text)
+	Size Font::_measureText_PO(const StringParam& _text)
 	{
-		CTFontRef handle = GraphicsPlatform::getCoreTextFont(this);
-		if (!handle) {
+		UIFont* hFont = GraphicsPlatform::getNativeFont(this);
+		if (hFont == nil) {
 			return Size::zero();
 		}
-		
-		Size ret(0, 0);
-		
-		NSString* ns_text = Apple::getNSStringFromString(text);
-		
-		CFStringRef string = (__bridge CFStringRef)ns_text;
-		
-		CFStringRef keys[] = { kCTFontAttributeName };
-		CFTypeRef values[] = { handle };
-		CFDictionaryRef attributes = CFDictionaryCreate(kCFAllocatorDefault,
-														(const void**)&keys, (const void**)&values,
-														sizeof(keys) / sizeof(keys[0]),
-														&kCFCopyStringDictionaryKeyCallBacks,
-														&kCFTypeDictionaryValueCallBacks);
-		if (attributes) {
-			CFAttributedStringRef attrString = CFAttributedStringCreate(kCFAllocatorDefault, string, attributes);
-			if (attrString) {
-				CTLineRef line = CTLineCreateWithAttributedString(attrString);
-				if (line) {
-					CGRect rect = CTLineGetBoundsWithOptions(line, 0);
-					ret.x = (sl_real)(rect.size.width);
-					ret.y = (sl_real)(rect.size.height);
-					CFRelease(line);
-				}
-				CFRelease(attrString);
-			}
-			CFRelease(attributes);
+		NSString* text = Apple::getNSStringFromString(_text);
+		if (text == nil) {
+			return Size::zero();
 		}
+		NSAttributedString* attrText = [[NSAttributedString alloc] initWithString:text attributes:@{NSFontAttributeName: hFont}];
+		if (text == nil) {
+			return Size::zero();
+		}
+		Size ret(0, 0);
+#if defined(SLIB_PLATFORM_IS_MACOS)
+		NSRect bounds = [attrText boundingRectWithSize:NSMakeSize(CGFLOAT_MAX, CGFLOAT_MAX) options:0 context:nil];
+#else
+		CGRect bounds = [attrText boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX) options:0 context:nil];
+#endif
+		ret.x = (sl_real)(bounds.size.width);
+		ret.y = (sl_real)(bounds.size.height);
 		return ret;
 	}
 
-	CTFontRef GraphicsPlatform::getCoreTextFont(Font* _font)
+	UIFont* GraphicsPlatform::getNativeFont(Font* _font, CGFloat scaleFactor)
 	{
 		if (_font) {
 			FontHelper* font = (FontHelper*)_font;
-			return font->getCoreText();
-		}
-		return NULL;
-	}
-
-#if defined(SLIB_PLATFORM_IS_MACOS)
-	NSFont* GraphicsPlatform::getNSFont(Font* _font, CGFloat scaleFactor)
-#else
-	UIFont* GraphicsPlatform::getUIFont(Font* _font, CGFloat scaleFactor)
-#endif
-	{
-		if (_font) {
-			FontHelper* font = (FontHelper*)_font;
-			return font->getUI(scaleFactor);
+			return font->getFontObject(scaleFactor);
 		}
 		return nil;
 	}

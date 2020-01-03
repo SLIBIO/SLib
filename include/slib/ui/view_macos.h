@@ -150,7 +150,7 @@ namespace slib
 		static void setHandleFont(HANDLE* handle, const Ref<Font>& font)
 		{
 			if (font.isNotNull()) {
-				NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
+				NSFont* hFont = GraphicsPlatform::getNativeFont(font.get());
 				if (hFont != nil) {
 					[handle setFont:hFont];
 				}

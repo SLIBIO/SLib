@@ -146,7 +146,7 @@ namespace slib
 		static void setHandleFont(HANDLE* handle, const Ref<Font>& font)
 		{
 			if (font.isNotNull()) {
-				UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
+				UIFont* hFont = GraphicsPlatform::getNativeFont(font.get(), UIPlatform::getGlobalScaleFactor());
 				if (hFont != nil) {
 					[handle setFont:hFont];
 				}
