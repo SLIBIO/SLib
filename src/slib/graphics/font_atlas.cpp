@@ -398,4 +398,30 @@ namespace slib
 		m_currentPlaneRowHeight = 0;
 	}
 
+	Ref<FontAtlas> Font::getAtlas()
+	{
+		Ref<FontAtlas> fa = m_fontAtlas;
+		if (fa.isNull()) {
+			FontAtlasParam param;
+			param.font = this;
+			fa = FontAtlas::create(param);
+			if (fa.isNotNull()) {
+				m_fontAtlas = fa;
+			}
+		}
+		return fa;
+	}
+
+	Ref<FontAtlas> Font::getSharedAtlas()
+	{
+		Ref<FontAtlas> fa = m_fontAtlas;
+		if (fa.isNull()) {
+			fa = FontAtlas::getShared(this);
+			if (fa.isNotNull()) {
+				m_fontAtlas = fa;
+			}
+		}
+		return fa;
+	}
+
 }
