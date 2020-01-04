@@ -22,6 +22,7 @@
 
 #include "slib/service/captcha.h"
 
+#include "slib/math/transform2d.h"
 #include "slib/core/scoped.h"
 
 namespace slib
@@ -47,6 +48,36 @@ namespace slib
 				return (sl_uint8)(GetRandom(vmin, vmax));
 			}
 		
+			static Ref<Image> GenerateCharImage(sl_char16 ch, const Ref<Font>& font)
+			{
+				StringParam str(&ch, 1);
+				Sizei size = font->measureText(str);
+				if (size.x < 1 || size.y < 1) {
+					return sl_null;
+				}
+				Ref<Bitmap> bitmap = Bitmap::create(size.x, size.y);
+				if (bitmap.isNull()) {
+					return sl_null;
+				}
+				// draw
+				{
+					bitmap->resetPixels(Color::zero());
+					Ref<Canvas> canvas = bitmap->getCanvas();
+					if (canvas.isNull()) {
+						return sl_null;
+					}
+					canvas->drawText(str, 0, 0, font, Color::Black);
+				}
+				Ref<Image> image = bitmap->toImage();
+				if (image.isNotNull()) {
+					Rectanglei bounds;
+					if (image->getDrawnBounds(&bounds)) {
+						return image->sub(bounds.left, bounds.top, bounds.getWidth(), bounds.getHeight());
+					}
+				}
+				return sl_null;
+			}
+		
 		}
 	}
 
@@ -58,28 +89,13 @@ namespace slib
 	Captcha::Captcha()
 	{
 		m_length = 4;
-		m_width = 130;
-		m_height = 50;
+		m_width = 100;
+		m_height = 40;
 		SLIB_STATIC_STRING16(codeset, "abcdefghkmnprstuvwxyzABCDEFGHKMNPRSTUVWXYZ23456789")
 		m_codeset = codeset;
-		SLIB_STATIC_STRING16(interferingElements, "*")
-		m_interferingElements = interferingElements;
-	}
-
-	String Captcha::getCode() const
-	{
-		return String::from(m_code);
-	}
-	
-	String16 Captcha::getCode16() const
-	{
-		return m_code;
-	}
-
-	void Captcha::setCode(const StringParam& code)
-	{
-		m_codeInput = code.toString16();
-		m_code = m_codeInput;
+		m_interferingCount = 10;
+		
+		m_flagPrepared = sl_false;
 	}
 
 	sl_uint32 Captcha::getCodeLength() const
@@ -100,6 +116,7 @@ namespace slib
 	void Captcha::setCodeElements(const StringParam& codeset)
 	{
 		m_codeset = codeset.toString16();
+		m_flagPrepared = sl_false;
 	}
 
 	String16 Captcha::getInterferingElements() const
@@ -110,6 +127,17 @@ namespace slib
 	void Captcha::setInterferingElements(const StringParam& elements)
 	{
 		m_interferingElements = elements.toString16();
+		m_flagPrepared = sl_false;
+	}
+
+	sl_uint32 Captcha::getInterferingCount() const
+	{
+		return m_interferingCount;
+	}
+
+	void Captcha::setInterferingCount(sl_uint32 count)
+	{
+		m_interferingCount = count;
 	}
 
 	sl_uint32 Captcha::getWidth() const
@@ -120,8 +148,6 @@ namespace slib
 	void Captcha::setWidth(sl_uint32 width)
 	{
 		m_width = width;
-		m_bitmap.setNull();
-		m_image.setNull();
 	}
 
 	sl_uint32 Captcha::getHeight() const
@@ -132,8 +158,7 @@ namespace slib
 	void Captcha::setHeight(sl_uint32 height)
 	{
 		m_height = height;
-		m_bitmap.setNull();
-		m_image.setNull();
+		m_flagPrepared = sl_false;
 	}
 
 	Ref<Font> Captcha::getFont() const
@@ -144,78 +169,134 @@ namespace slib
 	void Captcha::setFont(const Ref<Font>& font)
 	{
 		m_font = font;
+		m_flagPrepared = sl_false;
 	}
 
-	void Captcha::setBackgroundColor(const Color& background)
+	Ref<Font> Captcha::getInterferingFont() const
 	{
-		m_background = background;
+		return m_fontInterfering;
 	}
 
-	Ref<Image> Captcha::generate(String* outCode)
+	void Captcha::setInterferingFont(const Ref<Font>& font)
 	{
+		m_fontInterfering = font;
+		m_flagPrepared = sl_false;
+	}
+
+	Color Captcha::getBackgroundColor() const
+	{
+		return m_backgroundColor;
+	}
+
+	void Captcha::setBackgroundColor(const Color& color)
+	{
+		m_backgroundColor = color;
+	}
+
+	sl_bool Captcha::prepare()
+	{
+		if (m_flagPrepared) {
+			return sl_true;
+		}
 		MutexLocker locker(&m_lock);
+		if (m_flagPrepared) {
+			return sl_true;
+		}
 		
-		Ref<Bitmap> bitmap = m_bitmap;
-		if (bitmap.isNull()) {
-			bitmap = Bitmap::create(m_width, m_height);
-			if (bitmap.isNull()) {
-				return sl_null;
-			}
-			m_bitmap = bitmap;
-		}
-		if (m_background.isNotZero()) {
-			bitmap->resetPixels(m_background);
-		} else {
-			bitmap->resetPixels(Color(GetRandom8(157,255), GetRandom8(157,255), GetRandom8(157,255)));
-		}
-		Ref<Canvas> canvas = bitmap->getCanvas();
-		if (canvas.isNull()) {
-			return sl_null;
-		}
-
+		m_imagesCodeset.setNull();
+		m_imagesInterferingElements.setNull();
+		
 		sl_uint32 width = m_width;
 		sl_uint32 height = m_height;
-		Ref<Font> font = this->m_font;
-		if (font.isNull()) {
-			font = Font::create("Arial", (sl_real)(m_height / 2), sl_true);
+		if (!width) {
+			return sl_false;
+		}
+		if (!height) {
+			return sl_false;
+		}
+				
+		if (m_interferingElements.isNotEmpty()) {
+			Ref<Font> font = this->m_fontInterfering;
 			if (font.isNull()) {
-				return sl_null;
+				font = Font::create("Arial", (sl_real)(height / 3), sl_true);
+				if (font.isNull()) {
+					return sl_false;
+				}
 			}
-			m_font = font;
+			sl_char16* elements = m_interferingElements.getData();
+			sl_uint32 count = (sl_uint32)(m_interferingElements.getLength());
+			for (sl_uint32 i = 0; i < count; i++) {
+				Ref<Image> image = GenerateCharImage(elements[i], font);
+				m_imagesInterferingElements.add_NoLock(Move(image));
+			}
+		}
+		if (m_codeset.isNotEmpty()) {
+			Ref<Font> font = this->m_font;
+			if (font.isNull()) {
+				font = Font::create("Arial", (sl_real)(height / 2), sl_true);
+				if (font.isNull()) {
+					return sl_false;
+				}
+			}
+			sl_char16* codesets = m_codeset.getData();
+			sl_uint32 count = (sl_uint32)(m_codeset.getLength());
+			for (sl_uint32 i = 0; i < count; i++) {
+				Ref<Image> image = GenerateCharImage(codesets[i], font);
+				m_imagesCodeset.add_NoLock(Move(image));
+			}
+		}
+		
+		m_flagPrepared = sl_true;
+		return sl_true;
+	}
+
+	Ref<Image> Captcha::generate(String& _code)
+	{
+		sl_uint32 width = m_width;
+		sl_uint32 height = m_height;
+		if (!width) {
+			return sl_null;
+		}
+		if (!height) {
+			return sl_null;
+		}
+		if (!(prepare())) {
+			return sl_null;
+		}
+		Ref<Image> image = Image::create(width, height);
+		if (image.isNull()) {
+			return sl_null;
+		}
+		
+		if (m_backgroundColor.isNotZero()) {
+			image->resetPixels(m_backgroundColor);
+		} else {
+			image->resetPixels(Color(GetRandom8(157,255), GetRandom8(157,255), GetRandom8(157,255)));
 		}
 		
 		// draw line
 		{
 			for (int i = 0; i < 6; i++) {
-				Ref<Pen> pen = Pen::createSolidPen(1, Color(GetRandom8(0,156), GetRandom8(0,156), GetRandom8(0,156)));
-				canvas->drawLine((sl_real)(GetRandom(0, width)), (sl_real)(GetRandom(0, height)), (sl_real)(GetRandom(0, width)), (sl_real)(GetRandom(0, height)), pen);
+				image->drawSmoothLine(GetRandom(0, width), GetRandom(0, height), GetRandom(0, width), GetRandom(0, height), Color(GetRandom8(0,156), GetRandom8(0,156), GetRandom8(0,156)));
 			}
 		}
 		// draw interfering elements
-		String16 interferingElements = m_interferingElements;
-		if (interferingElements.isNotEmpty()) {
-			sl_char16* elements = interferingElements.getData();
-			sl_uint32 countElements = (sl_uint32)(interferingElements.getLength());
-			Ref<Font> fonts[6];
-			for (int k = 0; k < 6; k++) {
-				fonts[k] = Font::create(font->getFamilyName(), font->getSize() * (sl_real)k / 10);
-			}
-			for (int i = 0; i < 100; i++) {
-				sl_int32 indexFont = GetRandom(0, 5);
-				sl_char16 c;
-				if (countElements <= 1) {
-					c = elements[0];
-				} else {
-					sl_uint32 index = GetRandom(0, countElements - 1);
-					c = elements[index];
+		if (m_imagesInterferingElements.isNotEmpty()) {
+			ListElements< Ref<Image> > elements(m_imagesInterferingElements);
+			for (int i = 0; i < m_interferingCount; i++) {
+				sl_int32 index = GetRandom(0, (sl_int32)(elements.count - 1));
+				Ref<Image>& element = elements[index];
+				if (element.isNotNull()) {
+					double f = (double)(GetRandom(5, 10)) / 10.0;
+					Color color(GetRandom8(200,255), GetRandom8(200,255), GetRandom8(200,255), 0);
+					sl_int32 sw = element->getWidth();
+					sl_int32 sh = element->getHeight();
+					image->drawImage(GetRandom(-sw, width), GetRandom(-sh, height), (sl_int32)(sw * f), (sl_int32)(sh * f), element, color, 0, 0, sw, sh, BlendMode::Over, StretchMode::Linear);
 				}
-				Ref<Font>& font = fonts[indexFont];
-				Color color(GetRandom8(200,255), GetRandom8(200,255), GetRandom8(200,255));
-				canvas->drawText(StringParam(&c, 1), (sl_real)(GetRandom(0, width)), (sl_real)(GetRandom(0, height)), font, color);
 			}
 		}
 
-		String16 code = m_codeInput;
+		String16 code = String16::from(_code);
 		// generate code
 		if (code.isEmpty()) {
 			sl_uint32 length = m_length;
@@ -224,12 +305,11 @@ namespace slib
 				return sl_null;
 			}
 			sl_char16* codes = code.getData();
-			String16 codeset = m_codeset;
-			sl_uint32 lenCodeset = (sl_uint32)(codeset.getLength());
+			sl_uint32 lenCodeset = (sl_uint32)(m_codeset.getLength());
 			if (!lenCodeset) {
 				return sl_null;
 			}
-			sl_char16* codesets = codeset.getData();
+			sl_char16* codesets = m_codeset.getData();
 			for (sl_uint32 i = 0; i < length; i++) {
 				sl_uint32 index = GetRandom(0, lenCodeset - 1);
 				sl_char16 code = codesets[index];
@@ -243,35 +323,28 @@ namespace slib
 			sl_char16* codes = code.getData();
 			for (sl_uint32 i = 0; i < length; i++) {
 				sl_char16 c = codes[i];
-				StringParam s(&c, 1);
-				Color color(GetRandom8(0,156), GetRandom8(0,156), GetRandom8(0,156));
-				CanvasStateScope scope(canvas);
-				Size size = font->measureText(s);
-				sl_real x = (sl_real)(width * (i + 0.5f) / length + GetRandom(1, 5) - size.x / 2);
-				sl_real y = (sl_real)(height - font->getFontHeight()) / 2;
-				canvas->rotate(x + size.x / 2, y + size.y / 2, (sl_real)(GetRandom(-30, 30) * SLIB_PI / 180));
-				canvas->drawText(s, x, y, font, color);
+				sl_reg index = m_codeset.indexOf(c);
+				if (index >= 0) {
+					Ref<Image> imageChar = m_imagesCodeset.getValueAt(index);
+					if (imageChar.isNotNull()) {
+						sl_real iw = (sl_real)(imageChar->getWidth());
+						sl_real ih = (sl_real)(imageChar->getHeight());
+						Color color(GetRandom8(0,156), GetRandom8(0,156), GetRandom8(0,156), 0);
+						sl_real x = (sl_real)(width * (i + 0.5f) / length + GetRandom(1, 5) - iw / 2);
+						sl_real y = (sl_real)(height - ih) / 2;
+						Matrix3 mat;
+						Transform2::setTranslation(mat, -iw/2, -ih/2);
+						Transform2::rotate(mat, (sl_real)(GetRandom(-30, 30) * SLIB_PI / 180));
+						Transform2::translate(mat, iw/2 + x, ih/2 + y);
+						image->drawImage(imageChar, color, mat);
+					}
+				}
 			}
 		} else {
 			return sl_null;
 		}
 		
-		canvas.setNull();
-		
-		Ref<Image> image = m_image;
-		if (image.isNull()) {
-			image = bitmap->toImage();
-			if (image.isNull()) {
-				return sl_null;
-			}
-			m_image = image;
-		} else {
-			image->copyBitmap(bitmap, 0, 0, width, height);
-		}
-		m_code = code;
-		if (outCode) {
-			*outCode = String::from(code);
-		}
+		_code = String::from(code);
 		return image;
 	}
 
