@@ -126,19 +126,23 @@ namespace slib
 		void tintColor(const Color& color);
 
 
-		static void draw(ImageDesc& dst, const ImageDesc& src, BlendMode blend = BlendMode::Copy, StretchMode stretch = StretchMode::Default);
+		static void draw(ImageDesc& dst, const ImageDesc& src, BlendMode blend = BlendMode::Over, StretchMode stretch = StretchMode::Default);
 
 		void drawImage(sl_int32 dx, sl_int32 dy, sl_int32 dw, sl_int32 dh,
 					   const Ref<Image>& src, sl_int32 sx, sl_int32 sy, sl_int32 sw, sl_int32 sh,
-					   BlendMode blend = BlendMode::Copy, StretchMode stretch = StretchMode::Default);
-
+					   BlendMode blend = BlendMode::Over, StretchMode stretch = StretchMode::Default);
+		
 		void drawImage(const Rectanglei& rectDst,
 					   const Ref<Image>& src, const Rectanglei& rectSrc,
-					   BlendMode blend = BlendMode::Copy, StretchMode stretch = StretchMode::Default);
-
+					   BlendMode blend = BlendMode::Over, StretchMode stretch = StretchMode::Default);
+		
 		void drawImage(sl_int32 dx, sl_int32 dy, sl_int32 dw, sl_int32 dh,
 					   const Ref<Image>& src, sl_int32 sx, sl_int32 sy,
-					   BlendMode blend = BlendMode::Copy, StretchMode stretch = StretchMode::Default);
+					   BlendMode blend = BlendMode::Over, StretchMode stretch = StretchMode::Default);
+		
+		void drawImage(sl_int32 dx, sl_int32 dy, sl_int32 dw, sl_int32 dh,
+					   const Ref<Image>& src, const Color& srcAdd, sl_int32 sx, sl_int32 sy, sl_int32 sw, sl_int32 sh,
+					   BlendMode blend = BlendMode::Over, StretchMode stretch = StretchMode::Default);
 
 		void copyBitmap(const Ref<Bitmap>& bitmap, sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height);
 
@@ -228,6 +232,12 @@ namespace slib
 		void drawLine(sl_int32 x1, sl_int32 y1, sl_int32 x2, sl_int32 y2, const Color& color, BlendMode blend = BlendMode::Over);
 		
 		void drawSmoothLine(sl_int32 x1, sl_int32 y1, sl_int32 x2, sl_int32 y2, const Color& color, BlendMode blend = BlendMode::Over);
+		
+		void drawImage(const Ref<Image>& src, const Matrix3& transform, BlendMode blend = BlendMode::Over, StretchMode stretch = StretchMode::Default);
+		
+		void drawImage(const Ref<Image>& src, const Color& srcAdd, const Matrix3& transform, BlendMode blend = BlendMode::Over, StretchMode stretch = StretchMode::Default);
+		
+		sl_bool getDrawnBounds(Rectanglei* _out = sl_null) const;
 
 	protected:
 		Ref<Drawable> getDrawableCache(Canvas* canvas);
