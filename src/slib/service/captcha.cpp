@@ -283,7 +283,7 @@ namespace slib
 		// draw interfering elements
 		if (m_imagesInterferingElements.isNotEmpty()) {
 			ListElements< Ref<Image> > elements(m_imagesInterferingElements);
-			for (int i = 0; i < m_interferingCount; i++) {
+			for (sl_uint32 i = 0; i < m_interferingCount; i++) {
 				sl_int32 index = GetRandom(0, (sl_int32)(elements.count - 1));
 				Ref<Image>& element = elements[index];
 				if (element.isNotNull()) {

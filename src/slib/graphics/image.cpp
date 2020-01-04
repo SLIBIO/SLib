@@ -2026,7 +2026,7 @@ namespace slib
 				Color* c = dst.colors;
 				sl_int32 stride = dst.stride;
 				Color* d = c + (y * stride + x1);
-				for (sl_int32 i = 0; i <= dx; i++) {
+				for (sl_uint32 i = 0; i <= dx; i++) {
 					blend(*d, color);
 					d++;
 				}
@@ -2058,7 +2058,7 @@ namespace slib
 				Color* c = dst.colors;
 				sl_int32 stride = dst.stride;
 				Color* d = c + (y1 * stride + x);
-				for (sl_int32 i = 0; i <= dy; i++) {
+				for (sl_uint32 i = 0; i <= dy; i++) {
 					blend(*d, color);
 					d += stride;
 				}
