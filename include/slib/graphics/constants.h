@@ -120,7 +120,7 @@ namespace slib
 	enum class BlendMode
 	{
 		Copy = 0,
-		SrcAlpha = 1
+		Over = 1
 	};
 
 	enum class RotationMode

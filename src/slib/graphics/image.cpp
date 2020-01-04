@@ -1172,11 +1172,7 @@ namespace slib
 									c += src.stride;
 								}
 								cs += fx;
-								Color& t = colorsDst[dx];
-								t.r = (sl_uint8)(r >> n);
-								t.g = (sl_uint8)(g >> n);
-								t.b = (sl_uint8)(b >> n);
-								t.a = (sl_uint8)(a >> n);
+								BLEND_OP::blend(colorsDst[dx], Color((sl_uint8)(r >> n), (sl_uint8)(g >> n), (sl_uint8)(b >> n), (sl_uint8)(a >> n)));
 							}
 							colorsDst += dst.stride;
 							colorsSrc += ly;
@@ -1200,11 +1196,7 @@ namespace slib
 									c += src.stride;
 								}
 								cs += fx;
-								Color& t = colorsDst[dx];
-								t.r = (sl_uint8)(r / area);
-								t.g = (sl_uint8)(g / area);
-								t.b = (sl_uint8)(b / area);
-								t.a = (sl_uint8)(a / area);
+								BLEND_OP::blend(colorsDst[dx], Color((sl_uint8)(r / area), (sl_uint8)(g / area), (sl_uint8)(b / area), (sl_uint8)(a / area)));
 							}
 							colorsDst += dst.stride;
 							colorsSrc += ly;
@@ -1223,7 +1215,7 @@ namespace slib
 				}
 			};
 			
-			class Blend_SrcAlpha
+			class Blend_Over
 			{
 			public:
 				SLIB_INLINE static void blend(Color& dst, const Color& src)
@@ -1242,49 +1234,52 @@ namespace slib
 						case BlendMode::Copy:
 							STRETCH_OP::template stretch<Blend_Copy>(dst, src);
 							break;
-						case BlendMode::SrcAlpha:
-							STRETCH_OP::template stretch<Blend_SrcAlpha>(dst, src);
+						case BlendMode::Over:
+							STRETCH_OP::template stretch<Blend_Over>(dst, src);
 							break;
 					}
 				}
 			};
+		
+			static void Draw(ImageDesc& dst, const ImageDesc& src, BlendMode blend, StretchMode stretch)
+			{
+				if (src.width == 0 || src.height == 0 || src.stride == 0 || src.colors == sl_null) {
+					return;
+				}
+				if (dst.width == 0 || dst.height == 0 || dst.stride == 0 || dst.colors == sl_null) {
+					return;
+				}
+				if (src.width == dst.width && src.height == dst.height) {
+					Stretch::template stretch<Stretch_Copy>(dst, src, blend);
+					return;
+				}
+				if (src.width == 1 && src.height == 1) {
+					Stretch::template stretch<Stretch_FillColor>(dst, src, blend);
+					return;
+				}
+				if (stretch == StretchMode::Nearest) {
+					Stretch::template stretch<Stretch_Nearest>(dst, src, blend);
+				} else if (stretch == StretchMode::Linear) {
+					Stretch::template stretch< Stretch_Smooth<Stretch_Smooth_LinearFilter> >(dst, src, blend);
+				} else {
+					if (src.width <= dst.width && src.height <= dst.height) {
+						Stretch::template stretch< Stretch_Smooth<Stretch_Smooth_LinearFilter> >(dst, src, blend);
+						return;
+					}
+					if (src.width % dst.width == 0 && src.height % dst.height == 0) {
+						Stretch::template stretch<Stretch_Smooth_IntBox>(dst, src, blend);
+						return;
+					}
+					Stretch::template stretch< Stretch_Smooth<Stretch_Smooth_BoxFilter> >(dst, src, blend);
+				}
+			}
 
 		}
 	}
 	
-	using namespace priv::image;
-
 	void Image::draw(ImageDesc& dst, const ImageDesc& src, BlendMode blend, StretchMode stretch)
 	{
-		if (src.width == 0 || src.height == 0 || src.stride == 0 || src.colors == sl_null) {
-			return;
-		}
-		if (dst.width == 0 || dst.height == 0 || dst.stride == 0 || dst.colors == sl_null) {
-			return;
-		}
-		if (src.width == dst.width && src.height == dst.height) {
-			Stretch::template stretch<Stretch_Copy>(dst, src, blend);
-			return;
-		}
-		if (src.width == 1 && src.height == 1) {
-			Stretch::template stretch<Stretch_FillColor>(dst, src, blend);
-			return;
-		}
-		if (stretch == StretchMode::Nearest) {
-			Stretch::template stretch<Stretch_Nearest>(dst, src, blend);
-		} else if (stretch == StretchMode::Linear) {
-			Stretch::template stretch< Stretch_Smooth<Stretch_Smooth_LinearFilter> >(dst, src, blend);
-		} else {
-			if (src.width <= dst.width && src.height <= dst.height) {
-				Stretch::template stretch< Stretch_Smooth<Stretch_Smooth_LinearFilter> >(dst, src, blend);
-				return;
-			}
-			if (src.width % dst.width == 0 && src.height % dst.height == 0) {
-				Stretch::template stretch<Stretch_Smooth_IntBox>(dst, src, blend);
-				return;
-			}
-			Stretch::template stretch< Stretch_Smooth<Stretch_Smooth_BoxFilter> >(dst, src, blend);
-		}
+		priv::image::Draw(dst, src, blend, stretch);
 	}
 
 	void Image::drawImage(sl_int32 dx, sl_int32 dy, sl_int32 dw, sl_int32 dh
@@ -1769,5 +1764,336 @@ namespace slib
 		}
 		return sl_false;
 	}
-	
+
+
+	namespace priv
+	{
+		namespace image
+		{
+
+			// https://github.com/libgd/libgd/blob/master/src/gd.c
+			static sl_bool ClipLineHelper(sl_int32& x0, sl_int32& y0, sl_int32& x1, sl_int32& y1, sl_int32 mindim, sl_int32 maxdim)
+			{
+				if (x0 < mindim) {
+					if (x1 < mindim) {
+						return sl_false;
+					}
+					double gradient = (double)(y1 - y0) / (double)(x1 - x0);
+					y0 -= (sl_int32)(gradient * (x0 - mindim));
+					x0 = mindim;
+					if (x1 > maxdim) {
+						y1 += (sl_int32)(gradient * (maxdim - x1));
+						x1 = maxdim;
+					}
+					return sl_true;
+				}
+				if (x0 > maxdim) {
+					if (x1 > maxdim) {
+						return sl_false;
+					}
+					double gradient = (double)(y1 - y0) / (double)(x1 - x0);
+					y0 += (sl_int32)(gradient * (maxdim - x0));
+					x0 = maxdim;
+					if (x1 < mindim) {
+						y1 -= (sl_int32)(gradient * (x1 - mindim));
+						x1 = mindim;
+					}
+					return sl_true;
+				}
+				if (x1 > maxdim) {
+					double gradient = (double)(y1 - y0) / (double)(x1 - x0);
+					y1 += (sl_int32)(gradient * (maxdim - x1));
+					x1 = maxdim;
+					return sl_true;
+				}
+				if (x1 < mindim) {
+					double gradient = (y1 - y0) / (double) (x1 - x0);
+					y1 -= (sl_int32)(gradient * (x1 - mindim));
+					x1 = mindim;
+					return sl_true;
+				}
+				return sl_true;
+			}
+
+		
+			static sl_bool ClipLine(sl_int32& x1, sl_int32& y1, sl_int32& x2, sl_int32& y2, sl_int32 left, sl_int32 top, sl_int32 right, sl_int32 bottom)
+			{
+				if (right < left) {
+					return sl_false;
+				}
+				if (bottom < top) {
+					return sl_false;
+				}
+				if (x1 == x2) {
+					if (x1 < left || x1 > right) {
+						return sl_false;
+					}
+					if (y1 < y2) {
+						if (y1 < top) {
+							y1 = top;
+						}
+						if (y2 > bottom) {
+							y2 = bottom;
+						}
+						if (y1 > y2) {
+							return sl_false;
+						}
+					} else {
+						if (y2 < top) {
+							y2 = top;
+						}
+						if (y1 > bottom) {
+							y1 = bottom;
+						}
+						if (y2 > y1) {
+							return sl_false;
+						}
+					}
+					return sl_true;
+				}
+				if (y1 == y2) {
+					if (y1 < top || y1 > bottom) {
+						return sl_false;
+					}
+					if (x1 < x2) {
+						if (x1 < left) {
+							x1 = left;
+						}
+						if (x2 > right) {
+							x2 = right;
+						}
+						if (x1 > x2) {
+							return sl_false;
+						}
+					} else {
+						if (x2 < left) {
+							x2 = left;
+						}
+						if (x1 > right) {
+							x1 = right;
+						}
+						if (x2 > x1) {
+							return sl_false;
+						}
+					}
+					return sl_true;
+				}
+				if (!(ClipLineHelper(x1, y1, x2, y2, left, right))) {
+					return sl_false;
+				}
+				if (!(ClipLineHelper(y1, x1, y2, x2, top, bottom))) {
+					return sl_false;
+				}
+				return sl_true;
+			}
+		
+			template <class BLEND_OP>
+			void DrawHorizontalLine(ImageDesc& dst, sl_int32 x1, sl_int32 x2, sl_int32 y, const Color& color)
+			{
+				sl_int32 w = (sl_int32)(dst.width);
+				sl_int32 h = (sl_int32)(dst.height);
+				if (y < 0 || y >= h) {
+					return;
+				}
+				if (x1 > x2) {
+					sl_int32 t = x2;
+					x2 = x1;
+					x1 = t;
+				}
+				if (x1 < 0) {
+					x1 = 0;
+				}
+				if (x2 >= w) {
+					x2 = w - 1;
+				}
+				if (x1 > x2) {
+					return;
+				}
+				sl_uint32 dx = x2 - x1;
+				Color* c = dst.colors;
+				sl_int32 stride = dst.stride;
+				Color* d = c + y * stride + x1;
+				for (sl_int32 i = 0; i <= dx; i++) {
+					BLEND_OP::blend(*d, color);
+					d++;
+				}
+			}
+		
+			template <class BLEND_OP>
+			static void DrawVerticalLine(ImageDesc& dst, sl_int32 x, sl_int32 y1, sl_int32 y2, const Color& color)
+			{
+				sl_int32 w = (sl_int32)(dst.width);
+				sl_int32 h = (sl_int32)(dst.height);
+				if (x < 0 || x >= w) {
+					return;
+				}
+				if (y1 > y2) {
+					sl_int32 t = y2;
+					y2 = y1;
+					y1 = t;
+				}
+				if (y1 < 0) {
+					y1 = 0;
+				}
+				if (y2 >= h) {
+					y2 = h - 1;
+				}
+				if (y1 > y2) {
+					return;
+				}
+				sl_uint32 dy = y2 - y1;
+				Color* c = dst.colors;
+				sl_int32 stride = dst.stride;
+				Color* d = c + y1 * stride + x;
+				for (sl_int32 i = 0; i <= dy; i++) {
+					BLEND_OP::blend(*d, color);
+					d += stride;
+				}
+			}
+		
+			// https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+			template <class BLEND_OP>
+			static void DrawLine(ImageDesc& dst, sl_int32 x1, sl_int32 y1, sl_int32 x2, sl_int32 y2, const Color& color, sl_bool flagAntialias)
+			{
+				if (y1 == y2) {
+					DrawHorizontalLine<BLEND_OP>(dst, x1, x2, y1, color);
+					return;
+				}
+				if (x1 == x2) {
+					DrawVerticalLine<BLEND_OP>(dst, x1, y1, y2, color);
+					return;
+				}
+				sl_int32 w = (sl_int32)(dst.width);
+				sl_int32 h = (sl_int32)(dst.height);
+				if (!w) {
+					return;
+				}
+				if (!h) {
+					return;
+				}
+				ClipLine(x1, y1, x2, y2, 0, 0, w - 1, h - 1);
+				sl_int32 dx = x2 - x1;
+				sl_int32 dy = y2 - y1;
+				Color* c = dst.colors;
+				sl_int32 stride = dst.stride;
+				if (Math::abs(dx) > Math::abs(dy)) {
+					if (dx < 0) {
+						sl_int32 t = x2;
+						x2 = x1;
+						x1 = t;
+						t = y2;
+						y2 = y1;
+						y1 = t;
+						dx = -dx;
+						dy = -dy;
+					}
+					c += x1 + y1 * stride;
+					sl_int32 inc_stride;
+					if (dy < 0) {
+						inc_stride = -stride;
+						dy = -dy;
+					} else {
+						inc_stride = stride;
+					}
+					if (flagAntialias) {
+						for (sl_int32 ix = 0; ix <= dx; ix++) {
+							sl_int32 t = ix * dy;
+							sl_int32 iy = t / dx;
+							sl_int32 my = t % dx;
+							if (my) {
+								Color* cn = c + inc_stride * iy;
+								float f = (float)(my) / (float)dx;
+								BLEND_OP::blend(*cn, Color(color.r, color.g, color.b, Math::clamp0_255((sl_int32)(color.a * (1 - f)))));
+								BLEND_OP::blend(*(cn + inc_stride), Color(color.r, color.g, color.b, Math::clamp0_255((sl_int32)(color.a * f))));
+							} else {
+								BLEND_OP::blend(*(c + inc_stride * iy), color);
+							}
+							c++;
+						}
+					} else {
+						sl_int32 D = 2 * dy - dx;
+						for (sl_int32 ix = 0; ix <= dx; ix++) {
+							BLEND_OP::blend(*c, color);
+							if (D > 0) {
+								c += inc_stride;
+								D = D - 2 * dx;
+							}
+							D = D + 2 * dy;
+							c++;
+						}
+					}
+				} else {
+					if (dy < 0) {
+						sl_int32 t = x2;
+						x2 = x1;
+						x1 = t;
+						t = y2;
+						y2 = y1;
+						y1 = t;
+						dx = -dx;
+						dy = -dy;
+					}
+					c += x1 + y1 * stride;
+					sl_int32 inc_x;
+					if (dx < 0) {
+						inc_x = -1;
+						dx = -dx;
+					} else {
+						inc_x = 1;
+					}
+					if (flagAntialias) {
+						for (sl_int32 iy = 0; iy <= dy; iy++) {
+							sl_int32 t = iy * dx;
+							sl_int32 ix = t / dy;
+							sl_int32 mx = t % dy;
+							if (mx) {
+								Color* cn = c + inc_x * ix;
+								float f = (float)(mx) / (float)dy;
+								BLEND_OP::blend(*cn, Color(color.r, color.g, color.b, Math::clamp0_255((sl_int32)(color.a * (1 - f)))));
+								BLEND_OP::blend(*(cn + inc_x), Color(color.r, color.g, color.b, Math::clamp0_255((sl_int32)(color.a * f))));
+							} else {
+								BLEND_OP::blend(*(c + inc_x * ix), color);
+							}
+							c += stride;
+						}
+					} else {
+						sl_int32 D = 2 * dx - dy;
+						for (sl_int32 iy = 0; iy <= dy; iy++) {
+							BLEND_OP::blend(*c, color);
+							if (D > 0) {
+								c += inc_x;
+								D = D - 2 * dy;
+							}
+							D = D + 2 * dx;
+							c += stride;
+						}
+					}
+				}
+			}
+		
+			static void DrawLine(ImageDesc& dst, sl_int32 x1, sl_int32 y1, sl_int32 x2, sl_int32 y2, const Color& color, BlendMode blend, sl_bool flagAntialias)
+			{
+				switch (blend) {
+					case BlendMode::Copy:
+						DrawLine<Blend_Copy>(dst, x1, y1, x2, y2, color, flagAntialias);
+						break;
+					case BlendMode::Over:
+						DrawLine<Blend_Over>(dst, x1, y1, x2, y2, color, flagAntialias);
+						break;
+				}
+			}
+
+		}
+	}
+
+	void Image::drawLine(sl_int32 x1, sl_int32 y1, sl_int32 x2, sl_int32 y2, const Color& color, BlendMode blend)
+	{
+		priv::image::DrawLine(m_desc, x1, y1, x2, y2, color, blend, sl_false);
+	}
+
+	void Image::drawSmoothLine(sl_int32 x1, sl_int32 y1, sl_int32 x2, sl_int32 y2, const Color& color, BlendMode blend)
+	{
+		priv::image::DrawLine(m_desc, x1, y1, x2, y2, color, blend, sl_true);
+	}
+
 }

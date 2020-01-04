@@ -224,6 +224,10 @@ namespace slib
 		
 		sl_bool getAnimationInfo(DrawableAnimationInfo* info) override;
 
+		
+		void drawLine(sl_int32 x1, sl_int32 y1, sl_int32 x2, sl_int32 y2, const Color& color, BlendMode blend = BlendMode::Over);
+		
+		void drawSmoothLine(sl_int32 x1, sl_int32 y1, sl_int32 x2, sl_int32 y2, const Color& color, BlendMode blend = BlendMode::Over);
 
 	protected:
 		Ref<Drawable> getDrawableCache(Canvas* canvas);
