@@ -2117,15 +2117,21 @@ namespace slib
 						inc_stride = stride;
 					}
 					if (flagAntialias) {
+						float dxf = (float)dx;
+						Color src = color;
 						for (sl_int32 ix = 0; ix <= dx; ix++) {
 							sl_int32 t = ix * dy;
 							sl_int32 iy = t / dx;
 							sl_int32 my = t % dx;
 							if (my) {
 								Color* cn = c + inc_stride * iy;
-								float f = (float)(my) / (float)dx;
-								blend(*cn, Color(color.r, color.g, color.b, Math::clamp0_255((sl_int32)(color.a * (1 - f)))));
-								blend(*(cn + inc_stride), Color(color.r, color.g, color.b, Math::clamp0_255((sl_int32)(color.a * f))));
+								float f = (float)(my) / dxf;
+								src.a = (sl_uint8)(Math::clamp0_255((sl_int32)(color.a * f)));
+								blend(*(cn + inc_stride), src);
+								if (color.a > src.a) {
+									src.a = color.a - src.a;
+									blend(*cn, src);
+								}
 							} else {
 								blend(*(c + inc_stride * iy), color);
 							}
@@ -2163,15 +2169,21 @@ namespace slib
 						inc_x = 1;
 					}
 					if (flagAntialias) {
+						float dyf = (float)dy;
+						Color src = color;
 						for (sl_int32 iy = 0; iy <= dy; iy++) {
 							sl_int32 t = iy * dx;
 							sl_int32 ix = t / dy;
 							sl_int32 mx = t % dy;
 							if (mx) {
 								Color* cn = c + inc_x * ix;
-								float f = (float)(mx) / (float)dy;
-								blend(*cn, Color(color.r, color.g, color.b, Math::clamp0_255((sl_int32)(color.a * (1 - f)))));
-								blend(*(cn + inc_x), Color(color.r, color.g, color.b, Math::clamp0_255((sl_int32)(color.a * f))));
+								float f = (float)(mx) / dyf;
+								src.a = (sl_uint8)(Math::clamp0_255((sl_int32)(color.a * f)));
+								blend(*(cn + inc_x), src);
+								if (color.a > src.a) {
+									src.a = color.a - src.a;
+									blend(*cn, src);
+								}
 							} else {
 								blend(*(c + inc_x * ix), color);
 							}
@@ -2215,6 +2227,236 @@ namespace slib
 	void Image::drawSmoothLine(sl_int32 x1, sl_int32 y1, sl_int32 x2, sl_int32 y2, const Color& color, BlendMode blend)
 	{
 		priv::image::DrawLine(m_desc, x1, y1, x2, y2, color, blend, sl_true);
+	}
+
+	void Image::drawRectangle(sl_int32 x1, sl_int32 y1, sl_int32 x2, sl_int32 y2, const Color& color, BlendMode blend)
+	{
+		if (x1 == x2) {
+			return;
+		}
+		if (y1 == y2) {
+			return;
+		}
+		if (x1 > x2) {
+			sl_int32 t = x2;
+			x2 = x1;
+			x1 = t;
+		}
+		if (y1 > y2) {
+			sl_int32 t = y2;
+			y2 = y1;
+			y1 = t;
+		}
+		drawLine(x1, y1, x2 - 1, y1, color, blend);
+		drawLine(x1, y2 - 1, x2 - 1, y2 - 1, color, blend);
+		if (y2 > y1 + 2) {
+			drawLine(x1, y1 + 1, x1, y2 - 2, color, blend);
+			drawLine(x2 - 1, y1 + 1, x2 - 1, y2 - 2, color, blend);
+		}
+	}
+
+	namespace priv
+	{
+		namespace image
+		{
+		
+			template <class BLEND>
+			SLIB_INLINE static void SetPixel(const BLEND& blend, ImageDesc& dst, sl_int32 x, sl_int32 y, const Color& color)
+			{
+				if (x < 0) {
+					return;
+				}
+				if (x >= (sl_int32)(dst.width)) {
+					return;
+				}
+				if (y < 0) {
+					return;
+				}
+				if (y >= (sl_int32)(dst.height)) {
+					return;
+				}
+				blend(dst.colors[dst.stride * y + x], color);
+			}
+
+			template <class BLEND>
+			void DrawEllipse(const BLEND& blend, ImageDesc& dst, sl_int32 x1, sl_int32 y1, sl_int32 x2, sl_int32 y2, const Color& color, sl_bool flagAntialias)
+			{
+				if (x1 == x2) {
+					return;
+				}
+				if (y1 == y2) {
+					return;
+				}
+				if (x1 > x2) {
+					sl_int32 t = x2;
+					x2 = x1;
+					x1 = t;
+				}
+				if (y1 > y2) {
+					sl_int32 t = y2;
+					y2 = y1;
+					y1 = t;
+				}
+				sl_int32 cy = (y1 + y2) >> 1;
+				sl_int32 w = x2 - x1;
+				sl_int32 h = y2 - y1;
+				sl_int32 a = w >> 1;
+				sl_int32 b = h >> 1;
+				if (flagAntialias) {
+					sl_int32 cx = (x1 + x2) >> 1;
+					sl_int32 mx1 = cx;
+					sl_int32 mx2 = cx;
+					sl_int32 my1 = cy;
+					sl_int32 my2 = cy;
+					SetPixel(blend, dst, mx2, y1, color);
+					SetPixel(blend, dst, mx2, y2 - 1, color);
+					if (!((x1 + x2) & 1)) {
+						mx1--;
+						a--;
+						SetPixel(blend, dst, mx1, y1, color);
+						SetPixel(blend, dst, mx1, y2 - 1, color);
+					}
+					SetPixel(blend, dst, x1, my2, color);
+					SetPixel(blend, dst, x2 - 1, my2, color);
+					if (!((y1 + y2) & 1)) {
+						my1--;
+						b--;
+						SetPixel(blend, dst, x1, my1, color);
+						SetPixel(blend, dst, x2 - 1, my1, color);
+					}
+					Color src = color;
+					sl_int32 aq = a * a;
+					sl_int32 bq = b * b;
+					sl_int32 abq = aq * bq;
+					sl_int32 nx = a - 1;
+					sl_int32 ny = b - 1;
+					float aqf = (float)aq;
+					float bqf = (float)bq;
+					{
+						float oy = (float)b;
+						sl_int32 x = 1;
+						for (; x < nx; x++) {
+							float y = Math::sqrt((float)(abq - x * x * bq) / aqf);
+							float yf = Math::floor(y);
+							sl_int32 iy = (sl_int32)yf;
+							float fy = y - yf;
+							if (y > oy + 1.0f) {
+								break;
+							}
+							sl_uint8 ify = (sl_uint8)(Math::clamp0_255((sl_int32)(color.a * fy)));
+							if (color.a > ify) {
+								src.a = color.a - ify;
+								SetPixel(blend, dst, mx2 + x, my1 - iy, src);
+								SetPixel(blend, dst, mx2 + x, my2 + iy, src);
+								SetPixel(blend, dst, mx1 - x, my1 - iy, src);
+								SetPixel(blend, dst, mx1 - x, my2 + iy, src);
+							}
+							if (ify) {
+								iy++;
+								src.a = ify;
+								SetPixel(blend, dst, mx2 + x, my1 - iy, src);
+								SetPixel(blend, dst, mx2 + x, my2 + iy, src);
+								SetPixel(blend, dst, mx1 - x, my1 - iy, src);
+								SetPixel(blend, dst, mx1 - x, my2 + iy, src);
+							}
+							oy = y;
+						}
+					}
+					{
+						float ox = (float)a;
+						sl_int32 y = 1;
+						for (; y < ny; y++) {
+							float x = Math::sqrt((float)(abq - y * y * aq) / bqf);
+							float xf = Math::floor(x);
+							sl_int32 ix = (sl_int32)xf;
+							float fx = x - xf;
+							if (x < ox - 1.0f) {
+								break;
+							}
+							sl_uint8 ifx = (sl_uint8)(Math::clamp0_255((sl_int32)(color.a * fx)));
+							if (color.a > ifx) {
+								src.a = color.a - ifx;
+								SetPixel(blend, dst, mx2 + ix, my1 - y, src);
+								SetPixel(blend, dst, mx2 + ix, my2 + y, src);
+								SetPixel(blend, dst, mx1 - ix, my1 - y, src);
+								SetPixel(blend, dst, mx1 - ix, my2 + y, src);
+							}
+							if (ifx) {
+								ix++;
+								src.a = ifx;
+								SetPixel(blend, dst, mx2 + ix, my1 - y, src);
+								SetPixel(blend, dst, mx2 + ix, my2 + y, src);
+								SetPixel(blend, dst, mx1 - ix, my1 - y, src);
+								SetPixel(blend, dst, mx1 - ix, my2 + y, src);
+							}
+							ox = x;
+						}
+					}
+				} else {
+					sl_int32 mx1 = x1;
+					sl_int32 mx2 = x2 - 1;
+					sl_int32 my1 = cy;
+					sl_int32 my2 = cy;
+					SetPixel(blend, dst, x1, cy, color);
+					SetPixel(blend, dst, x2 - 1, cy, color);
+					if (!((y1 + y2) & 1)) {
+						my1--;
+						SetPixel(blend, dst, x1, my2, color);
+						SetPixel(blend, dst, x2 - 1, my2, color);
+					}
+					sl_int32 aq = a * a;
+					sl_int32 bq = b * b;
+					sl_int32 dx = aq << 1;
+					sl_int32 dy = bq << 1;
+					sl_int32 r  = a * bq;
+					sl_int32 rx = r << 1;
+					sl_int32 ry = 0;
+					sl_int32 x = a;
+					while (x > 0) {
+						if (r > 0) {
+							my1++;
+							my2--;
+							ry += dx;
+							r -= ry;
+						}
+						if (r <= 0) {
+							x--;
+							mx1++;
+							mx2--;
+							rx -= dy;
+							r += rx;
+						}
+						SetPixel(blend, dst, mx1, my1, color);
+						SetPixel(blend, dst, mx1, my2, color);
+						SetPixel(blend, dst, mx2, my1, color);
+						SetPixel(blend, dst, mx2, my2, color);
+					}
+				}
+			}
+		
+			void DrawEllipse(ImageDesc& dst, sl_int32 x1, sl_int32 y1, sl_int32 x2, sl_int32 y2, const Color& color, BlendMode blend, sl_bool flagAntialias)
+			{
+				switch (blend) {
+					case BlendMode::Copy:
+						DrawEllipse(Blend_Copy<ColorOp_None>(ColorOp_None()), dst, x1, y1, x2, y2, color, flagAntialias);
+						break;
+					case BlendMode::Over:
+						DrawEllipse(Blend_Over<ColorOp_None>(ColorOp_None()), dst, x1, y1, x2, y2, color, flagAntialias);
+						break;
+				}
+			}
+		
+		}
+	}
+
+	void Image::drawEllipse(sl_int32 x1, sl_int32 y1, sl_int32 x2, sl_int32 y2, const Color& color, BlendMode blend)
+	{
+		priv::image::DrawEllipse(m_desc, x1, y1, x2, y2, color, blend, sl_false);
+	}
+
+	void Image::drawSmoothEllipse(sl_int32 x1, sl_int32 y1, sl_int32 x2, sl_int32 y2, const Color& color, BlendMode blend)
+	{
+		priv::image::DrawEllipse(m_desc, x1, y1, x2, y2, color, blend, sl_true);
 	}
 
 	namespace priv
@@ -2305,7 +2547,7 @@ namespace slib
 									Color* sc = src_colors + (src_stride * iy + ix);
 									if (ix >= 0) {
 										if (iy >= 0) {
-											float f = (1 - fx) * (1 - fy);
+											float f = (1.0f - fx) * (1.0f - fy);
 											Color& color = *sc;
 											sa += (sl_int32)(color.a * f);
 											sr += (sl_int32)(color.r * f);
@@ -2313,7 +2555,7 @@ namespace slib
 											sb += (sl_int32)(color.b * f);
 										}
 										if (iy < sh - 1) {
-											float f = (1 - fx) * fy;
+											float f = (1.0f - fx) * fy;
 											Color& color = sc[src_stride];
 											sa += (sl_int32)(color.a * f);
 											sr += (sl_int32)(color.r * f);
@@ -2323,7 +2565,7 @@ namespace slib
 									}
 									if (ix < sw - 1) {
 										if (iy >= 0) {
-											float f = fx * (1 - fy);
+											float f = fx * (1.0f - fy);
 											Color& color = sc[1];
 											sa += (sl_int32)(color.a * f);
 											sr += (sl_int32)(color.r * f);

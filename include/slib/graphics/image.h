@@ -233,6 +233,12 @@ namespace slib
 		
 		void drawSmoothLine(sl_int32 x1, sl_int32 y1, sl_int32 x2, sl_int32 y2, const Color& color, BlendMode blend = BlendMode::Over);
 		
+		void drawRectangle(sl_int32 x1, sl_int32 y1, sl_int32 x2, sl_int32 y2, const Color& color, BlendMode blend = BlendMode::Over);
+		
+		void drawEllipse(sl_int32 x1, sl_int32 y1, sl_int32 x2, sl_int32 y2, const Color& color, BlendMode blend = BlendMode::Over);
+		
+		void drawSmoothEllipse(sl_int32 x1, sl_int32 y1, sl_int32 x2, sl_int32 y2, const Color& color, BlendMode blend = BlendMode::Over);
+		
 		void drawImage(const Ref<Image>& src, const Matrix3& transform, BlendMode blend = BlendMode::Over, StretchMode stretch = StretchMode::Default);
 		
 		void drawImage(const Ref<Image>& src, const Color& srcAdd, const Matrix3& transform, BlendMode blend = BlendMode::Over, StretchMode stretch = StretchMode::Default);
