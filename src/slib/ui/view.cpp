@@ -9910,7 +9910,7 @@ namespace slib
 			if (IsInstanceOf<ScrollView>(view)) {
 				UIAction action = ev->getAction();
 				if (action == UIAction::TouchMove) {
-					if (capture.isNotNull() && capture.isNotNull() && capture != view) {
+					if (capture.isNotNull() && capture != view) {
 						setLockScroll(view.get(), sl_true);
 					}
 				} else {
