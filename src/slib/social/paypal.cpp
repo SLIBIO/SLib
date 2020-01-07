@@ -262,6 +262,10 @@ namespace slib
 		amount.putItem("value", String::format("%.2f", param.amount));
 		Json purchase_unit;
 		purchase_unit.putItem("amount", amount);
+		String description = param.description.trim();
+		if (description.isNotEmpty()) {
+			purchase_unit.putItem("description", description.substring(0, 126));
+		}
 		json.putItem("purchase_units", JsonList::createFromElement(purchase_unit));
 		Json application_context;
 		if (param.brandName.isNotEmpty()) {

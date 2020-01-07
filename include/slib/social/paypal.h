@@ -90,6 +90,7 @@ namespace slib
 		PayPalOrderIntent intent;
 		double amount;
 		String currencyCode;
+		String description;
 		
 		String brandName;
 		String locale;
