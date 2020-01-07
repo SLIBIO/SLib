@@ -300,7 +300,7 @@ namespace slib
 		} else if (action == UIAction::LeftButtonDrag || action == UIAction::TouchMove) {
 			if (m_flagMouseDown && !(isLockScroll())) {
 				sl_real dx = Math::abs(pos.x - m_posMouseDown.x);
-				if (dx > 5 * dimUnit) {
+				if (dx > 10 * dimUnit) {
 					cancelPressedStateOfChildren();
 					sl_real dy = Math::abs(pos.y - m_posMouseDown.y);
 					if (dy < dx) {
@@ -364,7 +364,9 @@ namespace slib
 		} else if (action == UIAction::LeftButtonUp || action == UIAction::TouchEnd || action == UIAction::TouchCancel) {
 			if (m_flagMouseDown && !(isLockScroll())) {
 				sl_real v = 0;
-				m_motionTracker.getVelocity(&v, sl_null);
+				if (Math::abs(m_offsetPages) > dimUnit * 10) {
+					m_motionTracker.getVelocity(&v, sl_null);
+				}
 				sl_real t = dimUnit * 10;
 				if (v > t) {
 					if (m_offsetPages > 0) {
