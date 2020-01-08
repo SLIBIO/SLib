@@ -246,6 +246,7 @@ namespace slib
 		ViewGroup::setLockScroll(flag);
 		if (flag) {
 			m_flagMouseDown = sl_false;
+			_selectPage(sl_true, m_indexCurrent);
 		}
 	}
 	
@@ -298,17 +299,31 @@ namespace slib
 			m_offsetPagesMouseDown = m_offsetPages;
 			m_timer.setNull();
 		} else if (action == UIAction::LeftButtonDrag || action == UIAction::TouchMove) {
-			if (m_flagMouseDown && !(isLockScroll())) {
+			if (m_flagMouseDown) {
+				if (isLockScroll()) {
+					if (m_offsetPages && m_timer.isNull()) {
+						_selectPage(sl_true, m_indexCurrent);
+					}
+					return;
+				}
 				sl_real dx = Math::abs(pos.x - m_posMouseDown.x);
+				sl_real dy = Math::abs(pos.y - m_posMouseDown.y);
 				if (dx > 10 * dimUnit) {
 					cancelPressedStateOfChildren();
-					sl_real dy = Math::abs(pos.y - m_posMouseDown.y);
 					if (dy < dx) {
 						setCapturingEvents(sl_true);
 						Ref<View> parent = getParent();
 						if (parent.isNotNull()) {
 							parent->setLockScroll(sl_true);
 						}
+					}
+				}
+				if (dy > 10 * dimUnit) {
+					if (dy >= dx) {
+						m_flagMouseDown = sl_false;
+						m_motionTracker.clearMovements();
+						_selectPage(sl_true, m_indexCurrent);
+						return;
 					}
 				}
 				m_motionTracker.addMovement(pos.x, pos.y);
