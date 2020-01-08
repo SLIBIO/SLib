@@ -9300,25 +9300,38 @@ namespace slib
 		
 		sl_bool flagHorz = scrollAttrs->flagHorz;
 		sl_bool flagVert = scrollAttrs->flagVert;
+		
+		if (flagHorz && scrollAttrs->contentWidth <= (sl_scroll_pos)(getWidth())) {
+			flagHorz = sl_false;
+		}
+		if (flagVert && scrollAttrs->contentHeight <= (sl_scroll_pos)(getHeight())) {
+			flagVert = sl_false;
+		}
+
+		if (!flagHorz && !flagVert) {
+			return;
+		}
 		if (!(flagHorz && flagVert)) {
 			if (action == UIAction::TouchMove) {
-				sl_real dx = Math::abs(ev->getX() - scrollAttrs->mousePointDown.x);
-				sl_real dy = Math::abs(ev->getY() - scrollAttrs->mousePointDown.y);
-				sl_real d0, d1;
-				if (flagHorz) {
-					d0 = dx;
-					d1 = dy;
-				} else {
-					d0 = dy;
-					d1 = dx;
-				}
-				if (d0 > UI::dpToPixel(5)) {
-					cancelPressedStateOfChildren();
-					if (d1 < d0) {
-						setCapturingEvents(sl_true);
-						Ref<View> parent = getParent();
-						if (parent.isNotNull()) {
-							parent->setLockScroll(sl_true);
+				if (scrollAttrs->flagDownContent) {
+					sl_real dx = Math::abs(ev->getX() - scrollAttrs->mousePointDown.x);
+					sl_real dy = Math::abs(ev->getY() - scrollAttrs->mousePointDown.y);
+					sl_real d0, d1;
+					if (flagHorz) {
+						d0 = dx;
+						d1 = dy;
+					} else {
+						d0 = dy;
+						d1 = dx;
+					}
+					if (d0 > UI::dpToPixel(5)) {
+						cancelPressedStateOfChildren();
+						if (d1 < d0) {
+							setCapturingEvents(sl_true);
+							Ref<View> parent = getParent();
+							if (parent.isNotNull()) {
+								parent->setLockScroll(sl_true);
+							}
 						}
 					}
 				}
@@ -9333,16 +9346,6 @@ namespace slib
 			}
 		}
 		
-		if (flagHorz && scrollAttrs->contentWidth <= (sl_scroll_pos)(getWidth())) {
-			flagHorz = sl_false;
-		}
-		if (flagVert && scrollAttrs->contentHeight <= (sl_scroll_pos)(getHeight())) {
-			flagVert = sl_false;
-		}
-		if (!flagHorz && !flagVert) {
-			return;
-		}
-
 		if (isNativeWidget()) {
 			switch (action) {
 				case UIAction::LeftButtonDown:
