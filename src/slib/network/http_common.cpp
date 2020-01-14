@@ -1463,14 +1463,11 @@ namespace slib
 			output.addStatic("\r\n");
 			output.addStatic("Content-Disposition: form-data; name=\"");
 			output.addStatic(name.getData(), name.getLength());
-			output.addStatic("\"");
 			if (fileName.isNotNull()) {
-				output.addStatic("; filename=\"");
+				output.addStatic("\"; filename=\"");
 				output.add(Memory::create(fileName.getData(), fileName.getLength()));
-				output.addStatic("\"\r\n");
-			} else {
-				output.addStatic("\"\r\n");
 			}
+			output.addStatic("\"\r\n");
 			if (headers) {
 				for (auto& header: *headers) {
 					if (header.key.equalsIgnoreCase(HttpHeader::ContentDisposition)) {
