@@ -161,28 +161,32 @@ namespace slib
 
 
 	class SLIB_EXPORT UIEvent : public Referable
-	{	
+	{
+		SLIB_DECLARE_OBJECT
+		
 	protected:
 		UIEvent();
+		
+		UIEvent(UIAction action, const Time& time);
 		
 		~UIEvent();
 		
 		SLIB_DELETE_CLASS_DEFAULT_MEMBERS(UIEvent)
 		
 	public:
-		static Ref<UIEvent> create(UIAction action);
+		static Ref<UIEvent> createUnknown(const Time& time);
 		
 		static Ref<UIEvent> createKeyEvent(UIAction action, Keycode keycode, sl_uint32 systemKeycode, const Time& time);
 		
 		static Ref<UIEvent> createMouseEvent(UIAction action, sl_ui_posf x, sl_ui_posf y, const Time& time);
+		
+		static Ref<UIEvent> createSetCursorEvent(sl_ui_posf x, sl_ui_posf y, const Time& time);
 		
 		static Ref<UIEvent> createMouseWheelEvent(sl_ui_posf mouseX, sl_ui_posf mouseY, sl_real deltaX, sl_real deltaY, const Time& time);
 		
 		static Ref<UIEvent> createTouchEvent(UIAction action, const Array<TouchPoint>& points, const Time& time);
 		
 		static Ref<UIEvent> createTouchEvent(UIAction action, const TouchPoint& point, const Time& time);
-		
-		static Ref<UIEvent> createSetCursorEvent(sl_ui_posf x, sl_ui_posf y, const Time& time);
 		
 	public:
 		UIAction getAction() const;
@@ -194,6 +198,8 @@ namespace slib
 		sl_bool isMouseEvent() const;
 		
 		sl_bool isTouchEvent() const;
+		
+		sl_bool isDragEvent() const;
 		
 		// Relative to a absolute time or to the system startup
 		Time getTime() const;
@@ -263,11 +269,11 @@ namespace slib
 		
 		void setPressure(sl_real pressure);
 		
-		Array<TouchPoint> getTouchPoints() const;
+		const Array<TouchPoint>& getTouchPoints() const;
 		
 		sl_uint32 getTouchPointsCount() const;
 		
-		TouchPoint getTouchPoint(sl_uint32 index) const;
+		const TouchPoint& getTouchPoint(sl_uint32 index) const;
 		
 		void setTouchPoints(const Array<TouchPoint>& points);
 
@@ -344,7 +350,7 @@ namespace slib
 		
 		void setPassedToNext(sl_bool flag);
 		
-		Ref<UIEvent> duplicate();
+		virtual Ref<UIEvent> duplicate() const;
 		
 		static sl_uint32 getSystemKeycode(Keycode key);
 		
@@ -355,24 +361,14 @@ namespace slib
 		static Keycode getKeycodeFromName(const String& keyName);
 		
 	protected:
-		UIEventFlags m_flags;
 		UIAction m_action;
 		Time m_time;
-		
-		// keyboard
+		UIEventFlags m_flags;
 		KeycodeAndModifiers m_keycodeAndModifiers;
-		sl_uint32 m_systemKeycode;
 		
-		// mouse, touch, mouse wheel
-		TouchPoint m_point;
-		
-		// mouse wheel
-		sl_real m_deltaX;
-		sl_real m_deltaY;
-		
-		// touch
-		Array<TouchPoint> m_points;
-		
+	protected:
+		void _copyProperties(const UIEvent* other);
+
 	};
 
 }

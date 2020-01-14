@@ -181,7 +181,7 @@ namespace slib
 					if (event == nil) {
 						event = [NSApp currentEvent];
 						if (event == nil) {
-							Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
+							Ref<UIEvent> ev = UIEvent::createUnknown(Time::now());
 							if (ev.isNotNull()) {
 								dispatchEvent(ev.get());
 							}

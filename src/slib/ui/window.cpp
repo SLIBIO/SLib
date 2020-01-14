@@ -1653,7 +1653,7 @@ namespace slib
 
 	void Window::dispatchOK()
 	{
-		Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
+		Ref<UIEvent> ev = UIEvent::createUnknown(Time::now());
 		if (ev.isNotNull()) {
 			dispatchOK(ev.get());
 		}
@@ -1676,7 +1676,7 @@ namespace slib
 
 	void Window::dispatchCancel()
 	{
-		Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
+		Ref<UIEvent> ev = UIEvent::createUnknown(Time::now());
 		if (ev.isNotNull()) {
 			dispatchCancel(ev.get());
 		}
@@ -1891,7 +1891,7 @@ namespace slib
 	{
 		Ref<Window> window = getWindow();
 		if (window.isNotNull()) {
-			Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
+			Ref<UIEvent> ev = UIEvent::createUnknown(Time::now());
 			if (ev.isNotNull()) {
 				window->dispatchClose(ev.get());
 				if (ev->isPreventedDefault()) {

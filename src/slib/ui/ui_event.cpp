@@ -209,7 +209,128 @@ sl_bool UIEvent::is##NAME##Key() const \
 	}
 
 
-	UIEvent::UIEvent() : m_flags(0), m_action(UIAction::Unknown), m_time(0), m_systemKeycode(0), m_deltaX(0), m_deltaY(0)
+	SLIB_DEFINE_ROOT_OBJECT(UIEvent)
+
+	namespace priv
+	{
+		namespace ui_event
+		{
+			
+			class KeyboardEvent : public UIEvent
+			{
+			public:
+				sl_uint32 m_systemKeycode;
+				
+			public:
+				KeyboardEvent(UIAction action, const Time& time, sl_uint32 systemKeyboard) : UIEvent(action, time), m_systemKeycode(systemKeyboard)
+				{
+				}
+				
+			public:
+				Ref<UIEvent> duplicate() const override
+				{
+					KeyboardEvent* ret = new KeyboardEvent(m_action, m_time, m_systemKeycode);
+					if (ret) {
+						ret->_copyProperties(this);
+						return ret;
+					}
+					return sl_null;
+				}
+
+			};
+			
+			class MouseEvent : public UIEvent
+			{
+			public:
+				TouchPoint m_pt;
+				
+			public:
+				MouseEvent(UIAction action, const Time& time, sl_ui_posf x, sl_ui_posf y) : UIEvent(action, time), m_pt(x, y)
+				{
+				}
+
+				MouseEvent(UIAction action, const Time& time, const TouchPoint& pt) : UIEvent(action, time), m_pt(pt)
+				{
+				}
+				
+			public:
+				Ref<UIEvent> duplicate() const override
+				{
+					MouseEvent* ret = new MouseEvent(m_action, m_time, m_pt);
+					if (ret) {
+						ret->_copyProperties(this);
+						return ret;
+					}
+					return sl_null;
+				}
+
+			};
+			
+			class MouseWheelEvent : public MouseEvent
+			{
+			public:
+				sl_real m_deltaX;
+				sl_real m_deltaY;
+				
+			public:
+				MouseWheelEvent(UIAction action, const Time& time, sl_ui_posf x, sl_ui_posf y, sl_real deltaX, sl_real deltaY) : MouseEvent(action, time, x, y), m_deltaX(deltaX), m_deltaY(deltaY)
+				{
+				}
+				
+			public:
+				Ref<UIEvent> duplicate() const override
+				{
+					MouseWheelEvent* ret = new MouseWheelEvent(m_action, m_time, m_pt.point.x, m_pt.point.y, m_deltaX, m_deltaY);
+					if (ret) {
+						ret->_copyProperties(this);
+						return ret;
+					}
+					return sl_null;
+				}
+
+			};
+			
+			class TouchEvent : public MouseEvent
+			{
+			public:
+				Array<TouchPoint> m_points;
+				
+			public:
+				TouchEvent(UIAction action, const Time& time, const TouchPoint& pt) : MouseEvent(action, time, pt)
+				{
+				}
+
+				TouchEvent(UIAction action, const Time& time, const Array<TouchPoint>& points) : MouseEvent(action, time, 0, 0), m_points(points)
+				{
+					if (points.getCount()) {
+						m_pt = points[0];
+					}
+				}
+
+			public:
+				Ref<UIEvent> duplicate() const override
+				{
+					TouchEvent* ret = new TouchEvent(m_action, m_time, m_points);
+					if (ret) {
+						ret->_copyProperties(this);
+						ret->m_pt = m_pt;
+						return ret;
+					}
+					return sl_null;
+				}
+
+			};
+			
+		}
+	}
+
+	using namespace priv::ui_event;
+
+	UIEvent::UIEvent() : m_flags(0), m_action(UIAction::Unknown), m_time(0)
+	{
+	}
+
+	UIEvent::UIEvent(UIAction action, const Time& time) : m_flags(0), m_action(action), m_time(time)
 	{
 	}
 
@@ -217,96 +338,46 @@ sl_bool UIEvent::is##NAME##Key() const \
 	{
 	}
 
-	Ref<UIEvent> UIEvent::create(UIAction action)
+	Ref<UIEvent> UIEvent::createUnknown(const Time& time)
 	{
-		Ref<UIEvent> ret = new UIEvent;
-		if (ret.isNotNull()) {
-			ret->setAction(action);
-			return ret;
-		}
-		return sl_null;
+		return new UIEvent(UIAction::Unknown, time);
 	}
 
 	Ref<UIEvent> UIEvent::createKeyEvent(UIAction action, Keycode keycode, sl_uint32 systemKeycode, const Time& time)
 	{
-		Ref<UIEvent> ret = new UIEvent;
+		Ref<KeyboardEvent> ret = new KeyboardEvent(action, time, systemKeycode);
 		if (ret.isNotNull()) {
-			ret->setAction(action);
 			ret->setKeycode(keycode);
-			ret->setSystemKeycode(systemKeycode);
-			ret->setTime(time);
-			return ret;
+			return Ref<UIEvent>::from(ret);
 		}
 		return sl_null;
 	}
 
 	Ref<UIEvent> UIEvent::createMouseEvent(UIAction action, sl_ui_posf x, sl_ui_posf y, const Time& time)
 	{
-		Ref<UIEvent> ret = new UIEvent;
-		if (ret.isNotNull()) {
-			ret->setAction(action);
-			ret->setX(x);
-			ret->setY(y);
-			ret->setTime(time);
-			return ret;
-		}
-		return sl_null;
-	}
-
-	Ref<UIEvent> UIEvent::createMouseWheelEvent(sl_ui_posf mouseX, sl_ui_posf mouseY, sl_real deltaX, sl_real deltaY, const Time& time)
-	{
-		Ref<UIEvent> ret = new UIEvent;
-		if (ret.isNotNull()) {
-			ret->setAction(UIAction::MouseWheel);
-			ret->setX(mouseX);
-			ret->setY(mouseY);
-			ret->setDeltaX(deltaX);
-			ret->setDeltaY(deltaY);
-			ret->setTime(time);
-			return ret;
-		}
-		return sl_null;
-	}
-
-	Ref<UIEvent> UIEvent::createTouchEvent(UIAction action, const Array<TouchPoint>& points, const Time& time)
-	{
-		Ref<UIEvent> ret = new UIEvent;
-		if (ret.isNotNull()) {
-			ret->setAction(action);
-			ret->setTouchPoints(points);
-			if (points.getCount() > 0) {
-				ret->setTouchPoint((points.getData())[0]);
-			}
-			ret->setTime(time);
-			return ret;
-		}
-		return sl_null;
-	}
-	
-	Ref<UIEvent> UIEvent::createTouchEvent(UIAction action, const TouchPoint& point, const Time& time)
-	{
-		Ref<UIEvent> ret = new UIEvent;
-		if (ret.isNotNull()) {
-			ret->setAction(action);
-			ret->setTouchPoint(point);
-			ret->setTime(time);
-			return ret;
-		}
-		return sl_null;
+		return new MouseEvent(action, time, x, y);
 	}
 
 	Ref<UIEvent> UIEvent::createSetCursorEvent(sl_ui_posf x, sl_ui_posf y, const Time& time)
 	{
-		Ref<UIEvent> ret = new UIEvent;
-		if (ret.isNotNull()) {
-			ret->setAction(UIAction::SetCursor);
-			ret->setPoint(x, y);
-			ret->setTime(time);
-			return ret;
-		}
-		return sl_null;
+		return new MouseEvent(UIAction::SetCursor, time, x, y);
+	}
+
+	Ref<UIEvent> UIEvent::createMouseWheelEvent(sl_ui_posf mouseX, sl_ui_posf mouseY, sl_real deltaX, sl_real deltaY, const Time& time)
+	{
+		return new MouseWheelEvent(UIAction::MouseWheel, time, mouseX, mouseY, deltaX, deltaY);
+	}
+
+	Ref<UIEvent> UIEvent::createTouchEvent(UIAction action, const Array<TouchPoint>& points, const Time& time)
+	{
+		return new TouchEvent(action, time, points);
 	}
 	
+	Ref<UIEvent> UIEvent::createTouchEvent(UIAction action, const TouchPoint& point, const Time& time)
+	{
+		return new TouchEvent(action, time, Array<TouchPoint>::create(&point, 1));
+	}
+
 	UIAction UIEvent::getAction() const
 	{
 		return m_action;
@@ -319,17 +390,22 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	sl_bool UIEvent::isKeyEvent() const
 	{
-		return ((sl_uint32)m_action & 0xff00) == 0x0100;
+		return ((sl_uint32)m_action & SLIB_UI_ACTION_TYPE_KEYBOARD) != 0;
 	}
 
 	sl_bool UIEvent::isMouseEvent() const
 	{
-		return ((sl_uint32)m_action & 0xff00) == 0x0200;
+		return ((sl_uint32)m_action & SLIB_UI_ACTION_TYPE_MOUSE) != 0;
 	}
 
 	sl_bool UIEvent::isTouchEvent() const
 	{
-		return ((sl_uint32)m_action & 0xff00) == 0x0300;
+		return ((sl_uint32)m_action & SLIB_UI_ACTION_TYPE_TOUCH) != 0;
+	}
+
+	sl_bool UIEvent::isDragEvent() const
+	{
+		return ((sl_uint32)m_action & SLIB_UI_ACTION_TYPE_DRAG) != 0;
 	}
 
 	Time UIEvent::getTime() const
@@ -374,159 +450,219 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	sl_uint32 UIEvent::getSystemKeycode() const
 	{
-		return m_systemKeycode;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_KEYBOARD) {
+			return ((KeyboardEvent*)this)->m_systemKeycode;
+		}
+		return 0;
 	}
 
 	void UIEvent::setSystemKeycode(sl_uint32 keycode)
 	{
-		m_systemKeycode = keycode;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_KEYBOARD) {
+			((KeyboardEvent*)this)->m_systemKeycode = keycode;
+		}
 	}
 
 	const UIPointf& UIEvent::getPoint() const
 	{
-		return m_point.point;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+			return ((MouseEvent*)this)->m_pt.point;
+		}
+		return UIPointf::zero();
 	}
 
 	void UIEvent::setPoint(const UIPointf& pt)
 	{
-		m_point.point = pt;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+			((MouseEvent*)this)->m_pt.point = pt;
+		}
 	}
 
 	void UIEvent::setPoint(sl_ui_posf x, sl_ui_posf y)
 	{
-		m_point.point.x = x;
-		m_point.point.y = y;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+			((MouseEvent*)this)->m_pt.point.x = x;
+			((MouseEvent*)this)->m_pt.point.y = y;
+		}
 	}
 
 	sl_ui_posf UIEvent::getX() const
 	{
-		return m_point.point.x;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+			return ((MouseEvent*)this)->m_pt.point.x;
+		}
+		return 0;
 	}
 
 	void UIEvent::setX(sl_ui_posf x)
 	{
-		m_point.point.x = x;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+			((MouseEvent*)this)->m_pt.point.x = x;
+		}
 	}
 
 	sl_ui_posf UIEvent::getY() const
 	{
-		return m_point.point.y;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+			return ((MouseEvent*)this)->m_pt.point.y;
+		}
+		return 0;
 	}
 
 	void UIEvent::setY(sl_ui_posf y)
 	{
-		m_point.point.y = y;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+			((MouseEvent*)this)->m_pt.point.y = y;
+		}
 	}
 
 	sl_real UIEvent::getDelta() const
 	{
-		return m_deltaY;
+		return getDeltaY();
 	}
 
 	void UIEvent::setDelta(sl_real delta)
 	{
-		m_deltaY = delta;
+		setDeltaY(delta);
 	}
 
 	sl_real UIEvent::getDeltaX() const
 	{
-		return m_deltaX;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE_WHEEL) {
+			return ((MouseWheelEvent*)this)->m_deltaX;
+		}
+		return 0;
 	}
 
 	void UIEvent::setDeltaX(sl_real x)
 	{
-		m_deltaX = x;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE_WHEEL) {
+			((MouseWheelEvent*)this)->m_deltaX = x;
+		}
 	}
 
 	sl_real UIEvent::getDeltaY() const
 	{
-		return m_deltaY;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE_WHEEL) {
+			return ((MouseWheelEvent*)this)->m_deltaY;
+		}
+		return 0;
 	}
 
 	void UIEvent::setDeltaY(sl_real y)
 	{
-		m_deltaY = y;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE_WHEEL) {
+			((MouseWheelEvent*)this)->m_deltaY = y;
+		}
 	}
 
 	const TouchPoint& UIEvent::getTouchPoint() const
 	{
-		return m_point;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+			return ((MouseEvent*)this)->m_pt;
+		}
+		static const char zero[sizeof(TouchPoint)] = {0};
+		return *((TouchPoint*)(void*)zero);
 	}
 
 	void UIEvent::setTouchPoint(const TouchPoint& pt)
 	{
-		m_point = pt;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+			((MouseEvent*)this)->m_pt = pt;
+		}
 	}
 
 	void UIEvent::setTouchPoint(const UIPointf& pt)
 	{
-		m_point.point = pt;
-		m_point.pressure = 0;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+			((MouseEvent*)this)->m_pt.point = pt;
+			((MouseEvent*)this)->m_pt.pressure = 0;
+		}
 	}
 
 	void UIEvent::setTouchPoint(const UIPointf& pt, sl_real pressure)
 	{
-		m_point.point = pt;
-		m_point.pressure = pressure;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+			((MouseEvent*)this)->m_pt.point = pt;
+			((MouseEvent*)this)->m_pt.pressure = pressure;
+		}
 	}
 
 	void UIEvent::setTouchPoint(sl_ui_posf x, sl_ui_posf y)
 	{
-		m_point.point.x = x;
-		m_point.point.y = y;
-		m_point.pressure = 0;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+			((MouseEvent*)this)->m_pt.point.x = x;
+			((MouseEvent*)this)->m_pt.point.y = y;
+			((MouseEvent*)this)->m_pt.pressure = 0;
+		}
 	}
 
 	void UIEvent::setTouchPoint(sl_ui_posf x, sl_ui_posf y, sl_real pressure)
 	{
-		m_point.point.x = x;
-		m_point.point.y = y;
-		m_point.pressure = pressure;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+			((MouseEvent*)this)->m_pt.point.x = x;
+			((MouseEvent*)this)->m_pt.point.y = y;
+			((MouseEvent*)this)->m_pt.pressure = pressure;
+		}
 	}
 
 	sl_real UIEvent::getPressure() const
 	{
-		return m_point.pressure;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+			return ((MouseEvent*)this)->m_pt.pressure;
+		}
+		return 0;
 	}
 
 	void UIEvent::setPressure(sl_real pressure)
 	{
-		m_point.pressure = pressure;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+			((MouseEvent*)this)->m_pt.pressure = pressure;
+		}
 	}
 
-	Array<TouchPoint> UIEvent::getTouchPoints() const
+	const Array<TouchPoint>& UIEvent::getTouchPoints() const
 	{
-		return m_points;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_TOUCH) {
+			return ((TouchEvent*)this)->m_points;
+		}
+		return Array<TouchPoint>::null();
 	}
 
 	sl_uint32 UIEvent::getTouchPointsCount() const
 	{
-		return (sl_uint32)(m_points.getCount());
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_TOUCH) {
+			return (sl_uint32)(((TouchEvent*)this)->m_points.getCount());
+		}
+		return 0;
 	}
 
-	TouchPoint UIEvent::getTouchPoint(sl_uint32 index) const
+	const TouchPoint& UIEvent::getTouchPoint(sl_uint32 index) const
 	{
-		if (index < m_points.getCount()) {
-			TouchPoint pt;
-			m_points.getAt(index, &pt);
-			return pt;
-		} else {
-			return m_point;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_TOUCH) {
+			if (index < ((TouchEvent*)this)->m_points.getCount()) {
+				return ((TouchEvent*)this)->m_points[index];
+			} else {
+				return ((TouchEvent*)this)->m_pt;
+			}
 		}
+		return getTouchPoint();
 	}
 
 	void UIEvent::setTouchPoints(const Array<TouchPoint>& points)
 	{
-		m_points = points;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_TOUCH) {
+			((TouchEvent*)this)->m_points = points;
+		}
 	}
 
 	void UIEvent::transformPoints(const Matrix3f& mat)
 	{
-		if (isMouseEvent() || isTouchEvent()) {
-			m_point.point = mat.transformPosition(m_point.point);
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+			((MouseEvent*)this)->m_pt.point = mat.transformPosition(((MouseEvent*)this)->m_pt.point);
 		}
-		if (isTouchEvent()) {
-			Array<TouchPoint> points = m_points;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_TOUCH) {
+			Array<TouchPoint>& points = ((TouchEvent*)this)->m_points;
 			sl_size n = points.getCount();
 			TouchPoint* pts = points.getData();
 			for (sl_size i = 0; i < n; i++) {
@@ -537,11 +673,11 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	void UIEvent::transformPoints(const Matrix3lf& mat)
 	{
-		if (isMouseEvent() || isTouchEvent()) {
-			m_point.point = mat.transformPosition(m_point.point);
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+			((MouseEvent*)this)->m_pt.point = mat.transformPosition(((MouseEvent*)this)->m_pt.point);
 		}
-		if (isTouchEvent()) {
-			Array<TouchPoint> points = m_points;
+		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_TOUCH) {
+			Array<TouchPoint>& points = ((TouchEvent*)this)->m_points;
 			sl_size n = points.getCount();
 			TouchPoint* pts = points.getData();
 			for (sl_size i = 0; i < n; i++) {
@@ -627,21 +763,20 @@ sl_bool UIEvent::is##NAME##Key() const \
 		}
 	}
 	
-	Ref<UIEvent> UIEvent::duplicate()
+	Ref<UIEvent> UIEvent::duplicate() const
 	{
-		Ref<UIEvent> ret = new UIEvent();
+		Ref<UIEvent> ret = new UIEvent(m_action, m_time);
 		if (ret.isNotNull()) {
-			ret->m_flags = m_flags;
-			ret->m_action = m_action;
-			ret->m_time = m_time;
-			ret->m_keycodeAndModifiers = m_keycodeAndModifiers;
-			ret->m_systemKeycode = m_systemKeycode;
-			ret->m_point = m_point;
-			ret->m_deltaX = m_deltaX;
-			ret->m_deltaY = m_deltaY;
-			ret->m_points = m_points.duplicate();
+			ret->_copyProperties(this);
+			return ret;
 		}
-		return ret;
+		return sl_null;
+	}
+
+	void UIEvent::_copyProperties(const UIEvent* other)
+	{
+		m_flags = other->m_flags;
+		m_keycodeAndModifiers = other->m_keycodeAndModifiers;
 	}
 
 	namespace priv

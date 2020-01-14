@@ -8977,7 +8977,7 @@ namespace slib
 
 	void View::dispatchClick()
 	{
-		Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
+		Ref<UIEvent> ev = UIEvent::createUnknown(Time::now());
 		if (ev.isNotNull()) {
 			dispatchClickEvent(ev.get());
 		}
@@ -9161,7 +9161,7 @@ namespace slib
 
 	void View::dispatchOK()
 	{
-		Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
+		Ref<UIEvent> ev = UIEvent::createUnknown(Time::now());
 		if (ev.isNotNull()) {
 			dispatchOK(ev.get());
 		}
@@ -9190,7 +9190,7 @@ namespace slib
 
 	void View::dispatchCancel()
 	{
-		Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
+		Ref<UIEvent> ev = UIEvent::createUnknown(Time::now());
 		if (ev.isNotNull()) {
 			dispatchCancel(ev.get());
 		}

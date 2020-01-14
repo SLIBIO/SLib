@@ -380,7 +380,7 @@ namespace slib
 	{
 		Ref<MobileApp> app = getApp();
 		if (app.isNotNull()) {
-			Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
+			Ref<UIEvent> ev = UIEvent::createUnknown(Time::now());
 			if (ev.isNotNull()) {
 				app->dispatchBackPressed(ev.get());
 				if (ev->isPreventedDefault()) {

@@ -30,37 +30,51 @@
 namespace slib
 {
 
+#define SLIB_UI_ACTION_TYPE_KEYBOARD 0x00000100
+#define SLIB_UI_ACTION_TYPE_MOUSE 0x00000200
+#define SLIB_UI_ACTION_TYPE_MOUSE_WHEEL (0x00000400 | SLIB_UI_ACTION_TYPE_MOUSE)
+#define SLIB_UI_ACTION_TYPE_TOUCH (0x00000800 | SLIB_UI_ACTION_TYPE_MOUSE)
+#define SLIB_UI_ACTION_TYPE_DRAG 0x00001000
+
 	enum class UIAction
 	{
 		Unknown = 0x0000,
 		// keyboard
-		KeyDown = 0x0101,
-		KeyUp = 0x0102,
+		KeyDown = SLIB_UI_ACTION_TYPE_KEYBOARD | 0x01,
+		KeyUp = SLIB_UI_ACTION_TYPE_KEYBOARD | 0x02,
 		// mouse
-		MouseMove = 0x0201,
-		MouseEnter = 0x0202,
-		MouseLeave = 0x0203,
-		LeftButtonDown = 0x0204,
-		LeftButtonUp = 0x0205,
-		LeftButtonDrag = 0x0206,
-		RightButtonDown = 0x0207,
-		RightButtonUp = 0x0208,
-		RightButtonDrag = 0x0209,
-		MiddleButtonDown = 0x020a,
-		MiddleButtonUp = 0x020b,
-		MiddleButtonDrag = 0x020c,
-		LeftButtonDoubleClick = 0x020d,
-		RightButtonDoubleClick = 0x020e,
-		MiddleButtonDoubleClick = 0x020f,
+		MouseMove = SLIB_UI_ACTION_TYPE_MOUSE | 0x01,
+		MouseEnter = SLIB_UI_ACTION_TYPE_MOUSE | 0x02,
+		MouseLeave = SLIB_UI_ACTION_TYPE_MOUSE | 0x03,
+		LeftButtonDown = SLIB_UI_ACTION_TYPE_MOUSE | 0x04,
+		LeftButtonUp = SLIB_UI_ACTION_TYPE_MOUSE | 0x05,
+		LeftButtonDrag = SLIB_UI_ACTION_TYPE_MOUSE | 0x06,
+		RightButtonDown = SLIB_UI_ACTION_TYPE_MOUSE | 0x07,
+		RightButtonUp = SLIB_UI_ACTION_TYPE_MOUSE | 0x08,
+		RightButtonDrag = SLIB_UI_ACTION_TYPE_MOUSE | 0x09,
+		MiddleButtonDown = SLIB_UI_ACTION_TYPE_MOUSE | 0x0a,
+		MiddleButtonUp = SLIB_UI_ACTION_TYPE_MOUSE | 0x0b,
+		MiddleButtonDrag = SLIB_UI_ACTION_TYPE_MOUSE | 0x0c,
+		LeftButtonDoubleClick = SLIB_UI_ACTION_TYPE_MOUSE | 0x0d,
+		RightButtonDoubleClick = SLIB_UI_ACTION_TYPE_MOUSE | 0x0e,
+		MiddleButtonDoubleClick = SLIB_UI_ACTION_TYPE_MOUSE | 0x0f,
+		SetCursor = SLIB_UI_ACTION_TYPE_MOUSE | 0x10,
 		// mouse wheel
-		MouseWheel = 0x0210,
+		MouseWheel = SLIB_UI_ACTION_TYPE_MOUSE_WHEEL | 0x01,
 		// touch
-		TouchBegin = 0x0301,
-		TouchMove = 0x0302,
-		TouchEnd = 0x0303,
-		TouchCancel = 0x0304,
-		// other
-		SetCursor = 0x0401,
+		TouchBegin = SLIB_UI_ACTION_TYPE_TOUCH | 0x01,
+		TouchMove = SLIB_UI_ACTION_TYPE_TOUCH | 0x02,
+		TouchEnd = SLIB_UI_ACTION_TYPE_TOUCH | 0x03,
+		TouchCancel = SLIB_UI_ACTION_TYPE_TOUCH | 0x04,
+		// drag & drop
+		DragStart = SLIB_UI_ACTION_TYPE_DRAG | 0x02,
+		DragEnd = SLIB_UI_ACTION_TYPE_DRAG | 0x03,
+		Drag = SLIB_UI_ACTION_TYPE_DRAG | 0x04,
+		Drop = SLIB_UI_ACTION_TYPE_DRAG | 0x11,
+		DragEnter = SLIB_UI_ACTION_TYPE_DRAG | 0x12,
+		DragLeave = SLIB_UI_ACTION_TYPE_DRAG | 0x13,
+		DragOver = SLIB_UI_ACTION_TYPE_DRAG | 0x14
+		
 	};
 	
 	class UIEventFlags
