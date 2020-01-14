@@ -310,11 +310,19 @@ sl_bool UIEvent::is##NAME##Key() const \
 			public:
 				Ref<UIEvent> duplicate() const override
 				{
-					TouchEvent* ret = new TouchEvent(m_action, m_time, m_points);
-					if (ret) {
-						ret->_copyProperties(this);
-						ret->m_pt = m_pt;
-						return ret;
+					if (m_points.isNotNull()) {
+						TouchEvent* ret = new TouchEvent(m_action, m_time, m_points.duplicate());
+						if (ret) {
+							ret->_copyProperties(this);
+							ret->m_pt = m_pt;
+							return ret;
+						}
+					} else {
+						TouchEvent* ret = new TouchEvent(m_action, m_time, m_pt);
+						if (ret) {
+							ret->_copyProperties(this);
+							return ret;
+						}
 					}
 					return sl_null;
 				}
