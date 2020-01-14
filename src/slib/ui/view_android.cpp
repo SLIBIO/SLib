@@ -104,7 +104,23 @@ namespace slib
 			{
 				Ref<Android_ViewInstance> instance = Android_ViewInstance::findInstance(jinstance);
 				if (instance.isNotNull()) {
-					UIAction action = (UIAction)_action;
+					UIAction action;
+					switch (_action) {
+						case 1:
+							action = UIAction::TouchBegin;
+							break;
+						case 2:
+							action = UIAction::TouchMove;
+							break;
+						case 3:
+							action = UIAction::TouchEnd;
+							break;
+						case 4:
+							action = UIAction::TouchCancel;
+							break;
+						default:
+							return 0;
+					}
 					sl_uint32 nPts = Jni::getArrayLength(jpoints);
 					if (nPts > 0) {
 						Array<TouchPoint> points = Array<TouchPoint>::create(nPts);
@@ -116,7 +132,24 @@ namespace slib
 									pts[i].point.x = (sl_ui_posf)(JTouchPoint::x.get(jpt));
 									pts[i].point.y = (sl_ui_posf)(JTouchPoint::y.get(jpt));
 									pts[i].pressure = JTouchPoint::pressure.get(jpt);
-									pts[i].phase = (TouchPhase)(JTouchPoint::phase.get(jpt));
+									TouchPhase phase;
+									switch (JTouchPoint::phase.get(jpt)) {
+										case 0:
+											phase = TouchPhase::Move;
+											break;
+										case 1:
+											phase = TouchPhase::Begin;
+											break;
+										case 2:
+											phase = TouchPhase::End;
+											break;
+										case 3:
+											phase = TouchPhase::Cancel;
+											break;
+										default:
+											return 0;
+									}
+									pts[i].phase = phase;
 									pts[i].pointerId = JTouchPoint::pointerId.get(jpt);
 								}
 							}

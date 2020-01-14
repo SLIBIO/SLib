@@ -482,18 +482,18 @@ public class UiView {
 			int _action = event.getActionMasked();
 			switch (_action) {
 			case MotionEvent.ACTION_DOWN:
-				action = 0x0301;
+				action = 1;
 				break;
 			case MotionEvent.ACTION_MOVE:
 			case MotionEvent.ACTION_POINTER_DOWN:
 			case MotionEvent.ACTION_POINTER_UP:
-				action = 0x0302;
+				action = 2;
 				break;
 			case MotionEvent.ACTION_UP:
-				action = 0x0303;
+				action = 3;
 				break;
 			case MotionEvent.ACTION_CANCEL:
-				action = 0x0304;
+				action = 4;
 				break;
 			default:
 				return bRet;
