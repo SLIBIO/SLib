@@ -1,0 +1,52 @@
+<sapp>
+	<layout
+		type='window'
+		title='Drag And Drop'
+		width='800'
+		height='500'
+		centerScreen='true'
+		fontSize='20'
+		>
+		
+		<hlinear
+			width='fill'
+			height='fill'
+			>
+			
+			<linear
+				width='*'
+				height='wrap'
+				centerVertical='true'
+				>
+				
+				<button
+					name='btnDrag'
+					text='Button'
+					textColor='white'
+					alignCenter='true'
+					background='green'
+					boundRadius='4'
+					padding='5'
+					/>
+
+			</linear>
+			
+			<linear
+				name='linearDrop'
+				width='*'
+				height='fill'
+				background='#8080ff'
+				padding='5'
+				>
+				
+				<label
+					text='Drop Here'
+					centerHorizontal='true'
+					/>
+				
+			</linear>
+
+		</hlinear>
+
+ 	</layout>
+</sapp>
