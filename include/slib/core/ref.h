@@ -699,7 +699,7 @@ namespace slib
 	Ref<T> New(ARG&& arg, ARGS&&... args) noexcept;
 
 	template <class T, class OTHER>
-	sl_bool IsInstanceOf(OTHER* object) noexcept;
+	sl_bool IsInstanceOf(const OTHER* object) noexcept;
 
 	template <class T, class OTHER>
 	sl_bool IsInstanceOf(const Ref<OTHER>& object) noexcept;

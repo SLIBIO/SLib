@@ -51,7 +51,7 @@ namespace slib
 	}
 	
 	template <class T, class OTHER>
-	SLIB_INLINE sl_bool IsInstanceOf(OTHER* object) noexcept
+	SLIB_INLINE sl_bool IsInstanceOf(const OTHER* object) noexcept
 	{
 		SLIB_TRY_CONVERT_TYPE(OTHER*, Referable*)
 		if (object) {
