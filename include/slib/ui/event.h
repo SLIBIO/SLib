@@ -160,6 +160,46 @@ namespace slib
 	KeycodeAndModifiers operator|(int modifiers, Keycode keycode);
 
 
+	class Drawable;
+
+	class SLIB_EXPORT DragItem
+	{
+	public:
+		DragItem();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DragItem)
+		
+	public:
+		const UIRect& getFrame() const;
+		
+		void setDraggingFrame(const UIRect& frame);
+		
+		const Ref<Drawable>& getDraggingImage() const;
+		
+		void setDraggingImage(const Ref<Drawable>& image);
+		
+	protected:
+		Ref<Referable> m_data;
+		UIRect m_frame;
+		Ref<Drawable> m_image;
+		
+	};
+
+	class SLIB_EXPORT DragContext
+	{
+	public:
+		Ref<View> view;
+		List<DragItem> items;
+		DragOperations operationMask;
+
+	public:
+		DragContext();
+		
+		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DragContext)
+				
+	};
+
+
 	class SLIB_EXPORT UIEvent : public Referable
 	{
 		SLIB_DECLARE_OBJECT

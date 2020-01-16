@@ -42,10 +42,6 @@
 namespace slib
 {
 
-/**********************
-	View
-**********************/
-
 	SLIB_DEFINE_OBJECT(View, Object)
 
 	View::View():
@@ -65,6 +61,8 @@ namespace slib
 		m_flagOkCancelEnabled(sl_true),
 		m_flagTabStopEnabled(sl_true),
 		m_flagKeepKeyboard(sl_false),
+		m_flagDraggable(sl_false),
+		m_flagDroppable(sl_false),
 	
 		m_flagCurrentCreatingInstance(sl_false),
 		m_flagInvalidLayout(sl_true),
@@ -7380,6 +7378,39 @@ namespace slib
 		m_flagKeepKeyboard = flag;
 	}
 
+
+	sl_bool View::isDraggable()
+	{
+		return m_flagDraggable;
+	}
+
+	void View::setDraggable(sl_bool flag)
+	{
+		m_flagDraggable = flag;
+	}
+
+	sl_bool View::isDroppable()
+	{
+		return m_flagDroppable;
+	}
+
+	void View::setDroppable(sl_bool flag)
+	{
+		m_flagDroppable = flag;
+		if (flag) {
+			Ref<ViewInstance> instance = m_instance;
+			if (instance.isNotNull()) {
+				instance->setDroppable(sl_true);
+			} else {
+				Ref<View> parent = m_parent;
+				if (parent.isNotNull()) {
+					parent->setDroppable(sl_true);
+				}
+			}
+		}
+	}
+
+
 	Function<sl_bool(const UIPoint& pt)> View::getCapturingChildInstanceEvents()
 	{
 		Ref<ChildAttributes>& attrs = m_childAttrs;
@@ -9084,6 +9115,84 @@ namespace slib
 		}
 	}
 
+	DEFINE_VIEW_EVENT_HANDLER(DragEvent, UIEvent* ev)
+
+	void View::dispatchDragEvent(UIEvent* ev)
+	{
+		SLIB_INVOKE_EVENT_HANDLER(DragEvent, ev)
+	}
+
+	DEFINE_VIEW_EVENT_HANDLER(DropEvent, UIEvent* ev)
+
+	void View::dispatchDropEvent(UIEvent* ev)
+	{
+		if (!ev) {
+			return;
+		}
+		if (! m_flagEnabled) {
+			return;
+		}
+		
+		// pass event to children
+		{
+			Ref<ChildAttributes>& childAttrs = m_childAttrs;
+			if (childAttrs.isNotNull()) {
+				if (childAttrs->flagPassEventToChildren) {
+					ListElements< Ref<View> > children(getChildren());
+					if (children.count > 0) {
+						dispatchDropEventToChildren(ev, children.data, children.count);
+					}
+				}
+			}
+		}
+		
+		if (ev->isStoppedPropagation()) {
+			return;
+		}
+		if (ev->isPreventedDefault()) {
+			return;
+		}
+		
+		ev->resetFlags();
+		
+		SLIB_INVOKE_EVENT_HANDLER(DropEvent, ev)
+	}
+
+	sl_bool View::dispatchDropEventToChildren(UIEvent* ev, const Ref<View>* children, sl_size count)
+	{
+		UIPointf ptMouse = ev->getPoint();
+		for (sl_size i = 0; i < count; i++) {
+			View* child = children[count - 1 - i].get();
+			if (POINT_EVENT_CHECK_CHILD(child)) {
+				UIPointf pt = child->convertCoordinateFromParent(ptMouse);
+				if (child->hitTest(pt)) {
+					ev->setPoint(pt);
+					dispatchDropEventToChild(ev, child, sl_false);
+					ev->setPoint(ptMouse);
+					if (!(ev->isPassedToNext())) {
+						return sl_true;
+					}
+				}
+			}
+		}
+		return sl_false;
+	}
+
+	void View::dispatchDropEventToChild(UIEvent* ev, View* child, sl_bool flagTransformPoints)
+	{
+		if (child) {
+			ev->resetFlags();
+			if (flagTransformPoints) {
+				UIPointf ptMouse = ev->getPoint();
+				ev->setPoint(child->convertCoordinateFromParent(ptMouse));
+				child->dispatchDropEvent(ev);
+				ev->setPoint(ptMouse);
+			} else {
+				child->dispatchDropEvent(ev);
+			}
+		}
+	}
+
 	DEFINE_VIEW_EVENT_HANDLER(ChangeFocus, sl_bool flagFocused)
 	
 	void View::dispatchChangeFocus(sl_bool flagFocused)
@@ -9737,6 +9846,10 @@ namespace slib
 	void ViewInstance::setLockScroll(View* view, sl_bool flagLock)
 	{
 	}
+
+	void ViewInstance::setDroppable(sl_bool flag)
+	{
+	}
 	
 	void ViewInstance::onDraw(Canvas* canvas)
 	{
@@ -9941,6 +10054,14 @@ namespace slib
 		}
 	}
 	
+	void ViewInstance::onDragEvent(UIEvent* ev)
+	{
+		Ref<View> view = getView();
+		if (view.isNotNull()) {
+			view->dispatchDragEvent(ev);
+		}
+	}
+
 	void ViewInstance::onSetFocus()
 	{
 		Ref<View> view = getView();

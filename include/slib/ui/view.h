@@ -1201,6 +1201,19 @@ namespace slib
 		void setKeepKeyboard(sl_bool flag);
 		
 		
+		sl_bool isDraggable();
+		
+		void setDraggable(sl_bool flag);
+		
+		sl_bool isDroppable();
+		
+		void setDroppable(sl_bool flag);
+		
+		void beginDragging(const List<DragItem>& items, DragOperations operationMask = DragOperations::All);
+		
+		void beginDragging(const DragItem& item, DragOperations operationMask = DragOperations::All);
+		
+		
 		Function<sl_bool(const UIPoint& pt)> getCapturingChildInstanceEvents();
 		
 		void setCapturingChildInstanceEvents(const Function<sl_bool(const UIPoint& pt)>& hitTestCapture);
@@ -1325,6 +1338,11 @@ namespace slib
 		sl_bool dispatchSetCursorToChildren(UIEvent* ev, const Ref<View>* children, sl_size count);
 		void dispatchSetCursorToChild(UIEvent* ev, View* child, sl_bool flagTransformPoints = sl_true);
 		
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, DragEvent, UIEvent* ev)
+		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, DropEvent, UIEvent* ev)
+		sl_bool dispatchDropEventToChildren(UIEvent* ev, const Ref<View>* children, sl_size count);
+		void dispatchDropEventToChild(UIEvent* ev, View* child, sl_bool flagTransformPoints = sl_true);
+
 		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, ChangeFocus, sl_bool flagFocused)
 
 		SLIB_DECLARE_EVENT_HANDLER_FUNCTIONS(View, Move, sl_ui_pos x, sl_ui_pos y)
@@ -1466,6 +1484,8 @@ namespace slib
 		sl_bool m_flagOkCancelEnabled : 1;
 		sl_bool m_flagTabStopEnabled : 1;
 		sl_bool m_flagKeepKeyboard : 1;
+		sl_bool m_flagDraggable : 1;
+		sl_bool m_flagDroppable : 1;
 		
 		sl_bool m_flagCurrentCreatingInstance : 1;
 		sl_bool m_flagInvalidLayout : 1;
@@ -1799,6 +1819,8 @@ namespace slib
 			AtomicFunction<void(View*)> onClick;
 			AtomicFunction<void(View*, UIEvent*)> onClickEvent;
 			AtomicFunction<void(View*, UIEvent*)> onSetCursor;
+			AtomicFunction<void(View*, UIEvent*)> onDragEvent;
+			AtomicFunction<void(View*, UIEvent*)> onDropEvent;
 			AtomicFunction<void(View*, sl_bool flagFocused)> onChangeFocus;
 			AtomicFunction<void(View*, sl_ui_pos, sl_ui_pos)> onMove;
 			AtomicFunction<void(View*, sl_ui_len, sl_ui_len)> onResize;
@@ -1911,6 +1933,8 @@ namespace slib
 
 		virtual void setLockScroll(View* view, sl_bool flagLock);
 		
+		virtual void setDroppable(sl_bool flag);
+		
 	public:
 		void onDraw(Canvas* canvas);
 		
@@ -1925,6 +1949,10 @@ namespace slib
 		void onMouseWheelEvent(UIEvent* event);
 		
 		void onSetCursor(UIEvent* event);
+		
+		void onDragEvent(UIEvent* event);
+
+		void onDropEvent(UIEvent* event);
 		
 		void onSetFocus();
 		

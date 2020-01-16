@@ -454,6 +454,25 @@ namespace slib
 		
 	};
 	
+	class DragOperations
+	{
+	public:
+		int value;
+		SLIB_MEMBERS_OF_FLAGS(DragOperations, value)
+		
+	public:
+		enum {
+			None = 0,
+			All = 0xFFFF,
+			Copy = 0x0001, // The data can be copied
+			Link = 0x0002, // The data can be shared
+			Generic = 0x0004, // The operation can be defined by the destination
+			Private = 0x0008, // The operation is negotiated privately between the source and the destination
+			Move = 0x0010, // The data can be moved.
+			Delete = 0x0020 // The data can be deleted.
+		};
+	};
+	
 }
 
 #endif

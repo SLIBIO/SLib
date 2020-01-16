@@ -23,6 +23,8 @@
 #include "slib/ui/event.h"
 
 #include "slib/ui/core.h"
+#include "slib/ui/view.h"
+#include "slib/graphics/drawable.h"
 #include "slib/core/hash_table.h"
 #include "slib/core/string_buffer.h"
 #include "slib/core/safe_static.h"
@@ -206,6 +208,40 @@ sl_bool UIEvent::is##NAME##Key() const \
 	KeycodeAndModifiers operator|(int modifiers, Keycode keycode)
 	{
 		return KeycodeAndModifiers(keycode, modifiers);
+	}
+
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DragItem)
+
+	DragItem::DragItem()
+	{
+	}
+
+	const UIRect& DragItem::getFrame() const
+	{
+		return m_frame;
+	}
+
+	void DragItem::setDraggingFrame(const UIRect& frame)
+	{
+		m_frame = frame;
+	}
+
+	const Ref<Drawable>& DragItem::getDraggingImage() const
+	{
+		return m_image;
+	}
+
+	void DragItem::setDraggingImage(const Ref<Drawable>& image)
+	{
+		m_image = image;
+	}
+
+
+	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DragContext)
+
+	DragContext::DragContext()
+	{
 	}
 
 

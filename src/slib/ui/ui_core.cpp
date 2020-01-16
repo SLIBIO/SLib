@@ -127,6 +127,10 @@ namespace slib
 			void UpdateKeyboardAdjustMode(UIKeyboardAdjustMode mode);
 #endif
 			
+			
+			SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<View>, g_currentDraggingView)
+			DragOperations g_currentDraggingOperationMask;
+		
 		}
 	}
 	
@@ -702,5 +706,5 @@ namespace slib
 	{
 	}
 #endif
-	
+
 }
