@@ -170,16 +170,22 @@ namespace slib
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DragItem)
 		
 	public:
+		const String& getText() const;
+		
+		void setText(const String& text);
+		
 		const UIRect& getFrame() const;
 		
-		void setDraggingFrame(const UIRect& frame);
+		void setFrame(const UIRect& frame);
+		
+		void setDraggingSize(sl_ui_pos width, sl_ui_pos height);
 		
 		const Ref<Drawable>& getDraggingImage() const;
 		
 		void setDraggingImage(const Ref<Drawable>& image);
 		
 	protected:
-		Ref<Referable> m_data;
+		String m_text;
 		UIRect m_frame;
 		Ref<Drawable> m_image;
 		
@@ -189,14 +195,21 @@ namespace slib
 	{
 	public:
 		Ref<View> view;
-		List<DragItem> items;
+		DragItem item;
 		DragOperations operationMask;
+		DragOperations operation;
+		sl_uint64 sn;
 
 	public:
 		DragContext();
 		
 		SLIB_DECLARE_CLASS_DEFAULT_MEMBERS(DragContext)
-				
+		
+	public:
+		sl_bool isAlive() const;
+		
+		void release();
+		
 	};
 
 
@@ -227,6 +240,8 @@ namespace slib
 		static Ref<UIEvent> createTouchEvent(UIAction action, const Array<TouchPoint>& points, const Time& time);
 		
 		static Ref<UIEvent> createTouchEvent(UIAction action, const TouchPoint& point, const Time& time);
+		
+		static Ref<UIEvent> createDragEvent(UIAction action, sl_ui_posf x, sl_ui_posf y, const DragContext& context, const Time& time);
 		
 	public:
 		UIAction getAction() const;
@@ -321,10 +336,22 @@ namespace slib
 		
 		void transformPoints(const Matrix3lf& mat);
 		
-		// open url
-		const String& getUrl() const;
+		// drag & drop
+		const DragItem& getDragItem() const;
 		
-		void setUrl(const String& url);
+		void setDragItem(const DragItem& item);
+		
+		DragOperations getDragOperationMask() const;
+		
+		void setDragOperationMask(const DragOperations& mask);
+		
+		DragOperations getDragOperation() const;
+		
+		void setDragOperation(const DragOperations& op);
+		
+		sl_uint64 getDragId() const;
+		
+		void setDragId(sl_uint64 _id);
 		
 		// modifiers
 		void setShiftKey();
@@ -399,6 +426,8 @@ namespace slib
 		static String getKeyName(Keycode key, sl_bool flagShort = sl_false);
 		
 		static Keycode getKeycodeFromName(const String& keyName);
+		
+		static DragContext& getCurrentDragContext();
 		
 	protected:
 		UIAction m_action;

@@ -213,8 +213,18 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DragItem)
 
-	DragItem::DragItem()
+	DragItem::DragItem(): m_frame(0, 0, 1, 1)
 	{
+	}
+
+	const String& DragItem::getText() const
+	{
+		return m_text;
+	}
+
+	void DragItem::setText(const String& text)
+	{
+		m_text = text;
 	}
 
 	const UIRect& DragItem::getFrame() const
@@ -222,9 +232,14 @@ sl_bool UIEvent::is##NAME##Key() const \
 		return m_frame;
 	}
 
-	void DragItem::setDraggingFrame(const UIRect& frame)
+	void DragItem::setFrame(const UIRect& frame)
 	{
 		m_frame = frame;
+	}
+
+	void DragItem::setDraggingSize(sl_ui_pos width, sl_ui_pos height)
+	{
+		m_frame.setSize(width, height);
 	}
 
 	const Ref<Drawable>& DragItem::getDraggingImage() const
@@ -240,10 +255,19 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	SLIB_DEFINE_CLASS_DEFAULT_MEMBERS(DragContext)
 
-	DragContext::DragContext()
+	DragContext::DragContext(): operation(0), operationMask(DragOperations::All), sn(0)
 	{
 	}
 
+	sl_bool DragContext::isAlive() const
+	{
+		return view.isNotNull();
+	}
+
+	void DragContext::release()
+	{
+		view.setNull();
+	}
 
 	SLIB_DEFINE_ROOT_OBJECT(UIEvent)
 
@@ -254,6 +278,8 @@ sl_bool UIEvent::is##NAME##Key() const \
 			
 			class KeyboardEvent : public UIEvent
 			{
+				SLIB_DECLARE_OBJECT
+				
 			public:
 				sl_uint32 m_systemKeycode;
 				
@@ -275,8 +301,13 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 			};
 			
+			SLIB_DEFINE_OBJECT(KeyboardEvent, UIEvent)
+			
+			
 			class MouseEvent : public UIEvent
 			{
+				SLIB_DECLARE_OBJECT
+				
 			public:
 				TouchPoint m_pt;
 				
@@ -302,8 +333,13 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 			};
 			
+			SLIB_DEFINE_OBJECT(MouseEvent, UIEvent)
+			
+			
 			class MouseWheelEvent : public MouseEvent
 			{
+				SLIB_DECLARE_OBJECT
+				
 			public:
 				sl_real m_deltaX;
 				sl_real m_deltaY;
@@ -326,8 +362,13 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 			};
 			
+			SLIB_DEFINE_OBJECT(MouseWheelEvent, MouseEvent)
+			
+			
 			class TouchEvent : public MouseEvent
 			{
+				SLIB_DECLARE_OBJECT
+				
 			public:
 				Array<TouchPoint> m_points;
 				
@@ -364,6 +405,38 @@ sl_bool UIEvent::is##NAME##Key() const \
 				}
 
 			};
+			
+			SLIB_DEFINE_OBJECT(TouchEvent, MouseEvent)
+			
+		
+			class DragEvent : public MouseEvent
+			{
+				SLIB_DECLARE_OBJECT
+				
+			public:
+				DragContext m_context;
+				
+			public:
+				DragEvent(UIAction action, const Time& time, sl_ui_posf x, sl_ui_posf y, const DragContext& context) : MouseEvent(action, time, x, y), m_context(context)
+				{
+				}
+
+			public:
+				Ref<UIEvent> duplicate() const override
+				{
+					DragEvent* ret = new DragEvent(m_action, m_time, m_pt.point.x, m_pt.point.y, m_context);
+					if (ret) {
+						ret->_copyProperties(this);
+						return ret;
+					}
+					return sl_null;
+				}
+
+			};
+			
+			SLIB_DEFINE_OBJECT(DragEvent, MouseEvent)
+			
+			DragContext g_currentDragContext;
 			
 		}
 	}
@@ -420,6 +493,11 @@ sl_bool UIEvent::is##NAME##Key() const \
 	Ref<UIEvent> UIEvent::createTouchEvent(UIAction action, const TouchPoint& point, const Time& time)
 	{
 		return new TouchEvent(action, time, Array<TouchPoint>::create(&point, 1));
+	}
+
+	Ref<UIEvent> UIEvent::createDragEvent(UIAction action, sl_ui_posf x, sl_ui_posf y, const DragContext& context, const Time& time)
+	{
+		return new DragEvent(action, time, x, y, context);
 	}
 
 	UIAction UIEvent::getAction() const
@@ -494,7 +572,7 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	sl_uint32 UIEvent::getSystemKeycode() const
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_KEYBOARD) {
+		if (IsInstanceOf<KeyboardEvent>(this)) {
 			return ((KeyboardEvent*)this)->m_systemKeycode;
 		}
 		return 0;
@@ -502,14 +580,14 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	void UIEvent::setSystemKeycode(sl_uint32 keycode)
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_KEYBOARD) {
+		if (IsInstanceOf<KeyboardEvent>(this)) {
 			((KeyboardEvent*)this)->m_systemKeycode = keycode;
 		}
 	}
 
 	const UIPointf& UIEvent::getPoint() const
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+		if (IsInstanceOf<MouseEvent>(this)) {
 			return ((MouseEvent*)this)->m_pt.point;
 		}
 		return UIPointf::zero();
@@ -517,14 +595,14 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	void UIEvent::setPoint(const UIPointf& pt)
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+		if (IsInstanceOf<MouseEvent>(this)) {
 			((MouseEvent*)this)->m_pt.point = pt;
 		}
 	}
 
 	void UIEvent::setPoint(sl_ui_posf x, sl_ui_posf y)
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+		if (IsInstanceOf<MouseEvent>(this)) {
 			((MouseEvent*)this)->m_pt.point.x = x;
 			((MouseEvent*)this)->m_pt.point.y = y;
 		}
@@ -532,7 +610,7 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	sl_ui_posf UIEvent::getX() const
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+		if (IsInstanceOf<MouseEvent>(this)) {
 			return ((MouseEvent*)this)->m_pt.point.x;
 		}
 		return 0;
@@ -540,14 +618,14 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	void UIEvent::setX(sl_ui_posf x)
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+		if (IsInstanceOf<MouseEvent>(this)) {
 			((MouseEvent*)this)->m_pt.point.x = x;
 		}
 	}
 
 	sl_ui_posf UIEvent::getY() const
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+		if (IsInstanceOf<MouseEvent>(this)) {
 			return ((MouseEvent*)this)->m_pt.point.y;
 		}
 		return 0;
@@ -555,7 +633,7 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	void UIEvent::setY(sl_ui_posf y)
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+		if (IsInstanceOf<MouseEvent>(this)) {
 			((MouseEvent*)this)->m_pt.point.y = y;
 		}
 	}
@@ -572,7 +650,7 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	sl_real UIEvent::getDeltaX() const
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE_WHEEL) {
+		if (IsInstanceOf<MouseWheelEvent>(this)) {
 			return ((MouseWheelEvent*)this)->m_deltaX;
 		}
 		return 0;
@@ -580,14 +658,14 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	void UIEvent::setDeltaX(sl_real x)
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE_WHEEL) {
+		if (IsInstanceOf<MouseWheelEvent>(this)) {
 			((MouseWheelEvent*)this)->m_deltaX = x;
 		}
 	}
 
 	sl_real UIEvent::getDeltaY() const
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE_WHEEL) {
+		if (IsInstanceOf<MouseWheelEvent>(this)) {
 			return ((MouseWheelEvent*)this)->m_deltaY;
 		}
 		return 0;
@@ -595,14 +673,14 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	void UIEvent::setDeltaY(sl_real y)
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE_WHEEL) {
+		if (IsInstanceOf<MouseWheelEvent>(this)) {
 			((MouseWheelEvent*)this)->m_deltaY = y;
 		}
 	}
 
 	const TouchPoint& UIEvent::getTouchPoint() const
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+		if (IsInstanceOf<MouseEvent>(this)) {
 			return ((MouseEvent*)this)->m_pt;
 		}
 		static const char zero[sizeof(TouchPoint)] = {0};
@@ -611,14 +689,14 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	void UIEvent::setTouchPoint(const TouchPoint& pt)
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+		if (IsInstanceOf<MouseEvent>(this)) {
 			((MouseEvent*)this)->m_pt = pt;
 		}
 	}
 
 	void UIEvent::setTouchPoint(const UIPointf& pt)
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+		if (IsInstanceOf<MouseEvent>(this)) {
 			((MouseEvent*)this)->m_pt.point = pt;
 			((MouseEvent*)this)->m_pt.pressure = 0;
 		}
@@ -626,7 +704,7 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	void UIEvent::setTouchPoint(const UIPointf& pt, sl_real pressure)
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+		if (IsInstanceOf<MouseEvent>(this)) {
 			((MouseEvent*)this)->m_pt.point = pt;
 			((MouseEvent*)this)->m_pt.pressure = pressure;
 		}
@@ -634,7 +712,7 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	void UIEvent::setTouchPoint(sl_ui_posf x, sl_ui_posf y)
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+		if (IsInstanceOf<MouseEvent>(this)) {
 			((MouseEvent*)this)->m_pt.point.x = x;
 			((MouseEvent*)this)->m_pt.point.y = y;
 			((MouseEvent*)this)->m_pt.pressure = 0;
@@ -643,7 +721,7 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	void UIEvent::setTouchPoint(sl_ui_posf x, sl_ui_posf y, sl_real pressure)
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+		if (IsInstanceOf<MouseEvent>(this)) {
 			((MouseEvent*)this)->m_pt.point.x = x;
 			((MouseEvent*)this)->m_pt.point.y = y;
 			((MouseEvent*)this)->m_pt.pressure = pressure;
@@ -652,7 +730,7 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	sl_real UIEvent::getPressure() const
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+		if (IsInstanceOf<MouseEvent>(this)) {
 			return ((MouseEvent*)this)->m_pt.pressure;
 		}
 		return 0;
@@ -660,14 +738,14 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	void UIEvent::setPressure(sl_real pressure)
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+		if (IsInstanceOf<MouseEvent>(this)) {
 			((MouseEvent*)this)->m_pt.pressure = pressure;
 		}
 	}
 
 	const Array<TouchPoint>& UIEvent::getTouchPoints() const
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_TOUCH) {
+		if (IsInstanceOf<TouchEvent>(this)) {
 			return ((TouchEvent*)this)->m_points;
 		}
 		return Array<TouchPoint>::null();
@@ -675,7 +753,7 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	sl_uint32 UIEvent::getTouchPointsCount() const
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_TOUCH) {
+		if (IsInstanceOf<TouchEvent>(this)) {
 			return (sl_uint32)(((TouchEvent*)this)->m_points.getCount());
 		}
 		return 0;
@@ -683,7 +761,7 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	const TouchPoint& UIEvent::getTouchPoint(sl_uint32 index) const
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_TOUCH) {
+		if (IsInstanceOf<TouchEvent>(this)) {
 			if (index < ((TouchEvent*)this)->m_points.getCount()) {
 				return ((TouchEvent*)this)->m_points[index];
 			} else {
@@ -695,17 +773,17 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	void UIEvent::setTouchPoints(const Array<TouchPoint>& points)
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_TOUCH) {
+		if (IsInstanceOf<TouchEvent>(this)) {
 			((TouchEvent*)this)->m_points = points;
 		}
 	}
 
 	void UIEvent::transformPoints(const Matrix3f& mat)
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+		if (IsInstanceOf<MouseEvent>(this)) {
 			((MouseEvent*)this)->m_pt.point = mat.transformPosition(((MouseEvent*)this)->m_pt.point);
 		}
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_TOUCH) {
+		if (IsInstanceOf<TouchEvent>(this)) {
 			Array<TouchPoint>& points = ((TouchEvent*)this)->m_points;
 			sl_size n = points.getCount();
 			TouchPoint* pts = points.getData();
@@ -717,16 +795,77 @@ sl_bool UIEvent::is##NAME##Key() const \
 
 	void UIEvent::transformPoints(const Matrix3lf& mat)
 	{
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_MOUSE) {
+		if (IsInstanceOf<MouseEvent>(this)) {
 			((MouseEvent*)this)->m_pt.point = mat.transformPosition(((MouseEvent*)this)->m_pt.point);
 		}
-		if (((sl_uint32)m_action) & SLIB_UI_ACTION_TYPE_TOUCH) {
+		if (IsInstanceOf<TouchEvent>(this)) {
 			Array<TouchPoint>& points = ((TouchEvent*)this)->m_points;
 			sl_size n = points.getCount();
 			TouchPoint* pts = points.getData();
 			for (sl_size i = 0; i < n; i++) {
 				pts[i].point = mat.transformPosition(pts[i].point);
 			}
+		}
+	}
+
+	const DragItem& UIEvent::getDragItem() const
+	{
+		if (IsInstanceOf<DragEvent>(this)) {
+			return ((DragEvent*)this)->m_context.item;
+		}
+		static DragItem item;
+		return item;
+	}
+
+	void UIEvent::setDragItem(const DragItem& item)
+	{
+		if (IsInstanceOf<DragEvent>(this)) {
+			((DragEvent*)this)->m_context.item = item;
+		}
+	}
+
+	DragOperations UIEvent::getDragOperationMask() const
+	{
+		if (IsInstanceOf<DragEvent>(this)) {
+			return ((DragEvent*)this)->m_context.operationMask;
+		}
+		return 0;
+	}
+
+	void UIEvent::setDragOperationMask(const DragOperations& mask)
+	{
+		if (IsInstanceOf<DragEvent>(this)) {
+			((DragEvent*)this)->m_context.operationMask = mask;
+		}
+	}
+
+	DragOperations UIEvent::getDragOperation() const
+	{
+		if (IsInstanceOf<DragEvent>(this)) {
+			return ((DragEvent*)this)->m_context.operation;
+		}
+		return 0;
+	}
+
+	void UIEvent::setDragOperation(const DragOperations& op)
+	{
+		if (IsInstanceOf<DragEvent>(this)) {
+			((DragEvent*)this)->m_context.operation = op;
+		}
+	}
+
+	sl_uint64 UIEvent::getDragId() const
+	{
+		if (IsInstanceOf<DragEvent>(this)) {
+			return ((DragEvent*)this)->m_context.sn;
+		}
+		return 0;
+	}
+
+	void UIEvent::setDragId(sl_uint64 _id)
+	{
+		if (IsInstanceOf<DragEvent>(this)) {
+			((DragEvent*)this)->m_context.sn = _id;
 		}
 	}
 
@@ -1053,6 +1192,11 @@ sl_bool UIEvent::is##NAME##Key() const \
 			return mapper->getCode(keyName);
 		}
 		return Keycode::Unknown;
+	}
+
+	DragContext& UIEvent::getCurrentDragContext()
+	{
+		return g_currentDragContext;
 	}
 
 }

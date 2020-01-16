@@ -30,11 +30,88 @@
 
 #include "slib/math/transform2d.h"
 
+@interface SLIBDraggingSource : NSObject<NSDraggingSource>
+{
+	@public slib::DragContext context;
+}
+@end
+
 namespace slib
 {
 	
 	SLIB_DEFINE_OBJECT(macOS_ViewInstance, ViewInstance)
 
+	namespace priv
+	{
+		namespace view_macos
+		{
+
+			static NSDragOperation ToNSDragOperation(int op)
+			{
+				NSDragOperation ret = 0;
+				if (op & DragOperations::Copy) {
+					ret |= NSDragOperationCopy;
+				}
+				if (op & DragOperations::Link) {
+					ret |= NSDragOperationLink;
+				}
+				if (op & DragOperations::Generic) {
+					ret |= NSDragOperationGeneric;
+				}
+				if (op & DragOperations::Private) {
+					ret |= NSDragOperationPrivate;
+				}
+				if (op & DragOperations::Move) {
+					ret |= NSDragOperationMove;
+				}
+				if (op & DragOperations::Delete) {
+					ret |= NSDragOperationDelete;
+				}
+				return ret;
+			}
+
+			static int FromNSDragOperation(NSDragOperation operation)
+			{
+				int op = 0;
+				if (operation & NSDragOperationCopy) {
+					op |= DragOperations::Copy;
+				}
+				if (operation & NSDragOperationLink) {
+					op |= DragOperations::Link;
+				}
+				if (operation & NSDragOperationGeneric) {
+					op |= DragOperations::Generic;
+				}
+				if (operation & NSDragOperationPrivate) {
+					op |= DragOperations::Private;
+				}
+				if (operation & NSDragOperationMove) {
+					op |= DragOperations::Move;
+				}
+				if (operation & NSDragOperationDelete) {
+					op |= DragOperations::Delete;
+				}
+				return op;
+			}
+		
+			static void SetDroppable(NSView* handle, sl_bool flag)
+			{
+				if (flag) {
+					if (handle.registeredDraggedTypes == nil || handle.registeredDraggedTypes.count == 0) {
+						[handle registerForDraggedTypes:@[NSPasteboardTypeString]];
+					}
+				} else {
+					if (handle.registeredDraggedTypes != nil && handle.registeredDraggedTypes.count) {
+						[handle unregisterDraggedTypes];
+					}
+				}
+			}
+		
+		}
+	}
+
+	using namespace priv::view_macos;
+	
 	macOS_ViewInstance::macOS_ViewInstance()
 	{
 		m_handle = nil;
@@ -97,6 +174,10 @@ namespace slib
 					CFRelease(color);
 				}
 			}
+		}
+		
+		if (view->isDroppable()) {
+			SetDroppable(handle, sl_true);
 		}
 	}
 	
@@ -377,6 +458,14 @@ namespace slib
 		}
 	}
 	
+	void macOS_ViewInstance::setDroppable(View* view, sl_bool flag)
+	{
+		NSView* handle = m_handle;
+		if (handle != nil) {
+			SetDroppable(handle, flag);
+		}
+	}
+
 	NSRect macOS_ViewInstance::getViewFrameAndTransform(const UIRect& frame, const Matrix3& transform, sl_real& rotation)
 	{
 		rotation = Transform2::getRotationAngleFromMatrix(transform);
@@ -575,6 +664,26 @@ namespace slib
 		return 0;
 	}
 
+	Ref<UIEvent> macOS_ViewInstance::onEventDrop(UIAction action, id<NSDraggingInfo> info)
+	{
+		NSView* handle = m_handle;
+		if (handle != nil) {
+			DragContext context;
+			context.sn = (sl_uint64)(info.draggingSequenceNumber);
+			context.operationMask = FromNSDragOperation(info.draggingSourceOperationMask);
+			NSPasteboard* paste = info.draggingPasteboard;
+			context.item.setText(Apple::getStringFromNSString([paste stringForType:NSPasteboardTypeString]));
+			NSPoint loc = info.draggingLocation;
+			NSPoint pt = [handle convertPoint:loc fromView:nil];
+			Ref<UIEvent> ev = UIEvent::createDragEvent(action, (sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y), context, Time::now());
+			if (ev.isNotNull()) {
+				onDropEvent(ev.get());
+				return ev;
+			}
+		}
+		return sl_null;
+	}
+
 	void macOS_ViewInstance::updateFrameAndTransform()
 	{
 		NSView* handle = m_handle;
@@ -666,6 +775,7 @@ namespace slib
 }
 
 using namespace slib;
+using namespace slib::priv::view_macos;
 
 @implementation SLIBViewBaseHandle
 
@@ -728,7 +838,31 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 {
 	Ref<macOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
+		DragContext& dragContext = UIEvent::getCurrentDragContext();
+		dragContext.release();
 		UIEventFlags flags = instance->onEventMouse(UIAction::LeftButtonDown, theEvent);
+		if (dragContext.view.isNotNull()) {
+			NSDraggingItem* drag = nil;
+			{
+				DragItem& item = dragContext.item;
+				UIRect frame = item.getFrame();
+				sl_ui_pos w = frame.getWidth();
+				sl_ui_pos h = frame.getHeight();
+				if (w > 0 && h > 0) {
+					UIRect frameInInstance = dragContext.view->getFrameInInstance();
+					NSImage* dragImage = GraphicsPlatform::getNSImage(item.getDraggingImage());
+					NSPasteboardItem* paste = [[NSPasteboardItem alloc] init];
+					[paste setString:Apple::getNSStringFromString(item.getText()) forType:NSPasteboardTypeString];
+					drag = [[NSDraggingItem alloc] initWithPasteboardWriter:paste];
+					[drag setDraggingFrame:NSMakeRect((CGFloat)(frame.left + frameInInstance.left), (CGFloat)(frame.top + frameInInstance.top), (CGFloat)w, (CGFloat)h) contents:dragImage];
+				}
+			}
+			if (drag != nil) {
+				SLIBDraggingSource* source = [[SLIBDraggingSource alloc] init];
+				source->context = dragContext;
+				[self beginDraggingSessionWithItems:@[drag] event:theEvent source:source];
+			}
+		}
 		if (flags & UIEventFlags::StopPropagation) {
 			return;
 		}
@@ -956,6 +1090,97 @@ MACOS_VIEW_DEFINE_ON_FOCUS
 		return self;
 	}
 	return nil;
+}
+
+- (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)sender
+{
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		Ref<UIEvent> ev = instance->onEventDrop(UIAction::DropEnter, sender);
+		if (ev.isNotNull()) {
+			return ToNSDragOperation(ev->getDragOperation());
+		}
+	}
+	return NSDragOperationNone;
+}
+
+- (NSDragOperation)draggingUpdated:(id<NSDraggingInfo>)sender
+{
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		Ref<UIEvent> ev = instance->onEventDrop(UIAction::DropOver, sender);
+		if (ev.isNotNull()) {
+			return ToNSDragOperation(ev->getDragOperation());
+		}
+	}
+	return NSDragOperationNone;
+}
+
+- (void)draggingExited:(id<NSDraggingInfo>)sender
+{
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		instance->onEventDrop(UIAction::DropLeave, sender);
+	}
+}
+
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
+{
+	Ref<macOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		Ref<UIEvent> ev = instance->onEventDrop(UIAction::Drop, sender);
+		if (ev.isNotNull()) {
+			if (ev->getDragOperation() != DragOperations::None) {
+				return YES;
+			}
+		}
+	}
+	return NO;
+}
+
+@end
+
+@implementation SLIBDraggingSource
+
+- (NSDragOperation)draggingSession:(nonnull NSDraggingSession *)session sourceOperationMaskForDraggingContext:(NSDraggingContext)context
+{
+	return ToNSDragOperation(self->context.operationMask);
+}
+
+- (void)draggingSession:(NSDraggingSession *)session willBeginAtPoint:(NSPoint)screenPoint
+{
+	Ref<View>& view = self->context.view;
+	if (view.isNotNull()) {
+		Ref<UIEvent> ev = UIEvent::createDragEvent(UIAction::DragStart, (sl_ui_posf)(screenPoint.x), (sl_ui_posf)(screenPoint.y), self->context, Time::now());
+		if (ev.isNotNull()) {
+			view->dispatchDragEvent(ev.get());
+		}
+	}
+}
+
+- (void)draggingSession:(NSDraggingSession *)session movedToPoint:(NSPoint)screenPoint
+{
+	Ref<View>& view = self->context.view;
+	if (view.isNotNull()) {
+		Ref<UIEvent> ev = UIEvent::createDragEvent(UIAction::Drag, (sl_ui_posf)(screenPoint.x), (sl_ui_posf)(screenPoint.y), self->context, Time::now());
+		if (ev.isNotNull()) {
+			view->dispatchDragEvent(ev.get());
+		}
+	}
+}
+
+- (void)draggingSession:(NSDraggingSession *)session endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation
+{
+	Ref<View>& view = self->context.view;
+	if (view.isNotNull()) {
+		view->cancelPressedState();
+		view->cancelHoverState();
+		self->context.operation = FromNSDragOperation(operation);
+		Ref<UIEvent> ev = UIEvent::createDragEvent(UIAction::DragEnd, (sl_ui_posf)(screenPoint.x), (sl_ui_posf)(screenPoint.y), self->context, Time::now());
+		if (ev.isNotNull()) {
+			view->dispatchDragEvent(ev.get());
+		}
+	}
 }
 
 @end

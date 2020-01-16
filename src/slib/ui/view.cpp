@@ -382,7 +382,7 @@ namespace slib
 		attrs = new ChildAttributes;
 	}
 	
-	View::OtherAttributes::OtherAttributes()
+	View::OtherAttributes::OtherAttributes(): dragOperationMask(DragOperations::All)
 	{
 	}
 	
@@ -854,6 +854,9 @@ namespace slib
 		if (view == attrs->childMouseMove) {
 			attrs->childMouseMove.setNull();
 		}
+		if (view == attrs->childDragOver) {
+			attrs->childDragOver.setNull();
+		}
 		if (view == attrs->childFocused) {
 			if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
 				_setFocusedChild(sl_null, UIUpdateMode::Init);
@@ -882,6 +885,9 @@ namespace slib
 		}
 		if (view == attrs->childMouseMove) {
 			attrs->childMouseMove.setNull();
+		}
+		if (view == attrs->childDragOver) {
+			attrs->childDragOver.setNull();
 		}
 		if (view == attrs->childFocused) {
 			if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
@@ -923,6 +929,7 @@ namespace slib
 		
 		attrs->childMouseDown.setNull();
 		attrs->childMouseMove.setNull();
+		attrs->childDragOver.setNull();
 		if (attrs->childFocused.isNotNull()) {
 			if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
 				_setFocusedChild(sl_null, UIUpdateMode::Init);
@@ -1108,6 +1115,10 @@ namespace slib
 		
 		child->setParent(this);
 		onAddChild(child);
+		
+		if (child->isDroppable() && !(child->isInstance())) {
+			setDroppable();
+		}
 		
 		if (SLIB_UI_UPDATE_MODE_IS_INIT(mode)) {
 			return;
@@ -2105,6 +2116,29 @@ namespace slib
 		}
 	}
 	
+	void View::cancelHoverState()
+	{
+		if (m_flagHover) {
+			setHoverState(sl_false);
+		}
+		cancelHoverStateOfChildren();
+	}
+	
+	void View::cancelHoverStateOfChildren()
+	{
+		Ref<ChildAttributes>& childAttrs = m_childAttrs;
+		if (childAttrs.isNotNull()) {
+			childAttrs->childMouseMove.setNull();
+			ListElements< Ref<View> > children(getChildren());
+			for (sl_size i = 0; i < children.count; i++) {
+				Ref<View>& child = children[i];
+				if (child->isVisible()) {
+					child->cancelHoverState();
+				}
+			}
+		}
+	}
+
 	sl_bool View::isLockScroll()
 	{
 		return m_flagLockScroll;
@@ -7400,7 +7434,7 @@ namespace slib
 		if (flag) {
 			Ref<ViewInstance> instance = m_instance;
 			if (instance.isNotNull()) {
-				instance->setDroppable(sl_true);
+				instance->setDroppable(this, sl_true);
 			} else {
 				Ref<View> parent = m_parent;
 				if (parent.isNotNull()) {
@@ -7410,6 +7444,57 @@ namespace slib
 		}
 	}
 
+	const DragItem& View::getDragItem()
+	{
+		Ref<OtherAttributes>& attrs = m_otherAttrs;
+		if (attrs.isNotNull()) {
+			Ptr<DragItem> item = attrs->dragItem;
+			if (item.isNotNull()) {
+				return *item;
+			}
+		}
+		static DragItem item;
+		return item;
+	}
+
+	void View::setDragItem(const DragItem& item)
+	{
+		_initializeOtherAttributes();
+		Ref<OtherAttributes>& attrs = m_otherAttrs;
+		if (attrs.isNotNull()) {
+			attrs->dragItem = MakeShared<DragItem>(item);
+			m_flagDraggable = sl_true;
+		}
+	}
+
+	DragOperations View::getDragOperationMask()
+	{
+		Ref<OtherAttributes>& attrs = m_otherAttrs;
+		if (attrs.isNotNull()) {
+			return attrs->dragOperationMask;
+		}
+		return DragOperations::All;
+	}
+
+	void View::setDragOperationMask(const DragOperations& mask)
+	{
+		_initializeOtherAttributes();
+		Ref<OtherAttributes>& attrs = m_otherAttrs;
+		if (attrs.isNotNull()) {
+			attrs->dragOperationMask = mask;
+		}
+	}
+
+	void View::beginDragging(const DragItem& item, DragOperations operationMask)
+	{
+		if (!(UI::isUiThread())) {
+			return;
+		}
+		DragContext& context = UIEvent::getCurrentDragContext();
+		context.view = this;
+		context.item = item;
+		context.operationMask = operationMask;
+	}
 
 	Function<sl_bool(const UIPoint& pt)> View::getCapturingChildInstanceEvents()
 	{
@@ -8366,6 +8451,13 @@ namespace slib
 			ev->addFlag(UIEventFlags::Captured);
 			ev->stopPropagation();
 		}
+		
+		if (m_flagDraggable) {
+			DragContext& context = UIEvent::getCurrentDragContext();
+			if (!(context.isAlive())) {
+				beginDragging(getDragItem(), getDragOperationMask());
+			}
+		}
 	}
 
 	sl_bool View::dispatchMouseEventToChildren(UIEvent* ev, const Ref<View>* children, sl_size count)
@@ -9133,14 +9225,35 @@ namespace slib
 			return;
 		}
 		
+		UIAction action = ev->getAction();
+		
 		// pass event to children
-		{
+		if (!m_flagCaptureEvents && !(ev->getFlags() & UIEventFlags::NotDispatchToChildren)) {
 			Ref<ChildAttributes>& childAttrs = m_childAttrs;
 			if (childAttrs.isNotNull()) {
+				Ref<View> oldChildDragOver;
+				if (action == UIAction::DropOver || action == UIAction::DropEnter) {
+					oldChildDragOver = childAttrs->childDragOver;
+				}
 				if (childAttrs->flagPassEventToChildren) {
 					ListElements< Ref<View> > children(getChildren());
 					if (children.count > 0) {
-						dispatchDropEventToChildren(ev, children.data, children.count);
+						if (dispatchDropEventToChildren(ev, children.data, children.count)) {
+							oldChildDragOver.setNull();
+						}
+					}
+				} else {
+					oldChildDragOver.setNull();
+				}
+				if (action == UIAction::DropOver || action == UIAction::DropEnter) {
+					if (oldChildDragOver.isNotNull()) {
+						sl_bool flagSP = ev->isStoppedPropagation();
+						UIAction action = ev->getAction();
+						ev->setAction(UIAction::DropLeave);
+						dispatchDropEventToChild(ev, oldChildDragOver.get());
+						ev->setAction(action);
+						ev->setStoppedPropagation(flagSP);
+						childAttrs->childDragOver.setNull();
 					}
 				}
 			}
@@ -9160,20 +9273,56 @@ namespace slib
 
 	sl_bool View::dispatchDropEventToChildren(UIEvent* ev, const Ref<View>* children, sl_size count)
 	{
+		Ref<ChildAttributes>& childAttrs = m_childAttrs;
+		if (childAttrs.isNull()) {
+			return sl_false;
+		}
+
+		UIAction action = ev->getAction();
 		UIPointf ptMouse = ev->getPoint();
-		for (sl_size i = 0; i < count; i++) {
-			View* child = children[count - 1 - i].get();
-			if (POINT_EVENT_CHECK_CHILD(child)) {
-				UIPointf pt = child->convertCoordinateFromParent(ptMouse);
-				if (child->hitTest(pt)) {
-					ev->setPoint(pt);
-					dispatchDropEventToChild(ev, child, sl_false);
-					ev->setPoint(ptMouse);
-					if (!(ev->isPassedToNext())) {
-						return sl_true;
+		
+		Ref<View> oldChild;
+		switch (action) {
+			case UIAction::DropOver:
+			case UIAction::DropEnter:
+				oldChild = childAttrs->childDragOver;
+				for (sl_size i = 0; i < count; i++) {
+					View* child = children[count - 1 - i].get();
+					if (POINT_EVENT_CHECK_CHILD(child)) {
+						UIPointf pt = child->convertCoordinateFromParent(ptMouse);
+						if (child->hitTest(pt)) {
+							if (oldChild == child) {
+								ev->setAction(UIAction::DropOver);
+							} else {
+								ev->setAction(UIAction::DropEnter);
+							}
+							ev->setPoint(pt);
+							dispatchDropEventToChild(ev, child, sl_false);
+							ev->setPoint(ptMouse);
+							ev->setAction(action);
+							if (!(ev->isPassedToNext())) {
+								childAttrs->childDragOver = child;
+								if (oldChild.isNotNull() && oldChild != child) {
+									ev->setAction(UIAction::DropLeave);
+									dispatchDropEventToChild(ev, oldChild.get());
+									ev->setAction(action);
+								}
+								return sl_true;
+							}
+						}
 					}
 				}
-			}
+				break;
+			case UIAction::DropLeave:
+			case UIAction::Drop:
+				oldChild = childAttrs->childDragOver;
+				if (oldChild.isNotNull()) {
+					dispatchDropEventToChild(ev, oldChild.get());
+					childAttrs->childDragOver.setNull();
+				}
+				return sl_true;
+			default:
+				break;
 		}
 		return sl_false;
 	}
@@ -9847,7 +9996,7 @@ namespace slib
 	{
 	}
 
-	void ViewInstance::setDroppable(sl_bool flag)
+	void ViewInstance::setDroppable(View* view, sl_bool flag)
 	{
 	}
 	
@@ -10059,6 +10208,14 @@ namespace slib
 		Ref<View> view = getView();
 		if (view.isNotNull()) {
 			view->dispatchDragEvent(ev);
+		}
+	}
+
+	void ViewInstance::onDropEvent(UIEvent* ev)
+	{
+		Ref<View> view = getView();
+		if (view.isNotNull()) {
+			view->dispatchDropEvent(ev);
 		}
 	}
 

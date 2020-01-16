@@ -1414,6 +1414,7 @@ namespace slib
 					contentViewInstance->setEnabled(view.get(), view->isEnabled());
 					contentViewInstance->setOpaque(view.get(), view->isOpaque());
 					contentViewInstance->setDrawing(view.get(), view->isDrawing());
+					contentViewInstance->setDroppable(view.get(), view->isDroppable());
 					view->_attach(contentViewInstance);
 					instance->onAttachedContentView();
 				}

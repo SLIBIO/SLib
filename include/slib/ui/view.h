@@ -304,6 +304,10 @@ namespace slib
 		
 		virtual void setHoverState(sl_bool flagState, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
+		void cancelHoverState();
+		
+		void cancelHoverStateOfChildren();
+		
 		sl_bool isLockScroll();
 		
 		virtual void setLockScroll(sl_bool flagLock);
@@ -1203,13 +1207,19 @@ namespace slib
 		
 		sl_bool isDraggable();
 		
-		void setDraggable(sl_bool flag);
+		void setDraggable(sl_bool flag = sl_true);
 		
 		sl_bool isDroppable();
 		
-		void setDroppable(sl_bool flag);
+		void setDroppable(sl_bool flag = sl_true);
 		
-		void beginDragging(const List<DragItem>& items, DragOperations operationMask = DragOperations::All);
+		const DragItem& getDragItem();
+		
+		void setDragItem(const DragItem& item);
+		
+		DragOperations getDragOperationMask();
+		
+		void setDragOperationMask(const DragOperations& mask);
 		
 		void beginDragging(const DragItem& item, DragOperations operationMask = DragOperations::All);
 		
@@ -1767,6 +1777,7 @@ namespace slib
 			List< Ref<View> > childrenMultiTouch;
 			AtomicRef<View> childMouseMove;
 			AtomicRef<View> childMouseDown;
+			AtomicRef<View> childDragOver;
 			AtomicRef<View> childFocused;
 
 			AtomicFunction<sl_bool(const UIPoint& pt)> hitTestCapturingChildInstanceEvents;
@@ -1790,6 +1801,8 @@ namespace slib
 			AtomicWeakRef<View> viewPrevTabStop;
 			AtomicRef<Cursor> cursor;
 			AtomicRef<GestureDetector> gestureDetector;
+			AtomicPtr<DragItem> dragItem;
+			DragOperations dragOperationMask;
 			
 		public:
 			OtherAttributes();
@@ -1933,7 +1946,7 @@ namespace slib
 
 		virtual void setLockScroll(View* view, sl_bool flagLock);
 		
-		virtual void setDroppable(sl_bool flag);
+		virtual void setDroppable(View* view, sl_bool flag);
 		
 	public:
 		void onDraw(Canvas* canvas);
